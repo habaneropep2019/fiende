@@ -1,0 +1,405 @@
+<USER_FUNCTION>
+<NAME>GladeNewFunc</NAME>
+<RETURNS>GtkWidget *</RETURNS>
+GladeXML *xml,
+				     GladeWidgetInfo *info
+</USER_FUNCTION>
+<USER_FUNCTION>
+<NAME>GladeBuildChildrenFunc</NAME>
+<RETURNS>void </RETURNS>
+GladeXML *xml,
+					 GtkWidget *w,
+					 GladeWidgetInfo *info,
+					 const char *longname
+</USER_FUNCTION>
+<STRUCT>
+<NAME>GladeWidgetBuildData</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeWidgetBuildData</NAME>
+struct GladeWidgetBuildData {
+  char *name;
+  GladeNewFunc new;
+  GladeBuildChildrenFunc build_children;
+};
+</STRUCT>
+<FUNCTION>
+<NAME>glade_register_widgets</NAME>
+<RETURNS>void  </RETURNS>
+const GladeWidgetBuildData *widgets
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_set_toplevel</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *xml, GtkWindow *window
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_push_accel</NAME>
+<RETURNS>GtkAccelGroup  *</RETURNS>
+GladeXML *xml
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_pop_accel</NAME>
+<RETURNS>GtkAccelGroup  *</RETURNS>
+GladeXML *xml
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_ensure_accel</NAME>
+<RETURNS>GtkAccelGroup  *</RETURNS>
+GladeXML *xml
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_push_uline_accel</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *xml, GtkAccelGroup *uline
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_pop_uline_accel</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *xml
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_get_uline_accel</NAME>
+<RETURNS>GtkAccelGroup  *</RETURNS>
+GladeXML *xml
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_handle_label_accel</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *xml, const gchar *target,guint key
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_get_parent_accel</NAME>
+<RETURNS>guint  </RETURNS>
+GladeXML *xml
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_set_window_props</NAME>
+<RETURNS>void  </RETURNS>
+GtkWindow *window,GladeWidgetInfo *info
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_build_widget</NAME>
+<RETURNS>GtkWidget  *</RETURNS>
+GladeXML *self, GladeWidgetInfo *info,const char *parent_long
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_set_common_params</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *self,GtkWidget *widget,GladeWidgetInfo *info,const char *parent_long
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_standard_build_children</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *self, GtkWidget *w,GladeWidgetInfo *info,const char *longname
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_get_adjustment</NAME>
+<RETURNS>GtkAdjustment  *</RETURNS>
+GladeWidgetInfo *info
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_enum_from_string</NAME>
+<RETURNS>gint  </RETURNS>
+GtkType type, const char *string
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_gettext</NAME>
+<RETURNS>char  *</RETURNS>
+GladeXML *xml, const char *msgid
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_create_custom</NAME>
+<RETURNS>GtkWidget  *</RETURNS>
+GladeXML *xml, gchar *func_name, gchar *name,gchar *string1, gchar *string2,gint int1, gint int2
+</FUNCTION>
+<STRUCT>
+<NAME>GladeAttribute</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeAttribute</NAME>
+struct GladeAttribute {
+    gchar *name;
+    gchar *value;
+};
+</STRUCT>
+<STRUCT>
+<NAME>GladeAcceleratorInfo</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeAcceleratorInfo</NAME>
+struct GladeAcceleratorInfo {
+    guint key;
+    GdkModifierType modifiers;
+    gchar *signal;
+};
+</STRUCT>
+<STRUCT>
+<NAME>GladeSignalInfo</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeSignalInfo</NAME>
+struct GladeSignalInfo {
+    gchar *name;
+    gchar *handler;
+    gchar *data;
+    gchar *object; /* NULL if this isn't a connect_object signal */
+    gboolean after : 1;
+};
+</STRUCT>
+<STRUCT>
+<NAME>GladeStyleInfo</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeStyleInfo</NAME>
+struct GladeStyleInfo {
+    gchar *name;
+    gchar *rc_name;
+    gboolean local : 1;
+};
+</STRUCT>
+<STRUCT>
+<NAME>GladeWidgetInfo</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeWidgetInfo</NAME>
+struct GladeWidgetInfo {
+    GladeWidgetInfo *parent;
+
+    gchar *class;
+    gchar *name;
+    gchar *tooltip;
+
+    gint width, height;
+    gint border_width;
+
+    /* bit field */
+    gboolean visible : 1;
+    gboolean sensitive : 1;
+    gboolean can_default : 1;
+    gboolean can_focus : 1;
+    gboolean has_default : 1;
+    gboolean has_focus : 1;
+
+    GladeStyleInfo *style;
+
+    /* lists of GladeAttribute's */
+    GList *attributes;
+    GList *child_attributes; /* for the <child></child> section */
+
+    GList *signals;
+    GList *accelerators;
+
+    GList *children;
+};
+</STRUCT>
+<STRUCT>
+<NAME>GladeWidgetTree</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeWidgetTree</NAME>
+struct GladeWidgetTree {
+    guint ref;
+    GTime mtime;
+    GList *styles;
+    GList *widgets;
+    GHashTable *names;
+};
+</STRUCT>
+<FUNCTION>
+<NAME>glade_widget_tree_parse_file</NAME>
+<RETURNS>GladeWidgetTree  *</RETURNS>
+const char *file
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_widget_tree_parse_memory</NAME>
+<RETURNS>GladeWidgetTree  *</RETURNS>
+char *buffer, int size
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_widget_tree_ref</NAME>
+<RETURNS>GladeWidgetTree  *</RETURNS>
+GladeWidgetTree *tree
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_widget_tree_unref</NAME>
+<RETURNS>void  </RETURNS>
+GladeWidgetTree *tree
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_widget_tree_print</NAME>
+<RETURNS>void  </RETURNS>
+GladeWidgetTree *tree
+</FUNCTION>
+<MACRO>
+<NAME>GLADE_XML</NAME>
+#define GLADE_XML(obj) GTK_CHECK_CAST((obj), glade_xml_get_type(), GladeXML)
+</MACRO>
+<MACRO>
+<NAME>GLADE_XML_CLASS</NAME>
+#define GLADE_XML_CLASS(klass) GTK_CHECK_CLASS_CAST((klass), glade_xml_get_type(), GladeXMLClass)
+</MACRO>
+<MACRO>
+<NAME>GLADE_IS_XML</NAME>
+#define GLADE_IS_XML(obj) GTK_CHECK_TYPE((obj), glade_xml_get_type())
+</MACRO>
+<STRUCT>
+<NAME>GladeXML</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeXMLClass</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeXMLPrivate</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>GladeXML</NAME>
+struct GladeXML {
+  /* <public> */
+  GtkData parent;
+
+  char *filename;
+  char *txtdomain;
+
+  /* <private> */
+  GladeXMLPrivate *priv;
+};
+</STRUCT>
+<FUNCTION>
+<NAME>glade_xml_get_type</NAME>
+<RETURNS>GtkType  </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_new</NAME>
+<RETURNS>GladeXML  *</RETURNS>
+const char *fname, const char *root
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_new_with_domain</NAME>
+<RETURNS>GladeXML  *</RETURNS>
+const char *fname, const char *root,const char *domain
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_new_from_memory</NAME>
+<RETURNS>GladeXML  *</RETURNS>
+char *buffer, int size, const char *root,const char *domain
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_construct</NAME>
+<RETURNS>gboolean  </RETURNS>
+GladeXML *self, const char *fname,const char *root, const char *domain
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_signal_connect</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *self, const char *handlername,GtkSignalFunc func
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_signal_connect_data</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *self, const char *handlername,GtkSignalFunc func, gpointer user_data
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_signal_autoconnect</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *self
+</FUNCTION>
+<USER_FUNCTION>
+<NAME>GladeXMLConnectFunc</NAME>
+<RETURNS>void </RETURNS>
+const gchar *handler_name,
+					      GtkObject *object,
+					      const gchar *signal_name,
+					      const gchar *signal_data,
+					      GtkObject *connect_object,
+					      gboolean after,
+					      gpointer user_data
+</USER_FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_signal_connect_full</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *self,const gchar *handler_name,GladeXMLConnectFunc func,gpointer user_data
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_signal_autoconnect_full</NAME>
+<RETURNS>void  </RETURNS>
+GladeXML *self,GladeXMLConnectFunc func,gpointer user_data
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_get_widget</NAME>
+<RETURNS>GtkWidget  *</RETURNS>
+GladeXML *self,const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_get_widget_prefix</NAME>
+<RETURNS>GList      *</RETURNS>
+GladeXML *self,const char *name
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_get_widget_by_long_name</NAME>
+<RETURNS>GtkWidget  *</RETURNS>
+GladeXML *self,const char *longname
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_xml_relative_file</NAME>
+<RETURNS>gchar      *</RETURNS>
+GladeXML *self,const gchar *filename
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_get_widget_name</NAME>
+<RETURNS>const char  *</RETURNS>
+GtkWidget *widget
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_get_widget_long_name</NAME>
+<RETURNS>const char  *</RETURNS>
+GtkWidget *widget
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_get_widget_tree</NAME>
+<RETURNS>GladeXML    *</RETURNS>
+GtkWidget *widget
+</FUNCTION>
+<USER_FUNCTION>
+<NAME>GladeXMLCustomWidgetHandler</NAME>
+<RETURNS>GtkWidget *</RETURNS>
+GladeXML *xml,
+						    gchar *func_name,
+						    gchar *name,
+						    gchar *string1,
+						    gchar *string2,
+						    gint int1,
+						    gint int2,
+						    gpointer user_data
+</USER_FUNCTION>
+<FUNCTION>
+<NAME>glade_set_custom_handler</NAME>
+<RETURNS>void  </RETURNS>
+GladeXMLCustomWidgetHandler handler,gpointer user_data
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_init</NAME>
+<RETURNS>void  </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_gnome_init</NAME>
+<RETURNS>void  </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_bonobo_init</NAME>
+<RETURNS>void  </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_gnome_db_init</NAME>
+<RETURNS>void  </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>glade_load_module</NAME>
+<RETURNS>void  </RETURNS>
+const char *module
+</FUNCTION>

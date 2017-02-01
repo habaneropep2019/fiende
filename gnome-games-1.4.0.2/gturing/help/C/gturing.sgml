@@ -1,0 +1,383 @@
+<!DOCTYPE article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+]>
+
+
+  <article id="index">
+    <artheader>
+    <title>GNOME Turing Machine simulator user guide.</title>
+    <copyright>
+      <year>1998, 2000</year>
+      <holder>Free Software Foundation</holder>
+    </copyright>
+    <legalnotice id="legalnotice">
+      <para>
+        Permission is granted to copy, distribute and/or modify this
+        document under the terms of the <ulink type="help"
+        url="gnome-help:fdl"><citetitle>GNU Free Documentation
+        License</citetitle></ulink>, Version 1.1 or any later version
+        published by the Free Software Foundation with no Invariant
+        Sections, no Front-Cover Texts, and no Back-Cover Texts. You
+        may obtain a copy of the <citetitle>GNU Free Documentation
+        License</citetitle> from the Free Software Foundation by
+        visiting <ulink type="http" url="http://www.fsf.org">their Web
+        site</ulink> or by writing to: Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+      </para>
+      <para>
+        Many of the names used by companies to distinguish their
+        products and services are claimed as trademarks. Where those
+        names appear in any GNOME documentation, and those trademarks
+        are made aware to the members of the GNOME Documentation
+        Project, the names have been printed in caps or initial caps.
+      </para>
+    </legalnotice>
+ </artheader>
+
+ 
+  <sect1 id="description">
+    <title>Introduction</title>
+    <para>
+      A very simple Turing Machine simulator.  Turing machine was
+      introduced by British mathematician Alan Turing in 1936 as a
+      formalization of the notion of an <quote>algorithm</quote>. It
+      is the simplest possible computing device which can only perform
+      very simple operations. However, it can be shown that Turing
+      machine is every bit as powerful as any of the modern
+      programming languages: every algorithm that can be implemented
+      in, say, Java, can also be written as a program for the Turing
+      Machine. Of course, no one uses the Turing machine for actual
+      computing work, but it is very useful in theoretical computer
+      science and mathematical logic, not to mention that it is a nice
+      toy to play with.
+    </para>
+    <para>
+      GNOME Turing machine simulator provides graphical interface for
+      resetting, stopping, running and stepping the machine.
+      It also contains a states viewer which allows you to to
+      see, and even debug, the currently running program. Finally, GNOME
+      Turing machine simulator comes with a number of sample
+      <quote>programs</quote>; the program file format is described in
+      <xref linkend="prgfmt"> so that you can write your own
+      programs. Please send any programs you produce to Arturo
+      Espinosa (<email>arturo@nuclecu.unam.mx</email>) so that they
+      are included in the next release.
+    </para>
+
+    <para>
+      To run <application>gturing</application>, select
+      <menuchoice>
+	<guisubmenu>Games</guisubmenu>
+	<guimenuitem>gturing</guimenuitem>
+      </menuchoice>
+      from the <guimenu>Main Menu</guimenu>, or type
+      <command>gturing</command> on the command line.
+  </para>
+
+    <para>
+      <application>gturing</application> is included in the
+      <filename>gnome-games</filename> package, which is part of the
+      GNOME desktop environment. This document describes version
+      1.2 of <application>gturing</application>.
+    </para>
+
+  </sect1>
+
+  <sect1 id="turingmachine">
+    <title> What is a Turing machine?</title>
+
+
+    <para>There are several ways to define the Turing machine, all of
+      them equivalent. The definition used by
+      <application>gturing</application> is as follows.  A Turing
+      machine consists of two parts:
+      <itemizedlist>
+	<listitem><para>
+	    The tape,  which contains the
+	    data. The tape is infinite in both directions; it is divided
+	    in cells, and each cell can contain a symbol
+	    from some fixed finite set (for
+	    <application>gturing</application>, any printable ASCII
+	    symbol). The tape has an infinite sequence of spaces at each
+			end.
+	    </para>
+	</listitem>
+      <listitem>
+	  <para>
+	    The head, which plays the role of the computing device,
+	    moves along the tape. At every moment, it is placed at
+	    one of the tape's cells. The head can move along the tape
+	    in both directions and read and write symbols on it.
+	    Also, there is a notion of the head's <quote>internal
+	    states</quote>: at any moment, the head is in one of
+	    these states, and it can change from one to the other.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </para>
+    <para>
+      To make the machine work, you must also give it a set of rules,
+      which determine the operations it should perform depending on
+      the current symbol it reads from the tape and the head's
+      state. Typical rule can be <quote><literal>If the symbol read is
+      1 and the internal state is 0, change the current symbol on the
+      tape for a space, move to the left, and change the internal
+      state to 3</literal></quote>. Formal description of the rules
+      can be found in <xref linkend="prgfmt">.  You can think of the
+      set of rules as a <quote>program</quote> for the Turing machine.
+    </para>
+
+    <para>If you want to know more
+      about Turing Machines, check this <ulink
+      URL="http://obiwan.uvi.edu/computing/turing/ture.htm">Turing
+	Machine Introduction</ulink>.
+    </para>
+  </sect1>
+
+  <sect1 id="using">
+    <title>
+     Using gturing</title>
+
+    <sect2 id="entering">
+      <title>Choosing a program and entering data</title>
+      <para>
+	To use the <application>gturing</application>, you should
+      select a set of rules (program) for the Turing machine, and give
+      initial data. To select the program, select
+      <guimenuitem>Open</guimenuitem> from the <guimenu>File</guimenu>
+      menu and select the file containing the
+      program. <application>gturing</application> includes many sample
+      programs; selecting one of them will give you a brief message
+      telling what this program does and what kind of data it expects
+      to find on the tape. You can also write your own program as
+      described in <xref linkend="prgfmt">.
+      </para>
+      <note>
+	<title>NOTE</title>
+	<para>
+	  You can not create new program files or edit existing files
+	  from within <application>gturing</application>; use your
+	  favorite text editor instead!
+      </para>
+      </note>
+      <para>
+      Once you have chosen the program, you should give it the initial
+      data tape. To do so, select
+      <menuchoice><guimenu>Settings</guimenu><guimenuitem>Tape</guimenuitem> 
+      </menuchoice> and enter the tape symbols. Now your Turing
+      machine is ready to run. 
+    </para>
+    </sect2>
+
+    <sect2 id="running">
+      <title>Running a program</title> 
+
+      <para> The main window for <application>gturing</application>
+	looks as shown in <xref linkend="figure1">. It consists of a
+	menu bar, a toolbar, the main application display and a status
+	display (at the bottom).  The main display shows the contents
+	of the tape and position of the head (denoted by a circumflex
+	accent (^)). The status display shows the name of
+	the program file that is currently loaded on the left and the
+	current machine's state on the right.
+      </para>
+          <!-- ==== Figure ==== -->
+        <figure id="figure1">
+	  <title>gturing main window</title>
+	  <screenshot>
+	    <screeninfo>gturing Main Window</screeninfo>
+	    <graphic fileref="figures/mainwin" format="png" srccredit="sasha">
+            </graphic>
+	  </screenshot>
+	</figure>
+    <!-- ==== End of Figure ==== -->
+      <para>
+	To start or stop running the program, use buttons
+	<guibutton>Run</guibutton> and <guibutton>Stop</guibutton>, or
+	press <guibutton>Step</guibutton> to run just one step of the
+	algorithm. 
+    </para>
+    <para>
+      To restart the program, press <guibutton>Reset</guibutton>
+      button. This sets the machine at state 0 and puts the tape's
+      contents as it was originaly entered by the user. The machine's
+      head is set at the leftmost character of the tape.
+    </para>
+    </sect2>
+
+    <sect2 id="menubar"><title>The Menu Bar</title>
+      <para>
+	The menu bar, located at the top of the <interface>Main
+	Window</interface>, contains the following menus:
+       </para>
+      <variablelist>
+	<varlistentry>
+	  <term><guimenu>File</guimenu></term>
+	  <listitem>
+	    <para>This menu lets you load a program into the machine
+	      and exit the application. You will have to choose a
+	      previously edited file when loading a program. The
+	      examples directory will be open the first time you
+	      choose this option.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><guimenu>Settings</guimenu></term>
+	  <listitem>
+	    <para>This menu lets you set the tape's contents and the
+	      speed at which the machine will run. (Changing
+	      the tape's contents will reset the machine.)  It also
+	      allows you to open or close the <guilabel>Machine's
+	      states</guilabel> window, which shows all the rules form
+	      the program file hilighting the rule which is being
+	      applied at this step. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+ 
+	<varlistentry>
+	  <term><guimenu>Help</guimenu></term>
+	  <listitem>
+	    <para>
+	      Provides access to this manual and to
+	      <guilabel>About</guilabel> window, which shows
+	      <application>gturing</application> version and copyright
+	      information. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+  </sect1>
+
+  <sect1 id="prgfmt">
+    <title>Program File Format</title>
+    <para>
+      Empty line or  lines beginning with a hash (#) are regarded
+      as comments, and displayed to the user when the program is loaded.
+      In other case, five tokens, separated by a spaces,
+      are expected. These are the state number, the expected symbol,
+      the symbol to write, the direction to move, and the new
+      state. Anything following these tokens is ignored, and can be
+			used to document every rule.
+    </para>
+    <para>
+      Expected symbols and symbols to write can be any printable
+      character.  The blank character is represented by the underscore
+      (_). States are integer numbers, starting from 0. The possible
+      directions to move are left and right, represented by 'l' and
+      'r', respectively.
+    </para>
+    <para>
+      The machine starts at state 0 and stops when it cannot find the
+      new state or the new state doesn't expect the read symbol.
+    </para>
+    <para>
+      It is important to note that, as the machine's tape is supposed
+      to be of infinite length, the tape will have an infinite number
+      of blank spaces appended at each end of what the user sets as the
+      tape's contents.
+    </para>
+    <para>
+      <example><title>Binary ++</title>
+	<programlisting>
+# This program adds 1 to a binary number. The initial tape must be a binary
+# number.
+
+0 1 1 r 0 Move to the rightmost digit of the binary number. Then, goto 
+0 0 0 r 0 state 1.
+0 _ _ l 1
+1 1 0 l 1 If there is a 1, change it for a 0 and move left.
+1 0 1 r 2 If there is a 0, change it for a 1 and goto state 2
+1 _ 1 r 2 Same for the blank space.
+
+# As there is no state 2, the machine stops.
+	</programlisting>
+      </example>
+    </para>
+  </sect1>
+
+<!-- ============= Authors ================================ -->
+
+ <sect1 id="authors">
+  <title>Authors</title>
+  <para>
+   <application>gturing</application> was written by Arturo Espinosa
+   Aldama (<email>arturo@nuclecu.unam.mx</email>).  Please send all
+   comments, suggestions, and bug reports to the <ulink
+   url="http://bugs.gnome.org" type="http">GNOME bug tracking
+   database</ulink>.  (Instructions for submitting bug reports can be
+   found <ulink url="http://bugs.gnome.org/Reporting.html"
+   type="http"> on-line</ulink>.)  You can also use <application>Bug
+   Report Tool</application> (<command>bug-buddy</command>), available
+   in the <guisubmenu>Utilities</guisubmenu> submenu of <guimenu>Main
+   Menu</guimenu>, for submitting bug reports.
+  </para>
+
+  <para>
+   This manual was written by Arturo Espinosa Aldama
+   (<email>arturo@nuclecu.unam.mx</email>) with some contributions
+   from Alexander Kirillov
+   (<email>kirillov@math.sunysb.edu</email>). Please send all comments
+   and suggestions regarding this manual to the <ulink type="http"
+   url="http://developer.gnome.org/projects/gdp/">GNOME Documentation
+   Project</ulink> by sending an email to
+   <email>docs@gnome.org</email>. You can also add your comments
+   online by using the <ulink type="http"
+   url="http://developer.gnome.org/projects/gdp/doctable/">GNOME
+   Documentation Status Table</ulink>.
+  </para>
+  </sect1>
+
+ <!-- ============= Application License ============================= -->
+
+ <sect1 id="license">
+  <title>License</title>
+  <para>
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the  <ulink type="help" url="gnome-help:gpl">
+    <citetitle>GNU General Public License</citetitle></ulink> as
+   published by the Free Software Foundation; 
+   either version 2 of the License, or (at your option) any later
+   version.
+  </para>
+  <para>
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   <citetitle>GNU General Public License</citetitle> for more details.
+  </para>
+  <para>
+   A copy of the <citetitle>GNU General Public License</citetitle> is
+   included as an appendix to the <citetitle>GNOME Users
+   Guide</citetitle>.  You may also obtain a copy of the
+   <citetitle>GNU General Public License</citetitle> from the Free
+   Software Foundation by visiting <ulink type="http"
+   url="http://www.fsf.org">their Web site</ulink> or by writing to
+   <address>
+    Free Software Foundation, Inc.
+    <street>59 Temple Place</street> - Suite 330
+    <city>Boston</city>, <state>MA</state> <postcode>02111-1307</postcode>
+    <country>USA</country>
+   </address>
+  </para>
+ </sect1>
+
+</article>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

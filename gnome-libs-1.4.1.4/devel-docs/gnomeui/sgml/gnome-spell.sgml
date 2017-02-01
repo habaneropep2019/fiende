@@ -1,0 +1,210 @@
+<refentry id="GnomeSpell">
+<refmeta>
+<refentrytitle>GnomeSpell</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeSpell</refname><refpurpose>
+Deprecated.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeSpell-struct">GnomeSpell</link>;
+struct      <link linkend="GnomeSpellInfo">GnomeSpellInfo</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-spell-new">gnome_spell_new</link>                 (void);
+<link linkend="gint">gint</link>        <link linkend="gnome-spell-check">gnome_spell_check</link>               (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell,
+                                             <link linkend="gchar">gchar</link> *str);
+void        <link linkend="gnome-spell-accept">gnome_spell_accept</link>              (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell,
+                                             <link linkend="gchar">gchar</link> *word);
+void        <link linkend="gnome-spell-insert">gnome_spell_insert</link>              (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell,
+                                             <link linkend="gchar">gchar</link> *word,
+                                             <link linkend="gint">gint</link> lowercase);
+int         <link linkend="gnome-spell-next">gnome_spell_next</link>                (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell);
+void        <link linkend="gnome-spell-kill">gnome_spell_kill</link>                (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBox">GtkBox</link>
+                     +----<link linkend="GtkVBox">GtkVBox</link>
+                           +----GnomeSpell
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+Deprecated spell-checker widget.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeSpell-struct">struct GnomeSpell</title>
+<programlisting>struct GnomeSpell;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeSpellInfo">struct GnomeSpellInfo</title>
+<programlisting>struct GnomeSpellInfo {
+	gchar* original;
+	gchar* replacement;
+	gchar* word;
+	guint offset;
+	GSList * words;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-spell-new">gnome_spell_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_spell_new                 (void);</programlisting>
+<para>
+Create a new GNOME spell checker object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  Pointer to new GNOME spell checker object, or <literal>NULL</literal> on
+failure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-spell-check">gnome_spell_check ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_spell_check               (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell,
+                                             <link linkend="gchar">gchar</link> *str);</programlisting>
+<para>
+Perform spell-checking on one or more words.
+</para>
+<para>
+FIXME: there is a problem when you call gnome_spell_check(spell, "bogus bogus"):
+if you accept bogus the first time, it will be reported again
+because ispell checked it before...
+The easiest solution is to spell-check a word at a time (but it's slow).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>spell</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME spell checker object.
+</entry></row>
+<row><entry align="right"><parameter>str</parameter>&nbsp;:</entry>
+<entry> String to be spell-checked.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 1 if spelling is ok, 0 if not, -1 on system error.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-spell-accept">gnome_spell_accept ()</title>
+<programlisting>void        gnome_spell_accept              (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell,
+                                             <link linkend="gchar">gchar</link> *word);</programlisting>
+<para>
+Adds a single word to the runtime list of words that the spelling
+checker should ignore.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>spell</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME spell checker object.
+</entry></row>
+<row><entry align="right"><parameter>word</parameter>&nbsp;:</entry>
+<entry> Word to be ignored.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-spell-insert">gnome_spell_insert ()</title>
+<programlisting>void        gnome_spell_insert              (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell,
+                                             <link linkend="gchar">gchar</link> *word,
+                                             <link linkend="gint">gint</link> lowercase);</programlisting>
+<para>
+Adds a single word to the spelling checker's private dictionary.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>spell</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME spell checker object.
+</entry></row>
+<row><entry align="right"><parameter>word</parameter>&nbsp;:</entry>
+<entry> Word to be added to private dictionary.
+</entry></row>
+<row><entry align="right"><parameter>lowercase</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if the added word should be changed to lowercase, <literal>FALSE</literal> if not.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-spell-next">gnome_spell_next ()</title>
+<programlisting>int         gnome_spell_next                (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell);</programlisting>
+<para>
+Adds a single word to the runtime list of words that the spelling
+checker should ignore.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>spell</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME spell checker object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> on success, <literal>FALSE</literal> on failure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-spell-kill">gnome_spell_kill ()</title>
+<programlisting>void        gnome_spell_kill                (<link linkend="GnomeSpell">GnomeSpell</link> *gtkspell);</programlisting>
+<para>
+Terminates the external spelling checker process, if present.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>spell</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME spell checker object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

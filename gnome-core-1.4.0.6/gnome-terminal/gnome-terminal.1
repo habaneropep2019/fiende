@@ -1,0 +1,184 @@
+.\" 
+.\" gnome-terminal manual page.
+.\" (C) 2000, 2001 Miguel de Icaza (miguel@helixcode.com)
+.\"
+.\" This documentation is released under the terms of the GNU GPL.
+.TH GNOME 1 "GNOME 1.2"
+.SH NAME
+gnome-terminal \- Terminal emulator for GNOME
+.SH SYNOPSIS
+.B gnome-terminal [\-\-tclass CLASS_NAME] [\-\-font FONT_NAME] [\-\-nologin] [\-\-login]
+[\-\-geometry GEOMETRY] [\-\-command CMD] [\-\-execute CMD]
+[\-\-foreground COLOR]
+[\-\-background COLOR] [\-\-utmp] [\-\-noutmp] [\-\-wtmp] [\-\-nowtmp]
+[\-\-title] [\-\-termname NAME] [\-\-start\-factory\-server]
+[\-\-use\-factory] [\-\-pixmap FILENAME] [\-\-bgscroll]
+[\-\-bgnoscroll] [\-\-shaded] [\-\-noshaded] [\-\-transparent]
+[\-\-lastlog] [\-\-nolastlog] [\-\-icon FNAME]
+.SH DESCRIPTION
+\fIgnome-terminal\fP is a terminal emulator program that is part of
+the GNOME project.  It provides access to the Unix shell on the GNOME
+environment.  It emulates the DEC VT terminals as supported by the
+\fIxterm(1)\fP program from the X distribution.
+.PP
+\fIgnome\-terminal\fP supports colour display (see the section on
+environment variables for details) and provides mouse support
+to applications that are aware of mouse events for xterm-like
+terminals.
+.SH EMULATION
+The GNOME terminal program (\fIgnome\-terminal\fP) is designed to
+emulate the 'xterm' program provided by the X Consortium.  The
+\fIxterm(1)\fP program in turn is an almost-complete emulation of the DEC
+VT102 terminal.
+.PP
+The GNOME terminal program supports the same extensions to
+the VT102 that the xterm program provides, through special escape
+sequences. The xterm program is an evolving program. Recent changes
+to xterm have been been incorporated into gnome-terminal. This
+includes emulation of the newer DEC VT220 escape sequences.
+.SH CLASSES
+The GNOME terminal allows you to have different configuration
+profiles to suit different uses (different background colours,
+presence, absence or position of scrollbars, and so on).  To set
+these up, you invoke the preferences dialogue box from the settings
+menu of gnome-terminal. Select the options you prefer (these changes
+will be made to your currently-open terminal, so you can see what
+they look like), and before closing the preferences box, make sure
+you have put a new name in the space marked "Terminal Class".
+.PP
+To activate a specific class at program startup you can use
+the \fI--tclass\fP command line option
+.SH GNOME Terminal Factories.
+It is possible to start a single instance of the GNOME terminal
+program, and yet have multiple windows open at the same time.  The
+easiest way of achieving this is by selecting "File" and then "New
+terminal" from the menu.  But it is also possible to programatically
+instruct GNOME Terminal to reuse an existing running instance of GNOME
+Terminal.
+.PP
+By defaul the GNOME desktop ships with settings that allow terminals
+to share a single process, hence reducing memory usage.  This is
+achieved by registering GNOME with the CORBA gnome-name-service and
+using the \-\-start\-factory and the \-\-use\-factory options.
+.SH OPTIONS
+.TP 8
+.B \-\-tclass CLASS_NAME
+Makes Gnome Terminal uses the configuration values for the terminal
+class specified in CLASS_NAME (for example, I use --tclass red for
+root terminals).  You can define new classes through the Preferences
+dialog.
+.TP 8
+.B \-\-font FONT_NAME
+Specifies the font to be used to display text in the Gnome Terminal.
+.TP 8
+.B \-\-nologin
+This option indicates that the shell started by Gnome Terminal should
+not be a login shell but a regular shell.
+.TP 8
+.B \-\-login
+This option indicates that the shell started by Gnome Terminal should
+be a login shell (this trick is cleverly achieved in the Unix world by
+running the shell but telling the shell that its name has a dash in
+the front.  Very clever).
+.TP 8
+.B \-\-geometry GEOMETRY
+Specifies the startup geometry for the terminal.
+.TP 8
+.B \-\-command CMD, \-e CMD
+Executes the command
+.I CMD
+instead of the shell.  This saves some memory if you are just planning
+on running a dedicated application on that window.  For example, you
+could run the `minicom' terminal emulator on the window like this:
+.nf
+gnome-terminal --command minicom
+.fi
+or for example, if you want to monitor your system:
+.nf
+gnome-terminal --command top
+.fi
+.TP 8
+.B \-\-execute CMD, \-x CMD
+This flag is here for compatibility reasons.  It is the same as --command.
+.TP 8
+.B \-\-foreground COLOR
+Specifies the color to be used for the foreground of the terminal.
+.TP 8
+.B \-\-background COLOR
+Specifies the color to be used for the background of the terminal.
+.TP 8
+.B \-\-utmp
+Updates the Unix Login entry (The UTMP file, this is the default),
+this registers the GNOME terminal instance with the list of users that
+are logged into the system (so you will be visible with the `who'
+command).
+.TP 8
+.B \-\-noutmp
+Requests GNOME Terminal to not update the login records.  This means
+that the user will not show up in the output of the `who' Unix command.
+.TP 8
+.B \-\-wtmp
+Requests that this session will be logged into the system records for
+users  that have logged into the system.  This is different from
+`utmp' because this keeps track of who logged in and logged out of the
+system, independently of whether it shows up in the list of users.
+.TP 8
+.B \-\-nowtmp
+Requests that the session be not logged into the system records.
+.TP 8
+.B \-\-title TITLE, \-t TITLE
+Sets the title for the GNOME terminal to be TITLE.
+.TP 8
+.B \-\-termname NAME
+Specifies the terminal name that should be put in the environment
+variable TERM.  It is not advised that you use this flag, but you
+might want to use it for some bizarre cases.
+.TP 8
+.B \-\-start-factory-server
+Tells GNOME Terminal that it should start the factory server.  This
+will provide a terminal server that later other GNOME terminals can
+contact (this saves memory, as a single process is ran, and multiple
+GNOME terminals windows can be managed by the same process).
+.TP 8
+.B \-\-use-factory
+This tells GNOME terminal that it should try to contact an existing
+GNOME Terminal factory to minimize memory use.
+.TP 8
+.B \-\-pixmap FILENAME
+Specifies the image filename to be used as the background for this
+terminal.
+.TP 8
+.B \-\-bgscroll
+Specifies that the background image should scroll together with the
+text as the screen scrools.
+.TP 8
+.B \-\-bgnoscroll
+Specifies that the background image should not scroll when the text
+scrolls in the terminal.
+.TP 8
+.B \-\-shaded
+Requests that the background image be shaded (for used with
+\-\-transparent and \-\-pixmap).
+.TP 8
+.B \-\-noshaded
+Requests that the background remain untouched (no shading be applied).
+.B \-\-transparent
+Requests that the terminal should run in "transparent" mode, making
+the background of the terminal be the background of your root window.
+.B \-\-icon FNAME
+Specifies the filename that contains the icon that would be used for
+your terminal (if your window manager supports the icon hints).
+.SH AUTHORS
+Michael Zucchi is the wizard behind the Zvt widget which implements
+the terminal.  Miguel de Icaza and Erik Troan implemented the user
+interface elements for the gnome-terminal program.
+.SH MAINTAINER
+You can contact the maintainer of this code by mailing
+miguel@ximian.com.  The maintainer for Zvt is notzed@ximian.com
+.SH SEE ALSO
+gnome-session(1)
+.SH BUGS
+Please report bugs in this program in the GNOME bug tracking system at
+http://bugzilla.gnome.org 
+
+

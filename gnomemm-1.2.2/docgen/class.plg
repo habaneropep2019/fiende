@@ -1,0 +1,207 @@
+use strict;
+sub plugin {
+  my $global=shift;
+  print "Generation class documentation\n";
+  print_classes($global);
+  print_class_index($global);
+  print "Done with classes\n";
+}
+
+sub print_classes {
+  my $space=shift;
+  foreach (sort byfullname $space->all()) {
+    next if (!$_->is_class());
+    print_class($_);
+  }
+}
+
+sub print_class_index {
+  my $space=shift;
+  my @classes;
+  my @base;
+
+
+  # gather up all classes
+  foreach ($space->all()) {
+    push(@classes,$_) if $_->is_class();
+  }
+
+  # find the base classes
+  foreach (@classes) {
+    push(@base,$_) if !($_->known_parents());
+  }
+
+  open(FILE,">class_index.html");
+
+
+  print FILE '
+<html>
+<head><title>Gtk-- Reference: Class Index</title></head>
+<body bgcolor="#F0F0F0" text="#000000" link="#0000FF"
+vlink="#000077" alink="#FF0000">
+<table align=center border=0 cellspacing=10> <tr>
+<td>Class Index</td>
+<td><a href="cross_index.html">Cross Index</a></td>
+<td><a href="name_index.html">Namespace Index</a></td>
+</table>
+<h1 align=center>Classes</h1>
+<ul type=disc>';
+
+  foreach (@base) {
+    print_class_tree($_);
+  }
+
+  print FILE "</ul></body></html>";
+  close(FILE);
+}
+
+sub print_class_tree {
+  my $item=shift;
+  my $str;
+  print FILE "<li><b>",$item->href($$item{fullname}),"</b>\n";
+  foreach ($item->parents()) {
+    $str.=", " if ($str);
+    $str.=$$_{fullname};
+  }
+  print FILE "- $str\n" if $str;
+  if ($item->children()) {
+    print FILE "<ul type=disc>\n";
+    foreach (sort byname $item->children()) {
+      print_class_tree($_);
+    }
+    print FILE "</ul>\n";
+  }
+}
+    
+sub print_class {
+  $_=shift;
+  print "Generating $$_{fullname}\n";
+  open(FILE,">$$_{fullname}.html");
+
+  print FILE "<html>\n";
+  print FILE "<head><title>Gtk-- Reference: $$_{fullname}</title></head>\n";
+
+  print FILE '
+<body bgcolor="#F0F0F0" text="#000000" link="#0000FF"
+vlink="#000077" alink="#FF0000">
+<table align=center border=0 cellspacing=10> <tr>
+<td><a href="class_index.html">Class Index</a></td>
+<td><a href="cross_index.html">Cross Index</a></td>
+<td><a href="name_index.html">Namespace Index</a></td>
+</table>
+';
+   
+  print FILE "<h1 align=center>Class $$_{fullname}</h1><p>\n";
+  print FILE "<b>$$_{short}</b><br>\n";
+
+  # Print containing space
+  my $space=$$_{space};
+  print FILE "Contained in: ",$space->href($$space{fullname}),"<br>\n";
+
+  # Print base classes
+  print FILE "Derived from:\n";
+  if ($_->parents()) {
+    foreach (sort byname parents $_) {
+      print FILE $_->href("$$_{fullname}"),"\n";
+    }
+  }
+  else {print FILE "<i>none</i>\n"; }
+  print FILE "<br>\n";
+
+  # Print derived classes
+  print FILE "Derived by:\n";
+  if ($_->children()) {
+    foreach (sort byname children $_) {
+      print FILE "<a href=\"$$_{fullname}.html\">$$_{fullname}</a>\n";
+    }
+  }
+  else { print FILE "<i>none</i>\n"; }
+
+  print FILE "<p>\n";
+  print FILE "#include \&lt;gtk--/$$_{file}\&gt;\n";
+  print FILE "<p>\n";
+
+  print FILE "<hr noshade>\n";
+  if ($_->functions()) {
+    my $access;
+    print FILE "<table border=0>\n";
+  
+    foreach $access ($Enum::PUBLIC, $Enum::PROTECTED, $Enum::PRIVATE) {
+
+      my @group;
+      foreach ($_->get_by_access($access)) {
+        push(@group,$_) if ($_->is_function());
+      }
+      next if (!@group);
+
+      print FILE "<tr><td colspan=3><h3>$Enum::ACCESS_NAMES[$access] function member index:</h3></td>\n";
+      foreach  (sort byname @group) {
+	my @decl=$_->html_decl();
+        print FILE "<tr valign=top><td align=right>$decl[0]</td>";
+        print FILE "<td align=right>$decl[1]</td>";
+        print FILE "<td>$decl[2]</td>\n";
+      }
+      print FILE "<tr><td>&nbsp;</td>";
+    }
+    print FILE "</table>\n";
+  }
+
+  print FILE "<hr noshade>\n";
+
+  print FILE "<h2>Description:</h2>\n";
+  print FILE "$$_{long}<br>\n";
+  print FILE "<p>\n";
+ 
+  if ($_->functions()) {
+    print FILE "<hr noshade>\n";
+    print FILE "<h2>Function Member Descriptions:</h2>\n";
+    foreach (sort byname $_->functions()) {
+      my $impl;
+
+      next if !$$_{short};
+      print FILE "<a name=\"$$_{refnum}\"><font size=+1><b>$$_{fullname}</b></font></a> - ";
+      print FILE "$$_{short}<br>\n";
+      print FILE '<hr size="1" width="70%" align="left" noshade="noshade">';
+
+      print FILE $_->html_decl(); 
+     
+      #group out _impl functions with the signal description
+      $impl=$$_{space}->lookup("$$_{name}_impl");
+      print FILE "<br>",$impl->html_decl() if ($impl);
+
+      if ($$_{long}) {
+         print FILE "<br><blockquote>$$_{long}</blockquote>\n";
+      }
+#      else {
+#        print FILE "<br><i>no description</i>\n" 
+#      }
+      print FILE "<br><br>\n";
+    }
+  }
+
+  if ($_->variables()) {
+    print FILE "<hr noshade>\n";
+    print FILE "<h2>Variable Member Descriptions:</h2>\n";
+    foreach (sort byname $_->variables()) {
+      my $impl;
+
+      next if !$$_{short};
+      print FILE "<a name=\"$$_{refnum}\"><font size=+1><b>$$_{fullname}</b></font></a> - ";
+      print FILE "$$_{short}<br>\n";
+
+      print FILE '<hr size="1" width="70%" align="left" noshade="noshade">';
+      print FILE $_->html_decl();
+      if ($$_{long}) {
+         print FILE "<br><blockquote>$$_{long}</blockquote>\n";
+      }
+#      else {
+#        print FILE "<br><i>no description</i>\n"
+#      }
+      print FILE "<br>\n";
+    }
+  }
+   
+  print FILE "<hr noshade>\n";
+  print FILE "</html>\n";
+  close(FILE);
+}

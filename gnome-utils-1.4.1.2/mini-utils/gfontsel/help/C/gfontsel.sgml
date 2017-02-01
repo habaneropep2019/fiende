@@ -1,0 +1,482 @@
+<!DOCTYPE article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+<!ENTITY version "1.2">
+]>
+ 
+<article id="index">
+  <title>GNOME Font Selector Manual</title>
+
+  <artheader> 
+    <copyright> 
+      <year> 2000</year>
+      <holder>Alexander Kirillov</holder>
+    </copyright>
+    <legalnotice id="legalnotice">
+   <para>
+        Permission is granted to copy, distribute and/or modify this
+        document under the terms of the <ulink type="help"
+        url="gnome-help:fdl"><citetitle>GNU Free Documentation
+        License</citetitle></ulink>, Version 1.1 or any later version
+        published by the Free Software Foundation with no Invariant
+        Sections, no Front-Cover Texts, and no Back-Cover Texts. You
+        may obtain a copy of the <citetitle>GNU Free Documentation
+        License</citetitle> from the Free Software Foundation by
+        visiting <ulink type="http" url="http://www.fsf.org">their Web
+        site</ulink> or by writing to: Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   </para>
+   <para>
+    Many of the names used by companies to distinguish their products and
+    services are claimed as trademarks. Where those names appear in any
+    GNOME documentation, and those trademarks are made aware to the members
+    of the GNOME Documentation Project, the names have been printed in caps
+    or initial caps.
+   </para>
+
+    </legalnotice>
+  </artheader>
+    <sect1 id="intro">
+      <title> Introduction</title>
+      <para>
+	<application>GNOME Font selector</application> is a simple
+	utility for choosing a screen (i.e. X Window System) font.
+        It is included in <application>gnome-utils</application>
+	package, which is a part of GNOME environment. This manual
+	describes version &version; of <application>GNOME Font
+	selector</application>.
+    </para>
+    <para>
+      <application>GNOME Font selector</application> 
+	is usually launched when you are changing an application's
+	font in a <interface>Settings</interface> or
+	<interface>Preferences</interface> dialog. It can also be
+	launched from the main menu by selecting <guimenuitem>Font
+	Selector</guimenuitem> item in the
+	<guimenu>Utilities</guimenu> submenu of the <guimenu>Main
+	Menu</guimenu>, or from the command line by running command
+	<command>gfontsel</command>. 
+      </para>
+      <para> It is important to know that in X Window System, each
+	font has a number of attributes, such as family (Helvetica,
+	Times, Courier&hellip;), size, weight, slant, etc., and two
+	fonts are considered different even if they only differ in one
+	of the properties, such as size or weight: <guilabel>Helvetica
+	10 point</guilabel>, <guilabel>Helvetica 12 point</guilabel>,
+	and <guilabel>Helvetica 10 point bold</guilabel> are
+	considered as  different fonts.  Each font has a unique name
+	(officially known as <emphasis>X Logical Font
+	Description</emphasis>, or XLFD), which includes the values of
+	all font's attributes, and by necessity is very long. Detailed
+	description of X Window System fonts, their attributes and names can
+	be found in <xref linkend="xlfd">.
+      </para>
+    </sect1>
+    <sect1 id="mainwin">
+      <title>Main window</title>
+      <para>  
+	This window (labelled <guilabel>Font</guilabel>) is the main window
+	used for choosing the font. It is shown in <xref linkend="mainshot">. 
+	</para>
+	<figure id="mainshot">
+	  <title>GNOME Font Selector</title>
+	  <screenshot>
+	    <screeninfo> GNOME Font Selector - Main Window</screeninfo>
+	    <graphic fileref="figures/mainshot" format="png"
+	    srccredit="sasha">
+	    </graphic>
+	  </screenshot>
+	</figure>
+
+      <sect2 id="mainwin-basic">
+	<title>Basic usage</title>
+       <para>
+	To choose a font, select the font family
+	(for example, <guilabel>courier</guilabel>) in the left
+	column, then select font style&mdash;that is, weight and slant (for
+	example, <guilabel>bold italic</guilabel>), and finally, font size. 
+      </para>
+      <para> The <guilabel>Preview</guilabel> window will show you what
+	the selected font looks like. By default, it shows the Latin
+	alphabet; you can also type any text you like in this window,
+	and it will be shown using the selected font.
+      </para>
+      <para>
+	To find more information about the selected font, you can switch to
+	the <link linkend="fontinfo"><guilabel>Font
+	information</guilabel> window</link>. 
+      </para> 
+      <para>
+	If the font selector utility was launched by some application,
+	such as one of the preferences dialogs, you will have buttons
+	<guibutton>OK</guibutton> and <guibutton>Cancel</guibutton> at
+	the bottom of the window. After you are satisfied with the
+	chosen font, you can press <guibutton>OK</guibutton> and the
+	name of the selected font will be returned to the launching
+	application.
+      </para>
+      <para>
+	If the font selector utility was started from the menu or from
+	the command line, it will have buttons
+	<guibutton>Apply</guibutton> and <guibutton>Close</guibutton>.
+	Pressing <guibutton>Apply</guibutton> button will copy the
+	full name (XLFD) of the selected font to the clipboard, so
+	that it can be pasted into any other area of the screen by
+	pressing the middle mouse button. Pressing
+	<guibutton>Apply</guibutton> button also shows the name of the
+	selected font in the <guilabel>Selection</guilabel> field at
+	the top of the screen.
+      </para>
+    </sect2>
+    <sect2 id="mainwin-fine">
+      <title> Finer points</title>
+      <para> If there are several fonts with the same family name, the
+	font foundry (usually the vendor name) will also be shown in
+	the left field, for example: <guilabel>courier(adobe)</guilabel>,
+	<guilabel>courier(bitstream)</guilabel>.
+      </para>
+      <para>
+	<guilabel>Font Style</guilabel> field shows more than just
+	font weight and slant. Namely, it also shows font's spacing,
+	which can be monospaced (<guilabel>[M]</guilabel>),
+	character-cell (<guilabel>[C]</guilabel>), or proportional (no
+	label). In monospaced and character-cell fonts, each character
+	has the same width; in proportional fonts, the character width
+	varies, which usually looks better.  
+
+	<warning>
+	<title>Warning</title> 
+
+	  <para> Unfortunately, terminal emulation programs (including
+	  <application>xterm</application> and
+	  <application>gnome-terminal</application>) and many programs
+	  initially designed to work in a terminal (such as
+	  <application> emacs</application> editor) can only properly
+	  display monospaced and character cell fonts.
+       </para>
+       </warning> 
+      </para>
+      <para>
+	Finally, <guilabel>Font Style</guilabel> field also shows all
+	possible character sets available for given font (if there is
+	more than one). Roughly speaking, character set describes
+	symbols of what alphabet are shown in this font. The most
+	common charset is <literal>iso8859-1</literal>, which includes
+	all Latin letters, punctuation marks, numbers and enough
+	accented letters to cover majority of Western European
+	languages. More information is given in <xref linkend="xlfd">.
+      </para>
+
+      <para> You will also notice that in the
+        <guilabel>Size</guilabel> field, some font sizes are marked
+        with stars. These are the sizes of unscaled bitmap fonts; they
+        usually look better than other type (scalable and scaled
+        bitmap) fonts &mdash; see <xref linkend="filter">.  
+     </para>
+      
+      <para> You can configure the font selector dialog to show only
+        those fonts which meet certain criteria. This is done in the
+        <link linkend="filter"><guilabel>Filter</guilabel>
+        window</link>. If you later decide that you again want to see
+        all the fonts, just press the button <guibutton>Reset
+        Filter</guibutton> either in the main window or in the filter
+        window.
+      </para>
+
+
+      </sect2>	
+    </sect1>
+    <sect1 id="fontinfo">
+      <title>Font Information window</title>
+      <para>
+	This window shows the information about selected font, both
+	the values you requested and actual values. This is useful if
+	you want to check the values of some of the font's parameters
+	which you can not specify in the main window, such as screen
+	resolution. This window also shows the full font name (<link
+	linkend="xlfd">XLFD</link>), which contains the same
+	information.
+      </para>
+    </sect1>
+
+
+    <sect1 id="filter">
+      <title>Filter window</title>
+      <para>
+	In this window, you can set the font selector to show only the
+	fonts which satisfy some criteria.  You can specify values for
+	font foundry (vendor), weight, character set, slant, set
+	width, and spacing (see <xref linkend="xlfd"> for description
+	of these and other font parameters). You can choose
+	<keysym>*</keysym>, which means <quote>any value</quote>; you
+	can also specify several values for the same field: just click
+	on several of the them with the left mouse button (you do not
+	need to hold <keycap>SHIFT</keycap> or <keycap>CTRL</keycap>).
+      </para>
+
+	<figure id="filtershot">
+	  <title>Filter window</title>
+	  <screenshot>
+	    <screeninfo> GNOME Font Selector - Filter Window</screeninfo>
+	    <graphic fileref="figures/filterwin" format="png"
+	    srccredit="sasha">
+	    </graphic>
+	  </screenshot>
+	</figure>
+
+
+
+      <para> You can also specify allowed font types, using
+	checkbuttons at the top of this window. Possible types are
+	bitmap fonts, scalable fonts, and scaled bitmaps. The most
+	common fonts are bitmap fonts; scalable fonts (TrueType and
+	Type 1 PostScript) usually produce equally good quality, but
+	not all implementations of X Window System are able to use
+	them. 
+      </para>
+      <para> 
+	As the name shows, scalable fonts can be scaled to any size without
+	loss of quality. While it is possible to scale bitmap fonts as well,
+	the quality of scaled bitmap fonts is disastrous. For this reason, by
+	default font selector does not show scaled bitmap fonts. 
+      </para>
+      <para>
+	After you have set your filter, you can return to the <link
+	linkend="mainwin"><interface>main window</interface></link>
+	(do not press <guibutton>OK</guibutton> or
+	<guibutton>Apply</guibutton> &mdash; just choose the tab
+	<guilabel>Font</guilabel>), which will now only show the fonts
+	satisfying your criteria. To remind you about this, the main
+	window will now show words <guilabel>Filter
+	applied</guilabel>.
+      </para>
+      <para>
+	To return to the default filter (i.e., show all possible fonts
+	except for scaled bitmaps), press <guibutton>Reset
+	Filter</guibutton> either in the <interface>Filter
+	window</interface> or in the <interface>main
+	window</interface>.
+      </para>
+    </sect1>
+    <sect1 id="xlfd">
+      <title> Font attributes in X Window System and XLFD</title>
+      <para>
+	As was said earlier, each font in X Window system has a number
+	of attributes and a full name, also known as X Logical Font
+	Description (XLFD), which lists all of these attributes and therefore
+	is quite long.  Typical font name looks like this
+	<programlisting>
+	  -adobe-courier-medium-r-normal--12-120-75-75-m-70-iso8859-1
+	</programlisting>
+      </para>
+      <para>
+	This name consists of 14 fields, showing the values of 14 parameters
+	of the font, separated by dashes. 
+      </para>
+      <para>
+	While such a name gives a complete information about the font,
+	it is somewhat overwhelming, especially since not all of this
+	parameters are actually useful. To make life a little bit
+	easier, you can use wildcard <keysym>*</keysym> in the font
+	name; for example, the previous font can also be referred to
+	as
+	<programlisting>
+	  -adobe-courier-medium-r-*-*-12-*-*-*-*-*-*-*
+	</programlisting>
+	As usual, <keysym>*</keysym> matches any value; if there are
+	several fonts matching the given name, the system will pick
+	the first matching one. In this particular example, most
+	probably there is only one font matching this name, so this
+	name is unambiguous.
+      </para>
+      <para> 
+	Below we list those of the  font's 14 attributes which are actually
+	useful:
+	<itemizedlist mark="bull">
+	  <listitem><para> 
+              <guilabel>foundry</guilabel> &mdash; font
+	      foundry, the company or individual which made the font
+	      (in our example, <literal>adobe</literal>) 
+          </para></listitem>
+
+	  <listitem><para> <guilabel>family</guilabel> &mdash; font
+	      family, the popular nickname of the font (in our
+	      example, <literal>courier</literal>) 
+          </para></listitem>
+
+	  <listitem><para> 
+              <guilabel>weight</guilabel> &mdash; font weight (in our
+	      example, <literal>medium</literal>). Admissible values:
+              bold, medium, etc. 
+	  </para></listitem>
+
+	  <listitem><para> <guilabel>slant</guilabel> &mdash; font
+              slant (in our example, <literal>(r)oman</literal>,
+              i.e. unslanted). Admissible values: (i)talics,
+              (o)blique, (r)roman, etc.  
+          </para></listitem>
+
+	  <listitem><para> <guilabel>pixelsize</guilabel> &mdash; the
+              number of pixels vertically in a character (in our
+              example, 12) </para></listitem>
+
+	  <listitem><para> <guilabel>pointsize</guilabel> &mdash;
+              approximate point size of the font, measured in tenths
+              of a point. In the example above, point size is 120,
+              that is, 12 points. One point is equal to 1/72 of an
+              inch, which is the common convention in English and
+              American typesetting.  </para></listitem>
+
+	  <listitem><para> horizontal and vertical
+               <guilabel>resolutions</guilabel> in dots per inch
+               &mdash; in the example above, both are 75 dpi.
+	    </para>
+	    <para>
+	      Note that point size, pixel size, and vertical resolution are
+	      related: for fonts with resolution 75dpi, point size is
+	      approximately equal to (pixel size)*10; for fonts with resolution
+	      100dpi, point size is approximately equal to (pixel size)*7.
+	    </para></listitem>
+
+	  <listitem><para> <guilabel>spacing</guilabel> &mdash;
+              describes variance of character sizes in the
+              font. Allowed values are (m)onospaced, (c)haracter cell
+              (in both of these spacings, all characters have the same
+              width) and proportional (characters have varying
+              sizes). Proportional fonts usually look nicer. 
+              </para></listitem>
+
+	  <listitem><para> character set <guilabel>registry</guilabel>
+              and <guilabel>encoding</guilabel> &mdash; these two
+              parameters, commonly referred to as <guilabel>character
+              set</guilabel>, or <guilabel>charset</guilabel> for
+              short, describe what set of symbols (or what alphabet)
+              this font represents. There is a number of possible
+              charsets. Some of the most popular ones include:
+	      <itemizedlist>
+		<listitem>
+		  <para>
+		    <emphasis>iso8859-1</emphasis>, also known as
+		    Latin 1 &mdash; this character set includes all
+		    the symbols found on the keyboard, i.e. Latin
+		    letters, punctuation marks, numbers, symbols such
+		    as @ or $. It also includes some special symbols,
+		    such as the copyright sign, and a number of
+		    accented letters, thus covering the needs of most
+		    Western European languages (to be precise,
+		    Afrikaans, Basque, Catalan, Danish, Dutch,
+		    English, Faeroese, Finnish, French, Galician,
+		    German, Icelandic, Irish, Italian, Norwegian,
+		    Portuguese, Scottish, Spanish, and Swedish).
+		  </para>
+		</listitem>
+		<listitem><para>
+		    <emphasis>iso8859-7</emphasis> &mdash; includes Latin and
+		    Greek alphabets 
+		  </para></listitem> 
+		<listitem><para>
+		    <emphasis>iso8859-8</emphasis> &mdash; includes Latin and
+		    Hebrew alphabets 
+		  </para></listitem>
+		<listitem><para>
+		    <emphasis>koi8-r</emphasis> &mdash; includes Latin and
+		    Cyrillic alphabets 
+		  </para></listitem>
+		<listitem><para>
+		    <emphasis>big5.eten.3.10-1</emphasis> &mdash; Chinese
+		    (Big5 encoding) 
+		  </para></listitem>
+
+		<listitem><para> <emphasis>gb2312.1980-0</emphasis>
+		    &mdash; Chinese (GB encoding) 
+		</para></listitem>
+
+	      <listitem><para> 
+                    <emphasis>jisx0208.1983-0</emphasis> &mdash; Japanese
+		</para></listitem>
+	      </itemizedlist>
+
+
+	    </para></listitem>
+	</itemizedlist>
+      </para>
+      <para>
+	The remaining font attributes (<guilabel>Set Width</guilabel>,
+	<guilabel>Additional Style</guilabel>, and <guilabel>Average
+	Width</guilabel>) are rarely used and therefore we skip their
+	description.
+      </para>
+      <para>
+	Full XLFD specifications are included in technical documentation for
+	the X Window system and can be found online at <ulink
+	url="ftp://ftp.x.org/pub/R6.4/xc/doc/hardcopy/XLFD" type="ftp">    
+	  ftp://ftp.x.org/pub/R6.4/xc/doc/hardcopy/XLFD</ulink>; most probably,
+	you will never need it.
+    </para>
+
+  </sect1>
+  
+  <sect1 id="authors">
+    <title>Authors</title>
+     <para>
+      <application>GNOME Font Selector</application> was written by
+      Andrew Veliath (<email>andrewtv@usa.net</email>) with the help
+      of many other GNOME developers.  Please send all comments,
+      suggestions, and bug reports to the <ulink
+      url="http://bugs.gnome.org" type="http">GNOME bug tracking
+      database</ulink>. (Instructions for submitting bug reports can
+      be found <ulink url="http://bugs.gnome.org/Reporting.html"
+      type="http"> on-line</ulink>.) You can also use <application>Bug
+      Report Tool</application> (<command>bug-buddy</command>),
+      available in the <guisubmenu>Utilities</guisubmenu> submenu of
+      <guimenu>Main Menu</guimenu>, for submitting bug reports.
+      </para>
+    <para>
+      This manual was written by Alexander Kirillov
+      (<email>kirillov@math.sunysb.edu</email>). Please send all
+      comments and suggestions regarding this manual to the <ulink
+      type="http" url="http://developer.gnome.org/projects/gdp">GNOME
+      Documentation Project</ulink> by sending an email to
+      <email>docs@gnome.org</email>. You can also add your comments
+      online by using the <ulink type="http"
+      url="http://developer.gnome.org/projects/gdp/doctable/">GNOME
+      Documentation Status Table</ulink>.
+      </para>
+    </sect1>
+
+ <!-- ============= Application License ============================= -->
+
+ <sect1 id="license">
+  <title>License</title>
+  <para>
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the  <ulink type="help" url="gnome-help:gpl">
+    <citetitle>GNU General Public License</citetitle></ulink> as
+   published by the Free Software Foundation; 
+   either version 2 of the License, or (at your option) any later
+   version.
+  </para>
+  <para>
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   <citetitle>GNU General Public License</citetitle> for more details.
+  </para>
+  <para>
+   A copy of the <citetitle>GNU General Public License</citetitle> is
+   included as an appendix to the <citetitle>GNOME Users
+   Guide</citetitle>.  You may also obtain a copy of the
+   <citetitle>GNU General Public License</citetitle> from the Free
+   Software Foundation by visiting <ulink type="http"
+   url="http://www.fsf.org">their Web site</ulink> or by writing to
+   <address>
+    Free Software Foundation, Inc.
+    <street>59 Temple Place</street> - Suite 330
+    <city>Boston</city>, <state>MA</state> <postcode>02111-1307</postcode>
+    <country>USA</country>
+   </address>
+  </para>
+ </sect1>
+
+  
+</article>
+
+

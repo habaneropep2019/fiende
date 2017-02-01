@@ -1,0 +1,117 @@
+// -*- C++ -*-
+
+/* $Id: about.gen_h,v 1.22 2001/04/24 14:39:35 murrayc Exp $ */
+
+/* about.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/dialog.h>
+#include <libgnomeui/gnome-about.h>
+
+CLASS_START(Gnome);
+class About : public Dialog
+{
+  WRAP_CLASS(About, GnomeAbout,
+             GNOME_ABOUT, GNOME_IS_ABOUT,
+             about,
+             Dialog,GnomeDialog,GNOME_DIALOG);
+public:
+
+  About(const Gtk::string &title,
+	      const Gtk::string &version,
+	      const Gtk::string &copyright,
+	      const Gtk::SArray &authors,
+	      const Gtk::string &comments = "",
+	      const Gtk::nstring &logo = 0);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+
+  // Has no nonstandard methods; use Gnome_Dialog methods.
+
+};
+
+PRIVATE_START;
+#include <gnome--/private/dialog_p.h>
+IMPL_START;
+#include <gnome--/private/about_p.h>
+
+/* about.cc
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+namespace Gnome{
+
+About::About(const Gtk::string &title,
+			 const Gtk::string &version,
+			 const Gtk::string &copyright,
+			 const Gtk::SArray &authors,
+			 const Gtk::string &comments,
+			 const Gtk::nstring &logo)
+  : Dialog(GNOME_DIALOG(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+
+  const gchar** ppchAuthors = (const gchar**)(authors);
+
+  //0 is a valid logo value. An empty string leads to a warning:
+  const gchar* pchLogo = 0;
+  if(logo.size())
+  {
+    pchLogo = logo.c_str();
+  }
+  
+  gnome_about_construct(gtkobj(),
+			title.c_str(),
+			version.c_str(),
+			copyright.c_str(),
+			ppchAuthors,
+			comments.c_str(),
+			pchLogo);
+
+  // Gtk_SArray manages memory handling, no need to free anything
+  //delete[] ppchAuthors;
+
+  //Prevent automatic gtkobj destruction upon dialog close.
+  //It's not suitable for C++.
+  close_hides();
+}
+
+}
+
+DOCUMENTATION_START;

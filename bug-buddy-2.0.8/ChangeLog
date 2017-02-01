@@ -1,0 +1,953 @@
+2001-08-06  jacob berkman  <jacob@ximian.com>
+
+	* configure.in: 
+	* NEWS: 2.0.8
+
+	* src/gdb-buddy.c (get_trace_from_pair): 
+	(get_trace_from_core): revert --nw patch: it seems to break things
+	for me pretty badly.  i'm an idiot.
+
+	* configure.in: 
+	* NEWS: 2.0.7
+
+	* src/util.c (format_for_width): wrap to GStrings rather than text
+	entries
+
+	* src/bugzilla.c (generate_email_text): wrap the mail bodies at 72
+	chars again
+
+	* src/gdb-cmd: also run `thread apply all bt' to get all of the
+	stack traces for currently running threads
+
+	* bugzilla/*: update
+
+2001-08-05  Leonard Norrgard  <vinsci@bugg.lnorrgard.com>
+
+	* gdb-buddy.c (get_trace_from_core): Add --nw option for running
+	GDB, to make Bug-Buddy work with the GNUPro Insight debugger,
+	which defaults to using a GUI.  All GDB versions, starting with
+	gdb-4.13 released in 1994, support the --nw option.)
+	(get_trace_from_pair): Likewise.	
+
+2001-08-04  Leonard Norrgård  <vinsci@sourceforge.net>
+
+	* united-states-f-bug-buddy.c (email_is_valid):
+	Added the seven new toplevel domains.
+	* gdb-buddy.c (start_gdb):
+	Moved the CRASH_NONE case into the switch.
+	
+Tue Jul 10 12:34:00 2001  Jonathan Blandford  <jrb@redhat.com>
+
+	* configure.in: change order of xml in gnome-config command to fix
+	broken include path.
+	(src/Makefile.am): ditto.
+
+2001-06-21  jacob berkman  <jacob@ximian.com>
+
+	* NEWS: 
+	* configure.in: 2.0.6
+
+	* src/bugzilla.c (load_config_xml): use the configured xml node
+	names
+	(load_bugzilla): load the name of the severity nodes and header
+	from the config file
+	(generate_email_text): use the configured severity header
+
+2001-06-19  jacob berkman  <jacob@ximian.com>
+
+	* NEWS:
+	* configure.in: 2.0.5
+
+	* src/bugzilla.c (async_update): touch files we download so that
+	the cache finally works
+
+	* NEWS:
+	* configure.in: 2.0.4
+
+	* src/united-states-of-bug-buddy.c (submit_ok): thank the
+	submitter
+	(submit_ok): set the From: line.  it used to do this before 2.0.
+	i apparently am a doofus.
+	(submit_ok): pop up a question dialog before sending the bug
+	report
+	
+2001-06-15  jacob berkman  <jacob@ximian.com>
+
+	* NEWS: 
+	* configure.in: 2.0.3
+
+	* src/bugzilla.[ch]: 
+	* src/bug-buddy.c: 
+	* src/bts.[ch]: 
+	* src/bts-debian.c: libxml include fixes
+
+2001-06-12  jacob berkman  <jacob@ximian.com>
+
+	* various makefiles: fixes and ximian bugzilla support
+	
+	* src/bug-buddy.c (init_ui): set the row height to 20
+
+	* src/bugzilla.c (load_bugzilla): make icons 16 pixels
+	(load_bugzilla): fix a tyop
+	(generate_email_text): comment out some fields
+	(add_severity): also default to unknown
+
+2001-06-03  Karl Eichwalder  <ke@suse.de>
+
+	* src/Makefile.am (EXTRA_DIST): Remove 
+	xml-i18n-extract will directly work on .glade files.
+	* glade-strings.c: Remove file.
+
+2001-05-31  Karl Eichwalder  <ke@suse.de>
+
+	* .cvsignore: Add xml-i18n-extract, xml-i18n-merge, and
+	xml-i18n-update.
+
+2001-05-30  Karl Eichwalder  <ke@suse.de>
+
+	* Makefile.am (EXTRA_DIST): Add xml-i18n-extract.in
+	xml-i18n-merge.in xml-i18n-update.in.
+	* xml-i18n-extract.in: Add from xml-i18n-tools 0.8.4.
+	* xml-i18n-update.in: Ditto.
+	* xml-i18n-merge.in: Ditto.
+
+	* configure.in: Add AM_PROG_XML_I18N_TOOLS.
+
+	* Start to apply xml-i18n-toolization running xml-i18n-prepare
+	(0.8.4):
+	* src/Makefile.am (utils_in_files): Fix bug-buddy.desktop entry.
+	* src/.cvsignore: Add bug-buddy.desktop.
+	* src/bug-buddy.desktop: Remove file.
+	* src/bug-buddy.desktop.in: New file.
+
+2001-03-28  jacob berkman  <jacob@ximian.com>
+
+	* src/bug-buddy.c (delete_me): save the config here
+
+	* src/united-states-of-bug-buddy.c (on_druid_cancel_clicked): save
+	the config here
+
+	* src/*.c: turn off debugging output
+
+	* src/bugzilla.c (get_xml_file): really fix cache this time
+
+	* NEWS:
+	* configure.in: 2.0.1
+	
+2001-03-26  jacob berkman  <jacob@ximian.com>
+
+	* src/bugzilla.c (get_xml_file): turn an or into an and to make
+	the cache update itself.  also added some ()'s so people will
+	think twice about changing this code.
+
+2001-03-20  Karl Eichwalder  <ke@suse.de>
+
+	* src/united-states-of-bug-buddy.c (intro_page_ok): Normalize
+	single quote.
+
+2001-03-19  Karl Eichwalder  <ke@suse.de>
+
+	* src/bugzilla.c (load_bugzillas): s/bug-buddy/Bug Buddy/.
+	* src/gdb-buddy.c (get_trace_from_pair): Ditto.
+
+2001-02-26  jacob berkman  <jacob@ximian.com>
+
+	* src/united-states-of-bug-buddy.c (druid_set_state): don't
+	desensitize the next button for the component and product page, so
+	telsa isn't confused
+
+	* src/bug-buddy.c (main): save config after the main loop
+	(*): remove an assbarn full of #if 0'd code
+
+	* src/bugzilla.c (bugzilla_product_add_components_to_clist): if
+	there is only one component, select it
+
+	* src/united-states-of-bug-buddy.c: fill in missing doc pages
+
+	* docs/C/bug-buddy.sgml: new version from telsa
+
+2001-02-18  Akira TAGOH  <tagoh@gnome.gr.jp>
+
+	* src/bug-buddy.desktop: Updated Japanese entry.
+
+2001-02-15  jacob berkman  <jacob@ximian.com>
+
+	* src/united-states-of-bug-buddy.c (intro_page_ok): make these
+	dialogs modal (wasn't code i wrote!)  fixes bugzilla #50865
+
+2001-02-12  Karl Eichwalder  <ke@suse.de>
+
+	* src/bug-buddy.c (init_bts_menu): s/bug-buddy/Bug Buddy/ .
+	* src/gdb-buddy.c (get_trace_from_pair): Ditto.
+	* src/gdb-buddy (main): Ditto.
+	* src/bug-buddy.glade: Ditto.
+	* src/glade-strings.c (N_): Ditto.
+	* src/united-states-of-bug-buddy.c (on_druid_about_clicked): Ditto.
+
+	* src/bugzilla.c (load_bugzillas): Fix message.
+
+2001-02-12  jacob berkman  <jacob@ximian.com>
+
+	* src/bug-buddy.glade: un-split a string
+
+2001-02-12  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* configure.in: added lt to ALL_LINGUAS.
+	* src/bug-buddy.glade, src/glade-strings.c: fixed two typos.
+
+2001-02-11  jacob berkman  <jacob@ximian.com>
+
+	* `find .`: (almost) completely rewritten to support bugzilla and
+	have a new UI
+
+2001-02-05  Fatih Demir	<kabalak@gmx.net>
+
+	* src/gnome.appmap: Added gtranslator.
+
+2001-01-23  Gregory Leblanc  <gleblanc@cu-portland.edu>
+
+	* docs/C/bug-buddy.sgml: Updated for/tested in Nautilus
+	* docs/it/bug-buddy.sgml: Updated for/tested in Nautilus
+
+2001-01-05  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* configure.in: Added "nn" to ALL_LINGUAS.
+	
+2000-12-24  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in,po/az.po: Added Azeri language file
+
+2000-11-23  Yukihiro Nakai  <nakai@gnome.gr.jp>
+
+	* configure.in: Add zh_CN.GB2312 to ALL_LINGUAS.
+
+2000-11-15  Jacob "Ulysses" Berkman  <jacob@helixcode.com>
+
+	* src/bug-buddy.c (on_debian_page_next): fix bug #29310
+	(load_config): allow the included file to be set by a command line
+	argument
+
+2000-11-14  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
+
+	* src/bug-buddy.desktop: added Slovak strings.
+
+2000-11-04  Yukihiro Nakai  <nakai@gnome.gr.jp>
+
+	* configure.in (ALL_LINGUAS): Add sk(Slovak)
+
+2000-10-31  Christopher R. Gabriel  <cgabriel@softwarelibero.org>
+
+	* configure.in (ALL_LINGUAS): added 'pt_BR' under the request of
+	Juan Carlos Castro y Castro <jcastro@appi.com.br>
+
+2000-10-29  Christopher R. Gabriel  <cgabriel@softwarelibero.org>
+
+	* configure.in (AC_OUTPUT): added Makefile for italian documentation
+
+2000-10-04  Jacob "Ulysses" Berkman  <jacob@helixcode.com>
+
+	* src/gdb-buddy.c (get_trace_from_pair): check that the file
+	exists, and is not a directory.  If it doesn't, look for it in our
+	path.  This fixes problems with evolution and ~/evolution.
+
+	* src/bug-buddy.c: warning fixes, removed #if 0'd code
+	(save_entry): don't prepend history if entry is blank
+	(save_config): change the email var name
+	(load_config): pass NULL for email, since we don't want to guess
+	(on_debian_page_next): do not accept 'general' as a package at all
+	(email_is_invalid): add stricter checking of email addresses.
+	Based on a patch from Robert Brady <robert@suse.co.uk>.
+
+	* src/util.c:
+	* src/gtk-combo-box.c:
+	* src/bug-buddy.h:
+	* src/bts.h:
+	* src/bts-debian.c: warning fixes
+
+	* src/distro.h:
+	* src/bts.c:
+	* src/distro-irix.c:
+	* src/Makefile.am: add irix support
+
+2000-10-02  Christophe Merlet  <christophe@merlet.net>
+
+	* src/bug-buddy.desktop: added french strings.
+
+2000-09-06  Simos Xenitellis  <simos@hellug.gr>
+
+	* src/bug-buddy.desktop: added messages for the Greek language
+
+2000-06-02  Szabolcs BAN <shooby@gnome.hu>
+
+	* po/hu.po: added po of Greg Nagy <greg@gnome.hu>
+	Hungarian Translation Team rulez
+
+2000-05-21  Jacob Berkman  <jacob@helixcode.com>
+
+	* src/bug-buddy.c (on_debian_page_next): bother the user a bit if
+	they specify 'general'
+	(make_pixmap_button): try an ugly hack
+
+	* src/bts-debian.c (debian_bts_init): give the miggie combo text
+	some intelligence
+
+2000-05-13  Karl Eichwalder  <ke@suse.de>
+
+	* src/bug-buddy.c (on_complete_page_prepare): Improve the looking
+	of the msg string; remove \t.
+
+2000-05-12  Andreas Hyden  <a.hyden@cyberpoint.se>
+
+	* src/bug-buddy.desktop: Added Swedish translation.
+
+2000-05-10  Jacob Berkman  <jacob@helixcode.com>
+
+	* configure.in: 0.90 release
+
+	* src/bug-buddy.c (on_action_page_prepare): 
+	* src/bts-debian.c (debian_bts_doit): 
+	* src/util.c (append_widthv): fix bug #10159
+
+	* src/bug-buddy.c (on_complete_page_prepare): fix bug #9493
+
+2000-05-04  Jacob Berkman  <jacob@helixcode.com>
+
+	* src/bug-buddy.glade: mention that reports should be in English
+
+	* configure.in: check for new gnome-libs 1.0.59
+
+	* src/bug-buddy.c (main): push / pop the visual / colormap
+	(init_ui): use the default icon on the main window
+	(main): set the default icon
+
+2000-05-02 Telsa Gwynne <hobbit@aloss.ukuu.org.uk>
+
+	* Silly typo fix in docs. 
+
+2000-04-29  Jacob Berkman  <jacob@helixcode.com>
+
+	* NEWS: 
+	* configure.in: 0.9 releasage action
+
+2000-04-28  Jacob Berkman  <jacob@helixcode.com>
+
+	* src/Helix_Code.bts: 
+	* src/GNOME.bts: add gnome-print for jody
+
+	* src/bug-buddy.c (init_ui): show the href again
+	(on_desc_page_next): use gnome-mime to ensure we have a text
+	file
+
+	* src/bts-debian.c (debian_bts_doit): get rid of warning when we
+	start feeding the GtkText
+
+2000-04-27  Jacob Berkman  <jacob@helixcode.com>
+
+	* src/bug-buddy.c (init_ui): only have border on mouseover for
+	the Big Ugly Button
+
+	* docs/C/bug-buddy.sgml: doc updates
+	
+2000-04-25  Sami Pesonen <spesonen@dlc.fi>
+
+	* src/bug-buddy.desktop : Added [fi]
+	* configure.in (ALL_LINGUAS): added Finnish 
+
+2000-04-24  Arjan van de Ven	<arjan@fenrus.demon.nl>
+
+	* po/nl.po : Updated dutch translation
+
+2000-04-20  Fatih Demir	<kabalak@gmx.net>
+
+	* src/bug-buddy.desktop : Added [tr] .
+
+2000-04-19  Karl EICHWALDER  <ke@suse.de>
+
+	* src/bug-buddy.desktop (Name): Improve [de].
+
+2000-04-18  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): added Catalan (also put it in sync
+	  with po/ directory, that is added en_AU, en_GB and pl)
+
+2000-04-18  Jacob Berkman  <jacob@helixcode.com>
+
+	* src/bug-buddy.glade: remove the menus from some option
+	menus as these are generated by the source, and move the
+	ugly button down
+
+2000-04-18  Karl EICHWALDER  <ke@suse.de>
+
+	* src/bug-buddy.glade: Typo.
+	* src/glade-strings.c (N_): ditto.
+
+2000-04-17  Jacob Berkman  <jacob@helixcode.com>
+
+	* lot's of hacking this weekend
+
+	* turbolinux should now correctly be detected
+
+	* add Helix Code's BTS, and an 'Independent' BTS... for submitting
+	to other email addresses
+
+	* docs from Telsa
+
+	* rework the user experience:
+
+	* now, you have to have a subject / description (no more empty
+	reports hopefully)
+
+	* remove the redundant 'how to repeat' section
+
+	* move the system config page to the end, since it is rather
+	boring
+
+	* you can now Cc: yourself on reports you submit
+
+	* UI retouching
+
+	* there is now a preview of the report at the end
+
+	* changes to the popt stuff as suggested by Karl Eichwalder
+
+	* new button to browse bugs for a package, so hopefully people
+	will stop submitting g-h-b crash reports
+
+	* basicall bug-buddy is ready for some 1.0 action
+
+2000-04-05  Dan Damian  <dand@dnttm.ro>
+
+	* configure.in: Added "ro" to ALL_LINGUAS.
+
+2000-03-29  Karl EICHWALDER  <ke@suse.de>
+
+	* src/bug-buddy.desktop: Add de.
+	* src/bug-buddy.c (init_ui): Delete spurious white space.
+	* src/bug-buddy.c (on_contact_page_next): Typo.
+
+2000-03-27  Christopher R. Gabriel  <cgabriel@firenze.linux.it>
+
+	* configure.in (ALL_LINGUAS): added italian translation.
+
+2000-03-27  Karl EICHWALDER  <ke@suse.de>
+
+	* src/bug-buddy.c (on_stop_button_clicked): Add missing \n's.
+	* configure.in (ALL_LINGUAS): Add de.
+
+2000-03-11 Alastair McKinstry <mckinstry@computer.org>
+
+	* configure.in (ALL_LINGUAS): Added Irish (ga) translation.
+
+2000-03-04  Jacob Berkman  <jacob@helixcode.com>
+
+	* src/bug-buddy.[ch] (on_complete_page_prepare): use email address from
+	BTS instead of GNOME one
+
+	* src/bts-debian.c (debian_bts_get_email): implement get_email
+	for debian
+
+	* src/bts.h: add get_email function
+
+2000-02-23  Jacob Berkman  <jacob@helixcode.com>
+
+	* NEWS, configure.in: 0.7 release
+	
+	* src/util.c (get_line_from_commandv): remove unused variables
+
+	* src/gdb-buddy.c (stop_gdb): remove unused variable
+
+	* src/bug-buddy.c (stop_progress): remove the timeout, and
+	hide the progress bar
+	(append_packages): call stop_progress()
+	(on_version_page_prepare): show the progress bar, since we
+	are now hiding it
+	(make_pixmap_button): translate this string
+	(delete_me): exit the app when the dialog is deleted.  Fixes
+	bug #6013
+
+	* src/bts.c (load_bts_xml): 
+	(update_das_clist): call stop_progress()
+
+	* src/bug-buddy.c (init_toggle): connect the signal first
+	so we get the correct initial setting
+
+	* src/bug-buddy.desktop (Name): be a big more descriptive
+
+2000-02-22  Dan Winship  <danw@helixcode.com>
+
+	* src/Makefile.am (bug_buddy_LDFLAGS): Add -export-dynamic so
+	libglade can resolve bug-buddy's symbols (on all platforms).
+
+2000-02-16  Fatih Demir	<kabalak@gmx.net>
+
+	* configure.in : Added tr to ALL_LINGUAS .
+	
+2000-01-26  Yukihiro Nakai <nakai@gnome.gr.jp>
+
+	* configure.in (ALL_LINGUAS): add ja
+
+2000-01-24  Jacob Berkman  <jacob@helixcode.com>
+
+	* configure.in (ALL_LINGUAS): add el
+
+2000-01-24  Sergey Panov <sipan@mit.edu>
+
+	* configure.in (ALL_LINGUAS): Added Russian (ru)
+
+2000-01-06  Jesus Bravo Alvarez  <jba@pobox.com>
+
+	* configure.in (ALL_LINGUAS): Added Spanish (es)
+
+1999-12-30  Richard Hult  <rhult@hem.passagen.se>
+
+	* configure.in (ALL_LINGUAS): Added "sv".
+
+1999-12-29  Jesus Bravo Alvarez  <jba@pobox.com>
+
+	* configure.in (ALL_LINGUAS): Added Galician (gl)
+
+	* src/bug-buddy.desktop: Added Galician entries
+
+1999-12-29  Yuri Syrota  <rasta@renome.rovno.ua>
+
+	* configure.in (ALL_LINGUAS): added "uk"
+
+1999-12-09  Arjan van de Ven <arjan@fenrus.demon.nl>
+
+	* po/nl.po: Updated Dutch translation
+
+1999-12-09  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* NEWS:
+	* configure.in: version 0.6
+
+	* src/*.c: use GET_WIDGET ()
+
+	* src/GNOME.bts: reformatting
+
+	* src/bts-debian.c: moved some debian specific functions here;
+	parse the xml a little better; support including a file
+
+	* src/bts.c: removed some functions; remove the gtk timeout
+	for the progress bar
+
+	* src/bug-buddy.c: don't declare PoptData here; save more state;
+	hide the save-to-file file entry when we aren't saving to a file;
+	druid path reorganization; support for the progress bar;
+	support function for async package version getting; load up
+	xml files when we init the UI
+
+	* src/bug-buddy.glade: some reorg, change padding to 4/8
+
+	* src/bug-buddy.h: define some debian specific stuff here, this
+	should be moved soon;  get rid of a lot of stuff in DruidData
+
+	* src/ctree-combo.c: lots of stuff
+
+	* src/distro-debian: get version stuff asyncly
+
+	* src/distro-redhat.c: append_packages ()
+
+	* src/distro.h: no more post_command
+
+	* src/gdb-buddy.c: on _ERROR_AGAIN try again
+
+	* src/glade-druid.h: defing a couple more widgets
+
+	* src/gtk-combo-box.c: block toggled signal in _hide_popdown()
+
+	* src/util.[ch]: added get_line_from_ioc ()
+
+1999-12-06  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/ctree-combo.c (on_ctree_select_row): only _popup_hide()
+	on leaves
+
+	* src/bts-debian.c (debian_bts_init): add a max of 20
+	leavs per subtree
+
+	* src/ctree-combo.c (on_ctree_select_row): This seems
+	to work.  I wonder why.
+	(ctree_combo_construct): 
+
+	* src/ctree-combo.c: maybe getting closer to working
+
+	* src/bts-debian: use the new ctree combo box
+	
+	* src/glade-druid.h: sync with .glade file
+
+	* src/Makefile.am:
+	* src/kde-packages: packages files shouldn't be backwards
+	any more
+
+	* src/ctree-combo.[ch]: combo box with a drop down ctree
+
+	* src/gtk-combo-box.[ch]: steal miguel's combo box from
+	gnumeric
+
+1999-12-05  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/KDE.bts:
+	* src/kde-packages:
+	* src/Makefile.am:  support for KDE BTS
+
+	* src/bts.c:
+	* distro-redhat.c:
+	* src/bts-debian.c:  remove some debugging output;  packages
+	whose version was obtained via rpm/dpkg are now in the clist
+	again
+
+1999-12-04  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/GNOME.bts:
+	* src/Debian.bts: cleanups; in <package> use attributes
+
+	* src/Makefile.am: don't depend on ../debbugs/Maintainers... yet
+
+	* src/bts.c:
+	* src/bts-debian.c:
+	* src/bug-buddy.c: optimize stuff a little, and don't leak
+	so much memory
+
+	* configure.in: find debian root dir
+	* src/*: Initial support for supporting multiple BTS's
+	Currently Debian and GNOME are supported.
+
+1999-12-02  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* configure.in (ALL_LINGUAS): added nl.po, from
+	Arjan van de Ven <arjan@fenrus.demon.nl>
+
+1999-11-30  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* 0.5 release
+	
+	* src/*: clean up warnings
+	
+	* src/bug-buddy.glade:
+	* src/bug-buddy.[ch]: add an entry for sendmail's path
+	
+	* configure.in:
+	* debian/changelog(.in): generate changelog with the
+	correct version
+	
+	* Makefile.am:
+	* debian/Makefile.am: dist stuff in debian/
+
+	* src/bug-buddy.c:
+	* src/bug-buddy.glade: ugly glade hackery to get an about
+	button
+
+	Please do not look at the code for this commit.
+
+	* src/bug-buddy.glade: more ui nicities
+
+	* src/bug-buddy.c (on_the_druid_cancel): save config
+	on cancel, to save email
+
+	* src/bug-buddy.glade: add some padding and stuff
+	
+	* src/util.[ch]: actually read a line at a time
+	
+	* src/distro-debian.c: it works now
+
+	* src/bug-buddy.glade:
+	* src/bug-buddy.c: merge the attach/core/nature pages;
+	some cleanup
+
+	* src/gdb-buddy.c: don't pipe() on the fd anymore
+
+	* src/distro-debian.c: some fixes, not working yet
+
+1999-11-29  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/util.[ch]:
+	* src/distro.h:
+	* src/distro-debian.[ch]:
+	* src/distro-redhat.[ch]: detect package versions a bit
+	differently, and move some stuff used all around to util.c
+
+	* src/gdb-buddy.c:
+	* src/bug-buddy.[ch]: use the new package and util stuff
+
+1999-11-24  Jacob Berkman  <jberkman@serendipity.res.cmu.edu>
+
+	* src/bug-buddy.c: fudge around with dpkg and extract
+	some things.  This is really slow and sucks.  Better
+	ways will follow.
+
+1999-11-24  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* debian/*: add stuff to make .debs   (no idea if this really
+	works yet)
+	
+	* src/bug-buddy.glade:
+	* src/bug-buddy.c: added ability to add info to existing
+	reports
+
+1999-11-23  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.c: fix debian detection
+	
+	* src/bug-buddy.c (write_72): 	
+	* src/bug-buddy.c (write_72v): wrap lines at 72 chars
+	
+	* src/gdb-buddy.c (get_trace_from_pair): we don't need to
+	set the fd to non blocking
+
+1999-11-14  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* NEWS:
+	* configure.in: 0.4 release
+
+	* src/gdb-buddy.c:
+	* src/bug-buddy.c: don't print out status messages
+	(on_version_list_select_row): fix a crash if there is no text
+	in the row
+
+	* src/bug-buddy.c (on_stop_button_clicked): better dialog box,
+	I think.
+
+	* src/gdb-buddy.c: don't be so verbose
+
+	* src/gdb-buddy.c:
+	* src/bug-buddy.[ch]: use g_io_channels and do the
+	fork()/exec() for gdb ourselves
+
+	* src/bug-buddy.c (load_entry, save_entry): work with
+	GnomeFileEntries right
+
+	* src/gdb-buddy.c: 
+	* src/bug-buddy.glade:
+	* src/bug-buddy.[ch]: add stop/refresh button to the
+	less page, and code to support this
+
+	* src/bug-buddy.c: code clean up
+	(get_data_from_command): remove extra \n's and add _()'s
+
+	* src/bug-buddy.c (init_ui): actually do something
+	for the --package command line arg
+
+1999-11-13  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.c: fix tyop (bug #3545)
+	(on_action_page_back): use on_action_page_back like
+	the .glade specifies
+
+1999-11-12  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/prog.bugmap: add gnomeicu
+
+1999-11-11  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.[ch]:
+	* src/bug-buddy.glade: reorder the dialogs a little
+
+	* src/bug-buddy.c: change the scripts so that we have
+	the distribution for debian and slackware on one line
+
+	* src/Makefile.am (buddy_DATA): add prog.bugmap (stolen
+	from the crashed app web page).  added bug-buddy and rp3
+	do it first
+
+	* src/bug-buddy.c (init_ui): figure out which package the
+	app is from, and which version.  We are smart now.
+
+	also fixed some tyops.
+	
+	* NEWS: update for 0.3
+
+	* src/bug-buddy.c (on_action_page_next): ask the
+	user if they really want to override a file if
+	it exists  (based on a patch from Ali Abdin 
+	<ALIABDIN@aucegypt.edu>)
+	(on_action_page_next): fix something dumb
+	(on_complete_page_finish): we don't need -t and the
+	address
+
+1999-11-10  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/packages.c (packages): add crescendo
+
+	* configure.in: 
+	* bug-buddy.spec.in: may as well have one
+
+	* configure.in: bump to 0.3
+
+	* src/bug-buddy.glade:
+	* src/bug-buddy.[ch]: stuff to look more like gnome-bug
+	
+	* src/bug-buddy.c (init_ui): if no data was obtained, display
+	a blank thing anyway (so people can type it in)
+	(main): better warning and stuff
+	(on_complete_page_finish): 
+
+	* src/Makefile.am:
+	* src/gdb-buddy.c (get_trace_from_pair): 
+	* src/bug-buddy.c (make_anim): 
+	(main): define the prefix, so we can locate our data
+	This will be unnecessary with gnome-libs 2
+
+1999-11-08  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* docs/multiple_bts.txt: email excerpt talking about
+	supporting multiple BTS's, and what needs to be done.
+
+1999-11-07  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.mime: ok, this regex works now
+
+	* configure.in: bump to 0.2
+	
+	* src/bug-buddy.c: slightly better gnome-core version script;
+	grave, not severe, is the correct severity
+
+	fixes bugs 3388, 3389
+
+1999-11-06  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/packages.c (packages): add bug-buddy
+
+	* 0.1 release
+	
+	* src/bug-buddy.mime: go back to the old regex
+
+	* src/bug-buddy.c (load_config): initially default to real/user name
+
+	* src/Makefile.am (bug_buddy_SOURCES): distcheck fix
+
+	* src/bug-buddy.mime: better regexp
+
+	* src/gdb-buddy.c (handle_gdb_input): don't print a line of
+	garbage at the end
+
+	* pixmaps/bug-anim.png: new file
+	
+	* pixmaps/Makefile.am (pixmap_DATA): add bug-anim.png
+
+	* src/gdb-buddy.c (get_trace_from_pair): start the animator
+	(handle_gdb_input): stop the animator
+
+	* src/bug-buddy.c (make_anim): create a GnomeAnimator for glade
+
+	* src/bug-buddy.glade: add a custom widget until glade supports
+	GnomeAnimators
+	
+	* src/bug-buddy.c (on_complete_page_prepare): mark another
+	string for i18n (sorry kmarass)
+
+	* src/bug-buddy.c (on_less_page_prepare):
+	* src/gdb-buddy.c (handle_gdb_input): fix some things when you
+	get a trace, then go back and change things and get another one
+
+ 	* src/gdb-buddy.h:
+	* src/bug-buddy.h: use bug-buddy.h for a while
+
+	* src/gdb-buddy.c:
+	* src/bug-buddy.c: some reorganization with the non blockingness
+	stuff.
+
+	Look at me, coding on a Friday night.
+	
+1999-11-05  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.glade:
+	* src/gdb-buddy.[ch]:
+	* src/bug-buddy.c: bye-bye blocking bug-buddy
+
+	This probably introduces lots of nice bugs.
+
+	* src/bug-buddy.glade: spelling mistake
+	
+	* src/bug-buddy.c (on_complete_page_prepare): add a \n
+
+	* src/Makefile.am (EXTRA_DIST): make it distcheck
+
+	* src/bug-buddy.c (on_complete_page_prepare): print a summary
+	of the bug submission.
+
+	* src/bug-buddy.keys.in:
+	* src/bug-buddy.mime: mime type foo for launching bug-buddy
+	on a core file
+
+	* src/Makefile.am (mime_DATA): generate/install mime type foo
+
+	* src/bug-buddy.glade:
+	* src/bug-buddy.c: do some not-so-clever determination (?)
+	of what is going on wrt stack obtaination;  remember how
+	the bug was submitted from last time
+
+1999-11-04  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.glade:
+	* src/bug-buddy.c (save_config): change the configuration around
+	a little, and add make name/email a GnomeEntry again
+
+	* src/Makefile.am (EXTRA_DIST): 
+	* pixmaps/Makefile.am (EXTRA_DIST): make distable
+
+	* src/bug-buddy.glade:
+	* src/bug-buddy.c: support output to a file
+
+1999-10-30  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/glade-strings.c:
+	* src/bug-buddy.glade: a couple translation bugs in
+	glade are gone
+
+	* src/bug-buddy.c (main): show the window before gtk_main()
+	(list_data): add slackware detection
+	(on_complete_page_finish): if no version info available, don't
+	print the version of the last thing we visited
+
+	# src/bug-buddy.glade: make the main window not visible by default
+	(so we can do the init before the gui shows)
+
+1999-10-29  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.c (on_contact_page_next): mark a string for
+	translation
+
+1999-10-28  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.c: mark more strings for translation
+
+	* src/Makefile.am: install the new .desktop
+
+	* pixmaps/Makefile.am (pixmap_DATA): add bug-buddy.png
+	(thanks, tigert)
+
+	* src/bug-buddy.c: save the name/email in our config file
+
+1999-10-27  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/packages.c (packages): fix tyop
+
+	* src/bug-buddy.c (update_selected_row): don't crash when
+	no rows have been selected
+
+	* pixmaps/Makefile.am
+	* Makefile.am:
+	* configure.in: get pixmaps to work
+
+	* src/bug-buddy.glade:
+	* src/bug-buddy.c: change to using a clist instead of lots
+	of gtk_entry's.  This gets rid of a druid page, and is nicer.
+	(main): bindtextdomain() and textdomain() so translations work
+
+1999-10-26  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/gdb-buddy.c (get_trace_from_pair): try batch mode
+	here too
+
+1999-10-23  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* src/bug-buddy.c (main): don't crash when the 
+	.glade file isn't found
+
+	* src/gdb-cmd: use bt not w
+
+1999-10-23  Kjartan Maraas  <kmaraas@online.no>
+
+	* configure.in: Added "no" to ALL_LINGUAS.
+	

@@ -1,0 +1,212 @@
+<!-- ##### SECTION Title ##### -->
+gnome-mime-info
+
+<!-- ##### SECTION Short_Description ##### -->
+Routines to get information bound to a MIME type.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The routines in the <filename>gnome-mime-info</filename> allow
+retrieval of information that has been bound to a given MIME type.
+There are a number of standard keys used in GNOME to provide default
+actions and behaviour.</para>
+
+<para>
+To add keys to a MIME type, it is necessary to install a file with the
+extension <filename>.keys</filename> in the
+<filename>$gnome/share/mime-info</filename> directory or in the
+<filename>~/.gnome/mime-info directory</filename> directory.  The
+former is for system-provided MIME information and the latter is to
+enable the user to extend the actions as provided by the system.
+</para>
+
+<para>
+The file <filename>$gnome/share/mime-info/gnome.keys</filename> is
+special, as it contains the defaults for gnome, and is read first.  In
+addition, the file <filename>~/.gnome/mime-info/user.keys</filename> is
+read last.  This will guarantee that there is a way to set system
+defaults, and there is a way for the user to override them.  There is
+currently no way to tell anything about the order of the other files in
+those directories, nor is there any way to override system defaults yet.
+</para>
+
+<para>
+The <filename>.keys</filename> files have the following format:</para>
+
+<example>
+  <title>Format of a .keys file</title>
+  <programlisting>
+mime-type-match:
+	[\[LANG\]]key=value
+  </programlisting>
+</example>
+
+<para>
+Above, the <structfield>key</structfield> is the key that is being
+defined, and <structfield>value</structfield> is the value we bind to
+it.  The optional <structfield>[LANG]</structfield> represents a
+language in which this definition is valid.  If this part is
+specified, then the definition will only be valid if LANG matches the
+setting of the environment variable LANG.  The LANG setting is used to
+provide keys which can be displayed to the user in a localized way.
+</para>
+
+<para>
+This is an example to bind the key <emphasis>open</emphasis> to all of
+the MIME types matching <emphasis>image/*</emphasis> and the
+<emphasis>icon-filename</emphasis> key is bound to the
+<filename>/opt/gimp/share/xcf.png</filename> value:</para>
+
+<example>
+  <title>Sample gimp.keys file</title>
+  <programlisting>
+image/*:
+	open=gimp %f
+
+image/x-xcf:
+        icon-filename=/opt/gimp/share/xcf.png
+  </programlisting>
+</example>
+
+<para>This will make the GIMP the handler for the open action.  Files of
+type xcf would use the filename pointed to in the icon-filename key.</para>
+
+<para>%f gets interpolated with the file name or the list of file names that
+matched this MIME type.</para>
+
+<para>As you can see from the example above, a
+<filename>.keys</filename> file does not need to provide all of the
+values, it can just provide or override some of the actions.</para>
+
+<para>User defined bindings in <filename>.keys</filename> file will take
+precedence over system installed files.</para>
+
+<para>The following keys are currently used in the GNOME
+desktop:</para>
+
+<itemizedlist>
+  <listitem><para><emphasis>open</emphasis>: Open the file with this
+    command.</para></listitem>
+
+
+  <listitem><para><emphasis>icon-filename</emphasis>: The filename
+    with the icon that should be used to represent files of this type.</para>
+  </listitem>
+
+  <listitem><para><emphasis>view</emphasis>: Command to view the file
+    contents.</para></listitem>
+
+  <listitem><para><emphasis>ascii-view</emphasis>: A command that
+   should be used to do an ascii-rendering of the file.  Used as a
+   fallback by the filemanager if a <emphasis>view</emphasis> action
+   does not exist.</para></listitem>
+
+  <listitem><para><emphasis>fm-open</emphasis>:file-manager open.  If
+   present, the file manager will use this action instead of the value
+   in open to perform this action (the filemanager for example will
+   open archive files as if they were directories by using the VFS).</para>
+  </listitem>
+
+  <listitem><para><emphasis>fm-view</emphasis>: file-manager view.  If
+    present, invoking the view opertion on the file manager will use
+    the value defined here instead of the value in "view".
+  </para></listitem>
+
+  <listitem><para><emphasis>fm-ascii-view</emphasis>:Fallback
+    operation for the file manager as well.</para>
+  </listitem>
+
+</itemizedlist>
+
+<para>Those keys are also queried on the metadata (except in the cases
+where the lookup would be too expensive). </para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### FUNCTION gnome_mime_get_value ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_mime_get_keys ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_mime_program ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_mime_description ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_mime_nametemplate ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_mime_test ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_mime_composetyped ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_mime_copiousoutput ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_mime_needsterminal ##### -->
+<para>
+
+</para>
+
+@mime_type: 
+@key: 
+@Returns: 
+
+

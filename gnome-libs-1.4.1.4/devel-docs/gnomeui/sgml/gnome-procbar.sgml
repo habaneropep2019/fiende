@@ -1,0 +1,238 @@
+<refentry id="GnomeProcBar">
+<refmeta>
+<refentrytitle>GnomeProcBar</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeProcBar</refname><refpurpose>Gnome Process Bar</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeProcBar-struct">GnomeProcBar</link>;
+#define     <link linkend="GNOME-PROC-BAR--CLASS-CAPS">GNOME_PROC_BAR__CLASS</link>           (klass)
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-proc-bar-new">gnome_proc_bar_new</link>              (<link linkend="GtkWidget">GtkWidget</link> *label,
+                                             <link linkend="gint">gint</link> n,
+                                             <link linkend="GdkColor">GdkColor</link> *colors,
+                                             <link linkend="gint">gint</link> (*cb) ());
+void        <link linkend="gnome-proc-bar-set-values">gnome_proc_bar_set_values</link>       (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb,
+                                             unsigned <link linkend="val">val</link>[]);
+void        <link linkend="gnome-proc-bar-set-orient">gnome_proc_bar_set_orient</link>       (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb,
+                                             <link linkend="gboolean">gboolean</link> vertical);
+void        <link linkend="gnome-proc-bar-start">gnome_proc_bar_start</link>            (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb,
+                                             <link linkend="gint">gint</link> gtime,
+                                             <link linkend="gpointer">gpointer</link> data);
+void        <link linkend="gnome-proc-bar-stop">gnome_proc_bar_stop</link>             (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb);
+void        <link linkend="gnome-proc-bar-update">gnome_proc_bar_update</link>           (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb,
+                                             <link linkend="GdkColor">GdkColor</link> *colors);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBox">GtkBox</link>
+                     +----<link linkend="GtkHBox">GtkHBox</link>
+                           +----GnomeProcBar
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The GnomeProcBar widget is used to display load graphs like cpu usage, memory
+and swap load. It is for instance used in the cpumemusage applet and in GTop.
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeProcBar-struct">struct GnomeProcBar</title>
+<programlisting>struct GnomeProcBar;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-PROC-BAR--CLASS-CAPS">GNOME_PROC_BAR__CLASS()</title>
+<programlisting>#define GNOME_PROC_BAR__CLASS(klass)	GTK_CHECK_CLASS_CAST (klass, gnome_proc_bar_get_type (), GnomeProcBarClass)
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>klass</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-proc-bar-new">gnome_proc_bar_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_proc_bar_new              (<link linkend="GtkWidget">GtkWidget</link> *label,
+                                             <link linkend="gint">gint</link> n,
+                                             <link linkend="GdkColor">GdkColor</link> *colors,
+                                             <link linkend="gint">gint</link> (*cb) ());</programlisting>
+<para>
+Creates a new Gnome Process Bar with <parameter>n</parameter> items with the
+colors of <parameter>colors</parameter>. To do automatic updating, you set the <parameter>cb</parameter> to a function
+which takes a single void pointer as an argument and returns <literal>TRUE</literal> or <literal>FALSE</literal>.
+When it returns <literal>FALSE</literal> the timer stops running and the function stops getting
+called. You need to call <link linkend="gnome-proc-bar-start">gnome_proc_bar_start</link> with the time interval and
+the data argument that will be passed to the callback to actually start
+executing the timer.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry> Either <literal>NULL</literal> or a <link linkend="GtkWidget">GtkWidget</link> that will be shown at the left
+side of the process bar.
+</entry></row>
+<row><entry align="right"><parameter>n</parameter>&nbsp;:</entry>
+<entry> Number of items.
+</entry></row>
+<row><entry align="right"><parameter>colors</parameter>&nbsp;:</entry>
+<entry> Pointer to an array of <parameter>n</parameter> <link linkend="GdkColor">GdkColor</link> elements.
+</entry></row>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry> Callback function to update the process bar.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly created <link linkend="GnomeProcBar">GnomeProcBar</link> widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-proc-bar-set-values">gnome_proc_bar_set_values ()</title>
+<programlisting>void        gnome_proc_bar_set_values       (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb,
+                                             unsigned <link linkend="val">val</link>[]);</programlisting>
+<para>
+Set the values of <parameter>pb</parameter> to <parameter>val</parameter> and redraw it. You will
+probably call this function in the callback to update the values.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> Pointer to a <link linkend="GnomeProcBar">GnomeProcBar</link> object
+</entry></row>
+<row><entry align="right"><parameter>Param2</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-proc-bar-set-orient">gnome_proc_bar_set_orient ()</title>
+<programlisting>void        gnome_proc_bar_set_orient       (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb,
+                                             <link linkend="gboolean">gboolean</link> vertical);</programlisting>
+<para>
+Sets the orientation of <parameter>pb</parameter> to vertical if
+<parameter>vertical</parameter> is <literal>TRUE</literal> or to horizontal if <parameter>vertical</parameter> is <literal>FALSE</literal>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> Pointer to a <link linkend="GnomeProcBar">GnomeProcBar</link> object
+</entry></row>
+<row><entry align="right"><parameter>vertical</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if vertical <literal>FALSE</literal> if horizontal
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-proc-bar-start">gnome_proc_bar_start ()</title>
+<programlisting>void        gnome_proc_bar_start            (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb,
+                                             <link linkend="gint">gint</link> gtime,
+                                             <link linkend="gpointer">gpointer</link> data);</programlisting>
+<para>
+Start a timer, and call the callback that was set
+on <link linkend="gnome-proc-bar-new">gnome_proc_bar_new</link> with the <parameter>data</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> Pointer to a <link linkend="GnomeProcBar">GnomeProcBar</link> object
+</entry></row>
+<row><entry align="right"><parameter>gtime</parameter>&nbsp;:</entry>
+<entry> time interval in ms
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> data to the callback
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-proc-bar-stop">gnome_proc_bar_stop ()</title>
+<programlisting>void        gnome_proc_bar_stop             (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb);</programlisting>
+<para>
+Stop running the callback in the timer.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> Pointer to a <link linkend="GnomeProcBar">GnomeProcBar</link> object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-proc-bar-update">gnome_proc_bar_update ()</title>
+<programlisting>void        gnome_proc_bar_update           (<link linkend="GnomeProcBar">GnomeProcBar</link> *pb,
+                                             <link linkend="GdkColor">GdkColor</link> *colors);</programlisting>
+<para>
+Update <parameter>pb</parameter> with <parameter>colors</parameter>. <parameter>pb</parameter> is not redrawn,
+it is only redrawn when you call <link linkend="gnome-proc-bar-set-values">gnome_proc_bar_set_values</link></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> Pointer to a <link linkend="GnomeProcBar">GnomeProcBar</link> object
+</entry></row>
+<row><entry align="right"><parameter>colors</parameter>&nbsp;:</entry>
+<entry> Pointer to an array of <parameter>pb</parameter>-&gt;n <link linkend="GdkColor">GdkColor</link> elements
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

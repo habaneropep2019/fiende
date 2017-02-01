@@ -1,0 +1,407 @@
+<!DOCTYPE article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+]>
+
+
+  <article id="index">
+    <artheader>
+    <title>Guida utente del Simulatore di macchina di Turing per GNOME.</title>
+    <copyright>
+      <year>1998, 2000</year>
+      <holder>Free Software Foundation</holder>
+    </copyright>
+    <legalnotice id="legalnotice">
+      <para>
+       È permesso copiare, distribuire e/o modificare questo
+       documento secondo i termini della <citetitle>GNU Free Documentation
+       License</citetitle>, Versione 1.1 o qualsiasi altra versione
+       successiva pubblicata dalla Free Software Foundation, senza
+       Sezioni non modificabili, senza nessun Testo Copertina e senza
+       nessun Testo di retro copertina. È possibile ottenere una copia 
+       della <citetitle>GNU Free Documentation License</citetitle> dalla
+       Free Software Foundation visitando <ulink type="http"
+       url="http://www.fsf.org/">il loro sito Web</ulink> oppure scrivendo
+       alla: Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+       Boston, MA 02111-1307, USA.
+      </para>
+      <para>
+       Molti dei nomi usati dalle compagnie per identificare i loro prodotti
+       e servizi sono dichiarati marchi registrati. Quando tali nomi appaiono
+       in un qualsiasi documento GNOME, e qualora tali nomi siano noti ai
+       membri dello GNOME Documentation Project, essi vengono stampati in
+       maiuscolo o con iniziali maiuscole.
+      </para>
+    </legalnotice>
+ </artheader>
+
+ 
+  <sect1 id="description">
+    <title>Introduzione</title>
+    <para>
+     Un semplicissimo simulatore di Macchine di Turing. La macchina di 
+     Turing è stata presentata nel 1936 dal matematico inglese Al Turing
+     come formalizzazione della nozione di <quote>algoritmo</quote>.
+     È il computer più semplice possibile, in grado di effettuare solo
+     operazioni semplicissime; tuttavia è possibile dimostrare che la
+     macchina di Turing è tanto potente quanto uno qualsiasi dei moderni
+     linguaggi di programmazione. Qualsiasi algoritmo implementabile,
+     ad esempio, in Java può anche essere scritto come programma per la
+     macchina di Turing. Ovviamente nessuno usa la macchina di Turing
+     per lavori veri, ma è comunque utilissima in informatica e nella
+     logica matematica, per non parlare del fatto che sia anche un bel
+     giocattolo.
+    </para>
+    <para>
+     Il simulatore di macchina di Turing per GNOME dispone di una
+     interfaccia grafica per resettare, fermare, far girare e far girare
+     un passo alla volta la macchina. Inoltre dispone di un visore degli
+     stati della macchina che permette di vedere il programma in
+     esecuzione, ed anche di effettuarne il debug. Infine, il simulatore
+     di macchina di Turing per GNOME è fornito con diversi 
+     <quote>programmi</quote> campione. Il formato dei file di programma
+     è descritto in <xref linkend="prgfmt">, di modo che possiate scrivere
+     i vostri programmi. Inviate i vostri programmi ad Arturo
+      Espinosa (<email>arturo@nuclecu.unam.mx</email>), in modo che
+      vengano inclusi nella prossima versione.
+    </para>
+
+    <para>
+      Per eseguire <application>gturing</application>, selezionate
+      <menuchoice>
+	<guisubmenu>Giochi</guisubmenu>
+	<guimenuitem>gturing</guimenuitem>
+      </menuchoice>
+      nel <guimenu>Menu principale</guimenu>, oppure battete
+      <command>gturing</command> sulla riga di comando.
+  </para>
+
+    <para>
+      <application>gturing</application> è incluso nel pacchetto
+      <filename>gnome-games</filename>, che è parte del desktop GNOME.
+      Questo documento descrive la versione 1.2 di
+      <application>gturing</application>.
+    </para>
+
+  </sect1>
+
+  <sect1 id="turingmachine">
+    <title>Cos'è una macchina di Turing!</title>
+
+
+    <para>Ci sono vari modi per definire una macchina di Turing, tutti
+     equivalenti. La definizione usata da 
+      <application>gturing</application> è la seguente. 
+      Una macchina di Turing è formata da due parti:
+      <itemizedlist>
+	<listitem><para>
+	  Un nastro, che contiene i dati. Il nastro è infinito in entrambe
+	  le direzioni; è diviso in celle ed ogni cella può contenere un
+	  simbolo appartenente ad un insieme finito (in
+	  <application>gturing</application> tale insieme è quello dei
+	  caratteri ASCII stampabili). Il nastro, ad ogni estremità, ha un 
+	  numero infinito di spazi.
+         </para>
+	</listitem>
+      <listitem>
+	<para>
+	 Una testina, in grado di muoversi lungo il nastro, che ricopre il 
+	 ruolo di dispositivo di elaborazione. In ogni istante esso si trova
+	 sopra una delle celle del nastro. La testina può muoversi lungo
+	 il nastro in ambo le direzioni e può leggere e scrivere simboli
+	 su di esso. Inoltre esiste il concetto di <quote>stati
+	 interni</quote> della testina; in ogni istante la testina si trova
+	 in uno di tali stati e può cambiare da uno all'altro.
+        </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
+     Per far funzionare la macchina dovete dargli un insieme di regole
+     che stabiliscono le operazioni che deve effettuare a seconda del
+     simbolo che legge al momento sul nastro e dello stato attuale della
+     testina. Una tipica regola potrebbe essere <quote><literal>Se il
+     simbolo letto è 1 e lo stato interno è 0, allora cambia il simbolo
+     corrente in uno spazio, spostati a destra e cambia lo stato interno
+     in 3</literal></quote>. Una descrizione formale delle regole può
+     essere trovata in <xref linkend="prgfmt">. Potete pensare all'insieme
+     di regole come ad un <quote>programma</quote> per la macchina di Turing.
+    </para>
+
+    <para>Se volete saperne di più sulle macchine di Turing guardate
+     questa <ulink
+     URL="http://obiwan.uvi.edu/computing/turing/ture.htm">Turing
+     Machine Introduction</ulink>.
+    </para>
+  </sect1>
+
+  <sect1 id="using">
+    <title>Usare gturing</title>
+
+    <sect2 id="entering">
+      <title>Scegliere un programma ed immettere i dati</title>
+      <para>
+       Per usare <application>gturing</application> dovete scegliere un
+       insieme di regole (un programma) pe la macchina e fornirgli dei
+       dati iniziali. Per scegliere il programma selezionate 
+       <guimenuitem>Apri</guimenuitem> nel menu <guimenu>File</guimenu>
+       e selezionare il file contenente il programma.
+       <application>gturing</application> include parecchi programmi
+       d'esempio; selezionandone uno vi verrà mostrato un breve messaggio
+       che spiega cosa fa il programma e quali dati si aspetta di trovare
+       sul nastro. Potete anche scrivere un vostro programma, come 
+       descritto in <xref linkend="prgfmt">.
+      </para>
+      <note>
+	<title>NOTA</title>
+	<para>
+	 Non è possibile creare nuovi file di programma, o modificare quelli
+	 esistenti, dall'interno di <application>gturing</application>;
+	 piuttosto usate il vostro editor preferito!
+        </para>
+      </note>
+      <para>
+       Una volta scelto il programma dovete fornirgli il nastro con i dati
+       iniziali. Per farlo selezionate 
+       <menuchoice><guimenu>Opzioni</guimenu><guimenuitem>Nastro</guimenuitem> 
+       </menuchoice> e inserite i simboli nel nastro. Ora la vostra macchina
+       di Turing è pronta a funzionare.
+      </para>
+    </sect2>
+
+    <sect2 id="running">
+      <title>Far girare un programma</title> 
+
+      <para>
+        La finestra principale di <application>gturing</application>
+	è come quella in <xref linkend="figure1">. È formata da una
+	barra di menu, una barra degli strumenti, il display principale
+	e un display dello stato (in fondo). Il display principale
+	mostra il contenuto del nastro e la posizione della testina
+	(indicata con un accento acuto (^)). Il display dello stato
+	mostra, a sinistra, il nome del file di programma che è stato
+	caricato e, a destra, lo stato attuale della macchina.
+      </para>
+          <!-- ==== Figure ==== -->
+        <figure id="figure1">
+	  <title>gturing: finestra principale</title>
+	  <screenshot>
+	    <screeninfo>gturing: finestra principale</screeninfo>
+	    <graphic fileref="mainwin" format="png" srccredit="sasha">
+            </graphic>
+	  </screenshot>
+	</figure>
+    <!-- ==== End of Figure ==== -->
+      <para>
+	Per avviare ed interrompere l'esecuzione del programma usate i
+	pulsanti <guibutton>Esegui</guibutton> e <guibutton>Stop</guibutton>,
+	oppure premete <guibutton>Passo</guibutton> per eseguire solo un
+	passo dell'algoritmo.
+      </para>
+      <para>
+       Per riavviare il programma premete <guibutton>Reset</guibutton>.
+       Ciò pone la macchina nello stato 0 e mette il contenuto del nastro
+       nel modo in cui era stato originariamente posto dall'utente.
+       La testina della macchina viene posizionata sul carattere all'estrema
+       sinistra del nastro.
+      </para>
+    </sect2>
+
+    <sect2 id="menubar"><title>La barra dei menu</title>
+      <para>
+        La barra dei menu, situata in cima alla <interface>Finestra
+	Principale</interface>, contiene i seguenti menu:
+      </para>
+      <variablelist>
+	<varlistentry>
+	  <term><guimenu>File</guimenu></term>
+	  <listitem>
+	    <para>
+	      Questo menu vi permette di caricare un programma nella
+	      macchina e di uscire dall'applicazione. Per caricare un
+	      programma dovrete scegliere un file scritto precedentemente.
+	      La prima volta che scegliete questa opzione verrà aperta
+	      la directory con gli esempi.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	 <term><guimenu>Opzioni</guimenu></term>
+	  <listitem>
+	    <para>
+	      Questo menu vi consente di impostare il contenuto del nastro
+	      e la velocità con cui girerà la macchina (cambiando il
+	      contenuto del nastro la macchina verrà resettata).
+	      Inoltre vi permette di aprire o chiudere la finestra con
+	      gli <guilabel>Stati della macchina</guilabel>, che mostra
+	      tutte le regole scritte nel file di programma ed evidenzia
+	      la regola che viene applicata al passo corrente.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+ 
+	<varlistentry>
+	  <term><guimenu>Aiuto</guimenu></term>
+	  <listitem>
+	    <para>
+	      Fornisce l'accesso a questo manuale e alla finestra
+	      <guilabel>Informazioni su...</guilabel>, che mostra
+	      le informazioni sulla versione e sul copyright di
+	      <application>gturing</application>.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+  </sect1>
+
+  <sect1 id="prgfmt">
+    <title>Formato dei file di programma</title>
+    <para>
+      Le righe vuote e quelle che iniziano con (#) sono considerati commenti
+      e verranno mostrati all'utente al caricamento del programma.
+      Altrimenti ci si aspettano cinque elementi, separati da uno spazio. 
+      Essi sono il numero dello stato, il simbolo atteso, il simbolo da 
+      scrivere, la direzione in cui muoversi e il nuovo stato. Qualsiasi 
+      cosa segua tali elementi verrà ignorata e può essere usata per
+      documentare le varie regole.
+    </para>
+    <para>
+      Expected symbols and symbols to write can be any printable
+      character.  The blank character is represented by the underscore
+      (_). States are integer numbers, starting from 0. The possible
+      directions to move are left and right, represented by 'l' and
+      'r', respectively.
+
+      I simboli attesi e i simboli da scrivere possono essere qualsiasi 
+      carattere stampabile. Il carattere blank (spazio vuoto) è 
+      rappresentato dall'underscore (_). Gli stati sono numeri interi, a 
+      partire da 0. Le possibili direzioni di movimento sono sinistra e 
+      destra, rappresentate, rispettivamente, da 'l' (left, sinistra) e 
+      'r' (right, destra).
+    </para>
+    <para>
+      La macchina parte dallo stato 0 e si ferma quando non riesce a 
+      trovare il nuovo stato o il nuovo stato non si aspetta il simbolo 
+      di lettura.
+    </para>
+    <para>
+      È importante osservare che, poiché il nastro della macchina è
+      pensato di lunghezza infinita, il nastro avrà un infinito numero 
+      di spazi vuoti in fondo ad ogni estremità di ciò che l'utente ha 
+      messo come contenuto del nastro.
+    </para>
+    <para>
+      <example><title>Binary ++</title>
+	<programlisting>
+# Questo programma aggiunge 1 ad un numero binario. Il nastro iniziale deve
+# essere un numero binario.
+
+0 1 1 r 0 Muove fino alla cifra piu' a destra del numero binario. Poi, va nello
+0 0 0 r 0 stato 1.
+0 _ _ l 1
+1 1 0 l 1 Se c'e' un 1, lo cambia in 0 e si sposta a sinistra.
+1 0 1 r 2 Se c'e' uno 0, lo cambia in 1 e va nello stato 2
+1 _ 1 r 2 Fa lo stesso per gli spazi bianchi.
+
+# Visto che non c'e' uno stato 2, la macchina si ferma.
+	</programlisting>
+      </example>
+    </para>
+  </sect1>
+
+<!-- ============= Authors ================================ -->
+
+ <sect1 id="authors">
+  <title>Autori</title>
+  <para>
+   <application>gturing</application>> è stata scritta da Arturo Espinosa
+   Aldama (<email>arturo@nuclecu.unam.mx</email>).
+  Please send all
+   comments, suggestions, and bug reports to the <ulink
+   url="http://bugs.gnome.org" type="http">GNOME bug tracking
+   database</ulink>.  (Instructions for submitting bug reports can be
+   found <ulink url="http://bugs.gnome.org/Reporting.html"
+   type="http"> on-line</ulink>.)  You can also use <application>Bug
+   Report Tool</application> (<command>bug-buddy</command>), available
+   in the <guisubmenu>Utilities</guisubmenu> submenu of <guimenu>Main
+   Menu</guimenu>, for submitting bug reports.
+  </para>
+
+  <para>
+   This manual was written by Arturo Espinosa Aldama
+   (<email>arturo@nuclecu.unam.mx</email>) con dei contributi da parte
+   di Alexander Kirillov (<email>kirillov@math.sunysb.edu</email>). 
+   Per favore, si mandino commenti e suggerimenti riguardanti questo
+   manuale allo <ulink type="http"
+   url="http://developer.gnome.org/projects/gdp/">GNOME documentation
+   project</ulink> inviando una email a <email>docs@gnome.org</email>.
+   È possibile anche aggiungere i propri commenti online usando la
+   <ulink type="http"
+   url="http://developer.gnome.org/projects/gdp/doctable/">GNOME
+   Documentation Status Table</ulink>.
+  </para>
+  </sect1>
+
+ <!-- ============= Application License ============================= -->
+
+ <sect1 id="license">
+  <title>Licenza</title>
+  <para>
+   Questo programma è software libero; è possibile ridistribuirlo e/o
+   modificarlo rispettando i termini della <citetitle>GNU General Public
+   License</citetitle> pubblicata dalla Free Software Foundation;
+   nella versione 2 o (a vostra scelta) qualsiasi altra versione
+   successiva.
+  </para>
+  <para>
+   Questo programma è distribuito nella speranza che sia utile, ma SENZA
+   NESSUNA GARANZIA; senza neppure l'implicita garanzia di COMMERCIABILITÀ
+   o UTILIZZABILITÀ PER UN PARTICOLARE SCOPO. Per maggiori dettagli
+   vedere la <citetitle>Licenza pubblica generica GNU</citetitle>.
+  </para>
+  <para>
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the  <ulink type="help" url="gnome-help:gpl">
+    <citetitle>GNU General Public License</citetitle></ulink> as
+   published by the Free Software Foundation; 
+   either version 2 of the License, or (at your option) any later
+   version.
+  </para>
+  <para>
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   <citetitle>GNU General Public License</citetitle> for more details.
+  </para>
+  <para>
+   Una copia della <citetitle>Licenza pubblica generica GNU</citetitle>
+   è inclusa come appendice nella <citetitle>Guida utente di
+   GNOME<citetitle>. È possibile anche ottenerne una copia dalla
+   Free Software Foundation visitando <ulink type="http"
+   url="http://www.fsf.org">il loro sito Web</ulink> o scrivendo a:
+   <address>
+    Free Software Foundation, Inc.
+    <street>59 Temple Place</street> - Suite 330
+    <city>Boston</city>, <state>MA</state> <postcode>02111-1307</postcode>
+    <country>USA</country>
+   </address>
+  </para>
+ </sect1>
+
+</article>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

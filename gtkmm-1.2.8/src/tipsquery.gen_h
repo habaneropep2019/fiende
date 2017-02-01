@@ -1,0 +1,96 @@
+/* $Id: tipsquery.gen_h,v 1.38 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* tipsquery.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/label.h>
+#include <gtk/gtktipsquery.h>
+CLASS_START(Gtk);
+//: Displays help about widgets in the user interface.
+//- The {\class Gtk::TipsQuery} widget is a subclass of {Gtk::Label::} which is used
+//- to display help about widgets in a user interface.
+//-
+//- A query is started with a call to {start_query()}, usually when some kind of
+//- 'Help' button is pressed. The {\class Gtk::TipsQuery} then grabs all
+//- events, stopping the user interface from functioning normally. Then as the user
+//- moves the mouse over the widgets, the {\class Gtk::TipsQuery} displays each
+//- widget's tooltip text.
+//-
+//- By connecting to the "widget-entered" or "widget-selected" signals, it is
+//- possible to customize the {\class Gtk::TipsQuery} to perform other actions when
+//- widgets are entered or selected. For example, a help browser could be opened
+//- with documentation on the widget selected.
+//-
+//- At some point a call to {stop_query()} must be made in order to stop the query
+//- and return the interface to its normal state. The {set_caller()} function can be
+//- used to specify a widget which the user can select to stop the query (often the
+//- same button used to start the query).
+class TipsQuery : public Label
+{
+  WRAP_CLASS(TipsQuery,GtkTipsQuery,GTK_TIPS_QUERY,GTK_IS_TIPS_QUERY,tips_query,Gtk::Label,GtkLabel,GTK_LABEL);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Emitted when the query is started.
+  SIGNAL_SPEC("start_query",both,void start_query(),gtk_tips_query_start_query);
+  //: Emitted when the query is stopped.
+  SIGNAL_SPEC("stop_query",both,void stop_query(),gtk_tips_query_stop_query);
+
+  //: Emitted when a widget is entered by the pointer while the query is in effect.
+  SIGNAL_SPEC("widget_entered",impl,
+     void widget_entered(Gtk::Widget*, const gchar*, const gchar*),
+     void gtk_tips_query_widget_entered(GtkTipsQuery*,GtkWidget*, const gchar*, const gchar*));
+  //: Emitted when a widget is selected during a query.
+  SIGNAL_SPEC("widget_selected",impl,
+     gint widget_selected(Gtk::Widget*, const gchar*, const gchar*, GdkEventButton*),
+     gint gtk_tips_query_widget_selected(GtkTipsQuery*,GtkWidget*, const gchar*, const gchar*, GdkEventButton*));
+
+  //: Sets the widget which initiates the query, usually a button.
+  //- If the caller is selected while the query is running, the query is automatically stopped.
+  //-
+  //- {\var caller}: The widget which initiates the query.
+  WRAP_METHOD(void gtk_tips_query_set_caller(GtkTipsQuery*,GtkWidget*),
+    void set_caller(Gtk::Widget *caller=0));
+  //: Sets the widget which initiates the query, usually a button.
+  //- If the caller is selected while the query is running, the query is automatically stopped.
+  //-
+  //- {\var caller}: The widget which initiates the query.
+  WRAP_METHOD(void gtk_tips_query_set_caller(GtkTipsQuery*,GtkWidget*),
+    void set_caller(Gtk::Widget &caller));
+
+  //: Sets the text to display when the query is not in effect, and the text to display when
+  //: the query is in effect but the widget beneath the pointer has no tooltip.
+  //- {\var label_inactive}: The text to display when the query is not running.
+  //-
+  //- {\var label_no_tip}: The text to display when the query is running but the widget beneath
+  //- the pointer has no tooltip.
+  WRAP_METHOD(
+    void gtk_tips_query_set_labels(GtkTipsQuery*,const gchar*,const gchar*),
+    void set_labels(const string &label_inactive,
+		    const string &label_no_tip));
+};
+
+PRIVATE_START;
+#include <gtk--/private/label_p.h>
+IMPL_START;
+DOCUMENTATION_START;
+

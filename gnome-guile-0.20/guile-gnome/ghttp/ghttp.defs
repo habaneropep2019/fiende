@@ -1,0 +1,179 @@
+;;; -*- scheme -*-
+;;; gnome.defs - Export gnome-http libraries to gnome-guile
+;;; 
+;;; Copyright (C) 2000 Ariel Rios ariel@gnu.org
+;;; 
+;;; This program is free software; you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 2, or (at your option)
+;;; any later version.
+;;; 
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;; 
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program; if not, write to the Free Software
+;;; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+;;; 02111-1307, USA.  */
+
+
+;; ghttp.h
+
+(define-struct ghttp_request
+  (copy ghttp_request_new)
+  (free ghttp_request_destroy))
+
+(define-enum ghttp_type
+  (get ghttp_type_get) 
+  (opitons ghttp_type_options)
+  (head ghttp_type_head)
+  (post ghttp_type_post)
+  (put ghttp_type_put)
+  (delete ghttp_type_delete)
+  (trace ghttp_type_trace)
+  (connect ghttp_type_connect)
+  (propfind ghttp_type_propfind)
+  (propatch ghttp_type_proppatch)
+  (mkcol ghttp_type_mkcol)
+  (copy ghttp_type_copy)
+  (move ghttp_type_move)
+  (lock ghttp_type_lock)
+  (unlock ghttp_type_unlock))
+
+(define-enum  ghttp_sync_mode
+  (sync ghttp_sync)
+  (async ghttp_async))
+
+(define-enum ghttp_status
+  (error ghttp_error)
+  (not-done ghttp_not_done)
+  (donde ghttp_done))
+
+(define-enum ghttp_proc
+  (none ghttp_proc_none)
+  (request ghttp_proc_request)
+  (hdrs ghttp_proc_response_hdrs)
+  (response ghttp_proc_response)) 
+
+(define-func ghttp_request_new
+  ghttp_request
+  ())
+
+(define-func ghttp_request_destroy
+  none
+  ((ghttp_request  a_request)))
+
+(define-func ghttp_uri_validate
+  int
+  ((string  a_uri)))
+
+(define-func ghttp_set_uri
+  int
+  ((ghttp_request  a_request)
+   (string  a_uri)))
+
+(define-func ghttp_set_proxy
+  int
+  ((ghttp_request  a_request)
+   (string  a_uri)))
+
+(define-func ghttp_set_type
+  int
+  ((ghttp_request  a_request)
+   (ghttp_type a_type)))
+
+(define-func ghttp_set_body
+  int
+  ((ghttp_request  a_request)
+   (string  a_body)
+   (int a_len)))
+
+(define-func ghttp_set_sync
+  int
+  ((ghttp_request  a_request)
+   (ghttp_sync_mode a_mode)))
+
+(define-func ghttp_prepare
+  int
+  ((ghttp_request  a_request)))
+
+(define-func ghttp_set_chunksize
+  none
+  ((ghttp_request  a_request)
+   (int a_size)))
+
+(define-func ghttp_set_header
+  none
+  ((ghttp_request a_request)
+   (string a_hdr)
+   (string a_val)))
+
+(define-func ghttp_process
+  ghttp_status
+  ((ghttp_request  a_request)))
+
+;; FIXME!!!!!!! Manual Bindings
+;;(define-func ghttp_get_status
+;;  ghttp_current-status
+;;  ((ghttp_request a_request)))
+
+(define-func ghttp_get_header
+  string
+  ((ghttp_request a_request)
+   (string a_hdr)))
+
+(define-func ghttp_close
+  int
+  ((ghttp_request a_request)))
+
+(define-func ghttp_clean
+  none
+  ((ghttp_request a_request)))
+
+(define-func ghttp_get_socket
+  int
+  ((ghttp_request a_request)))
+
+(define-func ghttp_get_body
+  string
+  ((ghttp_request a_request)))
+
+(define-func ghttp_get_body_len
+  int
+  ((ghttp_request a_request)))
+
+(define-func ghttp_get_error
+  string
+  ((ghttp_request  a_request)))
+
+;;(define-func ghttp_parse_date
+;;  time-t
+;;  ((string  a_date)))
+
+(define-func ghttp_status_code
+  int
+  ((ghttp_request a_request)))
+
+(define-func ghttp_reason_phrase
+  string
+  ((ghttp_request  a_request)))
+
+(define-func ghttp_set_authinfo
+  int
+  ((ghttp_request a_request)
+   (string a_user)
+   (string a_pass)))
+
+(define-func ghttp_set_proxy_authinfo
+  int
+  ((ghttp_request a_request)
+   (string a_user)
+   (string a_pass)))
+
+(options 
+ (includes "#include <ghttp.h>")
+ (init-func "ghttp_init_glue"))
+
+

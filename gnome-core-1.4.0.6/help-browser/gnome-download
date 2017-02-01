@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+#
+# Download script originally for QWeb - 
+# downloads anything and converts it into html
+#
+# Distribute under GPL version 2.
+#
+# Copyright 1997,1999 Pavel Machek <pavel@ucw.cz>
+#
+
+sub lynx {
+    system( "lynx -source $_ || echo '<HTML><BODY><H1>Error</H1><P>Error occured when trying to download <TT>$_</TT>. Lynx failed to download selected file.</BODY></HTML>'" ); 
+}
+
+$_ = $ARGV[0];
+$| = 1;
+if (/^ftp:/) {
+    print "Content-Type: text/html\n\n";
+    $_ =~ s-foo/../--;
+    lynx();
+    exit $? >> 8;
+}
+
+# Don't use xterm - it is suid on my system and if I use it,
+# gnome-help-browser is blocked for the time it runs.
+$xterm = "xterm";
+# gnome-terminal does not recognize -e correctly.
+#$xterm = "gnome-terminal";
+
+if (/^mailto:/) {
+    print "Content-Type: text/html\n\n";
+    $_ =~ s-^mailto:--;
+    $_ =~ s-^//--;
+    $_ =~ s-^//--;
+    $mailer = $ENV{'MAILER'};
+    if ($mailer eq "") {
+	$mailer = "elm";
+	$defaultmailer = 1;
+    }
+    $cmd = "$xterm -e $mailer $_";
+
+    print "<HTML><HEAD>\n";
+    print "<TITLE>Sending mail to $_</TITLE>\n";
+    print "</HEAD><BODY>\n";
+    print "<H1>Mail to $_</H1>\n";
+    print "<P>External programs for sending mail (<tt>$cmd</tt>) were spawned for you. Press <I>back</I> when you finish sending mail. Press <I>reload</I> if you want to retry sending mail.\n";
+    if ($defaultmailer) {
+	print "<P>Notice that default mailer <tt>$mailer</tt> was spawned for you. If you do not like this, set your <tt>\$MAILER</tt> environment variable to mailer you prefer.\n";
+    }
+    print "</BODY></HTML>\n";
+
+    system( "$cmd &" );
+    exit 0;
+}
+
+if (/^news:/) {
+    print "Content-Type: internal/lynx-news\n\n";
+
+    lynx();
+    exit $? >> 8;
+}
+
+if (/^telnet:/) {
+    print "Content-Type: text/html\n\n";
+
+    $_ =~ s-^telnet:--;
+    $_ =~ s-^//--;
+    $_ =~ s-^//--;
+    $HOST = $_;
+    if (/@/) { $NAME = $_;
+	       $NAME =~ s-@.*--;
+	   }
+    $HOST =~ s-.*@--;
+    $cmd = "$xterm -e telnet $HOST";
+
+    print "<HTML><HEAD>\n";
+    print "<TITLE>Telnet to $HOST</TITLE>\n";
+    print "</HEAD><BODY>\n";
+    print "<H1>Telnet</H1>\n";
+    print "<P>External commands <TT>$cmd</TT> were spawned for you.\n";
+    if ($NAME) {
+	print "Login as <B><TT>$NAME</TT></B> when you get a chance.\n";
+    }
+    print "Press <I>back</I> when you finish connecting to remote host.</P>\n";
+    print "</BODY></HTML>\n";
+
+    system( "$cmd &\n" );
+    exit 0;
+}
+
+if (/^about:/) {
+    print "Content-Type: text/html\n\n";
+
+    if (/mozilla/) {
+	print "<HTML><HEAD>\n";
+	print "<TITLE>Mozilla</TITLE>\n";
+	print "</HEAD><BODY>\n";
+	print "<H3><I>And time will come, when will be no Mozillas at all. Noone will eat megabytes and never let them free. Software will no longer crash. And sun will shine at the GNU world.</I></H3>\n";
+	print "<P ALIGN=right>I wrote this 2 years ago. Since mozilla went open source, I no longer think it is evil. Still, GNU GPL would be better.";
+	print "</BODY></HTML>\n";
+	exit 0;
+    }
+	
+    print "<HTML><HEAD>\n";
+    print "<TITLE>Gnome</TITLE>\n";
+    print "</HEAD><BODY>\n";
+    print "<H1>Gnome download system</H1>\n";
+    print "<H3>Copyright 1999 <A HREF=\"http://atrey.karlin.mff.cuni.cz/~pavel\">Pavel Machek</A>, GPL v2</H3>\n";
+    print "<P><TT>gnome-download</TT> allows retrieving documents by various transport methods pretty painlessly. It is perl script, which launches external commands (like lynx) frequently. It was designed for maximum flexibility, and you should feel free to modify it.\n";
+
+    print "<H3>TODO</H3>\n";
+    print "<P><TT>lynx</TT> is really slow if <tt>/etc/mailcap</tt> is used. Fix it, somehow. Find nice possibility to save files, enter tar archives etc.\n";
+    
+    print "<H3>Contributors</H3>\n";
+    print "<UL>\n";
+    print "<LI>you want your name here ;-)\n";
+    print "</UL>\n";
+    print "</BODY></HTML>\n";
+    exit 0;
+}
+
+if (/^file/) {
+    print "Content-Type: text/html\n\n";
+
+    $_ =~ s-foo/../--;
+#    $_ =~ s-^file:--;
+    lynx();
+    exit 0;
+}
+
+if (/^newspost/) {
+    print "Content-Type: text/html\n\n";
+
+    $GROUPS = $_;
+    $GROUPS =~ s#.*/##;
+    $0 =~ s#download##;
+    $SERVER = $_;
+    $SERVER =~ s#newspost://##;
+    $SERVER =~ s#/.*##;
+
+    print "<HTML><HEAD>\n";
+    print "<TITLE>Posting news article to $GROUPS on $SERVER</TITLE>\n";
+    print "</HEAD><BODY>\n";
+    print "<H1>Posting news</H1>\n";
+    print "<P>External programs <TT>xterm</TT> and <TT>bash</TT> were spawned for you. This means that you should fix newspost method. \n";
+    print "Press <I>back</I> when you finish posting to newsgroups.</P>\n";
+    print "</BODY></HTML>\n";
+
+#    system( "$xterm -e $0newspost --post $GROUPS $SERVER &" );
+    system( "$xterm -e bash &" );
+    exit 0;
+}
+
+if (/^netscape:|^lynx:|^mozilla:|^w3m:/) {
+    print "Content-Type: text/html\n\n";
+
+    print "<HTML><HEAD>\n";
+    print "</HEAD><BODY>\n";
+    print "<H1>Launching other browser</H1>\n";
+    print "<P>Ok, you have requested browsing using other browser. It was spawned for you. Press <I>back</I> when you are done.\n";
+    $_ =~ s#([^:]*):##;
+    print "<P>(Am I right that you want $1?)\n"; 
+    print "</BODY></HTML>\n";
+    system( "$xterm -e bash -c '$1 $_' &" );
+    exit 0;
+}
+
+print "Content-Type: text/html\n\n";
+
+lynx();
+exit $? >> 8;
+
+

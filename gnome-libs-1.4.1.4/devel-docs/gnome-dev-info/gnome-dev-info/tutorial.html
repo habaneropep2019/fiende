@@ -1,0 +1,399 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>GNOME Developer's Tutorial.</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Coding Standards."
+HREF="codstd.html"><LINK
+REL="NEXT"
+TITLE="Adding menus"
+HREF="tut-menus.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="codstd.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="tut-menus.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="TUTORIAL"
+>GNOME Developer's Tutorial.</A
+></H1
+><P
+>	From the gnome-hello manual:
+	</P
+><P
+>	  gnome-hello is a GNOME application which contains all the essential
+	  and common features of GNOME programs, such as initialization, event
+	  loops, configuration file parsing, internationalization and so forth.
+	  </P
+><P
+>	
+	  gnome-hello is intended to be an example of the GNOME coding
+	  standards, as well as a fun and useless little program.
+	  </P
+><P
+>        In this chapter we're going to use it to explain the basics features 
+        that an application must have to be considered gnome-compliant.
+        </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUT-BASICS"
+>Starting with GNOME</A
+></H1
+><P
+><IMG
+SRC="gnome-hello-0-basic.jpg"></P
+><P
+>      	  We'll start with a very basic application. It's only a window
+      	  with a button which when clicked, close the window and prints
+      	  "Hello GNOME". The code source for it is in <TT
+CLASS="FILENAME"
+>      	  programs/gnome-hello/gnome-hello-0-basic.c</TT
+>. [FIXME:
+      	  Should i include the full code here?]
+      	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  #include &#60;config.h&#62;
+	  #include &#60;gnome.h&#62;
+	  </PRE
+></TD
+></TR
+></TABLE
+><P
+>	  All the programs have to include <TT
+CLASS="FILENAME"
+>gnome.h</TT
+> which
+	  gives all you need to use the Gtk+ and GNOME libraries.
+	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	int
+	main(int argc, char *argv[])
+	{
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+><TT
+CLASS="FUNCTION"
+>gnome_init</TT
+> is always called at the beginning 
+          of a program. It takes care of initializing both Gtk and GNOME.
+          </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  gnome_init (&#38;argc, &#38;argv);
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Then we call <TT
+CLASS="FUNCTION"
+>prepare_app</TT
+> that do the real 
+	  work and <TT
+CLASS="FUNCTION"
+>gtk_main</TT
+> to enter into the main 
+	  processing loop.
+	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  prepare_app ();
+
+ 	  gtk_main ();
+
+	  return 0;
+	}
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Let's now go to the <TT
+CLASS="FUNCTION"
+>prepare_app</TT
+> code...
+	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	void
+	prepare_app()
+	{
+	  GtkWidget *button;
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>We first make the main window calling
+	  <TT
+CLASS="FUNCTION"
+>gnome_app_new</TT
+> and connect the signal 
+	  <TT
+CLASS="FUNCTION"
+>delete_event</TT
+> to the callback 
+	  <TT
+CLASS="FUNCTION"
+>quit_cb</TT
+>, so the user can close the app via the 
+	  window manager:
+	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  app = gnome_app_new ("hello", "Hello World Gnomified");
+	  gtk_widget_realize (app);
+	  gtk_signal_connect (GTK_OBJECT (app), "delete_event",
+	                      GTK_SIGNAL_FUNC (quit_cb), NULL);
+        </PRE
+></TD
+></TR
+></TABLE
+><P
+>Then, we create a button and set it to be the content of the main
+	  window.
+	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  button = gtk_button_new_with_label ("Hello GNOME");
+	  gtk_signal_connect (GTK_OBJECT (button), "clicked",
+	                     GTK_SIGNAL_FUNC (hello_cb), NULL);
+	  gtk_container_border_width (GTK_CONTAINER (button), 60);
+	  gnome_app_set_contents ( GNOME_APP (app), button);
+        </PRE
+></TD
+></TR
+></TABLE
+><P
+>Finally, we show the widgets. It could be done in any order,
+	  but we display at last the main window so the whole window
+	  will pop up at once rather than seeing the window pop up, and 
+	  then the button form inside of it.
+	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  gtk_widget_show (button);
+ 	  gtk_widget_show (app);
+	}
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>The callbacks (<TT
+CLASS="FUNCTION"
+>hello_cb</TT
+> for the button and 
+	  <TT
+CLASS="FUNCTION"
+>quit_cb</TT
+> for <TT
+CLASS="LITERAL"
+>delete_event</TT
+>)
+	  are very simple. They just call <TT
+CLASS="FUNCTION"
+>gtk_main_quit</TT
+> 
+	  to exit.
+	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	void
+	hello_cb (GtkWidget *widget, void *data)
+	{
+  	  g_print ("Hello GNOME\n");
+	  gtk_main_quit ();
+	  return;
+	}
+
+	void
+	quit_cb (GtkWidget *widget, void *data)
+	{
+	  gtk_main_quit ();
+	  return;
+	}
+	</PRE
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="codstd.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tut-menus.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Coding Standards.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Adding menus</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

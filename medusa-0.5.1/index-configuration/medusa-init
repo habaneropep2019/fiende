@@ -1,0 +1,28 @@
+#!/bin/sh
+
+indexing_is_enabled=`/usr//sbin/medusa-test-indexing-status`
+
+if [ "$indexing_is_enabled" != "Indexing is enabled." ]
+then
+    exit 1
+fi
+
+case "$1" in
+	start)
+		/usr//bin/medusa-searchd
+	;;
+ 
+	stop)
+		killall medusa-searchd
+	;;
+ 
+	restart)
+		killall medusa-searchd
+		/usr//bin/medusa-searchd
+	;;
+ 
+	*)
+		echo "Usage: $0 start | stop | restart" >&2
+		exit 1
+	;;
+esac

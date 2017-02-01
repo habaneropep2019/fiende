@@ -1,0 +1,301 @@
+<refentry id="GnomeMDIChild">
+<refmeta>
+<refentrytitle>GnomeMDIChild</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeMDIChild</refname><refpurpose>An abstract MDI child class</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeMDIChild-struct">GnomeMDIChild</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  (<link linkend="GnomeMDIChildViewCreator">*GnomeMDIChildViewCreator</link>)     (<link linkend="GnomeMDIChild">GnomeMDIChild</link>*,
+                                             <link linkend="gpointer">gpointer</link>);
+<link linkend="GList">GList</link>*      (<link linkend="GnomeMDIChildMenuCreator">*GnomeMDIChildMenuCreator</link>)     (<link linkend="GnomeMDIChild">GnomeMDIChild</link>*,
+                                             <link linkend="GtkWidget">GtkWidget</link>*,
+                                             <link linkend="gpointer">gpointer</link>);
+<link linkend="gchar">gchar</link>*      (<link linkend="GnomeMDIChildConfigFunc">*GnomeMDIChildConfigFunc</link>)      (<link linkend="GnomeMDIChild">GnomeMDIChild</link>*,
+                                             <link linkend="gpointer">gpointer</link>);
+<link linkend="GtkWidget">GtkWidget</link>*  (<link linkend="GnomeMDIChildLabelFunc">*GnomeMDIChildLabelFunc</link>)       (<link linkend="GnomeMDIChild">GnomeMDIChild</link>*,
+                                             <link linkend="GtkWidget">GtkWidget</link>*,
+                                             <link linkend="gpointer">gpointer</link>);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-mdi-child-add-view">gnome_mdi_child_add_view</link>        (<link linkend="GnomeMDIChild">GnomeMDIChild</link> *mdi_child);
+void        <link linkend="gnome-mdi-child-remove-view">gnome_mdi_child_remove_view</link>     (<link linkend="GnomeMDIChild">GnomeMDIChild</link> *mdi_child,
+                                             <link linkend="GtkWidget">GtkWidget</link> *view);
+void        <link linkend="gnome-mdi-child-set-name">gnome_mdi_child_set_name</link>        (<link linkend="GnomeMDIChild">GnomeMDIChild</link> *mdi_child,
+                                             <link linkend="gchar">gchar</link> *name);
+void        <link linkend="gnome-mdi-child-set-menu-template">gnome_mdi_child_set_menu_template</link>
+                                            (<link linkend="GnomeMDIChild">GnomeMDIChild</link> *mdi_child,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menu_tmpl);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----GnomeMDIChild
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    <type>GnomeMDIChild</type> is an abstract class for <type>GnomeMDI</type>
+    children. In order to use it, you have to either derive a new class from it
+    and define the proper virtual functions in its parent
+    <type>GnomeMDIChildClass</type> structure or use the
+    <type>GnomeMDIGenericChild</type> class that allows to specify the relevant
+    functions on a per-instance rather than on per-class basis.
+  </para>
+  
+  <para>
+    Each instance of GnomeMDIChild class defines a name for the child and possibly
+    a menu template for document-specific menus that will be merged with the global
+    MDI menus. The menu template is set using the <link linkend="gnome-mdi-child-set-menu-template">gnome_mdi_child_set_menu_template</link>()
+    function.
+  </para> 
+  
+  <para>
+    The <type>GnomeMDIChild</type> class has four virtual functions that are used by
+    the MDI:
+    <itemizedlist>
+      <listitem><para>
+	  create_view must be defined for each subclass and must return a pointer to a
+	  GtkWidget representing a new view of the document.
+	</para></listitem>
+      <listitem><para>
+	  create_menus must return a GList of menu items and can be used instead of the
+	  child's menu template. If both template and this function are defined, only the
+	  template (which can be defined on a per-instance basis) is used.
+	</para></listitem>
+      <listitem><para>
+	  get_config_string must return a string that represents the state of the child
+	  and will be used to save and restore state of the MDI children bewtween sessions.
+	</para></listitem>
+      <listitem><para>
+	  set_label must return a pointer to a GtkWidget that will be used as notebook and
+	  menu item label for this child.
+	</para></listitem>
+    </itemizedlist>
+    create_view function must be defined for each subclass and the <type>GnomeMDIChild</type>
+    class provides a simple default implementation of set_label; create_menus and get_config_string
+    may be undefined.
+  </para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeMDIChild-struct">struct GnomeMDIChild</title>
+<programlisting>struct GnomeMDIChild;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeMDIChildViewCreator">GnomeMDIChildViewCreator ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  (*GnomeMDIChildViewCreator)     (<link linkend="GnomeMDIChild">GnomeMDIChild</link>*,
+                                             <link linkend="gpointer">gpointer</link>);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Param1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Param2</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeMDIChildMenuCreator">GnomeMDIChildMenuCreator ()</title>
+<programlisting><link linkend="GList">GList</link>*      (*GnomeMDIChildMenuCreator)     (<link linkend="GnomeMDIChild">GnomeMDIChild</link>*,
+                                             <link linkend="GtkWidget">GtkWidget</link>*,
+                                             <link linkend="gpointer">gpointer</link>);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Param1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Param2</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Param3</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeMDIChildConfigFunc">GnomeMDIChildConfigFunc ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      (*GnomeMDIChildConfigFunc)      (<link linkend="GnomeMDIChild">GnomeMDIChild</link>*,
+                                             <link linkend="gpointer">gpointer</link>);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Param1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Param2</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeMDIChildLabelFunc">GnomeMDIChildLabelFunc ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  (*GnomeMDIChildLabelFunc)       (<link linkend="GnomeMDIChild">GnomeMDIChild</link>*,
+                                             <link linkend="GtkWidget">GtkWidget</link>*,
+                                             <link linkend="gpointer">gpointer</link>);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Param1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Param2</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Param3</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-child-add-view">gnome_mdi_child_add_view ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_mdi_child_add_view        (<link linkend="GnomeMDIChild">GnomeMDIChild</link> *mdi_child);</programlisting>
+<para>
+Creates a new view of a child (a GtkWidget) adds it to the list
+of the views and returns a pointer to it. Virtual function
+that has to be specified for classes derived from GnomeMDIChild
+is used to create the new view.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi_child</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDIChild object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+A pointer to the new view.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-child-remove-view">gnome_mdi_child_remove_view ()</title>
+<programlisting>void        gnome_mdi_child_remove_view     (<link linkend="GnomeMDIChild">GnomeMDIChild</link> *mdi_child,
+                                             <link linkend="GtkWidget">GtkWidget</link> *view);</programlisting>
+<para>
+Removes view <parameter>view</parameter> from the list of <parameter>mdi_child</parameter>'s views and
+unrefs it.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi_child</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDIChild object.
+</entry></row>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> View to be removed.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-child-set-name">gnome_mdi_child_set_name ()</title>
+<programlisting>void        gnome_mdi_child_set_name        (<link linkend="GnomeMDIChild">GnomeMDIChild</link> *mdi_child,
+                                             <link linkend="gchar">gchar</link> *name);</programlisting>
+<para>
+Changes name of <parameter>mdi_child</parameter> to <parameter>name</parameter>. <parameter>name</parameter> is duplicated and stored
+in <parameter>mdi_child</parameter>. If <parameter>mdi_child</parameter> has already been added to GnomeMDI,
+it also takes care of updating it.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi_child</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDIChild object.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> String containing the new name for the child.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-child-set-menu-template">gnome_mdi_child_set_menu_template ()</title>
+<programlisting>void        gnome_mdi_child_set_menu_template
+                                            (<link linkend="GnomeMDIChild">GnomeMDIChild</link> *mdi_child,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menu_tmpl);</programlisting>
+<para>
+Sets the template for menus that are added and removed when differrent
+children get activated. This way, each child can modify the MDI menubar
+to suit its needs. If no template is set, the create_menus virtual
+function will be used for creating these menus (it has to return a
+GList of menu items). If no such function is specified, the menubar will
+be unchanged by MDI children.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi_child</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDIChild object.
+</entry></row>
+<row><entry align="right"><parameter>menu_tmpl</parameter>&nbsp;:</entry>
+<entry> A GnomeUIInfo array describing the child specific menus.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

@@ -1,0 +1,265 @@
+/* $Id: client.gen_h,v 1.8 2001/04/24 14:39:35 murrayc Exp $ */
+
+
+/* client.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/object.h>
+#include <libgnomeui/gnome-client.h>
+
+CLASS_START(Gnome);
+class Dialog;
+class Client : public Gtk::Object
+{
+  WRAP_CLASS(Client, GnomeClient,
+             GNOME_CLIENT, GNOME_IS_CLIENT,
+             client,
+             Gtk::Object, GtkObject, GTK_OBJECT);
+public:
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  Client(bool connect_to_session_manager = true);
+
+  static Client* master_client();
+
+  WRAP_METHOD(gchar* gnome_client_get_config_prefix(GnomeClient*),
+	      Gtk::string get_config_prefix());
+
+  WRAP_METHOD(gchar* gnome_client_get_global_config_prefix(GnomeClient*),
+	      Gtk::string get_global_config_prefix());
+
+
+  WRAP_METHOD(void gnome_client_set_global_config_prefix (GnomeClient*, const gchar*),
+	      void set_global_config_prefix (const Gtk::string &prefix));
+
+  WRAP_METHOD(GnomeClientFlags gnome_client_get_flags (GnomeClient*),
+	      GnomeClientFlags get_flags ());
+
+  WRAP_METHOD(void gnome_client_set_restart_style (GnomeClient*, GnomeRestartStyle),
+	      void set_restart_style (GnomeRestartStyle style));
+
+  WRAP_METHOD(void gnome_client_set_priority (GnomeClient*, guint),
+	      void set_priority (guint priority));
+
+  // We keep the argc, argv versions because they can be more
+  // convenient that the vector<string> ones
+
+  WRAP_METHOD(void gnome_client_set_restart_command (GnomeClient*, gint , gchar**),
+	      void set_restart_command (gint argc, gchar **argv));
+
+  void set_restart_command (const Gtk::SArray &argv);
+
+//   WRAP_METHOD(void gnome_client_add_static_arg (GnomeClient*, ...),
+// 	      void add_static_arg (...));
+
+  WRAP_METHOD(void gnome_client_set_discard_command (GnomeClient*, gint , gchar**),
+	      void set_discard_command (gint argc, gchar **argv));
+
+  void set_discard_command (const Gtk::SArray &argv);
+  
+  WRAP_METHOD(void gnome_client_set_resign_command (GnomeClient*, gint , gchar**),
+	      void set_resign_command (gint argc, gchar **argv));
+
+  void set_resign_command (const Gtk::SArray &argv);
+
+  WRAP_METHOD(void gnome_client_set_shutdown_command (GnomeClient*, gint , gchar**),
+	      void set_shutdown_command (gint argc, gchar **argv));
+
+  void set_shutdown_command (const Gtk::SArray &argv);
+  
+  WRAP_METHOD(void gnome_client_set_current_directory (GnomeClient*, const gchar*),
+	      void set_current_directory (const Gtk::string &dir));
+
+  WRAP_METHOD(void gnome_client_set_environment (GnomeClient*, const gchar*, const gchar*),
+	      void set_environment (const Gtk::string &name, const Gtk::string &value));
+
+  WRAP_METHOD(void gnome_client_set_clone_command (GnomeClient*, gint, gchar**),
+	      void set_clone_command (gint argc, gchar **argv));
+
+  void set_clone_command (const Gtk::SArray &argv);
+
+  WRAP_METHOD(void gnome_client_set_process_id (GnomeClient*, pid_t),
+	      void set_process_id (pid_t pid));
+
+  WRAP_METHOD(void gnome_client_set_program (GnomeClient*, const gchar*),
+	      void set_program (const Gtk::string &program));
+
+  WRAP_METHOD(void gnome_client_set_user_id (GnomeClient*, const gchar*),
+	      void set_user_id (const Gtk::string &user_id));
+
+  void save_any_dialog (const Dialog &dialog);
+
+  void save_error_dialog (const Dialog &dialog);
+  
+
+  WRAP_METHOD(void gnome_client_request_phase_2 (GnomeClient*),
+	      void request_phase_2 ());
+
+  WRAP_METHOD(void gnome_client_request_save (GnomeClient*,
+					      GnomeSaveStyle, gboolean, GnomeInteractStyle,
+					      gboolean, gboolean),
+	      void request_save (GnomeSaveStyle save_style,
+				 gboolean shutdown,
+				 GnomeInteractStyle interact_style,
+				 gboolean fast, gboolean global));
+
+  WRAP_METHOD(void gnome_client_flush (GnomeClient*),
+	      void flush ());
+
+  WRAP_METHOD(void gnome_client_disable_master_connection (),
+	      static void disable_master_connection ());
+
+  // Note : there's a naming convention breach here, due to the
+  // existence of the connect() signal which isn't emitted after
+  // gnome_client_connect() is called
+  //
+  WRAP_METHOD(void gnome_client_connect (GnomeClient*),
+	      void connect_to_session_manager ());
+
+  bool is_connected();
+
+//   WRAP_METHOD(void gnome_client_disconnect (GnomeClient*),
+// 	      void disconnect ());
+
+  WRAP_METHOD(void gnome_client_set_id (GnomeClient*, const gchar*),
+	      void set_id (const Gtk::string &client_id));
+
+  WRAP_METHOD(gchar* gnome_client_get_id(GnomeClient*),
+	      Gtk::string get_id());
+  
+  WRAP_METHOD(gchar* gnome_client_get_previous_id(GnomeClient*),
+	      Gtk::string get_previous_id());
+
+  WRAP_METHOD(void gnome_client_request_interaction (GnomeClient*, GnomeDialogType , GnomeInteractFunction , gpointer),
+	      void request_interaction (GnomeDialogType dialog,
+					GnomeInteractFunction func,
+					gpointer client_data));
+
+  WRAP_METHOD(void gnome_interaction_key_return (gint, gboolean),
+	      static void gnome_interaction_key_return (gint key, gboolean cancel_shutdown));
+
+
+  // save_yourself should return bool, and the last two gint args
+  // should be bools also
+  SIGNAL_SPEC("save_yourself",      both, gint save_yourself(gint,
+							     GnomeSaveStyle,
+							     gint,
+							     GnomeInteractStyle,
+							     gint));
+  SIGNAL_SPEC("die",                both, void die());
+  SIGNAL_SPEC("save_complete",      both, void save_complete());
+  SIGNAL_SPEC("shutdown_cancelled", both, void shutdown_cancelled());
+  SIGNAL_SPEC("connect",            both, void connect(gint));
+  SIGNAL_SPEC("disconnect",         both, void disconnect(), gnome_client_disconnect);
+  
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/object_p.h>
+IMPL_START;
+#include <gnome--/private/client_p.h>
+#include <gnome--/dialog.h>
+
+namespace Gnome {
+
+Client::Client(bool connect_to_sm)
+  :  Gtk::Object(GTK_OBJECT(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+
+  gtkobj()->program = 0; // this should normally be program_invocation_name
+
+  if(connect_to_sm)
+    connect_to_session_manager();
+}
+
+Client*
+Client::master_client()
+{
+  return Gtk::wrap(gnome_master_client());
+}
+
+
+void
+Client::save_any_dialog (const Dialog &dialog)
+{
+  gnome_client_save_any_dialog (gtkobj(), const_cast<GnomeDialog*>(dialog.gtkobj()));
+}
+
+void
+Client::save_error_dialog (const Dialog &dialog)
+{
+  gnome_client_save_error_dialog (gtkobj(), const_cast<GnomeDialog*>(dialog.gtkobj()));
+}
+
+void
+Client::set_restart_command (const Gtk::SArray &argv)
+{
+  const gchar **tmp = (const gchar**)(argv);
+  
+  gnome_client_set_restart_command(gtkobj(), argv.size(), const_cast<gchar**>(tmp));
+}
+
+void 
+Client::set_discard_command(const Gtk::SArray &argv)
+{
+  const gchar **tmp = (const gchar**)(argv);
+  
+  gnome_client_set_discard_command(gtkobj(), argv.size(), const_cast<gchar**>(tmp));
+}
+
+void 
+Client::set_shutdown_command(const Gtk::SArray &argv)
+{
+  const gchar **tmp = (const gchar**)(argv);
+  
+  gnome_client_set_shutdown_command(gtkobj(), argv.size(), const_cast<gchar**>(tmp));
+}
+
+void  
+Client::set_resign_command (const Gtk::SArray &argv)
+{
+  const gchar **tmp = (const gchar**)(argv);
+  
+  gnome_client_set_resign_command(gtkobj(), argv.size(), const_cast<gchar**>(tmp));
+}
+
+void  
+Client::set_clone_command (const Gtk::SArray &argv)
+{
+  const gchar **tmp = (const gchar**)(argv);
+  
+  gnome_client_set_clone_command(gtkobj(), argv.size(),
+				 const_cast<gchar**>(tmp));
+}
+
+bool
+Client::is_connected()
+{
+  return GNOME_CLIENT_CONNECTED(gtkobj());
+}
+
+} /* namespace Gnome */
+
+
+DOCUMENTATION_START;

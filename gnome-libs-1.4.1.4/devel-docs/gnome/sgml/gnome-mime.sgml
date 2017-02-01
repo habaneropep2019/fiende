@@ -1,0 +1,261 @@
+<refentry id="gnome-gnome-mime">
+<refmeta>
+<refentrytitle>gnome-mime</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-mime</refname><refpurpose>Routines to determine the MIME type of a file</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+const char* <link linkend="gnome-mime-type">gnome_mime_type</link>                 (const <link linkend="gchar">gchar</link> *filename);
+const char* <link linkend="gnome-mime-type-or-default">gnome_mime_type_or_default</link>      (const <link linkend="gchar">gchar</link> *filename,
+                                             const <link linkend="gchar">gchar</link> *defaultv);
+const char* <link linkend="gnome-mime-type-of-file">gnome_mime_type_of_file</link>         (const char *existing_filename);
+const char* <link linkend="gnome-mime-type-or-default-of-file">gnome_mime_type_or_default_of_file</link>
+                                            (const char *existing_filename,
+                                             const <link linkend="gchar">gchar</link> *defaultv);
+const char* <link linkend="gnome-mime-type-from-magic">gnome_mime_type_from_magic</link>      (const <link linkend="gchar">gchar</link> *filename);
+<link linkend="GList">GList</link>*      <link linkend="gnome-uri-list-extract-filenames">gnome_uri_list_extract_filenames</link>
+                                            (const <link linkend="gchar">gchar</link> *uri_list);
+<link linkend="GList">GList</link>*      <link linkend="gnome-uri-list-extract-uris">gnome_uri_list_extract_uris</link>     (const <link linkend="gchar">gchar</link> *uri_list);
+void        <link linkend="gnome-uri-list-free-strings">gnome_uri_list_free_strings</link>     (<link linkend="GList">GList</link> *list);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The routines in gnome-mime provide a way to obtain the MIME (Multipurpose
+Internet Mail Extension) type of a given file and some utility functions.
+</para>
+
+<para>
+There are two different methods for getting the MIME type of a particular file:
+Using only the filename to find the corresponding MIME type by matching the
+name against a database of known extensions and regular expressions; Or
+obtaining the MIME type by peeking at the contents of the file. 
+Generally it should be faster using the former method, because the routines
+only do in-memory operations, while the latter method needs to do possibly
+time-expensive disk operations to obtain the necessary information.
+</para>
+
+<para>
+The routines that classify a file only by its name, look at the
+<filename>*.mime</filename> files in the
+<filename>$gnome_prefix/share/mime-info/</filename> directory and in
+<filename>~/.gnome/mime-info/</filename> to build the extension
+database. This gives the user the possibility to extend and/or override the
+system defaults.
+</para>
+
+<para>
+Applications wanting to make additional MIME types available only need to
+install their files in one of these directories.
+</para>
+
+<para>
+The file <filename>$gnome_prefix/share/mime-info/gnome.mime</filename>
+contains the defaults for Gnome and is read first. In addition,
+<filename>~/.gnome/mime-info/user.mime</filename> is the last file to be
+read and thus makes it possible to set system-wide defaults and still
+gives the user a chance to override them. However, there is currently no
+determined order in which the other files in these directories will be
+read, nor is there any way to override system defaults, yet.
+</para>
+
+<para>
+The <link linkend="gnome-mime-type-from-magic">gnome_mime_type_from_magic</link>() function looks at the
+<filename>$gnome_prefix/etc/mime-magic</filename> file to determine the
+MIME type of a given file (This database in usually kept in a
+pre-processed, easily readable format in
+<filename>$gnome_prefix/etc/mime-magic.dat</filename>).
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-mime-type">gnome_mime_type ()</title>
+<programlisting>const char* gnome_mime_type                 (const <link linkend="gchar">gchar</link> *filename);</programlisting>
+<para>
+Determined the mime type for <parameter>filename</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>filename</parameter>&nbsp;:</entry>
+<entry> A filename (the file does not necesarily exist).
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the mime-type for this filename.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-type-or-default">gnome_mime_type_or_default ()</title>
+<programlisting>const char* gnome_mime_type_or_default      (const <link linkend="gchar">gchar</link> *filename,
+                                             const <link linkend="gchar">gchar</link> *defaultv);</programlisting>
+<para>
+This routine tries to determine the mime-type of the filename
+only by looking at the filename from the GNOME database of mime-types.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>filename</parameter>&nbsp;:</entry>
+<entry> A filename (the file does not necesarily exist).
+</entry></row>
+<row><entry align="right"><parameter>defaultv</parameter>&nbsp;:</entry>
+<entry> A default value to be returned if no match is found
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the mime-type of the <parameter>filename</parameter>.  If no value could not be
+determined, it will return <parameter>defaultv</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-type-of-file">gnome_mime_type_of_file ()</title>
+<programlisting>const char* gnome_mime_type_of_file         (const char *existing_filename);</programlisting>
+<para>
+Determined the mime type for <parameter>existing_filename</parameter>.  It will try
+to figure this out by looking at the contents of the file, if this
+fails it will use the filename to figure out a name.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>existing_filename</parameter>&nbsp;:</entry>
+<entry> A filename pointing to an existing file.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the mime-type for this filename.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-type-or-default-of-file">gnome_mime_type_or_default_of_file ()</title>
+<programlisting>const char* gnome_mime_type_or_default_of_file
+                                            (const char *existing_filename,
+                                             const <link linkend="gchar">gchar</link> *defaultv);</programlisting>
+<para>
+This routine tries to determine the mime-type of the filename
+by trying to guess the content of the file.  If this fails, it will
+return the mime-type based only on the filename.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>existing_filename</parameter>&nbsp;:</entry>
+<entry> A filename that points to an existing filename.
+</entry></row>
+<row><entry align="right"><parameter>defaultv</parameter>&nbsp;:</entry>
+<entry> A default value to be returned if no match is found
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the mime-type of the <parameter>existing_filename</parameter>.  If no value could not be
+determined, it will return <parameter>defaultv</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-type-from-magic">gnome_mime_type_from_magic ()</title>
+<programlisting>const char* gnome_mime_type_from_magic      (const <link linkend="gchar">gchar</link> *filename);</programlisting>
+<para>
+This routine uses a magic database as described in magic(5) that maps
+files into their mime-type (so our modified magic database contains mime-types
+rather than textual descriptions of the files).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>filename</parameter>&nbsp;:</entry>
+<entry> an existing file name for which we want to guess the mime-type
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a pointer to an internal copy of the mime-type for <parameter>filename</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-uri-list-extract-filenames">gnome_uri_list_extract_filenames ()</title>
+<programlisting><link linkend="GList">GList</link>*      gnome_uri_list_extract_filenames
+                                            (const <link linkend="gchar">gchar</link> *uri_list);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uri_list</parameter>&nbsp;:</entry>
+<entry> an uri-list in the standard format
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a GList containing strings allocated with g_malloc
+that contain the filenames in the uri-list.
+
+Note that unlike <link linkend="gnome-uri-list-extract-uris">gnome_uri_list_extract_uris</link>() function, this
+will discard any non-file uri from the result value.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-uri-list-extract-uris">gnome_uri_list_extract_uris ()</title>
+<programlisting><link linkend="GList">GList</link>*      gnome_uri_list_extract_uris     (const <link linkend="gchar">gchar</link> *uri_list);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uri_list</parameter>&nbsp;:</entry>
+<entry> an uri-list in the standard format.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a GList containing strings allocated with g_malloc
+that have been splitted from <parameter>uri</parameter>-list.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-uri-list-free-strings">gnome_uri_list_free_strings ()</title>
+<programlisting>void        gnome_uri_list_free_strings     (<link linkend="GList">GList</link> *list);</programlisting>
+<para>
+Releases all of the resources allocated by <parameter>list</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>list</parameter>&nbsp;:</entry>
+<entry> A GList returned by <link linkend="gnome-uri-list-extract-uris">gnome_uri_list_extract_uris</link>() or <link linkend="gnome-uri-list-extract-filenames">gnome_uri_list_extract_filenames</link>()
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

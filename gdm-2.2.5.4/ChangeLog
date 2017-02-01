@@ -1,0 +1,3938 @@
+Mon Dec 31 18:55:07 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.5.4
+
+Mon Dec 31 18:54:25 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, NEWS: raise version
+
+	* daemon/slave.c: set egid to the correct value before we do setuid
+	  to avoid running the session with gdm group privilages.  (Note
+	  that all session files run bash and thus drop those, but this
+	  is a problem for the failsafes)
+
+	* gui/gdmlogin.c: Make PositionX and PositionY follow the standard
+	  X geometry behaviour where negative values mean position from
+	  lower/right edge
+
+Thu Dec 27 00:59:43 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.5.3
+
+Wed Dec 26 17:20:28 2001  George Lebl <jirka@5z.com>
+
+	* daemon/veriyfy-crypt.c, daemon/verify-shadow.c: include
+	  errorgui.h
+
+Thu Dec 20 17:13:24 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: raise version
+
+Thu Dec 20 16:27:40 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify-pam.c: apparently the actually correct
+	  order (Which actually makes sense) is setcred/open_session.
+	  This is apparently the 'offical' word from the linux-pam
+	  people.  Though not everybody agrees.  Well screw this,
+	  this makes sense, so this is the way it will be damnit :)
+
+	* gui/gdmconfig.c: fix saving of server definitions
+
+	* gui/gdmlogin.c: add ability to have newlines in the 
+	  welcome string by just adding \n into the strings
+
+Thu Dec 06 22:09:11 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: Fix TimedLogin I broke on last commit
+
+	* daemon/verify-pam.c:  For autologin, still call authenticate,
+	  but use the service gdm-autologin.  Also a bit of cleanup.
+
+	* config/gdm-autologin, config/Makefile.am:  A promiscuous
+	  service.  This will let anyone in, gdm uses this for autologin
+	  or timed login when we want to let a user in without a password,
+	  this way we can follow all the proper pam doodaah with
+	  pam_authenticate and all that so we can safely call setcred
+
+Tue Dec 04 20:46:57 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c, daemon/misc.[ch], daemon/display.c:  On events where
+	  we fail due to bad configuration, run the text message dialog.
+	  Also if we hit the loop of death outside of XFAILED on a local
+	  display, run a text message telling the user so instead of just
+	  putting this into the syslog.  We need more interaction here I
+	  think.  But this is better then nothing.
+
+Tue Dec 04 18:44:10 2001  George Lebl <jirka@5z.com>
+
+	* daemon/Makefile.am, daemon/verify-pam.c, daemon/verify-crypt.c, 
+	  daemon/verify-shadow.c, daemon/verify.h, daemon/misc.[ch],
+	  daemon/slave.c:  revamp the PAM support based on a patch
+	  from Karsten Petersen <karsten.petersen@informatik.tu-chemnitz.de>.
+	  Move the open session and setcred back to verify, implement
+	  account checking more properly, especially for auto logins.  We
+	  assume the pamh existing when needed.  And don't do the weird
+	  ensure hack.  Also setgid and initgroups in the verify/setup
+	  function.  rename the open_session function to setup_env, since
+	  that's what it does.  Also implement more checking of errors
+	  during login process.
+
+	* daemon/gdm.c, daemon/errorgui.c: make sure that we're not 'setuid'
+	  looking in the failsafes.  Also correctly setup "PATH" from stored
+	  path.
+
+	* daemon/slave.c: fix race where USR2 was expected from a
+	  non-existant parent.  This can happen when you do 'killall gdm'
+
+Wed Nov 21 21:46:42 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.5.2
+
+Wed Nov 21 21:12:58 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c, daemon/xdmcp.c: Fix minor leaks
+
+Wed Nov 21 20:58:24 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmwm.c: Support the InputHint to support No Input windows,
+	  so that we can support things like xscribble and keyboards and
+	  other accessibility and such doodaahs.  Based on a patch from
+	  Crossfire <xfire@xware.cx>
+
+Wed Nov 21 19:46:50 2001  George Lebl <jirka@5z.com>
+
+	* daemon/server.c: keep 4 old x server logs in a logrotate like
+	  manner to make debugging X server problems easier
+
+2001-11-17  Carlos Perelló Marín <carlos@gnome-db.org>
+
+	* configure.in (ALL_LINGUAS): Added pt.
+
+Fri Nov 16 13:43:18 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: raise version
+
+Fri Nov 16 11:45:11 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: fix crash for timed logins
+
+Thu Nov 15 23:19:10 2001  George Lebl <jirka@5z.com>
+
+	* daemon/*.c, gui/*.c: remove RCSid's from everything, it makes
+	  merging not fun
+
+Thu Nov 15 21:18:48 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], daemon/slave.[ch], daemon/server.c, gui/gdmlogin.c:
+	  clean up a bit of the constants mess (though it's still an utter
+	  mess).  Implement a new SUP opcode so that the daemon knows
+	  when the server was started so that it can start local servers
+	  in order, so that things like complete machine lockups don't occur
+	  (I got one just testing this).  Also add a 3 second 'padding'
+	  between server starts to really be sure.
+
+	* config/gdm.conf.in:  add some comments, mostly for distributions
+
+2001-11-06  Gregory Leblanc  <gleblanc@linuxweasel.com>
+
+	* gdm.spec.in: more minor updates, just to piss George off.  :-)
+	There's a ChangeLog in the file, if you care that much.
+
+Thu Nov 01 01:06:21 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.5.1
+
+Sun Oct 28 12:15:50 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: when the server refuses to be started, some error
+	  in the start code.  Tell the user that we have no clue what's
+	  happening and give up.
+
+Sun Oct 28 11:56:33 2001  George Lebl <jirka@5z.com>
+
+	* daemon/auth.c, daemon/misc.[ch], daemon/xdmcp.[ch]: be more
+	  thorough in setting up address/cookie pairs for local servers,
+	  and make sure to always setup localhost.localdomain and
+	  loopback.  Don't use hostname based lookup on local servers,
+	  but use the same code we use for xdmcp peeking local addresses.
+	  This will make it possible to start an X server and login
+	  even if the hostname is out of whack.
+
+Sun Oct 28 10:46:21 2001  Christophe Merlet <redfox@eikonex.org>
+
+	* gui/gdmXnestchooser.c: corrected just a little typo.
+
+Sat Oct 27 21:44:20 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c, daemon/verify-*.c: put the sleep day in the verify	
+	  code, and in pam verification use the pam sleep to do the same
+	  if available.  This means that the error will come after the sleep
+	  but that the sleep will be 1) random 2) not doubled with both the
+	  gdm and the pam sleep.  Second always print the "Please enter your
+	  username" message on the verify not just the first time.
+
+Sat Oct 27 14:56:47 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: raise version to 2.2.5.1
+
+	* daemon/errorgui.[ch], daemon/gdm.c: add yesno error dialog
+
+	* daemon/auth.[ch], daemon/slave.c: allow logins without a home
+	  dir (it will be set to '/') but only after properly warning the
+	  user about it, and asking him if he wants to continue.
+
+Sat Oct 27 13:22:48 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify-*.c, daemon/slave.c, daemon/gdm.h, gui/gdmlogin.c:
+	  Make pam errors and such pop up in a dialog box to make sure
+	  the user notices them.  If the login gets a QUIT and it had some
+	  informative messages to tell the user but there was no prompt
+	  in between (that is, the user hasn't read them), display it in
+	  a dialog.
+
+	* daemon/gdmlogin.c: fix focus after uniconify
+
+Fri Oct 26 01:01:53 2001  George Lebl <jirka@5z.com>
+
+	* config/Gnome.in: run ssh-agent if available, also remove some
+	  bashisms, patch taken and modified from Ximian SRPM
+
+Fri Oct 26 00:30:45 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: try also appending .png to the face file to support
+	  KDE like faces (fixed version of Mandrake SRPM patch)
+
+	* gui/gdmlogin.c: Accept KP_Enter as return as well (from Mandrake)
+
+	* daemon/server.c: change perms on open to 0644, those were the perms
+	  actually used anyway because of umask, but this makes the code
+	  easier to read.
+
+	* config/XKeepsCrashing:  fix some logic, fix for filenames with
+	  spaces, test for XFdrake so that this works seemlessy on Mandrake,
+	  also add xf86cfg to the list of configurators, also kill some
+	  bashism.  If we can't find a configurator still offer to display
+	  the server output and then disable the server.
+
+	* gdmconfig-security.in: make FALLBACK false, as it doesn't make
+	  sense to have fallback, also make SESSION true as per redhat
+	  patches
+
+	* gdmconfig-pam: apply the redhat patch.  It seems to me that is
+	  the more correct way to handle it in general.  Scream at me if
+	  it is wrong.
+
+	* configure.in: make console helper automatically detected and
+	  used if present.
+
+Thu Oct 25 20:28:03 2001  George Lebl <jirka@5z.com>
+
+	* daemon/misc.[ch], daemon/display.c, daemon/errorgui.c,
+	  daemon/gdm.c, daemon/server.c, daemon/slave.c:  Super fork race
+	  killing patch, suspend both SIGCHLD and TERM/INT/HUP over 
+	  forks, suspend CHLD over short waitpids.  Fix races where
+	  the switch logic after forks may have gotten confused.  A tiny bit
+	  of unrelated cleanup as well.
+
+Thu Oct 25 01:49:57 2001  George Lebl <jirka@5z.com>
+
+	* config/XKeepsCrashing: fix minor issues
+
+	* daemon/gdm.c: set TEXTDOMAIN and TEXTDOMAINDIR for XKeepsCrashing
+
+	* utils/gdmopen.c: echo \033(K onto the console to make sure
+	  that non lat1 fonts get set up
+
+	* daemon/gdm.h, daemon/server.c, daemon/slave.c:  When starting
+	  a server consider loss of connection within 5 seconds a crash
+	  no matter what.  It seems that for example not being able
+	  to open a mouse manifests self AFTER server tells us
+	  it's ready and we XOpenDisplay.  Actually it's 5 seconds from
+	  the USR1, which means 5 seconds after it's ready to accept
+	  connections.
+
+Wed Oct 24 17:57:03 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], gui/gdmconfig.(c|glade), config/gdm.conf.in:
+	  Don't pass extra arguments to XKeepsCrashing, and whack the X
+	  configurators option since that is now changed by editting the
+	  XKeepsCrashing script directly.
+
+	* config/XKeepsCrashing, config/Makefile.am, config/gettextfoo.h,
+	  po/POTFILES.in, config/extract-shell.sh:  Rework the XKeepsCrashing
+	  script, configurator is found from a list in the script.  If the
+	  error is a mouse error try the mouseconfig configurator first. 
+	  Messages are now gotten by gettext -s directly and extracted
+	  by a simple stupid script, that needs a tad of work still I think.
+
+	* docs/C/gdm.sgml:  Remove the XKeepsCrashingConfigurators option
+
+Wed Oct 24 11:39:54 2001  George Lebl <jirka@5z.com>
+
+	* utils/gdmmktemp.c, utils/Makefile.am: rename to gdmmktemp,
+	  make it build, and install in /bin
+
+Wed Oct 24 11:02:55 2001  George Lebl <jirka@5z.com>
+
+	* utils/gdmkstemp.c, utils/Makefile.am:  add a small utility
+	  for safely making temp files
+
+Wed Oct 24 01:22:41 2001  George Lebl <jirka@5z.com>
+
+	* docs/C/gdm.sgml: remove documentation of the VerboseAuth option
+
+Wed Oct 24 01:26:47 2001  George Lebl <jirka@5z.com>
+
+	* bin/gdm.[ch], bin/verify-*.c, config/gdm.conf.in,
+	  gui/gdmconfig.(c|glade):  Remove the VerboseAuth conf variable,
+	  it provided absolutely zero extra security (since it didn't divulge
+	  any info the user cannot get by other means, and making it
+	  false just made the whole thing less usable and more confusing)
+
+	* bin/gdm.c: include locale.h
+
+Tue Oct 23 15:17:23 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmXnestchooser.c: add --broadcast, --direct and
+	  --no-gdm-check, rename --no-chooser to --no-query, fix
+	  backgrounding vs. gtk and don't do checks when we don't need
+	  to (on no-query, broadcast or no-gdm-check)
+
+Tue Oct 23 02:32:05 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmXnestchooser.c: make this more useful, make it possible
+	  to specify a custom Xnest/options to run and default to running
+	  the one from the config.  Also add option to background the
+	  process, and an option to run no chooser, just Xnest, and have it
+	  print out the DISPLAY setting to use for the display.
+
+Sat Oct 20 16:26:34 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, gui/Makefile.am: a bit of makefile cleanup and
+	  make sure we REQUIRE libglade in the configure.in
+
+Sat Oct 20 14:11:02 2001  George Lebl <jirka@5z.com>
+
+	* daemon/errorgui.c, daemon/server.c: a bit of debug output.
+
+	* daemon/slave.c: check the home dir, if it doesn't exist (or is not
+	  a directory, then tell the user and try again.  Maybe we should
+	  continue and let the session fail, should we?  I don't see any
+	  merit in trying to log in with no home dir.  Also, clean up verify
+	  on auth problems, in term handler don't reset the signal mask,
+	  and fix some possible races and whack the chooser, same in
+	  xioerror handler.  In slave_exit, mask the CHLD signal to avoid
+	  races, and other race fixes
+
+Sat Oct 20 13:31:07 2001  George Lebl <jirka@5z.com>
+
+	* utils/gdmopen.c: set VT_NUMBER env var
+
+	* gui/gdmwm.c: Fix a race for MapNotify so that newly created windows
+	  are always focused
+
+Sat Oct 20 12:03:14 2001  George Lebl <jirka@5z.com>
+
+	* docs/C/Makefile.am: DESTDIR added patch by: frodol@dds.nl (Frodo
+	  Looijaard)
+
+Sat Oct 20 11:57:50 2001  George Lebl <jirka@5z.com>
+
+	Patches from: Heath Nielson <heath@cs.byu.edu>
+
+	* daemon/slave.c:  Fix from the FreeBSD bugtracker to fix a crash
+	  related to setenv (foo, NULL, 1).
+
+	* daemon/gdm-net.c:  Fix from the FreeBSD bugtracker to fix creation
+	  of the local socket
+
+Mon Oct 15 23:32:22 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.4.3
+
+Mon Oct 15 23:28:45 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in: the xdmcp indirect and manage waits were
+	  too long, changed to 15 seconds.  If you can't finish the
+	  xdmcp conversation in 15 seconds, you don't really have a
+	  connection you want to use X on.
+
+Fri Oct 12 12:52:08 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, daemon/Makefile.am, gui/Makefile.am,
+	  utils/Makefile.am:  Apply patch from Ali Akcaagac
+	  <ali.akcaagac@stud.fh-wilhelmshaven.de> for compatibility
+	  with automake 1.5 and autoconf 2.50
+
+	* config/locale.alias, gui/languages.c:  Make russian use KOI8-R and
+	  add ukrainian
+
+Mon Oct 08 20:54:33 2001  George Lebl <jirka@5z.com>
+
+	* daemon/auth.c:  Fix small leak
+
+	* daemon/server.[ch], daemon/slave.c: wipe cookies better and safer
+
+	* daemon/server.c: server killing right after launch race fixed,
+	  probably was harmless though, also reset the vt number on linux
+	  before starting a new server.
+
+	* daemon/slave.c: increase the loop of death time for logouts, and
+	  always redo parsed automatic/timed login vars after each display
+	  start as the display number / hostname might have changed.  When
+	  we can't open a display, it's XFAILED rather then REMANAGE so
+	  that we go into the "your X sucks" dialog.  We need better
+	  error reporting though.
+
+Sun Oct 07 16:55:24 2001  Fatih Demir <kabalak@gtranslator.org>
+
+	* configure.in: Added "ta" to the languages list.
+
+Fri Oct 05 13:58:41 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify-pam.c: user PAM_ESTABLISH_CRED for pam_setcred
+
+Thu Oct 04 13:19:50 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.4.2
+
+Thu Oct 04 13:18:30 2001  George Lebl <jirka@5z.com>
+
+	* daemon/misc.c: the mode for sticky 01777 not 02777.  Whoops.
+
+Thu Oct 04 00:12:05 2001  George Lebl <jirka@5z.com>
+
+	* daemon/misc.c, gui/gdmXnestserver.c: also check stale lock files
+	  when looking for empty display names
+
+Wed Oct 03 23:54:49 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c: fix segfault on send_got_manged_forward
+
+Wed Oct 03 20:26:27 2001  George Lebl <jirka@5z.com>
+
+	* daemon/misc.[ch], daemon/slave.[ch]: ensure the /tmp/.ICE-unix
+	  directory.  Hopefully we're correct.
+
+	* daemon/server.c: when running server as root, unset suplementary
+	  groups and set group to 0.  So that the files X creates it creates
+	  with gid 0 as well rather then with the 'gdm' group name.
+
+Wed Sep 26 23:54:11 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm-net.c, gui/gdmflexiserver.c: deal with the case where
+	  MSG_NOSIGNAL is not defined by temporairly ignoring the SIGPIPE
+	  signal.  Fixes #60586
+
+Wed Sep 26 21:01:38 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify.h, daemon/verify-*.c, daemon/slave.c,
+	  daemon/errorgui.[ch], daemon/gdm.c:  Add a failsafe question
+	  dialog similar in operation to the failsafe error box, and use
+	  it in the standalone pam conv function.  Kill all instances of
+	  PAM_SILENT since we can now always converse with the user.
+
+	* daemon/verify-pam.c: use a global pamh again but this time a bit
+	  smarter.  Make sure if we use a global one that it has all the
+	  right things set.  Also set PAM_RHOST to "localhost" or the remote
+	  host if not a "console" login.  Set PAM_RUSER to "gdm" (or whatever
+	  the gdm user is).  I'm sure I'm fucking something up again but
+	  I can't find enough docs to verify that what I'm doing is 100%
+	  correct.  Not to mention that there seem to be some braindead
+	  modules out there to begin with.
+
+Mon Sep 17 07:17:32 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: fix crash when quiver would happen while
+	  iconized
+
+	* daemon/misc.c: include signal.h
+
+	* gui/gdmlogin.c: don't go nuts on just minor version change, only
+	  tell the user to piss of when the greeter protocol version changed.
+
+Thu Sep 13 00:20:46 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: Apply patch from Ali Akcaagac
+	  <ali.akcaagac@stud.fh-wilhelmshaven.de> to fix up the 24hr time
+	  display to not show the %p
+
+Tue Sep 11 02:34:47 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h, config/gdm.conf.in, gui/gdmconfig.(c|glade),
+	  gui/gdmlogin.c, docs/C/gdm.sgml:  Apply and finish a patch from
+	  Terje Rosten <terjeros@phys.ntnu.no> to add an option to force
+	  24 hour clock on the greeter
+
+Tue Sep 11 01:37:42 2001  George Lebl <jirka@5z.com>
+
+	* daemon/errorgui.c: use the safe fork function
+
+	* daemon/gdm.c: a doh kind of error, waitpid returns 0 to mean
+	  'no child', not -1 as I assumed.
+
+	* gui/gdmflexiserver.c:  another doh!, actually whack the screen
+	  portion of the display number
+
+Mon Sep 10 20:20:59 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: raise version
+
+	* daemon/gdm.[ch], daemon/auth.c, daemon/misc.[ch], daemon/display.c, 
+	  daemon/server.c, daemon/slave.c, gui/gdmflexiserver.c:  Implement
+	  a new scheme for the FLEXI_XNEST command.  Old implementations
+	  will get ERROR 100 (I doubt there are any).  This solves some
+	  security issues with the Xnest stuff.  The Xnest server is now
+	  run as the user who owns the .Xauthority file, but only if that
+	  file is readable ONLY by the user and only if the user can
+	  access keys inside it.  An MIT-MAGIC-COOKIE-1 must exist for
+	  the current display on which Xnest will run.  This is of course
+	  true for gdm created sessions.
+	  
+	* daemon/misc.[ch], daemon/gdm.c, daemon/server.c, daemon/slave.c,
+	  daemon/display.c:  Implement a race safe fork, and improve the
+	  signal handlers to handle some more corner cases and avoid some
+	  races.  Also remove the old last_killed_pid hack since it's now
+	  handled nicer.
+
+	* daemon/gdm.[ch]: add a protocol
+
+Sat Sep 08 02:35:51 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify-pam.c: OK, PAM documentation is officially on crack.
+	  Some places (the kernel.org web manual) say order should be
+	  set_cred -> open_session, but it seems that the order is
+	  open_session -> set_cred.  Should fix #59977
+
+Sat Sep 08 02:06:44 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c: use pclose on popen'ed FILE *
+
+Thu Sep 06 20:17:31 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c: handle error from fork when daemonizing well
+
+Thu Sep 06 15:55:20 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmwm.c: "fix" for the toolbar deadlock problem.  apparently
+	  gnome-dock code is pretty braindead and uses the bulldog technique
+	  for grabbing the pointer, grab in a tight loop until we succeed.
+	  But the it will fail until the main loop is hit so a deadlock
+	  results.  Fix this by defining that function again in gdmwm with
+	  a more "maybe" correct semantics.
+
+Tue Sep  4 18:52:10 2001  Trevor Curtis <tcurtis@somaradio.ca>
+	* docs/gdmconfig/C/figures/GDM_xserv_setup.png,GDM_xdmcp.png: 
+	  Updated the above screenshots to reflect recent changes.
+
+Wed Sep  5 03:18:43 2001  Abel Cheung <maddog@linux.org.hk>
+
+	* config/locale.alias: Rename zh_TW.Big5 to zh_TW .
+
+Mon Sep 03 00:38:23 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmflexiserver.c:  When we run a new flexi server lock the
+	  current screen with xscreensaver.  We need a nicer locker though
+	  and one that can also run gdmflexiserver.  And this even for normal
+	  gnome locking.  It would be nice if xscreensaver allowed a custom
+	  locker dialog.
+
+Mon Sep  3 01:34:17 EDT 2001 Trevor Curtis <tcurtis@somaradio.ca>
+	* gdmconfig.sgml: updated the gdmconfig document to reflect
+	  the changes in the gui, gdmconfig.
+
+Sun Sep 02 16:44:28 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h, daemon/xdmcp.c: Implement a GOT_MANAGED_FORWARD
+	  opcode.  Also send MANAGED_FORWARD 3 times (1.5 sec spaced apart)
+	  or until we get a GOT_MANAGED_FORWARD.  This is a compatible
+	  change to the gdm xdmcp protocol so version wasn't raised.
+
+Sat Sep 01 14:53:22 2001  George Lebl <jirka@5z.com>
+
+	* AUTHORS, docs/gdmconfig/C/gdmconfig.sgml:  Updated trevors email
+
+Sat Sep 01 07:00:52 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c: the decline messages were switched still.  I've
+	  been up too late
+
+Sat Sep 01 05:31:07 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.4.1
+
+Sat Sep 01 05:29:31 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.[ch], daemon/choose.c:  Fix decline strings, and
+	  make the MANAGED_FORWARD work if the origin address is local.
+
+Sat Sep 01 04:15:38 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h, daemon/xdmcp.c, daemon/choose.[ch]: Change the gdm
+	  extension protocol, the MANAGED_FORWARD passes address of origin
+	  rather then hostname of self.  And we now handle the message
+	  correctly.  Also on DECLINE, send a descriptive english string
+	  to aid in debugging XDMCP setup.
+
+	* configure.in: raise version
+
+	* config/gdm.conf.in: add the DisplaysPerHost default
+
+Sat Sep 01 00:47:36 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c, daemon/gdm.[ch], daemon/server.c: Implement
+	  DisplaysPerHost which was documented so it should have worked
+	  in the first place
+
+	* daemon/xdmcp.c, daemon/server.c, daemon/auth.c, daemon/gdm.c,
+	  daemon/choose.c, daemon/cookie.c, daemon/display.c, daemon/slave.c,
+	  gui/gdmlogin.c: fix some memleaks, none really dangerous
+
+	* daemon/xdmcp.c: messages such as status information shouldn't be
+	  translated.  Because they go over a wire with no specification of
+	  charset or language.
+
+	* gui/gdmlogin.c: Fix broken "session don't exist wanna save new one"
+	  message
+
+	* daemon/gdm.c: Make sure static display numbers are unique.
+	  and fix a possible crash in flexible server code
+
+	* docs/C/gdm.sgml: a small update
+
+	* gui/gdmflexiserver.c: Add -a (--authenticate) command so that
+	  when using the --command option we can auth first, useful for
+	  testing.
+
+Fri Aug 31 20:22:33 2001  George Lebl <jirka@5z.com>
+
+	* docs/C/gdm.sgml: Update for all the server def stuff.
+
+Fri Aug 31 18:21:46 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c: run the Willing script at most once every 3
+	  seconds.  That way we can prevent some DOS attacks.
+
+	* docs/C/gdm.sgml: update
+
+Fri Aug 31 18:12:05 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in, daemon/gdm.[ch], daemon/xdmcp.c:  Add an
+	  xdmcp/Willing script configuration option.  To run a script
+	  when the system gets the QUERY command.  Original patch
+	  by Matt Forrest <mforrest@scs.ryerson.ca>, but heavily modified.
+
+	* daemon/gdm.c: Fix checks for the chooser and greeter binaries
+
+	* gui/gdmconfig.{glade,c}:  Add configuration for the Willing
+	  thing
+
+	* docs/C/gdm.sgml:  Document some of the new configuration keys.
+	  Not everything is documented yet.
+
+Fri Aug 31 17:04:02 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.c: Fix reading and changing servers with respect
+	  to server numbers.  All server numbers are now normalized and
+	  they equal the actual row (such assumptions were made before,
+	  but were not enforced).  Also fix some memory leaks.
+
+Fri Aug 31 16:34:58 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.c: fix writing of servers to config file
+
+2001-08-31  Abel Cheung  <maddog@linux.org.hk>
+
+	* configure.in (ALL_LINGUAS): zh_TW.Big5 -> zh_TW
+
+Tue Aug 28 23:17:41 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: s/login/username/ one more time, and in XDMCP
+	  mode call it "Disconnect" not "Quit", but in flexi mode, it should
+	  still be "Quit".
+
+Tue Aug 28 19:23:34 2001  George Lebl <jirka@5z.com>
+
+	* gdm.spec.in: redo restart logic to be a lot smarter and not hang
+	  on leftover fifo's
+
+Tue Aug 28 17:37:12 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.4.0
+
+2001-08-27  Abel Cheung  <maddog@linux.org.hk>
+
+	* daemon/filecheck.c (gdm_file_check): make the meaning of a syslog
+	  string a bit clearer. (hope not in string freeze now)
+
+Sun Aug 26 01:45:33 2001  George Lebl <jirka@5z.com>
+
+	* daemon/auth.c, daemon/cookie.c:   Minor cleanup and paranoia
+
+	* daemon/gdm-net.[ch], daemon/gdm.[ch], daemon/server.c,
+	  daemon/slave.[ch]: The daemon now keeps track of the cookies in 
+	  text form at least so that it can do authentication of it's own.
+	  FLEXI_XSERVER now requires an "authenticated" socket connection
+	  using AUTH_LOCAL (a new opcode).  This way only those users that
+	  are logged in from gdm on a console can start new
+	  console/fullscreen flexi servers.  I mean for remote people it
+	  wouldn't work anyway.
+
+	* gui/gdmflexiserver.c: implement AUTH_LOCAL authentication scheme
+	  by reading from the .Xauthority file and looking for FamilyLocal
+	  entries from gdm. (or those looking like it).  Tests all candidates
+	  and find the one that works for gdm.  This could cause some
+	  gdm_info messages in the log, but I suppose that's ok, vast
+	  majority of the time there will only be one that is even tried.
+	  Also added a debug flag and get xauth filename from XauFileName
+	  rather then my own hand created method.
+
+Sat Aug 25 21:35:29 2001  George Lebl <jirka@5z.com>
+
+	* daemon/display.c, daemon/gdm.c: don't use an extra printf, if
+	  this was user supplied it could have been a security hole, like
+	  this it was just one extra allocation.
+
+	* gui/gdmXnestchooser.c, gui/gdmchooser.c: cast address argument
+	  to connect to avoid a warning.
+
+Sat Aug 25 10:06:39 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c, daemon/misc.c:  Fix wiping of pid file on
+	  "gdm already exists" message
+
+	* daemon/gdm.c, daemon/gdm-net.c:  Don't unlink files on close.
+	  Instead only unlink things on final_cleanup.  This fixes the
+	  disappearing socket trick.
+
+	* gui/gdmflexiserver.c:  When not local refuse to run.  This is still
+	  not perfect.  But I don't suppose we'll get much better.
+	  Unfortunately a new string.  The translators will beat me up.
+
+Fri Aug 24 19:32:42 2001  George Lebl <jirka@5z.com>
+
+	* docs/sgmldocs.make: update to newest from gnome-core
+
+Thu Aug 23 12:03:41 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: add gdmopen and gdkaskpass to the summary
+
+Thu Aug 23 10:10:33 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in:  Update for the server stuff
+
+	* daemon/display.c, daemon/errorgui.c, daemon/misc.c, daemon/slave.c:
+	  close fds no longer needed.  Close all needed things after
+	  forking,  Some other related cleanup as well.
+
+	* gui/gdmlogin.c:  A minor UI cleanup, make the entry at least
+	  250 pixels wide, in an attempt t make the window not change size
+	  all the time
+
+	* gui/gdmphotosetup.c:  Don't require the browser to be on.  Just
+	  warn the user that the browser is off, but still let him pick
+	  the face.
+
+Wed Aug 22 23:23:21 2001  George Lebl <jirka@5z.com>
+
+	* config/XKeepsCrashing, daemon/misc.c: Also test for whiptail if
+	  we can't find dialog nor gdialog
+
+	* daemon/misc.[ch], daemon/gdm.c:  Make sure things that run dialog
+	  (and could thus run gdialog) don't have DISPLAY set
+
+Wed Aug 22 23:01:59 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, Makefile.am, utils/gdmopen.c, utils/gdmaskpass.c:
+	  Add two new small sbin utils.  gdmopen is like open (based on it)
+	  but better suited for gdm.  Exitcode is returned so no temp files
+	  are needed.  Process is cleaned up on a signal, the new vt is
+	  deallocated after use.  And unlike openvt this thing actually waits
+	  for the child.  Gdmaskpass just asks for the root password, for
+	  use in the XKeepsCrashing script.  Both of these things will only
+	  run as root as I'm too paranoid and it doesn't make sense for
+	  them to run otherwise for gdm anyway.
+
+	* configure.in: Fix sbin expansion.
+
+	* daemon/gdm.c, daemon/misc.[ch], daemon/slave.c, daemon/server.c:
+	  Use gdmopen to run dialog and add helper functions for doing this.
+
+	* daemon/gdm.h, daemon/slave.c, daemon/server.[ch]:  When a server is
+	  busy, ask the user if we want to run it on a new display number
+	  or retry.
+
+	* daemon/gdm.c, daemon/misc.c, daemon/slave.c: Make sure to whack
+	  any extra helper processes we launch when we are killed so that
+	  we don't leave things like 'dialog' processes around
+
+	* daemon/gdm.c, config/XKeepsCrashing:  Use gdmaskpass, ask if
+	  the user wants to view X logs if X is crashing.  And use gdmopen
+	  in the script and correctly abort with exit 32.  Also make it
+	  not use the ugly tempfile stuff (Though a tempfile is still given
+	  to the script for now)
+
+	* gdm.spec.in: raise epoch to 1, people abuse this field, and if they
+	  do abuse it again and raise it beyond 1, I'll just max it out since
+	  it makes package upgrading not work.
+
+	* daemon/slave.c, daemon/verify-(pam|crypt|shadow).c: add
+	  /sbin/nologin as a thing to test for for disabled logins in
+	  addition to /bin/false and /bin/true (it worked, but this adds a
+	  nicer message)
+
+	* daemon/xdmcp.c: fix a warning.
+
+	* gui/gdmflexiserver.desktop.in: kill TryExec here
+
+Tue Aug 21 04:42:05 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.[ch]:  Finish the editting of the server definitions.
+	  BTW, this is incredibly evil and ugly code and should be cleaned
+	  up one of these days.  I feel sort of dirty for doing it :)
+
+Tue Aug 21 03:03:49 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: raise version number
+
+	* daemon/display.c, daemon/gdm.[ch], daemon/server.[ch],
+	  daemon/slave.c, daemon/xdmcp.c:  Send back info about current
+	  user and get the VT number on linux.  Implement a command in
+	  the control protocol for getting a list of console logins
+
+	* gui/gdmflexiserver.c: add an option for sending arbitrary commands
+	  to gdm for testing, and remove debugging output
+
+Mon Aug 20 01:10:24 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.c: finish editting of static servers and a bit
+	  of work on server definitions editting.
+
+Sun Aug 19 14:47:09 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.(c|glade): work more on server editting, now fills
+	  out the static server edit dialog correctly
+
+2001-08-19  Jesus Bravo Alvarez  <jba@pobox.com>
+
+	* config/locale.alias, gui/gdmlanguages.c, gui/gdmconfig.glade,
+	  gui/gdmconfig-strings.c: Added Galician (gl_ES) and Brazilian
+	  Portuguese (pt_BR) entries.
+
+Sat Aug 18 18:17:44 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch]: add some code for choosable servers (not
+	  implemented yet
+
+	* daemon/misc.c: search our own displays for used numbers first
+
+	* daemon/gdm.c, daemon/server.c, daemon/slave.c:  Finish implementing
+	  choosing of flexi servers
+
+	* daemon/slave.c, daemon/verify{,-pam,-crypt,-shadow}.[ch]:
+	  Correctly implement credential setting and some pam related	
+	  fixes
+
+	* gui/gdmconfig.(c|h|glade): Start on making configuration for 
+	  all the new stuff including the server definitions, not finished
+	  yet.
+
+	* gui/gdmflexiserver.c: if there are multiple flexible servers,
+	  give the user a choice
+
+	* gui/gdmflexiserver-xnest.desktop.in: only show if Xnest exists
+
+Fri Aug 17 23:56:14 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in: Add a standard server definition and the Xnest
+	  key
+
+	* daemon/gdm.[ch], daemon/server.c:  Add server definition reading
+	  and using
+
+Fri Aug 17 14:47:08 2001  George Lebl <jirka@5z.com>
+
+	* docs/C/Makefile.am: fix rules since the .sgml file changed
+
+Fri Aug 17 04:42:34 2001  George Lebl <jirka@5z.com>
+
+	* daemon/auth.c, daemon/display.c, daemon/gdm-net.[ch],
+	  daemon/gdm.[ch], daemon/server.[ch], daemon/slave.[ch]:
+ 	  Finish implementation of flexible servers and lots of related
+	  cleanup and restructuring that was related.
+
+	* daemon/server.c: close all fd's when running the X server.
+
+	* gui/gdmflexiserver.c: implement the updated protocol and implement
+	  all the error codes
+
+	* gui/Makefile.am, gui/gdmflexiserver(|-xnest).desktop.in,
+	  po/POTFILEs.in:  Add launchers for new flexi server and new
+	  xnest flexiserver
+
+	* gui/gdmlogin.c, daemon/slave.c: On flexi servers add the "Quit"
+	  menu thingie, since it's just as useful as in xdmcp case here.
+	  It should probably be a close button, not a Quit button.  I dunno.
+
+Thu Aug 16 01:29:05 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, gui/gdmXnestchooser.c, gui/Makefile.am:  Add a proggie
+	  for starting an Xnest chooser session.
+
+	* daemon/gdm-net.c, daemon/gdm.[ch], gui/Makefile.am,
+	  gui/gdmflexiserver.c: Make the protocol actually work right and
+	  add a small proggie for starting new flexi X servers.
+
+Wed Aug 15 13:14:11 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmphotosetup.c: When writing to .gnome/photo, first unlink the
+	  file
+
+Wed Aug 15 01:54:02 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in: Added StandardXServer and FlexibleXServers
+	  and font includes a ,*.  Also Xservers use the "Standard"
+	  definition, which all probably doesn't work
+
+	* daemon/Makefile.am, daemon/gdm-net.[ch]: Move the fifo stuff here
+	  and generalize it and add an interface for unix sockets
+
+	* daemon/gdm.[ch]: Add support for the user protocol using unix
+	  domain sockets
+
+	* daemon/gdm.[ch], daemon/auth.c, daemon/display.c, daemon/server.c,
+	  daemon/slave.c:  Do some Standard and Flexible/Xnest servers dance. 
+	  Mostly doesn't work now still.
+
+	* daaemon/misc.c: implement an incredibly evil function to figure out
+	  a free X display number
+
+2001-08-14  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* docs/C/gdm.sgml: Fix sgml up a bit.
+	* docs/gdmconfig/C/gdmconfig.sgml: Fix up here too.
+	
+Mon Aug 13 13:13:25 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.3.2
+
+Sun Aug 12 11:44:02 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: use ve_gnome_dialog_grab_focus
+
+Fri Aug 10 22:56:21 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: use selected state for titlebar when window
+	  focused, normal when otherwise, get rid of handle crap and the
+	  frame to make titlebar slimer.
+
+Fri Aug 10 11:51:20 2001  George Lebl <jirka@5z.com>
+
+	* Apply the following patch and massage it a bit to be more sane
+
+	Mon Jul 30 14:29:00 2001  Heeten Choxi <azari.geo@yahoo.com>
+
+	* daemon/gdm.h, gui/gdmlogin.c: created new Opcode for communication
+	between daemon and greeter called GDM_ERRBOX.
+	
+	* daemon/verify-pam.c, daemon/verify-crypt.c, daemon/verify-shadow.c:
+	Use GDM_ERRBOX to send error feedback to greeter when logins fail.
+	(As suggested in GNOME Usability Study Report :: Logging In)
+	
+	* gui/gdmlogin.c: Added an "Ok" button that can be pushed to continue
+	with login.  (As suggested in GNOME Usability Report)
+
+Sat Aug 04 19:47:31 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c, gui/gdmchooser.c, gui/gdmlogin.c: In the rest of
+	  syslog usage use the "%s" format string to print a string
+
+Sat Aug 04 19:36:42 2001  George Lebl <jirka@5z.com>
+
+	* config/Gnome.in: run the scripts from /etc/X11/xinit/xinitrc.d
+	  which makes some more things work right
+
+Fri Aug  3 12:51:58 2001  Owen Taylor  <otaylor@redhat.com>
+
+	* daemon/slave.c (gdm_slave_exec_script): Set
+	RUNNING_UNDER_GDM - we might want to know this
+	when we, for instance, running the display init
+	script.
+
+2001-08-03  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* config/gdm.conf.in: Added Norwegian translations.
+	
+2001-08-02  Havoc Pennington  <hp@redhat.com>
+
+	* gui/gdmlogin.c (gdm_login_session_init): add config option to
+	not show the Last session item, because it's confusing to have in
+	addition to Default, and interacts badly with switchdesk and
+	kdm/xdm. Need a better solution, such as a unified session system
+	across kdm/gdm. Lang-setting is screwed up too (e.g.
+	/etc/sysconfig/i18n overrides it, and does not work for non-GNOME
+	sessions).
+
+2001-08-02  Havoc Pennington  <hp@redhat.com>
+
+	* daemon/gdm.c (gdm_config_parse): fix format
+
+	* daemon/server.c (display_busy): fix format 
+
+	* daemon/verify-crypt.c (gdm_verify_user): don't put login 
+	in syslog, because people accidentally type their password 
+	in this field.
+
+	* daemon/verify-shadow.c (gdm_verify_user): same
+
+	* daemon/verify-pam.c (gdm_verify_user): same
+	
+	* daemon/misc.c: syslog takes a format string, don't pass it data
+	we got from the user. Reported by Cyril Diakhate
+	<diakhate@easynet.fr>
+
+Thu Aug  2 03:10:23 2001  Abel Cheung <maddog@linux.org.hk>
+
+	* daemon/display.c: GdmDisplay->name should be a %s, not %d (I think)
+
+Tue Jul 24 20:25:00 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c, daemon/gdm.h: embrace and extend xdmcp.  Add
+	  an opcode for a sucessful forwarded session so that the original
+	  manager can discard the indirect easily and fix some relevant bugs.
+	  Still not sure about the design, will make it more robust later.
+
+Tue Jul 24 05:21:34 2001  George Lebl <jirka@5z.com>
+
+	* gdm.spec.in: Don't link Give/TakeConsole as those are stupid.
+	  fixes bad ownership of /dev/console (which is handled by pam
+	  anyway!) and fixes sessreg related bugs as well.
+
+Mon Jul 23 12:42:29 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: s/Halt/Shut down/ and don't ask for saving
+	  failsafe sessions.
+
+Wed Jul 11 12:55:36 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify-pam.c, daemon/verify-crypt.c: when user doesn't exist
+	  ask for a password anyway.  Also some sanity fixing all around.
+
+Mon Jul  9 09:20:49 2001  Owen Taylor  <otaylor@redhat.com>
+
+	* config/locale.alias: Fix typo - traditional, not traditonal.
+
+Mon Jul 09 00:14:02 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am, autogen.sh, configure.in, daemon/Makefile.am,
+	  daemon/auth.c, daemon/gdm.c, daemon/gdm.h, daemon/misc.c,
+	  daemon/server.c, daemon/slave.c, daemon/verify-crypt.c,
+	  daemon/verify-pam.c, daemon/verify-shadow.c, daemon/xdmcp.c,
+	  gui/Makefile.am, gui/gdmchooser.c, gui/gdmconfig.c, gui/gdmlogin.c,
+	  gui/gdmphotosetup.c, gui/misc.[ch], po/POTFILES.in:  Use
+	  vicious-extensions module rather then local routines
+
+	* gui/icon-entry-hack.[ch]: remove, in vicious-extensions now
+
+Sun Jul 08 16:38:02 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.3.1 
+
+	* config/locale.alias, gui/gdmlanguages.c: added simplified and
+	  traditional chinese
+
+Fri Jul 06 04:25:39 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: Fix fd leak after dup2
+
+Fri Jul 06 01:55:27 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c: Correct checks for chooser greeter binaries, and
+	  fix Suspend feature
+
+	* daemon/gdm.[ch], daemon/misc.[ch], gui/misc.[ch], daemon/server.c,
+	  daemon/slave.c, gui/gdmconfig.c, gui/gdmlogin.c: Use popt for
+	  splitting argv's, this makes things understand quotes which are
+	  apparently already used in places (eek).  This underlines the need
+	  for the vicious-extentions-module, I just cut and paste too much
+	  code.  Watch for this new cvs module soon.
+
+	* daemon/slave.c: fix code for sessions with spaces in them
+
+Thu Jul 05 23:45:45 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c: open 0,1,2 with correct rw flag
+
+	* daemon/slave.c: Ryan Murray pointed me to some of my braindamage
+	  which was causing gdm to fail in horrible ways on debian.  Get rid
+	  of the greeter FILE * which caused us to close fd 0 at one point
+	  which then caused us to prematurely close our X connection.  We
+	  just use stdin now, which makes more sense.
+
+Thu Jul 05 18:50:23 2001  George Lebl <jirka@5z.com>
+
+	* gdm.spec.in: remove the connection to RedHat's default init as that
+	  just does some background setting but we already set background
+	  ourselves in a nicer way and this just resulted in a slowdown and
+	  a flash
+
+	* daemon/server.c, daemon/slave.c: be more thorough in closing
+	  displays, never include an empty xioerror handler, and normally
+	  xio errors do a DISPLAY_REMANAGE and only on server startup do they
+	  do XFAILED.  Also before and after whacking clients grab/ungrab the
+	  server as xdm does.
+
+	* daemon/xdmcp.c: fix warnings
+
+Thu Jul 05 13:17:53 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: add kill_thingies to atexit to make sure that the
+	  background thing gets killed on X errors
+
+Thu Jul 05 03:29:01 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: raise version to 2.2.3.1
+
+	* gdm.spec.in: do a "soft restart" in %post
+
+	* gui/gdmchooser.c, gui/gdmlogin.c: warning fixes
+
+	* daemon/misc.h, daemon/slave.c, daemon/xdmcp.c, daemon/choose.c,
+	  daemon/display.c, daemon/gdm.c,saemon/server.c: fix printf style
+	  warnings
+
+	* daemon/choose.[ch], display/gdm.[ch], daemon/slave.c: change the
+	  fifo protocol to be text based so that we can also control from
+	  scripts like the .spec file.  Also store all the different pids
+	  in the daemon so that we can whack all the different processes
+	  the slave starts if it crashes.  Also add a soft restart opcode.
+
+Wed Jul 04 20:58:31 2001  George Lebl <jirka@5z.com>
+
+	* gdm-safe-restart.in, Makefile.am, configure.in, daemon/choose.[ch], 
+	  daemon/gdm.[ch], daemon/slave.c, daemon/xdmcp.c, gui/gdmconfig.c:
+	  The fifo is not only for chooser now, it is a general protocol to
+	  control some gdm things, more to come.  It's writing direct binary
+	  structs, but then again this is only a fifo and you should only be
+	  able to write to it from gdm and root account on the same machine.
+	  The daemon now knows when a user is logged in on a display and
+	  there is a safe restart option with SIGUSR1 to the daemon.  Also
+	  the daemon knows the x pids now and can whack the X server when
+	  the slave crashes, so that we don't get busy hanging server.
+
+	* daemon/misc.c: fails are LOG_CRIT not LOG_ERR (I hope this is
+	  correct)
+
+Tue Jul 03 13:18:18 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am, config/Makefile.am: prepend $DESTDIR to $PAM_PREFIX
+
+Tue Jul 03 03:33:13 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h, config/gdm.conf.in: Made HonorIndirect default
+	  to true now
+
+Tue Jul 03 02:18:08 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.3
+
+Tue Jul 03 02:14:41 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h: Hosts,Broadcast were in the wrong section
+
+	* daemon/xdmcp.c: check for current displays BEFORE we check the
+	  number of pending and allocate a new display, this way we'll remove
+	  it if it itself has been pending, also don't just dispose, the
+	  display may be already managed, in which case we want to unmanage
+	  it to avoid a process leak.
+
+	* gdm.spec.in: fix pam prefix stuff and file listing
+
+	* config/Makefile.am: fix pam installation stuff
+
+Mon Jul 02 14:36:57 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: In remote (xdmcp) mode, allow killing of the
+	  login window by a "Quit" on the menubar.  I will make this
+	  string better when I'm not in string freeze mode again.  It needs
+	  to be made better on the chooser as well.
+
+Mon Jul 02 14:11:38 2001  George Lebl <jirka@5z.com>
+
+	* daemon/choose.c, daemon/gdm.c: do not count chooser as pending
+	  indirect displays, they are not.  Only count them when the host has
+	  been chosen, so this allows as many choosers as login screens.
+	  When a new host is chosen and the limit has been reached, whack the
+	  oldest pending indirect display.  Makes choosers much easier to
+	  manage and use, and makes more sense.
+
+	* gui/gdmchooser.c: set the background color if any background is set
+
+Mon Jul 02 12:42:58 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c: remove sources for the watches during xdmcp close
+
+	* configure.in: raise version to 2.2.3
+
+Sun Jul 01 21:48:30 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: add ja.po and zh_TW.Big5 as those work again
+	  apparently
+
+Sun Jul 01 15:08:51 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c, daemon/choose.[ch]: use correct prototypes and stop
+	  casting watch functions
+
+Sun Jul 01 05:25:34 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmchooser.c: Another example of why we want compile time
+	  typesafety.  The GIOFunc was casted in the watch adding since
+	  it had a different prototype, and I was getting somewhat random
+	  return values.  Which meant that the chooser would stop working
+	  at points completely.  Eeeek!  So change to correct prototype
+	  to make the chooser happy.
+
+Sun Jul 01 04:50:39 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmchooser.c: scan the hosts 3 times in 2 second intervals
+	  like xdm chooser (and don't scan already found hosts) also
+	  when we get explicit localhost reply get the local hostname
+	  so that we get only entry for the local host.
+
+Sun Jul 01 03:53:08 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: actually get the configurator key, allows
+	  configuration yet again from the greeter.
+
+Fri Jun 29 19:10:48 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify-pam.c: Apply patch from Nalin Dahyabhai
+	  <nalin@redhat.com> to first zero out the reply array
+
+Fri Jun 29 02:32:01 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c: fixes and cleanups to the error display code.
+
+	* daemon/server.c: remove O_APPEND from log file openning since it
+	  was being overriden by O_TRUNC anyway.  On crash see if the logfile
+	  looks like display being busy.  If it does, tell the user so.  This
+	  prevents this case from looking like crashes, and is more
+	  informative.  Perhaps we should try starting on the first free
+	  display.  That would be good to investigate in the future.
+
+Fri Jun 29 01:22:20 2001  George Lebl <jirka@5z.com>
+
+	* gdm.spec.in:  Apply cleanup patch from drscott12@hotmail.com
+	  (Dean Scott)
+
+Thu Jun 28 18:48:56 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in, gui/gdmconfig.(c|glade), gui/gdmchooser.c:
+	  Add two keys Broadcast and Hosts to the chooser configuration
+	  to allow more fine grained control as to what appears in the
+	  chooser.  And to allow listing of hosts not reachable by
+	  broadcast.
+
+	* doc/C/gdm.sgml: add docs for the above two keys
+
+	* daemon/choose.c, daemon/gdm.[ch], daemon/slave.c, daemon/xdmcp.c:
+	  Fix a race with the daemon not getting the chooesr response in
+	  time.  Also move the chooser page from system setup to expert
+
+	* daemon/xdmcp.c: get all local interface addresses and use those
+	  for forward query in case we see only loopback as our address.
+	  This is useful if you do an indirect query to the local host
+	  and choose a remote server.  xdm screws this case up, so we have
+	  one up on xdm here.
+
+	* daemon/gdmlogin.c, daemon/gdmchooser.c, daemon/gdmwm.c:  Fix some
+	  gdmwm issues.  In the browser window allow Ctrl-F after selecting
+	  a face to finger that user and display the result, useful to check
+	  if you have new mail or whatnot.  Also strip excluded users before
+	  checking to allow spaces in the Exclude list.
+
+2001-06-28  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gui/gdmconfig.glade: Added nn_NO.
+	
+Thu Jun 28 13:44:40 2001  George Lebl <jirka@5z.com>
+
+	* config/Gnome.in, config/Xsession.in: use /bin/sh and not /bin/bash
+
+	* gui/gdmconfig.c: fix crash when reading long session files
+
+	* daemon/slave.c: s/editting/editing/
+
+Tue Jun 26 23:00:04 2001  Trevor Curtis <trevor.curtis@home.com>
+
+	* docs/gdmconfig/C: added sections for Miscellaneous, and Login 
+	  Sessions. Updated XServer-Setup section. 
+	* docs/gdmconfig/C/figures/*: updated GDM_xserv_setup.png, and 
+	  GDM_login_sessions.png. Added GDM_expert_misc.png
+
+Mon Jun 25 02:43:19 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: remove the POTFILES sed rule as that makes autogen.sh
+	  whack out
+
+Mon Jun 25 01:10:04 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmphotosetup.c, daemon/slave.c: Get a picture from the config
+	  file.  when the picture is in a known pixmap directory, don't
+	  check it since it's a system file.  Makes it possible to select
+	  larger system files which will be then scaled down, but the user
+	  can't point it to a malicious picture.
+
+Sun Jun 24 23:53:34 EDT 2001 Trevor Curtis <trevor.curtis@home.com>
+
+	* edited gdmconfig.sgml to make editing it a little easier.
+
+Sun Jun 24 14:55:29 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in, daemon/gdm.[ch], daemon/slave.c,
+	  gui/gdmconfig.(c|glade):  Add daemon/AlwaysRestartServer option
+	  so that the slave can just kill and restart the server instead
+	  of reinitting it.
+
+	* docs/C/gdm.sgml: update for all the new options
+
+Sun Jun 24 14:07:47 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: when ping times out, do proper session stoping
+	  first rather then just a straight kill
+
+Sun Jun 24 13:45:59 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in, daemon/gdm.[ch], daemon/slave.c,
+	  gui/gdmconfig.(c|glade), gui/gdmlogin.c:  Add suspend command
+	  support although it is off by default (empty command)  Also do
+	  checks for commands and don't show their respective menu items
+	  if the commands are not present or empty
+
+	* config/gdm.conf.in, daemon/gdm.[ch], daemon/slave.c,
+	  daemon/verify-pam.c, daemon/xdmcp.c, gui/gdmconfig.(c|glade),
+	  gui/gdmlogin.c:  Apply and massage a patch from Michel Dagenais
+	  <michel.dagenais@polymtl.ca> to add optional support
+	  for remote auto (timed) login, and also to use enriched strings
+	  for the timed and automatic login names.  This is to make the
+	  life of sysadmins easier if they're managing a large set of
+	  x terminals.
+
+Sat Jun 23 03:17:03 2001  George Lebl <jirka@5z.com>
+
+	* gdm.spec.in, Makefile.am: some pam related fixage
+
+Fri Jun 22 21:02:21 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmchooser.c: actually implement ScanTime
+
+Fri Jun 22 19:13:05 2001  George Lebl <jirka@5z.com>
+
+	* docs/C/gdm.sgml: fix indirect wait entry, add entries for the
+	  showing of different built in sessions (failsafes, chooser)
+
+	* gui/gdmconfig.(c|glade): add toggeling of builtin sessions
+	  (failsafes, chooser)
+
+Fri Jun 22 18:53:14 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c: fix up the forward query sending/handeling, fix
+	  some wrong freeing too, and fix the hosts_ctl warning by including
+	  a prototype.  We finally have chooser stuff all working! Yay!
+
+	* daemon/xdmcp.c, gui/gdmchooser.c: we want to be very careful in
+	  what types we pass xdmcp functions, the header does not include
+	  areguments in the prototypes, so usage is snarfed from xdm
+
+Fri Jun 22 15:50:00 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmchooser.c, gui/gdmwm.[ch], gui/gdmlogin.c: unify the
+	  xinerama stuff in gdmwm
+
+	* daemon/xdmcp.c: fix warning
+
+Fri Jun 22 15:26:01 2001  George Lebl <jirka@5z.com>
+
+	* daemon/Makefile.am, daemon/choose.[ch], daemon/xdmcp.c,
+	  daemon/gdm.h, daemon/display.c:  Rework of how choosing works,
+	  should theoretically all work and be complete, but it doesn't work
+	  currently
+
+2001-06-20  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gui/gdmlanguages.c: Added here too.
+	* config/locale.alias: Added entry for nynorsk.
+	
+Sat Jun 16 05:24:39 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: fix warning
+
+Sat Jun 16 04:43:33 2001  George Lebl <jirka@5z.com>
+
+	* daemon/choose.c, daemon/slave.c, daemon/xdmcp.c, daemon/gdm.h:
+	  Make choosing somewhat work.  Now always works if local host is
+	  chosen, but otherwise seems to have issues.
+
+	* gui/gdmchooser.c: do version checking when under gdm, and display a
+	  dialog after max indirect wait time
+
+Fri Jun 15 17:27:38 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmchooser.c: minor cleanups and i18n fixes 
+
+	* daemon/slave.c, daemon/gdm.h, daemon/xdmcp.c, daemon/choose.c: a
+	  bunch of xdmcp related fixes, and actually run the greeter on
+	  indirect queries, though it still doesn't actually choose the host,
+	  but oh well.
+
+	* daemon/slave.c: fix GETFD argument when doing SETFD on the pipe
+
+Wed Jun 13 22:22:55 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: on xterm failsafe session, instead of doing
+	  XSetInputFocus, just warp the pointer to the first window's
+	  center.  That works just as well and allows pointer root focus
+	  to still work
+
+Tue Jun 12 19:26:19 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: when running scripts always set the right
+	  USER/LOGNAME etc...  Thanks to Fernando Pablo Lopez-Lezcano
+	  <nando@ccrma.stanford.edu> for pointing this out.
+
+Tue Jun 12 18:14:32 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], daemon/slave.c, gui/gdmlogin.c:  do version checking
+	  and allow restarting gdm if possible, or at least rebooting and
+	  telling the user what is happening
+
+Sun Jun 10 17:13:47 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: fix CONSOLE_HELPER test
+
+	* gui/gdmwm.c: follow the motif deco hint a bit, and do better job of
+	  placement, and also do a hack to correctly place gkrellm.
+
+Wed Jun 06 16:51:34 2001  George Lebl <jirka@5z.com>
+
+	* config/XKeepsCrashing, daemon/gdm.c: try gdialog if we can't find
+	  standard dialog, that might work as well.
+
+Wed Jun 06 06:03:41 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am: add -f to mv
+
+Wed Jun 06 00:59:33 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, gui/Makefile.am: do the conditional chooser build
+	  in a kosher way that actually works
+
+Wed Jun 06 00:41:23 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, gui/Makefile.am: when compiling without xdmcp
+	  don't compile the chooser
+
+	* gui/Makefile.am, gui/gdmchooser.c: Use gdmwm for window management
+	  and query xinerama as well.  Also do manage on doubleclick
+
+	* daemon/choose.c, daemon/xdmcp.c: Some obvious fixes, note that
+	  indirect lookup will NOT return an expired Indirect thingie. 
+	  Still need to figure out where does the chooser plug in.
+
+	* gui/gdmlogin.c, gui/gdmchooser.c: run gdmwm only when not debugging
+
+	* daemon/slave.c, daemon/gdm.c, daemon/errorgui.[ch],
+	  daemon/Makefile.am:  Deal with the hanging bugs by doing an exec
+	  before running the gtk gui.  Also make the gui use GNOME to be
+	  prettier.  I'm less and less sure I like this hack and it might
+	  move into a separate binary, though this way it is faster as
+	  gdm is already paged in.  This also fixes some i18n problems
+	  with the error dialog.
+
+Tue Jun 05 21:27:52 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: fix hanging related to centering of dialogs.
+
+Mon Jun 04 20:45:54 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am, configure.in, gdmconfig-security(.in), gdm.spec.in:
+	  cleaned up the pam stuff ala gnome-utils
+
+	* configure.in, accconfig.h, daemon/xdmcp.[ch], daemon/gdm.c,
+	  gui/gdmconfig.(c|glade): Detect the xdmcp libs and compile
+	  without xdmcp support if not found and allow selecting this
+	  option ala the xinerama one.  The configurator will disable
+	  the xdmcp options if they aren't compiled in
+
+	* daemon/gdm.c, gui/gdmlogin.c, gui/gdmconfig.(c|glade): Apparently
+	  5 seconds is useful for timed login so lower the minimum from 10
+	  to 5
+
+Sun Jun 03 04:55:49 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h: remove unused opcode (GDM_STOP)
+
+	* daemon/slave.c, gui/gdmlogin.c: On GDM_QUIT the login will make
+	  sure to quickly quit and in the slave we no longer kill it to
+	  avoid a possible race, also try to avoid other races todo with
+	  killing things.  Also fclose the greeter channel to avoid a leak.
+
+	* daemon/gdm.h, daemon/slave.c: get the size of the screen from
+	  xinerama and center error dialog stuff.
+
+Sat Jun 02 03:41:06 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.2.1
+
+Sat Jun 02 02:14:37 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h: use 64 for the code for X failing and not 1 
+
+Sat Jun 02 01:58:15 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: bump version
+
+	* auth.c, xdmcp.c, cookie.c: fix clobering of cookies with zeros, only
+	  reget hostname on local displays, correctly setup authentication for
+	  local xdmcp case. reset umask to sane gdm value after setting the
+	  use auth
+
+	* gdm.c: cleanup, possible fd leak if there was a stale pid file
+
+	* server.c: handle memory errors in cookie setup
+
+	* slave.c: from xdm stole the idea of a bogus first client which
+	  apparently fixes some things.  Also actually close initial display
+	  on xdmcp session end.  Also make sure language is at least "C" if
+	  we can't find any other language
+
+	* slave.c: SECURITY! when reinitializing the display for another go,
+	  first bake new cookies
+
+Fri Jun 01 17:51:52 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: when sending GDM_QUIT to the greeter, first make
+	  sure greet is FALSE to avoid a race, this fixes the bugs where
+	  people couldn't log in.  Also added a bit of debugging.  Also fixed
+	  a problem where on a failed execution of a script one would get two
+	  slaves.
+
+2001-05-30  Havoc Pennington  <hp@redhat.com>
+
+	* daemon/gdm.h: add config keys for show/disable the sessions that 
+	are added in addition to those in /etc/X11/gdm/Sessions, so that
+	admins can fully control the session list
+
+	* config/gdm.conf.in: add abovementioned config keys
+
+	* gui/gdmlogin.c (gdm_login_parse_config): honor these settings
+	
+Thu May 31 03:17:32 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c: set euid/egid to 0 before verify check
+
+	* daemon/slave.c: set euid/egid to 0 at a bunch of places just to
+	  make sure that's how they're set.  When children want to exit they
+	  shouldn't use the slave_exit function as that's dangerous to the
+	  slave's health.  Instead use a new function for this which
+	  doesn't do slave specific cleanup.  Also fix segfaults on startup.
+
+	* daemon/verify-pam.c: the credential setting is supposed to be done
+	  after openning a session.  Closing of a session is done silently as
+	  well, jsut for good meassure as wel don't have anything to talk to
+	  anymore anyway
+
+	* daemon/slave.c, daemon/server.c: when reinitting ignore X errors
+	  and do not reopen the display.  When openning the display the first
+	  time, don't try so hard for a local display and instead wipe slave
+	  and try again.
+
+Wed May 30 21:43:21 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: make iconify button nicer by making it smaller and
+	  adding more border around it
+
+Wed May 30 19:17:46 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmphotosetup.c: fix permission setting, and open the source
+	  before dest.  Though a bit pointless since jrb is apprently
+	  rewriting the whole bit :)
+
+Wed May 30 16:19:39 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], daemon/slave.c, gui/gdmconfig.(c|glade):
+	  Add a PingInterval xdmcp thingie which is a combination of
+	  the xdm PingInterval and PingTimeout.
+
+2001-05-30  Havoc Pennington  <hp@redhat.com>
+
+	* configure.in (ALL_LINGUAS): remove ja.po and zh_TW.Big5.po. 
+	ja.po contains invalid euc-jp. zh_TW.Big5.po causes gettext 
+	to get upset but iconv likes it OK, so I don't know.
+
+Wed May 30 04:00:33 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h, daemon/slave.c, gui/gdmlogin.c: Save session in
+	  the gdm options file if requested from the chooser.  This is done
+	  since it's no longer saved in gsm which is the sane behaviour
+	  actually.
+
+Wed May 30 02:13:53 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: run gnome-session with --failsafe in failsafe
+	  gnome mode
+
+Tue May 29 15:47:16 2001  George Lebl <jirka@5z.com>
+
+	* config/locale.alias: Add british/american english language choices
+
+	* gui/gdmlanguages.c: Add the POSIX/C locale if it doesn't exist
+
+	* gui/gdmlogin.c: Make the minimize button like an actual minimize
+	  button instead of an arrow.  It's a black line in the bottom of the
+	  button.  Also turned on the relief again as it looks better like
+	  that now I think.
+
+Tue May 29 00:38:18 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.c, gui/gdmlogin.c: ignore .rpmorig files as well,
+	  and some cosmetic code changes
+
+Mon May 28 02:24:43 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c: Fixed a stupid mistake cased by a missed warning,
+	  not really that crucial since the default config has no failsafe
+	  X servers, because AFAIK, no such beast exists yet
+
+	* daemon/gdm.c, daemon/misc.[ch], daemon/slave.c:  In case the
+	  language doesn't have '_' as the third character it's a communist
+	  and must be executed.  Or perhaps we should just read the alias
+	  file and translate it.  This should really only happen if sysadmin
+	  and screwed up or the user has a very old setting from pre 2.2 days
+
+Sun May 27 23:39:19 2001  George Lebl <jirka@5z.com>
+
+	* config/PostSession, config/PreSession: Don't change utmp since
+	  there is no "terminal", debian bug #90981
+
+Thu May 24 16:05:32 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.2
+
+Thu May 24 15:32:54 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, gdm-restart.in, Makefile.am: a script to restart
+	  the gdm daemon, in sbin for root pleasure only
+
+	* gdm.spec.in: redo the file list to be hopefully sane
+
+	* daemon/gdm.c: actually read in GdmConfigurator
+
+	* gui/gdmconfig.c: show help fromt he help button
+
+	* gui/gdmlogin.c, gui/gdmwm.[ch]: add some short-circuit functions
+	  for window moving, bypassing the window management foo.  This makes
+	  quiver nice again.
+
+Thu May 24 13:22:49 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: add ms (Bahasa Melayu), the official Microsoft
+	  locale, for translations by Khairulanuar Abd Majid <khai@jaring.my>
+
+Thu May 24 12:55:05 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, docs/Makefile.am, omf-install/Makefile.am,
+	  docs/sgmldocs.make, docs/gdmconfig/C/Makefile.am, Makefile.am:
+	  Set up the documentation/omf build stuff.
+
+	* docs/gdmconfig/C/gdmconfig.sgml: fix version to say 2.2.2 and this
+	  is part of the GDM package not the Gnome-Core package :)
+
+Wed May 23 23:31:00 2001  Trevor Curtis <trevor.curtis@home.com>
+	
+	* docs/gdmconfig/C/gdmconfig.sgml: Added the expert and system
+	  descriptions.
+
+	* docs/gdmconfig/C/figures: Was created to put the screenshots
+	  in for the gdmconfig doc.
+
+	* docs/gdmconfig/C/figures/*: added the following png's; 
+	  GDM_auto_login.png, GDM_background.png, GDM_chooser.png,
+	  GDM_enviro.png, GDM_face_brow.png,  GDM_full.png, 
+	  GDM_login_appear.png, GDM_login_behav.png, GDM_login_sessions.png,
+	  GDM_menubar.png, GDM_misc.png, GDM_paths.png, GDM_security.png, 
+	  GDM_xdmcp.png, GDM_xserv_setup.png
+
+Mon May 21 11:31:35 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmchooser.c, gui/gdmconfig.c, gui/Makefile.am: Eeek, we were
+	  using the gnome_datadir_file function so when gdm was installed in
+	  a different prefix we didn't do too well.  Make a define for our
+	  own installation and first look there.
+
+Sun May 20 19:32:52 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c, daemon/gdm.c, gui/gdmphotosetup.c: Fix some
+	  spelling errors and gramatical weirdness as pointed out by
+	  Christian Rose <menthos@menthos.com>
+
+Fri May 18 04:17:00 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], daemon/slave.c, docs/C/gdm.sgml,
+	  config/gdm.conf.in, gui/gdmconfig.(c|glade):  Add a config
+	  option for a failsafe X server which is emtpy by default
+
+Fri May 18 00:16:58 2001  George Lebl <jirka@5z.com>
+
+	* config/Makefile.am: don't overwrite gnomerc on install, that's bad
+	  juju
+
+	* docs/C/gdm.sgml: update for the XKeepsCrashing stuff
+
+Thu May 17 15:44:08 2001  George Lebl <jirka@5z.com>
+
+	* config/Makefile.am: install factory settings, and for most settings
+	  files, overwrite the current and save the current in .orig files.
+	  this way changes will propagate.  Don't do this for gdm.conf
+	  however, this is the most likely to be modified by the user.
+
+	* gui/Makefile.am, gui/gdmphotosetip.desktop.in, gui/gdmphotosetup.c:
+	  a small proggie to setup the face for a user.  Should at some point
+	  become a crapplet and include all the gdm user settings
+
+	* gui/gdmconfig.(c|h|glade): fix some segfaults, include a factory
+	  settings reverting, and move the exclude users to the face
+	  browser as that's where it belongs
+
+Thu May 17 03:38:17 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: fix segfault in the login entry checking code 
+
+Thu May 17 02:52:38 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am, confgiure.in, debian/Default.debian,
+	  config/Makefile.am:  Don't put the debian stuff into the tarball,
+	  and remove it from the config, this is here for people wanting to
+	  live off the bleeding edge of 2.0-beta4 and run a stable gdm.
+	  Hopefully the gdm 2.2.x packages will show up in mainstream debian
+	  soon (they don't seem to be there now).  Plus some make distcheck
+	  fixes
+
+Thu May 17 01:27:15 2001  George Lebl <jirka@5z.com>
+
+	* config/XKeepsCrashing, config/gdm.conf.in, daemon/gdm.[ch],
+	  daemon/server.c, config/Makefile.am, daemon/slave.c: Added a script
+	  to run when X keeps crashing, this will run an X configuration
+	  tool (after asking for root password of course), only works
+	  on systems with /usr/bin/open (linux only I suppose) and XFree86
+	  for now.
+
+	* gui/Makefile,am:  fix make dist issues
+
+	* gui/gdmconfig.(c|glade): fix some issues, move debugging into it's
+	  own page and add the keeps crashing options from above
+
+Wed May 16 15:10:07 2001  Jonathan Blandford  <jrb@redhat.com>
+
+	* gui/gdmlogin.c (update_clock): Have clock update only once a
+	minute.
+
+	* gui/gdmlogin.c (gdm_screen_init): add missing declaration to
+	make it compile.
+
+Tue May 15 17:36:49 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: Apply patch from Remi@Cohen-Scali.com (Rémi
+	  Cohen-Scali) to fix #54723.  The sessions were not strduped when
+	  put into the global list.  Bad bad gdm :)
+
+	* daemon/gdm.c, daemon/slave.c:  when xdmcp is disabled and no
+	  servers exist and we can find /usr/bin/X11/X, this would mean that
+	  the user is an idiot and deleted all servers.  So add one for him
+	  and give him a warning before letting him log in and fix things.
+	  also graphically complaina bout not being able to start the
+	  greeter.
+
+	* daemon/gdm.c, gui/gdmlogin.c: Don't abort on recoverable errors
+	  that wouldn't be security problems.  Also allow things to be run
+	  without a config file, using the defaults
+
+	* daemon/gdm.h, gui/gdmlogin.c: fix the default for the welcome
+	  string, overcoming gnome-config idiocy
+
+	* gui/gdmconfig.c:  Warn user if he removed all servers.
+
+Tue May 15 15:28:57 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c, daemon/slave.c: Don't abort when a binary isn't
+	  found, instead try running the default binary and always give
+	  graphical errors.  Since we allow graphical hosification, we need
+	  to allow graphical unhosification as well, and thus gdm must be
+	  able to run in some default mode under adverse conditions.  It is
+	  still possible to utterly hose the system, but less so now.
+
+	* gui/gdmconfig.c:  Interactively check commands, directories and
+	  files for existance and display them in red if they don't.  This
+	  way the user has immediate feedback that he is going to hose stuff
+	  without having to actually try the hosing.
+
+	* configure.in:  Fix the standard path defines
+
+Tue May 15 02:39:23 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmwm.c: fix focusing windows on enter notify 
+
+Tue May 15 02:14:23 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], daemon/slave.c, gui/gdmlogin.c:  gdmlogin cannot
+	  fetch user pictures.  SO there is now an interface so that the
+	  slave can check/fetch the pictures for gdmlogin.  Unfortunately
+	  imlib is braindead so the way we pass the pictures is to write them
+	  to a temp file.  So this is even less friendly on large systems.
+	  Paranoia is high however so there should not be a way to exploit
+	  it.  Unless you find a pic that kills imlib in which case you can
+	  run a dos, so this isn't an option for all systems anyway.
+
+Mon May 14 23:54:18 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: Browser fixes.  Do smarter sizing of the browser
+	  window, align logo to the right to make it look nicer, fix warning
+	  when logo image missing, exclude root from browser if he wouldn't
+	  be allowed in anyway, fix reading of users, rewind the pw entry
+
+	* config/gdm.conf.in: change default locale from english to en_US,
+	  since not everything can properly dealias these things
+	  unfortunately
+
+Mon May 14 22:42:51 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c:  setup the environment better for the greeter
+	  and setup the actual HOME if it exists etc... This makes it nicer
+	  for BackgroundProgram's.  so if say the user wants to run a
+	  gnome program (which require a writable home dir) he can just
+	  create /home/gdm (or whatever it's in /etc/passwd)
+
+Mon May 14 22:20:09 2001  George Lebl <jirka@5z.com>
+
+	* docs/C/Makefile.am: install the index.html file correctly on make
+	  install.  For those weirdos like me that run out of CVS
+
+Mon May 14 21:52:53 2001  George Lebl <jirka@5z.com>
+
+	* docs/C/gdm.sgml:  Add proper copyrights/authors for me and Tim Jensen
+	  and update the configuration section with all the new keys.
+
+	* config/gdm.conf.in:  Run configurator with --disable-sound and
+	  --disable-crash-dialog
+
+Mon May 14 20:53:16 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], gui/gdmconfig.(c|h|glade), gui/gdmlogin.c:  Add a
+	  boolean flag for both timed and automatic login.  This makes
+	  configuring it nicer and easier to understand
+
+	* gui/gdmlogin.c:  Add a clock, perhaps there should be a config
+	  option about this
+
+	* gui/gdmlogin.c, gui/gdmlanguages.[ch], gui/Makefile.am:  Add a
+	  somewhat primitive (unfinished) framework for translating language
+	  names.  Unfortunately names are hardcoded, though available
+	  languages are still read from locale.alias.
+
+Mon May 14 03:16:50 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: in the error dialog thing do the button click
+	  mapping as well
+
+Mon May 14 02:15:06 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: define RUNNING_UNDER_GDM for gdmlogin and gdmconfig
+
+	* gui/gdmlogin.c, gui/gdmconfig.c:  When RUNNING_UNDER_GDM is defined
+	  we treat button click 3 like 1 since the user could be left
+	  handed but has not yet logged in.
+
+Mon May 14 00:55:17 2001  George Lebl <jirka@5z.com>
+
+	* gui/Makefile.am, gui/gdmwm.[ch], gui/gdmlogin.c: Clean up stuff,
+	  move the WM stuff into a separate file, make it run on a separate
+	  X connection, add a cool shadow to windows, do more correct window
+	  management, and all windows are managed now.
+
+Sun May 13 13:09:50 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c:  Simplify filters and only use the Substructure
+	  mask thing.  Handle border correctly (to make xclock look cool)
+
+	* daemon/server.c:  Eeek, HUP and TERM should have been DFL and not
+	  IGN though the X server didn't seem to mind.  Also set TTIN and
+	  TTOU to IGN since that's what happens when I startx apparently,
+	  I think this may be responsible for the X server dieing on me
+	  on unsuspend
+
+Sun May 13 04:40:10 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: Add a tooltip to the iconify arrow
+
+Sun May 13 04:36:14 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdmlogin.c: recenter windows when they resize, add a single
+	  black line decoration to make it easy to distinguish windows
+	  layered on top of each other (such as in the configurator)
+
+Sun May 13 00:59:48 2001  George Lebl <jirka@5z.com>
+
+	* AUTHORS, NEWS, README: updated
+
+	* Makefile.am, RELEASENOTES: removed, no longer needed and horribly
+	  useless and confusing to users
+
+Sat May 12 23:44:38 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: add configuration summary, fix libwrap detection
+	  and add configuration options to enable/disable xinerama
+	  tcpwrappers and choose the authentication scheme
+
+	* daemon/verify-crypt.c, daemon/verify-shadow.c:  don't ask for
+	  passwords on passwordless logins, fix a leak, and make crypt
+	  support actually compile.  Also check password before testing if
+	  the account is disabled.
+
+	* daemon/slave.c:  Focus first X window with res_name "xterm" when
+	  running the failsafe xterm session
+
+Sat May 12 19:32:31 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: when we don't find the wrappers library don't add
+	  it to LIBS
+
+Sat May 12 19:28:30 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c, gui/gdmconfig.c: Add .dpkg-old to the list of
+	  extentions to ignore
+
+Sat May 12 16:47:18 2001  George Lebl <jirka@5z.com>
+
+	* config/Xsession: check for freetemp existing
+
+Sat May 12 15:23:50 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: properly check for NULLs on cursess and curlang.
+	  Never, NEVER make the default session the last session, shit, the
+	  entire point of that would not work, there is no Last session when
+	  you use the default (that's the whole idea:).  Be more anal on the
+	  language stuff as well, avoiding possible cases of crashing and
+	  warnings.
+
+Thu May 10 00:29:06 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c, daemon/gdm.h, gui/gdmconfig.(c|glade): Add setting
+	  (which is default) to only set background color on remote logins.
+
+	* gdm/gdmlogin.c:  Icon has a tooltip now, and a bunch of the menu
+	  items as well
+
+	* config/gdm.conf.in, config/gdm.h, gui/gdmconfig.(c|glade),
+	  gui/gdmlogin.c:  Allow color to "seep through" transparent images
+	  and thus the color selector is on even for images.  Add a setting
+	  for only allowing color on remote logins.  This is useful to avoid
+	  net traffic.
+
+Wed May 09 18:19:22 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: Center all mapped windows, also disallow
+	  negative positions in centered windows.  Also clip size of
+	  windows to the screen size.
+
+	* daemon/gdm.h, acconfig.h, configure.in:  Make sure proper defaults 
+	  are read in.  That is, if gdm.conf is missing the result should be
+	  same as the supplied gdm.conf.  Also make ConfigAvailable=true the
+	  default.  It will always query for root password so it's safe.
+
+	* gui/gdmlogin.c, daemon/gdm.h, daemon/slave.c: When resetting after
+	  config don't quiver.
+
+	* gui/gdmlogin.c: properly translate failsafes
+
+	* daemon/slave.c:  properly test for existance/executability of
+	  just the path not arguments, and don't test for read on session
+	  executions.
+
+	* daemon/server.c:  Properly XSync before popping error handler
+
+	* daemon/slave.c, daemon/gdm.[ch], daemon/server.c:  Check for
+	  xinerama and start error dialogs and xterm failsafe at the
+	  correct offset.
+
+	* daemon/slave.c: Properly handle focus on the error dialog
+
+Tue May 08 16:38:02 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c:  Actually make the xinerama scaling thing work.
+	  Also limit the dragging to within xinerama screens and avoid
+	  dead space.  Allow jumping in between xinerama screens when
+	  dragging as well.
+
+Mon May 07 17:12:29 2001  George Lebl <jirka@5z.com>
+
+	* gui/icon-entry-hack.c: update from gnome-core to fix selection
+	  dialog issues
+
+Sun May 06 22:27:31 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: support xinerama in background scaling and scale
+	  image onto each screen rather then onto the entire screen
+
+Sun May 06 16:31:07 2001  George Lebl <jirka@5z.com>
+
+	* config/Failsafe*, config/Makefile.am, configure.in, gui/gdmlogin.c,
+	  daemon/gdm.h: Use our built in Failsafe thingies since they're more
+	  safe from hosage.  Also be nicer in translating them and add some
+	  tooltippage.
+
+	* config/Xsession, config/Gnome.in:  Load in the xresources and
+	  modmap and such magic.  Make it work on both rh6 and rh7 and
+	  hopefully others.
+
+	* daemon/slave.c:  Add more errors and pass some nice parameters
+	  to the failsafe thingies.
+
+Sun May 06 05:36:08 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: use the "Default" script if found as default
+
+	* config/Gnome.in:  Read in ~/.Xresources, we need more magic
+	  in this script however.
+
+Fri May 04 18:10:08 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.1
+
+Thu May 03 18:28:04 2001  George Lebl <jirka@5z.com>
+
+	* gui/Makefile.am, gui/gdmchooser.c, gui/gdmlogin.c, gui/gdmconfig.c,
+	  gui/misc.[ch]:  Add a misc functions file and add
+	  strcasecmp_no_locale and use it.  Without this we fail in all kinds
+	  of wird locale (like iso -9)
+
+Thu May 03 17:13:23 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.c, gui/gdmchooser.c:  Use DOING_GDM_DEVELOPMENT env
+	  var (scrap the old GDMCONFIG one for gdmconfig) and add actual
+	  useful messages when glade stuff fails (as it does in ximian
+	  packages now, but that makes a nice core file in those which sucks)
+
+Thu May 03 13:22:52 2001  George Lebl <jirka@5z.com>
+
+	* gui/Makefile.am, gui/gdmconfig.desktop(.in), po/POTFILES.in,
+	  po/*.po, configure.in, Makefile.am:  Add the usage of
+	  xml-i18n-tools for the desktop file
+
+Wed May 02 18:08:17 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.glade: fix limits on the spinbuttons
+
+	* gui/gdmconfig.c: Fix default linking, provide uniqueness checking
+	  fix naming races, and generally make the whole session editor
+	  actually work right.
+
+Wed May 02 03:15:15 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: fix running of gdmconfig by setuid/gid to 0
+	  and give an error dialog box if the configurator is not found
+
+Wed May 02 01:44:36 2001  George Lebl <jirka@5z.com>
+
+	* config/Gnome.in, config/Xsession: don't use bash -login, because we
+	  have already ran a login shell which was the users login shell
+
+	* config/gnomerc.in, daemon/slave.c: use exec to avoid running 2
+	  unneeded shells.  Now if you log in there is no extra shell process
+	  running.  This saves quite a bit of ram in fact since things like
+	  bash eat up quite a bit of ram, and if the user doesn't use any
+	  shells, none of it is shared.
+
+	* daemon/slave.c:  Fix a doh! error in the last commit where I got
+	  confused about which sessions I was talking about (gsm vs. gdm),
+	  also a little bit of cleanup
+
+Tue May 01 16:28:17 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c, daemon/gdm.h, daemon/slave.c, gui/gdmconfig.c,
+	  gui/gdmlogin.c:  Make it possible to log in even if the sessions
+	  directory is missing or empty.  Of course if that happens the
+	  user gets a "you're an idiot and your setup's b0rk" warning dialog
+	  (well not in those exact words)
+
+Tue May 01 14:41:03 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.c: instead of a define, read a
+	  DOING_GDMCONFIG_DEVELOPMENT env var.
+
+	* gui/gdmconfig.c, gui/gdmlogin.c: ignore sessions ending in .deleted
+	  and .desc
+
+	* gui/gdmconfig.c, gui/gdmlogin.c:  Session names ARE case sensitive
+	  so remove all this case insensitivity crap that could seriously mess
+	  things up.  The only case insensitive thing is that the default
+	  link can be case insensitive, the actual files are sensitive.
+
+	* gui/gdmconfig.(c|h|glade): fix an assload of stuff with respect to
+	  the Session directory editting.  Not all tested though, so still
+	  use at your own risk.  Though it theoretically has less problems
+	  now.  Also cleaned up stuff a tiny bit.  This file could use a run
+	  trhough indent.
+
+Mon Apr 30 17:27:11 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: fix a couple of possible crashes with invalid images
+	  being set.  Limit the logo size by just cropping the widget, that
+	  way user will still be able to log in if he screws up the config
+
+	* configure.in, config/gdm.conf.in:  Use the sbin path if using
+	  console helper for the Configurator setting, else it won't work
+	  right
+
+Mon Apr 30 16:48:42 2001  George Lebl <jirka@5z.com>
+
+	* gdm/gdm.[ch], gdm/verify-(pam|crypt|shadow).c,
+	  gui/gdmconfig.(c|glade):  Add an option to toggle logging in
+	  of root remotely.  So one can allow local root login but disallow
+	  remote root logins.
+
+	* daemon/slave.c:  add nicer error messages to all the exec failiures
+
+Mon Apr 30 02:34:37 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in, deamon/gdm.[ch], daemon/slave.c,
+	  gui/gdmconfig.(c|glade):  Split up the max sizes into normal
+	  and another one for session files for which the limit is much
+	  higher.  This is because session files are never read into memory,
+	  but rather just scanned.
+
+	* daemon/gdm.c, daemon/slave.c:  When no session is set browse
+	  through a list of possibles in order to find a good session.
+
+	* daemon/slave.c, daemon/Makefile.am:  Link the slave to gtk libs,
+	  and in case the session script doesn't exist isn't executable
+	  or isn't readable, display an error instead of the session.
+
+Sun Apr 29 23:54:34 2001  George Lebl <jirka@5z.com>
+
+	* config/Gnome.in, config/gnomerc, config/Makefile.am:  Revert stupid
+	  changes, now we rely on a new enough gnome-core where gsm
+	  understands GDM_GNOME_SESSION (in a similar way to GDM_LANG)
+
+	* daemon/verify-*.c:  Eeeek Forgot to use the GDM_LOGIN prompter
+	  opcode and that made the greeter very unhappy
+
+	* gui/gdmconfig.c, gui/gdmlogin.c: Ignore .orig files as well when
+	  looking at the Sessions dir
+
+Sun Apr 29 22:46:12 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], daemon/slave.c, gui/gdmlogin.c:  Add running of
+	  the configurator from the slave rather then the login which
+	  doesn't work.  There is a special session setup for this so that
+	  the user gets prompted for the root password first.
+
+	* daemon/gdm.c, daemon/slave.c, gui/gdmlogin.c, daemon/server.c:
+	  Only do the timed logins on the first local display just like
+	  autologin.  We don't want to do simultaneous logins of the same
+	  user on different screens really, that's usually bad.
+
+	* daemon/gdm.c: Increase general paranoia and don't trust the greeter
+	  and only allow reboots/config/halts when they are actually allowed
+	  in the config file and only for local.
+
+	* gui/gdmconfig.glade, gui/gdmconfig.c:  Add a bunch of tooltips,
+	  and add the configuration stuff for the timed logins
+
+Sun Apr 29 18:06:25 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c, daemon/gdm.[ch], daemon/slave.[ch],
+	  daemon/verify.h, daemon/verify-(pam|crypt|shadow).c,
+	  config/gdm.conf.in:  Create the concept of interruptions where the
+	  greeter can interrupt a query to have the daemon do something.
+	  and use it to do timeout logins, such as would be useful for
+	  say a kiosk operation.  Only on local displays of course.
+	  Originally based on the patch from Jim Bray.
+
+	* gui/gdmconfig.glade:  Raise the maximum allowable max user file
+	  size to 2^18 from 2^16
+
+Sun Apr 29 21:40:00 2001  Lee Mallabone <lee0@callnetuk.com>
+
+        * gui/gdmconfig.c, gui/gdmconfig.glade: Add the "run configurator"
+	  options and gdmconfig path to gdmconfig itself. (hmmm).
+	
+	* gui/gdmconfig.c, gui/gdmconfig.glade: Add a new notebook tab to
+	  the expert panel that allows configuration of the 'Sessions'
+	  directory; adding, editing, deleting & setting a new default are
+	  currently supported.
+
+Sun Apr 29 02:00:29 2001  George Lebl <jirka@5z.com>
+
+	* config/Gnome.in, config/Makefile.am:  Always install gnomerc
+	  and Gnome even if they already exist, this is because we may
+	  want to change these and want these changes to propagate.  Not
+	  a perfect solution since it's not clear which config files are
+	  editable without the install mucking them up, but oh well.
+
+	* gui/gdmlogin.c, daemon/gdm.[ch], daemon/slave.c,
+	  gui/gdmconfig.(glade|c):  Parse the session and session options
+	  file and pass the sessions to the greeter if Gnome Chooser session
+	  is selected.  The chooser then allows the picking of one specific
+	  gsm session or the creation of a new one.  We set an env var
+	  GDM_GNOME_SESSION with the session name in it.
+
+	* daemon/gdm.c:  doh!  on automatic login actually use the saved
+	  language and session
+
+	* gui/gdmlogin.c: the execution of background prog and config now
+	  closes all descriptors and opens /dev/null for stdin/out/err.  Also
+	  the config program is killed on exit just like the background prog
+	  and we don't allow starting multiple config programs.
+
+Sat Apr 28 16:01:48 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: Remove the overlay window crap and write a simple
+	  windowmanager.  Yeah I feared this would happen one day.  Focus
+	  now works properly finally, focus shows and GTK+ seems happy.
+	  This also makes it possible to have the background clients have
+	  sane focus management (with sloppy focus).  Though no frames,
+	  window movement, nor icons.  (the login window still manages
+	  it's frame, movement and icon itself)
+
+	* config/gdm.conf.in, daemon/gdm.h, gui/gdmlogin.c, gui/gdmconfig.c,
+	  gui/gdmconfig.glade:  Add a setting for disabeling the titlebar,
+	  apaprently some people hate it and I'd rather this be done by
+	  configuration then patches.  Then the user can easily reenable it.
+
+	* gui/gdmlogin.c: a little bit of work on the session chooser dialog
+	  still doesn't actually do anything
+
+Sat Apr 28 17:50:00 2001  Lee Mallabone <lee0@callnetuk.com>
+
+        * gui/gdmlogin.c, daemon/gdm.h, config/gdm.conf.in: Add the option
+	  (and relevant paths in the config) to run gdmconfig from the system
+	  menu in gdmlogin. Disabled by default for obvious reasons. This
+	  closes bug #53783.
+
+Fri Apr 27 16:41:11 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c, daemon/gdm.h, daemon/slave.c, config/Gnome.in: 
+	  Start on gsm session support.  Still doesn't work.  Also make gdm
+	  session strings translatable.  At least some of the standard ones,
+	  not perfect but oh well, who cares.
+
+Tue Apr 24 18:45:55 2001  George Lebl <jirka@5z.com>
+
+	* config/PostSession, config/PreSession, gui/gdmlogin.c:  Apply
+	  small bits of the ximian patches.  Pre/PostSession scripts only
+	  run sessreg if it exists.  and gdmlogin selects the Gnome session
+	  if no "default" exists.
+
+Tue Apr 24 15:04:56 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: set the menu separators to insensitive to make
+	  keyboard navigation nicer
+
+Mon Apr 23 22:34:24 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: always draw the focus correctly and hardset the
+	  gtk focus flag.  Hmm, I'm beginning not to like all this focus
+	  voodoo that gdmlogin does.
+
+Mon Apr 23 22:04:24 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, acconfig.h, daemon/auth.c, daemon/misc.[ch],
+	  daemon/slave.c, daemon/verify.h,
+	  daemon/verify-(pam|crypt|shadow).h:  Fixup enviroment issues.
+	  Clear the environment before running a session and before launching
+	  the greeter (taking care to save the localisation vars).  Also
+	  don't set user env on the slave and leave it, if we set it it's
+	  only temporary.  Also fix one possible crash by strduping the
+	  pam env since that will go away and putenv doesn't strdup.
+
+Mon Apr 23 20:16:07 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: when we find libwrap.a instead of specifying that
+	  filename, use -lwrap which may be better on some systems
+
+Mon Apr 23 20:08:19 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c:  if no LANG/LC_ALL is set, use the GdmDefaultLocale
+	  setting as our locale.
+
+Mon Apr 23 18:49:55 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c:  fix buffer overrun in making the enriched string
+
+Sat Apr 21 11:46:02 2001  George Lebl <jirka@5z.com>
+
+	* gui/icon-entry-hack.[ch]: update hack from panel
+
+Thu Apr 19 17:32:36 2001  George Lebl <jirka@5z.com>
+
+	* docs/C/gdm.sgml:  Update the VerboseAuth and AllowRoot sections
+	  to reflect what actually happens nowdays.
+
+Thu Apr 19 13:18:59 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify-crypt.c, daemon/verify-shadow.c,
+	  daemon/verify-pam.c:  Fix GdmAllowRoot (it only worked in verbose
+	  mode), made the verbose mode selection useful without being
+	  insecure, and in nonverbose mode you still get "Login incorrect"
+	  message as those are safe.  In pam mode we now check for 
+	  root as well.  We also now check for shell to be /bin/false as
+	  a sign the user was disallowed from logging in.
+
+Thu Apr 19 03:48:11 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: don't search for shells, that's wrong, if the
+	  user doesn't have a shell set, we are supposed to use straight
+	  /bin/sh.  On linux this makes no difference anyway since that was
+	  bash.  Also detect /bin/false shells and have a better error
+	  message in that case in the log file.  We should detect those
+	  earlier I suppose.
+
+Thu Apr 19 02:11:22 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c: Return to gid 0 after verify check, patch from
+	  rmurray+gnome@cyberhqz.com (Ryan Murray)
+
+	* daemon/auth.c: refetch the hostname each time the cookie is
+	  generated to deal with changing hostnames again from Ryan
+
+	* gui/gdmlogin.c: remove the display mutilating code for enriched
+	  string, again from Ryan
+
+	* daemon/server.c: Move logfile open after fork as it's only
+	  really used by the X server process (And that's the purpose of it)
+	  Again, from, you guessed it, Ryan
+
+	* daemon/slave.c: set gid after uid to 0 so that it doesn't fail
+	  (from Ryan again)
+
+	* gui/gdmlogin.c: do a gtk_main_quit in the QUIT handler, hopefuly
+	  won't cause races, and this is actually by me
+
+	* gui/gdmlogin.c: another one from ryan, set the password max entry
+	  length to 128 to allow for MD5 password things
+
+	* gui/gdmlogin.c: another one, this one to allow keyboard navigation
+	  of the menus
+
+	* daemon/slave.c: call initgroups to set up the groups correctly,
+	  from ryan
+
+	* daemon/slave.c: fixed problem of NULL lang/session returns, pointed
+	  out by ryan
+
+Wed Apr 18 22:32:53 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am, configure.in, debian/Makefile.am: fix make distcheck
+	  wrt libintl and make sure we get the debian directory into the
+	  tarball
+
+Tue Apr 17 17:01:59 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.h, gui/gdmconfig-strings.c, gui/gdmconfig.c,
+	  gui/gdmconfig.glade, gui/gdmlogin.c:  Add option for not
+	  scaling the background to fit, and tiling instead.  I think
+	  I might just implement more like the original background
+	  selection thingie for the desktop.
+
+	* gui/gdmlogin.c:  Apply a patch (and massage it a bit) from
+	  rmurray+gnome@cyberhqz.com (Ryan Murray) to make the locale
+	  menu just not display if the locale file is missing.
+
+2001-04-17  Ian McKellar  <ian@eazel.com>
+
+	* acinclude.m4:
+	Removed this - it contained out of date gettext stuff that was 
+	screwing up my build.
+
+	* config/Default.debian:
+	* config/Makefile.am:
+	* configure.in:
+	* debian/.cvsignore:
+	* debian/README.Debian:
+	* debian/changelog.in:
+	* debian/changelog.old:
+	* debian/control:
+	* debian/copyright:
+	* debian/dirs:
+	* debian/docs:
+	* debian/ex.doc-base.package:
+	* debian/gdm.pod:
+	* debian/gdmchooser.pod:
+	* debian/gdmlogin.pod:
+	* debian/init:
+	* debian/postinst:
+	* debian/postrm:
+	* debian/rules:
+	Added Debian build stuff and default config. It shouldn't break
+	builds on other platforms, but it might.
+
+Sun Apr 15 12:58:02 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: fix mispelling thanks to jrb
+
+Fri Mar 30 18:17:00 2001  George Lebl <jirka@5z.com>
+
+	* configure.in: up version to 2.2.1, and check for GdkPixbuf
+
+	* config/Default, config/gdm.conf.in, daemon/gdm.h, gui/Makefile.am,
+	  gui/gdmconfig-strings.c, gui/gdmconfig.c, gui/gdmconfig.glade,
+	  gui/gdmconfig.h, gui/gdmlogin.c:  Add background image/color
+	  setting and remove that setup from the Default init.
+
+	* gui/Makefile.am, gui/gdmconfig.c, gui/icon-entry-hack.[ch]:
+	  Put in the icon entry hack fromt he panel to make the icon
+	  entry behave properly
+
+	* gui/gdmlogin.c:  Make overlay window override redirect, don't
+	  proxy keyboard events to entry when window is iconified, raise
+	  window when moving, raise window on uniconify, set initial manual
+	  position after realize to avoid manual position being an offscreen
+	  one properly, only allow one query dialog to be up
+
+Mon Mar 12 16:21:47 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.2.0
+
+Mon Mar 12 16:08:34 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.c, gui/gdmconfig.glade:  Remove the scrolled window
+	  and make the window initially not shown so that the size doesn't
+	  flicker.  Also nuke the hardcoded width and height.  Still has
+	  some issues with really large fonts, but works good enough for a
+	  release now.  Also set the side help string again, and comment out
+	  the DOING_DEVELOPMENT define :)
+
+Mon Mar 12 23:20:15 2001  Lee Mallabone <lee0@callnetuk.com>
+
+	* gui/gdmconfig.c: Use a notebook instead of doing the container
+	  voodoo. This should sort out the widget packing.
+
+Fri Mar 09 21:00:03 2001  Lee Mallabone <lee0@callnetuk.com>
+
+	* gui/gdmconfig.glade: Be slightly nicer to people with fonts
+	  that aren't pretty small.
+
+2001-03-12  Christian Rose  <menthos@menthos.com>
+
+	* gui/gdmconfig.desktop: Added Swedish strings.
+
+Sun Mar 11 20:23:55 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: follow the xinerama screen size/position for
+	  the icon as well.
+
+Sat Mar 10 19:36:18 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: remove the clear message before first prompt hack,
+	  and make it, clear after first return hack.  Also add a hack to
+	  accumulate pam messages rather then replacing them in between
+	  queries.  This fixes the weird clearing bugs with respect to
+	  say expiring passwords.  Also clear message on GDM_RESET
+
+Thu Mar 08 21:00:03 2001  Lee Mallabone <lee0@callnetuk.com>
+
+	* gui/gdmconfig.c: Change (lack of) help message.
+
+	* gui/gdmconfig.glade: Set the initial height to be more
+	  representative of what it's like when the containers have been
+	  packed. Also do a little bit of container voodoo so the main panels
+	  are in a viewport, (makes gdmconfig more usable on small screens).
+
+Thu Mar 08 00:37:12 2001  George Lebl <jirka@5z.com>
+
+	* gdm.spec.in: Fixups, move the security dir as well and
+	  hardwire the sysconfdir to /etc as that seems broke on my 6.2 box
+	  otherwise
+
+	* configure.in: raise version to 2.2.0, no there isn't a release yet,
+	  this is just to start rumors of an upcoming one.  (Plus I wanted
+	  to build myself an rpm for my own use, cuz I'm not 'l33t 'nuff
+	  to build on my system from cvs directly)
+
+Wed Mar 07 22:50:06 2001  George Lebl <jirka@5z.com>
+
+	* gdm.spec.in: minor fixups from the merge
+
+2001-03-07  Gregory Leblanc <gleblanc@cu-portland.edu>
+
+	* gdm.spec.in: much better macros, and better portability.  Please
+	read the %ChangeLog section in the spec file for details.
+
+Mon Mar 05 18:17:42 2001  George Lebl <jirka@5z.com>
+
+	* AUTHORS, README, README.install:  Do a quick update as it's all
+	  horribly out of date.
+
+Mon Mar 05 23:41:40 2001  Lee Mallabone <lee0@callnetuk.com>
+
+        * gui/gdmconfig.[ch]: Fix bug that caused only values of 0 and 1 for
+	  RelaxPerms to be used/written.
+
+	* gui/gdmconfig.glade: Change RelaxPerms toggle to 3 radio buttons,
+	  and remove some old cruft.
+
+Mon Mar 05 22:42:54 2001  Lee Mallabone <lee0@callnetuk.com>
+
+        * gui/Makefile.am: Change shared directory for glade files
+	  to allow centralised storage of all gdm .glade files.
+	  Link gdmchooser against libglade.
+	
+	* gui/gdmconfig.c: Use new location for glade files.
+	
+	* gui/gdmchooser.c: Gladeify gdmchooser and give it a slightly
+	  less sucky GUI.
+	
+	* gui/gdmchooser.glade, gui/gdmchooser-strings.c: Added GUI and
+	  translatable strings for updated gdmchooser.
+	  
+	* gui/*.glade: Ensure WM_Class is set to be 'gdm' everywhere.
+	
+	* gdm.spec.in: Adjust paths for new glade file and location.
+
+Sun Mar 04 16:28:52 2001  George Lebl <jirka@5z.com>
+
+	* daemon/filecheck.[ch]: fix an error message and make const correct
+
+	* gui/gdmlogin.c: make the photo checking code saner, this assumes
+	  we're root and can read anyone's files, really and this is bad,
+	  oh well, it is sort of weird.  Also a bunch of cleanup and
+	  constization.
+
+	* gui/Makefile.am: don't link to filecheck anymore
+
+	* daemon/slave.c, gui/gdmlogin.c: cleanup some code, make GDM_QUIT
+	  work for doing cleanup.  Make it not actually quit but just
+	  cleanup to prepare to be killed.
+
+Sun Mar 04 12:27:50 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in: Added a note to the config file about running
+	  X on a specific console.  Mostly for packagers, apparently the
+	  debian packages were broken in this respect.
+
+Sun Mar  4 16:13:55 2001  Lee Mallabone <lee0@callnetuk.com>
+
+        * docs/gdmconfig/*: Added initial directory structure/files for
+	the gdmconfig user guide. Not installed yet.
+	
+	* docs/gdmconfig/C/gdmconfig.sgml: Initial gdmconfig user guide
+	content from Trevor Curtis <trevor.curtis@home.com>.
+
+Wed Feb 28 19:23:42 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmchooser.c:  Apply patch from "Matthias Clasen"
+	  <Matthias.Clasen@poet.de>, to fix issues with xdm.
+
+Web Feb 28 18:47:14 2001  Lee Mallabone <lee0@callnetuk.com>
+
+        * gdmconfig-pam, gdmconfig-security: New files to support
+	priviledged non-root users running gdmconfig.
+	
+	* Makefile.am, configure.in, gdm.spec.in: Add option to configure
+	to --enable-console-helper for gdmconfig.
+
+Tue Feb 27 16:44:34 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in: apply patch from Vlad Harchev <hvv@hippo.ru>
+	  to not force the adobe helvetica font and to exclude postgres and
+	  pvm users by default
+
+Tue Feb 27 13:27:00 2001  Lee Mallabone <lee0@callnetuk.com>
+
+        * gui/gdmconfig.c, gui/gdmconfig-strings.c, gui/gdmconfig.glade:
+	Fix version number and add bugzilla URL to about box.
+
+2001-02-27  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* gdmconfig/Makefile.am: removed DLOCALEDIR.
+	* gdmconfig/gdmconfig.c/h: include config.h in c file, not h.
+	i18n fixes, gui now translated.
+
+Tue Feb 27 00:25:10 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.0.99
+
+Tue Feb 27 00:25:09 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c, daemon/xdmcp.c:  Fixed xdmcp closing routine, and
+	  close the xdmcp fd before restarting after a HUP so that xdmcp
+	  doesn't fail.  If we fail when initting xdmcp don't die, but just
+	  disable xdmcp and continue after screaming stuff into syslog.
+
+Wed Feb 21 01:46:34 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c, config/Default: Setup cursor in gdmlogin
+
+Tue Feb 20 13:57:18 2001  George Lebl <jirka@5z.com>
+
+	* config/Default: Idea from peter winnberg <peter@rsub.com>, to set
+	  the cursor to left_ptr to be nicer
+
+Mon Feb 19 09:01:56 2001  Yukihiro Nakai <nakai@gnome.gr.jp>
+
+	* gui/gdmconfig.desktop: Add Japanese translation.
+
+Mon Feb 19 21:37:07 2001  George Lebl <jirka@5z.com>
+
+	Patch from Tim Jansen <tim@tjansen.de>
+
+	* docs/C/gdm.sgml:  fixed docs in terms of true/false vs. 1/0 and
+	  add new values
+
+	 * gui/gdmlogin.c, gui/gdmchooser.c:  change GdmDebug to gboolean
+	   and add some checks for config values
+
+2001-02-19  Christophe Merlet  <redfox@eikonex.org>
+
+	* gui/gdmconfig.desktop: Added French strings.
+
+Mon Feb 19 03:42:01 2001  Jonathan Blandford  <jrb@redhat.com>
+
+	* gui/gdmlogin.c (create_handle): Minor UI cleanup to gdmlogin.
+
+Sun Feb 18 15:05:00 2001  Lee Mallabone <lee0@callnetuk.com>
+
+	* gui/gdmconfig.glade: Improve clarity, and make 'automatic login'
+	more noticeable.
+
+Sun Feb 18 11:32:00 2001  Lee Mallabone <lee0@callnetuk.com>
+
+	* gui/gdmconfig.(c|glade): GUI fixes for Xserver clist.
+
+Sat Feb 17 19:08:00 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.(c|glade): Patch from Lee to fix xdmcp options
+	  sensitivity, plus make the clist title passive and set it to
+	  browse selection mode.
+
+Thu Feb 15 03:18:15 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.0.98.1
+
+Thu Feb 15 03:18:12 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, config/Gnome.in, config/Failsafe.in,
+	  config/gdm.conf.in, config/gnomerc.in:  Fix the autogeneration,
+	  by including all the prefixes and by expanding the variables.
+	  Idea stolen from GConf configure.in
+
+Wed Feb 14 18:53:57 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, config/Makefile.am: Apply patch from peter@ximian.com
+	  (Peter Teichman), to generate config files from .in files during
+	  configure time, rather then install time
+
+	* gdm.spec.in: update for the above
+
+Tue Feb 13 18:27:03 2001  George Lebl <jirka@5z.com>
+
+	* daemon/display.c: Apply fix from "Matthias Clasen"
+	  <Matthias.Clasen@poet.de> to make xmdcp work for him.  Also
+	  massaged that function a bit further.  But it doesn't solve
+	  my problems.
+
+Mon Feb 12 02:18:39 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: remove a duplicate bindtextdomain foo, and remove
+	  the default dialog pos is center thing since we explicitly set
+	  this anyway.
+
+Sun Feb 11 16:23:01 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.0.98
+
+Sat Feb 10 18:05:39 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.(c|h|glade): new update version of the configurator
+	  from Lee Mallabone <lee@fonicmonkey.net> which makes it simpler to
+	  do stuff.
+
+Tue Feb 06 21:33:10 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c, daemon/verify-pam.c: pam cleanup done when slave
+	  exitting.
+
+Sun Feb 04 16:23:30 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.*: Apply patch from Lee Mallabone <lee@fonicmonkey.net>
+	  To add a development define for debugging, and change a bit of
+	  the layout to be more consistent.
+
+Sat Feb 03 19:42:01 2001  George Lebl <jirka@5z.com>
+
+	* daemon/display.c, daemon/gdm.c:  Fix corruption of GSLists on exit
+
+Sat Feb 03 18:24:10 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xmdcp.c: apply some changes found in the gdm debian
+	  paches, but they don't make any difference
+
+Sat Feb 03 17:58:51 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c:  Patch from Tim Jansen <tim@tjansen.de> to fix
+	  a buffer overflow with xinerama support
+
+Sat Feb 03 15:39:29 2001  George Lebl <jirka@5z.com>
+
+	* gdm.spec.in: patch from Lee Mallabone <lee@fonicmonkey.net>, to
+	  make gdmconfig actually work. (install the glade and desktop file)
+
+Fri Feb 02 23:32:56 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.0.97.1
+
+Fri Feb 02 20:03:49 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, config/Default.redhat, config/Failsafe.redhat,
+	  config/Failsafe.in, config/Makefile.am, gdm.spec.in:  First
+	  attempt at making an rpm.  Doesn't break the build, but I doubt
+	  it works as I haven't tried it.  Will test on my laptop later.
+
+Fri Feb 02 18:29:40 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: the xinerama support might badmach if run under
+	  a non xinerama supporting xserver, so trap errors and just assume
+	  one screen if we get errors.
+
+Thu Feb 01 18:28:33 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.0.97
+
+Thu Feb 01 18:26:17 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: Add a hack so that if the Welcome string is
+	  set to a default, use the gettext translation for added hack
+	  value and more translations.
+
+Thu Feb 01 17:58:30 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmconfig.(c|glade): some glade fixes, and add a reset option
+	  when applying
+
+	* daemon/gdm.h: use true/false for booleans in defaults
+
+Thu Feb 01 17:05:54 2001  George Lebl <jirka@5z.com>
+
+	* Apply an port a patch from <tim.jansen@systembureau.com>,
+	  furhter modified default config (config/gdm.conf.in) and the 
+	  configuratior (gui/gdmconfig.c) to include the screen option
+
+	* gui/gdmlogin.c, configure.in: added support for Xinerama, 
+          the new key greeter/XineramaScreen selects on which screen the 
+          greeter will be centered
+
+Thu Feb 01 04:49:11 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in:  Add gdm to the list of default excludes
+
+	* daemon/gdm.c:  take HUP signal, which will unmanage all displays and
+	  then re-exec itself.  This is a poor-mans reset, not integrated
+	  with the configurator yet.
+
+	* daemon/display.c, daemon/gdm.[ch], daemon/server.c, daemon/slave.c,
+	  daemon/xdmcp.c:  Remove all loop of death catches except for the
+	  slave restart one.  Move the server loop of death to display.c
+	  as it must run in the master process, and it can now catch all
+	  the error conditions without races.  Move sleeping to slave.
+	  Kill many race conditions, some of them quite evil.  Kill the
+	  greeter segfault detection, loop of death in display.c is enough
+	  here.
+
+	* gui/gdmlogin.c:  If LANG is set, use that for a default language,
+	  preferring the DefaultLocale setting and use that only as fallback.
+	  Instead of setting LANG to the name of the language, set it to
+	  the proper unaliased string since our alias file may be different
+	  from the system one.   And add a way to sort of get from codes to
+	  langauge names.  Remove tolower ugly hack.
+
+2001-01-31  Gediminas Paulasukas <menesis@delfi.lt>
+
+	* gui/gdmconfig-strings.c, gui/gdmconfig.glade: fix some mistakes in
+	strings.
+	* config/locale.alias: added lithuanian.
+
+Tue Jan 30 20:19:46 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: Make quiver more visible and cooler looking (/me
+	  thinks)
+
+	* config/gdm.conf.in: Verbose Auth is on by default, since now it
+	  doesn't reveal information,  Not sure if this option is useful
+	  for anything really.  We want "Login Incorrect" messages all the
+	  time.  May need some thought
+
+	* daemon/verify-(crypt|shadow).c: Don't reveal what went wrong on
+	  login, just say "Login incorrect"
+
+Tue Jan 30 16:52:39 2001  George Lebl <jirka@5z.com>
+
+	* Pfffffffffffffft!  Really apply the patch from ChiDeok Hwang
+	  <hwang@mizi.co.kr>
+
+	* daemon/slave.c, gui/gdm.c:  Some locale stuff fixes.  This still
+	  feels really wrong as it mostly ignores the systemwide setting and
+	  uses it's own default most of the time.  And that's bad.  Needs
+	  some work.
+
+Tue Jan 30 19:08:46 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c, gui/gdmconfig.c, gui/gdmconfig.glade: configuration
+	  key fixes
+
+	* gui/Makefile.am: add desktop and glade to extradist
+
+	* gui/gdmconfig.desktop: start gdmconfig not gdmlogin (doh!)
+
+Tue Jan 30 15:16:40 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c, daemon/server.c, daemon/xdmcp.c, daemon/slave.c,
+	  gui/gdmconfig.c, gui/gdmconfig-strings.c, gui/gdmconfig.glade,
+	  po/POTFILES.in: x18n fixes, add missing configuration options,
+	  add warning dialog about when configuration will be applied,
+	  fix up gboolean vs. int mess and it's related gnome_config stuff
+
+Tue Jan 30 14:25:20 2001  George Lebl <jirka@5z.com>
+
+	Patch from ChiDeok Hwang <hwang@mizi.co.kr>:
+
+	* config/locale.alias:  remove one of the entries for french as
+	  that turns out to be blank on non -1 locales
+
+	* daemon/gdm.c, daemon/verify-pam.c, daemon/verify-crypt.c,
+	  daemon/verify-shadow.c: i18n fixes
+
+	* daemon/slave.c: made user to see last message when gdm sleeps.
+
+	* gui/gdmlogin.c: empty other menu is ugly. So remove it when it is
+	  empty.  gdm_slave_greeter_ctl(GDM_MSGERR, ...) was stalled waiting
+	  output from gui.
+
+	Patch from Lee Mallabone <lee@fonicmonkey.net>:
+
+	* configure.in, gui/Makefile.am: make gdmconfig buile and depend on
+	  libglade
+
+	* gui/gdmconfig.(c|h|desktop|glade): A working implementation of
+	  the configuration.  Doesn't yet restart gdm and only works for root
+	  (has no pam stuff), but much better then nothing.  Still missing
+	  the new options for 2.1
+
+2001-01-30  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* configure.in: Added "nn" to ALL_LINGUAS.
+	
+Thu Jan 25 23:49:44 2001  George Lebl <jirka@5z.com>
+
+	* Release 2.0.96
+
+Thu Jan 25 23:04:01 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.[ch]: cleanup
+
+	* daemon/gdm.h, gui/gdmlogin.c, config/gdm.conf.in:  Add options
+	  for setting the initial position to allow xinerama wankers to
+	  make their login not suck too much.  Also added an option to
+	  lock the window position and fixed some braindamages.  Fixed the
+	  label style setting as well to work with non default themes.
+
+Thu Jan 25 06:34:13 2001  George Lebl <jirka@5z.com>
+
+	* gui/gdmlogin.c: workaround non-working grabs, add a window title,
+	  implement window moving (poor mans support of xinerama) and other
+	  cleanup and fixes
+
+Tue Jan 23 18:09:01 2001  George Lebl <jirka@5z.com>
+
+	* daemon/slave.c: minor cleanups
+
+Tue Jan 23 03:34:29 2001  George Lebl <jirka@5z.com>
+
+	* daemon/xdmcp.c: some cleanup in hunt for a fix of xdmcp
+
+Mon Jan 22 21:02:19 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.c, daemon/slave.c, daemon/display.c, daemon/xdmcp.c: fix
+	  some xdmcp bugs, crashes, etc... random cleanup, autologin on the
+	  first display started only, when killing things make sure kill
+	  succeeded before waitpid, otherwise probably the process was
+	  already dead and we'd just wait forever.  But don't expect XDMCP
+	  to actually work now, it doesn't.
+
+Mon Jan 22 02:59:22 2001  George Lebl <jirka@5z.com>
+
+	* daemon/misc.c, daemon/server.[ch], daemon/slave.c,
+	  daemon/display.c:  Race fixes, remove old code, cleanups,
+	  leak fixes, use the same X server process and use HUP to
+	  reset it
+
+Wed Jan 10 19:25:54 2001  George Lebl <jirka@5z.com>
+
+	* configure.in, *: raise version and put in some notes in relevant
+	  files
+
+Wed Jan 10 13:57:56 2001  George Lebl <jirka@5z.com>
+
+	* daemon/display.c, daemon/gdm.[ch], daemon/server.c,
+	  daemon/slave.c:  A little bit of cleanup, if the greeter
+	  segs 5 times during 40 seconds, unmanage the display
+	  so that we don't hog the console.
+
+Wed Jan 10 07:22:29 2001  George Lebl <jirka@5z.com>
+
+	* daemon/server.[ch], daemon/slave.c: When slave is exitting
+	  we should kill the old X server really.  It should be possible to
+	  reuse, but currently this was leading to hangs.  Also only
+	  wait for the server if the kill worked to avoid hanging in
+	  waitpid.
+
+Wed Jan 10 03:20:48 2001  George Lebl <jirka@5z.com>
+
+	* config/gdm.conf.in: add empty line for automatic login (disabled)
+
+	* daemon/server.c: If the server aborts during startup try restarting
+	  it about 5 times
+
+Wed Jan 10 02:32:52 2001  George Lebl <jirka@5z.com>
+
+	* daemon/verify.h, daemon/verify-*.[ch], daemon/slave.c: For
+	  autologin we have to do the pam dance to setup stuff nicely.
+
+Wed Jan 10 01:13:54 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], daemon/slave.c, gui/gdmlogin.c,
+	  config/gdm.conf.in:  Move the background stuff to greeter as that
+	  makes more sense
+
+	* daemon/gdm.[ch], daemon/slave.c: Add automatic logging in on the
+	  first login (so most likely right after boot).  This is off by
+	  default of course and will not autologin root.
+
+Tue Jan 09 21:55:26 2001  George Lebl <jirka@5z.com>
+
+	* daemon/gdm.[ch], daemon/slave.c, config/gdm.conf.in:  Add support
+	  for running a background process and have it have the same lifetime
+	  as the greeter.  This makes it easy to add things like screensavers
+	  on the root and make them stop when you actually log in.
+
+Tue Jan 09 18:50:51 2001  George Lebl <jirka@5z.com>
+
+	* Many changes, too many to write a changelog for.  Applied most of
+	  the redhat and helix patches.  On the login screen make a window
+	  over the entire window and proxy key events back to the entry to
+	  get xdm like keyboard grab behaviour without a grab.  When starting
+	  local displays call gdm_display_manage to actually fork the slave.
+	  Try cleaning up after self when messing with signal handlers.
+	  When killing clients, ignore x errors.  Kill clients on the same
+	  display connection since opening a new one won't work.  Kill the
+	  alarm on the ping since it made no sense, and didn't work in the
+	  first place.
+
+2000-12-17  Marius Andreiana  <mandreiana@yahoo.com>
+
+	* configure.in: Added ro (Romanian) to ALL_LINGUAS
+
+2000-12-12  Mathieu Lacage  <mathieu@eazel.com>
+
+	Make it: 1) compile 2) pass make distcheck.
+	* configure.in: one BAD BAD typo: s/aC/AC/
+	* daemon/Makefile.am: add server.h
+	* docs/C/Makefile.am: remove images.
+	* docs/C/gdm.sgml: fix sgml.
+	* po/Makefile.in.in: I dunno.
+
+2000-11-28 Stanislav Visnovsky <visnovsky@nenya.ms.mff.cuni.cz>
+
+	* configure.in (ALL_LINGUAS): Added Slovak translation
+
+2000-10-19  Yukihiro Nakai  <nakai@gnome.gr.jp>
+
+	* configure.in: Add Chinese(GB2312, Big5) to ALL_LINGUAS
+
+2000-08-29 Carlos Perelló Marín <carlos@hispalinux.es>
+
+	* config/gdm.conf.in: Added the Spanish welcome message
+
+2000-08-24 Alastair McKinstry <mckinstry@computer.org>
+
+	* configure.in (ALL_LINGUAS): Added Irish translation
+
+2000-07-30  Christopher R. Gabriel  <cgabriel@softwarelibero.org>
+
+	* configure.in (ALL_LINGUAS): added Italian translation
+
+2000-06-18  Stanislav Brabec  <utx@penguin.cz>
+
+	* daemon/misc.c,
+	daemon/misc.h,
+	daemon/slave.c,
+	configure.in: Thread-safe wrapper for gdm_setenv, new function
+	gdm_unsetenv. Change required for gdm basic funftionallity on some
+	systems. On systems without setenv/unsetenv functions, gdm_(un)setenv
+	still remains thread unsafe & POSIX safe!
+
+2000-06-05  Stanislav Brabec  <utx@penguin.cz>
+
+	* daemon/gdm.c: Typo fix.
+
+2000-05-11  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): added Catalan file
+
+2000-04-20  Ruben Lopez <ryu@mundivia.es>
+
+	* configure.in (ALL_LINGUAS): added Galician (gl) translation
+
+2000-04-20  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): added Lithuanian file
+
+2000-02-29  Stanislav Brabec  <utx@penguin.cz>
+
+	* daemon/verify-shadow.c: Typo bug fixed.
+	* config/Makefile.am: Allow make install from separate dir.
+
+1999-12-31    <mkp@mkp.net>
+
+	* daemon/gdm.c (gdm_child_handler): Major overhaul.
+
+	* daemon/display.c (gdm_display_lookup): New function.
+
+	* daemon/server.c: Fixes.
+
+1999-12-29    <mkp@mkp.net>
+
+	* Checkin of my devel tree. Some of the new stuff is in. Mostly
+ 	infrastructure changes, though. Oh, and it doesn't actually work
+ 	yet. But it will eventually. Promise!
+
+1999-12-26    <mkp@mkp.net>
+
+	* daemon/verify-*.c: Move each authentication scheme to a separate
+ 	file (Sucks to be a translator :).
+
+1999-12-21    <mkp@mkp.net>
+
+	* daemon/verify.c (gdm_verify_user): Added fix for expired
+ 	passwords when using PAM (Philip Spencer
+ 	<pspencer@fields.utoronto.ca>).
+  
+1999-11-11    <mkp@mkp.net>
+
+	* daemon/misc.c (gdm_setenv): New function to work around POSIX
+ 	brain damage.
+
+1999-11-10  Yuri Syrota <rasta@renome.rovno.ua>
+
+	* configure.in (ALL_LINGUAS): Added uk.
+
+1999-11-01    <mkp@mkp.net>
+
+	* daemon/verify.c (gdm_verify_user): Error in error message.
+
+	* daemon/slave.c (gdm_slave_greeter_ctl): Nuke random junk that
+ 	might have accumulated in the ipc pipe.
+
+	* gui/gdmlogin.c (gdm_login_ctrl_handler): Same as above.
+
+	* configure.in: Fixed -lnsl (again)
+
+1999-10-21  Sergey Panov <sipan@mit.edu>
+
+        * configure.in (ALL_LINGUAS): Added ru.
+
+1999-10-03    <mkp@mkp.net>
+
+	* daemon/slave.c: Misc. hacks to solve #2487. PAM messes with
+ 	pwent.
+
+	* daemon/gdm.c (gdm_config_parse): Check that gdmlogin and
+ 	gdmchooser can be executed by gdm before starting up.
+
+1999-10-02    <mkp@mkp.net>
+
+	* daemon/slave.c (gdm_slave_greeter_ctl): Fix NULL string passing
+ 	bug.
+
+1999-09-30    <mkp@mkp.net>
+
+	* config/PreSession, config/PostSession: Example sessreg scripts.
+
+	* daemon/slave.c (gdm_slave_session_cleanup): Run PostSession
+ 	script even when display is dead. 
+
+	* daemon/xdmcp.c (gdm_xdmcp_handle_query): Get XDMCP running again.
+
+1999-09-29    <mkp@mkp.net>
+
+	* gui/gdmlogin.c, gui/gdmchooser.c: bindtextdomain() + other
+ 	fixes.
+
+	* daemon/slave.c (gdm_slave_session_start): Pipe fix from Elliot.
+
+1999-09-28  Rodrigo Stulzer Lopes <rodrigo@conectiva.com.br>
+
+	* configure.in (ALL_LINGUAS): Added pt_BR.
+
+1999-09-27    <mkp@mkp.net>
+
+	* docs/C/gdm.sgml: Lots of updates.
+
+	* daemon/slave.c (gdm_slave_session_start): Let the daemon handle
+ 	session/language lookups.
+
+1999-09-26 Changwoo Ryu  <cwryu@adam.kaist.ac.kr>
+
+	* configure.in (ALL_LINGUAS): Added Korean.
+	* config/locale.alias: Likewise.
+
+1999-09-23    <mkp@mkp.net>
+
+	* gui/gdmlogin.c (gdm_login_gui_init): Avoid dumping core when
+ 	specified font can't be loaded (#2315).
+
+	* Ripped out some work-in-progress code that didn't make it in
+ 	time for beta3. Postponed for beta4.
+	
+	* Loads of fixes. Thanks to Elliot.
+
+	* daemon/filecheck.c (gdm_file_check): Log warning if critical
+ 	files are missing.
+
+1999-09-21    <mkp@mkp.net>
+
+	* daemon/verify.c (gdm_verify_user): Avoid exposing usernames on
+ 	getpwent() failure. GdmAllowRoot is now used for non-PAM
+ 	configurations only.
+
+1999-09-13    <mkp@mkp.net>
+
+	* daemon/verify.c (gdm_verify_user): Fix root logins.
+
+1999-09-07    <mkp@mkp.net>
+
+	* gui/gdmlogin.c (gdm_login_browser_select): Fixed the obscure
+ 	curuser==NULL on doubleclick bug reported by Nils/Elliot.
+
+1999-09-03  Zbigniew Chyla  <chyla@alice.ci.pwr.wroc.pl>
+
+        * configure.in (ALL_LINGUAS): Added pl.
+
+1999-09-01    <mkp@mkp.net>
+
+	* gui/gdmlogin.c (gdm_login_gui_init): Only add column for logo if
+ 	it is readable.
+
+	* daemon/verify.c (gdm_verify_check): Check that PAM configuration
+ 	file exists before starting up.
+
+1999-08-31    <mkp@mkp.net>
+
+	* daemon/slave.c (gdm_slave_session_start): unset MAIL in the
+ 	user's environment. I have to POSIXify my environment handling at
+ 	some point.
+
+	* gui/gdmlogin.c (gdm_parse_enriched_string): %n is
+ 	uname.nodename. "Welcome to %n" is new default greeting.
+	
+	(gdm_login_users_init): Ignore duplicate usernames on broken NIS
+ 	systems (Nils Philippsen <nils@wombat.dialup.fht-esslingen.de>).
+
+1999-08-31  Kjartan Maraas  <kmaraas@online.no>
+
+	* configure.in: Added "da" to ALL_LINGUAS.
+	
+1999-08-18    <mkp@mkp.net>
+
+	* docs/C/gdm.sgml: More documentation work.
+
+1999-08-16    <mkp@mkp.net>
+
+	* docs/C/gdm.sgml: SGML-ified manual. Only bare bones so far.
+
+	* configure.in: Check whether crypt.h exists. Gnome bug #1925.
+
+1999-08-15    <mkp@mkp.net>
+
+	* docs/gdm-manual.txt: Updated for v2 config file syntax.
+
+	* daemon/choose.c: New file. Doing INDIRECT choosing the right
+ 	way.
+
+	* daemon/auth.c: Purge all instances of current display in user
+ 	cookie file.
+	(gdm_auth_user_remove): Fix stupid segfault.
+
+	* daemon/slave.c (gdm_slave_session_start): Avoid saving language
+ 	and session if ~user/.gnome/gdm isn't kosher instead of bailing
+ 	out.
+
+	* daemon/auth.c: Fixed cookie problems for local displays.
+
+	* daemon/gdm.c (gdm_display_dispose): Free Xauth.
+
+1999-08-14    <mkp@mkp.net>
+
+	* gui/gdmlogin.c: Fixed a few gtk_widget_set_sensitive(NULL)
+ 	occurrences.
+
+1999-08-11    <mkp@mkp.net>
+
+	* daemon/auth.c: Nailed down the bug that has been haunting me the
+ 	past couple of days. gdm no longer corrupts ~user/.Xauthority if
+ 	it contains ``foreign'' cookies.
+
+1999-08-08    <mkp@mkp.net>
+
+	Finally merged the Ottawa megapatch:
+
+	* daemon/auth.c: Real XAuth implementation. Doesn't rely on
+ 	/usr/bin/X11/xauth anymore.
+
+	* gui/gdmlogin.c: Implemented browser functionality.
+
+	* gui/gdmconfig.c: First shot at a graphical configuration tool.
+
+	* gui/gdmface.c: Face selector capplet.
+
+1999-08-07    <mkp@mkp.net>
+
+	* Replaced gdm_putenv() with calls to setenv() as putenv() is
+ 	broken by specification.
+
+1999-08-07  Anders Carlsson <anders.carlsson@tordata.se>
+
+	* configure.in (ALL_LINGUAS): Added sv to ALL_LINGUAS.
+
+1999-08-02    <mkp@mkp.net>
+
+	* md5.c, md5.h, cookie.c: Fixed MD5 endianness problem (Reported
+ 	by <gewrgiou@imbc.gr>, bugzilla 3898).
+
+1999-07-24  Tristan Tarrant  <ttarrant@etnoteam.it>
+
+	* gui/gdmchooser.c (main): centre all dialogs
+
+	* gui/gdmlogin.c (main): the same
+
+1999-07-14  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* gui/gdmchooser.c (gdm_chooser_gui_init): Set the scrollbar
+	adjustment properly.
+
+1999-06-30    <mkp@mkp.net>
+
+	* daemon/xdmcp.c (gdm_xdmcp_handle_forward_query): First shot at
+ 	implementing FORWARD_QUERY. gdm supports being chosen from remote
+ 	hosts now, but still doesn't provide chooser functionality itself.
+
+1999-06-29    <mkp@mkp.net>
+
+	* daemon/verify.c (gdm_verify_user): Transfer PAM environment to
+ 	user session (Suggested by nalin@thermo.stat.ncsu.edu)
+
+1999-05-14  Jacob Berkman  <jberk+@cmu.edu>
+
+	* gui/gdmlogin.c (gdm_parse_enriched_string): added support
+	for processor type for Welcome text
+	* docs/gdm-manual.txt: added entry for %m
+
+1999-05-09    <mkp@mkp.net>
+
+	* daemon/server.c (gdm_server_restart): Workaround for the
+ 	annoying gnome-name-server bug.
+
+	* Misc. fixes.
+
+1999-04-19  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* Created gdm2 branch. Most of the daemon code has been revamped,
+ 	gdmgreeter development suspended and gdmlogin written from
+ 	scratch. Face browser functionality will return eventually.
+	
+	* gui/gdmlogin.c (gdm_parse_enriched_string): Applied patch from
+ 	Jacob Berkman to support sysname and release variable expansion.
+
+1999-03-28  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* gui/gdmgreeter.c (gdm_greeter_user_alloc): Icon size bug
+ 	reported by Clifford Wright.
+
+1999-03-07  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* configure.in, src/Makefile.am: Pass -DGDM_CONFIG_PATH to
+ 	compiler to avoid ${prefix}/blah bug in Owen's patch.
+
+1999-03-06  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_user_alloc): Fixed a memory
+ 	corruption bug (Reported by Gregory McLean <gregm@comstar.net>).
+
+1999-03-05  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* gdm.spec: Fix spec file.
+
+	* Misc fixes.
+
+1999-03-03  Martin Kasper Petersen  <mkp@mkp.net>
+	
+	* config/Makefile.am, configure.in: Patch from Owen.
+
+	* po/de.po: Added (Patch from Karsten Weiss
+ 	<karsten@addx.au.s.shuttle.de>).
+
+1999-02-26  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (main): Force completion mode on for the time
+ 	being. I'll implement a real PAM conversation function within the
+ 	next couple of days to take care of the exposed usernames issue.
+
+1999-02-25  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmchooser.c: Done!
+	
+	* src/gdmchooser.c: First shot at reimplementing the code I
+ 	lost. Doesn't actually work yet.	
+
+1999-02-24  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmxdmcp.c: Fix gethostbyaddr() lookups.
+
+	* src/gdmslave.c: Various fixes.
+
+	* src/gdm.c (gdm_display_dispose): Call XCloseDisplay to close
+ 	remote connections.
+	
+	(gdm_child_handler): Fix wrong debug output.
+
+	* config/Makefile.am: Create Default display init file.
+
+1999-02-23  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmverify.c (gdm_verify_user): Added shadow support (Patch
+ 	from Timo Sirainen).
+
+	* src/gdmgreeter.c (main): Added GtkRC support
+ 	(Patch from Daniel_Burrows@brown.edu).
+
+1999-02-23  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+	
+	* src/gdmgreeter.c (main): Call gnome sound shutdown here. 
+
+	* src/gdm.c (main): Show a descriptive message to let the user
+	locate the stale pid file.
+
+	* configure.in (LIBWRAP_PATH): Use the same configuration
+	mechanism for detecting a working libwrap library on the system
+	(fixes crash).
+
+	* src/gdmslave.c (gdm_slave_greeter): Do not use sscanf to get the
+	password, as it might contain spaces, just copy the string.
+	(gdm_slave_get_opts): Use fgets directly on the target buffer. 
+	(gdm_slave_get_opts): Make the strings empty at startup.
+
+	* src/gdmgreeter.c (gdm_greeter_logo_init): Use gnome-pixmap
+	widget instead of gtk-pixmap.  Gnome-pixmap correctly uses the
+	right visual and is simpler to use (and does not crash on
+	multidepth visuals).
+	(gdm_greeter_iconify_handler): Use gnome-pixmao here too.
+
+1999-02-16  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdm.c: Ignore invalid lines in [servers] section.
+
+1999-02-14  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmserver.c: Changed SA_ONESHOT to SA_RESETHAND.
+
+1999-02-08  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_parse_config): Disable shutdown
+ 	menu on non-local displays.
+
+	* src/gdm.c (gdm_config_parse): Default path belongs in
+ 	[system] (msw).
+
+	* src/gdmxdmcp.c (gdm_xdmcp_init): Use GIOChannel to monitor fds.
+
+	* src/gdmmisc.c (gdm_parse_enriched_string): Support %d expansion
+ 	for display name.
+
+1999-02-06  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmxdmcp.c (gdm_xdmcp_send_accept): MIT cookies work for
+ 	remote displays now.
+
+	* src/gdmslave.c: Lots of fixes. Should be stable again.
+
+1999-02-04  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_child_handler): Only xping remote
+ 	displays to avoid DISPLAY_ABORT for murdered greeters/Xservers.
+
+	* src/gdmmisc.c (gdm_exec_script): Set default path before
+ 	executing.
+
+1999-02-03  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* Makefile.am: Stuff the docs dir back in and add the appropriate
+ 	Makefile.am.
+
+1999-02-02  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c: Fixes for XDMCP vs. local display handling.
+
+	* src/gdmxdmcp.c: Numerous fixes.
+
+1999-01-31  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmxdmcp.c: First shot at XDMCP implentation.
+
+1999-01-28  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* configure.in/Makefile.am: Generate Makefile in docs. Added
+ 	README.install to EXTRA_DIST.
+
+1999-01-27  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_info): Fixed the annoying hanging
+ 	Gtk bug caused by my inability to program user interfaces. Ahem.
+
+	* configure.in: Stuff GNOME_GETTEXT back in.
+
+1999-01-25  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_session_start): Moved english->C
+ 	locale here. Ugly, but it became a mess in greeter too.
+
+	* src/gdmverify.c (gdm_verify_user): Repetetetive pam_setcred
+ 	spotted by gb. Fixed.
+
+1999-01-22  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmverify.c (gdm_verify_user): syslog ident workaround.
+
+	* src/gdmgreeter.c (gdm_greeter_session_init): Used widget pointer
+ 	as session name if no default was found. Fixed.
+
+	* src/gdm.c (gdm_display_unmanage): Avoid killing master daemon
+ 	when unmanaging displays.
+
+	* src/gdmslave.c (gdm_slave_session_start): Added call to
+ 	initgroups() to set up additional group memberships.
+	
+	* src/gdmverify.c (gdm_verify_user): Fix non-PAM password
+ 	checking.
+
+1999-01-20  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmverify.c (gdm_verify_user): Updated PAM stuff.
+
+1999-01-19  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/gdmslave.c (gdm_slave_session_start): Set the umask.
+
+1999-01-19  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmverify.c (gdm_verify_pam_conv): Quick workaround for PAM
+ 	stuff. Real solution due tomorrow.
+
+	* src/gdmgreeter.c: Lots of new stuff. Non completion mode
+ 	deprecated. On demand NFS lookups. Language selection.
+
+	* src/gdmslave.c (gdm_slave_greeter): New session/language
+ 	selection support.
+
+1999-01-18  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_session_start): Fixed memleak.
+
+1999-01-15  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/gdmslave.c (gdm_slave_greeter): Check return values from
+	sscanf.  Because "\n" scanned with %s returns -1 and the target
+	buffer has an undefined value.
+
+	* src/gdm.c (main): Set the umask to 066 to make any
+	default file created indirectly by gnome-config be of mode 066. 
+
+1999-01-13  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_sessions_init): Check that Session
+ 	scripts are executable before adding them to the list.
+
+	* src/gdmmisc.c (gdm_file_check): Added an option making the
+ 	function return TRUE if it is ok that a file is absent. I.e. the
+ 	user has no existing .Xauthority, .gnome/gdm or whatever.
+
+	* src/gdmslave.c (gdm_slave_session_start): Added default
+ 	path. Create ~user/.gnome if it doesn't exist.	
+
+	* src/gdmslave.c (gdm_slave_session_stop): More setegid().
+
+	* src/gdmslave.c (gdm_slave_session_start): Added setgid().
+	(gdm_slave_greeter): Fixed sigmask.
+
+	* src/gdmauth.c (gdm_auth_user_{add|remove}): Added -i to xauth to
+ 	ignore hanging locks.
+
+	* src/gdmgreeter.c (main): Resize only when browser is enabled.
+	
+	* src/gdmgreeter.c (gdm_greeter_message_init): Removed debug msg.
+
+	* src/gdm.c (gdm_config_parse): Bail out if gdm user/group doesn't
+ 	exist. Root failover made people lazy. 
+	
+	* src/gdm.c (gdm_child_handler): Minor fix to make gdm work with
+ 	more than one local Xserver.
+
+1999-01-12  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* config/gdm.conf.in ([system]): Added UserIconMax{Width,Height}.
+
+	* src/gdmgreeter.c (gdm_greeter_user_alloc): Scales user icons to
+ 	sysadmin specified max size.
+	
+	* src/gdmgreeter.c (gdm_greeter_iconify_handler): Fixed
+ 	iconification bug.
+
+	(gdm_greeter_login_key_handler): Cursor/Tab key restriction.
+
+	* src/gdmslave.c (gdm_slave_greeter): Forgot to setgid()
+	
+	(gdm_slave_greeter): Workaround for getenv("HOME") until miguel
+ 	fixes gnome_init().
+
+	* src/gdmmisc.c (gdm_parse_enriched_string): Fallback if
+ 	getenv("HOSTNAME")==NULL.
+
+1999-01-11  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/<younameit>.[ch] Done rewriting the daemon code to avoid the
+ 	race condition caused by simultaneous greeter/session and Xserver
+ 	death.
+
+1998-12-30  Jeff Garzik  <jgarzik@pobox.com>
+
+	* src/gdmauth.c, src/gdmgreeter.c, src/gdmmisc.c,
+	  src/gdmslave.c, src/gdmxdmcp.c:
+	s/g_copy_strings/g_strconcat/
+
+1998-12-28  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/*.c: Loads of fixes over the past couple of days.
+
+	* src/gdmgreeter.c (gdm_greeter_parse_config): gdmUserMaxFile
+ 	tunable.
+
+	* src/gdmmisc.c (gdm_file_check): Moved gdm_greeter_file_check
+ 	here. Now a generic function.
+
+	* src/gdmslave.c (gdm_slave_windows_kill_error_handler): Ok,
+ 	nailed down the bug which caused gdmslave to exit(1)
+ 	mysteriously. A race in the windows_recursive_kill function caused
+ 	the X default error handler to kick in. Blam. You're dead.
+	
+	(gdm_slave_session_init): Run sanity check on ~user/.Xauthority
+ 	and ~user/.gnome/gdm.
+
+	(gdm_slave_exec_command): Use the passed pointer instead of
+ 	gdmSuspend.
+
+	(gdm_slave_session_init): Added SHELL environment variable so the
+ 	user's shell is executed. Not just root's..
+	
+1998-12-25  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_user_alloc): Rewritten to use
+ 	sanity check.
+	
+	(gdm_greeter_file_check): New function. Checks file size,
+ 	ownership etc. to avoid DoS attacks on greeter.
+
+1998-12-23  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdm.c (gdm_abort): New function for error logging and
+ 	aborting. 
+	
+	(gdm_config_parse): luser proof permissions checking on authdir.
+	
+	* src/gdmgreeter.c: Several oddities fixed.
+	
+	* src/gdmgreeter.c (gdm_greeter_buttons_init): Mark login button
+ 	as default.
+	
+	* src/gdmgreeter.c (gdm_greeter_login_entry_handler): Fixed event
+ 	handlers to avoid the obscure emit_stop bug. Turns out my ancient
+ 	event handlers were doing the right thing all along. Only the
+ 	recent ones were br0ked. *sigh*. Thanks Owen!
+
+1998-12-22  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_greet_init): Removed debug logging of
+ 	username and password. Ahem. Thanks Sopwith!
+
+	* src/gdmgreeter.c (gdm_greeter_login_entry_handler):
+ 	Fixes. gtk_signal_emit_stop_by_name workaround.
+
+1998-12-20  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_invalid_passwd_req): Minor hack to
+ 	avoid greeter to be reactivated during dialog.
+	
+	* src/(gdm_greeter_entry_init): Limit input length in login and
+ 	password entry fields.
+
+	* src/gdmslave.c (gdm_slave_greet_init): Avoid potential buffer
+ 	overflow, in case something/someone breaks greeter.
+
+1998-12-15  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmverify.c (gdm_verify_user): Two buglets reported by
+ 	<kvajk@ricochet.net>.
+
+1998-12-14  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_browser_unselect): Catch
+ 	BUTTON_RELEASE.
+
+1998-12-13  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_{reboot,halt}_handler): Use
+ 	gnome_question_dialog instead of message_box.
+
+1998-12-03  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* config/Makefile.am: Fixed gnomerc. Both path and INSTALL_SCRIPT
+ 	were wrong -- No wonder people have been complaining. *sigh*
+
+	* src/gdm.c (main): Abort with (xdm compliant :) error message if
+ 	gdm isn't started by root.
+
+1998-12-01  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* docs/gdm-manual.txt: Crude manual draft.
+
+	* src/gdm.c, config/gdm.conf.in: The PreRoot and PostRoot
+ 	directories have been renamed PreSession and PostSession to avoid
+ 	confusion.
+
+1998-11-30  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_message_init): Calls the enriched
+ 	string function on the message string to support ``Welcome to
+ 	<hostname>''. Need to supply both server and client macros.
+
+	* src/gdmmisc.c (gdm_parse_enriched_string): New function for %h
+ 	expansion in strings.
+
+	* src/gdmgreeter.c: Removed legacy labels and such. gettext takes
+ 	it from here.
+
+	* src/gdm.c (gdm_config_parse): Check for correct permissions on
+ 	vardir.
+
+1998-11-29  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/gdmgreeter.c (gdm_greeter_browser_init): IconList now starts
+	life in thawed mode.
+
+1998-11-22  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_browser_select): Reverted to the
+ 	old event types (GDK_BUTTON_PRESS) for gnome-icon-list.
+
+	* src/gdmslave.c, src/gdmgreeter.c, src/gdm.c: Added support for
+ 	suspending APM-aware machines from greeter.
+
+1998-11-20  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c: Fixed X server restart stuff. gdmslave rewrite
+ 	done.
+
+	* src/gdmslave.c, src/gdm.c, config/gdm.conf.in: Implemented
+ 	KillInitClients option (Requested by sct).
+
+1998-11-18  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_display_init): Finally nailed down the
+ 	bug that has been haunting me for the past week causing
+ 	gdm_slave_windows_kill to hang on second login. The X server takes
+ 	a while to recover consciousness after a reset. I take this into
+ 	account by sleeping for a while if XOpenDisplay fails.
+  	Unfortunately, dsp was already initialized in second run
+ 	(but invalid after the X server reset) causing my retry condition
+ 	to be ignored. Always check your pointers! *sigh*
+
+	So, the new gdm should be as fast as xdm (i.e. fewer resets
+ 	causing garbled displays and momentary flicker. Visual annoyances
+ 	beyond this point - Go bug the X server people).
+	
+	SANE tutorial coming up in 6 hours. *Thud*
+	
+1998-11-09  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c More or less a rewrite.
+
+1998-11-08  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_init): Add d->name when starting X
+ 	server.
+
+	* src/gdm.c (gdm_config_parse): Added intelligent AuthDir
+ 	searching and gdmLogDir. gdmLogFile deprecated.
+
+	* src/gdmslave.c (gdm_slave_init): Moved stdout, stderr logging
+ 	here. Logs are now per-display.
+
+1998-11-08  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* #include<errno.h> in *.c.
+
+1998-11-02  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_session_init): Reset display instead
+ 	of restarting the X server every time.
+
+1998-11-01  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_session_init): If PreRoot script
+ 	returns > 0 abort session.
+
+1998-10-31  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmauth.c (gdm_auth_user_add): New function.
+	(gdm_auth_user_remove): New function. ~/.Xauthority management.
+
+1998-10-30  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmmisc.c (gdm_arg_munch): Zero out the remaining
+ 	argv-entries. We use the static array several times.
+
+	* src/gdmslave.c (gdm_slave_session_init): Removed malloc(pwent) -
+ 	Duh!.
+
+	* src/gdm.c (gdm_config_parse): Added group lookup. Removed
+ 	malloc(pwent).
+
+1998-10-26  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* config/gdm.conf.in: New User and Group keys override NobodyUser
+
+1998-10-21  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdm.c (gdm_restart_slave): Implemented reboot and halt.
+
+	* src/gdmverify.c: #ifdefs to make it compile on non PAM systems.
+
+	* src/Makefile.am (gdm_SOURCES): Added gdmmisc.c
+
+	* src/gdmmisc.c: Moved arg_much to a seperate file. It is now used
+ 	by both gdm.c and gdmslave.c.
+
+1998-10-20  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c: Send STX through pipeline before sending a
+ 	command.
+
+	* src/gdmslave.c (gdm_slave_display_init): Added STX for greeter
+ 	communications to avoid problems with Gtk debug errors to stdout.
+
+1998-10-19  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_browser_init): Added background
+ 	color in browser.
+
+	* src/gdmgreeter.c (gdm_greeter_browser_select): Change
+ 	GDK_BUTTON_PRESS to ditto RELEASE due to gil.
+
+	* src/gdmgreeter.c (main): Removed buggy icon list workaround.
+	(main): Center window before realizing it.
+	(gdm_greeter_browser_init): Added 3D frame to new icon list.
+
+1998-10-18  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/gdmgreeter.c (gdm_greeter_browser_init): Icon List is born
+	in frozen state, calling freeze and thaw leaves it still in frozen
+	state (as we have a frozen counter instead of a flag these days.).
+
+1998-10-16  Christopher Blizzard  <blizzard@appliedtheory.com>
+
+	* config/Makefile.am (install-data-hook): Make sure that
+ 	install-data-hook depends on targets gdm.conf gnomerc and Gnome.
+  	Otherwise they are never built.  Also, if the directories that
+ 	these files are supposed to go in don't exist, create them with
+ 	the proper mode.
+
+1998-10-13  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/gdmgreeter.c (gdm_greeter_login_entry_handler): Fix use of
+	the gnome_icon_list_moveto routine
+	(gdm_greeter_browser_update): ditto.
+	(gdm_greeter_browser_init): Adapt to the new gnome-icon-list api.
+	(gdm_greeter_login_entry_handler): Thaw before attempting to use moveto
+
+	Martin, is there any reason why you clear() the icon lists
+	contents and then reload them when the user changes from the login
+	field to the password one?
+	
+1998-10-13  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_exec_script): New function.
+	(gdm_slave_display_init): Add support for display init script.
+	(gdm_slave_session_init): Add support for root pre-login script.
+	(gdm_slave_session_init): Add support for root post-login script.
+
+	* src/gdm.c (gdm_config_parse): Added new config options for
+ 	scripts.
+
+	* config/gdm.conf.in ([daemon]): Default config options for
+ 	scripts.
+
+1998-10-11  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdm.c (main): Redirect all output to a logfile.
+	
+	* src/gdm.c (main): Moved the pid checking code to main to avoid
+ 	/sbin/init respawns. Checks whether gdm is started by init and
+ 	stops forking if this is the case (actually works this time).
+
+	* config/gdm.conf.in (PidFile): I've been ignoring all bug reports
+ 	caused by this one. Turns out I made a typo in the config template
+ 	file. *sigh*
+
+1998-10-11  Carsten Schaar  <nhadcasc@fs-maphy.uni-hannover.de>
+
+	* src/Makefile.am (gdm_LDADD): Added '$(INTLLIBS).
+	(gdmgreeter_LDADD): Likewise.
+
+1998-10-10  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* config/gdm.conf.in ([servers]): Modified to default X server
+ 	entry to exclude display depth option.
+
+	* config/Makefile.am (install-data-hook): Avoid overwriting
+ 	existing config files.
+
+	* acconfig.h: Added HAVE_PAM
+
+	* src/gdmverify.c (gdm_verify_user): Change USE_PAM to HAVE_PAM to
+ 	follow conventions.
+
+	* configure.in (have_pam): PAM autodetection.
+
+1998-10-08  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_invalid_passwd_req): Set focus to
+ 	passwd field when auth fails.
+
+	* src/gdmslave.c: Finished the rewrite. Should be almost usable
+ 	again.
+
+	* config/Makefile.am: TODO: Need to find a way to prevent
+ 	overwriting gdm.conf when doing a make install.
+
+1998-10-07  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_login): Completely new
+ 	communication scheme. Easier to parse in gdmslave.c.
+
+1998-10-06  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmverify.c: New file. TODO: PAM detection in autoconf.
+
+	* src/gdmslave.c: Gave up on merging CVS and my .ch-work. Started
+ 	major rewrite instead.
+
+	* src/gdmgreeter.c: Removed `:' in pipe communication
+ 	protocol. Waste.
+
+1998-10-05  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c: Fixed the race reported on gnome-list the right
+ 	way. The posted fix broke X USR1 signalling.
+
+	* src/gdmgreeter.c (gdm_greeter_about): Bumped version
+ 	number. Whee.
+	(gdm_greeter_done): New function. Partly replaces parse_results().
+	(gdm_greeter_login): Former login_button_handler. Now passes
+ 	password through pipe. Disables input while gdmslave is thinking.
+	(gdm_greeter_passwd_entry_handler): Replaced parse_results with
+ 	gdm_greeter_login to reflect the auth redesign.
+	(gdm_greeter_invalid_passwd_req): Re-enable input and reset cursor
+ 	after requester has been acked.
+	(main): Added signal handling for gdmslave communication.
+
+1998-10-04  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdm.c: signal->sigaction stuff.
+	(gdm_daemonify): Moved openlog to main.
+	(main): Stop forking when ppid is init.
+
+1998-10-01  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* src/gdmslave.c (gdm_slave_init): Setup the signal before
+	forking.  FIXME: We need to use sigaction all over the place
+	instead of signal.
+
+Thu Sep 24 22:09:39 CEST 1998 Jochen Friedrich <jochen@scram.de>
+
+	* src/gdmgreeter.c: Fixed a memory corruption.
+
+1998-09-15  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmslave.c (gdm_slave_usr1_handler): Added support for
+ 	setting last session in ~/.gnome/gdm/session/last. I had forgotten
+ 	all about it after I removed it from greeter.
+
+	* src/gdm.c Gazillions of fixes
+
+	* src/gdmslave.c Gazillions of fixes
+
+1998-09-14  Martin Kasper Petersen  <mkp@mkp.net>
+
+	* src/gdmgreeter.c (gdm_greeter_verify_user): Replaced annoying
+ 	LOG_AUTH with LOG_ERR.
+
+	* config/Makefile.am: Changed _DATA to _SCRIPTS for gnomerc et al.
+
+1998-09-10  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+        * src/gdm.c (gdm_config_parse): Simplify as well.
+
+	* src/gdmgreeter.c (gdm_greeter_user_alloc): Fix my oversimplication
+	from last night.
+
+	* src/gdmgreeter.c (gdm_greeter_user_alloc): More simplification
+	of the use of gnome-config.  I think I really should document it. 
+
+	* src/gdm.h (gdm_slave_init): Add prototype.  Remove include to
+	gnome.h.
+
+	* src/gdmslave.c (gdm_slave_usr1_handler): Log errors when the
+	session can not be launched.
+	Simplify the includes.
+
+	* src/gdmgreeter.c (gdm_greeter_parse_config): Simplify the code
+	by using gnome_config_push_prefix
+	(gdm_greeter_parse_config): Do not strdup the resulting strings,
+	they are already dupped
+	(gdm_greeter_sessions_init): Removed dependency on static buffer
+	for s.  Find correcly the default session.
+
+Tue Sep  8 16:11:49 EDT 1998 Gregory McLean
+
+	* acconfig.h : added this file so one can cvs -z3 co gdm, cd gdm
+	./autogen.sh; make and have an executable be spit out.
+
+

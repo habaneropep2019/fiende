@@ -1,0 +1,108 @@
+# Note that this is NOT a relocatable package
+%define nam      gnome-guile
+%define ver      @VERSION@
+%define  RELEASE 1
+%define  rel     %{?CUSTOM_RELEASE} %{!?CUSTOM_RELEASE:%RELEASE}
+%define prefix   /usr
+
+Summary: GNOME guile interpreter
+Name: %nam
+Version: %ver
+Release: %rel
+Copyright: LGPL
+Group: X11/Gnome
+Source: ftp://ftp.gnome.org/pub/%{nam}-%{ver}.tar.gz
+BuildRoot: /tmp/%{nam}-root
+Obsoletes: gnome
+Packager: Marc Ewing <marc@redhat.com>
+URL: http://www.gnome.org
+Docdir: %{prefix}/doc
+
+%description
+GNOME guile (gnomeg) is a guile interpreter with GTK and GNOME support.
+A number of GNOME utilities are written to use gnomeg.
+
+GNOME is the GNU Network Object Model Environment.  That's a fancy
+name but really GNOME is a nice GUI desktop environment.  It makes
+using your computer easy, powerful, and easy to configure.
+
+%package devel
+Summary: GNOME guile libraries, includes, etc
+Group: X11/Gnome
+Requires: %nam
+
+%description devel
+Libraries and header files for GNOME guile development
+
+%changelog
+* Sat Feb 27 1999 Gregory Mclean <gregm@comstar.net>
+
+- fixed this up so it will build on more then one alpha and this file is
+  generated.
+
+* Wed May 27 1998 Michael Fulbright <msf@redhat.com>
+
+- modified file list to include %{prefix}/share/guile, %{prefix}/share/gtk
+
+* Fri Mar 13 1998 Marc Ewing <marc@redhat.com>
+
+- Integrate into gnome-guile CVS source tree
+
+%prep
+%setup
+
+%build
+# Alpha's return all sorts of diffrent things for alpha, this confuses
+# libtool so we press the issue.
+%ifarch alpha
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --host=alpha-redhat-linux --prefix=%prefix
+%else
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%prefix
+%endif
+
+if [ "$SMP" != "" ]; then
+  make -j$SMP "MAKE=make -j$SMP"
+else
+  make
+fi
+
+%install
+rm -rf $RPM_BUILD_ROOT
+
+# FIXME: This will only work on systems where guile is installed
+#        in /usr.  Hopefully we can get rid of this stuff soon!
+make prefix=$RPM_BUILD_ROOT%{prefix} \
+     ROOT=$RPM_BUILD_ROOT \
+     sitedir=$RPM_BUILD_ROOT/usr/share/guile/site \
+     schemedir=$RPM_BUILD_ROOT/usr/share/guile \
+     install
+mkdir -p $RPM_BUILD_ROOT/usr/share/guile/toolkits
+rm -f $RPM_BUILD_ROOT/usr/share/guile/toolkits/libgtkstubs.so
+ln -s /usr/lib/libguilegtk.so \
+      $RPM_BUILD_ROOT/usr/share/guile/toolkits/libgtkstubs.so
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+%files
+%defattr(-, root, root)
+
+%doc AUTHORS COPYING ChangeLog NEWS README
+%{prefix}/bin/*
+%{prefix}/lib/lib*.so.*
+
+%{prefix}/share/guile/gtk/*.scm
+%{prefix}/share/guile/gtk-1.2/*.scm
+%{prefix}/share/guile/gnome/*.scm
+%{prefix}/share/guile/toolkits/libgtkstubs.so
+#%{prefix}/share/guile/site/event-repl.scm
+
+%files devel
+%attr(-, root, root) %{prefix}/lib/lib*.so
+%attr(-, root, root) %{prefix}/lib/*a
+%attr(-, root, root) %{prefix}/include/*
+%attr(-, root, root) %{prefix}/share/guile-gtk/*.defs

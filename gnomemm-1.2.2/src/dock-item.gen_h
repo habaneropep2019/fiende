@@ -1,0 +1,94 @@
+/* $Id: dock-item.gen_h,v 1.9 2000/08/29 18:36:29 kenelson Exp $ */
+
+
+/* dock-item.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/bin.h>
+#include <libgnomeui/gnome-dock-item.h>
+
+CLASS_START(Gnome);
+
+class DockItem : public Gtk::Bin
+{
+  WRAP_CLASS(DockItem, GnomeDockItem,
+             GNOME_DOCK_ITEM, GNOME_IS_DOCK_ITEM,
+             dock_item,
+             Gtk::Bin, GtkBin, GTK_BIN);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  DockItem(const Gtk::nstring &name,
+		 GnomeDockItemBehavior behavior);
+
+  // No need to wrap this method because we already do it in the base class (Gtk::Bin).
+  // gnome_dock_item_get_child()
+  // Gtk_Widget* get_child();
+
+
+  WRAP_METHOD(char* gnome_dock_item_get_name (GnomeDockItem *dock_item),
+              Gtk::nstring get_name ());
+  
+  WRAP_METHOD(void gnome_dock_item_set_shadow_type (GnomeDockItem*, GtkShadowType),
+	      void set_shadow_type (GtkShadowType type));
+
+  WRAP_METHOD(GtkShadowType gnome_dock_item_get_shadow_type (GnomeDockItem*),
+	      GtkShadowType get_shadow_type ());
+
+  WRAP_METHOD(gboolean gnome_dock_item_set_orientation (GnomeDockItem*, GtkOrientation),
+	      gboolean set_orientation (GtkOrientation orientation));
+
+  WRAP_METHOD(GtkOrientation gnome_dock_item_get_orientation (GnomeDockItem*),
+	      GtkOrientation get_orientation ());
+
+  WRAP_METHOD(GnomeDockItemBehavior gnome_dock_item_get_behavior (GnomeDockItem *dock_item),
+              GnomeDockItemBehavior get_behaviour ());  
+	
+
+  SIGNAL_SPEC("dock_drag_begin",  both, void dock_drag_begin ());
+  SIGNAL_SPEC("dock_drag_motion", both, void dock_drag_motion (gint, gint));
+  SIGNAL_SPEC("dock_drag_end",    both, void dock_drag_end ());
+  SIGNAL_SPEC("dock_detach",      both, void dock_drag_detach ());
+  //TODO: Is the dock_drag_detach name change on purpose?
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+#include <gnome--/private/dock-item_p.h>
+
+namespace Gnome {
+
+DockItem::DockItem(const Gtk::nstring &name,
+			       GnomeDockItemBehavior behavior)
+  : Gtk::Bin(GTK_BIN(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gnome_dock_item_construct(gtkobj(), name.gc_str(), behavior);
+}
+
+}
+
+DOCUMENTATION_START;
+

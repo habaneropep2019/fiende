@@ -1,0 +1,397 @@
+To: orbit-list@cuc.edu
+Subject: CORBA memory allcoation
+From: Owen Taylor <otaylor@gtk.org>
+Date: 17 Jun 1998 20:19:53 -0400
+In-Reply-To: Elliot Lee's message of Wed, 17 Jun 1998 17:14:40 -0400 (EDT)
+Message-ID: <lzemwnv9w6.fsf@cu-dialup-1518.cit.cornell.edu>
+Lines: 192
+
+
+The descriptions of memory management issues in the CORBA
+spec are just horrible. I've been reading at them recently
+and am somewhat confused. But I'm pretty sure what is currently
+in ORBit isn't right.
+
+If people agree with what I say below, I'll try to write up
+a coherent description for docs/ 
+
+The basic problem is the nature of CORBA free. Here's
+what the standard says.
+
+  [...]
+  The client may use and retain that storage indefinitely, and
+  must indicate when the value is no longer needed by calling
+  the procedure CORBA_free, whose signature is: 
+
+  /* C */ extern
+  void CORBA_free(void *storage); 
+
+  The parameter to CORBA_free() is the pointer used to return
+  the out parameter. CORBA_free() releases the ORB-allocated
+  storage occupied by the out parameter, including storage
+  indirectly referenced, such as in the case of a sequence of
+  strings or array of object reference. If a client does not
+  call CORBA_free() before reusing the pointers that reference
+  the out parameters, that storage might be wasted. Passing a
+  null pointer to CORBA_free() is allowed; CORBA_free() simply
+  ignores it and returns without error.
+
+Note the portion beginning "including storage indirectly
+referenced.."  CORBA_free() is not like free() or
+g_free(). It needs to know about the nature of the thing it
+is freeing. (ILU's C mapping gets this wrong, but mostly
+gets away with it because it doesn't have Anys)
+
+
+To look at a specific example, take CORBA_any. The
+complication for Any's and sequences is the set_release()
+function. For CORBA_any_set_release () the standard says:
+
+  /* C */ 
+  void CORBA_any_set_release (CORBA_any*, CORBA_boolean); 
+  CORBA_boolean CORBA_any_get_release(CORBA_any*); 
+
+  CORBA_any_set_release can be used to set the state of the
+  release flag. If the flag is set to TRUE, the any
+  effectively "owns" the storage pointed to by _value; if
+  FALSE, the programmer is responsible for the storage. If,
+  for example, an any is returned from an operation with its
+  release flag set to FALSE, calling CORBA_free() on the
+  returned any* will not deallocate the memory pointed to by
+  _value.
+
+That is the allocation functions for CORBA_any look like:
+
+======
+typedef void (*ORBit_free_func)(void *);
+
+typedef struct {
+  void (*free)(void *, CORBA_ULong);
+  void *data;
+} ORBit_mem_info;
+
+typedef struct {
+  CORBA_any any;
+  CORBA_boolean release;
+} CORBA_any_private;
+
+void
+CORBA_free (void *ptr)
+{
+  ORBit_mem_info *mem_info = ((ORBit_mem_info *)ptr) - 1;
+  mem_info->free (ptr, mem_info->data);
+}
+
+void
+CORBA_any_free (void *ptr, CORBA_ULong length)
+{
+  CORBA_any_private *private = ptr;
+  if (private->release)
+    CORBA_free (private->_value);
+}
+
+CORBA_any *
+CORBA_any_alloc (void)
+{
+  ORBit_mem_info *mem_info;
+  CORBA_any_private *private;
+
+  mem_info = (ORBit_mem_info *)
+      malloc(sizeof(ORBit_mem_info) + sizeof(CORBA_any_private));
+  private = (CORBA_any_private *)(mem_info + 1);
+  
+  mem_info->free = CORBA_any_free;
+  private->release = FALSE;
+
+  return &private->any;
+}
+======
+
+With each thing we alloc, we store information about how
+to free it. the 'data' member is there mainly to support
+somebody doing:
+
+  COBRA_free (any->_value)
+
+If we demarshalled the any off the wire, the only way
+we may be able to free _value is by walking its TypeCode.
+So the CORBA_free call needs to have a pointer to the
+TypeCode. 
+
+[ 
+This situation is what the next (very confusing) statement
+in the standard refers to:
+
+  Before calling CORBA_free() on the _value member of
+  an any directly, the programmer should check the release
+  flag using CORBA_any_get_release. If it returns FALSE, the
+  programmer should not invoke CORBA_free() on the _value
+  member; doing so produces undefined behavior.
+
+This is refers to is the case when the programmer modifying
+an existing any to point to another buffer.  
+]
+
+===
+
+Sequences work pretty similiarly. But the examples in the
+section on sequences, if taken to be authoritative, show
+that the above division into CORBA_any_private and 
+CORBA_any is not possible. Here's why:
+
+Here's what standard says about an INOUT sequence parameter.
+
+  [...] Consider the following OMG IDL declaration: 
+
+  // IDL
+  typedef sequence<long,10> vec10; 
+
+  In C, this is converted to: 
+
+  /* C */
+  typedef struct { 
+    CORBA_unsigned_long _maximum; 
+    CORBA_unsigned_long _length; 
+    CORBA_long *_buffer; 
+  } vec10; 
+
+  An instance of this type is declared as follows: 
+
+  /* C */ 
+  vec10 x = {10L, 0L, (CORBA_long *)NULL);
+
+Since we've stack allocated the sequence, the vec10
+structure better have really looked like:
+
+typedef struct { 
+  CORBA_unsigned_long _maximum; 
+  CORBA_unsigned_long _length; 
+  CORBA_long *_buffer; 
+  CORBA_boolean _release;
+} vec10; 
+
+Or the _release flag will point into invalid memory. Perhaps
+the in such circumstances the release flag is never supposed
+to be examined? No - becaues shortly after we have:
+
+  Prior to passing &x as an inout parameter, the programmer
+  must set the _buffer member to point to a CORBA_long array
+  of 10 elements. The _length member must be set to the actual
+  number of elements to transmit. Upon successful return from
+  the invocation, the _length member will contain the number
+  of values that were copied into the buffer pointed to by the
+  _buffer member. If more data must be returned than the
+  original buffer can hold, the callee can deallocate the
+  original _buffer member using CORBA_free() (honoring the
+  release flag) and assign _buffer to point to new storage.
+
+====
+
+Finally, Note the typo on page 19-12:
+
+  char *CORBA_string_alloc();
+
+The correct definition appears on page 19-17:
+
+  CORBA_char *CORBA_string_alloc(CORBA_unsigned_long len);
+
+
+Regards,
+                                        Owen
+
+Date: Thu, 18 Jun 1998 13:36:02 -0400 (EDT)
+From: Elliot Lee <sopwith@redhat.com>
+To: orbit-list@cuc.edu
+Subject: Re: CORBA memory allcoation
+In-Reply-To: <lzemwnv9w6.fsf@cu-dialup-1518.cit.cornell.edu>
+Message-ID: <Pine.LNX.3.96.980618131957.15045F-100000@lacrosse.redhat.com>
+
+On 17 Jun 1998, Owen Taylor wrote:
+
+> Note the portion beginning "including storage indirectly
+> referenced.."  CORBA_free() is not like free() or
+> g_free(). It needs to know about the nature of the thing it
+> is freeing.
+
+Err, I guess we have to write our own memory allocation/freeing wrappers. 
+This is seriously depressing... :)
+
+> With each thing we alloc, we store information about how
+> to free it. the 'data' member is there mainly to support
+> somebody doing:
+> 
+>   COBRA_free (any->_value)
+> 
+> If we demarshalled the any off the wire, the only way
+> we may be able to free _value is by walking its TypeCode.
+> So the CORBA_free call needs to have a pointer to the
+> TypeCode.
+
+So... We'll need info on how to recursively descend all values, not just
+ones that we generated off the wire. You're right, TypeCode's are the
+obvious way to do it. 
+
+For sequences & any's we need to store the _release flag as well - might
+as well store it as part of the ORBit_mem_info structure (perhaps as the
+bottom-most bit of the 'free' function pointer, which is going to be
+aligned to a paragraph or something). 
+
+We also need to cope with arrays of structures - i.e. a sequence<any>
+translates roughly into
+
+typedef struct {
+	CORBA_unsigned_long _maximum, _length;
+	CORBA_any *_buffer;
+} CORBA_sequence_any;
+
+('typedef struct CORBA_any_struct CORBA_any;' is the way the header files
+are set up currently - if all typedefs are supposed to be pointers to
+structs then someone should say something quickly :) 
+
+If someone tries to free _buffer, it needs to free all the
+CORBA_any->_value's, but free the array memory as one big piece. 
+
+We could make this work by storing a "valcount" member in ORBit_mem_info
+structures that tells how many consecutive values there are in the memory
+region. Or is there a better way? 
+
+> Finally, Note the typo on page 19-12:
+> 
+>   char *CORBA_string_alloc();
+> 
+> The correct definition appears on page 19-17:
+> 
+>   CORBA_char *CORBA_string_alloc(CORBA_unsigned_long len);
+
+Yea, got that fixed already in the sources.
+
+Thanks,
+-- Elliot
+When I die, I want to die peacefully in my sleep like my grandfather...
+	...not yelling and screaming like the people in the back of the
+	   plane he was flying.
+
+To: orbit-list@cuc.edu
+Subject: Re: CORBA memory allcoation
+From: Owen Taylor <otaylor@gtk.org>
+Date: 19 Jun 1998 11:15:59 -0400
+In-Reply-To: Elliot Lee's message of Thu, 18 Jun 1998 13:36:02 -0400 (EDT)
+Message-ID: <lz4sxhwhg0.fsf@cu-dialup-1725.cit.cornell.edu>
+
+
+Elliot Lee <sopwith@redhat.com> writes:
+
+> On 17 Jun 1998, Owen Taylor wrote:
+> 
+> > Note the portion beginning "including storage indirectly
+> > referenced.."  CORBA_free() is not like free() or
+> > g_free(). It needs to know about the nature of the thing it
+> > is freeing.
+> 
+> Err, I guess we have to write our own memory allocation/freeing wrappers. 
+> This is seriously depressing... :)
+> 
+> > With each thing we alloc, we store information about how
+> > to free it. the 'data' member is there mainly to support
+> > somebody doing:
+> > 
+> >   COBRA_free (any->_value)
+> > 
+> > If we demarshalled the any off the wire, the only way
+> > we may be able to free _value is by walking its TypeCode.
+> > So the CORBA_free call needs to have a pointer to the
+> > TypeCode.
+> 
+> So... We'll need info on how to recursively descend all values, not just
+> ones that we generated off the wire. You're right, TypeCode's are the
+> obvious way to do it. 
+
+I think long-term we want to restrict Typecode descent to values
+we get off the wire. For values we know about statically, the descent
+can be done by emitting __free() functions along with the __alloc()
+functions. For instance:
+
+ struct Foo {
+    short a;
+    sequence <long>b;
+ }
+
+ void Foo__free (void *ptr) 
+ {
+   Foo *val = (Foo *)ptr;
+   CORBA_free (val->b);
+   g_free (ptr);
+ }
+
+For sequences, we need a __freebuf() to go along with __allocbuf().
+
+Then we just stick the pointer to the correct free function in
+the mem_info structure during the allocation.
+
+> For sequences & any's we need to store the _release flag as well - might
+> as well store it as part of the ORBit_mem_info structure (perhaps as the
+> bottom-most bit of the 'free' function pointer, which is going to be
+> aligned to a paragraph or something). 
+
+I think this needs to be actually in the structure definition. The
+example I quoted in my last definition shows that it is expected
+that you can access the release flag for a stack-allocated any
+or sequence. So hiding it doesn't work. 
+
+We don't need to worry about the release flag when the user does
+
+ CORBA_free (sequence->_buffer);
+
+In that case, the user is responsible for checking the _release
+flag for the sequence. (via _get_release())
+
+> We also need to cope with arrays of structures - i.e. a sequence<any>
+> translates roughly into
+> 
+> typedef struct {
+> 	CORBA_unsigned_long _maximum, _length;
+> 	CORBA_any *_buffer;
+> } CORBA_sequence_any;
+> 
+> ('typedef struct CORBA_any_struct CORBA_any;' is the way the header files
+> are set up currently - if all typedefs are supposed to be pointers to
+> structs then someone should say something quickly :) 
+
+What the header files have is correct. I think only object references
+(and pseudo-object references) hide the '*' within the typedef.
+> 
+> If someone tries to free _buffer, it needs to free all the
+> CORBA_any->_value's, but free the array memory as one big piece. 
+> 
+> We could make this work by storing a "valcount" member in ORBit_mem_info
+> structures that tells how many consecutive values there are in the memory
+> region. Or is there a better way? 
+
+I think this is the right way. But we can make it a union with
+the ->data part of mem_info; because the sequence is homogenous -
+we either:
+
+ - Free the buffer with a single g_free()
+or,
+ - Call CORBA_free on each element, then g_free() the buf.
+
+So we just need to know the length of the sequence and pass
+it to the free() function.
+
+Regards,
+                                        Owen
+
+-----------------------------------------------------------------------
+Requirements:
+	When a pointer is passed to CORBA_free(), it must free any
+	stuff "contained" in that region.
+Examples:
+	structs/arrays/unions/sequences/exceptions
+
+IDLN_TYPE_FIXED
+IDLN_TYPE_ANY
+IDLN_TYPE_OBJECT
+IDLN_TYPE_SEQUENCE
+IDLN_TYPE_ARRAY
+IDLN_TYPE_STRUCT
+IDLN_TYPE_UNION

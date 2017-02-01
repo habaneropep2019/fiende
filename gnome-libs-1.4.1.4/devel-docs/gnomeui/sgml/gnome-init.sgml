@@ -1,0 +1,241 @@
+<refentry id="gnomeui-gnome-init">
+<refmeta>
+<refentrytitle>gnome-init</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-init</refname><refpurpose>Initialize GNOME libraries.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+int         <link linkend="gnome-init">gnome_init</link>                      (const char *app_id,
+                                             const char *app_version,
+                                             int argc,
+                                             char **argv);
+int         <link linkend="gnome-init-with-popt-table">gnome_init_with_popt_table</link>      (const char *app_id,
+                                             const char *app_version,
+                                             int argc,
+                                             char **argv,
+                                             const struct <link linkend="poptOption">poptOption</link> *options,
+                                             int flags,
+                                             <link linkend="poptContext">poptContext</link> *return_ctx);
+struct      <link linkend="GnomeGuru-struct">GnomeGuru</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-guru-new">gnome_guru_new</link>                  (const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GtkWidget">GtkWidget</link> *graphic,
+                                             <link linkend="GnomeDialog">GnomeDialog</link> *dialog);
+void        <link linkend="gnome-guru-construct">gnome_guru_construct</link>            (<link linkend="GnomeGuru">GnomeGuru</link> *guru,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GtkWidget">GtkWidget</link> *graphic,
+                                             <link linkend="GnomeDialog">GnomeDialog</link> *dialog);
+void        <link linkend="gnome-guru-append-page">gnome_guru_append_page</link>          (<link linkend="GnomeGuru">GnomeGuru</link> *guru,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);
+void        <link linkend="gnome-guru-next-set-sensitive">gnome_guru_next_set_sensitive</link>   (<link linkend="GnomeGuru">GnomeGuru</link> *guru,
+                                             <link linkend="gboolean">gboolean</link> sensitivity);
+void        <link linkend="gnome-guru-back-set-sensitive">gnome_guru_back_set_sensitive</link>   (<link linkend="GnomeGuru">GnomeGuru</link> *guru,
+                                             <link linkend="gboolean">gboolean</link> sensitivity);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-guru-current-page">gnome_guru_current_page</link>         (<link linkend="GnomeGuru">GnomeGuru</link> *guru);
+#define     <link linkend="GNOME-GURU-CAPS">GNOME_GURU</link>                      (obj)
+#define     <link linkend="GNOME-IS-GURU-CAPS">GNOME_IS_GURU</link>                   (obj)
+<link linkend="guint">guint</link>       <link linkend="gnome-guru-get-type">gnome_guru_get_type</link>             (void);
+#define     <link linkend="GNOME-GURU-CLASS-CAPS">GNOME_GURU_CLASS</link>                (klass)
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    These routines initialize the GNOME libraries in an application.  As
+    part of the initialization these routines do command line argument
+    parsing.
+  </para>
+
+  <para>
+    The <link linkend="gnome-init">gnome_init</link>() function family initializes the Gtk+ toolkit, the
+    Imlib graphics library, initializes session management for the
+    application and loads the user preferences.  During this process it
+    parses the command line arguments and dispatches the arguments to
+    the proper argument parsers.
+  </para>
+  
+  <para>
+    To provide your own arguments, you need to provide a
+    <structname>poptOption</structname> array (see the man page for
+    popt(3) for more information) that contains the list of arguments
+    that your application recognizes.
+  </para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-init">gnome_init ()</title>
+<programlisting>int         gnome_init                      (const char *app_id,
+                                             const char *app_version,
+                                             int argc,
+                                             char **argv);</programlisting>
+<para>
+Initializes the application.  This sets up all of the GNOME
+internals and prepares them (imlib, gdk, session-management, triggers,
+sound, user preferences)</para>
+<para>
+    
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app_id</parameter>&nbsp;:</entry>
+<entry> Application id.
+</entry></row>
+<row><entry align="right"><parameter>app_version</parameter>&nbsp;:</entry>
+<entry> Application version.
+</entry></row>
+<row><entry align="right"><parameter>argc</parameter>&nbsp;:</entry>
+<entry> argument count (for example argc as received by main)
+</entry></row>
+<row><entry align="right"><parameter>argv</parameter>&nbsp;:</entry>
+<entry> argument vector (for example argv as received by main)
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-init-with-popt-table">gnome_init_with_popt_table ()</title>
+<programlisting>int         gnome_init_with_popt_table      (const char *app_id,
+                                             const char *app_version,
+                                             int argc,
+                                             char **argv,
+                                             const struct <link linkend="poptOption">poptOption</link> *options,
+                                             int flags,
+                                             <link linkend="poptContext">poptContext</link> *return_ctx);</programlisting>
+<para>
+Initializes the application.  This sets up all of the GNOME
+internals and prepares them (imlib, gdk, session-management, triggers,
+sound, user preferences)
+</para>
+<para>
+Unlike gnome_init, with gnome_init_with_popt_table you can provide
+a table of popt options (popt is the command line argument parsing
+library).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app_id</parameter>&nbsp;:</entry>
+<entry> Application id.
+</entry></row>
+<row><entry align="right"><parameter>app_version</parameter>&nbsp;:</entry>
+<entry> Application version.
+</entry></row>
+<row><entry align="right"><parameter>argc</parameter>&nbsp;:</entry>
+<entry> argument count (for example argc as received by main)
+</entry></row>
+<row><entry align="right"><parameter>argv</parameter>&nbsp;:</entry>
+<entry> argument vector (for example argv as received by main)
+</entry></row>
+<row><entry align="right"><parameter>options</parameter>&nbsp;:</entry>
+<entry> poptOption table with options to parse
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> popt flags.
+</entry></row>
+<row><entry align="right"><parameter>return_ctx</parameter>&nbsp;:</entry>
+<entry> if non-NULL, the popt context is returned here.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+<!--
+Local variables:
+mode: sgml
+sgml-parent-document: ("../gnomeui-docs.sgml" "book" "sect1" "")
+End:
+-->
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeGuru-struct">struct GnomeGuru</title>
+<programlisting>struct GnomeGuru;</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="gnome-guru-new">gnome_guru_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_guru_new                  (const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GtkWidget">GtkWidget</link> *graphic,
+                                             <link linkend="GnomeDialog">GnomeDialog</link> *dialog);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="gnome-guru-construct">gnome_guru_construct ()</title>
+<programlisting>void        gnome_guru_construct            (<link linkend="GnomeGuru">GnomeGuru</link> *guru,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GtkWidget">GtkWidget</link> *graphic,
+                                             <link linkend="GnomeDialog">GnomeDialog</link> *dialog);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="gnome-guru-append-page">gnome_guru_append_page ()</title>
+<programlisting>void        gnome_guru_append_page          (<link linkend="GnomeGuru">GnomeGuru</link> *guru,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="gnome-guru-next-set-sensitive">gnome_guru_next_set_sensitive ()</title>
+<programlisting>void        gnome_guru_next_set_sensitive   (<link linkend="GnomeGuru">GnomeGuru</link> *guru,
+                                             <link linkend="gboolean">gboolean</link> sensitivity);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="gnome-guru-back-set-sensitive">gnome_guru_back_set_sensitive ()</title>
+<programlisting>void        gnome_guru_back_set_sensitive   (<link linkend="GnomeGuru">GnomeGuru</link> *guru,
+                                             <link linkend="gboolean">gboolean</link> sensitivity);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="gnome-guru-current-page">gnome_guru_current_page ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_guru_current_page         (<link linkend="GnomeGuru">GnomeGuru</link> *guru);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="GNOME-GURU-CAPS">GNOME_GURU()</title>
+<programlisting>#define GNOME_GURU(obj) GTK_CHECK_CAST (obj, gnome_guru_get_type (), GnomeGuru)
+</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="GNOME-IS-GURU-CAPS">GNOME_IS_GURU()</title>
+<programlisting>#define GNOME_IS_GURU(obj)  GTK_CHECK_TYPE (obj, gnome_guru_get_type ())
+</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="gnome-guru-get-type">gnome_guru_get_type ()</title>
+<programlisting><link linkend="guint">guint</link>       gnome_guru_get_type             (void);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="GNOME-GURU-CLASS-CAPS">GNOME_GURU_CLASS()</title>
+<programlisting>#define GNOME_GURU_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, gnome_guru_get_type (), GnomeGuruClass)
+</programlisting>
+</refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+  <para>
+    Manual page popt(3).
+  </para>
+</refsect1>
+
+</refentry>

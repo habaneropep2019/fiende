@@ -1,0 +1,161 @@
+/* $Id: tooltips.gen_h,v 1.45 2001/07/15 13:33:39 murrayc Exp $ */
+
+
+/* tooltips.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/data.h>
+#include <gtk--/widget.h>
+#include <gtk/gtktooltips.h>
+
+CLASS_START(Gtk);
+
+//: Tooltip group
+//- Tooltips are the messages that appear next to a widget when the mouse pointer
+//- is held over it for a short amount of time. They are especially helpful
+//- for adding more verbose description of things such as buttons in a toolbar.
+//-
+//- An individual tooltip belongs to a group of tooltips. Every tooltip in the
+//- group can then be turned off with a call to {disable()} and enabled with
+//- {enable()}.
+//-
+//- The length of time the user must keep the mouse over a widget before the tip
+//- is shown, can be altered with {set_delay()}. This is set on a 'per group of
+//- tooltips' basis.
+//-
+//- To assign a tip to a particular {Gtk::Widget::}, {set_tip()} is used.
+//-
+//- {\b Note:} Tooltips can only be set on widgets which have their own X window.
+//- To add a tooltip to a widget that doesn't have its own window, place the widget inside a
+//- {Gtk::EventBox::} and add a tooltip to that instead.
+//-
+//- The default appearance of all tooltips in a program is determined by the current
+//- gtk theme that the user has selected.
+//-
+//- Information about the tooltip (if any) associated with an arbitrary widget can be
+//- retrieved using {data_get()}.
+class Tooltips : public Data
+{
+  WRAP_CLASS(Tooltips,GtkTooltips,GTK_TOOLTIPS,GTK_IS_TOOLTIPS,tooltips,Gtk::Data,GtkData,GTK_DATA);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Enable this tooltip group.
+  WRAP_METHOD(
+	      void gtk_tooltips_enable       (GtkTooltips*),
+	      void enable     ());
+
+  //: Disable this tooltip group.
+  WRAP_METHOD(
+	      void gtk_tooltips_disable      (GtkTooltips*),
+	      void disable    ());
+
+  //: Set the time before tooltips are displayed.
+  //- {\var delay} is in seconds.
+  WRAP_METHOD(
+	      void gtk_tooltips_set_delay    (GtkTooltips*,guint),
+	      void set_delay  (guint delay));
+
+  //: Set a tip for a widget.
+  WRAP_METHOD(
+    void gtk_tooltips_set_tip      (GtkTooltips*,GtkWidget*,const gchar*,const gchar*),
+    void set_tip  (const Gtk::Widget &widget,
+		 const nstring &tip_text=0,
+		 const nstring &tip_private = 0));
+
+  //: This function is unimplemented because tooltip colors are instead determined by the theme.
+  WRAP_METHOD(
+	      void gtk_tooltips_set_colors   (GtkTooltips*,GdkColor*,GdkColor*),
+	      void set_colors (const Gdk_Color &background,const Gdk_Color &foreground));
+
+protected:
+  //: get tips data from a widget {\i (internal)}
+  WRAP_METHOD(
+	      GtkTooltipsData* gtk_tooltips_data_get(GtkWidget*),
+	      static GtkTooltipsData* data_get(Gtk::Widget &widget));
+
+public:
+  WRAP_METHOD(
+	      void gtk_tooltips_force_window (GtkTooltips*),
+	      void force_window());
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/data_p.h>
+IMPL_START;
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_ToolTips)
+//. name: tip_window
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: active_tips_data
+//. type: GtkTooltipsData*
+//. get:
+//. set:
+//. desc:
+
+//. name: tips_data_list
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: gc
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: foreground
+//. type: GdkColor*
+//. get:
+//. set:
+//. desc:
+
+//. name: background
+//. type: GdkColor*
+//. get:
+//. set:
+//. desc:
+
+//. name: delay
+//. type: guint:30
+//. get:
+//. set:
+//. desc:
+
+//. name: enabled
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: timer_tag
+//. type: gint
+//. get:
+//. set:
+//. desc:
+

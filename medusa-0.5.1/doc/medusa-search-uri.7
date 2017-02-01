@@ -1,0 +1,254 @@
+.TH MEDUSA-SEARCH-URI 7 "February 8, 2001" Eazel
+.SH NAME
+medusa-search-uri \- syntax for medusa searches
+.SH SYNOPSIS
+.B gnome-search:[file:///]
+.I criterion
+[
+.B &
+.I criterion
+\&...
+]
+.SH DESCRIPTION
+.B medusa-indexd
+produces file system indices which can then be queried
+with
+.B msearch
+or with the
+.B libmedusa
+libraries .
+This manual page documents the syntax used to specify what
+to search for.
+.LP
+.B WARNING:
+This manual page is mostly cloned from the
+.B search_uri_rfc
+document in the
+.B medusa
+distribution
+and has been put into manual page form
+by someone who really doesn't know how it all works.
+It also documents what the aforementioned document says works
+at the moment, rather than how it ought to work eventually.
+.SS "Search method and root"
+Search URIs begin with a search method:
+.RS
+.LP
+.B gnome-search:
+.RE
+.LP
+followed by a bracketed file system root:
+.RS
+.LP
+.B [file:///]
+.RE
+.LP
+At the moment
+.B medusa:
+or
+.B search:
+will also be accepted instead of
+.BR gnome-search: .
+You are supposed to be able to specify multiple bracketed roots,
+which are supposed to be able to have protocols other than
+.BR file: ,
+and roots other than
+.BR / ,
+but I believe at the moment it has to be exactly as above.
+.SS Criteria
+The search method and root are followed by one or more
+.IR criteria .
+If there is more than one, they are separated by ampersands:
+.RS
+.LP
+.I criterion
+.br
+.I criterion
+.B &
+.I criterion
+.br
+.I criterion
+.B &
+.I criterion
+.B &
+.I criterion
+.br
+\&...
+.RE
+.LP
+According to the specification,
+vertical bars (\(bv) can be used to specify an
+.I or
+relation, and parentheses (\fB(\fP and \fB)\fP) can be used to
+group criteria, but I believe neither of these features is
+currently implemented.
+.LP
+Below is the list of criteria that are understood:
+.RS
+.LP
+.B "file_name is"
+.I string
+.br
+.B "file_name contains"
+.I string
+.br
+.B "file_name does_not_contain"
+.I string
+.br
+.B "file_name begins_with"
+.I string
+.br
+.B "file_name matches"
+.I glob-pattern
+.br
+.B "file_name regexp_matches"
+.I regexp-pattern
+.LP
+.B "directory_name is"
+.I string
+.br
+.B "directory_name contains"
+.I string
+.br
+.B "directory_name regexp_matches"
+.I regexp-pattern
+.br
+.B "directory_name does_not_regexp_match"
+.I regexp-pattern
+.RE
+.LP
+(I think
+.B is_in
+means ``is a subdirectory of.''
+Directory searches don't seem to work for me, though.)
+.RS
+.LP
+.B "file_type is application"
+.br
+.B "file_type is_not application"
+.br
+.B "file_type is music"
+.br
+.B "file_type is_not music"
+.br
+.B "file_type is text_file"
+.br
+.B "file_type is_not text_file"
+.br
+.B "file_type is file"
+.br
+.B "file_type is_not file"
+.br
+.B "file_type is directory"
+.br
+.B "file_type is_not directory"
+.LP
+.B "modified is"
+\fIMM\fP\fB/\fP\fIDD\fP\fB/\fP\fIYYYY\fP
+.br
+.B "modified is_not"
+\fIMM\fP\fB/\fP\fIDD\fP\fB/\fP\fIYYYY\fP
+.br
+.B "modified is_before"
+\fIMM\fP\fB/\fP\fIDD\fP\fB/\fP\fIYYYY\fP
+.br
+.B "modified is_after"
+\fIMM\fP\fB/\fP\fIDD\fP\fB/\fP\fIYYYY\fP
+.br
+.B "modified is today"
+.br
+.B "modified is yesterday"
+.br
+.B "modified is_within_a_week_of"
+\fIMM\fP\fB/\fP\fIDD\fP\fB/\fP\fIYYYY\fP
+.br
+.B "modified is_within_a_month_of"
+\fIMM\fP\fB/\fP\fIDD\fP\fB/\fP\fIYYYY\fP
+.br
+.B "mtime is_before"
+.I time_t
+.br
+.B "mtime is_after"
+.I time_t
+.LP
+.B "owner is"
+.I login
+.br
+.B "owner has_uid"
+.I uid
+.br
+.B "owner is_not"
+.I login
+.br
+.B "owner does_not_have_uid"
+.I uid
+.LP
+.B "group is"
+.I groupname
+.br
+.B "group has_gid"
+.I gid
+.br
+.B "group is_not"
+.I groupname
+.br
+.B "group does_not_have_gid"
+.I gid
+.LP
+.B "size larger_than"
+.I byte-count
+.br
+.B "size smaller_than"
+.I byte-count
+.br
+.B "size is"
+.I byte-count
+.br
+.LP
+.B "permissions_to_read include_uid"
+.I uid
+.LP
+.B "content includes_all_of"
+.I string
+.br
+.B "content includes_any_of"
+.I string
+.br
+.B "content does_not_include_all_of"
+.I string
+.br
+.B "content does_not_include_any_of"
+.I string
+.RE
+.LP
+(This syntax is wrong for the
+.B content
+searches,
+but I don't know what the real syntax is,
+because even when I do a search from inside Nautilus
+I get the error message that the URI is invalid.)
+.RS
+.LP
+.B "keywords include"
+.I keyword
+.br
+.B "keywords do_not_include"
+.I keyword
+.RE
+.LP
+I leave out the other search criteria that
+.B search_uri_rfc
+documents but says are unimplemented now.
+.SH EXAMPLES
+msearch 'gnome-search:[file:///]file_name is etc'
+.br
+msearch 'gnome-search:[file:///]file_name begins_with gnome-s'
+.br
+msearch 'gnome-search:[file:///]file_name matches gnome*.png'
+.br
+msearch 'gnome-search:[file:///]file_name regexp_matches ^k[st]e'
+.br
+msearch 'gnome-search:[file:///]modified is 02/01/2001'
+.SH SEE ALSO
+.BR msearch (1),
+.BR medusa-indexd (1)

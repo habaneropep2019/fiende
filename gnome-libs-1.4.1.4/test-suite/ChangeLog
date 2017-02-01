@@ -1,0 +1,165 @@
+2000-04-05  Miguel de Icaza  <miguel@helixcode.com>
+
+	* tests/parse-path.c (main): Hack on the test-suite to set the
+	HOME variable to /tmp to trick parse path into returning values
+	that we can compare to
+
+1999-08-18  Havoc Pennington  <hp@pobox.com>
+
+	* tests/Makefile.am: Add includes for Imlib, fixes bug 1535
+
+1999-02-13  Tom Tromey  <tromey@cygnus.com>
+
+	* tests/metadata.c (keys): New structure.
+	(main): Added another rename test, from Miguel.
+
+1999-01-27  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (%.test): Defer $srcdir decision to runtime, not
+	when the script is created.
+	Bug report from Zach Frey <zfrey@bright.net>.
+	* *.test: Update.
+
+1999-01-18  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* runtest.sh: Make it handle `one in N outputs'.
+
+1999-01-18  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (EXTRA_DIST): Added the $(TESTS) here.
+
+1999-01-17  Raja R Harinath  <harinath@cs.umn.edu>
+
+	Overhaul test-suite framework.  Now, you can run individual tests
+	with "make TESTS=foo.test check", like the god of automake meant
+	it to be.  
+	* Makefile.am (SUBDIRS): Add `tests/'.
+	(TESTS): List individual tests.
+	(EXTRA_DIST): Don't lists tests/*.
+	(dummy.c): Remove.
+
+	* runtest.sh: Simplify drastically.  Now, is not a full-fledged
+	shell-script, but a shell-script fragment.  It should be sourced
+	with $the_test set to the name of the desired test.
+
+	* tests/Makefile.am: New file.
+	(noinst_PROGRAMS): List names of individual tests.
+	(INCLUDES): Move here from Makefile.am.
+	(LDADD): Likewise.
+	
+1999-01-15  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* runtest.sh (failed): `exit 1' if failed, not `exit 0'.
+
+	* expected/trigs.out: Update to new results, now that tests/trig.c
+	doesn't use gnome_triggers_readfile().
+
+1998-12-16  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (EXTRA_DIST): Added data/sample.
+
+1998-12-03  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* tests/parse-path.c (prefix): New variable -- standin for a
+	#define of the same name in `gnome-config.c'.
+	(parse-path.cP): Include this file.  It contains the internal
+	algorithm we desire to test. 
+	(test_parse_path): New function.  Moved from `gnome-config.c' and
+	renamed from _test_suite_check_parse_path.
+	(my_parse_path): Rename from `parse_path' to avoid conflict with
+	`parse-path.cP'. 
+	(run_tests_with_prefix): Simulate `gnome_config_{push,pop}_prefix'. 
+	(main): Pass a placebo version string to `gnomelib_init'.	
+
+	* Makefile.am (INCLUDES): Change -I../.. to -I..
+	(EXTRA_DISTS): Distribute `parse-path.c' and `parse-path.out'.
+
+1998-11-25  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* tests/fileconvert.c (main): Pass an additional version parameter
+	to `gnomelib_init'.
+	* tests/skel.c (main): Likewise.
+	* tests/split.c (main): Likewise.
+	* tests/trigs.c (main): Likewise.
+
+	* Makefile.am (INCLUDES): Reorder includes.
+
+Thu Nov 19 11:21:34 1998  Raph Levien  <raph@gimp.org>
+
+	* Makefile.am (LDADD): Added libart_lgpl.
+
+1998-10-16  Martin Baulig  <martin@home-of-linux.org>
+
+	* tests/parse-path.c: New test. This tests the `parse_path'
+	function in libgnome/gnome-config.c.
+	* expected/parse-path.out: New file.
+
+1998-09-18  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* runtest.sh: Remove `.o' file after successful run.
+	* tests/metadata.c (main): 
+	Look for `gnome_metadata_app_dir' in $srcdir. 
+
+Thu Sep 17 17:00:39 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* expected/metadata.out: Updated for new tests.
+	* data/sample: New file.
+	* tests/metadata.c (main): Set gnome_metadata_app_dir.  Added
+	tests for application-installed metadata files.
+
+Wed Sep  9 00:39:28 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* runtest.sh: Only remove test program if the test output is
+	correct.
+
+Tue Sep  8 22:40:32 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (EXTRA_DIST): Added metadata.c, metadata.out.
+	* expected/metadata.out: New file.
+	* tests/metadata.c: New file.
+
+1998-08-06  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (EXTRA_DIST): List tests/* and expected/*.
+
+1998-07-30  Christopher Blizzard  <blizzard@odin.appliedtheory.com>
+
+	* .cvsignore: Add .deps dir
+
+1998-07-13  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* tests/lynxdump.sh: Sed out the /tmp/.$$.html filename from the
+	output. 
+	* expected/fileconvert.out: Update to reflect this.
+
+	* tests/skel.c (main): `gnomelib_init' has one argument now.
+	* tests/split.c (main): Likewise.
+	* tests/fileconvert.c (main): Likewise.  Also, look for input file
+	in $srcdir.
+	* tests/trigs.c (main): Likewise.
+
+	* runtest.sh: Cleanup.
+	(LINK): Give the output of the LINK a name.
+
+	Based partly on patch from James Michael Mastros
+	<spare@jennifer-unix.dyn.ml.org>. 
+	
+1998-06-11  Raja R Harinath  <harinath@cs.umn.edu>
+
+	Improve test harness.
+	* Makefile.am (INCLUDES): Add GTK_CFLAGS.
+	(dummy.c): Hack to force `automake' to define $COMPILE and $LINK.
+	(TESTS_ENVIRONMENT): Pass $COMPILE and $LINK in environment to
+	runtest.sh.
+
+	* runtest.sh: Reorganized.  Makes better use of automake/libtool
+	machinery to build and execute the tests.  Should work for
+	builddir != srcdir.
+
+Fri Jan  2 00:15:32 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (bin_PROGRAMS): Removed.
+	(test): Likewise.
+	(EXTRA_DIST): New macro.
+	(TESTS): Likewise.
+	(TESTS_ENVIRONMENT): Likewise.

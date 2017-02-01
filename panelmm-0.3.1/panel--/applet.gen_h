@@ -1,0 +1,264 @@
+/* $Id: applet.gen_h,v 1.7 2002/01/07 20:16:01 cactus Exp $ -*- c++ -*- */
+
+
+/* applet.gen_h
+ * 
+ * Copyright (C) 1999-2001 Gergõ ÉRDI <cactus@cactus.rulez.org>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/plug.h>
+#include <applet-widget.h>
+
+CLASS_START(Gnome);
+class Applet : public Gtk::Plug
+{
+    WRAP_CLASS(Applet, AppletWidget,
+	       APPLET_WIDGET, IS_APPLET_WIDGET,
+	       applet,
+	       Gtk::Plug, GtkPlug, GTK_PLUG);
+public:
+    WRAP_CTOR_CAST;
+    WRAP_DTOR;
+
+    //: Create a new panel applet
+    //- You can later add a widget to it with the {Applet::add()}
+    //- method. The {\param goad_id} argument is a unique Gtk::string
+    //- identifier of the applet.
+    Applet(const Gtk::string& goad_id);
+
+    //: Set the tooltip displayed for the applet
+    //- This tooltip is displayed when the user rests the pointer
+    //- above anywhere on the applet.
+    WRAP_METHOD(void applet_widget_set_tooltip (AppletWidget*,
+						const gchar*),
+		void set_tooltip (const Gtk::nstring &text));
+
+    //: Set the tooltip displayed for a child widget
+    WRAP_METHOD(void applet_widget_set_widget_tooltip (AppletWidget*,
+						       GtkWidget*,
+						       const gchar*),
+	      void set_widget_tooltip (Gtk::Widget& widget,
+				       const Gtk::nstring &text));
+
+    //: Add a widget to the applet container
+    WRAP_METHOD(void applet_widget_add (AppletWidget*, GtkWidget*),
+		void add (Gtk::Widget& widget));
+
+    //: Remove the applet's child widget
+    WRAP_METHOD(void applet_widget_remove (AppletWidget*),
+		void remove ());
+
+    WRAP_METHOD(void applet_widget_sync_config (AppletWidget*),
+		void sync_config ());
+
+    //: Abort applet before it's added to the panel
+    WRAP_METHOD(void applet_widget_abort_load (AppletWidget*),
+		void abort_load ());
+    
+    //: Add a menu item to the applet's context menu
+    //- {\param Name} is the ID to use later when removing the widget.
+    //-
+    //- To add a menuitem to a submenu created with {\method
+    //- add_submenu} or {\method add_submenu_stock}, set the
+    //- {\param name} argument to a "path" to the submenu.
+    //- e.g. to add the menu item "General" to the previously
+    //- created submenu "Settings", use
+    //- add_menuitem("settings/general", "General", slot(...));
+    void add_menuitem(const Gtk::string& name,
+		      const Gtk::string& caption,
+		      SigC::Slot0<void> callback);
+
+    void add_menuitem_stock(const Gtk::string& name,
+			    const Gtk::string& stock_type,
+			    const Gtk::string& caption,
+			    SigC::Slot0<void> callback);
+
+    //: Remove a menu item
+    WRAP_METHOD(void applet_widget_unregister_callback (AppletWidget*,
+							const gchar*),
+		void remove_menuitem (const Gtk::string &name));
+
+    //: Set the sensitivity of a menu item
+    WRAP_METHOD(void applet_widget_callback_set_sensitive (AppletWidget*,
+							   const gchar*,
+							   int sensitive),
+		void set_menu_sensitive(const Gtk::string& name,
+					bool sensitive));
+							   
+    // Submenu functions
+    //: Add a submenu to the applet's context menu
+    //- You can later add menu items and/or more submenus to it
+    //- using it's {\param name} parameter (see {\method
+    //- add_menuitem})
+    WRAP_METHOD(void applet_widget_register_callback_dir (AppletWidget*,
+							  const char*,
+							  const char*),
+		void add_submenu (const Gtk::string& name,
+				  const Gtk::string& caption));
+
+    WRAP_METHOD(void applet_widget_register_stock_callback_dir (AppletWidget*,
+								const char*,
+								const char*,
+								const char*),
+		void add_submenu_stock (const Gtk::string& name,
+					const Gtk::string& stock_type,
+					const Gtk::string& caption));
+
+    //: Remove a submenu
+    WRAP_METHOD(void applet_widget_unregister_callback_dir (AppletWidget*,
+							    const gchar*),
+		void remove_submenu (const Gtk::string& name));
+
+    // General panel functions
+
+    //: Get the orientation of the panel the applet is currently in
+    WRAP_METHOD(GNOME_Panel_OrientType applet_widget_get_panel_orient (AppletWidget*),
+		GNOME_Panel_OrientType get_panel_orient ());
+
+    //: Get the screen size (in pixels) the applet should use
+    WRAP_METHOD(int applet_widget_get_panel_pixel_size (AppletWidget*),
+		int get_panel_pixel_size ());
+
+    WRAP_METHOD(void applet_widget_get_rgb_bg (AppletWidget*,
+					       guchar**,
+					       int*, int*,
+					       int*),
+		void get_rgb_bg (guchar** rgb,
+				 int& w, int& h,
+				 int& rowstride));
+    
+    
+    // Signals
+
+    //: Set if the applet gets do_draw signals
+    WRAP_METHOD(void applet_widget_send_position (AppletWidget*,
+						  int),
+		void send_position (bool enable));
+    WRAP_METHOD(void applet_widget_send_draw (AppletWidget*,
+					      int),
+		void send_draw (bool enable));
+    
+    //: The orientation of the panel containing the widget has changed
+    SIGNAL_SPEC("change_orient", both,
+		void change_orient(GNOME_Panel_OrientType));
+
+    //: The size allocated to the applet has changed
+    SIGNAL_SPEC("change_pixel_size", both,
+		void change_pixel_size(int));
+
+    //: The applet's position has been changed
+    //- The two parameters are the X and Y coordinates.
+    SIGNAL_SPEC("change_position", both,
+		void change_position(int, int));
+    
+    //: The session manager exits the panel
+    SIGNAL_SPEC("save_session", both,
+		int save_session(char*, char*));
+    
+    //: Panel background has changed
+    SIGNAL_SPEC("back_change", both,
+		void back_change(GNOME_Panel_BackType, char*, GdkColor*));
+    
+    SIGNAL_SPEC("tooltip_state", both,
+		void tooltip_state(int));
+
+    SIGNAL_SPEC("do_draw", both,
+		void do_draw());
+
+protected:
+    static void _fw_signal(AppletWidget*, gpointer data);
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/plug_p.h>
+IMPL_START;
+#include <panel--/private/applet_p.h>
+
+/* applet.cc
+ *
+ * Copyright (C) 1999-2001 Gergõ ÉRDI <cactus@cactus.rulez.org>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+namespace Gnome {
+    using namespace SigC;
+    
+Applet::Applet(const Gtk::string& goad_id):
+    Plug(GTK_PLUG(gtk_object_new(get_type(),0)))
+{
+    initialize_class();
+
+    applet_widget_construct(gtkobj(), goad_id.c_str());
+}
+
+void Applet::add_menuitem(const Gtk::string &name,
+			  const Gtk::string &caption,
+			  Slot0<void>        callback)
+{
+    SlotData* slotdata = callback.data();
+    applet_widget_register_callback(gtkobj(),
+				    strdup(name.c_str()),
+				    strdup(caption.c_str()),
+				    &Applet::_fw_signal,
+				    (gpointer)slotdata);
+    slotdata->connect();
+    ScopeNode* node = slotdata->receiver();
+    register_data(node);
+}
+
+void Applet::add_menuitem_stock(const Gtk::string &name,
+				const Gtk::string &stock_type,
+				const Gtk::string &caption,
+				Slot0<void>        callback)
+{
+    SlotData* slotdata = callback.data();
+    applet_widget_register_stock_callback(gtkobj(),
+					  strdup(name.c_str()),
+					  strdup(stock_type.c_str()),
+					  strdup(caption.c_str()),
+					  &Applet::_fw_signal,
+					  (gpointer)slotdata);
+    slotdata->connect();
+    ScopeNode* node = slotdata->receiver();
+    register_data(node);
+}
+
+void Applet::_fw_signal(AppletWidget*,
+			gpointer data)
+{
+    Slot0<void> slot((SlotData*)data);
+    slot.call();
+}
+}
+
+DOCUMENTATION_START;
+

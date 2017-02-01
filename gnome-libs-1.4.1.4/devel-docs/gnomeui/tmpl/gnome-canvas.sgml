@@ -1,0 +1,512 @@
+<!-- ##### SECTION Title ##### -->
+GnomeCanvas
+
+<!-- ##### SECTION Short_Description ##### -->
+  A generic engine for structured graphics.
+  
+<!-- ##### SECTION Long_Description ##### -->
+  <para>
+    The GNOME canvas is an engine for displaying structured graphics
+    and simplifying the development of complex graphic-based
+    applications.  
+  </para>
+  
+  <refsect2>
+    <title>Canvas Items</title>
+    <para>
+      The GNOME Canvas basic building blocks are the GNOME Canvas
+      Items (#GnomeCanvasItem): lines, rectangles, text, ellipses,
+      polylines, images and embedded widgets.  You can use any of
+      those directly in your application.
+    </para>
+    
+    <para>
+      The CanvasItem system is designed to be extensible.
+      Applications can define their own #GnomeCanvasItem objects for
+      special purpose tasks.  For example, the GNOME Gnumeric
+      spreadsheet defines a number of special Canvas Items that are
+      specialized for the task of spreadsheets.
+    </para>
+    
+    <para>
+      Specialized canvas items allow the developer to write
+      custom items that can adapt to their needs for speed,
+      scalability and gives the user the power to extend the
+      canvas. 
+    </para>
+    
+    <para>
+      Items on the canvas can be reconfigured by using the Gtk
+      argument system.  Users can reconfigure the parameters of
+      the canvas items and the changes on the parameters will be
+      reflected immediately on the screen.
+    </para>
+  </refsect2>
+  
+  <refsect2>
+    <title>Flicker free display</title>
+    <para>
+      The GNOME Canvas uses off-screen buffers to render the images
+      before transferring them to the screen.  Transfers can take
+      place at the command of the programmer (by explicitly
+      requesting a repaint update) or done automatically by the
+      engine (during the idle look handler).
+    </para>
+  </refsect2>
+  
+  <refsect2>
+    <title>Event dispatching</title> 
+    <para>Each 
+      GnomeCanvasItem can receive mouse events, keyboard events,
+      mouse-enter and mouse leave events.  In addition a canvas
+      item can grab the mouse (for example to implement reliable
+      dragging of objects).
+    </para>
+  </refsect2>
+  
+  <refsect2>
+    <title>Canvas types</title>
+    <para>
+      The Canvas can be run in two different modes: X11 mode and Art
+      mode.  The mode is chosen at the creation time of the widget
+      by either calling gnome_canvas_new() or gnome_canvas_new_aa(),
+      the former creates an X11 canvas, while the latter creates an
+      Art-based canvas.
+    </para>
+    
+    <para>
+      The X11 mode uses the X server to draw the items and it takes
+      advantage of the X server acceleration features for drawing on
+      the screen.  The only drawback is that the output quality and
+      the imaging model are restricted to the X11 quality and
+      imaging model.
+    </para>
+    
+    <para>
+      The Art mode of the canvas has an advanced imaging model based
+      on LibArt and it allows any GnomeCanvasItem (with the
+      exception of the embedded widget item) to be rotated, scaled
+      and translated (this is done by means of applying an affine
+      transformation on the object).
+    </para>
+  </refsect2>
+
+<!-- ##### SECTION See_Also ##### -->
+  <para>
+    #GnomeCanvasItem, #GnomeCanvasGroup, GnomeCanvasRE,
+    #GnomeCanvasRectEllipse, #GnomeCanvasImage, #GnomeCanvasLine,
+    #GnomeCanvasPolygon, #GnomeCanvasText, #GnomeCanvasWidget
+  </para>
+
+<!-- ##### STRUCT GnomeCanvas ##### -->
+  <para>
+    Most of the fields in this structure are for private use only.
+    However, canvas item implementations may make use of some of them.
+  </para>
+
+
+<!-- ##### MACRO GNOME_CANVAS_EPSILON ##### -->
+  <para>
+    This macro defines a &lsquo;small&rsquo; floating-point value for
+    the internal computations that the canvas performs.  It can be
+    used by item implementations as a test to see whether a number is
+    &ldquo;almost zero&rdquo;.
+  </para>
+
+
+
+<!-- ##### MACRO GNOME_CANVAS_COLOR ##### -->
+  <para>
+    This macro is used to build a 32-bit integer with an RGB color
+    specification.  The specified values must be integers in the range
+    [0, 255].
+  </para>
+
+@r: Red component of the color.
+@g: Green component of the color.
+@b: Blue component of the color.
+
+
+<!-- ##### MACRO GNOME_CANVAS_COLOR_A ##### -->
+  <para>
+    This macro is used to build a 32-bit integer with an RGBA color
+    specification.  This is the same as an RGB color specification,
+    but with an added alpha or opacity value.  The specified values
+    must be integers in the range [0, 255].
+  </para>
+
+@r: Red component of the color.
+@g: Green component of the color.
+@b: Blue component of the color.
+@a: Opacity component of the color.
+
+
+<!-- ##### STRUCT GnomeCanvasBuf ##### -->
+  <para>
+    This structure is passed to the <function>render</function> method
+    of canvas items when they need to paint themselves on an
+    antialiased canvas.  The <structfield>buf</structfield> field
+    points to a 24-bit RGB buffer for rendering.  The
+    <structfield>buf_rowstride</structfield> field specifies the
+    number of bytes in each row in the buffer, which should be used to
+    calculate byte offsets inside it.  The buffer's pixel offsets in
+    canvas pixel coordinates are given by the
+    <structfield>rect</structfield> rectangle.  The
+    <structfield>is_bg</structfield> and
+    <structfield>is_buf</structfield> fields are flags that items can
+    use to implement rendering optimizations, and they are used in
+    conjunction with the <structfield>bg_color</structfield> field.
+  </para>
+
+  <para>
+    The <structfield>is_buf</structfield> flag specifies whether the
+    contents of the buffer are an accurate representation of the state
+    of the canvas.  If this flag is true, then the RGB data in the
+    <structfield>buf</structfield> is valid, that is, it contains
+    meaningful data.
+  </para>
+
+  <para>
+    The <structfield>is_bg</structfield> flag specifies whether the
+    buffer has all its pixels set to the same color.  This allows
+    canvas items to optimize for this case by doing alpha compositing
+    for a smaller set of values than if the buffer had pixels of
+    different colors.
+  </para>
+
+  <para>
+    At least one of these flags is on at any one time.  The meaning of
+    their combinations is as follows:
+
+    <table>
+      <title>
+	Values for <structfield>is_bg</structfield> and
+	<structfield>is_buf</structfield>
+      </title>
+      <tgroup cols="3">
+	<thead>
+	  <row>
+	    <entry><structfield>is_buf</structfield></entry>
+	    <entry><structfield>is_bg</structfield></entry>
+	    <entry>Meaning</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry><symbol>FALSE</symbol></entry>
+	    <entry><symbol>TRUE</symbol></entry>
+	    <entry>
+	      The buffer does not contain meaningful data.  However,
+	      it should be considered as if it were filled with the
+	      solid color specified in the
+	      <structfield>bg_color</structfield> field.  Item
+	      implementations may want to call
+	      <function>gnome_canvas_buf_ensure_buf()</function> to
+	      fill the buffer automatically.
+	    </entry>
+	  </row>
+	  <row>
+	    <entry><symbol>TRUE</symbol></entry>
+	    <entry><symbol>FALSE</symbol></entry>
+	    <entry>
+	      The buffer contains meaningful data and not all of its
+	      pixels may be the same color.  Item implementations can
+	      use the buffer data as-is for alpha compositing.
+	    </entry>
+	  </row>
+	  <row>
+	    <entry><symbol>TRUE</symbol></entry>
+	    <entry><symbol>TRUE</symbol></entry>
+	    <entry>
+	      The buffer contains meaningful data, and all the pixels
+	      are of the same color.  Item implementations can use the
+	      buffer data as-is for alpha compositing, or be smarter
+	      and do less operations since they can just composite
+	      over a single color.
+	    </entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+  </para>
+
+  <para>
+    Whenever an item paints to an RGB buffer in which the
+    <structfield>is_bg</structfield> field was true, the item is then
+    responsible for turning off this flag if it knows that the result
+    will not be pixels all of the same color.  If a large item, like a
+    solid rectangle, knows that it will be filling the buffer with a
+    solid color, then it take any one of the following actions:
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  Fill the actual pixels in the buffer with the solid color
+	  and turn off the <structfield>is_bg</structfield> flag.  It
+	  should then turn on the <structfield>is_buf</structfield>
+	  flag.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fill the actual pixels in the buffer with the solid color,
+	  set the <structfield>bg_color</structfield> field to that
+	  same color, and turn on both the
+	  <structfield>is_bg</structfield> and
+	  <structfield>is_buf</structfield> flags.  This is correct,
+	  but is wasteful, since it could have done just the following
+	  instead.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Just set the <structfield>bg_color</structfield> to the
+	  solid color, turn on the <structfield>is_bg</structfield>
+	  flag, and turn off the <structfield>is_buf</structfield>
+	  flag.  This means that the buffer does not contain the
+	  actual meaningful data, and the next item to be repainted
+	  should look at the solid color instead.  This is the most
+	  efficient version.
+	</para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    Most item implementations may only need to perform the actions for
+    the first case described above.  The other two are simply
+    optimizations they can perform.
+  </para>
+
+
+<!-- ##### FUNCTION gnome_canvas_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_canvas_new_aa ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_canvas_root ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_canvas_set_scroll_region ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@x1: 
+@y1: 
+@x2: 
+@y2: 
+
+
+<!-- ##### FUNCTION gnome_canvas_get_scroll_region ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@x1: 
+@y1: 
+@x2: 
+@y2: 
+
+
+<!-- ##### FUNCTION gnome_canvas_set_pixels_per_unit ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@n: 
+
+
+<!-- ##### FUNCTION gnome_canvas_scroll_to ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@cx: 
+@cy: 
+
+
+<!-- ##### FUNCTION gnome_canvas_get_scroll_offsets ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@cx: 
+@cy: 
+
+
+<!-- ##### FUNCTION gnome_canvas_update_now ##### -->
+<para>
+
+</para>
+
+@canvas: 
+
+
+<!-- ##### FUNCTION gnome_canvas_get_item_at ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@x: 
+@y: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_canvas_request_redraw_uta ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@uta: 
+
+
+<!-- ##### FUNCTION gnome_canvas_request_redraw ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@x1: 
+@y1: 
+@x2: 
+@y2: 
+
+
+<!-- ##### FUNCTION gnome_canvas_w2c_affine ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@affine: 
+
+
+<!-- ##### FUNCTION gnome_canvas_w2c ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@wx: 
+@wy: 
+@cx: 
+@cy: 
+
+
+<!-- ##### FUNCTION gnome_canvas_w2c_d ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@wx: 
+@wy: 
+@cx: 
+@cy: 
+
+
+<!-- ##### FUNCTION gnome_canvas_c2w ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@cx: 
+@cy: 
+@wx: 
+@wy: 
+
+
+<!-- ##### FUNCTION gnome_canvas_window_to_world ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@winx: 
+@winy: 
+@worldx: 
+@worldy: 
+
+
+<!-- ##### FUNCTION gnome_canvas_world_to_window ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@worldx: 
+@worldy: 
+@winx: 
+@winy: 
+
+
+<!-- ##### FUNCTION gnome_canvas_get_color ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@spec: 
+@color: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_canvas_set_stipple_origin ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@gc: 
+
+<!-- ##### FUNCTION gnome_canvas_get_dither ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@Returns: 
+
+<!-- ##### FUNCTION gnome_canvas_set_dither ##### -->
+<para>
+
+</para>
+
+@canvas: 
+@dither:
+@Returns: 
+
+<!--
+Local variables:
+mode: sgml
+sgml-parent-document: ("../gnomeui-docs.sgml" "book" "sect1" "")
+End:
+-->
+
+

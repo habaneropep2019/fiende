@@ -1,0 +1,307 @@
+/* $Id: curve.gen_h,v 1.39 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* curve.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <gtk--/drawingarea.h>
+#include <gtk/gtkcurve.h>
+#include <gtk/gtkgamma.h>
+#include <gtk/gtkdrawingarea.h>
+
+CLASS_START(Gtk);
+
+// (internal) Input conversion class to allow for flexible use
+struct CurveArray
+{
+  protected:
+    bool owned_;
+    int size_;
+    gfloat* data_;
+
+    void a_alloc(int size);
+
+    template <class Iterator>
+    void a_dup(Iterator b,Iterator e)
+      {
+        int i;
+        Iterator iter;
+        for (iter=b,i=0;iter!=e;++iter,++i);
+        a_alloc(i);
+        for (iter=b,i=0;iter!=e;++iter,++i)
+          data_[i]=(*iter);
+      }
+
+  public:
+    int size() const          {return size_;}
+    operator float* () const  {return data_;}
+
+    CurveArray(const CurveArray& c)
+       : owned_(0),size_(c.size_),data_(c.data_)
+      { }
+    CurveArray(int size,gfloat data[])
+       : owned_(0),size_(size),data_(data)
+      { }
+
+#ifndef GTKMM_CXX_AMBIGUOUS_TEMPLATES
+    // copy a other containers
+    template <class Container>
+    CurveArray(const Container& c)
+      { a_dup(c.begin(),c.end()); }
+#else
+    // compiler can't handle template cctor properly.
+    CurveArray(const list<gfloat>& c)    { a_dup(c.begin(),c.end()); }
+    CurveArray(const vector<gfloat>& c)  { a_dup(c.begin(),c.end()); }
+#endif
+
+    // copy a partial container
+    template <class Iterator>
+    CurveArray(Iterator b,Iterator e):owned_(0)
+      { a_dup(b,e); }
+  
+    ~CurveArray();
+    
+};
+
+//: Allows direct editing of a curve.
+//- The {\class Gtk::Curve} widget allows the user to edit a curve covering
+//- a range of values. It is typically used to fine-tune color balances in
+//- graphics applications like the Gimp.
+//-
+//- The {\class Gtk::Curve} widget has 3 modes of operation - spline, linear
+//- and free. In spline mode the user places points on the curve which are
+//- automatically connected together into a smooth curve. In linear mode the
+//- user places points on the curve which are connected by straight lines. In
+//- free mode the user can draw the points of the curve freely, and they are
+//- not connected at all.
+class Curve : public DrawingArea {
+  WRAP_CLASS(Curve,GtkCurve,GTK_CURVE,GTK_IS_CURVE,curve,Gtk::DrawingArea,GtkDrawingArea,GTK_DRAWING_AREA);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Reset the curve.
+  //- Resets the curve to a straight line from the minimum x & y values to
+  //- the maximum x & y values (i.e. from the bottom-left to the top-right
+  //- corners). The curve type is not changed.
+  WRAP_METHOD(void gtk_curve_reset(GtkCurve*),
+    void reset());
+
+  //: Recomputes the entire curve using the given gamma value.
+  //- A gamma value of 1 results in a straight line. Values greater than 1
+  //- result in a curve above the straight line. Values less than 1 result
+  //- in a curve below the straight line. The curve type is changed to
+  //- {\enum GTK_CURVE_TYPE_FREE}.
+  //-
+  //- gamma: The gamma value.
+  WRAP_METHOD(void gtk_curve_set_gamma(GtkCurve*,gfloat),
+    void set_gamma(gfloat gamma));
+
+  //: Sets the minimum and maximum x & y values of the curve.
+  //- The curve is also reset with a call to {curve_reset()}.
+  //-
+  //- min_x: The minimum x value.
+  //-
+  //- max_x: The maximum x value.
+  //-
+  //- min_y: The minimum y value.
+  //-
+  //- max_y: The maximum y value.
+  WRAP_METHOD(void gtk_curve_set_range(GtkCurve*,gfloat,gfloat,gfloat,gfloat),
+    void set_range(gfloat min_x, gfloat max_x,
+		 gfloat min_y, gfloat max_y));
+
+  //: Returns a vector of points representing the curve.
+  //-
+  //- data: Returns the points.
+  WRAP_METHOD(
+    void gtk_curve_get_vector(GtkCurve*,int,gfloat*),
+    void get_vector(int num,gfloat* data));
+
+  // For containers       
+  template <class Iterator>
+  int get_vector(Iterator b,Iterator e) const
+    {
+      int i;
+      Iterator iter;
+      for (iter=b,i=0;iter!=e;++iter,i++);
+      gfloat data[]=new gfloat[i];
+      get_vector(n,data);
+      for (iter=b,i=0;iter!=e;++iter,i++)
+        (*iter)=data[i];
+      delete [] data;
+      return i;
+    };
+
+  //void gtk_curve_set_vector(GtkCurve*,int,gfloat[]);
+  //: Sets the vector of points on the curve.
+  //- The curve type is set to {\enum GTK_CURVE_TYPE_FREE}.
+  //-
+  //- vect: The points on the curve.
+  void set_vector(const CurveArray &vect);
+
+  //: Sets the type of the curve.
+  //- The curve will remain unchanged except when changing from a free curve to
+  //- a linear or spline curve, in which case the curve will be changed as
+  //- little as possible.
+  //- type: The type of the curve. Possible values are: {\enum GTK_CURVE_TYPE_LINEAR},
+  //- {\enum GTK_CURVE_TYPE_SPLINE}, {\enum GTK_CURVE_TYPE_FREE}.
+  WRAP_METHOD(void gtk_curve_set_curve_type(GtkCurve*,GtkCurveType),
+    void set_curve_type(GtkCurveType type));
+
+  //: Emitted when the curve type has been changed.
+  //- The curve type can be changed explicitly with a call to
+  //- {set_curve_type()}. It is also changed as a side-effect of calling
+  //- {reset()} or {set_gamma()}.
+  SIGNAL_SPEC("curve_type_changed",both,void curve_type_changed());
+  
+
+};
+
+//: A subclass of {\class Gtk::VBox} for editing gamma curves.
+//- The {\class Gtk::GammaCurve} widget is a subclass of {\class Gtk::VBox}
+//- specifically for editing gamma curves, which are used in graphics applications
+//- such as the Gimp.
+//-
+//- The GammaCurve widget shows a curve which the user can edit with the mouse just
+//- like a {\class Gtk::Curve} widget. On the right of the curve it also displays 5
+//- buttons, 3 of which change between the 3 curve modes (spline, linear and free),
+//- and the other 2 set the curve to a particular gamma value, or reset it to a straight
+//- line.
+class GammaCurve : public VBox
+{
+  WRAP_CLASS(GammaCurve,GtkGammaCurve,GTK_GAMMA_CURVE,GTK_IS_GAMMA_CURVE,gamma_curve,Gtk::VBox,GtkVBox,GTK_VBOX);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/drawingarea_p.h>
+#include <gtk--/private/box_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+void
+Curve::set_vector(const CurveArray &vect)
+{
+  gtk_curve_set_vector(gtkobj(), vect.size(), vect);
+}
+
+void CurveArray::a_alloc(int size)
+{
+  data_=new gfloat[size+1];
+  data_[size]=0;
+  size_=size;
+  owned_=1;
+}
+
+CurveArray::~CurveArray()
+{
+  if (owned_) delete [] data_;
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Curve)
+//. name: cursor_type
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: min_x
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: max_x
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: min_y
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: max_y
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: pixmap
+//. type: GdkPixmap*
+//. get:
+//. set:
+//. desc:
+
+//. name: curve_type
+//. type: GtkCurveType
+//. get:
+//. set:
+//. desc:
+
+//. name: height
+//. type: gint
+//. get:
+//. set:
+//. desc: (cached) graph height in pixels 
+
+//. name: grab_point
+//. type: gint
+//. get:
+//. set:
+//. desc: point currently grabbed 
+
+//. name: last
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: num_points
+//. type: gint
+//. get:
+//. set:
+//. desc: (cached) curve points: 
+
+//. name: point
+//. type: GdkPoint*
+//. get:
+//. set:
+//. desc:
+
+//. name: num_ctlpoints
+//. type: gint
+//. get:
+//. set:
+//. desc: number of control points 
+

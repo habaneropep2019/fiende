@@ -1,0 +1,300 @@
+<refentry id="gnomeui-gnome-properties">
+<refmeta>
+<refentrytitle>gnome-properties</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-properties</refname><refpurpose>
+deprecated/experimental/unfinished</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomePropertyObject">GnomePropertyObject</link>;
+struct      <link linkend="GnomePropertyDescriptor">GnomePropertyDescriptor</link>;
+enum        <link linkend="GnomePropertyAction">GnomePropertyAction</link>;
+<link linkend="GnomePropertyObject">GnomePropertyObject</link>* <link linkend="gnome-property-object-new">gnome_property_object_new</link>
+                                            (<link linkend="GnomePropertyDescriptor">GnomePropertyDescriptor</link> *descriptor,
+                                             <link linkend="gpointer">gpointer</link> property_data_ptr);
+void        <link linkend="gnome-property-object-register">gnome_property_object_register</link>  (<link linkend="GnomePropertyBox">GnomePropertyBox</link> *property_box,
+                                             <link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+void        <link linkend="gnome-property-object-list-walk">gnome_property_object_list_walk</link> (<link linkend="GList">GList</link> *property_object_list,
+                                             <link linkend="GnomePropertyAction">GnomePropertyAction</link> action);
+void        <link linkend="gnome-property-object-apply">gnome_property_object_apply</link>     (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+void        <link linkend="gnome-property-object-update">gnome_property_object_update</link>    (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+void        <link linkend="gnome-property-object-load">gnome_property_object_load</link>      (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+void        <link linkend="gnome-property-object-save">gnome_property_object_save</link>      (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+void        <link linkend="gnome-property-object-load-temp">gnome_property_object_load_temp</link> (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+void        <link linkend="gnome-property-object-save-temp">gnome_property_object_save_temp</link> (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+void        <link linkend="gnome-property-object-discard-temp">gnome_property_object_discard_temp</link>
+                                            (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+void        <link linkend="gnome-property-object-changed">gnome_property_object_changed</link>   (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+This module is deprecated/experimental/unfinished. Don't use it.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomePropertyObject">struct GnomePropertyObject</title>
+<programlisting>struct GnomePropertyObject {
+	GtkWidget *label;
+	GnomePropertyDescriptor *descriptor;
+	gpointer prop_data, temp_data, user_data;
+	GList *object_list;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomePropertyDescriptor">struct GnomePropertyDescriptor</title>
+<programlisting>struct GnomePropertyDescriptor {
+	guint size;
+	const gchar *label;
+	GtkWidget * (*init_func) (GnomePropertyObject *);
+	void (*apply_func) (GnomePropertyObject *);
+	void (*update_func) (GnomePropertyObject *);
+	void (*load_func) (GnomePropertyObject *);
+	void (*save_func) (GnomePropertyObject *);
+	void (*load_temp_func) (GnomePropertyObject *);
+	gint (*save_temp_func) (GnomePropertyObject *);
+	void (*discard_temp_func) (GnomePropertyObject *);
+	void (*changed_func) (GnomePropertyObject *);
+	GList *next;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomePropertyAction">enum GnomePropertyAction</title>
+<programlisting>typedef enum {
+	GNOME_PROPERTY_ACTION_APPLY = 1,
+	GNOME_PROPERTY_ACTION_UPDATE,
+	GNOME_PROPERTY_ACTION_LOAD,
+	GNOME_PROPERTY_ACTION_SAVE,
+	GNOME_PROPERTY_ACTION_LOAD_TEMP,
+	GNOME_PROPERTY_ACTION_SAVE_TEMP,
+	GNOME_PROPERTY_ACTION_DISCARD_TEMP,
+	GNOME_PROPERTY_ACTION_CHANGED
+} GnomePropertyAction;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-new">gnome_property_object_new ()</title>
+<programlisting><link linkend="GnomePropertyObject">GnomePropertyObject</link>* gnome_property_object_new
+                                            (<link linkend="GnomePropertyDescriptor">GnomePropertyDescriptor</link> *descriptor,
+                                             <link linkend="gpointer">gpointer</link> property_data_ptr);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>descriptor</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>property_data_ptr</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-register">gnome_property_object_register ()</title>
+<programlisting>void        gnome_property_object_register  (<link linkend="GnomePropertyBox">GnomePropertyBox</link> *property_box,
+                                             <link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>property_box</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-list-walk">gnome_property_object_list_walk ()</title>
+<programlisting>void        gnome_property_object_list_walk (<link linkend="GList">GList</link> *property_object_list,
+                                             <link linkend="GnomePropertyAction">GnomePropertyAction</link> action);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>property_object_list</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>action</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-apply">gnome_property_object_apply ()</title>
+<programlisting>void        gnome_property_object_apply     (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-update">gnome_property_object_update ()</title>
+<programlisting>void        gnome_property_object_update    (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-load">gnome_property_object_load ()</title>
+<programlisting>void        gnome_property_object_load      (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-save">gnome_property_object_save ()</title>
+<programlisting>void        gnome_property_object_save      (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-load-temp">gnome_property_object_load_temp ()</title>
+<programlisting>void        gnome_property_object_load_temp (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-save-temp">gnome_property_object_save_temp ()</title>
+<programlisting>void        gnome_property_object_save_temp (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-discard-temp">gnome_property_object_discard_temp ()</title>
+<programlisting>void        gnome_property_object_discard_temp
+                                            (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-object-changed">gnome_property_object_changed ()</title>
+<programlisting>void        gnome_property_object_changed   (<link linkend="GnomePropertyObject">GnomePropertyObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

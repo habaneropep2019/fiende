@@ -1,0 +1,120 @@
+// -*- Mode: C++; style: bsd -*-
+/* $Id: mdi-generic-child.gen_h,v 1.5 2001/04/24 14:39:35 murrayc Exp $ */
+
+
+/* mdi-generic-child.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/mdi-child.h>
+#include <libgnomeui/gnome-mdi-generic-child.h>
+
+CLASS_START(Gnome);
+class MDIGenericChild : public MDIChild
+{
+  WRAP_CLASS(MDIGenericChild, GnomeMDIGenericChild,
+             GNOME_MDI_GENERIC_CHILD, GNOME_IS_MDI_GENERIC_CHILD,
+             mdi_generic_child,
+             MDIChild, GnomeMDIChild, GNOME_MDI_CHILD);
+public:
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  MDIGenericChild(const Gtk::string &name);
+  
+  WRAP_METHOD(void gnome_mdi_generic_child_set_view_creator(GnomeMDIGenericChild*, GnomeMDIChildViewCreator,
+							    gpointer),
+	      void set_view_creator (GnomeMDIChildViewCreator func, gpointer data));
+
+  WRAP_METHOD(void gnome_mdi_generic_child_set_view_creator_full(GnomeMDIGenericChild*,
+								 GnomeMDIChildViewCreator,
+								 GtkCallbackMarshal,
+								 gpointer,
+								 GtkDestroyNotify),
+	      void set_view_creator_full(GnomeMDIChildViewCreator func,
+					 GtkCallbackMarshal marshal,
+					 gpointer data,
+					 GtkDestroyNotify notify));
+
+  WRAP_METHOD(void gnome_mdi_generic_child_set_menu_creator(GnomeMDIGenericChild*,
+							    GnomeMDIChildMenuCreator,
+							    gpointer),
+	      void set_menu_creator(GnomeMDIChildMenuCreator func,
+				    gpointer data));
+
+  WRAP_METHOD(void gnome_mdi_generic_child_set_menu_creator_full(GnomeMDIGenericChild*,
+								 GnomeMDIChildMenuCreator,
+								 GtkCallbackMarshal,
+								 gpointer,
+								 GtkDestroyNotify),
+	      void set_menu_creator_full(GnomeMDIChildMenuCreator func,
+					 GtkCallbackMarshal marshal,
+					 gpointer data,
+					 GtkDestroyNotify notify));
+
+  WRAP_METHOD(void gnome_mdi_generic_child_set_config_func(GnomeMDIGenericChild*,
+							   GnomeMDIChildConfigFunc,
+							   gpointer),
+	      void set_config_func(GnomeMDIChildConfigFunc func,
+				   gpointer data));
+
+  WRAP_METHOD(void gnome_mdi_generic_child_set_config_func_full(GnomeMDIGenericChild*,
+								GnomeMDIChildConfigFunc,
+								GtkCallbackMarshal,
+								gpointer,
+								GtkDestroyNotify),
+	      void set_config_func_full(GnomeMDIChildConfigFunc func,
+					GtkCallbackMarshal marshal,
+					gpointer data,
+					GtkDestroyNotify notify));
+
+  WRAP_METHOD(void gnome_mdi_generic_child_set_label_func(GnomeMDIGenericChild*,
+							  GnomeMDIChildLabelFunc,
+							  gpointer),
+	      void set_label_func(GnomeMDIChildLabelFunc func,
+				   gpointer data));
+
+  WRAP_METHOD(void gnome_mdi_generic_child_set_label_func_full(GnomeMDIGenericChild*,
+							       GnomeMDIChildLabelFunc,
+							       GtkCallbackMarshal,
+							       gpointer,
+							       GtkDestroyNotify),
+	      void set_label_func_full(GnomeMDIChildLabelFunc func,
+				       GtkCallbackMarshal marshal,
+				       gpointer data,
+				       GtkDestroyNotify notify));
+
+};
+
+
+
+PRIVATE_START;
+#include <gnome--/private/mdi-child_p.h>
+IMPL_START;
+#include <gnome--/private/mdi-generic-child_p.h>
+
+
+Gnome::MDIGenericChild::MDIGenericChild(const Gtk::string &name)
+  : MDIChild(GNOME_MDI_CHILD(gtk_object_new(get_type(),0)))
+{
+  // need _configure call here
+  GNOME_MDI_CHILD(gtkobj())->name = g_strdup(name.c_str());
+}
+
+
+DOCUMENTATION_START;

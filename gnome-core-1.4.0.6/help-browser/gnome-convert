@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+
+sub basicescape {
+    s#&#&apm;#g;
+    s#<#&lt;#g;
+    s#>#&gt;#g;
+}
+
+sub tagify {
+    s#(^&lt;.*)#<I>&lt;$1</I>#;
+    s#([a-z]*://\S*)#<A HREF="$1">$1</A>#g;
+    s#([-a-zA-Z._0-9]+\@[-a-zA-Z._0-9]+)#<A HREF="mailto:$1">$1</A>#g;
+    s#&lt;(\S+\.h)&gt;#<A HREF="file:/usr/include/$1">&lt;$1&gt;</A>#g;
+    s# (/[a-z]+/[a-z.-/]+)# <A HREF="file:$1">$1</A>#g;
+}
+
+sub plain {
+}
+
+$_ = $ARGV[1];
+if (/^text.html/) {
+} else {
+    print "Can't convert to something else than text/html... yet.\n";
+    exit(1);
+}    
+
+$_ = $ARGV[0];
+if (/^text.plain/) {
+    print "<HTML><BODY>\n";
+    print "<PRE>";
+    while( <STDIN> ) {
+	basicescape();
+	tagify();
+	print "$_";
+    }
+    print "</PRE>";
+    goto done;
+} 
+
+if (/^internal.lynx-news/) {
+    while( <STDIN> ) {
+	if (/<XMP>/) {
+	    print "<HTML><HEAD><TITLE>News article</TITLE></HEAD><BODY><PRE>";
+	    last;
+	}
+	print "$_";
+    }
+    $first = 1;
+    $skip = 0;
+    while( <STDIN> ) {
+	if ($skip) { $skip--; next; }
+	$first = 0;
+
+	basicescape();
+        s:>+(\S+\@[-a-zA-Z._0-9]*):<A HREF=\"mailto\:$1\">$1</A>:;
+	s#From:(.*)#<B>From:$1</B>#;
+	s#Subject:(.*)#<B>Subject:$1</B>#;
+        s#(\S+\@[-a-zA-Z._0-9]*)#<A HREF="mailto:$1">$1</A>#;
+	if (/^Mime-Version/) { next; }
+	if (/^Message-ID/) { next; }
+	if (/^NNTP-Posting-Host/) { next; }
+	if (/^Content-Type/) { next; }
+	if (/^Lines/) { next; }
+	if (/^Newsgroups/) { 
+	    s#([a-zA-Z]*\.[a-zA-Z.]*)#<A HREF="$1">$1</A>#g;
+	}
+	if (/^Path/) { $skip = 1; next; }
+
+	if (/^\s*$/) { print "\n\n"; last; }
+	print "$_";
+    }
+    while( <STDIN> ) {
+	basicescape();
+	tagify();
+	s#&lt;/XMP&gt;#</PRE>#;
+	print "$_";
+    }
+    goto done;
+}
+
+if (/^internal.hexdump/) {
+    print "<h1>Hexdump</h1>\n";
+    print "<pre>\n";
+    open( INPUT, 'od -A x -t xC |' );
+    while ( <INPUT> ) {
+	print $_;
+    }
+    goto done;
+}
+
+
+$filename = $ARGV[2];
+$filename =~ s#.*/##;
+$tmpname = `mktemp /tmp/$filename.conv.XXXXXX`;
+$filetype = $_;
+
+open( INPUT, "cat > $tmpname |" );
+while ( <INPUT> ) {
+    print $_;
+}
+
+$_ = $filetype;
+if (/^application.postscript/) {
+    print "<h1>Postscript</h1>\n";
+    print "<p>External application <tt>gv $tmpname</tt> was called for you. Press <i>back</i> when you are done.\n";
+
+    system( "gv $tmpname &" );
+    goto done;
+}
+
+if (/^application.pdf/) {
+    print "<h1>Pdf</h1>\n";
+    print "<p>External application <tt>gv $tmpname</tt> was called for you. Press <i>back</i> when you are done.\n";
+
+    system( "gv $tmpname &" );
+    goto done;
+}
+
+print "<h1>Unknown data type</h1>\n";
+print "<p>File with unkown type <TT>$_</TT> was encountered. If it can reasonably be converted to text/html, add conversion routine to <CODE>gnome-convert</CODE> script.\n";
+print "<p>File has been saved into <TT>$tmpname</TT>, delete it if you don't need it.\n";
+
+print "<p>Additionaly, you may\n<ul>\n";
+print "<li><A HREF=\"(text/plain)file:$tmpname\">View it as text</A>\n";
+print "<li><A HREF=\"(text/html)file:$tmpname\">View it as html</A>\n";
+print "<li><A HREF=\"(internal/hexdump)file:$tmpname\">View it as hexdump</A>\n";
+print "</ul>";
+
+$type = `file $tmpname`;
+print "<p>PS: file's type seems to be: <pre>$type</pre>\n";
+
+done:
+print "<HR><P ALIGN=right><I>[$ARGV[2]: $ARGV[0] -&gt; $ARGV[1]]</I></BODY></HTML>";

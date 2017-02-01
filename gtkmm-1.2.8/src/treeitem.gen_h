@@ -1,0 +1,118 @@
+/* $Id: treeitem.gen_h,v 1.53 2001/02/10 00:52:24 kenelson Exp $ */
+
+/* treeitem.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/item.h>
+#include <gtk/gtktreeitem.h>
+CLASS_START(Gtk);
+class Tree;
+class TreeItem : public Item {
+  WRAP_CLASS(TreeItem,GtkTreeItem,GTK_TREE_ITEM,GTK_IS_TREE_ITEM,tree_item,Gtk::Item,GtkItem,GTK_ITEM);
+public:
+
+/* 
+  Not implemented:
+    these are defined in base class, not needed here 
+      void select();
+      void deselect();
+*/
+
+  explicit TreeItem(const Gdk_Pixmap &pixmap,
+                    const Gdk_Bitmap &bitmap,
+                    const string &label,
+                    gfloat x=0.0,
+                    gfloat y=0.5);
+
+  explicit TreeItem(const string &label,gfloat x=0.0,gfloat y=0.5);
+  WRAP_CTOR_CAST;
+  WRAP_CTOR_DEFAULT;
+  WRAP_DTOR;
+
+  WRAP_MEMBER(value,subtree,subtree,Gtk::Tree*,GtkWidget*);
+
+  //- You cannot do set_subtree before you've added the treeitem to some
+  //- container. (Setting subtree requires parent of the TreeItem to exists
+  //- and it doesnt exists until you added it to some container.)
+  WRAP_METHOD(
+    void gtk_tree_item_set_subtree(GtkTreeItem*,GtkWidget*),
+    void set_subtree(Gtk::Widget &subtree));
+
+  WRAP_METHOD( 
+    void gtk_tree_item_remove_subtree (GtkTreeItem *),
+    void remove_subtree());
+
+  SIGNAL_SPEC("expand",both,void expand(),gtk_tree_item_expand);
+  SIGNAL_SPEC("collapse",both,void collapse(),gtk_tree_item_collapse);
+};
+
+PRIVATE_START;
+#include <gtk--/private/item_p.h>
+IMPL_START;
+#include <gtk--/tree.h>
+namespace Gtk
+{
+
+TreeItem::TreeItem(const string &label,gfloat x,gfloat y)
+  :     Item((GtkItem*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  add_label(label,x,y);
+}
+
+TreeItem::TreeItem(const Gdk_Pixmap &pixmap,
+                    const Gdk_Bitmap &bitmap,
+                    const string &label,
+                    gfloat x,
+                    gfloat y)
+  :     Item((GtkItem*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  add_pixlabel(pixmap,bitmap,label,x,y);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_TreeItem)
+//. name: subtree
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: pixmaps_box
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: pixmaps
+//. type: GList*
+//. get:
+//. set:
+//. desc: pixmap node for this items color depth 
+
+//. name: expanded
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

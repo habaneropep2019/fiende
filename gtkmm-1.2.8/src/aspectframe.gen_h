@@ -1,0 +1,159 @@
+/* $Id: aspectframe.gen_h,v 1.34 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* aspectframe.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/frame.h>
+#include <gtk/gtkaspectframe.h>
+CLASS_START(Gtk);
+
+//: A frame that constrains its child to a particular aspect ratio.
+//- The GtkAspectFrame is useful when you want pack a widget so that it can resize but always
+//- retains the same aspect ratio. For instance, one might be drawing a small preview of a
+//- larger image. GtkAspectFrame derives from GtkFrame, so it can draw a label and a frame
+//- around the child. The frame will be "shrink-wrapped" to the size of the child.
+class AspectFrame : public Frame {
+  WRAP_CLASS(AspectFrame,GtkAspectFrame,GTK_ASPECT_FRAME,GTK_IS_ASPECT_FRAME,aspect_frame,Gtk::Frame,GtkFrame,GTK_FRAME);
+
+  void construct(const char *label,
+                  gfloat xalign,
+                  gfloat yalign,
+                  gfloat ratio,
+                  bool obey_child);
+public:
+  //: Constructor with label.
+  //- label: Label text.
+  //-
+  //- xalign: Horizontal alignment of the child within the allocation of the GtkAspectFrame.
+  //- This ranges from 0.0 (left aligned) to 1.0 (right aligned).
+  //-
+  //- yalign: Vertical alignment of the child within the allocation of the GtkAspectFrame.
+  //- This ranges from 0.0 (left aligned) to 1.0 (right aligned).
+  //-
+  //- ratio: The desired aspect ratio.
+  //-
+  //- obey_child: If TRUE, ratio is ignored, and the aspect ratio is taken from the requistion
+  //- of the child.
+  AspectFrame(const string &label,
+		  gfloat xalign,
+		  gfloat yalign,
+		  gfloat ratio=1.0,
+		  bool obey_child=false);
+
+  //: Constructor without a label.
+  //- The rest of the arguments are the same as above.
+  AspectFrame(gfloat xalign,
+		  gfloat yalign,
+		  gfloat ratio=1.0,
+		  bool obey_child=false);
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Set parameters for the GtkAspectFrame.
+  WRAP_METHOD(
+    void gtk_aspect_frame_set(GtkAspectFrame*,gfloat,gfloat,gfloat,gint),
+    void set(gfloat xalign,
+	   gfloat yalign,
+	   gfloat ratio,
+	   gint obey_child));
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/frame_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+#define MAX_RATIO 10000.0
+#define MIN_RATIO 0.0001
+
+void 
+AspectFrame::construct(const char* label,
+                           gfloat xalign,
+                           gfloat yalign,
+                           gfloat ratio,
+                           bool obey_child)
+{
+  initialize_class();
+  GtkAspectFrame *aspect_frame=(GtkAspectFrame*)gtkobject;
+  aspect_frame->xalign = CLAMP (xalign, 0.0, 1.0);
+  aspect_frame->yalign = CLAMP (yalign, 0.0, 1.0);
+  aspect_frame->ratio = CLAMP (ratio, MIN_RATIO, MAX_RATIO);
+  aspect_frame->obey_child = obey_child;
+
+  gtk_frame_set_label (GTK_FRAME(aspect_frame), label);
+
+}
+
+AspectFrame::AspectFrame(const string &label,
+				 gfloat xalign,
+				 gfloat yalign,
+				 gfloat ratio,
+				 bool obey_child)
+  : Frame((GtkFrame*)(gtk_object_new(get_type(),0)))
+{
+  construct(label.c_str(),xalign,yalign,ratio,obey_child);
+}
+
+AspectFrame::AspectFrame(gfloat xalign,
+				 gfloat yalign,
+				 gfloat ratio,
+				 bool obey_child)
+  : Frame((GtkFrame*)(gtk_object_new(get_type(),0)))
+{
+  construct((char*)0,xalign,yalign,ratio,obey_child);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_AspectFrame)
+//. name: xalign
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: yalign
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: ratio
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: obey_child
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: center_allocation
+//. type: GtkAllocation
+//. get:
+//. set:
+//. desc:
+

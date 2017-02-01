@@ -1,0 +1,344 @@
+<HTML
+><HEAD
+><TITLE
+>Window Hints</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="ZVT Terminal Widget Reference Guide"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Implementation notes"
+HREF="zvtterm-notes.html"><LINK
+REL="PREVIOUS"
+TITLE="Fonts"
+HREF="x1065.html"><LINK
+REL="NEXT"
+TITLE="Other ideas"
+HREF="x1086.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>ZVT Terminal Widget Reference Guide</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x1065.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="x1086.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ZVTTERM-WINDOW-HINTS"
+>Window Hints</A
+></H1
+><P
+>	Currently it is up to the calling application to appropriately
+	setup the window hints for the application so the terminal will
+	size properly (i.e. to the nearest character cell position).
+	This can be set using the gtk function
+	gtk_window_set_geometry_hints().
+      </P
+><P
+>If the application's main window area is not the terminal
+	then it may not make sense to set these hints - the terminal
+	will still operate and resize correctly, but may be resized to
+	fractions of a character cell, which will leave a blank space
+	along the right and/or bottom edges.
+      </P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1077"
+></A
+><P
+><B
+>Example 2. A realize signal handler which sets the
+	  window hints for character-accurate window resizing.</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static void
+set_hints (GtkWidget *widget)
+{
+        ZvtTerm *term;
+	GdkGeometry hints;
+	GtkWidget *app;
+
+	g_assert (widget != NULL);
+	term = ZVT_TERM (widget);
+
+	app = gtk_widget_get_toplevel(widget);
+	g_assert (app != NULL);
+
+#define PADDING 2
+	hints.base_width = (GTK_WIDGET (term)-&gt;style-&gt;klass-&gt;xthickness * 2) + PADDING;
+	hints.base_height =  (GTK_WIDGET (term)-&gt;style-&gt;klass-&gt;ythickness * 2);
+
+	hints.width_inc = term-&gt;charwidth;
+	hints.height_inc = term-&gt;charheight;
+	hints.min_width = hints.base_width + hints.width_inc;
+	hints.min_height = hints.base_height + hints.height_inc;
+
+	gtk_window_set_geometry_hints(GTK_WINDOW(app),
+				      GTK_WIDGET(term),
+				      &amp;hints,
+				      GDK_HINT_RESIZE_INC|GDK_HINT_MIN_SIZE|GDK_HINT_BASE_SIZE);
+}
+	</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>The example above sets the window hints so that the window
+	manager will force resizes to the nearest character, and report
+	the character dimensions if it provides that
+	functionality.</P
+><P
+>It should be attached to the terminal instance using
+	gtk_signal_connect_after() so that the hints are set after the
+	window is realized.
+	</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1082"
+></A
+><P
+><B
+>Example 3. Attaching the realize handler to the
+	  terminal</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  gtk_signal_connect_after (
+      GTK_OBJECT (term),
+      "realize",
+      GTK_SIGNAL_FUNC (set_hints),
+      term);
+        </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>It must also be called whenever the font is changed, to
+      get the correct behavior.  Only do this if the terminal is
+      realized.  Simply call this set_hints() function immediately
+      after calling one of the zvt_term_set_font*() functions, after
+      checking that the given terminal is actually realized
+      (using GTK_WIDGET_IS_REALIZED()).
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x1065.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="x1086.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Fonts</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Other ideas</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,664 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Functions provided by GnomeAppHelper</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Automatic menu and toolbar creation with GnomeAppHelper"
+HREF="gnome-app-helper.html"><LINK
+REL="PREVIOUS"
+TITLE="Format information for the configuration of keybindings
+      for standard mens"
+HREF="gnome-app-helper-keybindings-config.html"><LINK
+REL="NEXT"
+TITLE="The GnomeCanvas widget"
+HREF="gnome-canvas.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="gnome-app-helper-keybindings-config.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Automatic menu and toolbar creation with GnomeAppHelper</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="gnome-canvas.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GNOME-APP-HELPER-FUNCTIONS"
+>Functions provided by GnomeAppHelper</A
+></H1
+><P
+>	The following is a list of the functions provided by
+	GnomeAppHelper.
+      </P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-APP-FIND-MENU-POS"
+>gnome_app_find_menu_pos - return position of a menu item</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN1805"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_find_menu_pos</TT
+></CODE
+>(GtkWidget *<TT
+CLASS="PARAMETER"
+><I
+>root</I
+></TT
+>, gchar *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>, gint *<TT
+CLASS="PARAMETER"
+><I
+>pos</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1814"
+>Description</A
+></H3
+><P
+>For a menu item specified by <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>, returns item's parent
+        GtkMenuShell and sets *pos to item's position in it if the item is found in the
+        menu tree starting in GtkMenuShell root and NULL otherwise. New menus can later be
+        inserted after the menu-item with a call to:
+        <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>          gtk_menu_shell_insert(GTK_MENU_SHELL(parent), new_item, pos);
+        </PRE
+></TD
+></TR
+></TABLE
+>
+        </P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1819"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  GnomeApp *app;
+          GtkWidget *shell;
+          gint pos;
+
+          shell = gnome_app_find_menu_pos(app-&#62;menubar, "Edit/Sort/Ascending", &#38;pos);
+        </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1822"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>GtkWidget *<TT
+CLASS="PARAMETER"
+><I
+>root</I
+></TT
+>
+            </P
+><P
+>The menu shell at the root of the menu subtree that is to be searched.
+            </P
+></LI
+><LI
+><P
+>gchar *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>
+            </P
+><P
+>Menu path describing the searched-for item.
+              <P
+></P
+><UL
+><LI
+><P
+>the path argument should be in the form "File/.../.../ItemName".
+                  </P
+></LI
+><LI
+><P
+> "" will return position before the first item
+                    in <TT
+CLASS="PARAMETER"
+><I
+>root</I
+></TT
+>.
+                  </P
+></LI
+><LI
+><P
+>"File/" will return position before the first
+                    item of the File submenu.
+                  </P
+></LI
+><LI
+><P
+>                    "File/Settings" will return position after the
+                    Settings item in the File submenu.
+                  </P
+></LI
+><LI
+><P
+>use of  "File/&#60;Separator&#62;" should be obvious. However this stops
+                     after the first separator.
+                  </P
+></LI
+></UL
+>
+            </P
+></LI
+><LI
+><P
+>gint *<TT
+CLASS="PARAMETER"
+><I
+>pos</I
+></TT
+>
+            </P
+><P
+>The integer pointed to by this parameter is set to the position of the
+              menu item described by <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+> in its parent menu shell.
+            </P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-APP-REMOVE-MENUS"
+>gnome_app_remove_menus - remove a number of menu items</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN1852"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_app_remove_menus</TT
+></CODE
+>(GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>, gchar *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>, gint <TT
+CLASS="PARAMETER"
+><I
+>item_count</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1861"
+>Description</A
+></H3
+><P
+>This function removes <TT
+CLASS="PARAMETER"
+><I
+>item_count</I
+></TT
+> items
+          from GnomeApp's menu structure, beginning with item described by
+          <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>.
+          </P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1866"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>            gnome_app_remove_menus(app, "Edit/Sort/Ascending", 2);
+          </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1869"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+              </P
+><P
+>The GnomeApp widget with the menubar containing the items to be removed.
+              </P
+></LI
+><LI
+><P
+>gchar *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>
+              </P
+><P
+>Path describing the first item to be removed. See
+                <TT
+CLASS="FUNCTION"
+>gnome_app_find_menu_pos</TT
+> for more information on menu paths.
+              </P
+></LI
+><LI
+><P
+>gint <TT
+CLASS="PARAMETER"
+><I
+>item_count</I
+></TT
+>
+              </P
+><P
+>Number of subsequent items to remove.
+              </P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-APP-INSERT-MENUS"
+>gnome_app_insert_menus - insert menu structure in a GnomeApp's menubar</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN1887"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_app_insert_menus</TT
+></CODE
+>(GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>, gchar *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>, GnomeUIInfo *<TT
+CLASS="PARAMETER"
+><I
+>uiinfo</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1896"
+>Description</A
+></H3
+><P
+>Inserts menu structure described by <TT
+CLASS="PARAMETER"
+><I
+>uiinfo</I
+></TT
+> at position
+            described by <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>.
+          </P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1901"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	    static GnomeUIInfo edit_menu[] = {
+	    { GNOME_APP_UI_ITEM, N_("_Copy"), N_("Copy text"), copy_callback, NULL, NULL,
+	      GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_COPY, 'c', GDK_CONTROL_MASK, NULL },
+	    { GNOME_APP_UI_ITEM, N_("C_ut..."), N_("Cut text"), cut_callback, NULL, NULL,
+	      GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CUT, 'x', GDK_CONTROL_MASK, NULL },
+	    { GNOME_APP_UI_ITEM, N_("_Paste"), N_("Paste clipboard contents"), paste_callback, NULL, NULL,
+	      GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_PASTE, 'v', GDK_CONTROL_MASK, NULL },
+	    GNOMEUIINFO_END
+	    };
+
+	    static GnomeUIInfo more_menus[] = {
+	    { GNOME_APP_UI_ITEM, N_("_Search..."), N_("Search for text"), search_callback, NULL, NULL,
+	      GNOME_APP_PIXMAP_NONE, NULL, 's', GDK_CONTROL_MASK, NULL },
+	    { GNOME_APP_UI_ITEM, N_("_Replace..."), N_("Replace text"), replace_callback, NULL, NULL,
+	      GNOME_APP_PIXMAP_NONE, NULL, 'r', GDK_CONTROL_MASK, NULL },
+	    GNOMEUIINFO_END
+	    };
+
+	    static GnomeUIInfo main_menu[] = {
+	    GNOMEUIINFO_SUBTREE (N_("_Edit"), edit_menu),
+	    GNOMEUIINFO_END
+	    };
+
+            app = gnome_app_new("app", "App");
+            gnome_app_create_menus(app, main_menu);
+
+            /* do something */
+
+            /* insert Search and Replace items after Paste */
+            gnome_app_insert_menus(app, "Edit/Paste", sort_menu);
+          </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN1904"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+              </P
+><P
+>The GnomeApp containing the menubar in which the new items will
+                be inserted.
+              </P
+></LI
+><LI
+><P
+>gchar *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>
+              </P
+><P
+>Path describing the position where the new items will be insterted. See
+                <TT
+CLASS="FUNCTION"
+>gnome_app_find_menu_pos</TT
+> for more information on menu paths.
+              </P
+></LI
+><LI
+><P
+>GnomeUIInfo *<TT
+CLASS="PARAMETER"
+><I
+>uiinfo</I
+></TT
+>
+              </P
+><P
+>A pointer to an array of GnomeUIInfo entries describing the menu items
+                to insert.
+              </P
+></LI
+></UL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gnome-app-helper-keybindings-config.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gnome-canvas.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Format information for the configuration of keybindings
+      for standard mens</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="gnome-app-helper.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The <SPAN
+CLASS="TYPE"
+>GnomeCanvas</SPAN
+> widget</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

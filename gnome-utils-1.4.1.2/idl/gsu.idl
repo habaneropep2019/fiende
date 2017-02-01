@@ -1,0 +1,26 @@
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+
+module GNOME {
+    interface Su {
+        exception UserAbort {};
+        exception NoSuidHelper {};
+        exception IncorrectPassword {};
+        exception CommandNotFound {};
+        exception NoSuchUser {};
+
+        exception CommandFailed {
+            short exitcode;
+        };
+
+        exception UnknownError {
+            string message;
+        };
+
+        typedef sequence<string> arg_seq;
+
+        void su_command (in string user, in string command, in arg_seq args)
+            raises (NoSuidHelper,IncorrectPassword,CommandNotFound,
+                    NoSuchUser,CommandFailed,UnknownError,UserAbort);
+    };
+};
+  

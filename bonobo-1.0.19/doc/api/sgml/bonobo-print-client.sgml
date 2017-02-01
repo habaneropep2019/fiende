@@ -1,0 +1,372 @@
+<refentry id="bonobo-bonobo-print-client">
+<refmeta>
+<refentrytitle>BonoboPrintClient</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboPrintClient</refname><refpurpose>provides an easy interface for supporting remote printing</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboPrintClient">BonoboPrintClient</link>;
+typedef     <link linkend="BonoboPrintClientClass">BonoboPrintClientClass</link>;
+typedef     <link linkend="BonoboPrintData">BonoboPrintData</link>;
+<link linkend="BonoboPrintClient">BonoboPrintClient</link>* <link linkend="bonobo-print-client-new">bonobo_print_client_new</link>  (<link linkend="Bonobo-Print">Bonobo_Print</link> corba_print);
+<link linkend="BonoboPrintClient">BonoboPrintClient</link>* <link linkend="bonobo-print-client-get">bonobo_print_client_get</link>  (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object);
+void        <link linkend="bonobo-print-client-render">bonobo_print_client_render</link>      (<link linkend="BonoboPrintClient">BonoboPrintClient</link> *client,
+                                             <link linkend="BonoboPrintData">BonoboPrintData</link> *pd);
+<link linkend="BonoboPrintData">BonoboPrintData</link>* <link linkend="bonobo-print-data-new">bonobo_print_data_new</link>      (<link linkend="double">double</link> width,
+                                             <link linkend="double">double</link> height);
+<link linkend="BonoboPrintData">BonoboPrintData</link>* <link linkend="bonobo-print-data-new-full">bonobo_print_data_new_full</link> (<link linkend="double">double</link> width,
+                                             <link linkend="double">double</link> height,
+                                             <link linkend="double">double</link> width_first_page,
+                                             <link linkend="double">double</link> width_per_page,
+                                             <link linkend="double">double</link> height_first_page,
+                                             <link linkend="double">double</link> height_per_page);
+void        <link linkend="bonobo-print-data-free">bonobo_print_data_free</link>          (<link linkend="BonoboPrintData">BonoboPrintData</link> *pd);
+<link linkend="GnomePrintMeta">GnomePrintMeta</link>* <link linkend="bonobo-print-data-get-meta">bonobo_print_data_get_meta</link>  (<link linkend="BonoboPrintData">BonoboPrintData</link> *pd);
+void        <link linkend="bonobo-print-data-render">bonobo_print_data_render</link>        (<link linkend="GnomePrintContext">GnomePrintContext</link> *pc,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y,
+                                             <link linkend="BonoboPrintData">BonoboPrintData</link> *pd,
+                                             <link linkend="double">double</link> meta_x,
+                                             <link linkend="double">double</link> meta_y);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The BonoboPrintClient is rather an ugly, but functional API for
+printing remote objects. As with all embeddables sizing and layout
+is controled by the container application.
+</para>
+
+<para>
+Note, if you think that this API needs to be substantialy more
+complicated, handle pagination etc. you are probably not implementing
+your embeddable correctly. Please read the section in <link linkend="BonoboEmbeddable">BonoboEmbeddable</link>
+on <link linkend="BonoboControls">BonoboControls</link>. If you are a 'toplevel' container you get to do
+complicated things, you should merge a print menu into your container
+and do what you like internaly.
+</para>
+
+<para>
+  <example>
+    <title>Basic sample component printing code</title>
+    <programlisting>
+void
+object_print (BonoboObjectClient *object,
+	      GnomePrintContext  *ctx,
+	      gdouble             x,
+	      gdouble             y,
+	      gdouble             width,
+	      gdouble             height)
+{
+	BonoboPrintClient *print_client = bonobo_print_client_get (object);
+	BonoboPrintData   *print_data;
+
+	if (!print_client) /* No remote printing interface - a broken Embeddable */
+		return;
+
+	print_data = bonobo_print_data_new (width, height);
+	bonobo_print_client_render (print_client, print_data);
+	bonobo_print_data_render (ctx, x, y, print_data, 0.0, 0.0);
+	bonobo_print_data_free (print_data);
+
+	gtk_object_unref (GTK_OBJECT (print_client));
+}
+
+void
+sample_app_print_preview (SampleApp *app)
+{
+	GList *l;
+	double ypos = 0.0;
+	GnomePrintMaster *pm;
+	GnomePrintContext *ctx;
+	GnomePrintMasterPreview *pv;
+
+	pm = <link linkend="gnome-print-master-new">gnome_print_master_new</link>();
+	ctx = gnome_print_master_get_context (pm);
+
+	/*
+	 *  The hardcoded 320.0 x 200.0 should be the visible
+	 * point size of the Embeddable in the document.
+	 */
+	for (l = app->components; l; l = l->next) {
+		BonoboClientSite *site = l->data;
+
+		object_print (bonobo_client_site_get_embeddable (site),
+			      ctx, 0.0, ypos, 320.0, 320.0);
+		ypos += 320.0;
+	}
+
+	gnome_print_showpage (ctx);
+	gnome_print_context_close (ctx);
+	gnome_print_master_close (pm);
+
+	pv = gnome_print_master_preview_new (pm, "Component demo");
+	gtk_widget_show  (GTK_WIDGET (pv));
+	gtk_object_unref (GTK_OBJECT (pm));
+}
+    </programlisting>
+  </example>
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboPrintClient">BonoboPrintClient</title>
+<programlisting>typedef struct {
+	GtkObject    parent;
+	Bonobo_Print corba_print;
+} BonoboPrintClient;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboPrintClientClass">BonoboPrintClientClass</title>
+<programlisting>typedef struct {
+	GtkObjectClass			parent;
+} BonoboPrintClientClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboPrintData">BonoboPrintData</title>
+<programlisting>typedef struct {
+	double width;
+	double height;
+	
+	double width_first_page;
+	double width_per_page;
+	double height_first_page;
+	double height_per_page;
+
+	GnomePrintMeta *meta_data;
+} BonoboPrintData;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-client-new">bonobo_print_client_new ()</title>
+<programlisting><link linkend="BonoboPrintClient">BonoboPrintClient</link>* bonobo_print_client_new  (<link linkend="Bonobo-Print">Bonobo_Print</link> corba_print);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>corba_print</parameter>&nbsp;:</entry>
+<entry> a remote Bonobo_Print interface handle
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a newly constructed BonoboPrintClient
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-client-get">bonobo_print_client_get ()</title>
+<programlisting><link linkend="BonoboPrintClient">BonoboPrintClient</link>* bonobo_print_client_get  (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object);</programlisting>
+<para>
+This does a QI on a remote BonoboObjectClient object, and
+if it supports the interface returns a newly constructed
+BonoboPrintClient handle, otherwise NULL.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> the print client
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a new handle or NULL.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-client-render">bonobo_print_client_render ()</title>
+<programlisting>void        bonobo_print_client_render      (<link linkend="BonoboPrintClient">BonoboPrintClient</link> *client,
+                                             <link linkend="BonoboPrintData">BonoboPrintData</link> *pd);</programlisting>
+<para>
+This routine is used to encourage a remote print client
+to print itself. The BonoboPrintData specifies the size
+information for the remote client to render itself to.
+After render the BonoboPrintData contains the meta data
+for the rendered page. This interface is baroque.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client</parameter>&nbsp;:</entry>
+<entry> the print client.
+</entry></row>
+<row><entry align="right"><parameter>pd</parameter>&nbsp;:</entry>
+<entry> the intialized print data
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-data-new">bonobo_print_data_new ()</title>
+<programlisting><link linkend="BonoboPrintData">BonoboPrintData</link>* bonobo_print_data_new      (<link linkend="double">double</link> width,
+                                             <link linkend="double">double</link> height);</programlisting>
+<para>
+This constructs a BonoboPrintData with default scissor data.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> the width in pts of the component to render
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> the height in pts of the component to render
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a new BonoboPrintData object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-data-new-full">bonobo_print_data_new_full ()</title>
+<programlisting><link linkend="BonoboPrintData">BonoboPrintData</link>* bonobo_print_data_new_full (<link linkend="double">double</link> width,
+                                             <link linkend="double">double</link> height,
+                                             <link linkend="double">double</link> width_first_page,
+                                             <link linkend="double">double</link> width_per_page,
+                                             <link linkend="double">double</link> height_first_page,
+                                             <link linkend="double">double</link> height_per_page);</programlisting>
+<para>
+This initializes a BonoboPrintData to contain the above
+parameters so that it can be used by <link linkend="bonobo-print-client-render">bonobo_print_client_render</link></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> the width in pts of the component to render
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> the height in pts of the component to render
+</entry></row>
+<row><entry align="right"><parameter>width_first_page</parameter>&nbsp;:</entry>
+<entry> the clear width available on the first page
+</entry></row>
+<row><entry align="right"><parameter>width_per_page</parameter>&nbsp;:</entry>
+<entry> the width available on subsequent pages
+</entry></row>
+<row><entry align="right"><parameter>height_first_page</parameter>&nbsp;:</entry>
+<entry> the clear height available on the first page
+</entry></row>
+<row><entry align="right"><parameter>height_per_page</parameter>&nbsp;:</entry>
+<entry> the height available on subsequent pages
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a new BonoboPrintData object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-data-free">bonobo_print_data_free ()</title>
+<programlisting>void        bonobo_print_data_free          (<link linkend="BonoboPrintData">BonoboPrintData</link> *pd);</programlisting>
+<para>
+Releases all resources associated with the print data.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pd</parameter>&nbsp;:</entry>
+<entry> the print data
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-data-get-meta">bonobo_print_data_get_meta ()</title>
+<programlisting><link linkend="GnomePrintMeta">GnomePrintMeta</link>* bonobo_print_data_get_meta  (<link linkend="BonoboPrintData">BonoboPrintData</link> *pd);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pd</parameter>&nbsp;:</entry>
+<entry> the print data
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the meta_data from <parameter>pd</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-data-render">bonobo_print_data_render ()</title>
+<programlisting>void        bonobo_print_data_render        (<link linkend="GnomePrintContext">GnomePrintContext</link> *pc,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y,
+                                             <link linkend="BonoboPrintData">BonoboPrintData</link> *pd,
+                                             <link linkend="double">double</link> meta_x,
+                                             <link linkend="double">double</link> meta_y);</programlisting>
+<para>
+This is used to render the print data in <parameter>pd</parameter>
+onto a GnomePrintContext in <parameter>ctx</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pc</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry> the tlc bbox x
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry> the ltc bbox y
+</entry></row>
+<row><entry align="right"><parameter>pd</parameter>&nbsp;:</entry>
+<entry> the print data to render
+</entry></row>
+<row><entry align="right"><parameter>meta_x</parameter>&nbsp;:</entry>
+<entry> the offset into the print data x
+</entry></row>
+<row><entry align="right"><parameter>meta_y</parameter>&nbsp;:</entry>
+<entry> the offset into the print data y
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="BonoboPrint">BonoboPrint</link>, <link linkend="BonoboEmbeddable">BonoboEmbeddable</link>
+</para>
+</refsect1>
+
+</refentry>

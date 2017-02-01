@@ -1,0 +1,296 @@
+<refentry id="GnomeDruid">
+<refmeta>
+<refentrytitle>GnomeDruid</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeDruid</refname><refpurpose>  The main widget of the GNOME druid system.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-druid-new">gnome_druid_new</link>                 (void);
+void        <link linkend="gnome-druid-set-buttons-sensitive">gnome_druid_set_buttons_sensitive</link>
+                                            (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="gboolean">gboolean</link> back_sensitive,
+                                             <link linkend="gboolean">gboolean</link> next_sensitive,
+                                             <link linkend="gboolean">gboolean</link> cancel_sensitive);
+void        <link linkend="gnome-druid-set-show-finish">gnome_druid_set_show_finish</link>     (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="gboolean">gboolean</link> show_finish);
+void        <link linkend="gnome-druid-prepend-page">gnome_druid_prepend_page</link>        (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *page);
+void        <link linkend="gnome-druid-insert-page">gnome_druid_insert_page</link>         (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *back_page,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *page);
+void        <link linkend="gnome-druid-append-page">gnome_druid_append_page</link>         (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *page);
+void        <link linkend="gnome-druid-set-page">gnome_druid_set_page</link>            (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *page);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----GnomeDruid
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    The GNOME druid is a system for assisting the user with installing a
+    service.  It is roughly equivalent in functionality to the
+    "Wizards" available in Windows.
+  </para>
+  <para>
+    There are two major parts of the druid, the <link linkend="GnomeDruid">GnomeDruid</link> widget, and
+    the set of <link linkend="GnomeDruidPage">GnomeDruidPage</link> widgets.  The <link linkend="GnomeDruid">GnomeDruid</link> widget is the
+    main widget that interacts with the user.  It has a Next, a
+    Prev, and a Cancel button, and acts as a container for the pages.
+    It is not a top-level window, so it needs to be put in a
+    <link linkend="GtkWindow">GtkWindow</link> in almost all cases.  The <link linkend="GnomeDruidPage">GnomeDruidPage</link> is a virtual
+    widget, from which all of the actual content of the page inherits
+    from.  There are currently three of these available within
+    gnome-libs.
+  </para>
+  <refsect2>
+    <title>Creating a druid</title>
+    <para>
+      GNOME druids are fairly simple to program with.  You start by
+      creating a <link linkend="GnomeDruid">GnomeDruid</link> into which you put all of your pages.
+      This widget will handle the presentation of the <link linkend="GnomeDruidPage">GnomeDruidPage</link>
+      widgets.
+    </para>
+    <para>
+      You then create all appropriate <link linkend="GnomeDruidPage">GnomeDruidPage</link> widgets.  There
+      are three implementations of these in libgnomeui, although there
+      is no reason why more couldn't be written.  They are the
+      <link linkend="GnomeDruidPageStart">GnomeDruidPageStart</link>, the <link linkend="GnomeDruidPageStandard">GnomeDruidPageStandard</link>, and the
+      <link linkend="GnomeDruidPageFinish">GnomeDruidPageFinish</link>.  The <link linkend="GnomeDruidPageStandard">GnomeDruidPageStandard</link> acts as a
+      <link linkend="GtkContainer">GtkContainer</link>, and is probably the most commonly used druid page.
+      The other ones, as their names might suggest, are used at the
+      endpoints of the druid.  More information on the specific
+      properties of these widgets can be found on their respective
+      pages.
+    </para>
+    <para>
+      You will need to add the pages to the druid in order for them to
+      appear.  The druid itself keeps an internal list of all pages, and
+      using the <link linkend="gnome-druid-prepend-page">gnome_druid_prepend_page</link>(), <link linkend="gnome-druid-append-page">gnome_druid_append_page</link>(),
+      and <link linkend="gnome-druid-insert-page">gnome_druid_insert_page</link>() will place them into it.
+    </para>
+  </refsect2>
+  <refsect2>
+    <title>Managing the control-flow in a druid</title>
+    <para>
+      The control-flow in a druid is managed at the <link linkend="GnomeDruidPage">GnomeDruidPage</link>
+      level, and is a little complex.  The signals available are "back",
+      "next", "finish", "cancel" and "prepare", and all but the last are
+      triggered when their respective buttons are pressed.  In the
+      absence of anything connected to these signals, the druid will
+      cycle through the pages in the order of the internal list, so for
+      a simple druid, just adding the pages in order is sufficient.
+    </para>
+    <para>
+      If the druid has some branching code, then it will be handled at
+      the point of the branch.  The current page will emit the
+      appropriate "next" or "back" signal in this case.  It is up to the
+      druid author to trap this signal when necessary and call
+      <link linkend="gnome-druid-set-page">gnome_druid_set_page</link>() in the handler to go to the correct page.
+      In addition, they will want to return TRUE to let the druid know
+      that it has handled the page change, and to prevent the druid from
+      following its list.
+    </para>
+  </refsect2>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-druid-new">gnome_druid_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_druid_new                 (void);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-druid-set-buttons-sensitive">gnome_druid_set_buttons_sensitive ()</title>
+<programlisting>void        gnome_druid_set_buttons_sensitive
+                                            (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="gboolean">gboolean</link> back_sensitive,
+                                             <link linkend="gboolean">gboolean</link> next_sensitive,
+                                             <link linkend="gboolean">gboolean</link> cancel_sensitive);</programlisting>
+<para>
+Sets the sensitivity of the <parameter>druid</parameter>'s control-buttons.  If the
+variables are TRUE, then they will be clickable.  This function is used
+primarily by the actual GnomeDruidPage widgets.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>druid</parameter>&nbsp;:</entry>
+<entry> A Druid.
+</entry></row>
+<row><entry align="right"><parameter>back_sensitive</parameter>&nbsp;:</entry>
+<entry> The sensitivity of the back button.
+</entry></row>
+<row><entry align="right"><parameter>next_sensitive</parameter>&nbsp;:</entry>
+<entry> The sensitivity of the next button.
+</entry></row>
+<row><entry align="right"><parameter>cancel_sensitive</parameter>&nbsp;:</entry>
+<entry> The sensitivity of the cancel button.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-druid-set-show-finish">gnome_druid_set_show_finish ()</title>
+<programlisting>void        gnome_druid_set_show_finish     (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="gboolean">gboolean</link> show_finish);</programlisting>
+<para>
+Sets the text on the last button on the <parameter>druid</parameter>.  If <parameter>show_finish</parameter>
+is TRUE, then the text becomes "Finish".  If <parameter>show_finish</parameter> is FALSE, then the
+text becomes "Cancel".</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>druid</parameter>&nbsp;:</entry>
+<entry> A Druid widget.
+ # <parameter>show_finish</parameter>: If TRUE, then the "Cancel" button is changed to be "Finish"
+</entry></row>
+<row><entry align="right"><parameter>show_finish</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-druid-prepend-page">gnome_druid_prepend_page ()</title>
+<programlisting>void        gnome_druid_prepend_page        (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *page);</programlisting>
+<para>
+This will prepend a GnomeDruidPage into the internal list of
+pages that the <parameter>druid</parameter> has.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>druid</parameter>&nbsp;:</entry>
+<entry> A Druid widget.
+</entry></row>
+<row><entry align="right"><parameter>page</parameter>&nbsp;:</entry>
+<entry> The page to be inserted.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-druid-insert-page">gnome_druid_insert_page ()</title>
+<programlisting>void        gnome_druid_insert_page         (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *back_page,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *page);</programlisting>
+<para>
+This will insert <parameter>page</parameter> after <parameter>back_page</parameter> into the list of
+internal pages that the <parameter>druid</parameter> has.  If <parameter>back_page</parameter> is not present in the list
+or NULL, <parameter>page</parameter> will be prepended to the list.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>druid</parameter>&nbsp;:</entry>
+<entry> A Druid widget.
+</entry></row>
+<row><entry align="right"><parameter>back_page</parameter>&nbsp;:</entry>
+<entry> The page prior to the page to be inserted.
+</entry></row>
+<row><entry align="right"><parameter>page</parameter>&nbsp;:</entry>
+<entry> The page to insert.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-druid-append-page">gnome_druid_append_page ()</title>
+<programlisting>void        gnome_druid_append_page         (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *page);</programlisting>
+<para>
+This will append <parameter>page</parameter> onto the end of the internal list.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>druid</parameter>&nbsp;:</entry>
+<entry> A Druid widget.
+</entry></row>
+<row><entry align="right"><parameter>page</parameter>&nbsp;:</entry>
+<entry> The page to be appended.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-druid-set-page">gnome_druid_set_page ()</title>
+<programlisting>void        gnome_druid_set_page            (<link linkend="GnomeDruid">GnomeDruid</link> *druid,
+                                             <link linkend="GnomeDruidPage">GnomeDruidPage</link> *page);</programlisting>
+<para>
+This will make <parameter>page</parameter> the currently showing page in the druid.
+<parameter>page</parameter> must already be in the druid.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>druid</parameter>&nbsp;:</entry>
+<entry> A Druid widget.
+</entry></row>
+<row><entry align="right"><parameter>page</parameter>&nbsp;:</entry>
+<entry> The page to be brought to the foreground.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+  <para>
+    <link linkend="GnomeDruidPage">GnomeDruidPage</link>, <link linkend="GnomeDruidPageStart">GnomeDruidPageStart</link>, <link linkend="GnomeDruidPageStandard">GnomeDruidPageStandard</link>, <link linkend="GnomeDruidPageFinish">GnomeDruidPageFinish</link>
+  </para>
+</refsect1>
+
+</refentry>

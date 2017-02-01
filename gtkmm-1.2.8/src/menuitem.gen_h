@@ -1,0 +1,217 @@
+/* $Id: menuitem.gen_h,v 1.49 2001/07/15 13:33:38 murrayc Exp $ */
+
+
+/* menuitem.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/item.h>
+#include <gtk/gtkmenuitem.h>
+
+CLASS_START(Gtk);
+class Menu;
+
+//: The widget used for item in menus.
+//- The {\class Gtk::MenuItem} widget and the derived widgets are the only valid
+//- childs for menus. Their function is to correctly handle highlighting,
+//- alignment, events and submenus.
+//-
+//- As it derives from {\class Gtk::Bin} it can hold any valid child widget,
+//- altough only a few are really useful.
+class MenuItem : public Item {
+  WRAP_CLASS(MenuItem,GtkMenuItem,GTK_MENU_ITEM,GTK_IS_MENU_ITEM,menu_item,Gtk::Item,GtkItem,GTK_ITEM);
+public:
+  //: create an empty menu item
+  MenuItem();
+
+  //: create a menu item with label
+  MenuItem(const string &label,gfloat x=0.0,gfloat y=0.5);
+
+  WRAP_DTOR;
+
+  WRAP_MEMBER(value,submenu,submenu,Gtk::Menu*,GtkWidget*);
+  bool has_submenu() { return (gtkobj()->submenu)!=0; }
+  //: Make this item a cascading menu
+  WRAP_METHOD(
+     void gtk_menu_item_set_submenu(GtkMenuItem*,GtkWidget*),
+     void set_submenu   (Gtk::Menu &submenu));
+
+  //: Remove the item's attached submenu
+  WRAP_METHOD(void gtk_menu_item_remove_submenu(GtkMenuItem*),
+	      void remove_submenu());
+
+  WRAP_METHOD(void gtk_menu_item_set_placement(GtkMenuItem*,GtkSubmenuPlacement),
+	      void set_placement (GtkSubmenuPlacement placement));
+
+  WRAP_METHOD(void gtk_menu_item_configure(GtkMenuItem*,gint,gint),
+	      void configure(gint show_toggle_indicator,
+			     gint show_submenu_indicator));
+
+  WRAP_METHOD(void gtk_menu_item_right_justify(GtkMenuItem*),
+	      void right_justify());
+
+  // gtk_menu_item_(de)select are just a wrapper for gtk_item_(de)select
+  // and defined in Gtk_Item, so they do not be redefined here
+  
+  SIGNAL_SPEC("activate",both,void activate(),gtk_menu_item_activate);
+  SIGNAL_SPEC("activate_item",both,void activate_item());
+
+  /* these are internal and will become private */
+  guint accel_key;
+  guint nav_key;
+  Label* accel_label_;
+  void show_accel_label();
+  void hide_accel_label();
+  void accelerate();
+  // this is a hack to insert accelerators in realized widgets
+  // without breaking binary compatiblity.  Move to realize_impl
+};
+
+PRIVATE_START;
+#include <gtk--/private/item_p.h>
+IMPL_START;
+#include <gtk--/label.h>
+#include <gtk--/misc.h>
+#include <gtk--/menu.h>
+#include <gtk--/box.h>
+#include <gtk--/window.h>
+#include <gtk--/menubar.h>
+
+// gtk_menu_item_(de)select are just a wrapper for gtk_item_(de)select
+// and defined in Gtk_Item, so they do not be redefined here
+
+namespace Gtk {
+void 
+MenuItem::accelerate()
+  {
+    using namespace Menu_Helpers;
+
+    MenuShell* parent=dynamic_cast<MenuShell*>(get_parent());
+    Window* window=(Window*)parent->get_data("gtkmm-accel-window");
+    AccelGroup* nav_group=parent->get_accel_group();
+    AccelGroup* accel_group=(window?window->get_accel_group():0);
+    bool in_menubar=Gtk::MenuBar::isA(parent);
+
+    AccelKey accel(accel_key);
+    AccelKey nav(nav_key);
+    if (accel_group&&accel.key()!=GDK_VoidSymbol)
+      {
+        add_accelerator("activate_item",*accel_group,
+                        accel.key(),accel.mod(),GtkAccelFlags(0));
+        if (!in_menubar) show_accel_label();
+      }
+    
+    if (nav_group&&!in_menubar&&nav.key()!=GDK_VoidSymbol)
+      add_accelerator("activate_item",*nav_group, 
+                      nav.key(), nav.mod(), GtkAccelFlags(0));
+
+    if (window&&has_submenu()) get_submenu()->accelerate(*window); 
+  }
+
+}
+
+Gtk::MenuItem::MenuItem(const string &label,gfloat x,gfloat y)
+  : Item((GtkItem*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  add_label(label,x,y);
+  accel_key=nav_key=GDK_VoidSymbol;
+  accel_label_=0;
+}
+
+Gtk::MenuItem::MenuItem()
+  : Item((GtkItem*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  accel_key=nav_key=GDK_VoidSymbol;
+  accel_label_=0;
+}
+
+Gtk::MenuItem::MenuItem(GtkMenuItem *castitem)
+  : Item((GtkItem*)(castitem))
+{
+  initialize_class();
+  accel_key=nav_key=GDK_VoidSymbol;
+  accel_label_=0;
+}
+
+void Gtk::MenuItem::show_accel_label()
+{
+  if (accel_label_) 
+    { 
+      accel_label_->show();
+      return;
+    }
+
+  if (accel_key==GDK_VoidSymbol) return;
+
+  Widget *contents=get_child();
+
+  if (!contents) return;
+  if (!Box::isA(contents))
+    {
+      SigC::Reference hc(*contents);
+      Box *box=manage(new HBox());
+      remove();
+      add(*box);
+      box->pack_start(*contents);
+      box->set_spacing(15);
+      box->show_all();
+      contents=box;
+    }
+
+  accel_label_=manage(new Label(Menu_Helpers::AccelKey(accel_key).abrev(),1.0,0.5));
+  ((Box*)contents)->pack_end(*accel_label_);
+  accel_label_->show();
+}
+
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(gtkmenuitem)
+
+//. name: submenu
+//. type: Gtk_Menu*
+//. get: {get_submenu()}
+//. set: {set_submenu()}
+//. desc: The submenu (e.g. cascading menu) this item may hold
+
+//. name: show_toggle_indicator
+//. type: bool
+//. get: none
+//. set: {configure()}
+//. desc: Unused.
+
+//. name: show_submenu_indicator
+//. type: bool
+//. get: none
+//. set: {configure()}
+//. desc: If the item holds a submenu and this flag is set,
+//. an arrow next to the item's label will be drawn
+
+//. name: submenu_placement
+//. type: guint:1
+//. get: none
+//. set: {set_placement()}
+//. desc: Can be set to {\enum GTK_TOP_BOTTOM, GTK_LEFT_RIGHT} 
+
+//. name: right_justify
+//. type: bool
+//. get: none
+//. set: {right_justify()}
+//. desc: {right_justify()} forces this flag to true

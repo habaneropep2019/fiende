@@ -1,0 +1,252 @@
+/* $Id: mdi-child.gen_h,v 1.17 2001/05/10 00:07:03 murrayc Exp $ */
+
+
+/* mdi-child.gen_h
+ * 
+ * Copyright (C) 1999, 2001 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/object.h>
+#include <gtk--/widget.h>
+#include <gnome--/app.h>
+#include <libgnomeui/gnome-mdi-child.h>
+
+CLASS_START(Gnome);
+class MDI;
+class MDIChild : public Gtk::Object
+{
+  WRAP_CLASS(MDIChild, GnomeMDIChild,
+             GNOME_MDI_CHILD, GNOME_IS_MDI_CHILD,
+             mdi_child,
+             Gtk::Object, GtkObject, GTK_OBJECT);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(void gnome_mdi_child_set_name (GnomeMDIChild*, const gchar*),
+	      void set_name (const Gtk::string& name));
+  WRAP_MEMBER(value,name,name,Gtk::string, char*);
+
+  //: Set the template from which child menus will be created.
+  // wrapper for gnome_mdi_child_set_menu_template
+  void create_menus(const UI::Array<UI::SubTree>& menu_tmpl);
+
+  // parent is set by adding child to MDI
+  WRAP_MEMBER(value, parent, parent, Gnome::MDI*, GtkObject*);
+
+  // Returns a default view.
+  Gtk::Widget* get_active();
+
+  //void set_active(); //FIXME: Not implemented? Should the child remember a view?
+  void set_active(Gtk::Widget& view);
+
+  void update();
+
+  // Creates a view 
+  Gtk::Widget* create_view();
+  Gtk::Widget* create_toplevel_view();
+
+  //void remove_view(); //FIXME: Not implemented? //What view?
+  bool remove_view(Gtk::Widget& view, bool force = false);
+
+  void set_config_string(const Gtk::string& config_string);
+
+protected:
+  //: Create a view of this widget.  
+  //- This must be derived
+  virtual Gtk::Widget* create_view_impl();
+
+  //: Create a custom title for this child
+  //- override this if you want the child to have something other
+  //- than the child name.  
+  virtual Gtk::Widget* create_title_impl();
+  virtual void update_title_impl(Gtk::Widget&);
+
+private:
+  UI::Array<UI::SubTree> menus_;
+  Gtk::string config_string_; //Set this in derived instances.
+  //static GnomeMDIChildLabelFunc default_set_label_impl;
+
+//This goes into MDIChild_Class:
+GTKMM_SECTION(PRIVATE)
+  static GtkWidget* create_view(GnomeMDIChild* child , gpointer data);
+  static gchar*     get_config_string(GnomeMDIChild* child, gpointer data);
+  static GtkWidget* set_label(GnomeMDIChild* child, GtkWidget* label , gpointer data);
+GTKMM_SECTION(CINIT)
+  klass->create_view=&create_view;
+  klass->get_config_string=&get_config_string;
+  klass->set_label=&set_label;
+
+GTKMM_SECTION(CLASS)
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/object_p.h>
+IMPL_START;
+#include <gnome--/mdi.h>
+#include <gnome--/private/mdi-child_p.h>
+#include <libgnomeui/gnome-mdi.h>
+
+namespace Gnome {
+
+Gtk::Widget* MDIChild::get_active()
+  { return Gtk::wrap((GtkWidget*)(((GnomeMDI*)(gtkobj()->parent))->active_view));}
+
+
+
+void MDIChild::create_menus(const UI::Array<UI::SubTree> &menu_tmpl)
+  {
+    menus_=menu_tmpl;
+    gnome_mdi_child_set_menu_template(gtkobj(), menus_.gtkobj());
+  }
+
+void MDIChild::update()
+  {
+    gnome_mdi_update_child((GnomeMDI*)(gtkobj()->parent), gtkobj());
+  }
+
+void MDIChild::set_active(Gtk::Widget& view)
+  {
+    gnome_mdi_set_active_view((GnomeMDI*)(gtkobj()->parent), view.gtkobj());
+  }
+
+
+Gtk::Widget* MDIChild::create_view()
+  {
+    if(gnome_mdi_add_view( (GnomeMDI*)(gtkobj()->parent), gtkobj()) )
+    {
+      return Gtk::wrap((GtkWidget *)(g_list_last(gtkobj()->views)->data));
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+Gtk::Widget* MDIChild::create_toplevel_view()
+  {
+    if( gnome_mdi_add_toplevel_view((GnomeMDI*)(gtkobj()->parent), gtkobj()) )
+    {
+      return Gtk::wrap( (GtkWidget*)(g_list_last(gtkobj()->views)->data) );
+    }
+    else
+    {
+       return 0;
+    }
+  }
+
+//vfunc is in MDIChild's class struct.
+//This delegates it to the C++ class,
+//so that it can be overridden.
+GtkWidget* MDIChild_Class::create_view(GnomeMDIChild* child , gpointer data)
+  {
+    Gnome::MDIChild* obj=
+      static_cast<Gnome::MDIChild*>(gtk_object_get_data_by_id((GtkObject*)child, Gtk::quark_));
+
+    if(obj)
+    {
+      return (GtkWidget*)Gtk::unwrap(obj->create_view_impl());
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+//vfunc is in MDIChild's class struct.
+//This delegates it to the C++ class,
+//so that it can be overridden (by changing the value of config_string_
+gchar* MDIChild_Class::get_config_string(GnomeMDIChild* child, gpointer data)
+  {
+    Gnome::MDIChild* obj=
+      static_cast<Gnome::MDIChild*>(gtk_object_get_data_by_id((GtkObject*)child,Gtk::quark_));
+
+    if(obj && !obj->config_string_.empty())
+    {
+       return g_strdup(obj->config_string_.c_str());
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+GtkWidget* MDIChild_Class::set_label(GnomeMDIChild* child, GtkWidget* label , gpointer data)
+  {
+    Gnome::MDIChild* obj=
+      static_cast<Gnome::MDIChild*>(gtk_object_get_data_by_id((GtkObject*)child, Gtk::quark_));
+
+    if (obj)
+    {
+      if (label)
+      {
+        obj->update_title_impl(*Gtk::wrap(label));
+        return label;
+      }
+      else
+      {
+        label= (GtkWidget*)Gtk::unwrap(obj->create_title_impl());
+      }
+    }
+
+    if (!label)
+    {
+      BaseClassType* base=
+      static_cast<BaseClassType*>(
+        gtk_type_parent_class(((GtkObject*)child)->klass->type));
+
+      label = (base->set_label)(child, label, data);
+
+    }
+
+    return label;
+  }
+
+bool MDIChild::remove_view(Gtk::Widget& view, bool force /* = false */)
+{
+  return (bool)
+    gnome_mdi_remove_view((GnomeMDI*)(gtkobj()->parent), view.gtkobj(), (gboolean)force);
+}
+
+
+void MDIChild::set_config_string(const Gtk::string& config_string)
+{
+  config_string_ = config_string;
+}
+
+Gtk::Widget* MDIChild::create_view_impl()
+  {
+    g_error ("MDIChild::create_view_impl not overriden\n");
+    return 0;
+  }
+
+Gtk::Widget* MDIChild::create_title_impl()
+  {
+    return 0;
+  }
+
+void MDIChild::update_title_impl(Gtk::Widget&)
+  {
+  }
+
+}
+
+DOCUMENTATION_START;

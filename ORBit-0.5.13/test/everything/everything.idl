@@ -1,0 +1,212 @@
+/*
+ * CORBA C language mapping tests
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Author: Phil Dawes <philipd@users.sourceforge.net>
+ */
+
+#pragma prefix "orbit"
+
+module test {
+	const char CONST_CHAR = 't';
+	const short CONST_SHORT = 0x1234;
+	const long CONST_LONG = 0x12345678;
+	const long long CONST_LONGLONG = 0x12345678;
+	const string CONST_STRING = "ConstString";
+	const float CONST_FLOAT = 1234.56;
+	const double CONST_DOUBLE = 1234.5678;
+	const boolean CONST_BOOLEAN = TRUE;
+	enum Colour { red, green, blue }; 
+	const Colour FAVORITE_COLOUR = red; 
+
+
+	// Forward declarations
+	interface BasicServer;
+  
+	interface StructServer;
+	interface SequenceServer;
+	interface UnionServer;
+	interface ArrayServer;
+	interface AnyServer;
+	interface BaseServer;
+	interface B1;
+	interface B2;
+	interface DerivedServer;
+	interface TransientObj;
+
+	interface TestFactory {
+		BasicServer getBasicServer();
+		StructServer getStructServer();
+		SequenceServer getSequenceServer();
+		UnionServer getUnionServer();
+		ArrayServer getArrayServer();
+		AnyServer getAnyServer();
+		BaseServer getBaseServer();
+		DerivedServer getDerivedServer();
+		BaseServer getDerivedServerAsBaseServer();
+		B2 getDerivedServerAsB2();
+		TransientObj createTransientObj();
+	};
+
+	interface TransientObj {
+		void remove();
+	};
+
+
+	struct FixedLengthStruct {
+		short a;
+	};
+  
+	struct VariableLengthStruct {
+		string a;
+	};
+
+	struct CompoundStruct {
+		VariableLengthStruct a;
+	};
+
+
+	interface StructServer {
+		FixedLengthStruct opFixed(in FixedLengthStruct inArg, 
+								  inout FixedLengthStruct inoutArg,
+								  out FixedLengthStruct outArg);
+		VariableLengthStruct opVariable(in VariableLengthStruct inArg, 
+								  inout VariableLengthStruct inoutArg,
+								  out VariableLengthStruct outArg);
+		CompoundStruct opCompound(in CompoundStruct inArg, 
+								  inout CompoundStruct inoutArg,
+								  out CompoundStruct outArg);
+	};
+
+	typedef sequence<string> StrSeq;
+	typedef sequence<CompoundStruct,2> BoundedStructSeq;
+	typedef sequence<long,2> BoundedLongSeq;
+	typedef sequence<long> LongSeq;
+	typedef sequence<StrSeq> StrSeqSeq;
+	typedef sequence<any> AnySeq;
+
+	struct StructWithSequenceInIt {
+		StrSeqSeq theSeq;
+	};
+
+
+	interface SequenceServer {
+		StrSeq opStrSeq(in StrSeq inArg, inout StrSeq inoutArg, out StrSeq outArg);
+		BoundedStructSeq opBoundedStructSeq(in BoundedStructSeq inArg,
+											inout BoundedStructSeq inoutArg,
+											out BoundedStructSeq outArg);
+	};
+  
+	enum AnEnum { 
+		ENUM_IN,
+ 		ENUM_INOUT_IN,
+		ENUM_INOUT_OUT,
+		ENUM_OUT,
+		ENUM_RETN
+	};
+  
+	exception TestException {
+	  string reason;
+	  long number;
+	  LongSeq aseq;
+	  TestFactory factory;
+	};
+
+	typedef long LongArray[2];
+	typedef string StrArray[2];
+	typedef string StrArrayMultiDimensional[2][3][5];
+	typedef VariableLengthStruct VariableLengthStructArray[2];
+
+	interface ArrayServer {
+		LongArray opLongArray(in LongArray inArg, inout LongArray inoutArg, out LongArray outArg);
+		StrArray opStrArray(in StrArray inArg, inout StrArray inoutArg, out StrArray outArg);
+	};
+  
+	interface BasicServer {
+		attribute string foo;
+		readonly attribute long bah;
+		string opString(in string inArg, inout string inoutArg, out string outArg);
+		long opLong(in long inArg, inout long inoutArg, out long outArg);
+		AnEnum opEnum(in AnEnum inArg, inout AnEnum inoutArg, out AnEnum outArg);
+		void opException() raises(TestException);
+	};
+
+	interface BaseServer {
+		long opPolymorphic();
+		attribute string attribPolymorphic;
+	};
+
+	// diamond of death, + an additional single inheritance level
+	interface B1 : BaseServer{};
+	interface B2 : BaseServer{};
+	interface C1 : B1,B2 {};
+
+	interface DerivedServer : C1 {};
+
+	union FixedLengthUnion switch (char) {
+	case 'a': long x;
+	case 'b': char y;
+	case 'c': 
+	case 'd': boolean z;
+	case 'e': FixedLengthStruct v;
+	};
+
+	union VariableLengthUnion switch (long) {
+	case 1: long x;
+	default: long w;
+	case 2: string y;
+	case 3: 
+	case 4: boolean z;
+	case 5: VariableLengthStruct a;
+	case 6: StrSeq b;
+	case 7: FixedLengthUnion c;
+	case 8: StrArray d;
+	};
+
+	union EnumUnion switch (Colour) {
+	case red: long x;
+	case blue: boolean y;
+	};
+
+	union BooleanUnion switch(boolean) {
+	case 0: VariableLengthStruct x;
+	case 1: string y;
+	};
+
+	typedef string StrArray2[20];
+
+	union ArrayUnion switch(boolean) {
+	case 0: StrArray2 d;
+	};
+
+	interface UnionServer {
+		FixedLengthUnion opFixed(in FixedLengthUnion inArg, 
+								  inout FixedLengthUnion inoutArg,
+								  out FixedLengthUnion outArg);
+		VariableLengthUnion opVariable(in VariableLengthUnion inArg, 
+								  inout VariableLengthUnion inoutArg,
+								  out VariableLengthUnion outArg);
+	};
+
+	interface AnyServer {
+		any opAnyStrSeq();
+		any opAnyLong(in any inArg, inout any inoutArg, out any outArg);
+		any opAnyString(in any inArg, inout any inoutArg, out any outArg);
+		any opAnyStruct(in any inArg, inout any inoutArg, out any outArg);
+		TypeCode opTypeCode(in TypeCode inArg, inout TypeCode inoutArg, out TypeCode outArg);
+	};
+};
+

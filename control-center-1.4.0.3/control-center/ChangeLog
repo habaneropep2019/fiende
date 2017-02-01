@@ -1,0 +1,501 @@
+2002-01-25  Mikael Hallendal  <micke@codefactory.se>
+
+	* capplet-manager.c (capplet_close_callback): added check for if
+	  style is !NULL before calling &style->fg. Fixes #69594.
+
+2001-12-21  Bradford Hovinen  <hovinen@ximian.com>
+
+	* capplet-widget.h: Fix prototype
+
+2001-08-02  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* callbacks.[ch]: Fix warnings.
+	* capplet-widget.c: Fix more warnings.
+	* main.c (create_exit_dialog): Added prototype.
+	* capplet-widget-libs.[ch]: Yet more warning fixes.
+	* corba-glue.c: Fix some warnings and a bug where CORBA_Object_duplicate
+	was being passed &ev instead of ev.
+	
+2001-06-21  Havoc Pennington  <hp@redhat.com>
+
+	* Makefile.am (cappletConf.sh): put GNOME_INCLUDEDIR in the libs for
+	capplet also
+
+2001-06-20  Havoc Pennington  <hp@redhat.com>
+
+	* cappletConf.sh.in (CAPPLET_INCLUDEDIR): point at the subdir
+
+	* Makefile.am (libcappletinclude_HEADERS): install headers to a
+	subdir of includedir
+
+2001-05-01  Bradford Hovinen  <hovinen@ximian.com>
+
+	From Christian Marillat <marillat.christian@wanadoo.fr>
+	* control-center/splash.c (get_linux_info): Make stirng buffer big 
+	enough not to truncate Debian name.
+
+2001-02-08  Elliot Lee  <sopwith@redhat.com>
+	* control-center/splash.c: Use uname_struct.release rather than
+	uname_struct.version, since the latter more accurately indicates the
+	kernel version.
+
+2000-11-15  Jason Leach  <leach@wam.umd.edu>
+
+	* Makefile.am (cappletConf.sh): add a sed command to replace
+	@VERSION@ with the correct version so 'gnome-config --modversion
+	capplet' returns the correct value.  Fixes bug #30206.
+
+2000-11-14  Stanislav Visnovsky  <visnovsky@nenya.ms.mff.cuni.cz>
+
+	* control-center/gnomecc.desktop: Add Slovak [sk] translations.
+	
+2000-11-10  Robert Brady  <robert@suse.co.uk>
+
+	* control-center/gnomecc.desktop: Fix typo in en_GB.
+	
+2000-11-03  Bradford Hovinen  <hovinen@helixcode.com>
+
+	* splash.c: Remove p attribute on SPLASH_FONT_{BOLD|REG}
+
+2000-10-14  Bradford Hovinen  <hovinen@helixcode.com>
+
+	Courtesy of Christian Marillat <marillat.christian@wanadoo.fr>:
+	* splash.c (SPLASH_FONT_BOLD): 
+	(SPLASH_FONT_REG): Support encodings other than iso-8859-1
+	(create_splash_screen): Use a fontset rather than a font for the text
+
+	* callbacks.c (exit_dialog_ok_callback): Change return value:
+	return FALSE iff actually exiting
+
+2000-10-07  Bradford Hovinen  <hovinen@helixcode.com>
+
+	* callbacks.c (help_callback): Use gnome_help_display() rather
+ 	than gnome_help_goto()
+
+2000-09-10  Karl Eichwalder  <ke@suse.de>
+
+	* splash.c (create_splash_screen): Add _() to use the translation
+	string to calculate the label width and height.
+
+2000-09-03  Ettore Perazzoli  <ettore@helixcode.com>
+
+	* tree.h: Add missing `void' in the prototype for
+	`generate_tree()'.
+
+	* tree.c (free_directory_list): New helper function.
+	(get_directory_list): New helper function.
+	(add_directories_from_GNOME_PATH): New helper function.
+	(read_all_directories): New helper function.
+	(generate_tree): Use these new functions to activate the capplets
+	from the global directory, the user directory, as well as the
+	directories defined by `GNOME_PATH'.  Also, update the error
+	message for the case in which the Control Center doesn't find any
+	capplets.  And add the `void' type.
+	(read_directory): Don't abort returning NULL if there is no
+	`.directory' file.  Instead, build a `GnomeDesktopEntry' from the
+	directory name and put it in the tree.
+	(merge_nodes): If one of the nodes has a NULL `name' member while
+	the other one has a non-NULL one, set the name of the result node
+	to the non-NULL value.  When freeing an entry, set it to NULL.
+
+2000-08-11  Jonathan Blandford  <jrb@redhat.com>
+
+	* tree.c (generate_tree_helper): remove potential segfault if you
+	don't have access to the .desktop file.
+
+2000-06-19  Jonathan Blandford  <jrb@redhat.com>
+
+	* splash.c (get_linux_info): Added conectiva-linux checking code.
+	I don't think this approach will scale in the long run,
+	unfortunately, but it will do for now.  I think most companies
+	should patch their SRPMS.
+
+2000-05-22  Jacob Berkman  <jacob@helixcode.com>
+
+	* capplet-manager.c (revert_all): set the window icon
+	(close_capplet): ditto
+	: also use stock buttons
+
+	* main.c (main): set the default icon
+
+	* tree.h: add an icon member
+
+	* tree.c (generate_tree_helper): set the node's icon
+
+2000-04-15  Miguel de Icaza  <miguel@gnu.org>
+
+	* tree.c (generate_tree): Add colormap and visual handling here too.
+
+	* splash.c (create_splash_screen): Set the colormap to the imlib
+	one. 
+
+2000-04-04  Jonathan Blandford  <jrb@redhat.com>
+
+	* splash.c (create_splash_screen): added a splash screen.
+
+2000-03-29  Jonathan Blandford  <jrb@redhat.com>
+
+	* main.c: patch from Karl EICHWALDER <ke@gnu.franken.de> to remove
+	N_() from an empty string that didn't need it.
+
+2000-03-29  Jacob Berkman  <jacob@helixcode.com>
+
+	* main.c: use the about icon in the about menuitem
+
+2000-03-28  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-manager.c: Big changes.  Now we no longer use
+	gtknotebook, and the world is better for it.  Added
+	gtk-multiview.[ch] to handle switching better w/o the bevel.
+	Also, removed the help button and made it a menu.  The docs guys
+	are going to kill me, but I'll try to help them fix it all
+	tomorrow.
+
+1999-10-05  Jonathan Blandford  <jrb@redhat.com>
+
+	* tree.c (read_directory): let's close our directory.
+
+1999-09-30  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-manager.c (capplet_close_callback): Add a hack-?ish
+	destroying flag so that I can 1) Go home for dinner, and, 2) avoid
+	cleaning up the control-center when I'm exitting.
+
+1999-09-21  Jonathan Blandford  <jrb@redhat.com>
+
+	* tree.c (generate_tree): Change back to 'GTK_SELECTION_BROWSE.'
+	It stops the annoying Double-click problem. 
+
+1999-09-17    <rhult@hem2.passagen.se>
+
+	* gnomecc.desktop: Updated Swedish entry.
+
+1999-09-12  Ettore Perazzoli  <ettore@comm2000.it>
+
+	* tree.c (generate_tree): Use the `GTK_SELECTION_SINGLE' selection
+	mode.
+
+1999-09-02  Iain Holmes  <iain@webtribe.net>
+
+	* capplets/mime-type/mime-data.c: A change is now updated in the main
+	clist.
+
+	* capplets/mime-type/edit-window.c: Ability to edit the extensions for
+	a mime-type.
+
+1999-09-01  Elliot Lee  <sopwith@redhat.com>
+	* capplets/gnome-edit-properties/gnome-edit-properties.c:
+	When reverting, store the executable name, not the viewed name.
+
+1999-08-12  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-widget-libs.c (capplet_corba_state_changed): quit the
+	"correct way" (TM)
+
+	* main.c (find_guname_helper): commented out the guname
+	initializing code for now.  I would like to see a real splash
+	screen sometime.
+
+1999-08-05  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-manager.c (revert_all): now, the "revert all changes"
+	button actually does something useful. (-:  I can't believe no one
+	ever noticed before.
+
+1999-07-21  Nat Friedman  <nat@gnome-support.com>
+
+	* main.c: Include capplet-manager.h
+	(find_guname_helper): New function to help find the guname entry
+ 	in the capplet tree.
+	(create_window): Launch the guname capplet when the control-center
+ 	window is created, if possible.
+	
+1999-06-15    <jrb@redhat.com>
+
+	* corba-glue.c (control_center_corba_gtk_init):  make ANSI C
+	compliant  
+
+1999-06-14    <jrb@redhat.com>
+
+	* tree.c (generate_tree): make it GTK_SELECTION_BROWSE instead of
+	SINGLE.  Revert change below.
+	(selected_row_callback): ditto
+
+1999-05-28    <nacai@iname.com>
+
+	* gnomecc.desktop: Add Japanese entry.
+
+1999-04-15    <jrb@redhat.com>
+
+	* tree.c (selected_row_callback): keyboard navigation for gnomecc
+	now is working.
+
+	* corba-glue.c (show_self): thinko.  And tigert, the icon is cool (tm).
+
+1999-04-14  Tuomas Kuosmanen  <tigert@gimp.org>
+
+	* control-center.png: New icon, I hope you like it. Control
+	center is a general all-round toolbox so I did one such icon.
+
+1999-03-29  Jonathan Blandford  <jrb@redhat.com>
+
+	* callbacks.c (help_callback): Go to the right file.
+
+1999-03-18  Ettore Perazzoli  <ettore@comm2000.it>
+
+	* main.c (create_exit_dialog): Added missing _() around i18n-able
+ 	strings.
+
+1999-03-12  Owen Taylor  <otaylor@redhat.com>
+
+	* capplet-manager.c (launch_capplet): Don't call page_shown()
+	if a capplet is registering itself.
+
+1999-03-10  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-widget-libs.c (capplet_widget_corba_init): now we can
+	actually debug capplets in gdb!
+
+1999-03-09  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-manager.c (queue_socket_destruction): New way of
+	handling shutting down capplets.  It's somewhat complex; and if
+	people could beat on it, i'd appreciate it.
+
+1999-02-27  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* tree.c (selected_row_callback): Make absolutely sure we do not
+	keep any sort of grabs that might hang the desktop before
+	launching the capplet (as we might block inside of ORBit if the
+	client dies).
+
+1999-02-24  Jonathan Blandford  <jrb@redhat.com>
+
+	* tree.c (generate_tree_helper): Comment out the icon code until
+	we actually have enough icons to make it worthwhile.
+
+1999-02-24  bertrand <Bertrand.Guiheneuf@inria.fr>
+
+	* tree.c (generate_tree_helper): added support for 
+	desktop entry icon display. The capplet icon was displayed
+	everywhere (panel-menu & gmenu) except... in the control panel.
+	This could be considered as a bug.
+
+1999-02-22  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-manager.c (launch_capplet): fixed bug in save-changes
+	dialog
+
+	* callbacks.c (exit_row_callback): fixed the about box.
+
+1999-02-21  Jonathan Blandford  <jrb@redhat.com>
+
+	* corba-glue.c (server_register_capplet_new): now we handle
+	multi-capplets.
+	(control_center_corba_gtk_init): let's  use g_warning instead.
+
+1999-02-19  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-manager.c (launch_capplet): only close the applet if we
+	are changing to a new capplet.
+
+	* tree.c (generate_tree_helper): Fixed a race condition here.
+
+1999-02-18  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-widget-libs.c (capplet_widget_corba_init): Now it's
+	started using gnorba.  A good thing.
+
+	* capplet-widget.c (get_widget_by_id): added a page_shown;
+	page_hidden call to let capplets with dialogs show/hide when
+	needed. 
+
+	* capplet-manager.c (launch_capplet): okay...
+	it's a little ugly, but it now will close pages that haven't been
+	changed.
+	(close_capplet): ibid
+
+1999-02-17  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-manager.c (launch_capplet): started removing the page if
+	it hasn't changed.  I'll finish this tomorrow.
+
+1999-02-15  Jonathan Blandford  <jrb@redhat.com>
+
+	* tree.c (generate_tree): start with all of the nodes expanded.  I
+	don't know if this is good or not, but a bunch of people have
+	asked for it.
+
+	* capplet-widget.c: Stupid cut-n-paste error.
+	(capplet_widget_class_init): as above.
+
+1999-01-21  Martin Baulig  <martin@home-of-linux.org>
+
+	* capplet-manager.c (cancel_button_callback): Use `nd->ctree'
+	instead of `nd->node' in call to gtk_widget_get_style ().
+	(ok_button_callback): Likewise.
+
+1999-01-09  Nat Friedman  <nat@nat.org>
+
+	* main.c (create_window): Removed the unused progress meter.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* tree.h: Added button_press prototype.
+
+	* tree.c (compare_last_dir): gtk_statusbar_pop changed to
+ 	gnome_appbar_pop and gtk_statusbar_push changed to
+ 	gnome_appbar_push.
+	(compare_last_dir): added explicit return type - gint
+	(selected_row_callback): gtk_statusbar_push changed to
+ 	gnome_appbar_push, and gtk_statusbar_pop changed to
+ 	gnome_appbar_pop
+
+	* main.c: Changed the "Program" menu to the "File" menu.
+	(create_window): Added a GnomeAppBar and installed menu hints.
+	Removed the old GtkStatusBar.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* main.c: use the new GNOMEUIINFO standard menu stuff.
+
+1999-01-06  Nat Friedman  <nat@nat.org>
+
+	* main.c: Use the gnome-uidefs.h macros.
+
+1999-01-06  Nat Friedman  <nat@nat.org>
+
+	* main.c: Use Ctrl-Q as the exit-app accelerator.
+
+1998-12-12  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* capplet-manager.c: Marked strings for translation.
+	Include <config.h>.
+
+1998-11-30  Jonathan Blandford  <jrb@redhat.com>
+
+	* capplet-widget-libs.c (capplet_widget_corba_init): quick fix to
+	handle new poa getting mechanism.
+
+1998-11-23  Christopher Blizzard  <blizzard@appliedtheory.com>
+
+	* tree.c (generate_tree): Comment out gtk_clist_set_policy().
+  	This should compile now.
+
+	* main.c (create_exit_dialog): Comment out gtk_clist_set_policy().
+  	This should compile now.
+	
+1998-11-21  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* callbacks.c: Include <config.h>
+
+	* main.c (main): Initialize gettext.
+
+Thu Nov 19 23:37:18 CST 1998  Frank Belew <frb@umr.edu>
+	* changed occurences of -lgnorba to $(GNORBA_LIBS) in Makefile.am 
+
+1998-11-08  Felix Bellaby <felix@pooh.u-net.com>
+	* Makefile.am: added ORBIT_IDL to dependencies.
+
+1998-10-12    <jrb@redhat.com>
+
+	* added multi capplet support.
+
+1998-10-08  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* callbacks.h: Remove `#pragma }'.
+	* capplet-manager.h: Likewise.
+	* capplet-widget.h: Likewise.
+	* corba-glue.h: Likewise.
+	* tree.h: Likewise.
+
+Tue Oct  6 20:14:10 1998  Jonathan Blandford <jrb@redhat.com>
+	* added gnorba support
+	* made the thing start smaller.
+	
+1998-10-04  Martin Baulig  <martin@home-of-linux.org>
+
+	* Makefile.am: Added explicit dependency of $(CORBA_SRCLIST) for
+ 	control-center-widget.c.
+
+1998-09-30  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* Makefile.am: Use '?' to separate the sed
+	commands as ',' is used when people pass -Wl,something.
+
+1998-09-24  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* main.c: Add keyboard shortcuts.
+
+1998-09-24  Ville Pätsi <drc@zoo-gate.fi>
+
+	* Added control-center.png icon.
+	* Makefile.am: Modified to install control-center.png
+	* gnomecc.desktop: Now uses control-center.png as a icon.
+
+1998-09-23  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* cappletConf.sh.in (CAPPLET_INCLUDEDIR): New file.
+	* Makefile.am: create cappletConf.sh.  Install it.
+
+1998-09-22  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (EXTRA_DIST): Removed control-center.idl, since now
+	it lives in another directory.
+	(libcapplet_la_SOURCES): Add capplet-widget-libs.h.
+	(gnomecc_SOURCES): Add corba-glue.h.
+
+1998-09-15    <jrb@redhat.com>
+
+	* capplet-widget.c (_capplet_widget_server_ok): see below
+
+	* capplet-manager.c (revert_button_callback): Now revert
+	desensitizes Try and Revert buttons
+
+1998-09-07    <jrb@redhat.com>
+
+	* main.c (main): removed the splash-screen code temporarily.
+
+1998-09-4	<jrb@redhat.com>
+	*fixed many things, and it all works (sorta... :)
+	
+1998-08-28    <jrb@redhat.com>
+
+	* capplet-manager.c (cancel_button_callback): now correctly closes 
+	capplets from the control-center end.
+
+
+Tue Aug 26 18:13:17 1998  Jonathan Blandford <jrb@redhat.com>
+	* caplet*: renamed to capplet*
+	* corba-glue: added working support for Corba
+	
+Mon Aug 24 13:06:33 1998  Jonathan Blandford <jrb@redhat.com>
+	* tree.c: Fixed a bug in logic while merging trees.
+	* *.[ch]: by request of Dr. Mike, changed the spelling of caplet.
+	It will henceforth be known as 'capplet'. (:
+
+Fri Aug 21 19:42:11 1998  Jonathan Blandford <jrb@redhat.com>
+	* caplet-manager.c: now trys to start the caplet
+	* caplet-widget-*: cleaned up testing code. Now works mostly.
+
+1998-08-21  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* gnomecc.desktop: Added Portuguese translation.
+
+Fri Aug 21 13:15:17 1998  Jonathan Blandford <jrb@redhat.com>
+	* test.c: Hmm, thought i'd already deleted this file.
+	It's gone now...
+	
+Fri Aug 21 13:12:35 1998  Jonathan Blandford <jrb@redhat.com>
+	* Checked in an even newer revision.  A lot more useable now. 
+	I will start doing proper Changelog entries now. (:
+
+1998-08-20  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (BUILT_SOURCES): Add $(CORBA_SRCLIST).
+
+Wed Aug 19 19:24:51 1998 Jonathan Blandford <jrb@redhat.com>
+	
+	* Checked in new revision.  Cleaned up the code some -- more
+	cleaning to come.  Much closer to the final look of the
+	application.

@@ -1,0 +1,170 @@
+/*
+ * bonobo-property.idl: The Bonobo Property interfaces.
+ *
+ * Authors:
+ *   Nat Friedman (nat@nat.org)
+ *   Mike Kestner (mkestner@ameritech.net)
+ *
+ * Copyright 1999, 2000 Helix Code, Inc.
+ * Copyright 2000, Mike Kestner
+ */
+
+ /*
+  * The Property-manipulation interfaces here are based in large part
+  * on suggestions from Chuck Jazdzewski <cjazdzewski@inprise.com>.
+  *
+  * Each PropertyBag is aggregated with an EventSource, so that it is
+  * possible to attach event listeners. The event name is composed
+  * of "Bonobo/Property", the type of the event and finally the property
+  * name - everything separated by colons. At the moment there is only one 
+  * type defined - "change". So if a property with name "autosave" changes
+  * its value, we emit an event with the name: 
+  * "Bonobo/Property:change:autosave"
+  */
+
+#ifndef BONOBO_PROPERTY_IDL
+#define BONOBO_PROPERTY_IDL
+
+#include "Bonobo_Unknown.idl"
+#include "Bonobo_Listener.idl"
+
+module Bonobo {
+
+interface Property : Bonobo::Unknown {
+	exception InvalidValue {};
+	exception ReadOnlyProperty {};
+
+	/**
+	 * getName:
+	 * 
+	 * Returns the name of the property.
+	 *
+	 * Do not confuse this with the human-readable string which
+	 * should be presented to the user in a property editor.  A
+	 * property name is a human-language-independent key used to
+	 * identify a property.  See getDocString() for more
+	 * information about human-readable property descriptors.
+	 */
+	string getName ();
+
+	/**
+	 * getType:
+	 * 
+	 * Returns this Property's type.
+	 */
+#if defined(__ORBIT_IDL__)
+	/* Bug filed */
+	TypeCode getType ();
+#else
+	CORBA::TypeCode getType ();
+#endif
+	/**
+	 * getValue:
+	 *
+	 * Returns the current value for this property.  The value
+	 * is returned
+	 */
+	any getValue ();
+
+	/**
+	 * setValue:
+	 * 
+	 * Sets the value for this object to @value
+	 */
+	void setValue (in any value)
+		raises (InvalidValue, ReadOnlyProperty);
+
+	/**
+	 * getDefault:
+	 *
+	 * Returns the default value for this property.
+	 *
+	 * The purpose of this method is twofold.  First, Property
+	 * editors can use it to implement a "set property value to
+	 * default" mechanism.
+	 *
+	 */
+	any getDefault ();
+
+	/**
+	 * getDocString:
+	 *
+	 * Returns a string describing this property.
+	 */
+	string getDocString ();
+
+	/** 
+	 * getFlags:
+	 * 
+	 * Returns this property's flags,
+	 * see bonobo-property-bag.h
+	 *
+	 * BONOBO_PROPERTY_UNSTORED        = 1,
+	 * BONOBO_PROPERTY_READABLE        = 2,
+	 * BONOBO_PROPERTY_WRITEABLE       = 4,
+	 * BONOBO_PROPERTY_USE_DEFAULT_OPT = 8,
+	 * BONOBO_PROPERTY_NO_LISTENING    = 16
+	 * 
+	 */
+	long getFlags ();
+
+	Bonobo::EventSource::ListenerId addListener (in Listener l);
+
+	void removeListener (in Bonobo::EventSource::ListenerId id)
+		raises (Bonobo::EventSource::UnknownListener);
+
+};
+
+typedef sequence<string>   PropertyNames;
+typedef sequence<Property> PropertyList;
+
+struct Pair {
+	string name;
+	any    value;
+};
+typedef sequence<Pair>     PropertySet;
+
+interface PropertyBag : Bonobo::Unknown {
+	/**
+	 * getProperties:
+	 *
+	 * Returns: All of the properties in this property bag.
+	 */
+	PropertyList getProperties ();
+
+	/**
+	 * getPropertyByName:
+	 * @name: A string which uniquely identifies a given property.
+	 *
+	 * Returns: The single property in this PropertyBag identified
+	 * by @name.
+	 */
+	exception NotFound {};
+	Property getPropertyByName (in string name)
+		raises (NotFound);
+
+	/**
+	 * getPropertyNames:
+	 *
+	 * Returns: The names of the properties available in this
+	 * PropertyBag.
+	 *
+	 * There's no particular need for this function, but without
+	 * it the only way to get a list of all the property names in
+	 * a given PropertyBag, you have to iterate through all the
+	 * properties, and that will cause the Property servants to be
+	 * incarnated, which is not very resource-conscious.
+	 */
+	PropertyNames getPropertyNames ();
+
+	void setValues (in PropertySet set)
+		raises (Bonobo::Property::InvalidValue, Bonobo::Property::ReadOnlyProperty);
+
+	PropertySet getValues ();
+
+	EventSource getEventSource ();
+};
+
+};
+
+#endif /* BONOBO_PROPERTY_IDL */

@@ -1,0 +1,1407 @@
+<HTML
+><HEAD
+><TITLE
+>gnome-mime-info</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Library Reference Manual"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Gnome Library"
+HREF="libgnome.html"><LINK
+REL="PREVIOUS"
+TITLE="gnome-metadata"
+HREF="gnome-gnome-metadata.html"><LINK
+REL="NEXT"
+TITLE="gnome-mime"
+HREF="gnome-gnome-mime.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>Gnome Library Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnome-gnome-metadata.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnome.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnome-gnome-mime.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="GNOME-GNOME-MIME-INFO"
+>gnome-mime-info</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN2831"
+></A
+><H2
+>Name</H2
+>gnome-mime-info&nbsp;--&nbsp;Routines to get information bound to a MIME type.</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN2834"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;gnome.h&gt;
+
+
+const char* <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-GET-VALUE"
+>gnome_mime_get_value</A
+>            (const char *mime_type,
+                                             char *key);
+<GTKDOCLINK
+HREF="GLIST"
+>GList</GTKDOCLINK
+>*      <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-GET-KEYS"
+>gnome_mime_get_keys</A
+>             (const char *mime_type);
+const char* <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-PROGRAM"
+>gnome_mime_program</A
+>              (const char *mime_type);
+const char* <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-DESCRIPTION"
+>gnome_mime_description</A
+>          (const char *mime_type);
+const char* <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-NAMETEMPLATE"
+>gnome_mime_nametemplate</A
+>         (const char *mime_type);
+const char* <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-TEST"
+>gnome_mime_test</A
+>                 (const char *mime_type);
+const char* <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-COMPOSETYPED"
+>gnome_mime_composetyped</A
+>         (const char *mime_type);
+<GTKDOCLINK
+HREF="GBOOLEAN"
+>gboolean</GTKDOCLINK
+>    <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-COPIOUSOUTPUT"
+>gnome_mime_copiousoutput</A
+>        (const char *mime_type,
+                                             char *key);
+<GTKDOCLINK
+HREF="GBOOLEAN"
+>gboolean</GTKDOCLINK
+>    <A
+HREF="gnome-gnome-mime-info.html#GNOME-MIME-NEEDSTERMINAL"
+>gnome_mime_needsterminal</A
+>        (const char *mime_type,
+                                             char *key);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2849"
+></A
+><H2
+>Description</H2
+><P
+>The routines in the <TT
+CLASS="FILENAME"
+>gnome-mime-info</TT
+> allow
+retrieval of information that has been bound to a given MIME type.
+There are a number of standard keys used in GNOME to provide default
+actions and behaviour.</P
+><P
+>To add keys to a MIME type, it is necessary to install a file with the
+extension <TT
+CLASS="FILENAME"
+>.keys</TT
+> in the
+<TT
+CLASS="FILENAME"
+>$gnome/share/mime-info</TT
+> directory or in the
+<TT
+CLASS="FILENAME"
+>~/.gnome/mime-info directory</TT
+> directory.  The
+former is for system-provided MIME information and the latter is to
+enable the user to extend the actions as provided by the system.</P
+><P
+>The file <TT
+CLASS="FILENAME"
+>$gnome/share/mime-info/gnome.keys</TT
+> is
+special, as it contains the defaults for gnome, and is read first.  In
+addition, the file <TT
+CLASS="FILENAME"
+>~/.gnome/mime-info/user.keys</TT
+> is
+read last.  This will guarantee that there is a way to set system
+defaults, and there is a way for the user to override them.  There is
+currently no way to tell anything about the order of the other files in
+those directories, nor is there any way to override system defaults yet.</P
+><P
+>The <TT
+CLASS="FILENAME"
+>.keys</TT
+> files have the following format:</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN2862"
+></A
+><P
+><B
+>Example 1. Format of a .keys file</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>mime-type-match:
+	[\[LANG\]]key=value
+  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>Above, the <TT
+CLASS="STRUCTFIELD"
+><I
+>key</I
+></TT
+> is the key that is being
+defined, and <TT
+CLASS="STRUCTFIELD"
+><I
+>value</I
+></TT
+> is the value we bind to
+it.  The optional <TT
+CLASS="STRUCTFIELD"
+><I
+>[LANG]</I
+></TT
+> represents a
+language in which this definition is valid.  If this part is
+specified, then the definition will only be valid if LANG matches the
+setting of the environment variable LANG.  The LANG setting is used to
+provide keys which can be displayed to the user in a localized way.</P
+><P
+>This is an example to bind the key <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>open</I
+></SPAN
+> to all of
+the MIME types matching <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>image/*</I
+></SPAN
+> and the
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>icon-filename</I
+></SPAN
+> key is bound to the
+<TT
+CLASS="FILENAME"
+>/opt/gimp/share/xcf.png</TT
+> value:</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN2874"
+></A
+><P
+><B
+>Example 2. Sample gimp.keys file</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>image/*:
+	open=gimp <TT
+CLASS="LITERAL"
+>f</TT
+>
+
+image/x-xcf:
+        icon-filename=/opt/gimp/share/xcf.png
+  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>This will make the GIMP the handler for the open action.  Files of
+type xcf would use the filename pointed to in the icon-filename key.</P
+><P
+><TT
+CLASS="LITERAL"
+>f</TT
+> gets interpolated with the file name or the list of file names that
+matched this MIME type.</P
+><P
+>As you can see from the example above, a
+<TT
+CLASS="FILENAME"
+>.keys</TT
+> file does not need to provide all of the
+values, it can just provide or override some of the actions.</P
+><P
+>User defined bindings in <TT
+CLASS="FILENAME"
+>.keys</TT
+> file will take
+precedence over system installed files.</P
+><P
+>The following keys are currently used in the GNOME
+desktop:</P
+><P
+></P
+><UL
+><LI
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>open</I
+></SPAN
+>: Open the file with this
+    command.</P
+></LI
+><LI
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>icon-filename</I
+></SPAN
+>: The filename
+    with the icon that should be used to represent files of this type.</P
+></LI
+><LI
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>view</I
+></SPAN
+>: Command to view the file
+    contents.</P
+></LI
+><LI
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>ascii-view</I
+></SPAN
+>: A command that
+   should be used to do an ascii-rendering of the file.  Used as a
+   fallback by the filemanager if a <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>view</I
+></SPAN
+> action
+   does not exist.</P
+></LI
+><LI
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>fm-open</I
+></SPAN
+>:file-manager open.  If
+   present, the file manager will use this action instead of the value
+   in open to perform this action (the filemanager for example will
+   open archive files as if they were directories by using the VFS).</P
+></LI
+><LI
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>fm-view</I
+></SPAN
+>: file-manager view.  If
+    present, invoking the view opertion on the file manager will use
+    the value defined here instead of the value in "view".
+  </P
+></LI
+><LI
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>fm-ascii-view</I
+></SPAN
+>:Fallback
+    operation for the file manager as well.</P
+></LI
+></UL
+><P
+>Those keys are also queried on the metadata (except in the cases
+where the lookup would be too expensive). </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2910"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2912"
+></A
+><H3
+><A
+NAME="GNOME-MIME-GET-VALUE"
+></A
+>gnome_mime_get_value ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>const char* gnome_mime_get_value            (const char *mime_type,
+                                             char *key);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2917"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>key</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2934"
+></A
+><H3
+><A
+NAME="GNOME-MIME-GET-KEYS"
+></A
+>gnome_mime_get_keys ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="GLIST"
+>GList</GTKDOCLINK
+>*      gnome_mime_get_keys             (const char *mime_type);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2941"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the mime type to lookup.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>a GList that contains private strings with all of the keys
+associated with the <TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>.  </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2955"
+></A
+><H3
+><A
+NAME="GNOME-MIME-PROGRAM"
+></A
+>gnome_mime_program ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>const char* gnome_mime_program              (const char *mime_type);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2961"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the mime_type </TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the program intended to be loaded for this given mime-type</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2974"
+></A
+><H3
+><A
+NAME="GNOME-MIME-DESCRIPTION"
+></A
+>gnome_mime_description ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>const char* gnome_mime_description          (const char *mime_type);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2980"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the mime type</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the description for this mime-type</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2993"
+></A
+><H3
+><A
+NAME="GNOME-MIME-NAMETEMPLATE"
+></A
+>gnome_mime_nametemplate ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>const char* gnome_mime_nametemplate         (const char *mime_type);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2998"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3011"
+></A
+><H3
+><A
+NAME="GNOME-MIME-TEST"
+></A
+>gnome_mime_test ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>const char* gnome_mime_test                 (const char *mime_type);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN3017"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the mime type</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the command to be executed on the file before considering
+the file to match this mime_type.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3030"
+></A
+><H3
+><A
+NAME="GNOME-MIME-COMPOSETYPED"
+></A
+>gnome_mime_composetyped ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>const char* gnome_mime_composetyped         (const char *mime_type);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN3036"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the mime type</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the command to be executed to compose a message of
+the given mime_type</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3049"
+></A
+><H3
+><A
+NAME="GNOME-MIME-COPIOUSOUTPUT"
+></A
+>gnome_mime_copiousoutput ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="GBOOLEAN"
+>gboolean</GTKDOCLINK
+>    gnome_mime_copiousoutput        (const char *mime_type,
+                                             char *key);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN3056"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the mime type</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>key</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the key which stores the flags for a command</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>a boolean value, whether the mime_type open
+command will produce lots of output</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3073"
+></A
+><H3
+><A
+NAME="GNOME-MIME-NEEDSTERMINAL"
+></A
+>gnome_mime_needsterminal ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="GBOOLEAN"
+>gboolean</GTKDOCLINK
+>    gnome_mime_needsterminal        (const char *mime_type,
+                                             char *key);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN3080"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mime_type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the mime type</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>key</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the key which stores the flags for a command</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>a boolean value, whether the mime_type open
+command will required a terminal.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnome-gnome-metadata.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnome.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnome-gnome-mime.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-metadata</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-mime</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,495 @@
+<refentry id="AppletWidget">
+<refmeta>
+<refentrytitle>AppletWidget</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>PANEL Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>AppletWidget</refname><refpurpose>
+Construction and Initialization of the AppletWidget</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;applet-widget.h&gt;
+
+
+struct      <link linkend="AppletWidget-struct">AppletWidget</link>;
+struct      <link linkend="AppletWidgetClass">AppletWidgetClass</link>;
+void        <link linkend="applet-factory-new">applet_factory_new</link>              (const char *goad_id,
+                                             <link linkend="AppletFactoryQuerier">AppletFactoryQuerier</link> qfunc,
+                                             <link linkend="AppletFactoryActivator">AppletFactoryActivator</link> afunc);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="applet-widget-new">applet_widget_new</link>               (const char *goad_id);
+void        <link linkend="applet-widget-construct">applet_widget_construct</link>         (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             const char *goad_id);
+<link linkend="gboolean">gboolean</link>    <link linkend="applet-widget-init">applet_widget_init</link>              (const char *app_id,
+                                             const char *app_version,
+                                             int argc,
+                                             char **argv,
+                                             struct <link linkend="poptOption">poptOption</link> *options,
+                                             unsigned int flags,
+                                             <link linkend="poptContext">poptContext</link> *return_ctx);
+<link linkend="CORBA-Object">CORBA_Object</link> <link linkend="applet-widget-corba-activate">applet_widget_corba_activate</link>   (<link linkend="GtkWidget">GtkWidget</link> *applet,
+                                             <link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             const char *goad_id,
+                                             const char **params,
+                                             <link linkend="gpointer">gpointer</link> *impl_ptr,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+void        <link linkend="applet-widget-corba-deactivate">applet_widget_corba_deactivate</link>  (<link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             const char *goad_id,
+                                             <link linkend="gpointer">gpointer</link> impl_ptr,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+void        <link linkend="applet-widget-gtk-main">applet_widget_gtk_main</link>          (void);
+void        <link linkend="applet-widget-gtk-main-quit">applet_widget_gtk_main_quit</link>     (void);
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBin">GtkBin</link>
+                     +----<link linkend="GtkWindow">GtkWindow</link>
+                           +----<link linkend="GtkPlug">GtkPlug</link>
+                                 +----AppletWidget
+</synopsis>
+
+</refsect1>
+
+
+<refsect1>
+<title>Signal Prototypes</title>
+<synopsis>
+
+&quot;<link linkend="AppletWidget-change-orient">change-orient</link>&quot;
+            void        user_function      (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="GtkEnum">GtkEnum</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> user_data);
+&quot;<link linkend="AppletWidget-change-pixel-size">change-pixel-size</link>&quot;
+            void        user_function      (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="gint">gint</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> user_data);
+&quot;<link linkend="AppletWidget-save-session">save-session</link>&quot;
+            <link linkend="gboolean">gboolean</link>    user_function      (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="GtkString">GtkString</link> arg1,
+                                            <link linkend="GtkString">GtkString</link> arg2,
+                                            <link linkend="gpointer">gpointer</link> user_data);
+&quot;<link linkend="AppletWidget-back-change">back-change</link>&quot;
+            void        user_function      (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="GtkEnum">GtkEnum</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> arg2,
+                                            <link linkend="gpointer">gpointer</link> arg3,
+                                            <link linkend="gpointer">gpointer</link> user_data);
+&quot;<link linkend="AppletWidget-do-draw">do-draw</link>&quot;   void        user_function      (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="gpointer">gpointer</link> user_data);
+&quot;<link linkend="AppletWidget-tooltip-state">tooltip-state</link>&quot;
+            void        user_function      (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="gint">gint</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> user_data);
+&quot;<link linkend="AppletWidget-change-position">change-position</link>&quot;
+            void        user_function      (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="gint">gint</link> arg1,
+                                            <link linkend="gint">gint</link> arg2,
+                                            <link linkend="gpointer">gpointer</link> user_data);
+</synopsis>
+</refsect1>
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="AppletWidget-struct">struct AppletWidget</title>
+<programlisting>struct AppletWidget {
+	char			*privcfgpath;
+	char			*globcfgpath;
+	
+	/* you should really use the accessors for these anyway */
+	PanelOrientType		orient;			
+	int			size;			
+	
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="AppletWidgetClass">struct AppletWidgetClass</title>
+<programlisting>struct AppletWidgetClass;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="applet-factory-new">applet_factory_new ()</title>
+<programlisting>void        applet_factory_new              (const char *goad_id,
+                                             <link linkend="AppletFactoryQuerier">AppletFactoryQuerier</link> qfunc,
+                                             <link linkend="AppletFactoryActivator">AppletFactoryActivator</link> afunc);</programlisting>
+<para>
+create a new applet factory.  It is used for applets
+that can run many applets from one process.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>goad_id</parameter>&nbsp;:</entry>
+<entry> GOAD ID of the factory to be registered.
+</entry></row>
+<row><entry align="right"><parameter>qfunc</parameter>&nbsp;:</entry>
+<entry> <link linkend="AppletFactoryQuerier">AppletFactoryQuerier</link> to determine whether an applet with
+a specified GOAD ID can be created.
+</entry></row>
+<row><entry align="right"><parameter>afunc</parameter>&nbsp;:</entry>
+<entry> <link linkend="AppletFactoryActivator">AppletFactoryActivator</link> to activate a specified GOAD ID.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-new">applet_widget_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  applet_widget_new               (const char *goad_id);</programlisting>
+<para>
+Make a new applet and register us with the panel, if you
+decide to cancel the load before calling <link linkend="applet-widget-add">applet_widget_add</link>, you should
+call <link linkend="applet-widget-abort-load">applet_widget_abort_load</link>.  This widget is a simple container but you
+should always use only <link linkend="applet-widget-add">applet_widget_add</link> to add a child and you should
+only use it once.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>goad_id</parameter>&nbsp;:</entry>
+<entry> The goad_id of the applet we are starting
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A pointer to a new widget of type <link linkend="AppletWidget">AppletWidget</link>, or <literal>NULL</literal> if 
+something went wrong.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-construct">applet_widget_construct ()</title>
+<programlisting>void        applet_widget_construct         (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             const char *goad_id);</programlisting>
+<para>
+For bindings and subclassing only</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> <link linkend="AppletWidget">AppletWidget</link> to work on
+</entry></row>
+<row><entry align="right"><parameter>goad_id</parameter>&nbsp;:</entry>
+<entry> goad_id of the applet to construct
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-init">applet_widget_init ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    applet_widget_init              (const char *app_id,
+                                             const char *app_version,
+                                             int argc,
+                                             char **argv,
+                                             struct <link linkend="poptOption">poptOption</link> *options,
+                                             unsigned int flags,
+                                             <link linkend="poptContext">poptContext</link> *return_ctx);</programlisting>
+<para>
+Initialize the applet library, gnome and corba.
+Don't call this if your app has an applet, but your process is not
+simply an applet process.  This will 1) disconnect the session
+manager and 2) setup stuff to call gtk_main_quit when the last applet
+you create exists.  And that's all really.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app_id</parameter>&nbsp;:</entry>
+<entry> applet id
+</entry></row>
+<row><entry align="right"><parameter>app_version</parameter>&nbsp;:</entry>
+<entry> applet version
+</entry></row>
+<row><entry align="right"><parameter>argc</parameter>&nbsp;:</entry>
+<entry> the argc passed to main
+</entry></row>
+<row><entry align="right"><parameter>argv</parameter>&nbsp;:</entry>
+<entry> the argv passed to main
+</entry></row>
+<row><entry align="right"><parameter>options</parameter>&nbsp;:</entry>
+<entry> extra popt options to use
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> extra popt flags
+</entry></row>
+<row><entry align="right"><parameter>return_ctx</parameter>&nbsp;:</entry>
+<entry> return popt context
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A boolean, <literal>TRUE</literal> if we succeed, <literal>FALSE</literal> if an error occured
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-corba-activate">applet_widget_corba_activate ()</title>
+<programlisting><link linkend="CORBA-Object">CORBA_Object</link> applet_widget_corba_activate   (<link linkend="GtkWidget">GtkWidget</link> *applet,
+                                             <link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             const char *goad_id,
+                                             const char **params,
+                                             <link linkend="gpointer">gpointer</link> *impl_ptr,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+Duplicates the applet's CORBA object.  This should
+be called when a shared library applet is activated.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> widget to embed.
+</entry></row>
+<row><entry align="right"><parameter>poa</parameter>&nbsp;:</entry>
+<entry> the POA to use.
+</entry></row>
+<row><entry align="right"><parameter>goad_id</parameter>&nbsp;:</entry>
+<entry> the GOAD ID string for the applet.
+</entry></row>
+<row><entry align="right"><parameter>params</parameter>&nbsp;:</entry>
+<entry> params passed when the applet is activated.
+</entry></row>
+<row><entry align="right"><parameter>impl_ptr</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> CORBA environment to use for errors.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the duplication CORBA object to use.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-corba-deactivate">applet_widget_corba_deactivate ()</title>
+<programlisting>void        applet_widget_corba_deactivate  (<link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             const char *goad_id,
+                                             <link linkend="gpointer">gpointer</link> impl_ptr,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>poa</parameter>&nbsp;:</entry>
+<entry> the POA to use.
+</entry></row>
+<row><entry align="right"><parameter>goad_id</parameter>&nbsp;:</entry>
+<entry> the GOAD ID of the applet.
+</entry></row>
+<row><entry align="right"><parameter>impl_ptr</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> CORBA environment to use for errors.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-gtk-main">applet_widget_gtk_main ()</title>
+<programlisting>void        applet_widget_gtk_main          (void);</programlisting>
+<para>
+Run the main loop, just like <link linkend="gtk-main">gtk_main</link></para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-gtk-main-quit">applet_widget_gtk_main_quit ()</title>
+<programlisting>void        applet_widget_gtk_main_quit     (void);</programlisting>
+<para>
+Quit the main loop, just like <link linkend="gtk-main-quit">gtk_main_quit</link></para>
+<para>
+
+</para></refsect2>
+
+</refsect1>
+
+<refsect1>
+<title>Signals</title>
+<refsect2><title><anchor id="AppletWidget-change-orient">The &quot;change-orient&quot; signal</title>
+<programlisting>void        user_function                  (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="GtkEnum">GtkEnum</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appletwidget</parameter>&nbsp;:</entry>
+<entry>the object which received the signal.
+</entry></row>
+<row><entry align="right"><parameter>arg1</parameter>&nbsp;:</entry>
+<entry>
+
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>user data set when the signal handler was connected.</entry></row>
+</tbody></tgroup></informaltable></refsect2><refsect2><title><anchor id="AppletWidget-change-pixel-size">The &quot;change-pixel-size&quot; signal</title>
+<programlisting>void        user_function                  (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="gint">gint</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appletwidget</parameter>&nbsp;:</entry>
+<entry>the object which received the signal.
+</entry></row>
+<row><entry align="right"><parameter>arg1</parameter>&nbsp;:</entry>
+<entry>
+
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>user data set when the signal handler was connected.</entry></row>
+</tbody></tgroup></informaltable></refsect2><refsect2><title><anchor id="AppletWidget-save-session">The &quot;save-session&quot; signal</title>
+<programlisting><link linkend="gboolean">gboolean</link>    user_function                  (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="GtkString">GtkString</link> arg1,
+                                            <link linkend="GtkString">GtkString</link> arg2,
+                                            <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appletwidget</parameter>&nbsp;:</entry>
+<entry>the object which received the signal.
+</entry></row>
+<row><entry align="right"><parameter>arg1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>arg2</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>user data set when the signal handler was connected.</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2><refsect2><title><anchor id="AppletWidget-back-change">The &quot;back-change&quot; signal</title>
+<programlisting>void        user_function                  (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="GtkEnum">GtkEnum</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> arg2,
+                                            <link linkend="gpointer">gpointer</link> arg3,
+                                            <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appletwidget</parameter>&nbsp;:</entry>
+<entry>the object which received the signal.
+</entry></row>
+<row><entry align="right"><parameter>arg1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>arg2</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>arg3</parameter>&nbsp;:</entry>
+<entry>
+
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>user data set when the signal handler was connected.</entry></row>
+</tbody></tgroup></informaltable></refsect2><refsect2><title><anchor id="AppletWidget-do-draw">The &quot;do-draw&quot; signal</title>
+<programlisting>void        user_function                  (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appletwidget</parameter>&nbsp;:</entry>
+<entry>the object which received the signal.
+
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>user data set when the signal handler was connected.</entry></row>
+</tbody></tgroup></informaltable></refsect2><refsect2><title><anchor id="AppletWidget-tooltip-state">The &quot;tooltip-state&quot; signal</title>
+<programlisting>void        user_function                  (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="gint">gint</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appletwidget</parameter>&nbsp;:</entry>
+<entry>the object which received the signal.
+</entry></row>
+<row><entry align="right"><parameter>arg1</parameter>&nbsp;:</entry>
+<entry>
+
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>user data set when the signal handler was connected.</entry></row>
+</tbody></tgroup></informaltable></refsect2><refsect2><title><anchor id="AppletWidget-change-position">The &quot;change-position&quot; signal</title>
+<programlisting>void        user_function                  (<link linkend="AppletWidget">AppletWidget</link> *appletwidget,
+                                            <link linkend="gint">gint</link> arg1,
+                                            <link linkend="gint">gint</link> arg2,
+                                            <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appletwidget</parameter>&nbsp;:</entry>
+<entry>the object which received the signal.
+</entry></row>
+<row><entry align="right"><parameter>arg1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>arg2</parameter>&nbsp;:</entry>
+<entry>
+
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>user data set when the signal handler was connected.</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+</refsect1>
+
+
+
+</refentry>

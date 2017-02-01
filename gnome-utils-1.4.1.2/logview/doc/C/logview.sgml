@@ -1,0 +1,587 @@
+<!DOCTYPE Article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[        
+<!ENTITY version "0.1">
+       
+]>
+
+<!--  THIS DOCUMENT IS NOT COMPLETE AND SHOULD NOT BE INCORPORATED INTO THE -->
+<!--  BUILD - John Fleck -->
+<!-- =============Document Header ============================= -->
+
+<article id="index"> 
+
+ <artheader>
+  <title>Logview</title>
+  <copyright>
+   <year>2000</year>
+   <holder>Judith Samson</holder>
+  </copyright>
+
+  <!-- translators: uncomment this: 
+
+  <copyright>
+   <year>2000</year>
+   <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
+  </copyright>
+
+   -->
+
+  <!-- do not put authorname in the header except in copyright - use
+  section "authors" below -->
+
+  <legalnotice>
+   <para>
+    Permission is granted to copy, distribute and/or modify this
+    document under the terms of the <citetitle>GNU Free Documentation
+    License</citetitle>, Version 1.1 or any later version published
+    by the Free Software Foundation with no Invariant Sections, no
+    Front-Cover Texts, and no Back-Cover Texts. You may obtain a copy
+    of the <citetitle>GNU Free Documentation License</citetitle> from
+    the Free Software Foundation by visiting <ulink type="http"
+    url="http://www.fsf.org">their Web site</ulink> or by writing to:
+    Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+    Boston, MA 02111-1307, USA.
+   </para>
+   <para>
+    Many of the names used by companies to distinguish their products and
+    services are claimed as trademarks. Where those names appear in any
+    GNOME documentation, and those trademarks are made aware to the members
+    of the GNOME Documentation Project, the names have been printed in caps
+    or initial caps.
+   </para>
+  </legalnotice>
+
+  <!-- this is version of manual, not application --> <releaseinfo>
+  This is version 1.0 of the logview manual.
+  </releaseinfo>
+
+ </artheader>
+
+ <!-- ============= Document Body ============================= -->
+
+ <!-- ============= Introduction ============================== -->
+ <sect1 id="intro">
+  <title>Introduction</title>
+ 
+    <para>
+      <application>logview</application> is a graphical, menu-driven
+      viewer that you can use to view and monitor your system
+      logs. <application>Logview</application> comes with a few utilities to help you
+      manage your logs, including a calendar, log monitor and log statistics
+      display.  For some of the most common log entries,
+      <application>logview</application> also displays a short description
+      of what the log entry means. 
+    </para>
+
+    <para>
+      <application>Logview</application> is useful if you are new to system
+      administration because it provides an easier, more user-friendly
+      display of your logs than a
+      text display of the log file. It is also useful for more
+      experienced administrators, as it contains a calendar to help you
+      locate trends and track problems, as well as a monitor to enable you
+      to continuously monitor crucial logs.
+    </para>
+
+    <para>
+      <application>Logview</application> is useful only to those who have
+      access to the system log files, which generally requires root access.
+    </para>
+
+    <para>
+      <application>Logview</application> is contained in the
+      <filename>gnome-utils</filename> package, which is part of the GNOME
+      desktop environment. This document describes version 0.2 of
+      <application>logview</application>.
+    </para>
+
+    <para>
+      To run <application>logview</application>, assume root status with
+      <command>su</command>, then start <application>logview</application>
+      from the shell prompt  with the command: <command>logview</command>.
+      Alternatively, if you are running your X session as root, you can
+      open <application>logview</application> from the <guimenu>Main
+	Menu</guimenu>, <guisubmenu>Programs</guisubmenu>,
+      <guisubmenu>System</guisubmenu>, <guimenuitem>System log
+	monitor</guimenuitem>.
+    </para>
+  </sect1>
+
+
+  <sect1 id="logfiles"> 
+    <title>Logfiles Explained</title>
+    <sect2 id="syslogd"> 
+      <title>Syslogd</title>
+
+   
+      <para>
+	Unix systems record all kinds of system activity in logs. Logs are
+	particularly useful to the system administrator for discovering
+	intruders, tracking down problems, and improving efficiency of the
+	system. Syslogd, the system log daemon, monitors system activity
+	looking for loggable events. When syslogd discovers an event that
+	should be logged, it puts it in the correct log file. Some messages,
+	such as kernel messages, are immediately printed to the screen, while
+	others are mailed to root. Syslogd quietly places routine messages in
+	the appropriate log file, to wait for the system administrator to open
+	the log file and read the messages.
+      </para>
+    </sect2>
+    <sect2 id="syslog.conf"> 
+      <title>Syslogd Configuration</title>
+      <para>
+	Syslogd's behavior is determined by the syslog configuration file
+	<filename>/etc/syslog.conf</filename>. <filename>/etc/syslog.conf</filename> lists the
+	kinds of events which should be logged, and the file where each event
+	should be placed. There are two parts to an
+	<filename>/etc/syslog.conf</filename> entry: the facility, which lists
+	the process that involves the event, and the severity, which gives
+	different instructions for the logging of the event, depending on its
+	severity. A sample <filename>syslog.conf</filename> file is shown below:
+      </para>
+
+      <programlisting>
+# Log all kernel messages to the console.
+# Logging much else clutters up the screen.
+#kern.*							/dev/console
+
+# Log anything (except mail) of level info or higher.
+# Don't log private authentication messages!
+*.info;mail.none;authpriv.none				/var/log/messages
+
+# The authpriv file has restricted access.
+authpriv.*						/var/log/secure
+
+# Log all the mail messages in one place.
+mail.*							/var/log/maillog
+
+# Everybody gets emergency messages, plus log them on another
+# machine.
+*.emerg							*
+ # Save mail and news errors of level err and higher in a
+# special file.
+uucp,news.crit						/var/log/spooler
+
+# Save boot messages also to boot.log
+local7.*						/var/log/boot.log
+      </programlisting>
+
+
+    </sect2>
+  </sect1>
+<sect1 id="usage"> 
+   <title>Using Logview</title>
+   <sect2 id="working">
+      <title>Working with Logview</title>
+
+<para>
+When you first start <application>logview</application>, it opens to
+<filename>/var/log/messages</filename> by default. The
+<interface>Open</interface> dialog box automatically displays the
+<filename>/var/log</filename> directory. You can open as many logs
+simultaneously as you want, but only one log appears in the
+<application>logview</application> window at a time. 
+</para>
+
+<figure>
+ <title>Logview</title>
+ <screenshot>
+  <screeninfo>Logview</screeninfo>
+  <graphic format="png" fileref="figures/openLog" srccredit="Bill Day">
+  </graphic>
+ </screenshot>
+</figure>
+
+<para>
+To display each open log in turn, press the <keysym>+</keysym> key to
+	scroll forwards through your logs in the order that you
+	opened them, and the <keysym>-</keysym> key to scroll
+	backwards. Use either
+	the scrollbar in the <application>logview</application> window
+	or  the <keysym>PageDn</keysym> and <keysym>PageUp</keysym>
+	keys to scroll through the entries of a log.
+</para>
+
+<para>
+       The menu bar consists of four menus: <guimenu>File</guimenu>,
+      <guimenu>View</guimenu>, <guimenu>Filter</guimenu> and <guimenu>Help</guimenu>.
+   </para>
+
+<!-- =========List=========================== -->
+      <variablelist>
+	<varlistentry> 
+          <term><guimenu>File</guimenu></term>
+	      <listitem>
+           <figure>
+	      <title>File Menu</title>
+	      <screenshot>
+		<screeninfo>The File Menu</screeninfo>
+		<graphic format="png" fileref="figures/fileMenu" srccredit="Bill Day">
+                </graphic>
+	      </screenshot>
+	    </figure>
+      
+              <para>
+                 This menu contains the following commands:
+              </para>  
+	        <para> 
+                <menuchoice>
+	            <guimenuitem>
+                       Open log
+                    </guimenuitem>
+	         </menuchoice>
+	         This item brings up the
+	         <interface>Open new logfile</interface> dialog for
+	         you to select a log to open.
+                </para>
+
+                <para>
+		<menuchoice>
+	         <guimenuitem>Export log</guimenuitem>
+		</menuchoice>
+	      
+	      This menu item is not yet available.
+	      </para>
+
+	      <para>
+	      <menuchoice>
+		<guimenuitem>Close log</guimenuitem>
+	      </menuchoice>
+	      This item closes the currently active log.
+	      </para>
+
+	      <para>
+	      <menuchoice>
+	        <guimenuitem>Switch log</guimenuitem>
+	      </menuchoice>
+	      Although you can have multiple logs open in
+	      <application>logview</application>, you can view only
+	      one log at a time in the window. If you have more than
+	      one log open, <guimenuitem>Switch log</guimenuitem>
+	      displays the next open log in the log viewing window.   
+	    </para>
+
+             <para>
+	      <menuchoice>
+	        <guimenuitem>Monitor</guimenuitem>
+	      </menuchoice>
+	      This menu item opens the <interface>Monitor
+	      options</interface> dialog so you can select logs for
+	      monitoring. 
+	    </para>
+	    <para>
+	      <menuchoice>
+	        <shortcut><keysym>Ctrl-E</keysym>
+		</shortcut>
+		<guimenuitem>Exit</guimenuitem>
+	      </menuchoice>
+	      Quits logview, and closes all monitored logs.  
+	    </para>
+	  </listitem>
+	</varlistentry> 
+
+	<varlistentry>
+	  <term><guimenu>View</guimenu></term>
+          <listitem>
+	    <figure>
+	      <title>View Menu</title>
+	      <screenshot>
+		<screeninfo>The View Menu</screeninfo>
+		<graphic format="png" fileref="figures/viewMenu" srccredit="Bill Day">
+                </graphic>
+	      </screenshot>
+	    </figure>
+
+	    <para>
+              This menu contains the following commands:
+            </para>
+            <para>	      
+              <menuchoice>
+	        <shortcut><keysym>Ctrl-C</keysym></shortcut>
+	        <guimenuitem>Calendar</guimenuitem>
+	      </menuchoice>
+	     Opens the <application>logview</application> calendar, so
+	     you can select particular dates to view log entries, or
+	     see which dates contain log entries. 
+	      </para>
+
+	      <para>
+		 <menuchoice>
+		    <shortcut><keysym>Ctrl-I</keysym></shortcut>
+		    <guimenuitem>Log stats</guimenuitem>
+		 </menuchoice>	
+		Displays the <interface>log stats</interface>
+		    information window, which provides basic
+		    information about the log.
+		</para>
+
+		<para>
+		   <menuchoice>
+		        <shortcut><keysym>Ctrl-Z</keysym></shortcut>
+		        <guimenuitem>Zoom</guimenuitem>
+		     </menuchoice>
+		     Provides a detailed description of the log entry.
+		</para>
+
+	 </listitem>
+	</varlistentry>
+
+	<varlistentry> 
+	    <term><guimenu>Filter</guimenu></term>
+	    <listitem>
+               <para>
+                 The <guimenu>Filter</guimenu> menu is not yet operational.
+               </para>
+             </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	    <term><guimenu>Help</guimenu></term>
+	      <listitem>
+	    <figure>
+	      <title>File Menu</title>
+	      <screenshot>
+		<screeninfo>The File Menu</screeninfo>
+		<graphic format="png" fileref="figures/helpMenu" srccredit="Bill Day">
+                </graphic>
+	      </screenshot>
+	    </figure>
+
+                 <para>
+                   This menu contains the commands:
+                 </para>
+                 <para> 
+	           <menuchoice><guimenuitem>Manual</guimenuitem></menuchoice>
+		   Shows this manual.
+		 </para>
+
+		 <para>
+                    <menuchoice><guimenuitem>About</guimenuitem></menuchoice>:
+		    Displays copyright and author information for
+		    <application>GTimeTracker</application>.
+		  </para>
+
+		</listitem>
+	   </varlistentry>
+	</variablelist>
+      <!-- =========End of list=========================== -->
+	</sect2>
+
+  </sect1>
+ <!-- ================ Utilities ================================ -->
+ 
+  <sect1 id="utilities">
+    <title>Logview Utilities</title>
+    <para>
+      Logview comes with a few tools to help you make use of your logs.
+    </para>
+	    <figure>
+	      <title>Calendar</title>
+	      <screenshot>
+		<screeninfo>Calendar</screeninfo>
+		<graphic format="png" fileref="figures/calendar" srccredit="Bill Day">
+                </graphic>
+	      </screenshot>
+	    </figure>
+
+
+  
+    <para>
+      The Calendar displays a monthly calendar, with dates that have log
+      entries displayed in bold or colored font. Click on the date in the
+      calendar to display the log entries for that date.
+    </para>
+
+            <figure>
+	      <title>Logstats</title>
+	      <screenshot>
+		<screeninfo>Logstats</screeninfo>
+		<graphic format="png" fileref="figures/logstats" srccredit="Bill Day">
+                </graphic>
+	      </screenshot>
+	    </figure>
+
+
+
+
+    <para>
+      The logstats tool displays basic statistics about the log, including
+      the log full pathname, the size of the log file in bytes, the date
+      the log was last modified, the date the log was started, the date of
+      the most recent log entry and the number of lines in the log.
+    </para>
+
+            <figure>
+	      <title>Zoom</title>
+	      <screenshot>
+		<screeninfo>Zoom</screeninfo>
+		<graphic format="png" fileref="figures/zoom" srccredit="Bill Day">
+                </graphic>
+	      </screenshot>
+	    </figure>
+
+
+
+    <para>
+      Zoom opens a window with detailed information on the selected log
+      entry. For some of the more common log entries, the zoom window also
+      contains a description of what the log entry means. The zoom window
+      dynamically updates as you scroll through the entries in the main
+      logview window. 
+    </para>
+
+    <para>
+      To close the calendar, logstats or zoom window, use the close icon in
+      the window title bar, as there is no close button in the logview
+      window itself. 
+    </para>
+
+<!-- ========= Monitoring Logs =========================== -->
+    <sect2 id="monitor">
+      <title>Monitor</title>
+      <para>
+
+	<application>logview</application> comes with a simple monitoring
+	utility. To monitor a log, open the log, then click
+	<menuchoice>
+	  <guimenuitem>File</guimenuitem>
+	</menuchoice>,
+	<guimenuitem>Monitor</guimenuitem>. Select the log(s) to monitor from
+	the <interface>Monitor options</interface> dialog box and click <guimenuitem>Add</guimenuitem>. 
+      </para>
+
+            <figure>
+	      <title>Monitor Options Dialog Box</title>
+	      <screenshot>
+		<screeninfo>Monitor Options Dialog Box</screeninfo>
+		<graphic format="png" fileref="figures/monitor" srccredit="Bill Day">
+                </graphic>
+	      </screenshot>
+	    </figure>
+
+
+
+      <note>
+	<title>NOTE</title>
+	<para>
+	  The Actions and Hide App buttons are not yet operable in this
+	  version of logview. 
+	</para>
+      </note>
+
+      <para>
+	When you monitor a log, the last few entries of the log are displayed
+	in a separate monitor window. The monitor window
+	updates automatically as new log entries are made. As with the main
+	logview window, you can monitor more than one log at a time, but only
+	one log is displayed at a time. The other monitored logs are displayed
+	as tabs in the monitor window.
+      </para>
+
+   <figure>
+	      <title>Monitor Window</title>
+	      <screenshot>
+		<screeninfo>Monitor Window</screeninfo>
+		<graphic format="png" fileref="figures/monitorDisplay" srccredit="Bill Day">
+                </graphic>
+	      </screenshot>
+	    </figure>
+
+
+
+
+    </sect2>
+  </sect1>
+  
+ <!-- ============= Bugs ================================== -->
+ 
+  <sect1 id="bugs">
+    <title>Known Bugs and Limitations</title>
+    <para>
+      Other than menu items that have not yet been implemented, this
+      application has no known bugs.
+    </para>
+  </sect1>
+
+
+<!-- ============= Authors ================================ -->
+
+ <sect1 id="authors">
+    <title>Authors</title>
+    <para>
+      <application>Logview</application> was written by Cesar Miquel
+      (<email>miquel@df.uba.ar</email>). To find more information about
+      <application>logview</application>, please visit the <ulink
+								  url="http://www.df.uba.ar/~miquel/logview" type="http">logview Web
+	page</ulink>.  Please send all comments, suggestions, and bug
+      reports to the <ulink url="http://bugs.gnome.org" type="http">GNOME
+	bug tracking database</ulink>. (Instructions for submitting bug
+      reports can be found <ulink
+				  url="http://bugs.gnome.org/Reporting.html" type="http">
+	on-line</ulink>.) If you are using
+      GNOME 1.1 or later, you can also use <application>Bug Report
+	Tool</application> (<command>bug-buddy</command>), available in the
+      <guisubmenu>Utilities</guisubmenu> submenu of <guimenu>Main
+	Menu</guimenu>, for submitting bug reports.
+    </para>
+
+    <para>
+      This manual was written by Judith Samson
+      (<email>judith@samsonsource.com</email>). Please send all comments and
+      suggestions regarding this manual to the <ulink type="http"
+						      url="http://www.gnome.org/gdp">GNOME Documentation Project</ulink> 
+      by sending an email to <email>docs@gnome.org</email>. You can also
+      add your comments online by using the <ulink type="http"
+						   url="http://www.gnome.org/gdp/doctable/">GNOME Documentation Status
+	Table</ulink>.
+    </para>
+
+  <!-- For translations: uncomment this:
+
+  <para>
+   Latin translation was done by ME
+   (<email>MYNAME@MYADDRESS</email>). Please send all  comments  and
+   suggestions regarding this translation to SOMEWHERE.
+  </para>
+
+  -->
+
+  </sect1>
+
+
+ <!-- ============= Application License ============================= -->
+
+  <sect1 id="license">
+  <title>License</title>
+    <para>
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the <citetitle>GNU General Public
+	License</citetitle> as published by the Free Software Foundation;
+      either version 2 of the License, or (at your option) any later
+      version.
+    </para>
+    <para>
+      This program is distributed in the hope that it will be useful, but
+      WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      <citetitle>GNU General Public License</citetitle> for more details.
+    </para>
+    <para>
+      A copy of the <citetitle>GNU General Public License</citetitle> is
+      included as an appendix to the <citetitle>GNOME Users
+	Guide</citetitle>.  You may also obtain a copy of the
+      <citetitle>GNU General Public License</citetitle> from the Free
+      Software Foundation by visiting <ulink type="http"
+					     url="http://www.fsf.org">their Web site</ulink> or by writing to
+      <address>
+	Free Software Foundation, Inc.
+	<street>59 Temple Place</street> - Suite 330
+	<city>Boston</city>, <state>MA</state> <postcode>02111-1307</postcode>
+	<country>USA</country>
+      </address>
+    </para>
+  </sect1>
+</article>
+
+
+
+

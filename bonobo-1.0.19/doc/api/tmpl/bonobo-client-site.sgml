@@ -1,0 +1,226 @@
+<!-- ##### SECTION Title ##### -->
+BonoboClientSite
+
+<!-- ##### SECTION Short_Description ##### -->
+Container side object embedding server.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+   The <classname>BonoboClientSite</classname> implements the
+   <classname>Bonobo::ClientSite</classname> CORBA interface.  It acts
+   as the container-side contact for
+   <classname>BonoboEmbeddable</classname> objects.
+</para>
+
+<para>
+   For each object embedded in your application, you should create a
+   <classname>BonoboClientSite</classname> object.  
+</para>
+
+<para>
+   Once you have a handle on a remote object that implements the
+   <classname>Bonobo::Embeddable</classname> interface (typically
+   returned by bonobo_object_activate() or
+   bonobo_get_object () or wrapper with
+   bonobo_object_client_from_corba ()) of type
+   <classname>BonoboObjectClient</classname>), you will have to bind
+   this object to the <classname>BonoboClientSite</classname> using the
+   bonobo_client_site_bind_embeddable ().  Once this is done, you will
+   be able to request a #BonoboView on the #BonoboClientSite.  
+</para>
+
+<para>
+   The #BonoboClientSite object also provides access to the remote
+   BonoboEmbeddable object's verb list.  
+</para>
+
+<example>
+   <title>Sample usage</title>
+
+   <para>
+      This demostrates the use of the #BonoboClientSite object.  This
+      launches the object specified, creates a #BonoboClientSite,
+      then requests a new #BonoboViewFrame and finally it returns the
+      widget that represents that component.
+   </para>
+      
+   <programlisting>
+GtkWidget *
+create_widget_from_component (BonoboContainer *container, const char *id)
+{
+	BonoboObjectClient *server;
+	BonoboClientSite   *client_site;
+	BonoboViewFrame    *view_frame;
+
+	/*
+	 * Launch the requested component
+	 */
+	server = bonobo_object_activate (id, 0);
+	if (!server){
+		printf ("Could not activate the server");
+		return NULL;
+	}
+
+	client_site = bonobo_client_site_new (app->container);
+
+	/*
+	 * Add this client site to the container
+	 */
+	bonobo_container_add (container, BONOBO_OBJECT (client_site));
+
+	/*
+	 * Bind the component to the client site
+	 */
+	bonobo_client_site_bind_embeddable (client_site, server);
+
+	/*
+	 * Create a new BonoboView, and then get a GtkWidget
+	 */
+	view_frame = bonobo_client_site_embeddable_new_view (client_site);
+
+	/*
+	 * Get the widget for this view.
+	 */
+
+	 return bonobo_view_frame_get_wrapper (view_frame);
+}
+
+   </programlisting>
+</example>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+  #BonoboEmbeddable, #BonoboContainer, #BonoboObjectClient, #BonoboViewFrame
+</para>
+
+<!-- ##### STRUCT BonoboClientSite ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF BonoboClientSiteClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION bonobo_client_site_new ##### -->
+<para>
+
+</para>
+
+@container: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_construct ##### -->
+<para>
+
+</para>
+
+@client_site: 
+@container: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@corba_client_site: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_bind_embeddable ##### -->
+<para>
+
+</para>
+
+@client_site: 
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_get_embeddable ##### -->
+<para>
+
+</para>
+
+@client_site: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_get_container ##### -->
+<para>
+
+</para>
+
+@client_site: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_new_view_full ##### -->
+<para>
+
+</para>
+
+@client_site: 
+@uic: 
+@visible_cover: 
+@active_view: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@uih: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_new_view ##### -->
+<para>
+
+</para>
+
+@client_site: 
+@uic: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@uih: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_new_item ##### -->
+<para>
+
+</para>
+
+@client_site: 
+@uic: 
+@group: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_get_verbs ##### -->
+<para>
+
+</para>
+
+@client_site: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_client_site_free_verbs ##### -->
+<para>
+
+</para>
+
+@verb_list: 
+
+
+<!-- ##### SIGNAL BonoboClientSite::show-window ##### -->
+<para>
+
+</para>
+
+@bonoboclientsite: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL BonoboClientSite::save-object ##### -->
+<para>
+
+</para>
+
+@bonoboclientsite: the object which received the signal.
+@arg1: 
+

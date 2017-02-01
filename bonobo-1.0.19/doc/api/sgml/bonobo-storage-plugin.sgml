@@ -1,0 +1,247 @@
+<refentry id="bonobo-bonobo-storage-plugin">
+<refmeta>
+<refentrytitle>bonobo-storage-plugin</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>bonobo-storage-plugin</refname><refpurpose>The interface for pluggable bonobo storage modules</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+#define     <link linkend="BONOBO-STORAGE-VERSION-CAPS">BONOBO_STORAGE_VERSION</link>
+struct      <link linkend="StoragePlugin">StoragePlugin</link>;
+<link linkend="gint">gint</link>        (<link linkend="StoragePluginInitFn">*StoragePluginInitFn</link>)          (<link linkend="StoragePlugin">StoragePlugin</link> *plugin);
+<link linkend="BonoboStorage">BonoboStorage</link>* (<link linkend="BonoboStorageOpenFn">*BonoboStorageOpenFn</link>)       (const char *path,
+                                             <link linkend="gint">gint</link> flags,
+                                             <link linkend="gint">gint</link> mode,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+<link linkend="BonoboStream">BonoboStream</link>* (<link linkend="BonoboStreamOpenFn">*BonoboStreamOpenFn</link>)         (const char *path,
+                                             <link linkend="gint">gint</link> flags,
+                                             <link linkend="gint">gint</link> mode,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+extern      GList *<link linkend="storage-plugin-list">storage_plugin_list</link>;
+<link linkend="gint">gint</link>        <link linkend="init-storage-plugin">init_storage_plugin</link>             (<link linkend="StoragePlugin">StoragePlugin</link> *plugin);
+void        <link linkend="bonobo-storage-load-plugins">bonobo_storage_load_plugins</link>     (void);
+<link linkend="StoragePlugin">StoragePlugin</link>* <link linkend="bonobo-storage-plugin-find">bonobo_storage_plugin_find</link>   (const <link linkend="gchar">gchar</link> *name);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+This header is only needed by <link linkend="BonoboStorage">BonoboStorage</link> and <link linkend="BonoboStream">BonoboStream</link>
+implementation plugins. Essentialy these are shared library
+modules that implement only 1 public function
+<function>init_storage_plugin</function>. It is unlikely that
+most Bonobo users will wish to implement a storage or stream
+plugin.
+</para>
+
+<para>
+The init function fills out a StoragePlugin structure,
+most importantly it fills in a version string that defines
+the plugin ABI version built against, this is defined by
+the version of bonobo-storage-plugin.h you build against.
+  <example>
+     <title>Sample Storage plugin init function</title>
+     <programlisting>
+gint 
+init_storage_plugin (StoragePlugin *plugin)
+{
+	g_return_val_if_fail (plugin != NULL, -1);
+
+	plugin->name = "fs";
+	plugin->description = "Native Filesystem Driver";
+	plugin->version = BONOBO_STORAGE_VERSION;
+	
+	plugin->storage_open = bonobo_storage_fs_open; 
+	plugin->stream_open = bonobo_stream_fs_open; 
+
+	return 0;
+}
+     </programlisting>
+  </example>
+  The callbacks for opening streams and storages are registered
+and these are used by the <function>bonobo_storage_open</function>
+and <function>bonobo_stream_open</function> functions when your
+plugin name is passed to these.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BONOBO-STORAGE-VERSION-CAPS">BONOBO_STORAGE_VERSION</title>
+<programlisting>#define BONOBO_STORAGE_VERSION "1.0"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="StoragePlugin">struct StoragePlugin</title>
+<programlisting>struct StoragePlugin {
+	/* public, read only */
+	gchar               *filename;     
+	gchar               *name;         /* efs, file */
+	gchar               *description;
+	gchar               *version;
+	BonoboStorageOpenFn  storage_open;
+	BonoboStreamOpenFn   stream_open;
+	/* private */
+	GModule             *handle;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="StoragePluginInitFn">StoragePluginInitFn ()</title>
+<programlisting><link linkend="gint">gint</link>        (*StoragePluginInitFn)          (<link linkend="StoragePlugin">StoragePlugin</link> *plugin);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>plugin</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboStorageOpenFn">BonoboStorageOpenFn ()</title>
+<programlisting><link linkend="BonoboStorage">BonoboStorage</link>* (*BonoboStorageOpenFn)       (const char *path,
+                                             <link linkend="gint">gint</link> flags,
+                                             <link linkend="gint">gint</link> mode,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>mode</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboStreamOpenFn">BonoboStreamOpenFn ()</title>
+<programlisting><link linkend="BonoboStream">BonoboStream</link>* (*BonoboStreamOpenFn)         (const char *path,
+                                             <link linkend="gint">gint</link> flags,
+                                             <link linkend="gint">gint</link> mode,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>mode</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="storage-plugin-list">storage_plugin_list</title>
+<programlisting>extern GList *storage_plugin_list;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="init-storage-plugin">init_storage_plugin ()</title>
+<programlisting><link linkend="gint">gint</link>        init_storage_plugin             (<link linkend="StoragePlugin">StoragePlugin</link> *plugin);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>plugin</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-storage-load-plugins">bonobo_storage_load_plugins ()</title>
+<programlisting>void        bonobo_storage_load_plugins     (void);</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-storage-plugin-find">bonobo_storage_plugin_find ()</title>
+<programlisting><link linkend="StoragePlugin">StoragePlugin</link>* bonobo_storage_plugin_find   (const <link linkend="gchar">gchar</link> *name);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="BonoboStorage">BonoboStorage</link>, <link linkend="BonoboStream">BonoboStream</link>
+</para>
+</refsect1>
+
+</refentry>

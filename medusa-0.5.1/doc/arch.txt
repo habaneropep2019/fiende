@@ -1,0 +1,127 @@
+This is a document describing implementation plans for searching in 
+nautilus.  Nautilus will be the first application for medusa technology.
+
+
+Features of search for version 1.0
+
+There will be two index panels which will allow for searching, a file
+search index panel, and a text search index panel.
+
+The file search index panel will be organized as a sentence.  The
+sentence will allow users to choose a set of files that satisfy
+criteria relating to MIME type, file owner, file size, and date of
+last change.  I would like there to also be a box that allows a user
+to select a search only in the current folder, although I don't know
+if this is needed.
+
+The text search panel will for now look like the web search panel,
+except it will not have a selector for the web search mechanism.
+Instead, it will have a selector to choose which file system and/or
+the current folder should be searched.  files that contain all of the
+words in the text box will be returned.
+
+
+Search Architecture 
+
+The information stored for the two types of searches above contain
+distinct correspondces (file attributes -> files) and (words -> file
+locations).  Therefore there will be two indexes, one that stores
+attributes of files on a file system, and another that stores contents
+of the text files in a file system.
+
+For each of the two cases, there will be one index per filesystem.
+For now, I will assume that root will create and deal with the index.
+This may not be possible for some users, and so it will be necessary
+to have the ability for a non root user to index the parts of the
+filesystem he/she has access permissions for.  I have decided to defer
+this part of the process until after version 1.0.
+
+1.  Indexing/Finding Files by File Attribute
+
+In the case where the root user is able to create an index itself,
+there will be a daemon that indexes the file system running separately
+from Nautilus, and a port where requests to the index can be made.
+
+The daemon to start will initially index the filesystem freshly, and
+then after every certain period of time will go through and stat
+files, updating data on files that have changed since the last check.
+It would be nice to design the rechecks not to interfere with users,
+and so to not run or quit, if machine load is at a certain level, but
+I think this can be added later, and will not be included in version
+1.0.  Since atimes on directories are recursive, most likely this will
+not involve a lot of work most of the time.  The worst case number of
+stats will be h*n, where n is the number of files changed since the
+last check, and h is the maximum number of ancestor directories of a
+changed file.
+
+The request responder will also run as root.  It will be responsible
+for taking search requests from users and returning them the result
+data.  This must be run as root, so that it can read the whole index,
+and only return the data that the requestor has permission to read.
+Right now, I do not have a way of authenticating user ids for
+requests, and I am open to suggestions on how to do this.  
+
+The idea behind this architecture is to allow for the following: One,
+the indexing and request response must be done as root, so they must
+be separate from a nautilus invocation.  Additionally, I think search
+functionality could be useful outside of nautilus, and this
+architecture allows other applications to use the same features very
+easily.
+
+2.  Indexing/Finding Information within Files
+
+The text indexing architecture will be parallel to the filesystem
+indexing stuff.  Text and file attrubte indexing can even run in the
+same process, and therefore share information about which files have
+been updated.  The disadvantage to this approach would be that both
+the index files would be locked at once, as opposed to just one.
+
+Specifically, for a set of words (For now, single words, excluding
+very common words like "the") a list of files where that word occurs
+will be stored.  This will allow constant time search returns.
+
+In brief, the text indexing architecture will be as follows:
+
+1.  a library to translate strings into byte length tokens, to
+    compress the index size.  
+
+2.  a file with the blocks where the file names that a piece of text
+    occurs are found.  Blank space will be left in new blocks, and the
+    last address space in each block will point to a new block to
+    allow for incremental indexing.
+
+3.  Use of a temporary index file 
+
+I have been working with Dan Winship, who works at Helix Code, and
+wrote IBEX, which is the indexing software that Evolution is using
+currently.  He thought about rewriting it but is now sold on our text
+indexing software.  He requested two features which the above
+architecture make it very easy to implement.
+
+1.  Support for "virtual files", since an email may not be an actual
+    file, but should still be treated as such for the purposes of
+    indexing.  In the above architecure, any location that can be
+    described by a string may be used as a location, as long as the
+    indexer knows to sequence through those locations during the
+    indexing process.
+
+2.  Incremental indexing, which is mentioned above.  
+
+One note about incremental indexing: Any incremental index, in order
+to remain efficient in the long term, must be "synced", which is
+equivalent to defragging a disk.  We should think about how to
+incorporate this process, or if we even care.  Think we should care
+though.
+
+One other note: I want to be able to search for not only one word
+words but phrases, and objects that occur inside files at some point
+in the future.  It will be easy to incorporate this into the index (by
+just creating new tokens that correspond to phrases or other more
+complex elements), but the ui issues for this are immense.  We will
+need to think about what things are interesting and where they can be
+incorporated.  But this, of course, is not for version 1.0.
+
+
+
+
+

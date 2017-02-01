@@ -1,0 +1,17 @@
+#!/bin/sh
+
+top=${REPTOP:-.}
+name=${REPNAME:-rep}
+
+if [ "x$1" != "x-g" ]; then
+  REP_DL_LOAD_PATH=${top}/src/.libexec \
+      REPLISPDIR=${top}/lisp \
+      REPDOCFILE=${top}/DOC \
+      ${top}/src/${name} $*
+else
+  shift
+  REP_DL_LOAD_PATH=${top}/src/.libexec \
+      REPLISPDIR=${top}/lisp \
+      REPDOCFILE=${top}/DOC \
+      ${top}/libtool gdb ${top}/src/${name} $*  
+fi

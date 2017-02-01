@@ -1,0 +1,375 @@
+/* $Id: window.gen_h,v 1.72 2001/07/15 13:33:39 murrayc Exp $ */
+
+/* window.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/bin.h>
+#include <gtk/gtkwindow.h>
+CLASS_START(Gtk);
+class AccelGroup;
+
+//: Toplevel Window
+//- This represents all widgets which are physical windows controlled
+//- by the window manager.  Windows have a hidden reference controlled
+//- by the gtk-- kit.
+//- 
+//- Windows which are told to manage() are not deleted until they are
+//- sent the destroy signal.
+class Window : public Bin {
+  WRAP_CLASS(Window,GtkWindow,GTK_WINDOW,GTK_IS_WINDOW,window,Gtk::Bin,GtkBin,GTK_BIN);
+public:
+   
+  //: Create a window.
+  //- This creates a window with an optional {type}. 
+  explicit Window(GtkWindowType type=GTK_WINDOW_TOPLEVEL);
+
+  bool is_toplevel() {return gtkobj()->type==GTK_WINDOW_TOPLEVEL;}
+  bool is_dialog()   {return gtkobj()->type==GTK_WINDOW_DIALOG;}
+  bool is_popup()    {return gtkobj()->type==GTK_WINDOW_POPUP;}
+
+  WRAP_MEMBER(value,window_type,type,GtkWindowType,GtkWindowType);
+
+  //: Set the window {title}.
+  WRAP_METHOD(
+    void gtk_window_set_title(GtkWindow*,const gchar*),
+    void set_title               (const nstring &title));
+
+  //: Set the window manager names.
+  //- See {wmclass_name} and {wmclass_class}.
+  WRAP_METHOD(
+    void gtk_window_set_wmclass(GtkWindow*,const gchar*,const gchar*),
+    void set_wmclass           (const nstring &wmclass_name,
+				const nstring &wmclass_class));
+
+  //: Changes how a toplevel window deals with its size request and user resize attempts.
+  //- There are really only two reasonable ways to call this function: 
+  //-
+  //- 1. set_policy( FALSE, TRUE, FALSE) means that the window is user-resizable.
+  //-
+  //- 2. set_policy(FALSE, FALSE, TRUE) means that the window's size is program-controlled, and should simply
+  //- match the current size request of the window's children.
+  //-
+  //- The first policy is the default, that is, by default windows are designed to be resized by users.
+  //-
+  //- The basic ugly truth of this function is that it should be simply: 
+  void set_user_resizeable(gboolean setting);
+  //-
+  //- So, pretend it is like that, and only use the two policies mentioned above.
+  //- GTK+ 1.4 may replace gtk_window_set_policy() with a nicer function like set_user_resizeable().
+  //-
+  //- If set to TRUE, the {\var allow_grow} parameter allows the user to expand the window beyond
+  //- the size request of its child widgets. If {\var allow_grow} is TRUE,
+  //- be sure to check that your child widgets work properly as the window is resized.
+  //-
+  //- A toplevel window will always change size to ensure its child widgets receive their
+  //- requested size. This means that if you add child widgets, the
+  //- toplevel window will expand to contain them. However, normally the toplevel will not
+  //- shrink to fit the size request of its children if it's too large; the
+  //- {\var auto_shrink} parameter causes the window to shrink when child widgets have too much space.
+  //- {\var auto_shrink} is normally used with the second of the
+  //- two window policies mentioned above. That is, set {\var auto_shrink} to TRUE if you want
+  //- the window to have a fixed, always-optimal size determined by your program.
+  //-
+  //- Note that {\var auto_shrink} doesn't do anything if {\var allow_shrink} and {\var allow_grow}
+  //- are both set to FALSE.
+  //-
+  //- Neither of the two suggested window policies set the {\var allow_shrink} paramter to TRUE.
+  //- If {\var allow_shrink} is TRUE, the user can shrink the window so
+  //- that its children do not receive their full size request; this is basically a bad thing,
+  //- because most widgets will look wrong if this happens. Furthermore
+  //- GTK+ has a tendency to re-expand the window if size is recalculated for any reason. The
+  //- upshot is that {\var allow_shrink} should always be set to FALSE.
+  //-
+  //- Sometimes when you think you want to use {\var allow_shrink}, the real problem is that
+  //- some specific child widget is requesting too much space, so the
+  //- user can't shrink the window sufficiently. Perhaps you are calling {Gtk::Widget::set_usize()}
+  //- on a child widget, and forcing its size request to be too large.
+  //- Instead of setting the child's usize, consider using {Gtk::Window::set_default_size()} so that
+  //- the child gets a larger allocation than it requests.
+  WRAP_METHOD(
+    void gtk_window_set_policy(GtkWindow*,gint,gint,gint),
+    void set_policy            (gint allow_shrink,
+				gint allow_grow,
+				gint auto_shrink));
+
+  //: Set the window position.
+  WRAP_METHOD(
+    void gtk_window_set_position(GtkWindow*,GtkWindowPosition),
+    void set_position            (GtkWindowPosition position));
+
+  WRAP_METHOD(
+    gint gtk_window_activate_focus(GtkWindow*),
+    gint activate_focus());
+
+  WRAP_METHOD(
+    gint gtk_window_activate_default(GtkWindow*),
+    gint activate_default());
+
+  WRAP_METHOD(
+    void gtk_window_set_transient_for (GtkWindow*,GtkWindow*),
+    void set_transient_for       (Gtk::Window &parent));
+  
+  WRAP_METHOD(
+    void gtk_window_set_geometry_hints(GtkWindow*,GtkWidget*,GdkGeometry*,GdkWindowHints),
+    void set_geometry_hints    (Gtk::Widget &geometry_widget,
+				GdkGeometry      *geometry,
+				GdkWindowHints   geom_mask));
+
+  WRAP_METHOD(
+    void gtk_window_set_default_size(GtkWindow*,gint,gint),
+    void set_default_size        (gint width,
+				gint height));
+
+  WRAP_METHOD(
+    void gtk_window_set_modal(GtkWindow*,gboolean),
+    void set_modal               (bool modal));
+
+  // set_focus is internal  
+
+  //: 
+  WRAP_METHOD(
+    void gtk_window_add_accel_group(GtkWindow*,GtkAccelGroup*),
+    void            add_accel_group(Gtk::AccelGroup &accel_group));
+
+  //:
+  WRAP_METHOD(
+    void gtk_window_remove_accel_group(GtkWindow*,GtkAccelGroup*),
+    void            remove_accel_group(Gtk::AccelGroup &accel_group));
+
+/* We are going to create our own accel concept, gtk+ is not documented
+   well enough to be of any use. */
+
+   //: returns a default accel group for this window
+   //- This is a gtk-- specific function.  This accel group can not
+   //- be removed.
+   AccelGroup* get_accel_group();
+
+private:
+   AccelGroup *accel_group_; 
+};
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+#include <gtk--/accelgroup.h>
+namespace Gtk
+{
+
+Window::Window(GtkWindowType typex)
+  :Bin((GtkBin*)(gtk_object_new(get_type(),0))),
+   accel_group_(0)
+{
+  initialize_class();
+  gtkobj()->type=typex;
+}
+
+Window::Window(GtkWindow *castitem)
+  :Bin((GtkBin*)(castitem)),
+   accel_group_(0)
+{
+  initialize_class();
+}
+
+Window::~Window()
+{
+  if (is_visible()) hide(); // we are going to try to die anyway
+}
+
+AccelGroup* Window::get_accel_group()
+{
+  if (!accel_group_) 
+    {
+      GtkAccelGroup *accel=gtk_accel_group_new();
+      gtk_window_add_accel_group(gtkobj(),accel);
+      accel_group_=wrap(accel);
+    }
+  return accel_group_;
+}
+
+} /* namespace Gtk */
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Window)
+//. name: title
+//. type: nstring
+//. get:
+//. set: {set_title()}
+//. desc: Title displayed by window manager for this window.
+//.   0 is means this window has no title.  
+//. 
+//. Windows with a {type} of {\enum GTK_WINDOW_POPUP} may not display 
+//. a title even if set.
+
+//. name: wmclass_name
+//. type: nstring
+//. get:
+//. set: {set_wmclass()}
+//. desc: Property used for X window manager.
+
+//. name: wmclass_class
+//. type: nstring
+//. get:
+//. set: {set_wmclass()}
+//. desc: Property used for X window manager.
+
+//. name: type
+//. type: GtkWindowType
+//. get:
+//. set: 
+//. desc: This flags determine what kind of decorations and behavior this
+//. window gets. This information is given to the window manager 
+//. and it determines how to show the window on the screen.
+//. See {GtkWindowType}
+//.
+//. Possible values for GtkWindowType argument are:
+//. {\enum GTK_WINDOW_TOPLEVEL}, {\enum GTK_WINDOW_DIALOG},
+//. {\enum GTK_WINDOW_POPUP} 
+
+//. name: focus_widget
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: default_widget
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: transient_parent
+//. type: Gtk_Window*
+//. get:
+//. set:
+//. desc:
+
+//. name: resize_count
+//. type: gushort
+//. get:
+//. set:
+//. desc:
+
+//. name: allow_shrink
+//. type: guint:1
+//. get:
+//. set: {set_policy()}
+//. desc: Indicates if shrinking this window is allowed by the user.
+
+//. name: allow_grow
+//. type: guint:1
+//. get:
+//. set: {set_policy()}
+//. desc: Indicates if expanding this window is allowed by the user.
+
+//. name: auto_shrink
+//. type: guint:1
+//. get:
+//. set: {set_policy()}
+//. desc: Indicates the window shrinks automatically when widgets within it shrink.
+
+//. name: handling_resize
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: position
+//. type: guint:2
+//. get:
+//. set:
+//. desc: Determine where the window will be displayed when it is
+//. finally drawn to the screen. Currently the following positions and 
+//. the effect they have on window placement can be specified.  
+//. See {GtkWindowPosition}
+//.
+//. Possible states are:
+//.  {\enum GTK_WIN_POS_NONE},
+//.  {\enum GTK_WIN_POS_CENTER},
+//.  {\enum GTK_WIN_POS_MOUSE}
+
+//. name: use_uposition
+//. type: guint:1
+//. get:
+//. set:
+//. desc: The following flag is initially TRUE when a window is mapped.
+//. and will be set to FALSE after it is first positioned.
+//. It is also temporarily reset when the window's size changes.
+//. 
+//. When TRUE, we move the window to the position the app set.
+//.    
+
+//. name: modal
+//. type: guint:1
+//. get:
+//. set:  {set_modal()}
+//. desc: A modal window is one that must be responded to before 
+//.   the user is allowed to return to the application.  Use modal
+//.   windows sparingly.
+
+
+//+ ENUM(GtkWindowPosition)
+//. value: GTK_WIN_POS_NONE
+//. desc: {\b No position specified.}
+//.
+//. The window manager is left full freedom to place the window whereever
+//. it wants.
+
+//. value: GTK_WIN_POS_CENTER
+//. desc: {\b Center window.}
+//.
+//. This will cause the window to center itself on the the
+//. screen. This option setting will take into account the {\b virtual screen}
+//.  size
+//. when calculating the center. This is not the same as the 
+//. {\i virtual desktop}
+//. setting of many window managers. It will center itself on the current
+//. {\i virtual desktop}. 
+
+//. value: GTK_WIN_POS_MOUSE
+//. desc: {\b User selected position.}
+//.
+//. This position option will cause the window to center itself under the
+//. mouse pointers' current location. Typical uses for this setting is in
+//. warning/error/informational dialogs where user interaction is desired.
+
+
+//+ ENUM(GtkWindowType)
+//. value: GTK_WINDOW_TOPLEVEL 
+//. desc: Used for the main application
+//. Window that will remain for the entire application run.
+
+//. value: GTK_WINDOW_DIALOG 
+//. desc: Used for transient windows with input.
+//. These windows will open up, gather some input or provide some
+//. application specific updates, then close. The window manager is free not
+//. to provide all the 'normal' window functions to this window. 
+
+//. value: GTK_WINDOW_POPUP 
+//. desc: Used for transient windows without input. 
+//. These
+//. windows are typically used for when no user interaction is required, to
+//. notify the user of some condition. Other uses for these types of windows
+//. are for 'about windows', startup windows and the like. 
+//. 
+//. Popup windows often lack decorations and will not be on window lists.
+//. They should be able to handle events even though they will {\b not} 
+//. get kill and close events from the window manager. 
+
+

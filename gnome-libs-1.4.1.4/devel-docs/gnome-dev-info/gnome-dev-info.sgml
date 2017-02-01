@@ -1,0 +1,1022 @@
+<!doctype book PUBLIC "-//Davenport//DTD DocBook V3.0//EN" [
+<!entity libgnome SYSTEM "libgnome.sgml">
+<!entity libgnomeui SYSTEM "libgnomeui.sgml">
+<!entity gnome-app-helper SYSTEM "gnome-app-helper.sgml">
+<!entity gnome-canvas SYSTEM "gnome-canvas.sgml">
+<!entity gnome-message-utils SYSTEM "gnome-message-utils.sgml">
+<!entity x-concepts SYSTEM "x-concepts.sgml">
+<!entity libgnorba SYSTEM "libgnorba.sgml">
+<!entity gnome-mdi SYSTEM "gnome-mdi.sgml">
+]>
+<book>
+  <bookinfo>
+    <title>Gnome Developers' Information</title>
+    <authorgroup>
+      <author>
+	<firstname>Horacio</firstname>
+	<surname>Pe&ntilde;a</surname>
+	<affiliation>
+	  <address>
+	    <email>horape@compendium.com.ar</email>
+	  </address>
+	</affiliation>
+      </author>
+    </authorgroup>
+    <copyright>
+      <year>1998</year>
+      <holder>The GNOME Project - Horacio J. Pe&ntilde;a (n.)</holder>
+    </copyright>
+    <legalnotice>
+      <para>This documentation is free software; you can redistribute
+	it and/or modify it under the terms of the GNU General Public
+	License as published by the Free Software Foundation; either
+	version 2 of the License, or (at your option) any later
+	version.</para>
+
+      <para>This program is distributed in the hope that it will be
+	useful, but WITHOUT ANY WARRANTY; without even the implied
+	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+	PURPOSE.  See the GNU General Public License for more
+	details.</para>
+
+      <para>You should have received a copy of the GNU General Public
+	License along with this program; if not, write to the Free
+	Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+	MA 02111-1307 USA</para>
+
+      <para>For more details see the file COPYING in the source
+	distribution of GNOME.</para>
+    </legalnotice>
+  </bookinfo>
+
+  <toc></toc>
+
+  <chapter id="intro">
+    <title>Introduction..</title>
+    <sect1 id="feedback">
+      <title>Feedback..</title>
+      <para>Well, my native language is Spanish, so you're probably going
+        to find a lot of grammatical and spelling errors. Please tell me
+        about them.</para>
+      </sect1>
+
+    <sect1 id="whatis">
+      <title>What is GNOME..</title>
+      <para>
+	GNOME stands for GNU Network Object Model Environment. The GNOME
+	project intends to build a complete, user-friendly desktop based
+	entirely on free software. GNOME is part of the GNU project. The
+	desktop will consist of small utilities and larger applications which
+	share a consistent look and feel. GNOME uses GTK as the GUI toolkit
+	for all GNOME-compliant applications.
+	</para>
+      </sect1>
+
+    <sect1 id="thisdoc">
+      <title>This document.</title>
+      <warning>
+	<para>
+          This tutorial is in its early stages.  So it's almost
+          empty and hasn't been checked. GNOME too is developing rapidly
+          so it's APIs are changing frequently and
+          the info here may well be inaccurate. When this document and
+          the code disagree, the code wins. :-)
+        </para>
+      </warning>
+      <para>
+        As a new GNOME developer I've had some trouble finding info about
+        how to do some things (and the people on the list were being a bit
+        annoyed with my questions). So I'm trying to make it easy for you,
+        the developers that come after me.
+        </para>
+      <para>
+        This document is not only intended to be a tutorial, but also a reference.
+        I hope it'll grow to be the ultimate guide to the GNOME internals.
+        I would like to include here the architecture notes that are now in
+        the website and the style guide.
+        </para>
+      <para>
+        If you add or change some API please document it here.
+        </para>
+      </sect1>
+
+    </chapter>
+
+  <chapter id="nontech">
+    <title>Non (very) technical issues.</title>
+    <para>
+      This chapter will discuss issues ranging from how to obtain a CVS account
+      to indenting standards.
+      </para>
+
+    <sect1 id="proglang">
+      <title>Programming languages that can be used in GNOME.</title>
+      <para>
+        GNOME is intended to support many languages. But you need to have
+        GTK+ and GNOME bindings for your particular language. Our preferred
+        languages are C and scheme (using guile.) There are bindings too
+        for Objective C. There also are GTK bindings for C++ (Gtk--) and for
+        Perl, but as far as I know, they aren't very good and still there aren't bindings
+        for GNOME stuff for these languages.
+        </para>
+      </sect1>
+
+    <sect1 id="start">
+      <title>How to start hacking GNOME.</title>
+      <para>
+        Read the README and HACKING files to learn how to download the latest
+        GNOME from CVS.
+	</para>
+      <para>
+        You will need know the Gtk+ toolkit. If you are not familiar with it,
+	you may consider reading the
+        <ulink URL="http://www.levien.com/~slow/gtk/">Gtk+ Tutorial</ulink>.
+        </para>
+      <para>
+        When you've made your changes you need to make a diff... The best
+        way to do it is:
+        <literallayout>
+        <prompt>$ </prompt><userinput>cvs diff -u > diffs</userinput>
+        </literallayout>
+        [FIXME: Does it work with anonymous CVS?]
+        After this send the diffs file to <email>gnome-devel-list@gnome.org</email>.
+	In a short time one of the core hackers will answer you and he
+	is going to be your "GNOME godfather". Then, and until you have a
+	CVS account send your patches to him.
+        [FIXME: What think, you GNOME core hackers, about the godfather idea?]
+        </para>
+      </sect1>
+
+    <sect1 id="what">
+      <title>What to hack.</title>
+      <para>
+        If you want to dirty your hands with GNOME, I've some advice for you:
+	</para>
+      <itemizedlist>
+        <listitem><para>Start simple. Do little things and familiarize yourself 
+          with GNOME. You'll have time to do great things afterwards.</para>
+          </listitem>
+        <listitem><para>Read the TODO. You'll find some interesting things to 
+          work in.</para>
+          </listitem>
+        </itemizedlist>
+      </sect1>
+
+    <sect1 id="CVS">
+      <title>Obtaining a CVS account.</title>
+      <para>
+        When you have been working on GNOME for a while it's may be time to
+        get a CVS account. Usually you will be offered one by your "godfather";
+        there is no harm in asking, but remember a CVS account carries responsibilities
+        too.
+	</para>
+      </sect1>
+
+    <sect1 id="altpol">
+      <title>Policy on hacking another people's code.</title>
+      <para>
+        If you're going to do little clean fixes, go for it. But if you
+        plan to do changes to some API or rewriting some code please
+        ask / tell the author.  Modules on CVS have different levels
+        of maturity: some of them are being developed actively, other
+        are very stable and changes to it should usually go first
+        through the module maintainer.  To help clarify this situation,
+        usually, there is a file called README.CVS included on every
+        module on CVS where the policy is detailed for the hacking you
+        can do to a module.
+	</para>
+
+	<para>
+	If in doubt, ask the gnome-hackers@nuclecu.unam.mx for
+	assistance. 
+	</para>
+      </sect1>
+
+    <sect1 id="addAUTH">
+      <title>When adding yourself to AUTHORS file.</title>
+      <para>
+        We know it. You're working in the GNOME to impress girls saying them:
+        "Hey, I'm a GNOME developer" :-), so you want to add yourself to
+        the AUTHORS file as quickly as you can...
+	</para>
+      <para>
+        To know when you can add yourself only think :-), if you've only
+        fixed some typos don't do it. If you've added a great bunch of
+        (good) code, then go ahead.
+        </para>
+      <para>
+        (<emphasis>Very personal opinion:</emphasis>) I suggest you don't 
+        add yourself to the root AUTHORS file. I think you should
+        wait for some of the core hackers recognize your work and add you.
+        (i believe it would be very much more satisfying to know that the
+        "real" hackers value your work, probably this belief is why I am not
+        there yet... :-) )
+        </para>
+      </sect1>
+
+    <sect1 id="codstd">
+      <title>Coding Standards.</title>
+      <itemizedlist>
+        <listitem><para> Code that goes into Gnome uses the Linux
+          kernel coding 
+          style (which is basically the GNU coding style but indentation is 
+          8 spaces, and braces are on the same line as the statements that 
+          open the block).  Make yourself familiar with both coding
+          styles (the GNU coding style and the Linux kernel coding
+          style)</para>
+	  <para>If you are working with vim, you can use the following setting
+	  for the cindent feature that will be compatible with the style used
+	  in gnome-libs. If you put this setting in your ~/.vimrc file, it will
+	  turn on cindent and other stuff useful for writing code for *.c and
+	  *.h files.
+      	  </para>
+	  <programlisting>
+	  set cino=t0,:0,(0,)100,*100
+	  au BufReadPost *.c set cindent sm wm=0 tw=0
+	  au BufReadPost *.h set cindent sm wm=0 tw=0
+	  </programlisting>
+	  </listitem>
+
+        <listitem><para>Try to make your code readable in 80 columns</para>
+          </listitem>
+
+        <listitem><para> When you change things, edit the ChangeLog, so the 
+          other people can know what you've did.  The ChangeLog is an
+          important document, as it is shipped with the package and it
+          lets the end user and programmers not familar with the GNOME
+          way of things to know what has been the evolution of a
+          package.  It also allows people with no continuous network
+          access to find out what changes were done and by whom</para></listitem>
+
+        <listitem><para> When you're writing code that should be written better
+          add FIXME comments so it's easy to recognize.</para></listitem>
+
+	<listitem><para>Try to use defensive programming techniques:
+          the glib library provides various utility macros that help
+          you make your code more robust.  g_return_if_fail,
+          g_return_val_if_fail, g_warning, g_error and g_assert are
+          your friends.</para>
+	  </listitem>
+
+        <listitem><para> Document your programs.</para></listitem>
+
+        <listitem><para> If you do changes to the APIs documented here or add
+          some new ones please update the documentation.</para></listitem>
+
+        <listitem><para> Add translations for your native language. We
+	      would like have a fully internationalized GNOME. (so if
+	      you know more than one language do translations for all of
+	      them) (we would like all the idioms, from francais to
+	      old greek :-) )
+	</para></listitem>
+
+        </itemizedlist>
+      </sect1>
+  </chapter>
+
+  <chapter id="tutorial">
+    <title>GNOME Developer's Tutorial.</title>
+      <para>
+	From the gnome-hello manual:
+	</para>
+        <para>
+	  gnome-hello is a GNOME application which contains all the essential
+	  and common features of GNOME programs, such as initialization, event
+	  loops, configuration file parsing, internationalization and so forth.
+	  </para>
+        <para>	
+	  gnome-hello is intended to be an example of the GNOME coding
+	  standards, as well as a fun and useless little program.
+	  </para>
+      <para>
+        In this chapter we're going to use it to explain the basics features 
+        that an application must have to be considered gnome-compliant.
+        </para>
+
+      <sect1 id="tut-basics">
+      	<title>Starting with GNOME</title>
+	<screenshot>
+	  <screeninfo>A basic GNOME App: A window with only a button
+	    </screeninfo>
+	  <graphic fileref="gnome-hello-0-basic.jpg"></graphic>
+	  </screenshot>
+      	<para>
+      	  We'll start with a very basic application. It's only a window
+      	  with a button which when clicked, close the window and prints
+      	  "Hello GNOME". The code source for it is in <filename>
+      	  programs/gnome-hello/gnome-hello-0-basic.c</filename>. [FIXME:
+      	  Should i include the full code here?]
+      	  </para>
+	<programlisting>
+	  #include &lt;config.h&gt;
+	  #include &lt;gnome.h&gt;
+	  </programlisting>
+	<para>
+	  All the programs have to include <filename>gnome.h</filename> which
+	  gives all you need to use the Gtk+ and GNOME libraries.
+	  </para>
+	<programlisting>
+	int
+	main(int argc, char *argv[])
+	{
+	</programlisting>
+        <para><function>gnome_init</function> is always called at the beginning 
+          of a program. It takes care of initializing both Gtk and GNOME.
+          </para>
+	<programlisting>
+	  gnome_init (&amp;argc, &amp;argv);
+	</programlisting>
+	<para>Then we call <function>prepare_app</function> that do the real 
+	  work and <function>gtk_main</function> to enter into the main 
+	  processing loop.
+	  </para>
+	<programlisting>
+	  prepare_app ();
+
+ 	  gtk_main ();
+
+	  return 0;
+	}
+	</programlisting>
+	<para>Let's now go to the <function>prepare_app</function> code...
+	  </para>
+        <programlisting>
+	void
+	prepare_app()
+	{
+	  GtkWidget *button;
+	</programlisting>
+      	<para>We first make the main window calling
+	  <function>gnome_app_new</function> and connect the signal 
+	  <function>delete_event</function> to the callback 
+	  <function>quit_cb</function>, so the user can close the app via the 
+	  window manager:
+	  </para>
+	<programlisting>
+	  app = gnome_app_new ("hello", "Hello World Gnomified");
+	  gtk_widget_realize (app);
+	  gtk_signal_connect (GTK_OBJECT (app), "delete_event",
+	                      GTK_SIGNAL_FUNC (quit_cb), NULL);
+        </programlisting>
+	<para>Then, we create a button and set it to be the content of the main
+	  window.
+	  </para>
+	<programlisting>
+	  button = gtk_button_new_with_label ("Hello GNOME");
+	  gtk_signal_connect (GTK_OBJECT (button), "clicked",
+	                     GTK_SIGNAL_FUNC (hello_cb), NULL);
+	  gtk_container_border_width (GTK_CONTAINER (button), 60);
+	  gnome_app_set_contents ( GNOME_APP (app), button);
+        </programlisting>
+	<para>Finally, we show the widgets. It could be done in any order,
+	  but we display at last the main window so the whole window
+	  will pop up at once rather than seeing the window pop up, and 
+	  then the button form inside of it.
+	  </para>
+	<programlisting>
+	  gtk_widget_show (button);
+ 	  gtk_widget_show (app);
+	}
+	</programlisting>
+	<para>The callbacks (<function>hello_cb</function> for the button and 
+	  <function>quit_cb</function> for <literal>delete_event</literal>)
+	  are very simple. They just call <function>gtk_main_quit</function> 
+	  to exit.
+	  </para>
+	<programlisting>
+	void
+	hello_cb (GtkWidget *widget, void *data)
+	{
+  	  g_print ("Hello GNOME\n");
+	  gtk_main_quit ();
+	  return;
+	}
+
+	void
+	quit_cb (GtkWidget *widget, void *data)
+	{
+	  gtk_main_quit ();
+	  return;
+	}
+	</programlisting>
+	</sect1>
+	
+      <sect1 id="tut-menus">
+      	<title>Adding menus</title>
+	<screenshot>
+	  <graphic fileref="gnome-hello-1-menus.jpg"></graphic>
+	  </screenshot>
+      	<para>
+      	  From the <citetitle>GNOME Style Guide</citetitle>
+      	  </para>
+      	<para>
+      	  <literallayout>
+Menus and MenuBars
+        Menubars should be present in every App.
+            All apps should have a "Help" entry in the Menubar.
+            All menus need at least one entry.
+            An About Menu should be available in under the Help Menu and
+            should open a small dialog telling at least app name, author,
+            version, and date.
+            A "File" menu should be in every application, and contain at least
+            Quit.
+            Menu items that open dialogs should indicate it with an "..."
+            Menu items that lead to submenus should indicate it with an
+            arrow. The Help Menu should be right justified in the
+            Menubar.
+	    </literallayout>
+	  </para>
+      	<para>
+          At the time of the writing of this draft gnome-hello uses the 
+          GtkMenuFactory way of creating menus. It's going to be replaced
+          by the gnome-app-helper in a little time. (when the gnome_app_*
+          have support for i18n, accelerators and right-justified menus). Until
+          then isn't going to be an explanation about "how" do the menus.
+      	  </para>
+      	<para>
+      	  The menu options present in gnome-hello are only the mandatory: 
+          <guimenuitem>File/Exit</guimenuitem>, that uses the same quit_cb
+          that we've seen in the previous section, and
+      	  <guimenuitem>Help/About...</guimenuitem> that uses the 
+      	  gnome-about widget (see <xref linkend="gnome-about">) written
+      	  by Cesar <email>miquel@df.uba.ar</email>.
+      	  </para>
+      	<programlisting>
+void
+about_cb (GtkWidget *widget, void *data)
+{
+  GtkWidget *about;
+  gchar *authors[] = {
+/* Here should be your names */
+          "Mark Galassi",
+          "Horacio J. Pe&ntilde;a",
+          NULL
+          };
+
+  about = gnome_about_new ( "The Hello World Gnomified", VERSION,
+                        /* copyright notice */
+                        "(C) 1998 the Free Software Foundation",
+                        authors,
+                        /* another comments */
+                        "GNOME is a civilized software system "
+                          "so we've a \"hello world\" program",
+                        NULL);
+  gtk_widget_show (about);
+
+  return;
+}
+      	  </programlisting>
+	</sect1>
+
+      <sect1 id="tut-i18n">
+      	<title>Internationalization.</title>
+	<screenshot>
+	  <graphic fileref="gnome-hello-2-i18n.jpg"></graphic>
+	  </screenshot>
+      	<para>
+	  Internationalization (i18n for short) is very easy with GNOME. We
+	  use GNU gettext. You need to initialize it with a call to 
+	  <function>bindtextdomain</function> and
+	  <function>textdomain</function> in your main function.
+ 	  After it a _() to all the strings that need translation. 
+      	  </para>
+      	<para>
+      	  You will need add your file to po/POTFILES.in. Then you can do
+      	  <literal>make gnome-modulename.pot;make update-po</literal>, edit the .po file
+      	  corresponding to your language and do <literal>make install</literal>.
+      	  Now try your program... Wow! It's speaking in Spanish/Finnish/Latin...
+      	  </para>
+      <warning>
+	<para>
+      	  _() is a macro for the function gettext.  So it won't work
+      	  when initializing arrays of strings or structs.  You'll need
+      	  use the N_() macro around the strings instead.  If you want
+      	  know more about it read the info documentation of GNU
+      	  gettext.
+      	</para>
+      </warning>
+    </sect1>
+	
+      <sect1 id="tut-parsing">
+      	<title>Parsing parameters.</title>
+      	<para>
+      	  Well, Carsten and Tom are talking about standardizing it, so I'll
+      	  wait a bit their definitions.
+      </para>
+    </sect1>
+	
+    <sect1 id="tut-SM">
+      <title>Session Management</title>
+      <warning>
+	<para>
+	This chapter is definitely under construction, But hold your
+	breath, it will (hopefully) be finished soon.</para>
+      </warning>
+      <sect2>
+	<title>Session Management in general</title>
+	<para>
+          The purpose of session management is to provide users a
+          possibility to save and restore their sessions.  A session
+          is a collection of applications, all of them having an
+          internal state.  This state may be the name of an open file,
+          a displayed image or the score of a game.
+        </para>
+	<para>
+          Every application that is session management aware connects
+          to one special server: the <emphasis>session
+          manager</emphasis>.  A session manager sends commands to his
+          <emphasis>clients</emphasis> telling them to save their
+          state or to terminate.  A client must provide the session
+          manager with all information, that is needed to restart the
+          client in the same state, as it is running now.  The session
+          manager's task is to take care of this information and to
+          use it when restarting a session.  In order to distinguish
+          all clients, the session manager assigns them a unique
+          identifier: the so called <emphasis>client id</emphasis>.
+         </para>
+	 <para>
+          The session management additionally includes a protocol to
+          sync the - so called - interact requests of applications.
+          Suppose you have three applications running.  Each of this
+          applications has one file opened, that you have just edited
+          without saving.  If you now log out, every application may
+          ask you, whether you want to save your changes or if you
+          want to abandon them.  It would be very annoying, if all
+          these three applications would pop up their dialog boxes at
+          the same time.  If these three applications have implemented
+          session management in the right way, a new dialog box only
+          pops up, if the previous one has been closed.
+      	 </para>
+      </sect2>
+      <sect2>
+	<title>GNOME Session Management implementation</title>
+	<para>
+          The GNOME project uses a special object - the GnomeClient
+          object - to implement session management.  This object
+          handles the connection to a session manager, the setting and
+          removing of properties and the handling of messages sent by
+          a session manager.
+        </para>
+	<para>
+          There are two functions in the GNOME libraries, that create
+          a new GnomeClient object:
+        </para>
+	<funcsynopsis>
+	  <funcdef>GnomeClient
+	    *<function>gnome_client_new</function></funcdef>
+	  <paramdef></paramdef>
+	</funcsynopsis>
+	<funcsynopsis>
+	  <funcdef>GnomeClient
+	    *<function>gnome_client_new_without_connection</function></funcdef>
+	  <paramdef></paramdef>
+	</funcsynopsis>
+	<para>
+          As one may guess from the functions names: The first
+          function tries to connect to a session manager
+          automatically, while the second one does not.  You may
+          connect or disconnect a GnomeClient after his creation using
+          the following functions:
+        </para>
+	<funcsynopsis>
+	  <funcdef>void <function>gnome_client_connect</function></funcdef>
+	  <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	</funcsynopsis>
+	<funcsynopsis>
+	  <funcdef>void
+	    <function>gnome_client_disconnect</function></funcdef>
+	  <paramdef>GnomeClient
+	    *<parameter>client</parameter></paramdef>
+	</funcsynopsis>
+	<funcsynopsis>
+	  <funcdef>gchar *<function>gnome_client_get_id</function></funcdef>
+	  <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	</funcsynopsis>
+	<funcsynopsis>
+	  <funcdef>void <function>gnome_client_set_id</function></funcdef>
+	  <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	  <paramdef>const gchar *<parameter>client_id</parameter></paramdef>
+	</funcsynopsis>
+	<para>to be continued...</para>
+	<sect3>
+	  <title>Properties</title>
+	  <para>
+          </para>
+	</sect3>
+	<sect3>
+	  <title>Signals</title>
+	  <para>
+            Whenever the session manager wants a client to do
+            something, these wishes are emitted as signals.
+          </para>
+
+	  <funcsynopsis>
+	    <funcdef>gint <function>save_yourself_signal</function></funcdef>
+	    <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	    <paramdef>gint <parameter>phase</parameter></paramdef>
+	    <paramdef>GnomeSaveStyle <parameter>save_style</parameter></paramdef>
+	    <paramdef>gint <parameter>shutdown</parameter></paramdef>
+	    <paramdef>GnomeInteractStyle <parameter>interact_style</parameter></paramdef>
+	    <paramdef>gint <parameter>fast</parameter></paramdef>
+	    <paramdef>gpointer <parameter>client_data</parameter></paramdef>
+	  </funcsynopsis>
+	  <para>
+            This signal is probably the most important one, because it
+            causes the clients to save the programs state.
+          </para>
+	  <para>
+            <parameter>save_style</parameter>.
+          </para>
+	  <para>
+            The <parameter>shutdown</parameter> parameter indicates, whether this 
+          </para>
+	  <para>
+            GNOME_INTERACT_NONE, GNOME_INTERACT_ERRORS, GNOME_INTERACT_ANY
+          </para>
+	  <para>
+            If the <parameter>fast</parameter> parameter is 
+            TRUE, the client is wanted to save it's state
+            as fast as possible.
+          </para>
+
+	  <funcsynopsis>
+	    <funcdef>gint <function>die_signal</function></funcdef>
+	    <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	    <paramdef>gpointer <parameter>client_data</parameter></paramdef>
+	  </funcsynopsis>
+	  <para>
+            The above signal is emitted, if the session manager wants
+            the client to terminate.  This will mostly happen, if the
+            user logs out from a running session.
+          </para>
+	  <funcsynopsis>
+	    <funcdef>gint <function>save_complete_signal</function></funcdef>
+	    <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	    <paramdef>gpointer <parameter>client_data</parameter></paramdef>
+	  </funcsynopsis>
+	  <para>
+            The session manager sends this message, if all client have
+            finished saving their state.
+          </para>
+	  <funcsynopsis>
+	    <funcdef>gint <function>shutdown_cancelled_signal</function></funcdef>
+	    <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	    <paramdef>gpointer <parameter>client_data</parameter></paramdef>
+	  </funcsynopsis>
+	  <para>
+            Whenever a shutdown, that has been announced in a
+            save_yourself signal, has been cancelled by the user, the
+            shutdown_cancelled message is sent.
+          </para>
+	  <funcsynopsis>
+	    <funcdef>gint <function>connect_signal</function></funcdef>
+	    <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	    <paramdef>gint <parameter>restarted</parameter></paramdef>
+	    <paramdef>gpointer <parameter>client_data</parameter></paramdef>
+	  </funcsynopsis>
+	  <funcsynopsis>
+	    <funcdef>gint <function>disconnect_signal</function></funcdef>
+	    <paramdef>GnomeClient *<parameter>client</parameter></paramdef>
+	    <paramdef>gpointer <parameter>client_data</parameter></paramdef>
+	  </funcsynopsis>
+	  <para>
+            This signal is emitted, if the connection to the session
+            manager gets lost.
+          </para>
+	</sect3>
+	<sect3>
+	  <title>The master client</title>
+	  <para>
+            To make life a little bit easier for GNOME developers, the
+            GNOME libraries feature a special client: the
+            <emphasis>master client</emphasis>.  This client is
+            created automatically, when calling
+            <function>gnome_init</function>.  He gets some default
+            properties set and is in general also connected to the
+            session manager automatically.  the GNOME libraries also
+            notice, if a this client was restarted.  In this case, the
+            libraries try to connect the master client to the session
+            manager with the same client id as last time.  That means,
+            that an application calling
+            <function>gnome_init</function> will be recognized and be
+            restarted from a session manager without any extra lines
+            of code.  A developer has only to take care, that the
+            applications state is saved or restored correctly and that
+            the application is terminated, if she is wanted to.
+          </para>
+	  <para>
+            Your get the master client by calling
+            <function>gnome_master_client</function>.
+          </para>
+	  <funcsynopsis>
+	    <funcdef>GnomeClient
+	    *<function>gnome_master_client</function></funcdef>
+	    <paramdef></paramdef>
+	  </funcsynopsis>
+	  <para>
+            The master client has the following properties preset.
+          </para>
+	  <informaltable>
+	    <tgroup cols="2">
+	      <thead>
+		<row>
+		  <entry>property</entry>
+		  <entry>value</entry>
+		</row>
+	      </thead>
+	      <tbody>
+		<row>
+		  <entry>current directory</entry>
+		  <entry>current directory</entry>
+		</row>
+		<row>
+		  <entry>process id</entry>
+		  <entry>pid</entry>
+		</row>
+		<row>
+		  <entry>user id</entry>
+		  <entry>uid</entry>
+		  <!-- one of (entrytbl entry) -->
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </informaltable>
+	</sect3>
+	<sect3>
+	  <title>The cloned client</title>
+	  <para></para>
+	</sect3>
+      </sect2>
+      <sect2>
+	<title>Continuing the tutorial</title> 
+	<para>
+           We want to implement session management, so we have to use
+           the master client.  To get access to this client, that was
+           created in <function>gnome_init</function>, you have to
+           call <function>gnome_master_client</function>.  Our
+           application should at least listen to the die and the
+           save_yourself signal, so insert the following lines of code
+           right after the <function>gnome_init</function> call.
+        </para>
+
+	   <programlisting role="C">
+  client= gnome_master_client ();
+
+  gtk_signal_connect (GTK_OBJECT (client), "save_yourself",
+                      GTK_SIGNAL_FUNC (save_state_cb), NULL);
+  gtk_signal_connect (GTK_OBJECT (client), "die",
+                      GTK_SIGNAL_FUNC (die_cb), NULL);</programlisting>
+
+	<para>
+           Now we have to implement our signal functions.  The die
+           signal function is rather easy to implement. We just have
+           to terminate our application.  Notice, that we must not
+           save the applications state in a die signal function.  If
+           the session manager would have wanted us to save the state,
+           he would have sent us a save_yourself signal right before
+           the die signal.  If you are writing a more complicated
+           application, you may want to close some files here or do
+           some other magic stuff.
+        </para>
+
+  	   <programlisting>
+static gint
+die (GnomeClient *client, gpointer client_data)
+{
+  gtk_exit (0);
+
+  return FALSE;
+}</programlisting>
+
+	<para>
+          Implementing the save_yourself signal is a little bit more
+          difficult, because we have to save the hole state of our
+          application.  Our tutorial application has only one state:
+          the window's position on the screen.  So we start our
+          save_yourself signal function like this:
+        </para>
+	<programlisting>
+gint
+save_yourself (GnomeClient        *client,
+               gint                phase,
+               GnomeRestartStyle   restart_style,
+               gint                shutdown,
+               GnomeInteractStyle  interact_style,
+               gint                fast,
+               gpointer            client_data)
+{
+  gchar *argv[3];
+  gint x, y, w, h;
+
+  gdk_window_get_geometry (app->window, &amp;x, &amp;y, &amp;w, &amp;h, NULL);</programlisting>
+
+
+	<para>
+          Now that we have our application's state, we have to store
+          it.  One way to do this is to store the application's state
+          in the command line that we use to restart our application.
+          That's a quite useful method for storing a little set of
+          values.  In this tutorial we'll implement another way of
+          saving the applications state, that is even practical, if
+          you have a huge bunch of data to save.  We use the gnome
+          config files.  The
+          <function>gnome_client_get_config_prefix</function> gives us
+          a hint , where to store our information.
+        </para>
+	<programlisting>
+  /* Save the state using gnome-config stuff. */
+  gnome_config_push_prefix (gnome_client_get_config_prefix (client));
+
+  gnome_config_set_int ("Geometry/x", x);
+  gnome_config_set_int ("Geometry/y", y);
+  gnome_config_set_int ("Geometry/w", w);
+  gnome_config_set_int ("Geometry/h", h);
+
+  gnome_config_pop_prefix ();
+  gnome_config_sync();</programlisting>
+
+
+	<para>
+          Additionally we have to give the session manager some hints,
+          how to restart our application. That means, we have to use
+          the <function>gnome_client_set_clone_command</function> and
+          <function>gnome_client_set_restart_command</function>
+          functions.  Notice that we don't have to add the clients id
+          to these command; we don't even have to add the standard
+          GNOME command line options. Both is added by the GNOME
+          libraries. We also don't have to distinguish between the
+          restart command and the clone command.  This is also handled
+          by the libraries.</para>
+
+        <programlisting>
+  gnome_client_set_clone_command (client, 1, argv);
+  gnome_client_set_restart_command (client, 1, argv);
+
+  return TRUE;                                               
+}</programlisting>
+
+
+	<para>
+          The attentive reader may have noticed, that we save the
+          applications state, but that we have no code to restore it.
+          This has to be changed!</para>
+
+	<para>
+          The following code snippets should be inserted directly
+          after the <function>gtk_signal_connect</function> calls,
+          that we inserted at the beginning of the session management
+          chapter.</para>
+
+	<para>
+          To restore the saved state, we use the cloned client.  We
+          get access to this client, by calling
+          <function>gnome_cloned_client</function>.  The creation of
+          the cloned client is handled by the GNOME libraries.  Our
+          application was only restarted by a session manager, if
+          <function>gnome_cloned_client</function> returns a non NULL
+          value.  That means, that, if
+          <function>gnome_cloned_client</function> returns NULL, we
+          don't have to restore any state, because there is no state
+          to restore.</para>
+
+        <programlisting>
+  if (GNOME_CLIENT_CONNECTED (client))
+    {
+      GnomeClient *cloned= gnome_cloned_client ();
+
+      if (cloned)
+	{
+	  restarted= 1;</programlisting>
+
+
+	<para>
+          We now again use
+          <function>gnome_client_get_config_prefix</function> to get a
+          hint, where to find our saved state.  Notice, that we use
+          the cloned client when restoring and the master client when
+          saving the state.  The reason for this is, that the cloned
+          client's id may be another then the master client's one, and
+          so the config prefixes differ.  This may happen, if you clone
+          a client (something, that's not yet supported by the
+          <application>gnome-session</application> session management
+          server).  </para>
+	
+	<programlisting>
+	  gnome_config_push_prefix (gnome_client_get_config_prefix
+	  (cloned));
+	  
+	  os_x = gnome_config_get_int ("Geometry/x");
+	  os_y = gnome_config_get_int ("Geometry/y");
+	  os_w = gnome_config_get_int ("Geometry/w");
+	  os_h = gnome_config_get_int ("Geometry/h");
+	  
+	  gnome_config_pop_prefix ();
+	}
+    }</programlisting>
+
+
+	<para>
+          Additionally the following lines should be included into the
+          <function>prepare_app</function> function, to really set the
+          values, we just red:</para>
+
+	<programlisting>
+  if (restarted) {
+    gtk_widget_set_uposition (app, os_x, os_y);
+    gtk_widget_set_usize     (app, os_w, os_h);
+  }</programlisting>
+
+
+	<para>
+          We have still not finished this tutorial's chapter, because
+          right now, saving the application's state would fill our
+          harddisc.  So we have to remove our config files, if they
+          are not needed anymore.  This is supported by the session
+          manager, using the discard command property.</para>
+
+	<para>
+          We have to add a new command line option to our application,
+          that discards a save state (Hold you breath, I'll add the
+          code soon).  Additionally, we have to inform the session
+          manager, to call us with this command line option to discard
+          our state.  This is easily be done by using the
+          <function>gnome_client_set_discard_command</function>
+          function.  The following lines, inserted somewhere in the
+          <function>save_yourself</function> function, do exactly what
+          we want.</para>
+
+	<programlisting>
+  argv[0] = program_invocation_name;
+  argv[1] = "--discard-session";
+  argv[2] = gnome_client_get_config_prefix (client);
+  gnome_client_set_discard_command (client, 3, argv);</programlisting>
+
+
+	<para>
+          still to be continued...</para>
+
+      </sect2>
+    </sect1>
+    
+      <sect1 id="tut-doc">
+      	<title>Help and documentation.</title>
+      	<para>
+      	  I think that Mark would like writing this section... [FIXME: Mark,
+      	  do you want do it?]
+      	  </para>
+	</sect1>
+	
+    </chapter>
+
+  <chapter id="arch">
+    <title>Architecture notes.</title>
+      <para>
+        [FIXME: I think that we could include here the notes that now are in
+        the website.]
+        </para>
+    </chapter>
+
+  <chapter id="libgnome">
+    <title>GNOME library.</title>
+      <para>
+        This chapter is intended to be a reference to the libgnome.
+        </para>
+      &libgnome;
+    </chapter>
+
+  <chapter id="libgnomeui">
+    <title>GNOME User Interface library.</title>
+    <para>
+      This chapter is intended to be a reference to the libgnomeui.
+    </para>
+      &libgnomeui;
+  </chapter>
+
+  <!-- Documentation for GnomeAppHelper -->
+  &gnome-app-helper;
+
+  <!-- Documentation for the GnomeCanvas -->
+  &gnome-canvas;
+
+  <chapter id="DialogAppUtil-docs">
+    <title>Talking to the user: <type>GnomeDialog</type>, <type>GnomeMessageBox</type>,
+    <type>GnomeAppBar</type>, and utility functions.</title>
+    &gnome-message-utils;
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <!-- Documentation on basic X concepts -->
+  &x-concepts;
+
+  <chapter id="libgnorba-docs">
+    <title>LibGnorba Documentation</title>
+    &libgnorba;
+  </chapter>
+
+  <chapter id="gnome-mdi-docs">
+    <title>Gnome-MDI (Gnome Multi Document Interface)</title>
+    &gnome-mdi;
+  </chapter>
+
+</book>

@@ -1,0 +1,73 @@
+AC_INIT(README)
+# Save this value here, since automake will set cflags later
+cflags_set=${CFLAGS+set}
+
+AM_INIT_AUTOMAKE(gtk-engines, 0.12)
+
+dnl Initialize maintainer mode
+AM_MAINTAINER_MODE
+
+ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
+
+AC_CANONICAL_HOST
+
+AC_PROG_CC
+AM_PROG_CC_STDC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+changequote(,)dnl
+if test "x$GCC" = "xyes"; then
+  case " $CFLAGS " in
+  *[\ \	]-Wall[\ \	]*) ;;
+  *) CFLAGS="$CFLAGS -Wall" ;;
+  esac
+fi
+changequote([,])dnl
+
+dnl Initialize libtool
+AM_DISABLE_STATIC
+AM_PROG_LIBTOOL
+
+# Checks for programs.
+AM_PATH_GTK(1.2.9, , 
+	AC_MSG_ERROR([*** GTK+-1.2.9 not installed - please install first ***]))
+AM_PATH_GDK_IMLIB(1.8, ,
+        AC_MSG_ERROR([*** IMLIB 1.8 not installed - please install first ***]))
+
+AC_CHECK_LIB(gtk, gtk_style_set_prop_experimental, :,
+	     AC_MSG_ERROR([*** gtk_style_set_prop_experimental() not found; perhaps you have an old CVS version of GTK+ ***]),
+             $GTK_LIBS)
+
+# Checks for header files.
+AC_HEADER_STDC
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+
+# Checks for endianness (needed by GdkRgb).
+AC_C_BIGENDIAN
+
+# Checks for library functions.
+AC_TYPE_SIGNAL
+AC_FUNC_MMAP
+
+AC_OUTPUT([
+gtk-engines.spec
+Makefile
+pixmap/Makefile
+pixmap/Theme/Makefile
+pixmap/Theme/gtk/Makefile
+metal/Makefile
+metal/Theme/Makefile
+metal/Theme/gtk/Makefile
+notif/Makefile
+notif/Theme/Makefile
+notif/Theme/gtk/Makefile
+raleigh/Makefile
+raleigh/Theme/Makefile
+raleigh/Theme/gtk/Makefile
+redmond95/Makefile
+redmond95/Theme/Makefile
+redmond95/Theme/gtk/Makefile
+])

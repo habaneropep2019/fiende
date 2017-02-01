@@ -1,0 +1,95 @@
+<HTML>
+<BODY>
+<PRE>
+Document still needs some work, but has basic ideas
+
+Gdk Handles have the following behavior (GC is used for example)
+  Construction, Destruction and Dynamic behavior:
+    - They can be unconnected (uninitialized) for the following reasons
+      * passed from a level where uninitialized objects exist
+      * resource exhaustion
+      * specifically created to be uninitialize
+          Gdk_GC gc=Gdk_GC(0);
+      * desired by user  (GDKMM_HANDLE_CONNECTED_ONLY not set)
+          Gdk_GC gc;  
+
+      If in doubt, the users should check if the handle is connected()
+      even if they are not allowed to construct one.
+
+      If GDKMM_HANDLE_CONNECTED_ONLY is set, all default contructors
+      of handles shall be protected.  create(...) and free() methods
+      are discuraged.
+          Gdk_GC gc; // compile time error.
+
+    - They will have a create() method available to initialize
+      unconnected handles or connect a handle to a new remote object.
+      The following will be equivent
+
+        gc.create(...);  <==>  gc=Gdk_GC(...);
+
+      (create is prefered for setting unconnected handles.)
+      (* Font also will have an equivent method load(...))
+ 
+    - They can be unconnected with the call free().  
+      free() will unconnect the remote object, and if it was the
+      last handle for the object, the object will be destroyed.
+      It does nothing to an unconnected handle.
+
+    - destruction of a handle will call free()
+
+    - There should never be a need to allocate a dynamic handle.  
+      The following are forbidden (read highly discuraged)
+
+        Gdk_GC *gc=new Gdk_GC;
+        delete gc;
+      
+  Operators:
+    - operator =
+      They will copy in a fashion similar to pointers
+          gca=gcb;  <= gca now refers to the same remote object
+
+      If it was connected, it will unconnect before copying.  
+
+    - operator * 
+      You can not get the contents of them as they
+      are considered remote.  Expressly forbidden.
+
+      (operator ->) same as operator *
+
+    - operator ==
+      True if both connect to the same remote object    
+      or both are unconnected.
+
+    - operator !=
+      True is they are connected to different remote objects
+ 
+    - operator (GdkGC)* ()
+      All handles will provide an operator to revert to their 
+      corresponding Gdk equivent.
+
+      This shall be invarient
+        Gdk_GC((GdkGC*)gc)==gc
+    
+      (meaning handles will never autoallocate.)
+ 
+    - some objects will have an method copy which copys the
+      charactoristics of one remote object to the other (on
+      the remote side)  Both handles must be connected.
+
+  Passing:
+    - They shall be returned by value
+       (return by reference only to expose a setable internal)
+
+    - They shall always be passed by reference
+       (value is not specifically excluded, but is never necessary
+        so it shall be discuraged) 
+
+    - Pass and return by pointer is forbidden.  Specifically disallowed
+      (highly discuraged)
+
+        int foo(Gdk_GC* gc);
+        Gdk_GC* foo();
+
+</PRE>
+</BODY>
+</HTML>

@@ -1,0 +1,255 @@
+<refentry id="gnorba-gnorba">
+<refmeta>
+<refentrytitle>gnorba</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNORBA Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnorba</refname><refpurpose>Utility routines for making CORBA use easy within GNOME applications.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+enum        <link linkend="GnorbaInitFlags">GnorbaInitFlags</link>;
+<link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   <link linkend="gnome-CORBA-init">gnome_CORBA_init</link>                (const char *app_id,
+                                             const char *app_version,
+                                             int *argc,
+                                             char **argv,
+                                             <link linkend="GnorbaInitFlags">GnorbaInitFlags</link> gnorba_flags,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+<link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   <link linkend="gnome-CORBA-init-with-popt-table">gnome_CORBA_init_with_popt_table</link>
+                                            (const char *app_id,
+                                             const char *app_version,
+                                             int *argc,
+                                             char **argv,
+                                             const struct <link linkend="poptOption">poptOption</link> *options,
+                                             int popt_flags,
+                                             <link linkend="poptContext">poptContext</link> *return_ctx,
+                                             <link linkend="GnorbaInitFlags">GnorbaInitFlags</link> gnorba_flags,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+<link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   <link linkend="gnome-CORBA-ORB">gnome_CORBA_ORB</link>                 (void);
+<link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   <link linkend="gnorba-CORBA-init">gnorba_CORBA_init</link>               (int *argc,
+                                             char **argv,
+                                             <link linkend="GnorbaInitFlags">GnorbaInitFlags</link> flags,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+<link linkend="CORBA-Object">CORBA_Object</link> <link linkend="gnome-name-service-get">gnome_name_service_get</link>         (void);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The gnorba routines relate to making basic use of CORBA in a GNOME
+application. This covers integrating the ORBit main loop with glib,
+adding basic security to CORBA connections, and accessing the CORBA
+name service for the session.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnorbaInitFlags">enum GnorbaInitFlags</title>
+<programlisting>typedef enum {
+  GNORBA_INIT_SERVER_FUNC = 1 &lt;&lt; 0,
+  GNORBA_INIT_DISABLE_COOKIES = 1 &lt;&lt; 1
+} GnorbaInitFlags;
+</programlisting>
+<para>
+<itemizedlist>
+<listitem><para>GNORBA_INIT_SERVER_FUNC specifies that this program
+intends to export implementations of CORBA objects to other
+programs</para></listitem>
+<listitem><para>GNORBA_INIT_DISABLE_COOKIES turns off the GNOME CORBA security mechanism</para></listitem>
+</itemizedlist>
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-CORBA-init">gnome_CORBA_init ()</title>
+<programlisting><link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   gnome_CORBA_init                (const char *app_id,
+                                             const char *app_version,
+                                             int *argc,
+                                             char **argv,
+                                             <link linkend="GnorbaInitFlags">GnorbaInitFlags</link> gnorba_flags,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+Wrapper around the GNORBA CORBA support routines for GNOME applications.
+This routine takes care of calling gnome_init after registering our
+command line arguments.  After gnome_init is invoked, the GNORBA CORBA
+setup is bootstrapped by calling gnorba_CORBA_init for you.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app_id</parameter>&nbsp;:</entry>
+<entry> Application id.
+</entry></row>
+<row><entry align="right"><parameter>app_version</parameter>&nbsp;:</entry>
+<entry> Application version.
+</entry></row>
+<row><entry align="right"><parameter>argc</parameter>&nbsp;:</entry>
+<entry> pointer to argc (for example, as received by main)
+</entry></row>
+<row><entry align="right"><parameter>argv</parameter>&nbsp;:</entry>
+<entry> pointer to argv (for example, as received by main)
+</entry></row>
+<row><entry align="right"><parameter>gnorba_flags</parameter>&nbsp;:</entry>
+<entry> GNORBA initialization flags.
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> CORBA Environment to return CORBA errors.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the CORBA_ORB for this application.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-CORBA-init-with-popt-table">gnome_CORBA_init_with_popt_table ()</title>
+<programlisting><link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   gnome_CORBA_init_with_popt_table
+                                            (const char *app_id,
+                                             const char *app_version,
+                                             int *argc,
+                                             char **argv,
+                                             const struct <link linkend="poptOption">poptOption</link> *options,
+                                             int popt_flags,
+                                             <link linkend="poptContext">poptContext</link> *return_ctx,
+                                             <link linkend="GnorbaInitFlags">GnorbaInitFlags</link> gnorba_flags,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+Wrapper around the GNORBA CORBA support routines for GNOME applications.
+This routine takes care of calling gnome_init after registering our
+command line arguments.  After gnome_init is invoked, the GNORBA CORBA
+setup is bootstrapped by calling gnorba_CORBA_init for you.
+</para>
+<para>
+This differs from gnome_CORBA_init only in that it provides a way
+to pass a table of popt options for argument parsing.
+</para>
+<para>
+If you pass return_ctx, you need to release it with the proper popt
+routine where you are done.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app_id</parameter>&nbsp;:</entry>
+<entry> Application id.
+</entry></row>
+<row><entry align="right"><parameter>app_version</parameter>&nbsp;:</entry>
+<entry> Application version.
+</entry></row>
+<row><entry align="right"><parameter>argc</parameter>&nbsp;:</entry>
+<entry> pointer to argc (for example, as received by main)
+</entry></row>
+<row><entry align="right"><parameter>argv</parameter>&nbsp;:</entry>
+<entry> argv (for example, as received by main)
+</entry></row>
+<row><entry align="right"><parameter>options</parameter>&nbsp;:</entry>
+<entry> an array of poptOptions.
+</entry></row>
+<row><entry align="right"><parameter>popt_flags</parameter>&nbsp;:</entry>
+<entry> flags passes to popt.
+</entry></row>
+<row><entry align="right"><parameter>return_ctx</parameter>&nbsp;:</entry>
+<entry> if non-NULL a popt context is returned here.
+</entry></row>
+<row><entry align="right"><parameter>gnorba_flags</parameter>&nbsp;:</entry>
+<entry> GNORBA initialization flags.
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry>CORBA Environment to return CORBA errors.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the CORBA_ORB for this application.
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-CORBA-ORB">gnome_CORBA_ORB ()</title>
+<programlisting><link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   gnome_CORBA_ORB                 (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the CORBA_ORB initialized by the GNORBA libraries.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnorba-CORBA-init">gnorba_CORBA_init ()</title>
+<programlisting><link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   gnorba_CORBA_init               (int *argc,
+                                             char **argv,
+                                             <link linkend="GnorbaInitFlags">GnorbaInitFlags</link> flags,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+Sets up the ORBit connection add/remove function pointers
+to our routines, which inform the gtk main loop about
+the CORBA connection fd's.
+</para>
+<para>
+Calls gnome_init and CORBA_ORB_init with the specified params.
+</para>
+<para>
+Sets up a cookie for requests.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>argc</parameter>&nbsp;:</entry>
+<entry> argc pointer from the application
+</entry></row>
+<row><entry align="right"><parameter>argv</parameter>&nbsp;:</entry>
+<entry> argv from the application
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> GnorbaInitFlags that control the way we startup
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> A CORBA_Environment for catching CORBA errors
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the CORBA_ORB initialized by the GNORBA libraries.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-name-service-get">gnome_name_service_get ()</title>
+<programlisting><link linkend="CORBA-Object">CORBA_Object</link> gnome_name_service_get         (void);</programlisting>
+<para>
+This routine returns an object reference to the name server
+for this user/session pair. This launches the name server if
+it is the first application running it.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> an object reference to the name service.
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

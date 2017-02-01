@@ -1,0 +1,188 @@
+<!-- ##### SECTION Title ##### -->
+BonoboPrintClient
+
+<!-- ##### SECTION Short_Description ##### -->
+provides an easy interface for supporting remote printing
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The BonoboPrintClient is rather an ugly, but functional API for
+printing remote objects. As with all embeddables sizing and layout
+is controled by the container application.
+</para>
+
+<para>
+Note, if you think that this API needs to be substantialy more
+complicated, handle pagination etc. you are probably not implementing
+your embeddable correctly. Please read the section in #BonoboEmbeddable
+on #BonoboControls. If you are a 'toplevel' container you get to do
+complicated things, you should merge a print menu into your container
+and do what you like internaly.
+</para>
+
+<para>
+  <example>
+    <title>Basic sample component printing code</title>
+    <programlisting>
+void
+object_print (BonoboObjectClient *object,
+	      GnomePrintContext  *ctx,
+	      gdouble             x,
+	      gdouble             y,
+	      gdouble             width,
+	      gdouble             height)
+{
+	BonoboPrintClient *print_client = bonobo_print_client_get (object);
+	BonoboPrintData   *print_data;
+
+	if (!print_client) /* No remote printing interface - a broken Embeddable */
+		return;
+
+	print_data = bonobo_print_data_new (width, height);
+	bonobo_print_client_render (print_client, print_data);
+	bonobo_print_data_render (ctx, x, y, print_data, 0.0, 0.0);
+	bonobo_print_data_free (print_data);
+
+	gtk_object_unref (GTK_OBJECT (print_client));
+}
+
+void
+sample_app_print_preview (SampleApp *app)
+{
+	GList *l;
+	double ypos = 0.0;
+	GnomePrintMaster *pm;
+	GnomePrintContext *ctx;
+	GnomePrintMasterPreview *pv;
+
+	pm = gnome_print_master_new ();
+	ctx = gnome_print_master_get_context (pm);
+
+	/*
+	 *  The hardcoded 320.0 x 200.0 should be the visible
+	 * point size of the Embeddable in the document.
+	 */
+	for (l = app->components; l; l = l->next) {
+		BonoboClientSite *site = l->data;
+
+		object_print (bonobo_client_site_get_embeddable (site),
+			      ctx, 0.0, ypos, 320.0, 320.0);
+		ypos += 320.0;
+	}
+
+	gnome_print_showpage (ctx);
+	gnome_print_context_close (ctx);
+	gnome_print_master_close (pm);
+
+	pv = gnome_print_master_preview_new (pm, "Component demo");
+	gtk_widget_show  (GTK_WIDGET (pv));
+	gtk_object_unref (GTK_OBJECT (pm));
+}
+    </programlisting>
+  </example>
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#BonoboPrint, #BonoboEmbeddable
+</para>
+
+<!-- ##### TYPEDEF BonoboPrintClient ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF BonoboPrintClientClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF BonoboPrintData ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION bonobo_print_client_new ##### -->
+<para>
+
+</para>
+
+@corba_print: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_print_client_get ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_print_client_render ##### -->
+<para>
+
+</para>
+
+@client: 
+@pd: 
+
+
+<!-- ##### FUNCTION bonobo_print_data_new ##### -->
+<para>
+
+</para>
+
+@width: 
+@height: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_print_data_new_full ##### -->
+<para>
+
+</para>
+
+@width: 
+@height: 
+@width_first_page: 
+@width_per_page: 
+@height_first_page: 
+@height_per_page: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_print_data_free ##### -->
+<para>
+
+</para>
+
+@pd: 
+
+
+<!-- ##### FUNCTION bonobo_print_data_get_meta ##### -->
+<para>
+
+</para>
+
+@pd: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_print_data_render ##### -->
+<para>
+
+</para>
+
+@pc: 
+@x: 
+@y: 
+@pd: 
+@meta_x: 
+@meta_y: 
+
+

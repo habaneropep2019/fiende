@@ -1,0 +1,459 @@
+
+The Glade XML File Format
+=========================
+
+This file documents the Glade XML file format, used when saving and loading
+projects in Glade. This format is also intended to be read by programs which
+convert it into source code in various languages.
+
+XML was chosen as it is a language-independent format which is likely to
+become very popular in the near future. Parsers will be widely available,
+and many programmers are already familiar with the basic syntax due to HTML.
+It may also prove useful for internationalization at some point.
+
+There is no DTD at present, though this may be added in future if useful.
+(But due to the way we use XML, a DTD may not be very useful when support
+for external widgets with arbitrary properties is added, since we use
+property names as XML tag names.)
+
+If you spot anything that doesn't conform to XML, please let me know.
+
+
+NEWS
+====
+
+Most project options now have default values. See the section below.
+
+Since ':' is used in XML tags for namespaces, we now use '-' instead for the
+style tags, e.g. instead of 'fg:NORMAL' we now use 'fg-NORMAL'.
+
+I've added a 'last_modification_time' tag for the signals. It uses the
+standard RFC1123 format, e.g. 'Sun, 06 Nov 1994 08:49:37 GMT'.
+It's used so we can simply append new signal handler prototypes, instead of
+completely overwriting the file each time the source code is written.
+It is only updated if the signal name, handler or data changes, since
+the object and after fields are only used when connecting the signal and
+do not affect the prototype.
+
+Styles aren't fully supported in Glade, so you can skip those bits for now.
+
+--------------------------------------------------------------------------
+
+Basic File Structure
+====================
+
+1. XML version
+2. Document root element - "<GTK-Interface>"
+3. Project options.
+4. Named styles - which can be shared among several widgets.
+5. UI Components - hierarchies of widgets.
+6. End of document - "</GTK-Interface>"
+
+Example file:
+
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>Project70</name>
+  <program_name>project70</program_name>
+  <directory></directory>
+  <source_directory>src</source_directory>
+  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <language>Ada 95</language>
+  <gnome_support>True</gnome_support>
+  <gettext_support>True</gettext_support>
+  <use_widget_names>False</use_widget_names>
+  <output_main_file>True</output_main_file>
+  <output_support_files>True</output_support_files>
+  <output_build_files>True</output_build_files>
+  <backup_source_files>True</backup_source_files>
+  <main_source_file>interface.c</main_source_file>
+  <main_header_file>interface.h</main_header_file>
+  <handler_source_file>callbacks.c</handler_source_file>
+  <handler_header_file>callbacks.h</handler_header_file>
+  <support_source_file>support.c</support_source_file>
+  <support_header_file>support.h</support_header_file>
+  <translatable_strings_file></translatable_strings_file>
+</project>
+
+<style>
+  <style_name>MyStyle</style_name>
+  <fg-NORMAL>198,80,111</fg-NORMAL>
+  <fg-PRELIGHT>181,93,139</fg-PRELIGHT>
+  <bg-NORMAL>131,214,165</bg-NORMAL>
+  <bg_pixmap-NORMAL>clist.xpm</bg_pixmap-NORMAL>
+</style>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>window1</name>
+  <title>window1</title>
+  <position>GTK_WIN_POS_NONE</position>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkTable</class>
+    <name>table1</name>
+    <homogeneous>False</homogeneous>
+    <row_spacing>0</row_spacing>
+    <column_spacing>0</column_spacing>
+    <style_name>MyStyle</style_name>
+    <Signal>
+      <name>need-resize</name>
+      <handler>on_table1_need-resize</handler>
+    </Signal>
+  </widget>
+</widget>
+
+</GTK-Interface>
+
+
+This file has one named style, "MyStyle", and one component - a window with
+a table in it. The table uses the style "MyStyle", and also has a signal
+handler associated with it.
+
+All filenames are specified relative to the XML file, except pixmap
+files which should be in the project's pixmaps directory.
+
+
+--------------------------------------------------------------------------
+
+Project Options
+===============
+
+  name			DESC	: the displayed name of the project.
+			TYPE    : string
+			DEFAULT : none
+
+  program_name		DESC	: the application binary filename.
+			TYPE    : string
+			DEFAULT : none
+
+  directory		DESC	: the project directory, relative to the XML
+				  file.
+			TYPE    : string
+			DEFAULT : "" (i.e. the same directory that the XML file
+				  is in.)
+
+  source_directory	DESC	: the source code directory, relative to the
+				  XML file.
+			TYPE    : string
+			DEFAULT : "src"
+
+  pixmaps_directory	DESC	: the pixmaps directory, relative to the XML
+				  file.
+			TYPE    : string
+			DEFAULT : "pixmaps"
+
+  language		DESC	: the source code language to use.
+			TYPE    : string ("C", "C++", "Ada 95", "Perl", or
+				  "Eiffel" - see GladeLanguages[] in
+				  glade_project.c)
+			DEFAULT : "C"
+
+  gnome_support		DESC	: whether to support Gnome.
+			TYPE    : boolean
+			DEFAULT : TRUE
+
+C Output Options:
+
+  gettext_support	DESC	: whether to support gettext, i.e. by using
+				  the standard _() and N_() macros around all
+				  strings.
+			TYPE    : boolean
+			DEFAULT : TRUE
+
+  use_widget_names	DESC	: whether to set the widget names in the source
+				  code (useful for rc files).
+			TYPE    : boolean
+			DEFAULT : FALSE
+
+  output_main_file	DESC	: whether to output a main.c file, if it
+				  doesn't already exist.
+			TYPE    : boolean
+			DEFAULT : TRUE
+
+  output_support_files	DESC	: whether to output the support files. This may
+				  be turned off if the developer is using
+				  several Glade XML files, otherwise they may
+				  end up with several copies of the support
+				  files in the project.
+			TYPE    : boolean
+			DEFAULT : TRUE
+
+  output_build_files	DESC	: whether to output all the files to build the
+				  project, e.g. configure.in, Makefile.am.
+				  The developer may be using an alternative
+				  method for building.
+			TYPE    : boolean
+			DEFAULT : TRUE
+
+  backup_source_files	DESC	: whether to backup source files before they
+				  are rebuilt, just in case.
+			TYPE    : boolean
+			DEFAULT : TRUE
+
+  gnome_help_support	DESC	: whether to output support for the Gnome Help
+				  system. Currently we just output the
+				  GNOME_UIINFO_HELP macro at the top of the
+				  Help GnomeUIInfo structs, but we will output
+				  a template help file with build files in
+				  future.
+			TYPE    : boolean
+			DEFAULT : FALSE
+
+  main_source_file	DESC	: the file to contain the code to build all the
+				  windows/dialogs, relative to the source
+				  directory.
+			TYPE    : string
+			DEFAULT : "interface.c"
+
+  main_header_file	DESC	: the header to go with main_source_file,
+				  relative to the source directory.
+			TYPE    : string
+			DEFAULT : "interface.h"
+
+  handler_source_file	DESC	: the file to contain the signal handler
+				  callbacks, relative to the source directory.
+			TYPE    : string
+			DEFAULT : "callbacks.c"
+
+  handler_header_file	DESC	: the header to go with handler_source_file.
+			TYPE    : string
+			DEFAULT : "callbacks.h"
+
+  support_source_file	DESC	: the file to contain support functions.
+			TYPE    : string
+			DEFAULT : "support.c"
+
+  support_header_file	DESC	: the header to go with support_source_file.
+			TYPE    : string
+			DEFAULT : "support.h"
+
+LibGlade Options:
+
+  output_translatable_strings
+			DESC	: whether to output all strings which could be
+				  translated into other languages into a
+				  special file, to be read by xgettext.
+			TYPE    : boolean
+			DEFAULT : FALSE
+
+  translatable_strings_file
+			DESC	: the file to place the translatable strings
+				  in.
+			TYPE    : string
+			DEFAULT : none
+
+--------------------------------------------------------------------------
+
+Named Styles
+============
+
+These are used to share styles among a number of widgets. Widgets can use one
+of the named styles, or can have their own individual style.
+
+A special named style, "Default", specifies the default style to apply to
+widgets which have no style set explicitly (or via style propagation.)
+The "Default" style should appear first, if it is defined, so that styles
+can be created as they are read in. If no "Default" style is defined, then
+the GTK default style should be used.
+
+Styles have 4 colours ('fg', 'bg', 'text' & 'base'), and a background pixmap
+for each of the 5 widget states ( "NORMAL", "ACTIVE", "PRELIGHT", "SELECTED",
+& "INSENSITIVE").
+
+They may also have a font. Note that only the properties which differ from the
+default values are written to the file.
+
+
+Colours are defined as "red,green,blue" with values ranging from 0-255.
+e.g.
+ <fg-NORMAL>198,80,111</fg-NORMAL>
+
+This is the foreground colour for the GTK_STATE_NORMAL widget state, with
+red=198, green=80 and blue=111.
+
+
+Background pixmaps are defined as filenames. The pixmap file should be in the
+project's pixmaps directory.
+e.g.
+ <bg_pixmap-NORMAL>clist.xpm</bg_pixmap-NORMAL>
+
+This is the background pixmap for the GTK_STATE_NORMAL widget state.
+
+
+Fonts are defined as X Logical Font Description fontnames,
+e.g.
+ <style_font>-adobe-utopia-bold-r-normal-*-*-160-*-*-p-*-iso8859-1</style_font>
+
+
+Named style example:
+
+<style>
+  <style_name>MyStyle</style_name>
+  <fg-NORMAL>198,80,111</fg-NORMAL>
+  <fg-PRELIGHT>181,93,139</fg-PRELIGHT>
+  <bg-NORMAL>131,214,165</bg-NORMAL>
+  <bg_pixmap-NORMAL>clist.xpm</bg_pixmap-NORMAL>
+</style>
+
+--------------------------------------------------------------------------
+
+UI Components
+=============
+
+The UI Component - windows, dialog boxes and popup-menus - are stored as
+hierarchies of widgets. Each widget has a number of properties, and optionally
+a style, accelerators, and signal handlers. Children of the widget appear
+last, and are indented for clarity. (The children are placed after the
+widget's properties so that the widgets can be easily created as the file is
+read.)
+e.g.
+
+<widget>
+  <class>GtkWindow</class>
+  <name>window1</name>
+  <title>window1</title>
+  <position>GTK_WIN_POS_NONE</position>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkTable</class>
+    <name>table1</name>
+    <homogeneous>False</homogeneous>
+    <row_spacing>0</row_spacing>
+    <column_spacing>0</column_spacing>
+    <style_name>MyStyle</style_name>
+    <Signal>
+      <name>need-resize</name>
+      <handler>on_table1_need-resize</handler>
+    </Signal>
+  </widget>
+</widget>
+
+
+Some properties have default values, so that we can cut down on unnecessary
+output. (It is likely that more default values will be used in future.)
+
+
+Basic Properties
+----------------
+
+  class			- The widget class, e.g. GtkLabel.
+			  The special value, 'Placeholder' indicates that this
+			  is a placeholder (i.e. an 'empty slot') in the
+			  interface. This means that the interface hasn't been
+			  completed, so a source code writer could issue a
+			  warning, though it could ignore the placeholder and
+			  carry on creating the rest of the interface.
+
+  (These appear on the 'Basic' page of Glade's property editor)
+
+  name			- The name of the widget, unique (in window/project?)
+  x			- The x coordinate of the widget, only applicable to
+			  toplevel widgets and widgets in fixed containers.
+  y			- The y coordinate of the widget, only applicable to
+			  toplevel widgets and widgets in fixed containers.
+  width			- The width of the widget.
+  height		- The height of the widget.
+  visible		- If the widget is initially shown.
+  sensitive		- If the widget is sensitive.
+  tooltip		- The tooltip to show for the widget.
+  can_default		- If the widget should have CAN_DEFAULT set.
+  has_default		- If the widget should grab the default.
+  can_focus		- If the widget should have CAN_FOCUS set.
+  has_focus		- If the widget should grab the focus.
+  events		- Which events the widget wants to receive.
+  extension_events	- Which extension events to receive.
+
+
+  Property		Type		Default
+
+  name			string		none
+  x			int		none/-1
+  y			int		none/-1
+  width			int		none/-1
+  height		int		none/-1
+  visible		bool		TRUE
+  sensitive		bool		TRUE
+  tooltip		string		none
+  can_default		bool		FALSE
+  has_default		bool		FALSE
+  can_focus		bool		FALSE
+  has_focus		bool		FALSE
+  events		int		0
+  extension_events	string		GDK_EXTENSION_EVENTS_NONE
+
+
+Special Properties According To The Widgets Parent
+--------------------------------------------------
+
+  (These appear on the 'Place' page of Glade's property editor)
+
+Widgets in a table have these additional properties, which map to the arguments
+used in the gtk_table_attach() function.
+
+  left_attach, right_attach, top_attach, bottom_attach
+  xpad, ypad, xexpand, yexpand, xshrink, yshrink, xfill, yfill
+
+For widgets in a box (but not button boxes):
+
+  padding, expand, fill, pack (default = "GTK_PACK_START")
+
+
+These properties are placed in the 'child' section, e.g.
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label1</name>
+      <child>
+        <left_attach>0</left_attach>
+        <right_attach>1</right_attach>
+        <top_attach>0</top_attach>
+        <bottom_attach>1</bottom_attach>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <xexpand>True</xexpand>
+        <yexpand>True</yexpand>
+        <xshrink>False</xshrink>
+        <yshrink>False</yshrink>
+        <xfill>True</xfill>
+        <yfill>True</yfill>
+      </child>
+      <label>label1</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+
+Signals
+-------
+
+  name, handler, object, after, data, last_modification_time
+
+
+Accelerators
+------------
+
+  modifiers, key, signal
+
+
+Style
+-----
+
+  similar to named styles.
+
+
+Special Widgets
+---------------
+
+Dialog buttons, clist titles, notebook tabs? scrolled window?

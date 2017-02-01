@@ -1,0 +1,183 @@
+AC_INIT(gmix)
+
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(gnome-media, 1.2.3)
+AM_MAINTAINER_MODE
+AM_PROG_XML_I18N_TOOLS
+
+AM_ACLOCAL_INCLUDE(macros)
+
+AC_PROG_CC
+AC_ISC_POSIX
+
+GNOME_INIT
+GNOME_COMPILE_WARNINGS
+
+dnl Checks for programs.
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+dnl Look for some version of curses (keeping AM_'s out of curses.m4)
+AC_CHECK_CURSES
+AM_CONDITIONAL(HAS_CURSES, test "$has_curses" = true)
+
+dnl Utility conditional
+AM_CONDITIONAL(FALSE, test x = y)
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h limits.h malloc.h strings.h sys/ioctl.h unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_OFF_T
+AC_TYPE_SIZE_T
+
+dnl Checks for library functions.
+AC_FUNC_ALLOCA
+AC_PROG_GCC_TRADITIONAL
+AC_FUNC_MMAP
+AC_CHECK_FUNCS(getcwd getwd putenv strdup strerror)
+AM_PROG_LIBTOOL
+
+dnl
+dnl Check for esound library
+dnl
+AM_PATH_ESD(0.2.7, we_have_esd=true)
+if test -n "$we_have_esd"; then
+AC_DEFINE(HAVE_ESD)
+fi
+
+dnl
+dnl Check for ScrollKeeper
+dnl
+AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
+if test x$SCROLLKEEPER_CONFIG = xno; then
+  AC_MSG_ERROR(Couldn't find scrollkeeper-config, please install the scrollkeeper package)
+fi
+
+dnl
+dnl ALSA
+dnl
+AC_ARG_ENABLE(alsa, 
+[  --enable-alsa=[no/yes]      Enable support for ALSA sound library],,enable_alsa=no)
+AC_CHECK_HEADERS(sys/asoundlib.h)
+if test "x$enable_alsa" = "xyes"; then
+    if test "${ac_cv_header_sys_asoundlib_h}" == "yes"; then
+	AC_DEFINE(ALSA)
+    else
+	enable_alsa="no";
+    fi
+fi
+
+ALL_LINGUAS="az ca cs da de el en_GB es et fi fr ga gl hu it ja ko lt nl no pl pt pt_BR ro ru sk sl sv tr uk zh_TW.Big5 zh_CN.GB2312"
+AM_GNU_GETTEXT
+
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+
+dnl
+dnl vu-meter
+dnl
+PROGRAMS_VUMETER=""
+if test -n "$we_have_esd"; then
+PROGRAMS_VUMETER="vu-meter"
+fi
+AC_SUBST(PROGRAMS_VUMETER)
+
+dnl
+dnl gmix
+dnl
+PROGRAMS_GMIX=""
+GMIX_LIBS=""
+AC_CHECK_HEADERS(soundcard.h linux/soundcard.h sys/soundcard.h)
+AC_CHECK_HEADERS(machine/soundcard.h)
+if test "x$enable_alsa" = "xyes"; then
+    PROGRAMS_GMIX=gmix
+    GMIX_LIBS="-lasound"
+elif test "${ac_cv_header_sys_soundcard_h}" = "yes" || \
+     test "${ac_cv_header_soundcard_h}" = "yes" || \
+     test "${ac_cv_header_linux_soundcard_h}" = "yes" || \
+     test "${ac_cv_header_machine_soundcard_h}" = "yes"; then
+    PROGRAMS_GMIX=gmix
+fi
+AC_SUBST(PROGRAMS_GMIX)
+AC_SUBST(GMIX_LIBS)
+
+
+dnl
+dnl cddbslave
+dnl
+GNOME_GHTTP_CHECK
+if test -n "`echo x$GHTTP_LIB | grep ghttp`"; then
+  AC_DEFINE(WITH_LIBGHTTP)
+else
+  GHTTP_LIB=
+fi
+
+dnl find the mailer for use with the submission helper
+dnl This code is from the gnome-bug script.  It should work for most systems
+AC_MSG_CHECKING(for the MTA)
+if test -f /usr/sbin/sendmail; then
+  MAIL_TRANSFER_AGENT="/usr/sbin/sendmail -t"
+elif test -f /usr/lib/sendmail; then
+  MAIL_TRANSFER_AGENT="/usr/lib/sendmail -t"
+else
+  MAIL_TRANSFER_AGENT="rmail "
+fi
+AC_DEFINE_UNQUOTED(MAIL_TRANSFER_AGENT, "$MAIL_TRANSFER_AGENT")
+AC_MSG_RESULT($MAIL_TRANSFER_AGENT)
+
+dnl
+dnl Everything OK for tcd?
+dnl
+PROGRAMS_TCD=""
+AC_CHECK_HEADERS(linux/cdrom.h,[PROGRAMS_TCD=tcd])
+AC_CHECK_HEADERS(linux/ucdrom.h)
+AC_CHECK_HEADERS(sys/cdio.h,[PROGRAMS_TCD=tcd])
+AC_CHECK_HEADERS(sun/dkio.h,[PROGRAMS_TCD=tcd])
+
+AC_MSG_CHECKING([whether to use cd changer support (Linux 2.1.x headers required)])
+AC_EGREP_CPP(answer_affirmatively,
+[#include <linux/cdrom.h>
+ #ifdef CDROM_CHANGER_NSLOTS
+	answer_affirmatively
+ #endif
+], cd_changer=yes, cd_changer=no)
+if test "$cd_changer" = "yes"; then
+	USE_CD_CHANGER="-DTCD_CHANGER_ENABLED"
+fi
+AC_MSG_RESULT("$cd_changer")
+
+AC_SUBST(USE_CD_CHANGER)
+AC_SUBST(PROGRAMS_TCD)
+
+dnl
+dnl grecord
+dnl
+PROGRAMS_GRECORD="grecord"
+AC_SUBST(PROGRAMS_GRECORD)
+
+AC_OUTPUT([
+gnome-media.spec
+Makefile
+po/Makefile.in
+gmix/Makefile
+gmix/doc/Makefile
+gmix/doc/C/Makefile
+gmix/doc/it/Makefile
+vu-meter/Makefile
+macros/Makefile
+intl/Makefile
+tcd/Makefile
+tcd/icons/Makefile
+tcd/doc/Makefile
+tcd/doc/C/Makefile
+cddbslave/Makefile
+grecord/Makefile
+grecord/src/Makefile
+omf-install/Makefile
+version.h])

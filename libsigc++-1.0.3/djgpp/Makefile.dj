@@ -1,0 +1,35 @@
+CC = gcc
+AR = ar
+
+OPTIONS = \
+	-O2\
+	-s
+
+OBJS = \
+	adaptor.o\
+	basic_signal.o\
+	marshal.o\
+	object.o\
+	scope.o\
+	slot.o\
+	thread.o\
+
+INCLUDE_DIRS = ../ ../sigc++
+INCLUDES = $(addprefix -I,$(INCLUDE_DIRS))
+
+all : libsigc++.a
+
+libsigc++.a : $(OBJS)
+	$(AR) rs $@ $^
+
+%o : %cc
+	$(CC) -c $(INCLUDES) $(OPTIONS) $<
+
+%o : %c
+	$(CC) -c $(INCLUDES) $(OPTIONS) $<
+
+clean:
+	del *.exe
+	del *.o
+	del *.gdt
+

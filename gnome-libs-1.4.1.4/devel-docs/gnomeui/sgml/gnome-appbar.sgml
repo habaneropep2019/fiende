@@ -1,0 +1,440 @@
+<refentry id="GnomeAppBar">
+<refmeta>
+<refentrytitle>GnomeAppBar</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeAppBar</refname><refpurpose>Statusbar/Progress/Minibuffer widget</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeAppBar-struct">GnomeAppBar</link>;
+#define     <link linkend="GNOME-APPBAR-HAS-STATUS-CAPS">GNOME_APPBAR_HAS_STATUS</link>         (appbar)
+#define     <link linkend="GNOME-APPBAR-HAS-PROGRESS-CAPS">GNOME_APPBAR_HAS_PROGRESS</link>       (appbar)
+struct      <link linkend="GnomeAppBarMsg">GnomeAppBarMsg</link>;
+#define     <link linkend="GNOME-APPBAR-INTERACTIVE-CAPS">GNOME_APPBAR_INTERACTIVE</link>        (ab)
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-appbar-new">gnome_appbar_new</link>                (<link linkend="gboolean">gboolean</link> has_progress,
+                                             <link linkend="gboolean">gboolean</link> has_status,
+                                             <link linkend="GnomePreferencesType">GnomePreferencesType</link> interactivity);
+void        <link linkend="gnome-appbar-set-status">gnome_appbar_set_status</link>         (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             const <link linkend="gchar">gchar</link> *status);
+void        <link linkend="gnome-appbar-set-default">gnome_appbar_set_default</link>        (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             const <link linkend="gchar">gchar</link> *default_status);
+void        <link linkend="gnome-appbar-push">gnome_appbar_push</link>               (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             const <link linkend="gchar">gchar</link> *status);
+void        <link linkend="gnome-appbar-pop">gnome_appbar_pop</link>                (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);
+void        <link linkend="gnome-appbar-clear-stack">gnome_appbar_clear_stack</link>        (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);
+void        <link linkend="gnome-appbar-set-progress">gnome_appbar_set_progress</link>       (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             <link linkend="gfloat">gfloat</link> percentage);
+<link linkend="GtkProgress">GtkProgress</link>* <link linkend="gnome-appbar-get-progress">gnome_appbar_get_progress</link>      (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);
+void        <link linkend="gnome-appbar-refresh">gnome_appbar_refresh</link>            (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);
+void        <link linkend="gnome-appbar-set-prompt">gnome_appbar_set_prompt</link>         (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             const <link linkend="gchar">gchar</link> *prompt,
+                                             <link linkend="gboolean">gboolean</link> modal);
+void        <link linkend="gnome-appbar-clear-prompt">gnome_appbar_clear_prompt</link>       (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);
+<link linkend="gchar">gchar</link>*      <link linkend="gnome-appbar-get-response">gnome_appbar_get_response</link>       (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);
+void        <link linkend="gnome-appbar-construct">gnome_appbar_construct</link>          (<link linkend="GnomeAppBar">GnomeAppBar</link> *ab,
+                                             <link linkend="gboolean">gboolean</link> has_progress,
+                                             <link linkend="gboolean">gboolean</link> has_status,
+                                             <link linkend="GnomePreferencesType">GnomePreferencesType</link> interactivity);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBox">GtkBox</link>
+                     +----<link linkend="GtkHBox">GtkHBox</link>
+                           +----GnomeAppBar
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  A bar that GNOME applications put on the bottom of the windows to display
+  status, progress, hints for menu items or a minibuffer for getting some
+  sort of response. It has a stack for status messages
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeAppBar-struct">struct GnomeAppBar</title>
+<programlisting>struct GnomeAppBar;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-APPBAR-HAS-STATUS-CAPS">GNOME_APPBAR_HAS_STATUS()</title>
+<programlisting>#define GNOME_APPBAR_HAS_STATUS(appbar) (GNOME_APPBAR(appbar)-&gt;status != NULL)
+</programlisting>
+<para>
+Returns whether the appbar contains a statusbar widget. For internal use. Don't use.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry>appbar to check
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOME-APPBAR-HAS-PROGRESS-CAPS">GNOME_APPBAR_HAS_PROGRESS()</title>
+<programlisting>#define GNOME_APPBAR_HAS_PROGRESS(appbar) (GNOME_APPBAR(appbar)-&gt;progress != NULL)
+</programlisting>
+<para>
+Returns whether the appbar has a progress widget. For internal use. Don't use.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry>appbar to check
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeAppBarMsg">struct GnomeAppBarMsg</title>
+<programlisting>struct GnomeAppBarMsg;</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="GNOME-APPBAR-INTERACTIVE-CAPS">GNOME_APPBAR_INTERACTIVE()</title>
+<programlisting>#define GNOME_APPBAR_INTERACTIVE(ab) ((ab) ? (ab)-&gt;interactive : FALSE)
+</programlisting>
+<para>
+Returns whether the appbar has a minibuffer-style interactive status display.
+For internal use. Don't use.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>ab</parameter>&nbsp;:</entry>
+<entry>appbar to check
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-new">gnome_appbar_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_appbar_new                (<link linkend="gboolean">gboolean</link> has_progress,
+                                             <link linkend="gboolean">gboolean</link> has_status,
+                                             <link linkend="GnomePreferencesType">GnomePreferencesType</link> interactivity);</programlisting>
+<para>
+Create a new GNOME application status bar.  If <parameter>has_progress</parameter> is
+<literal>TRUE</literal>, a small progress bar widget will be created, and placed on the
+left side of the appbar.  If <parameter>has_status</parameter> is <literal>TRUE</literal>, a status bar,
+possibly an editable one, is created.
+</para>
+<para>
+<parameter>interactivity</parameter> determines whether the appbar is an interactive
+"minibuffer" or just a status bar.  If it is set to
+<literal>GNOME_PREFERENCES_NEVER</literal>, it is never interactive.  If it is set to
+<literal>GNOME_PREFERENCES_USER</literal> we respect user preferences from
+ui-properties. If it's <literal>GNOME_PREFERENCES_ALWAYS</literal> we are interactive
+whether the user likes it or not. Basically, if your app supports
+both interactive and not (for example, if you use the
+gnome-app-util interfaces), you should use
+<literal>GNOME_PREFERENCES_USER</literal>. Otherwise, use the setting you
+support. Please note that "interactive" mode is not functional now;
+GtkEntry is inadequate and so a custom widget will be written
+eventually.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>has_progress</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if appbar needs progress bar widget, <literal>FALSE</literal> if not
+</entry></row>
+<row><entry align="right"><parameter>has_status</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if appbar needs status bar widget, <literal>FALSE</literal> if not
+</entry></row>
+<row><entry align="right"><parameter>interactivity</parameter>&nbsp;:</entry>
+<entry> Level of user activity required
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  Pointer to new GNOME appbar widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-set-status">gnome_appbar_set_status ()</title>
+<programlisting>void        gnome_appbar_set_status         (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             const <link linkend="gchar">gchar</link> *status);</programlisting>
+<para>
+Sets the status label without changing widget state; next set or push
+will destroy this permanently.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object.
+</entry></row>
+<row><entry align="right"><parameter>status</parameter>&nbsp;:</entry>
+<entry> Text to which status label will be set.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-set-default">gnome_appbar_set_default ()</title>
+<programlisting>void        gnome_appbar_set_default        (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             const <link linkend="gchar">gchar</link> *default_status);</programlisting>
+<para>
+What to show when showing nothing else; defaults to nothing.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+<row><entry align="right"><parameter>default_status</parameter>&nbsp;:</entry>
+<entry> Text for status label
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-push">gnome_appbar_push ()</title>
+<programlisting>void        gnome_appbar_push               (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             const <link linkend="gchar">gchar</link> *status);</programlisting>
+<para>
+Push a new status message onto the status bar stack, and
+display it.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+<row><entry align="right"><parameter>status</parameter>&nbsp;:</entry>
+<entry> Text of status message.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-pop">gnome_appbar_pop ()</title>
+<programlisting>void        gnome_appbar_pop                (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);</programlisting>
+<para>
+Remove current status message, and display previous status
+message, if any.  It is OK to call this with an empty stack.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-clear-stack">gnome_appbar_clear_stack ()</title>
+<programlisting>void        gnome_appbar_clear_stack        (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);</programlisting>
+<para>
+Remove all status messages from appbar, and display default status
+message (if present).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-set-progress">gnome_appbar_set_progress ()</title>
+<programlisting>void        gnome_appbar_set_progress       (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             <link linkend="gfloat">gfloat</link> percentage);</programlisting>
+<para>
+Sets progress bar to the given percentage.
+Pure sugar - with a bad name, in light of the get_progress name
+which is not the opposite of set_progress. Maybe this function
+should die.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+<row><entry align="right"><parameter>percentage</parameter>&nbsp;:</entry>
+<entry> Percentage to which progress bar should be set.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-get-progress">gnome_appbar_get_progress ()</title>
+<programlisting><link linkend="GtkProgress">GtkProgress</link>* gnome_appbar_get_progress      (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);</programlisting>
+<para>
+Returns &amp;GtkProgress widget pointer, so that the progress bar may be
+manipulated further.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+Pointer to appbar's progress bar object. May be NULL if the appbar
+has no progress object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-refresh">gnome_appbar_refresh ()</title>
+<programlisting>void        gnome_appbar_refresh            (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);</programlisting>
+<para>
+Reflect the current state of stack/default. Useful to force a
+set_status to disappear.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-set-prompt">gnome_appbar_set_prompt ()</title>
+<programlisting>void        gnome_appbar_set_prompt         (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             const <link linkend="gchar">gchar</link> *prompt,
+                                             <link linkend="gboolean">gboolean</link> modal);</programlisting>
+<para>
+Put a prompt in the appbar and wait for a response. When the
+user responds or cancels, a user_response signal is emitted.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object.
+</entry></row>
+<row><entry align="right"><parameter>prompt</parameter>&nbsp;:</entry>
+<entry> Text of the prompt message.
+</entry></row>
+<row><entry align="right"><parameter>modal</parameter>&nbsp;:</entry>
+<entry> If <literal>TRUE</literal>, grabs input.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-clear-prompt">gnome_appbar_clear_prompt ()</title>
+<programlisting>void        gnome_appbar_clear_prompt       (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);</programlisting>
+<para>
+Remove any prompt.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-get-response">gnome_appbar_get_response ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      gnome_appbar_get_response       (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar);</programlisting>
+<para>
+Get the response to the prompt, if any. Result must be g_free'd.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+Text from appbar entry widget, as entered by user.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-appbar-construct">gnome_appbar_construct ()</title>
+<programlisting>void        gnome_appbar_construct          (<link linkend="GnomeAppBar">GnomeAppBar</link> *ab,
+                                             <link linkend="gboolean">gboolean</link> has_progress,
+                                             <link linkend="gboolean">gboolean</link> has_status,
+                                             <link linkend="GnomePreferencesType">GnomePreferencesType</link> interactivity);</programlisting>
+<para>
+For use to bindings in languages other than C. Don't use.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>ab</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME appbar object.
+</entry></row>
+<row><entry align="right"><parameter>has_progress</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if appbar needs progress bar widget.
+</entry></row>
+<row><entry align="right"><parameter>has_status</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if appbar needs status bar widget.
+</entry></row>
+<row><entry align="right"><parameter>interactivity</parameter>&nbsp;:</entry>
+<entry> See <link linkend="gnome-appbar-new">gnome_appbar_new</link>() explanation.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="GnomeApp">GnomeApp</link>
+</para>
+</refsect1>
+
+</refentry>

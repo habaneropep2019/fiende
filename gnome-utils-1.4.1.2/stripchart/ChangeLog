@@ -1,0 +1,179 @@
+Mon Sep 03 03:51:57 2001  George Lebl <jirka@5z.com>
+
+	* eval.c: fix 64bit issues when scanning /proc
+
+2001-08-08  Abel Cheung  <maddog@linux.org.hk>
+
+	* \*.desktop: Added zh_TW.Big5 (traditional Chinese) strings.
+
+2001-07-13  John Kodis  <kodis@jagunet.com>
+
+	* utils.c (str_to_gdouble): Handle NULL strings gracefully.
+
+	* chart.c, chart.h (chart_parameter_add): Add four additional
+	parameters: {top,bot}_{min,max}.  Copy these into the
+	corresponding datum values.
+	(chart_rescale_by_table): Use any user-specified top_max as the
+	maximum upper bound, rather than using the largest table value
+	less than top_max.
+
+	* eval.c (chart_equation_add): Set {top,bot}_{min,max} to the
+	values obtained from the parameter specification, or to +/-
+	G_MAXDOUBLE if no value was supplied.
+
+	* utils.c, utils.h (str_to_gdouble): New helper function used in
+	the preceding change.
+
+	This batch of rescaling changes was developed and submitted by
+	Joachim Breuer <jmbreuer@gmx.net>
+
+2001-07-11  John Kodis  <kodis@jagunet.com>
+
+	* strip.c (strip_overlay_indicators): Draw indicators
+	left-to-right in the same order that they appear in the parameter
+	notebook.
+
+	* chart.c (chart_parameter_add): Insert new parameters
+	corresponding to the location of the page in the parameter
+	notebook.
+
+	* chart-app.h (struct): Remove plist; adjust code to get parameter
+	pages by iterating through notebook pages and getting the
+	user_data associated with each.
+
+	* utils.c: Fix a compilation problem under Solaris 2.6 reported by
+	Frederic Devernay <Frederic.Devernay@sophia.inria.fr>, by
+	including chart-app.h, and thus config.h, before any other header
+	files.
+
+2001-06-27  John Kodis  <kodis@jagunet.com>
+
+	* prefs.c (prefs_apply): Add call to gtk_widget_queue_draw() after
+	preferences get changed.  This will clear or draw tick marks
+	immediately after toggling the ticks setting, rather than delaying
+	until the next update.
+
+	* strip.c (strip_expose): Call strip_overlay_indicators() when
+	handling an expose event.
+
+2001-06-26  John Kodis  <kodis@jagunet.com>
+
+	* chart-app.c (on_show_values): Set text window policy to allow
+	auto-shrink so that this window to shrink when parameters are
+	deleted from its clist.
+
+2001-06-24  John Kodis  <kodis@jagunet.com>
+
+	* chart.c (val2gdk): If computing the vertical position of a value
+	results in not-a-number, return zero rather than -inf.  This
+	corrects the problem of data suddenly jumping to the top of the
+	strip when their values get very small.
+
+	* chart-app.c (chart_app_new): Replace multiple calls to
+	strip_set_history_size() to one call to
+	strip_set_default_history_size().  Locate this call so that it
+	works correctly.
+
+	* strip.c (strip_set_default_history_size): Renamed from
+	strip_set_history_size(), to better reflect what it actually does.
+
+Sun Jun 24 16:10:27 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am, stripchart-applet.gnorba:  Add a gnorba file so that
+	  the applet can actually work
+
+2001-06-24  John Kodis  <kodis@jagunet.com>
+
+	* strip.c (strip_indicator_marks): New function used to draw
+	indicator blocks both when updating and when shifting the strip.
+
+2001-06-23  John Kodis  <kodis@jagunet.com>
+
+	* params.c (param_page_set_from_desc): Move both calls to
+	add_color(page) here, since they both immediately proceeded a call
+	to param_page_set_from_desc anyway.  Shuffled code around to put
+	definitions before calls to avoid forward declarations,
+	artificially bloating this diff with code churn.
+	(on_option): Add 'do { add_color(page); } while (...);', as is
+	done in create_param_page().  This corrects bug #53324.
+
+	* strip.c (strip_update): Redraw the strip to erase any tick marks
+	when first turning off tick marks.
+	(strip_redraw): Move the indicator position initializations
+	outside of the indicator drawing loop so that more than a single
+	indicator can be displayed.
+
+	* stripchart.params: Add a description and a color to the "Custom"
+	(empty) parameter.  This corrects bug #52789.
+
+	* params.c (help_menu_uiinfo): Eliminate a lurking remnant of the
+	transition from gstripchart: change the name of the help files in
+	the GNOMEUIINFO_HELP macro from "gstripchart" to "stripchart".
+	(on_save): Don't try to hide the file selector unless the file
+	selector actually exists.  This eliminates a warning when saving a
+	configuration file.
+
+	* gnome-utils 1.4.0.1, the "Badger spleens" release was announced
+	today.  Too bad I didn't get today's batch of changes in earlier.
+
+2001-06-21  John Kodis  <kodis@jagunet.com>
+
+	* params.c (opts_to_file): Don't try to save parameters that have
+	been deleted.  This corrects bugs #55604 and #56415.
+
+2001-06-05  Christian Rose  <menthos@menthos.com>
+
+	* stripchart-applet.desktop: Added sv translation.
+
+2001-06-04  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* Comment out trailing stuff after #endif.
+	
+2001-04-25  Jason Leach  <jasonleach@usa.net>
+
+	* params.c: Fix bug #52289: Replace C++ comments with C.
+
+	* prefs.c: Here too.
+
+2001-04-07  Manuel de Vega Barreiro <mbarreiro@red.madritel.es>
+
+        New Spanish Translations
+
+        * stripchart/doc/es
+        * stripchart/doc/Makefile.am
+
+2001-03-10  John Kodis  <kodis@jagunet.com>
+
+	* eval.c (num_op): Correct evaluation of time ($t) and delta-time
+	(~t) values.
+
+	* chart.c (chart_parameter_add): Default to an unlimited range of
+	allowable adjustment for parameters.
+
+2001-03-07  John Kodis  <kodis@jagunet.com>
+
+	* params.c (param_desc_ingest): If a parameter file is missing or
+	invalid, only complain about it once.
+
+	* eval.c (num_op): Correct time values: $t is time since startup,
+	and ~t is the delta time between evaluation iterations.
+
+	* stripchart.params: Add mail, ppp parameters.
+
+	* stripchart.conf: Add parameter to monitor e-mail; add
+	description to Busy parameter.
+
+	* params.c (on_color_set): Insure that a parameter datum actually
+	exists before attempting to set its color, thus avoiding an
+	embarrassing seg fault.
+
+2001-02-24 - John Fleck <jfleck@inkstain.net>
+
+	* adding <figure> tags to screenshots in stripchart.sgml to avoid
+	annoying segfault in gnome-db2htm2
+
+2001-01-21  John Kodis  <kodis@jagunet.com>
+
+	* Initial checkin to the Gnome CVS repository.
+	
+

@@ -1,0 +1,430 @@
+2001-03-11  Chema Celorio  <chema@celorio.com>
+
+	* gpa-ppd-paper.c (gpa_ppd_papers_set_code_not_cleaned): implement.
+	If we can't optimize the Paper Set code, just include it like that.
+
+2001-03-10  Chema Celorio  <chema@celorio.com>
+
+	* gpa-option.c (gpa_option_dup_path): small stupid
+	crash.
+
+2001-03-10  Chema Celorio  <chema@celorio.com>
+
+	* gpa-ppd-constraints.c: add gpa-tags.h
+
+	* gpa-ppd-option.h: remove it from here it was duplicated
+
+	* gpa-ppd-utils.h (gpa_ppd_error): add #define gpa_ppd_warning
+
+	* gpa-ppd-paper.c (gpa_ppd_add_paper_options): if we can't clean
+	the querycode and divide it, just don't optimize for it.
+
+	* gpa-backend.c (gpa_backend_new): use g_new0 v.s. g_new
+	* gpa-code.c (gpa_code_fragment_new): ditto
+	* gpa-model-info.c (gpa_model_info_new): ditto
+	* gpa-constraints.c (gpa_constraint_new): ditto
+	* gpa-values.c (gpa_value_new): ditto
+
+	* gpa-ppd-paper.c (gpa_ppd_papers_get_query_code): the query code
+	is not required. Kill a memleak
+	(gpa_ppd_papers_clean_query_code): query code can be absent
+
+	* gpa-ppd-model.c (gpa_ppd_add_model_vendor): only strcmp if
+	we know the model_name or vendor_name
+	(gpa_ppd_add_model_vendor): free manuf_name
+
+	* gpa-vendor.c (gpa_vendor_list_load_all): loads all
+	vendors. It uses the PrinterIndex first so that it can
+	load the vendors that we know about fast. Then it searches
+	for printers that where generated from PPD and verifies
+	that the vendors exists.
+
+	* gpa-vendor-private.h: remove gpa_vendor_list_load_from_file
+	and add gpa_vendor_list_load_all
+
+	* gpa-vendor.c (gpa_vendor_get_from_name): ok, remove the
+	be_quiet variable. If a vendor could not be found from
+	name, create it.
+	(gpa_vendor_add): make static
+	(gpa_vendor_list_new_from_file): make static
+
+	* gpa-ppd-paper.c (gpa_ppd_papers_get_region): the imageable
+	area can have ceros in it, dont' g_return_if_fail
+
+	* gpa-vendor.h: move get_vendor_from_name to the private
+	header
+
+	* gpa-model.c: add the private header
+
+	* gpa-vendor.c (gpa_vendor_get_from_name): add a be_quiet
+	parameter so that the not found error can be turned off
+
+	* gpa-printer.c (gpa_printers_list_load): vendor_list_get
+	does not require a NULL pointer now
+
+	* gpa-vendor.h: update headers and add gpa_vendor_add
+
+	* gpa-vendor.c (gpa_vendor_new_from_tree): a vendor might not
+	contain models. Only call load_model_info_from_tree if we have a
+	<Models> tag
+	(gpa_vendor_add): implement.
+	(gpa_vendor_list_set_get): implement (static)
+	(gpa_vendor_list_get): this is just a small wrapper arround _set_get
+
+	* text-utils.c (gpa_tu_string_contains_newline): implement
+
+2001-03-08  Chema Celorio  <chema@celorio.com>
+
+	* gpa-ppd-model.c (gpa_ppd_load_vendor_dictionary): better error
+	reporting when looking for vendor in the VendorDictionary
+
+2001-02-12  Karl Eichwalder  <ke@suse.de>
+
+	* Makefile.am (EXTRA_DIST): Typo.
+
+2000-12-18  Chema Celorio  <chema@celorio.com>
+
+	* gpa-ppd-settings.c: add missing header
+
+	* gpa-printer.c (gpa_printer_dup_id): return g_strduped
+	value. Duh !
+
+2000-12-10  Chema Celorio  <chema@celorio.com>
+
+	* gpa-values.c (gpa_values_verify_settings): imlement.
+
+	* gpa-settings.c (gpa_settings_verify): verify the
+	settings values.
+
+	* gpa-values.c (gpa_value_insert): list can be null
+	(no items), remove g_return_val_if_fail
+
+	* Makefile.am (libgpa_la_SOURCES): add gpa-values.c
+
+	* gpa-values.c (gpa_value_get): change to list from hash_table
+
+	* gpa-ppd-model.c (gpa_ppd_to_model): dont call g_hash_table_new as
+	we are using lists now.
+
+	* gpa-ppd-settings.c (gpa_ppd_insert_default_settings): use list not hashes
+
+	* gpa-settings.c (gpa_settings_copy): copy list with
+	gpa_values_copy_list
+	(gpa_settings_new_from_node): get settings->values with
+	gpa_values_new_from_node
+
+	* gpa-values.c (gpa_values_write_list): Implement
+	(gpa_values_free_list): ditto
+	(gpa_values_copy_list): ditto
+	(gpa_value_copy): ditto
+	(gpa_values_new_list_from_node): ditto
+	(gpa_value_new_from_node): ditto
+	(gpa_value_new): ditto
+
+	* gpa-model-private.h: change default_values from hash to
+	GList
+
+	* gpa-options.c: add the settings-private header
+	* gpa-constraints.c: ditto
+	* gpa-option.c: ditto
+	* gpa-code.c: ditto
+
+	* gpa-private.h: move the GpaSettings object to settings-private.h
+
+	* gpa-settings.c (gpa_settings_value_get_from_option_double): set value to
+	0.0 before returning on error.
+
+	* gpa-settings.h: remove unused prototypes
+
+2000-11-30  Chema Celorio  <chema@celorio.com>
+
+	* gpa-ppd-*.c (gpa_ppd_append_syntax_error): got PPD importing working
+	again. Lots of small tweaks here & there.
+	
+	* gpa-ppd-utils.c (gpa_ppd_append_syntax_error): new function.
+
+	* text-utils.c: add gpa_ prefix to all functions. They where conflicting
+	with gnome-print's functions.
+	* text-utils.h: 
+
+2000-11-28  Chema Celorio  <chema@celorio.com>
+
+	* gpa-generic-ps.c: new file. Will take care of creating a
+	GpaPrinte & GpaModel if there aren't any printers installed.
+	This has to be hardcoded so that we don't depend on
+	the data on disk to pop up a print dialog.
+
+	* gpa-printer-private.h (struct _GpaPrinter): move here from
+	gpa-private.h
+	new file.
+
+	* gpa-model-private.h: move the gpa_model_new func. into here
+
+	* gpa-vendor-private.h: into here
+	* gpa-private.h: move the GpaVendor struct from here
+
+	* gpa-vendor.h: remove from here and
+	* gpa-vendor-private.h: new file. MOve stuff from
+	gpa-vendor.h to here
+
+	* gpa-vendor.c: move gpa_vendor_generic_ps to gpa-genric-ps
+	* gpa-vendor.h:
+	
+
+2000-11-28  Chema Celorio  <chema@celorio.com>
+
+	* gpa-settings.c (gpa_settigns_load_default_paths_from_node): don't
+	duplicate paths in model->default_settings. Honor the Default settings
+	in <defaultSettings->Paths> first the <Options->Default> second.
+
+	* gpa-tags.h (GPA_PATH_DELIMITER): add
+
+	* gpa-settings.c (gpa_settigns_load_default_paths_from_node): load
+	default settings from Option nodes too.
+
+	* gpa-option.c (gpa_option_new_from_node):
+	
+2000-11-28  Chema Celorio  <chema@celorio.com>
+	
+	* gpa-options.c (gpa_options_get_pickone_type): and use here
+
+	* gpa-known.h: add to the list of know options the GpaPickoneType
+	enumed value
+
+	* gpa-options.h: add GpaPickoneType enums
+
+	* gpa-options.c (gpa_options_verify): remove GPA_CONTENT_MEMORY as it
+	is now handled as a generic item.
+	(gpa_options_get_pickone_type): implement.
+
+	* libgpa.h: add this file. It contains all the libgpa headers.
+	* Makefile.am (libgpainclude_HEADERS): add here too
+
+2000-11-27  Chema Celorio  <chema@celorio.com>
+
+	* gpa-known.h: make the "Memory" a generic option type
+
+	* gpa-options.c (gpa_options_get_group_from_string): handle the PsGroup
+	(gpa_options_verify): ditto
+
+	* gpa-tags.h (GPA_TAG_PS_GROUP): add The Postscript Group Tag
+
+2000-11-27  Chema Celorio  <chema@celorio.com>
+
+	* gpa-settings.c (gpa_settings_query_options_boolean): implement.
+
+2000-11-27  Chema Celorio  <chema@celorio.com>
+
+	* gpa-printer.c (gpa_printer_verify): add a fail argument
+
+	* gpa-settings.c (gpa_settings_query_options): pass FALSE as the fail
+	argument.
+	(gpa_settings_verify): add a fail argument.
+	(gpa_settings_list_verify): ditto
+
+	* gpa-options.c (gpa_options_verify_with_settings): pass TRUE for
+	the fail argument
+
+	* gpa-options.h: update prototype
+
+	* gpa-options.c (gpa_options_get_selected_option): add a fail argument.
+	If it is true, fail and return NULL. Don't fix. 
+
+	* gpa-settings.c (gpa_settings_unselect_options): when finding the
+	option to unselect use gpa_options_dup_path and not gpa_options_dup_id
+	as whith children options we need the full path.
+	(gpa_settings_verify): verify that the paths are not duplicated, if they
+	are. Remove them.
+
+	* .cvsignore: added libgpaConf.sh.in
+
+	* libgpaConf.sh.in: added.
+
+	* Makefile.am (libgpaConf.sh): add support for
+	gnome-config --libs/--cflags/--modversion libgpa
+
+2000-11-26  Chema Celorio  <chema@celorio.com>
+
+	- Remove references to xml-utils.h in all the public
+	headers. xml-utils.h is not installed. Create private
+	headers where needed.
+	
+	* gpa-options.c: add gpa-code-private.h
+
+	* gpa-options-private.h: include xml-utils.h
+	* gpa-option-private.h: ditto
+
+	* gpa-model.c: include gpa-code-private.h
+
+	* gpa-code.c: use private header
+
+	* gpa-code.h: split into this
+	* gpa-code-private.h: and this
+
+	* gpa-option.h: remove reference to xml-utils.h, it was not needed
+
+	* gpa-model.c: add private header
+
+	* gpa-constraints.c: add new private header
+
+	* gpa-constraints.h: split into this and 
+	* gpa-constraints-private.h: this
+
+	* gpa-model-info.c (gpa_load_model_info_list_from_tree): add new
+	private header
+	* gpa-vendor.c: ditto
+
+	* gpa-model.c: add private headers
+
+	* gpa-model-info.[ch]: ditto
+
+	* gpa-backend.h: remove the reference to xml-utils.h. Split into this
+	* gpa-backend-private.h: and this
+
+2000-11-26  Chema Celorio  <chema@celorio.com>
+	
+	* gpa-options.c (gpa_options_get_selected_option): if an option
+	was not selected. Select a default one. This happens when a .model
+	file changes and the settings refer to the old file&id's.
+
+	* gpa-settings.c (gpa_settings_select_option): don't return if we
+	where unable to unselect an option. We need to select the new one
+	to fix errors when updating a .model file
+
+2000-11-25  Chema Celorio  <chema@celorio.com>
+
+	* gpa-code.c: remove references to libgnomeprint.
+	(libgpa_hex_2_dec): rename to avoid conflicts with gnome-print
+	(libgpa_decode_hex_wcs): ditto
+	(libgpa_decode_hex): ditto
+
+2000-11-24  Chema Celorio  <chema@celorio.com>
+
+	* gpa-settings.c (gpa_settings_list_swap): delete.
+	It was not beeing used
+	(gpa_text_utils_search_backwards): move here and prepend
+	gpa_ to it.
+	(gpa_settings_select_option): rename and fix. This is the
+	only function needed to select an Option now. No need
+	to unselect the previous selected option.
+	(gpa_settings_unselect_options): move here.
+
+	* gpa-model.h: clean this file. Remove old junk
+
+	* gpa-printer.c (gpa_printers_load_from_dir): make static
+	and remove from the .h file
+
+	* gpa-printer.h: remove gpa_printe_free, since it's a
+	GtkObject. gpa_printer_finalize should be used insteaad
+	
+	* gpa-printer.h: clean this file a bit. remove functions
+	that where delted but not removed from this .h file
+
+	* gpa-options.c (gpa_options_get_children): constify
+	(gpa_options_have_children): constify
+	(gpa_options_dup_path): rename from path_dup and constify
+
+	* gpa-option.c (gpa_option_get_children): constify
+
+	* gpa-option.h: cleaned
+
+	* gpa-option.c (gpa_option_value_get_double): constify
+	(gpa_option_value_get_int): ditto
+	(gpa_option_value_dup): ditto
+
+	* gpa-option-private.h: privatize the paths functions.
+	gpa_option_dup_path & gpa_option_get_from_$foo_and_path
+
+	* gpa-option.c (gpa_option_get_from_printer_and_path): constify
+	(gpa_option_dup_path): rename from path_dup 
+
+	* gpa-option.h: constify gpa_model_get_foo
+
+	* all_files: include gpa-model-private where needed.
+
+	* gpa-private.h: remove GpaModel into :
+	* gpa-model-private.h: 
+
+	* gpa-model.c (gpa_model_get_options_from_id): new funct.
+	replaces gpa_options_get_from_id.
+
+	* gpa-tags.h (GPA_TAG_FRAME): new tag
+
+	* All other files: Include "gpa-options-private.h" where
+	needed.
+
+	* gpa-options-private.h (struct _GpaOptions): new file,
+	move the struct here. All the functions that should not
+	be accessed by the library users should be prototyped here.
+
+	* gpa-private.h (struct _GpaOptions): added "gchar * frame"
+
+	* gpa-constraints.c (gpa_constraints_load_from_node): remove warning.
+	Constraints are disalbed for now.
+
+2000-11-23  Chema Celorio  <chema@celorio.com>
+
+	* gpa-settings.c (gpa_settings_remove_selected_option): deprecate
+	replaced with gpa_options_remove_selected_from_settings
+
+	* gpa-options.c (gpa_options_dup_id): implement
+	(gpa_options_remove_selected_from_settings): implement.
+
+2000-11-23  Chema Celorio  <chema@celorio.com>
+
+	* gpa-option.c (gpa_option_get_from_options_list_and_path): remove
+	\n from warning
+
+	* gpa-settings.c (gpa_settings_verify): remove the invalid paths from
+	settings->selected_options
+
+	* gpa-options.c (gpa_options_get_from_id): make public
+
+	* gpa-printer.h: rename from gpa_printer_foo_get to gpa_printer_get_foo
+	for all funcs. that provide access the strucutre.
+
+	* gpa-options.c (gpa_options_verify_with_settings): verify that each options
+	have a selected option in the settings path.
+
+	* gpa-settings.c (gpa_settings_list_verify): verify that there is one and
+	only one settings selected
+
+2000-11-22  Chema Celorio  <chema@celorio.com>
+
+	* gpa-model-info.c (gpa_load_model_info_list_from_tree): only load models
+	if the file exists on disk.
+	(gpa_load_model_info_from_tree): verify the .model file exists
+
+	* gpa-printer.c (gpa_printer_save): make the warning more detailed
+
+2000-11-21  Chema Celorio  <chema@celorio.com>
+
+	* gpa-settings.c (gpa_settings_replace_command): implement.
+
+	* gpa-vendor.c (gpa_vendor_new_generic_ps): fix. Return the vendor
+	pointer.
+	
+2000-11-21  Chema Celorio  <chema@celorio.com>
+	
+	* gpa-printer.c (gpa_printer_get_default): always return a printer.
+	If there isn't a printer marked as default, return the first one in
+	the list.
+
+2000-11-21  Chema Celorio  <chema@celorio.com>
+	
+	* gpa-private.h: move libgpa from gnome-print-admin into here.
+
+2000-11-15  Chema Celorio  <chema@celorio.com>
+
+	* all files: Clean stuff. Rename funcitons to follow gtk.
+	Change all the lists to GList from GSList
+
+2000-11-14  Chema Celorio  <chema@celorio.com>
+
+	* gpa-printer.c: added more functions to access from
+	the outside world.
+
+2000-11-14  Chema Celorio  <chema@celorio.com>
+
+	* make a library from gnome-print-admin 
+

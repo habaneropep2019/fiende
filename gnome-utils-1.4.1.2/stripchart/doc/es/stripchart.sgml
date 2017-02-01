@@ -1,0 +1,623 @@
+<!DOCTYPE Article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+<!ENTITY version "1.2">
+]>
+
+<article id="index">
+  <artheader> 
+    <title>histograma</title>
+
+    <copyright>
+      <year>2000</year>
+      <holder>John Kodis</holder>
+    </copyright>
+    <copyright>
+      <year>2001</year>
+      <holder>José Antonio Salgueiro (traducción al Castellano)</holder>
+    </copyright>
+
+    <legalnotice>
+      <para>Permission is granted to copy, distribute and/or modify
+      this document under the terms of the <citetitle>GNU Free
+      Documentation License</citetitle>, Version 1.1 or any later
+      version published by the Free Software Foundation with no
+      Invariant Sections, no Front-Cover Texts, and no Back-Cover
+      Texts. You may obtain a copy of the <citetitle>GNU Free
+      Documentation License</citetitle> from the Free Software
+      Foundation by visiting <ulink type="http"
+      url="http://www.fsf.org">their Web site</ulink> or by writing
+      to: Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+      Boston, MA 02111-1307, USA.</para>
+
+      <para>Many of the names used by companies to distinguish their
+      products and services are claimed as trademarks. Where those
+      names appear in any GNOME documentation, and those trademarks
+      are made aware to the members of the GNOME Documentation
+      Project, the names have been printed in caps or initial
+      caps.</para>
+    </legalnotice>
+
+    <releaseinfo>
+      Esta es la versión 1.0 del manual del histograma.
+    </releaseinfo>
+  </artheader>
+
+  <sect1 id="intro">
+    <title>Introducción</title> 
+
+    <para>El programa <application>histograma</application> de GNOME representa varios parámetros 
+    definidos por el usuario como función del tiempo. Su utilidad principal es representar los parámetros de
+    rendimiento del sistema tales como la carga de la CPU, la utilización de la CPU, el nivel de tráfico de
+    la red, y así. Otros usos más ingeniosos se dejan como ejercicio para los usuarios interesados. Está
+    incluído en el paquete <filename>gnome-utils</filename>, el cual es parte del entorno de escritorio
+    GNOME. Este documento describe la &version;  del programa <application>histograma
+    </application>.</para>
+    
+    <para>El programa <application>histograma</application>  lee periódicamente los datos de un
+    archivo, extrae su valor, y representa esos valores en uno de varios formatos. El formato por defecto es
+    una pantalla gráfica parecida  a un histograma. De ahí el nombre, <application>histograma</application>.
+    </para>
+
+    <screenshot>
+      <screeninfo>Ventana Principal del Histograma </screeninfo>
+      <graphic fileref="main" format="png" srccredit="John Kodis">
+	  </graphic>
+    </screenshot>
+
+    <para>En sistemas tales como Linux, en los cuales los parámetros del sistema están disponibles en un
+    formato legible en el directorio /proc,  el programa <application>histograma</application>  es una
+    herramienta elegante de monitorización del rendimiento del sistema, parecida pero más universal que
+    <application>xload</application>.</para>
+    
+    <para>En lugar de estar limitado a unos pocos parámetros de rendimiento estándar, el programa 
+    <application> histograma</application>  puede dibujar cualquier parámetro que varíe con el tiempo que 
+    pueda ser leído de un fichero o tubería ("pipe"). Esta facultad de leer datos de una tubería proporciona 
+    una forma muy polivalente y fácil de fijar una pantalla personalizada.</para> 
+ 
+    <para>La aplicación <application>histograma</application> está disponible como un programa sólo, o como
+    un aplique del panel de GNOME. El programa puede ser iniciado seleccionando elemento
+    <guimenuitem>histograma</guimenuitem> del submenú <guisubmenu>Utilidades</guisubmenu> del <guimenu> Menú
+    Principal</guimenu>, seleccionando el elemento <guimenuitem>histograma </guimenuitem> del  submenú 
+    <guisubmenu>Monitores</guisubmenu> del panel de Gnome  <guimenu>Apliques</guimenu>, o  ejecutando la
+    orden  <command>stripchart</command> o <command>stripchart-applet</command> desde la línea de
+    comandos.</para>
+
+    <screenshot>
+      <screeninfo>Ventana del Aplique Histograma </screeninfo>
+      <graphic fileref="applet" format="png" srccredit="John Kodis">
+	  </graphic>
+    </screenshot>
+  </sect1>
+
+  <sect1 id="usage"> 
+    <title>Utilización de Histograma</title>
+
+    <para> Aunque el programa <application>histograma</application> puede ser utilizado para representar casi
+    cualquier parámetros de interés, la configuración por defecto producirá un útil resumen de los parámetros
+    de rendimiento del sistema en el cual se está ejecutando. Esta sección describe la utilización básica del
+    programa    <application>histograma</application> en su configuración por defecto. Más adelante se
+    proporcionará una descripción de cómo personalizar los parámetros que se representan. </para>
+
+    <para> Cuando Vd. inicia por primera vez el programa <application>histograma</application> puede ver la
+    <interface>ventana principal</interface>, tal como 
+    <xref linkend="main"> or in <xref linkend="applet">.
+      <figure id="main">
+	<title>Ventana Principal de Histograma </title>
+	<screenshot>
+	  <screeninfo>Ventana Principal de Histograma </screeninfo>
+	  <graphic fileref="main" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+      <figure id="applet">
+	<title>Ventana del Aplique Histograma </title>
+	<screenshot>
+	  <screeninfo>Ventana del Aplique Histograma</screeninfo>
+	  <graphic fileref="applet" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    </para>
+
+    <para> En su configuración por defecto, el programa <application>histograma</application>  crea una
+    ventana de 200 por 500 pixels que contiene dos elementos principales &mdash; una "cinta" a la izquierda,
+    y una serie de "plumas" a la derecha. El applet <application>histograma</application>  es parecido, pero
+    su tamaño se adapta al panel en el cual se ejecuta. Cuando se utiliza la configuración por defecto, habrá
+    una "pluma" y una línea de "cintas" en la cual aparece en azul los valores actuales y anteriores de la
+    utilización de la CPU del sistema, el amarillo la carga media durante un minuto, en blanco el  porcentaje
+    de utilización del espacio de intercambio, y en rojo y verde los volúmenes de tráfico de red de  entrada
+    y salida, respectivamente. Si está activo un interface PPP, se mostrará una luz indicadora  verde en la
+    esquina superior izquierda de la ventana principal.</para>
+     
+  
+    <para>Pulsando en la <interface>ventana principal</interface> del <application>histograma</application>
+    con el botón del ratón izquierdo aparecerá una ventana de <interface>valores numéricos</interface>. La
+    ventana de <interface>valores numéricos</interface> correspondiente a la ventana principal mostrada  en
+    <xref linkend="main"> se muestra abajo en  <xref
+    linkend="text">.
+      <figure id="text">
+	<title>Ventana de Parámetros de Valores Numéricos</title>
+	<screenshot>
+	  <screeninfo>Ventana de Parámetros de Valores Numéricos</screeninfo>
+	  <graphic fileref="text" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    Esta ventana proporciona una visualización multi-línea, textual del nombre, valor actual, valor de la
+    escala completa, y escalado (lineal o logarítmico) de cada uno de los parámetros representados. Puede ser
+    cerrado bien presionando en el botón <guibutton>cerrar</guibutton> de la barra de título de la ventana
+    <interface>valor numérico</interface>, o  presionando otra vez el ratón sobre la <interface>ventana
+    principal</interface>. </para>
+      
+    <para>Presionando en la <interface>ventana principal</interface> del
+    <application>histograma</application> con el botón derecho (3) aparecerá un menú
+    <guimenu>Aplicación</guimenu> que contiene <guimenuitem>Ayuda</guimenuitem>,
+     <guimenuitem>Sobre</guimenuitem>, <guimenuitem>Mostrar valores </guimenuitem>, 
+     <guimenuitem>Editar Prefs</guimenuitem>,<guimenuitem>Edit Params</guimenuitem>, y<guimenuitem> Salir
+     </guimenuitem>, tal y como se muestra más abajo en 
+    <xref linkend="menu">.
+      <figure id="menu">
+	<title>Ventana Principal con el Menú Desplegable</title>
+	<screenshot>
+	  <screeninfo>Ventana Principal con el Menú Desplegable</screeninfo>
+	  <graphic fileref="menu" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    Los elementos de menú <guimenuitem>Ayuda</guimenuitem> y
+    <guimenuitem>Sobre</guimenuitem> muestran esta información de ayuda y
+    el habitual caja "sobre", respectivamente,  y el elemento de menú
+    <guimenuitem>Salir</guimenuitem> finaliza la ejecución del programa
+    <application>histograma</application>. El elemento de menú 
+    <guimenuitem>Mostrar valores </guimenuitem> desplegará una ventana  de
+    <interface>valor numérico</interface>, tal y cómo se describe más arriba,</para>
+
+    <para>El funcionamiento de la aplicación <application>histograma</application>
+    puede ser personalizado editando las preferencias y parámetros que se representan.
+    El elemento de menú  <guimenuitem>Editar Prefs</guimenuitem> muestra una 
+    ventana de edición de las preferencias de la aplicación, tal y como se observa en <xref
+    linkend="prefs">.  Los valores de la Ventana Preferencias se explican en <xref linkend="preferences">.
+      <figure id="prefs">
+	<title>Ventana Preferencias</title>
+	<screenshot>
+	  <screeninfo>Ventana Preferencias</screeninfo>
+	  <graphic fileref="prefs" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    </para>
+
+
+
+    <para>El elemento de menú  <guimenuitem>Editar Params</guimenuitem> 
+    muestra  una ventana  que contiene un bloc de notas con una página que
+    describe los detalles de cada parámetro, tal como se observa en <xref
+    linkend="param">. Los parámetros se pueden editar tal y como se describe en
+    <xref linkend="parameters">.
+      <figure id="param">
+	<title>Ventana de Parámetros</title>
+	<screenshot>
+	  <screeninfo>Ventana de Parámetros</screeninfo>
+	  <graphic fileref="param" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    </para>
+  </sect1>
+
+  <sect1 id="options">
+    <title>Opciones de la línea de comandos </title>
+
+    <para>Hay unos pocos conmutadores de la línea de comandos que se pueden
+    utilizar para alterar el comportamiento del programa. Además a las opciones
+    habituales de ayuda, utilización, versión, Gnome, Gtk, y gestión de sesión,
+    están disponibles las siguientes opciones específicas del histograma:</para>
+
+    <variablelist>
+      <varlistentry>
+	<term> --geometry <replaceable>GEOMETRY-SPEC</replaceable> </term> 
+	<listitem>
+	  <para>Una especificación estándar de la geometría de X11 de la forma
+	  <replaceable>WxH&plusmn;X&plusmn;Y</replaceable>. </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term> --config-file <replaceable>FILENAME</replaceable> </term>
+	<listitem>
+	  <para>Indica el fichero del cual se leerá la información sobre la
+	  configuración, sobreescribiendo el fichero configuración donde
+	  aparece el orden normal de las búsquedas tal como se describe en 
+	  <xref linkend=files/>. Vd. puede cambiar los parámetros seguidos por
+	  una parte del programa histograma indicando un fichero de
+	  configuración alternativo.	  
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </sect1>
+
+  <sect1 id="preferences">
+    <title>Preferencias</title>
+
+    <para>La Ventana Preferencias proporciona una forma de ajustar los elementos 
+     que tienen efecto sobre la operación del programa
+    <application>histograma</application>.  Se proporcionan unos conjuntos
+    separados de controles para la operación de las "plumas" y para la 
+    operación de la carta de la ventana principal.</para>
+
+    <screenshot>
+      <screeninfo>Ventana Preferencias</screeninfo>
+      <graphic fileref="prefs" format="png" srccredit="John Kodis"></graphic>
+    </screenshot>
+
+    <para> Ambos, carta y plumas, tienen sus propios ajustes para el intervalo de
+    actualización y para el nivel de suavizado que se realizará. El intervalo de
+    actualización determina con que frecuencia un nuevo conjunto de datos de
+    puntos se recogerán y mostrarán. Por defecto uno cada segundo para las plumas,
+    y uno cada 5 segundos para las líneas de carta.  El valor de suavizado
+    determina la dureza con la que se aplicará un filtro paso-bajo a los datos sin 
+    procesar antes de mostrarlos. Por defecto, este valor es 0.5 para plumas y 
+    carta. Fijando un suavizado cero elimina este filtro de los datos sin procesar, 
+    causando que en las actualizaciones aparezcan saltos o dientes. Fijando un 
+    suavizado a uno se congela el valor actual.  Valores intermedios generan
+    nuevos valores de la gráfica tomando la diferencia entre el último valor
+    y en nuevo valor del parámetro sin procesar, multiplicado por la constante
+    de suavizado, y sumado al último valor.</para>
+    
+    
+    <para>La porción de carta de la Ventana Preferencias tiene también una caja de
+    chequeo para habilitar o deshabilitar la visualización de marcas en el eje
+    temporal del histograma. Cuando se habilita la visualización de las marcas, se
+    pueden ajustar los intervalos entre marcas menores y mayores. Los valores
+    por defecto son una marca menor cada doce pixels y una marca
+    mayor cada cinco marcas menores. Con el intervalo de actualización de cinco
+    segundos, estos valores situarán una marca menor cada minuto y una marca mayor
+    cada cinco minutos. </para>
+
+    <para>La porción de pluma de la Ventana Preferencias proporciona una caja de
+    chequeo para habilitar o no la porción de ls pluma del histograma. Mientras
+    las plumas proporcionan una forma rápida de visualizar los parámetros
+    seguidos, su movimiento constante puede distraer. Ajústese a su gusto.</para>
+
+    <para>Los botones estándar "Ok", "Aplicar", y "Cancelar" se pueden utilizar
+    para aplicar los nuevos valores y cerrar el diálogo de Preferencias, para
+    aplicar los nuevos valores sin cerrar el diálogo Preferencias, y para cerrar
+    el diálogo Preferencias sin alterar los valores actuales,
+    respectivamente.</para>
+  
+
+  </sect1>
+
+  <sect1 id="parameters">
+    <title>Parámetros</title>
+
+    <para>Los parámetros mostrados en el 
+    <application>histograma</application> se pueden examinar  y editar utilizando
+    la ventana del <interface>Editor de Parámetros</interface>. Aunque
+    <application>histograma</application> proporciona un gran potencial para
+    añadir parámetros a medida, la mayoría de los usuarios estarán satistechos
+    inicialmente con la selección de la lista de los parámetros pre-conofigurados
+    suministrada. Para añadir o borrar estos parámetros véase <xref linkend="param-quickstart">.</para>
+
+    <screenshot>
+      <screeninfo>Ventana Parámetros</screeninfo>
+      <graphic fileref="param" format="png" srccredit="John Kodis"></graphic>
+    </screenshot>
+
+    <sect2 id="param-quickstart">
+      <title>Guía Rápida para el Editor de Parámetros</title>
+
+      <para>Para borrar uno de los parámetros actuales activos:
+      <itemizedlist>
+
+	<listitem><para>Seleccione el parámetros que borrará pulsando en su
+	pestaña en la parte inferior de la ventana del 
+         <interface>Editor de Parámetros</interface> ;</para></listitem>
+
+	<listitem><para>Seleccione el elemento de menú <guimenu>Editar</guimenu> 
+	;</para></listitem>
+
+	<listitem><para>Seleccione el elemento de menú <guimenu>Borrar Parámetro</guimenu> .</para></listitem>
+
+      </itemizedlist></para>
+
+      <para>Para añadir un de los parámetros predefinidos:
+      <itemizedlist>
+
+	<listitem><para>Seleccione el elemento de menú <guimenu>Editar</guimenu> ;
+	</para></listitem>
+
+	<listitem><para>Seleccione o bien el elemento de menú <guimenu>Añadir
+	Parámetro Antes</guimenu> o bien  <guimenu>Añadir Parámetro Después 
+	</guimenu> para incluir una nueva página de parámetro vacía;
+	</para></listitem>
+
+	<listitem><para>Seleccione uno de los parámetros predefinidos de la lista
+	de elementos en la línea "Parámetro" de la página. Esto rellenará los
+	campos necesarios para el parámetro recién creado, y comenzará a
+	representarlo.</para></listitem>
+
+      </itemizedlist></para>
+
+    </sect2>
+
+<!--
+    <variablelist>
+      <varlistentry>
+	<term>color: <replaceable>COLOR-NAME</replaceable></term>
+	<listitem>
+
+	  <para>Determines the color to be used in displaying a
+	  parameter.  The color names and their RGB values are taken
+	  from X11/rgb.txt.</para>
+
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>scale: <replaceable>LOG-OR-LINEAR</replaceable></term>
+	<listitem>
+
+	  <para>Specifies whether a logarithmic or linear scale factor
+	  is to be used when plotting a parameter value.</para>
+
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>maximum: <replaceable>NUMBER</replaceable></term>
+	<listitem>
+
+	  <para>The largest value that can be displayed.  Any value in
+	  excess of the maximum will be plotted at the top of the
+	  display.  If omitted, a default value of 1.0 is used.</para>
+
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>minimum: <replaceable>NUMBER</replaceable></term>
+	<listitem>
+
+	  <para>The smallest value that can be displayed.  Any value
+	  less than the minimum will be plotted at the bottom of the
+	  display.  If omitted, a default value of 0.0 is used.</para>
+
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+-->
+
+    <sect2 id="custom">
+      <title>Creando Parámetros Personalizados</title>
+
+      <para>ARREGLE ÉSTO</para>
+
+      <variablelist>
+
+        <varlistentry>
+	  <term>ecuación: <replaceable>CADENA</replaceable></term>
+	  <listitem>
+
+	    <para>Una ecuación usada para obtener el valor que ha de ser
+	    representado para este parámetro.</para>
+
+	    <para>Un valor se obtiene evaluando la línea "ecuación" empleando
+	    estos valores de campo. El primer valor (o único) se escribe como $1,
+	    el siguiente como $2, y así sucesivamente. La diferencia entre los 
+	    valores de los campos entre el último y la iteración actual se escribe
+	    como ~1,~2, y así. El tiempo transcurrido en segundos desde la última
+	    iteración hasta la actual es ~t. El intervalo de actualización pedido.
+            </para>
+
+	    <para>Están disponibles los operadores aritméticos habituales "infix" 
+	    &mdash; suma (+), resta (-), multiplicación (+), división (/), 
+	    y resto (%) &mdash;  juntamente con los paréntesis para agrupar
+	    subexpresión.</para>
+    
+
+	  </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	  <term>filename: <replaceable>NOMBREFICHERO</replaceable></term>
+	  <listitem>
+
+	    <para>El fichero del cual se lee un valor del parámetro. Cuando se
+	    suministra un nombre de fichero comenzando con un "|", las líneas de
+	    entrada se leerán de una tubería (pipe).</para>
+
+	    <para>En cada iteración, se mostrará el valor que se obtiene para cada
+	    parámetro en el fichero de configuración. Se abrirá el fichero
+	    nombrado en la línea "filename" -- ya sea como una tubería si el
+	    fichero comienza con un carácter de tubería (|), o de otra forma como
+	    un fichero normal -- y se lee una línea.</para>
+
+	    <para> Si se especifica un patrón, se leen las líneas hasta que se
+	    encuentra uno que contiene la cadena patrón en cualquier parte de la
+	    línea. Esta línea se separa en una serie de campos separados por
+	    espacios en blanco, cada uno de los cuales se interpreta como un
+	    número en coma flotante.</para>
+
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>pattern: <replaceable>CADENA</replaceable></term>
+	  <listitem>
+
+	    <para>El patrón que identifica la línea de la cual se estraerá un
+	    valor de parámetro. Si no se proporciona ningún patrón, se utiliza la
+	    primera línea del fichero.</para>
+
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+    </sect2>
+
+    <sect2 id="libgtop">
+      <title>Valores de libgtop </title>
+
+      <para>Habitualmente, el programa <application>histograma</application> se
+      construye enlazado con la biblioteca libgtop. La biblioteca libgtop
+      proporciona un método portable y bien establecido de acceder a los
+      parámetros comunes de rendimiento del sistema. Este es el método
+      preferido para obtener el valor que se representará.</para>
+
+      <para>Se dispone de los siguiente parámetros de libgtop: </para>
+
+      <itemizedlist>
+	<listitem> <para>Estadísticas de CPU &mdash; cpu_total,
+	    cpu_user, cpu_nice, cpu_sys, cpu_idle, and cpu_freq
+	    </para> </listitem>
+
+	<listitem> <para>Estadísticas de Memoria &mdash; mem_total,
+	    mem_used, mem_free, mem_shared, mem_buffer, mem_cached,
+	    mem_user, mem_locked </para> </listitem>
+
+	<listitem> <para>Estadísticas de Intercambio &mdash; swap_total,
+	    swap_used, swap_free, swap_pagein, swap_pageout </para>
+	</listitem>
+
+	<listitem> <para>Estadísticas de Actividad &mdash; uptime, idletime
+	    </para> </listitem>
+
+	<listitem> <para>Estadísticas de CargaMedia &mdash; load_running,
+	    load_tasks, load_1m, load_5m, load_15m </para> </listitem>
+
+	<listitem> <para>Estadísticas de Red &mdash; net_pkts_in,
+	    net_pkts_out, net_pkts_total, net_bytes_in, net_bytes_out,
+	    net_bytes_total, net_errs_in, net_errs_out, net_errs_total
+	    </para> 
+
+	  <para>Dese cuenta que los valores de las estadísticas de red no utilizan
+	  la biblioteca glibtop. En su lugar, se lee directamente de
+	  /proc/net/dev, entonces sólo está disponible para Linux. </para>
+	   </listitem>
+      </itemizedlist>
+
+      <para>Todas las cantidades son enteros largos con signo, excepto para el
+      tiempo de actividad, tiempo de inactividad, y los cinco valores de carga que
+      son valores de coma flotante. </para>
+
+    </sect2>
+  </sect1>
+
+  <sect1 id="files">
+    <title>Ficheros de Configuración y Parámetros</title> 
+
+    <para>El programa <application>histograma</application> determina los
+    parámetros que se mostrarán leyendo un fichero de configuración. El programa
+    <application>histograma</application> busca un fichero de configuración en el
+    siguiente orden:
+    <itemizedlist>
+
+      <listitem> <para>primero, un fichero de configuración indicado en la línea
+      de comandos, </para> </listitem>
+
+      <listitem> <para>entonces, un fichero llamado <filename>stripchart.conf
+      </filename>  en el directorio de trabajo actual, </para> </listitem>
+
+      <listitem> <para>entonces, un fichero nombrado <filename>stripchart.conf
+      </filename>  en el directorio de usuario,</para></listitem>
+
+      <listitem> <para>entonces, un fichero denominado <filename>/etc/stripchart.conf
+      </filename>,</para></listitem>
+      
+
+      <listitem> <para>y por último, por  un fichero llamado 
+      <filename>stripchart.conf</filename> en el directorio <replaceable>CONFDIR
+      </replaceable>, que será habitualmente
+      
+
+      <filename
+      class="directory">/usr/share/histograma/</filename> o
+      <filename
+      class="directory">/usr/local/share/histograma/</filename>.
+      </para> </listitem>
+
+    </itemizedlist>
+
+    Si no es encuentra ningún fichero de configuración, el programa muestra  un
+    mensaje de error y finaliza.</para>
+
+    <para>Los parámetros conservados que se muestran en la ventana del 
+    <interface>Editor de  Parametros</interface> se leen del fichero
+    <filename>stripchart.param</filename> en el directorio <filename
+    class="directory"> <replaceable> {prefix}/share/histograma
+    </replaceable> </filename>.</para>
+
+  </sect1>
+
+  <sect1 id="bugs">
+    <title>Errores y Limitaciones Conocidas</title>
+
+    <para>La opción  --geometry no interpreta correctamente argumentos de posición
+    negativa.</para>
+
+    <para>El tráfico de red sólo está disponible para Linux.</para>
+
+  </sect1>
+
+  <sect1 id="authors">
+    <title>Autores</title>
+
+    <para>El programa <application>Histograma</application> ha sido escrito por
+    John Kodis (<email>kodis@jagunet.com</email>). Por favor envíe todos los
+    comentarios, sugerencias, e informes de errores a la <ulink
+    url="http://bugs.gnome.org" type="http">Base de Datos de Seguimiento
+    de Errores de GNOME </ulink>.  (Las Instrucciones para enviar informes
+    de errores se pueden encontrar  <ulink url="http://bugs.gnome.org/Reporting.html"
+    type="http"> on-line</ulink>.) Si Vd. está utilizando  GNOME 1.1 o 
+    posterior, podrá también utilizar la <application>Herramienta de Informe de
+    Errores </application>
+    (<command>bug-buddy</command>), disponible en el submenú 
+    <guisubmenu>Utilidades</guisubmenu> del<guimenu>Menú
+    Principal</guimenu>, para enviar informe de errores.</para>
+
+    <para>Ese manual ha sido escrito por John Kodis
+    (<email>kodis@jagunet.com</email>). Por favor envíe todos los comentarios
+    y sugerencias sobre este manual al <ulink type="http"
+    url="http://www.gnome.org/gdp">Proyecto de Documentación de GNOME </ulink>
+    por email a <email>docs@gnome.org</email>. Vd. también puede enviar sus 
+    comentarios online utilizando la  <ulink type="http"
+    url="http://www.gnome.org/gdp/doctable/">Tabla del Status de la Documentación
+    de GNOME</ulink>.</para>
+
+     <para>
+     La traducción al español fue realizada por José Antonio Salgueiro 
+    (<email>joseantsa@retemail.es</email>) y  juampe <email>juampe@retemail.es </email>
+     Por favor envíe todos los comentarios
+    y sugerencias referidas a esta traducción a traductores@es.gnome.org.
+
+    </para>
+
+  </sect1>
+
+  <sect1 id="license">
+    <title>Liccencia</title> <para>Este programa es software libre; Vd. puede
+    distribuirlo y/o modificarlo bajo los término de la 
+    <citetitle>Licencia Pública General GNU </citetitle> tal y como publicó 
+    la  Fundación del Software Libre (FSF); o bien en su versión 2 de la
+    Licencia, o cualesquiera posteriores (a su elección.</para>
+
+    <para>Este programa se distribuye con el ánimo de que sea útil, pero SIN
+    GARANTÍA ALGUNO; sin, incluso la garantía MERCANTIL implícita o de UTILIDAD
+    PARA UN USO ESPECÍFICO. Véase la <citetitle>Licencia Pública General
+     GNU </citetitle>  para más detalles.</para>
+
+    <para>Se incluye una copia de la <citetitle>Licencia Pública General
+     GNU </citetitle> en un apéndice de la  <citetitle>Guía de Usuario de GNOME
+     </citetitle>. Vd. puede también ohtener un a copia de la   <citetitle>Licencia Pública General
+     GNU </citetitle> de la Fundación del Software Libre (FSF) visitando 
+     <ulink type="http" url="http://www.fsf.org">su sitio Web</ulink> 
+     o escribiendo a
+    <address>Free Software Foundation, Inc.  <street>59 Temple
+    Place</street> - Suite 330 <city>Boston</city>, <state>MA</state>
+    <postcode>02111-1307</postcode> <country>Estados Unidos</country>
+    </address></para>
+
+  </sect1>
+</article>

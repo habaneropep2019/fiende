@@ -1,0 +1,2491 @@
+<refentry id="gnomeui-gnome-app-helper">
+<refmeta>
+<refentrytitle>gnome-app-helper</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-app-helper</refname><refpurpose>Simplified menu and toolbar creation.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+enum        <link linkend="GnomeUIInfoType">GnomeUIInfoType</link>;
+enum        <link linkend="GnomeUIInfoConfigurableTypes">GnomeUIInfoConfigurableTypes</link>;
+enum        <link linkend="GnomeUIPixmapType">GnomeUIPixmapType</link>;
+struct      <link linkend="GnomeUIInfo">GnomeUIInfo</link>;
+#define     <link linkend="GNOMEUIINFO-KEY-UIDATA-CAPS">GNOMEUIINFO_KEY_UIDATA</link>
+#define     <link linkend="GNOMEUIINFO-KEY-UIBDATA-CAPS">GNOMEUIINFO_KEY_UIBDATA</link>
+#define     <link linkend="GNOMEUIINFO-END-CAPS">GNOMEUIINFO_END</link>
+#define     <link linkend="GNOMEUIINFO-SEPARATOR-CAPS">GNOMEUIINFO_SEPARATOR</link>
+#define     <link linkend="GNOMEUIINFO-ITEM-CAPS">GNOMEUIINFO_ITEM</link>                (label, tooltip, callback, xpm_data)
+#define     <link linkend="GNOMEUIINFO-ITEM-STOCK-CAPS">GNOMEUIINFO_ITEM_STOCK</link>          (label, tooltip, callback, stock_id)
+#define     <link linkend="GNOMEUIINFO-ITEM-NONE-CAPS">GNOMEUIINFO_ITEM_NONE</link>           (label, tooltip, callback)
+#define     <link linkend="GNOMEUIINFO-ITEM-DATA-CAPS">GNOMEUIINFO_ITEM_DATA</link>           (label, tooltip, callback, user_data, xpm_data)
+#define     <link linkend="GNOMEUIINFO-TOGGLEITEM-CAPS">GNOMEUIINFO_TOGGLEITEM</link>          (label, tooltip, callback, xpm_data)
+#define     <link linkend="GNOMEUIINFO-TOGGLEITEM-DATA-CAPS">GNOMEUIINFO_TOGGLEITEM_DATA</link>     (label, tooltip, callback, user_data, xpm_data)
+#define     <link linkend="GNOMEUIINFO-HELP-CAPS">GNOMEUIINFO_HELP</link>                (app_name)
+#define     <link linkend="GNOMEUIINFO-SUBTREE-CAPS">GNOMEUIINFO_SUBTREE</link>             (label, tree)
+#define     <link linkend="GNOMEUIINFO-SUBTREE-STOCK-CAPS">GNOMEUIINFO_SUBTREE_STOCK</link>       (label, tree, stock_id)
+#define     <link linkend="GNOMEUIINFO-RADIOLIST-CAPS">GNOMEUIINFO_RADIOLIST</link>           (list)
+#define     <link linkend="GNOMEUIINFO-RADIOITEM-CAPS">GNOMEUIINFO_RADIOITEM</link>           (label, tooltip, callback, xpm_data)
+#define     <link linkend="GNOMEUIINFO-RADIOITEM-DATA-CAPS">GNOMEUIINFO_RADIOITEM_DATA</link>      (label, tooltip, callback, user_data, xpm_data)
+#define     <link linkend="GNOMEUIINFO-MENU-ABOUT-ITEM-CAPS">GNOMEUIINFO_MENU_ABOUT_ITEM</link>     (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-CLEAR-ITEM-CAPS">GNOMEUIINFO_MENU_CLEAR_ITEM</link>     (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-CLOSE-ITEM-CAPS">GNOMEUIINFO_MENU_CLOSE_ITEM</link>     (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-CLOSE-WINDOW-ITEM-CAPS">GNOMEUIINFO_MENU_CLOSE_WINDOW_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-COPY-ITEM-CAPS">GNOMEUIINFO_MENU_COPY_ITEM</link>      (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-CUT-ITEM-CAPS">GNOMEUIINFO_MENU_CUT_ITEM</link>       (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-EDIT-TREE-CAPS">GNOMEUIINFO_MENU_EDIT_TREE</link>      (tree)
+#define     <link linkend="GNOMEUIINFO-MENU-END-GAME-ITEM-CAPS">GNOMEUIINFO_MENU_END_GAME_ITEM</link>  (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-EXIT-ITEM-CAPS">GNOMEUIINFO_MENU_EXIT_ITEM</link>      (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-FILES-TREE-CAPS">GNOMEUIINFO_MENU_FILES_TREE</link>     (tree)
+#define     <link linkend="GNOMEUIINFO-MENU-FILE-TREE-CAPS">GNOMEUIINFO_MENU_FILE_TREE</link>      (tree)
+#define     <link linkend="GNOMEUIINFO-MENU-FIND-AGAIN-ITEM-CAPS">GNOMEUIINFO_MENU_FIND_AGAIN_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-FIND-ITEM-CAPS">GNOMEUIINFO_MENU_FIND_ITEM</link>      (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-GAME-TREE-CAPS">GNOMEUIINFO_MENU_GAME_TREE</link>      (tree)
+#define     <link linkend="GNOMEUIINFO-MENU-HELP-TREE-CAPS">GNOMEUIINFO_MENU_HELP_TREE</link>      (tree)
+#define     <link linkend="GNOMEUIINFO-MENU-HINT-ITEM-CAPS">GNOMEUIINFO_MENU_HINT_ITEM</link>      (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-NEW-GAME-ITEM-CAPS">GNOMEUIINFO_MENU_NEW_GAME_ITEM</link>  (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-NEW-ITEM-CAPS">GNOMEUIINFO_MENU_NEW_ITEM</link>       (label, tip, cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-NEW-SUBTREE-CAPS">GNOMEUIINFO_MENU_NEW_SUBTREE</link>    (tree)
+#define     <link linkend="GNOMEUIINFO-MENU-NEW-WINDOW-ITEM-CAPS">GNOMEUIINFO_MENU_NEW_WINDOW_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-OPEN-ITEM-CAPS">GNOMEUIINFO_MENU_OPEN_ITEM</link>      (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-PASTE-ITEM-CAPS">GNOMEUIINFO_MENU_PASTE_ITEM</link>     (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-PAUSE-GAME-ITEM-CAPS">GNOMEUIINFO_MENU_PAUSE_GAME_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-PREFERENCES-ITEM-CAPS">GNOMEUIINFO_MENU_PREFERENCES_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-PRINT-ITEM-CAPS">GNOMEUIINFO_MENU_PRINT_ITEM</link>     (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-PRINT-SETUP-ITEM-CAPS">GNOMEUIINFO_MENU_PRINT_SETUP_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-PROPERTIES-ITEM-CAPS">GNOMEUIINFO_MENU_PROPERTIES_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-REDO-ITEM-CAPS">GNOMEUIINFO_MENU_REDO_ITEM</link>      (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-REDO-MOVE-ITEM-CAPS">GNOMEUIINFO_MENU_REDO_MOVE_ITEM</link> (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-REPLACE-ITEM-CAPS">GNOMEUIINFO_MENU_REPLACE_ITEM</link>   (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-RESTART-GAME-ITEM-CAPS">GNOMEUIINFO_MENU_RESTART_GAME_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-REVERT-ITEM-CAPS">GNOMEUIINFO_MENU_REVERT_ITEM</link>    (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-SAVE-AS-ITEM-CAPS">GNOMEUIINFO_MENU_SAVE_AS_ITEM</link>   (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-SAVE-ITEM-CAPS">GNOMEUIINFO_MENU_SAVE_ITEM</link>      (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-SCORES-ITEM-CAPS">GNOMEUIINFO_MENU_SCORES_ITEM</link>    (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-SELECT-ALL-ITEM-CAPS">GNOMEUIINFO_MENU_SELECT_ALL_ITEM</link>(cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-SETTINGS-TREE-CAPS">GNOMEUIINFO_MENU_SETTINGS_TREE</link>  (tree)
+#define     <link linkend="GNOMEUIINFO-MENU-UNDO-ITEM-CAPS">GNOMEUIINFO_MENU_UNDO_ITEM</link>      (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-UNDO-MOVE-ITEM-CAPS">GNOMEUIINFO_MENU_UNDO_MOVE_ITEM</link> (cb, data)
+#define     <link linkend="GNOMEUIINFO-MENU-VIEW-TREE-CAPS">GNOMEUIINFO_MENU_VIEW_TREE</link>      (tree)
+#define     <link linkend="GNOMEUIINFO-MENU-WINDOWS-TREE-CAPS">GNOMEUIINFO_MENU_WINDOWS_TREE</link>   (tree)
+#define     <link linkend="GNOMEUIINFO-SUBTREE-HINT-CAPS">GNOMEUIINFO_SUBTREE_HINT</link>        (label, hint, tree)
+#define     <link linkend="GNOME-MENU-FILE-STRING-CAPS">GNOME_MENU_FILE_STRING</link>
+#define     <link linkend="GNOME-MENU-FILE-PATH-CAPS">GNOME_MENU_FILE_PATH</link>
+#define     <link linkend="GNOME-MENU-EDIT-STRING-CAPS">GNOME_MENU_EDIT_STRING</link>
+#define     <link linkend="GNOME-MENU-EDIT-PATH-CAPS">GNOME_MENU_EDIT_PATH</link>
+#define     <link linkend="GNOME-MENU-VIEW-STRING-CAPS">GNOME_MENU_VIEW_STRING</link>
+#define     <link linkend="GNOME-MENU-VIEW-PATH-CAPS">GNOME_MENU_VIEW_PATH</link>
+#define     <link linkend="GNOME-MENU-SETTINGS-STRING-CAPS">GNOME_MENU_SETTINGS_STRING</link>
+#define     <link linkend="GNOME-MENU-SETTINGS-PATH-CAPS">GNOME_MENU_SETTINGS_PATH</link>
+#define     <link linkend="GNOME-MENU-FILES-STRING-CAPS">GNOME_MENU_FILES_STRING</link>
+#define     <link linkend="GNOME-MENU-FILES-PATH-CAPS">GNOME_MENU_FILES_PATH</link>
+#define     <link linkend="GNOME-MENU-WINDOWS-STRING-CAPS">GNOME_MENU_WINDOWS_STRING</link>
+#define     <link linkend="GNOME-MENU-WINDOWS-PATH-CAPS">GNOME_MENU_WINDOWS_PATH</link>
+struct      <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link>;
+void        (<link linkend="GnomeUISignalConnectFunc">*GnomeUISignalConnectFunc</link>)     (<link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="gchar">gchar</link> *signal_name,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata);
+void        <link linkend="gnome-app-fill-menu">gnome_app_fill_menu</link>             (<link linkend="GtkMenuShell">GtkMenuShell</link> *menu_shell,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accel_group,
+                                             <link linkend="gboolean">gboolean</link> uline_accels,
+                                             <link linkend="gint">gint</link> pos);
+void        <link linkend="gnome-app-fill-menu-custom">gnome_app_fill_menu_custom</link>      (<link linkend="GtkMenuShell">GtkMenuShell</link> *menu_shell,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accel_group,
+                                             <link linkend="gboolean">gboolean</link> uline_accels,
+                                             <link linkend="gint">gint</link> pos);
+void        <link linkend="gnome-app-ui-configure-configurable">gnome_app_ui_configure_configurable</link>
+                                            (<link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);
+void        <link linkend="gnome-app-create-menus">gnome_app_create_menus</link>          (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);
+void        <link linkend="gnome-app-create-menus-interp">gnome_app_create_menus_interp</link>   (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkCallbackMarshal">GtkCallbackMarshal</link> relay_func,
+                                             <link linkend="gpointer">gpointer</link> data,
+                                             <link linkend="GtkDestroyNotify">GtkDestroyNotify</link> destroy_func);
+void        <link linkend="gnome-app-create-menus-with-data">gnome_app_create_menus_with_data</link>
+                                            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+void        <link linkend="gnome-app-create-menus-custom">gnome_app_create_menus_custom</link>   (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata);
+void        <link linkend="gnome-app-fill-toolbar">gnome_app_fill_toolbar</link>          (<link linkend="GtkToolbar">GtkToolbar</link> *toolbar,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accel_group);
+void        <link linkend="gnome-app-fill-toolbar-custom">gnome_app_fill_toolbar_custom</link>   (<link linkend="GtkToolbar">GtkToolbar</link> *toolbar,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accel_group);
+void        <link linkend="gnome-app-create-toolbar">gnome_app_create_toolbar</link>        (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);
+void        <link linkend="gnome-app-create-toolbar-interp">gnome_app_create_toolbar_interp</link> (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkCallbackMarshal">GtkCallbackMarshal</link> relay_func,
+                                             <link linkend="gpointer">gpointer</link> data,
+                                             <link linkend="GtkDestroyNotify">GtkDestroyNotify</link> destroy_func);
+void        <link linkend="gnome-app-create-toolbar-with-data">gnome_app_create_toolbar_with_data</link>
+                                            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+void        <link linkend="gnome-app-create-toolbar-custom">gnome_app_create_toolbar_custom</link> (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-app-find-menu-pos">gnome_app_find_menu_pos</link>         (<link linkend="GtkWidget">GtkWidget</link> *parent,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="gint">gint</link> *pos);
+void        <link linkend="gnome-app-remove-menus">gnome_app_remove_menus</link>          (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="gint">gint</link> items);
+void        <link linkend="gnome-app-remove-menu-range">gnome_app_remove_menu_range</link>     (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="gint">gint</link> start,
+                                             <link linkend="gint">gint</link> items);
+void        <link linkend="gnome-app-insert-menus-custom">gnome_app_insert_menus_custom</link>   (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata);
+void        <link linkend="gnome-app-insert-menus">gnome_app_insert_menus</link>          (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo);
+void        <link linkend="gnome-app-insert-menus-with-data">gnome_app_insert_menus_with_data</link>
+                                            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo,
+                                             <link linkend="gpointer">gpointer</link> data);
+void        <link linkend="gnome-app-insert-menus-interp">gnome_app_insert_menus_interp</link>   (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo,
+                                             <link linkend="GtkCallbackMarshal">GtkCallbackMarshal</link> relay_func,
+                                             <link linkend="gpointer">gpointer</link> data,
+                                             <link linkend="GtkDestroyNotify">GtkDestroyNotify</link> destroy_func);
+void        <link linkend="gnome-app-install-appbar-menu-hints">gnome_app_install_appbar_menu_hints</link>
+                                            (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);
+void        <link linkend="gnome-app-install-statusbar-menu-hints">gnome_app_install_statusbar_menu_hints</link>
+                                            (<link linkend="GtkStatusbar">GtkStatusbar</link> *bar,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);
+void        <link linkend="gnome-app-install-menu-hints">gnome_app_install_menu_hints</link>    (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uinfo);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The GNOME App Helper module contains macros, functions and data
+structures used to simplify the creation of menus and toolbars
+for GNOME applications.</para>
+
+<para>Menus and toolbars created with GnomeApp helper ensure
+a consistent user interface.</para>
+
+<para> The basic building block is an array of
+<structname>GnomeUIInfoType</structname> structures.  You can use a
+number of macros to fill in each one of these structure entries, or
+you can fill each parameter manually if you wish to do so (although,
+it is not recommended, as it is an error-prone task).</para>
+
+  <refsect2>
+    <title>GNOME user interface recomendations for
+    applications</title>
+
+    <para>
+      The following is a list of suggestions to improve the
+      consistency of your application with the rest of the GNOME
+      tools
+    </para>
+
+    <itemizedlist>
+      <listitem><para>The order of the toplevel menus should be:</para>
+
+	  <para>File, &lt; any MDI child menus &gt;, Edit, View, Game, CUSTOM MENUS,
+	  Settings, Windows and Help</para>
+
+          <para>The Help menu should not be right-justified.</para>
+
+          <para>CUSTOM MENUS is where you should put your
+          application-specific top-level menus, such as Gnumeric's
+          "Insert" menu.  These are all optional except Help.</para>
+      </listitem>
+
+      <listitem><para>The prescribed order of standard menu items in
+          the "File" menu is the following:</para>
+
+          <para>New Window, SEPARATOR, New, Open, Save, Save As, Revert,
+          SEPARATOR, Print, Print Setup, SEPARATOR, Close, and Exit</para>
+
+          <para>The first menu must always be the "File" menu (unless
+          there are no files in your application, for example, in a
+          game you can call this "Game"), and it must always be called
+          "_File".</para>
+
+         <para>The main reason for this is that it is important for
+         the menu accelerators to be consistent.  Your application is
+         required to have at the very least a "File" menu containing
+         at the very least "Exit".</para>
+
+         <para>The New Window menu item should be a subtree if there
+         are different types of new windows which can be spawned.</para>
+
+         <para>All of these are optional, except Exit.</para>
+     </listitem>
+
+     <listitem><para>The prescribed order of standard menu items in the "Edit"
+         menu is the following:</para>
+
+         <para>Undo, Redo, SEPARATOR, Cut, Copy, Paste, Clear, Select
+         All, SEPARATOR, Add, SEPARATOR, Find, Find Again, and Replace</para>
+
+         <para>The "Add" item should be used to insert new editable
+         items, e.g. a new card in a rolodex app.  If there is more
+         than one type of insertable editable item, "Add" should be a
+         menu subtree.</para>
+     </listitem>
+
+     <listitem><para>The 'Windows' menu should be used by MDI
+        applications to contain a list of the document windows.  It
+        should be structured like this:</para>
+ 
+		<para>MDI window list</para>
+     </listitem>
+
+     <listitem><para>For standard menu items (Save, Save As, Close,
+        Quit, etc), use the macros defined in gnome-app-helper.h,
+        e.g.</para>
+
+<informalexample>
+<programlisting>
+	     GNOMEUIINFO_MENU_EXIT_ITEM(CB, DATA)
+</programlisting>
+</informalexample>
+
+     <para>except for New where the define is:</para>
+
+<informalexample>
+<programlisting>
+	     GNOMEUIINFO_MENU_NEW_ITEM(LABEL,TIP,CB,DATA)
+</programlisting>
+</informalexample>
+
+         <para>Where LABEL is the the text which appears in the menu
+         for this menu item.  You should put LABEL in the form of
+         N_("_New Document"), or whatever is appropriate for your
+         application.  TIP should be the description of this menu
+         item's function, e.g. N_("Create a new document").  This
+         ensures that your application menus can be translated to the
+         language of the user.</para>
+   </listitem>
+
+   <listitem><para>The standard print menu item should immediately print
+         the document without popping up a dialog.  If the user wants
+         a dialog, he will use the print_setup menu item.</para>
+
+         <para>For some standard toplevel menus (File, Edit, Help,
+         etc), you should use the macros GNOMEUIINFO_*_MENU(tree).</para></listitem>
+      
+   <listitem><para>For the help menu, you should have this:
+     <literal>GNOMEUIINFO_HELP</literal>(app_name), <literal>GNOMEUIINFO_MENU_ABOUT_ITEM</literal>(cb,
+     data), <literal>GNOMEUIINFO_END</literal></para></listitem>
+
+   <listitem><para>Ellipsis ("...") should be used on menu items that
+     require the application to prompt the user for extra information
+     before the command can execute.  "Save as..." is one of these
+     because the application needs to ask the user for the filename.
+     "About" is not because the command *is* to pop up an about box,
+     and it does not need to prompt for information before doing that.</para></listitem>
+
+   <listitem><para>Your menu hints should not have a trailing period.
+     They should be phrased like commands, e.g. "Open a new file".  Do
+     not phrase them like a description, e.g. "Opens a new file".</para></listitem>
+
+   <listitem><para> All menu text should be internationalized.  Use
+     the <link linkend="N--CAPS">N_</link>() macro, e.g.  N_("Open new mailbox")</para></listitem>
+
+   <listitem><para>You may notice that most of these guidelines seem
+     geared towards "productivity" applications (editors,
+     spreadsheets, ...).  If you're writing a game, most of your menu
+     items won't be appropriate in these menus.  The solution is to
+     create a "Game" menu which contains the game-related menu items.
+     The contents of the Game menu are as follows:</para>
+
+	 <para>New Game, Pause Game, Restart Game, SEPARATOR, Undo Move,
+	 Redo Move, Hint, SEPARATOR, Scores, and End game</para>
+
+     <para>End game should just end the current game -- it shouldn't
+     close the application.  That's the job of File/Exit.</para></listitem>
+      
+    </itemizedlist>
+  </refsect2>
+
+  <refsect2>
+    <title>Defining menus and toolbars.</title>
+
+    <para>All of the macros prefixed with <literal>GNOMEUIINFO_MENU_</literal> can be
+    used to simplify the task of making your application consistent
+    with the GNOME user interface recomendations.  The macros include
+    the default texts to show, images (in case they have one), pop-up
+    tooltips and in some cases default key-bindings. </para>
+
+    <para>A toplevel menu (like the one used by the GnomeApp widget)
+    is just an array of structures of type
+    <structname>GnomeUIInfoType</structname>.  Each record of type
+    <structname>GnomeUIInfoType</structname> in this array can
+    represent a menu item that the user can select, a radio-button, a
+    check-box, a division line, or a submenu.</para>
+
+    <para>There are a number of macros that will help you fill in this
+    structure to make your application conform to the GNOME user
+    interface guidelines.</para>
+
+    <para>The following macros can be used to create consistent
+    toplevel menus and they provide the standard naming for your
+    toplevel menus as well as translated texts for the various
+    languages supported by the GNOME libraries:</para>
+
+      <itemizedlist>
+
+	<listitem><para><literal>GNOMEUIINFO_MENU_FILE_TREE</literal>: Used for the
+	program "File" menu.  </para></listitem>
+
+	<listitem><para><literal>GNOMEUIINFO_MENU_EDIT_TREE</literal>: Used for the
+	program "Edit" menu.  </para></listitem>
+
+	<listitem><para><literal>GNOMEUIINFO_MENU_VIEW_TREE</literal>: Used for the
+	program "View" menu.  </para></listitem>
+
+	<listitem><para><literal>GNOMEUIINFO_MENU_SETTINGS_TREE</literal>: Used for the
+	program "Settings" menu.  </para></listitem>
+
+	<listitem><para><literal>GNOMEUIINFO_MENU_FILES_TREE</literal>: Used for the
+	program "Files" menu.  </para></listitem>
+
+	<listitem><para><literal>GNOMEUIINFO_MENU_WINDOWS_TREE</literal>: Used for the
+	program "Windows" menu.  </para></listitem>
+
+	<listitem><para><literal>GNOMEUIINFO_MENU_HELP_TREE</literal>: Used for the
+	program "Help" menu.  </para></listitem>
+
+	<listitem><para><literal>GNOMEUIINFO_MENU_GAME_TREE</literal>: Used for the
+	program "Game" menu.  Games should use the "Game" menu is used
+	instead of the "File" menu as the main menu entry in the GNOME
+	user interface guidelines </para></listitem>
+
+      </itemizedlist>
+  </refsect2>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeUIInfoType">enum GnomeUIInfoType</title>
+<programlisting>typedef enum {
+	GNOME_APP_UI_ENDOFINFO,		/* No more items, use it at the end of 
+					   an array */
+	GNOME_APP_UI_ITEM,		/* Normal item, or radio item if it is 
+					   inside a radioitems group */
+	GNOME_APP_UI_TOGGLEITEM,	/* Toggle (check box) item */
+	GNOME_APP_UI_RADIOITEMS,	/* Radio item group */
+	GNOME_APP_UI_SUBTREE,		/* Item that defines a 
+					   subtree/submenu */
+	GNOME_APP_UI_SEPARATOR,		/* Separator line (menus) or blank 
+					   space (toolbars) */
+	GNOME_APP_UI_HELP,		/* Create a list of help topics, 
+					   used in the Help menu */
+	GNOME_APP_UI_BUILDER_DATA,	/* Specifies the builder data for the 
+					   following entries, see code for 
+					   further info */
+	GNOME_APP_UI_ITEM_CONFIGURABLE, /* A configurable menu item. */
+	/* one should be careful when using 
+	 * gnome_app_create_*_[custom|interp|with_data]() functions with 
+	 * GnomeUIInfo arrays containing GNOME_APP_UI_BUILDER_DATA items since 
+	 * their GnomeUIBuilderData structures completely override the ones 
+	 * generated or supplied by the above functions. */
+	GNOME_APP_UI_SUBTREE_STOCK	/* Item that defines a 
+					   subtree/submenu, same as GNOME_APP_UI_SUBTREE,
+					   but the texts should be looked up in the
+					   gnome-libs catalog
+					*/
+} GnomeUIInfoType;
+</programlisting>
+<para>
+This enumeration is used to set the value in a
+<structname>GnomeUIInfo</structname> record to specify the type of the
+record.  There are macros that can do all the work for you.  Use
+those instead of these macros.  It is defined as follows:</para>
+
+<itemizedlist>
+	<listitem><para><literal>GNOME_APP_UI_ENDOFINFO</literal>: Use this to denote
+	     the end of the records in a <link linkend="GnomeUIInfo">GnomeUIInfo</link> array.
+	     </para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_ITEM</literal>: Use this for a normal
+             item, or radio item if it is inside a radioitems group.
+             </para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_TOGGLEITEM</literal>: Use this for a
+             toggle (check box) item. </para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_RADIOITEMS</literal>: Use this for a radio
+	     item group.</para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_SUBTREE</literal>: Use this to define a
+	     subtree or a submenu.  Set the
+	     <structfield>moreinfo</structfield> field in the
+	     structure to point to another array of <link linkend="GnomeUIInfo">GnomeUIInfo</link>
+	     structures.</para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_SEPARATOR</literal>: Use this to introduce
+	     a separator line (for menus) or a blank (for toolbars).
+	     </para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_HELP</literal>: Use this to create a list
+             of help topics.  This is usually employed on the Help
+             menu.</para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_BUILDER_DATA</literal>: Specifies the
+	     builder data for the following entries, see code for
+	     further info.</para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_ITEM_CONFIGURABLE</literal>: A
+	     configurable menu item.  You should be careful when using
+	     gnome_app_create_*_[custom|interp|with_data]() functions
+	     with GnomeUIInfo arrays containing
+	     GNOME_APP_UI_BUILDER_DATA items since their
+	     GnomeUIBuilderData structures completely override the
+	     ones generated or supplied by the above
+	     functions. </para></listitem>
+
+	<listitem><para><literal>GNOME_APP_UI_SUBTREE_STOCK</literal>: Use this to
+              specifiy a subtree/submenu. Same as
+              GNOME_APP_UI_SUBTREE, but the texts should be looked up
+              in the gnome-libs catalog. </para></listitem>
+
+</itemizedlist></refsect2>
+<refsect2>
+<title><anchor id="GnomeUIInfoConfigurableTypes">enum GnomeUIInfoConfigurableTypes</title>
+<programlisting>typedef enum {
+        /* 0 */
+        GNOME_APP_CONFIGURABLE_ITEM_NEW,
+        GNOME_APP_CONFIGURABLE_ITEM_OPEN,
+        GNOME_APP_CONFIGURABLE_ITEM_SAVE,
+        GNOME_APP_CONFIGURABLE_ITEM_SAVE_AS,
+        GNOME_APP_CONFIGURABLE_ITEM_REVERT,
+        GNOME_APP_CONFIGURABLE_ITEM_PRINT,
+        GNOME_APP_CONFIGURABLE_ITEM_PRINT_SETUP,
+        GNOME_APP_CONFIGURABLE_ITEM_CLOSE,
+        GNOME_APP_CONFIGURABLE_ITEM_EXIT,
+        GNOME_APP_CONFIGURABLE_ITEM_CUT,
+	/* 10 */
+        GNOME_APP_CONFIGURABLE_ITEM_COPY,
+        GNOME_APP_CONFIGURABLE_ITEM_PASTE,
+        GNOME_APP_CONFIGURABLE_ITEM_CLEAR,
+        GNOME_APP_CONFIGURABLE_ITEM_UNDO,
+        GNOME_APP_CONFIGURABLE_ITEM_REDO,
+        GNOME_APP_CONFIGURABLE_ITEM_FIND,
+        GNOME_APP_CONFIGURABLE_ITEM_FIND_AGAIN,
+        GNOME_APP_CONFIGURABLE_ITEM_REPLACE,
+        GNOME_APP_CONFIGURABLE_ITEM_PROPERTIES,
+        GNOME_APP_CONFIGURABLE_ITEM_PREFERENCES,
+	/* 20 */
+        GNOME_APP_CONFIGURABLE_ITEM_ABOUT,
+	GNOME_APP_CONFIGURABLE_ITEM_SELECT_ALL,
+	GNOME_APP_CONFIGURABLE_ITEM_NEW_WINDOW,
+	GNOME_APP_CONFIGURABLE_ITEM_CLOSE_WINDOW,
+	GNOME_APP_CONFIGURABLE_ITEM_NEW_GAME,
+	GNOME_APP_CONFIGURABLE_ITEM_PAUSE_GAME,
+	GNOME_APP_CONFIGURABLE_ITEM_RESTART_GAME,
+	GNOME_APP_CONFIGURABLE_ITEM_UNDO_MOVE,
+	GNOME_APP_CONFIGURABLE_ITEM_REDO_MOVE,
+	GNOME_APP_CONFIGURABLE_ITEM_HINT,
+	/* 30 */
+	GNOME_APP_CONFIGURABLE_ITEM_SCORES,
+	GNOME_APP_CONFIGURABLE_ITEM_END_GAME
+} GnomeUIInfoConfigurableTypes;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeUIPixmapType">enum GnomeUIPixmapType</title>
+<programlisting>typedef enum {
+	GNOME_APP_PIXMAP_NONE,		/* No pixmap specified */
+	GNOME_APP_PIXMAP_STOCK,		/* Use a stock pixmap (GnomeStock) */
+	GNOME_APP_PIXMAP_DATA,		/* Use a pixmap from inline xpm data */
+	GNOME_APP_PIXMAP_FILENAME	/* Use a pixmap from the specified 
+					   filename */
+} GnomeUIPixmapType;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeUIInfo">struct GnomeUIInfo</title>
+<programlisting>typedef struct {
+	GnomeUIInfoType type;		/* Type of item */
+	gchar *label;			/* String to use in the label */
+	gchar *hint;			/* For toolbar items, the tooltip. For 
+					   menu items, the status bar message */
+	gpointer moreinfo;		/* For an item, toggleitem, or 
+					   radioitem, this is a pointer to the 
+					   function to call when the item is 
+					   activated. For a subtree, a pointer 
+					   to another array of GnomeUIInfo 
+					   structures. For a radioitem lead 
+					   entry, a pointer to an array of 
+					   GnomeUIInfo structures for the radio 
+					   item group. For a help item, 
+					   specifies the help node to load 
+					   (i.e. the application's identifier) 
+					   or NULL for the main program's name.
+					   For builder data, points to the 
+					   GnomeUIBuilderData structure for 
+					   the following items */
+	gpointer user_data;		/* Data pointer to pass to callbacks */
+	gpointer unused_data;		/* Reserved for future expansion, 
+					   should be NULL */
+	GnomeUIPixmapType pixmap_type;	/* Type of pixmap for the item */
+	gpointer pixmap_info;		/* Pointer to the pixmap information:
+					 *
+					 * For GNOME_APP_PIXMAP_STOCK, a 
+					 * pointer to the stock icon name.
+					 *
+					 * For GNOME_APP_PIXMAP_DATA, a 
+					 * pointer to the inline xpm data.
+					 *
+					 * For GNOME_APP_PIXMAP_FILENAME, a 
+					 * pointer to the filename string.
+					 */
+	guint accelerator_key;		/* Accelerator key, or 0 for none */
+	GdkModifierType ac_mods;	/* Mask of modifier keys for the 
+					   accelerator */
+
+	GtkWidget *widget;		/* Filled in by gnome_app_create*, you 
+					   can use this to tweak the widgets 
+					   once they have been created */
+} GnomeUIInfo;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-KEY-UIDATA-CAPS">GNOMEUIINFO_KEY_UIDATA</title>
+<programlisting>#define GNOMEUIINFO_KEY_UIDATA		"uidata"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-KEY-UIBDATA-CAPS">GNOMEUIINFO_KEY_UIBDATA</title>
+<programlisting>#define GNOMEUIINFO_KEY_UIBDATA		"uibdata"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-END-CAPS">GNOMEUIINFO_END</title>
+<programlisting>#define     GNOMEUIINFO_END</programlisting>
+<para>
+Use this macro to tag the end of a menu or toolbar definition.
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-SEPARATOR-CAPS">GNOMEUIINFO_SEPARATOR</title>
+<programlisting>#define     GNOMEUIINFO_SEPARATOR</programlisting>
+<para>
+Use this macro to include a separator in your menu.
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-ITEM-CAPS">GNOMEUIINFO_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_ITEM(label, tooltip, callback, xpm_data)</programlisting>
+<para>
+Generic menu or toolbar item which includes a label, a tooltip and an
+optional pixmap (in xpm format) to be displayed next to the entry. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tooltip</parameter>&nbsp;:</entry>
+<entry>The tooltip that will popup.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry>Callback routine to invoke.
+</entry></row>
+<row><entry align="right"><parameter>xpm_data</parameter>&nbsp;:</entry>
+<entry>Pointer to a pixmap to display (in C-xpm format).
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-ITEM-STOCK-CAPS">GNOMEUIINFO_ITEM_STOCK()</title>
+<programlisting>#define     GNOMEUIINFO_ITEM_STOCK(label, tooltip, callback, stock_id)</programlisting>
+<para>
+Use this macro to include an item in your menu that includes a
+GNOME-stock image.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tooltip</parameter>&nbsp;:</entry>
+<entry>The tooltip that will popup.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry>Callback routine to invoke.
+</entry></row>
+<row><entry align="right"><parameter>stock_id</parameter>&nbsp;:</entry>
+<entry>A GNOME-stock pixmap name.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-ITEM-NONE-CAPS">GNOMEUIINFO_ITEM_NONE()</title>
+<programlisting>#define     GNOMEUIINFO_ITEM_NONE(label, tooltip, callback)</programlisting>
+<para>
+Use this macro to add an item to the menu that has no pixmap
+associated with it. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tooltip</parameter>&nbsp;:</entry>
+<entry>The tooltip that will popup.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry>Callback routine to invoke.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-ITEM-DATA-CAPS">GNOMEUIINFO_ITEM_DATA()</title>
+<programlisting>#define     GNOMEUIINFO_ITEM_DATA(label, tooltip, callback, user_data, xpm_data)</programlisting>
+<para>
+Use this macro to create a menu item and keep some information in the
+structure.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tooltip</parameter>&nbsp;:</entry>
+<entry>The tooltip that will popup.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry>Callback routine to invoke.
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>Data passed around.
+</entry></row>
+<row><entry align="right"><parameter>xpm_data</parameter>&nbsp;:</entry>
+<entry>Pointer to a pixmap to display (in C-xpm format).
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-TOGGLEITEM-CAPS">GNOMEUIINFO_TOGGLEITEM()</title>
+<programlisting>#define     GNOMEUIINFO_TOGGLEITEM(label, tooltip, callback, xpm_data)</programlisting>
+<para>
+Creates a toggle-item (a checkbox) in a menu, this includes an xpm
+graphic. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tooltip</parameter>&nbsp;:</entry>
+<entry>The tooltip that will popup.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry>Callback routine to invoke.
+</entry></row>
+<row><entry align="right"><parameter>xpm_data</parameter>&nbsp;:</entry>
+<entry>Pointer to a pixmap to display (in C-xpm format).
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-TOGGLEITEM-DATA-CAPS">GNOMEUIINFO_TOGGLEITEM_DATA()</title>
+<programlisting>#define     GNOMEUIINFO_TOGGLEITEM_DATA(label, tooltip, callback, user_data, xpm_data)</programlisting>
+<para>
+Creates a toggle-item (a checkbox) in a menu, this includes an xpm
+graphic.  Allows you to specify the data to be passed around to your
+callback routine.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tooltip</parameter>&nbsp;:</entry>
+<entry>The tooltip that will popup.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry>Callback routine to invoke.
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>Data to pass to callback routine.
+</entry></row>
+<row><entry align="right"><parameter>xpm_data</parameter>&nbsp;:</entry>
+<entry>Pointer to a pixmap to display (in C-xpm format).
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-HELP-CAPS">GNOMEUIINFO_HELP()</title>
+<programlisting>#define     GNOMEUIINFO_HELP(app_name)</programlisting>
+<para>
+This special item inserts all of the topics defined by the application
+in the <filename>topic.dat</filename> file.  The menu is constructed
+from the information stored in the file associated with the <parameter>app_name</parameter>
+you provide.  The information is usually taken from
+<filename>$(datadir)/help/<parameter>app_name</parameter>/$LANG/topic.dat</filename>.  Where
+$LANG is the language chosen when running the application.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app_name</parameter>&nbsp;:</entry>
+<entry>The application name.  Used to locate the correct topic.dat file.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-SUBTREE-CAPS">GNOMEUIINFO_SUBTREE()</title>
+<programlisting>#define     GNOMEUIINFO_SUBTREE(label, tree)</programlisting>
+<para>
+Creates a submenu or a sub-tree in the menu structure.  The argument
+passed is an array of <structname>GnomeUIInfo</structname>.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>A pointer to a <structname>GnomeUIInfo</structname>.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-SUBTREE-STOCK-CAPS">GNOMEUIINFO_SUBTREE_STOCK()</title>
+<programlisting>#define     GNOMEUIINFO_SUBTREE_STOCK(label, tree, stock_id)</programlisting>
+<para>
+Creates a submenu or a sub-tree in the menu structure with a stock
+pixmap displayed.  The argument
+passed is an array of <structname>GnomeUIInfo</structname>.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>A pointer to a <structname>GnomeUIInfo</structname>.
+</entry></row>
+<row><entry align="right"><parameter>stock_id</parameter>&nbsp;:</entry>
+<entry>A GNOME-stock pixmap name.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-RADIOLIST-CAPS">GNOMEUIINFO_RADIOLIST()</title>
+<programlisting>#define     GNOMEUIINFO_RADIOLIST(list)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>list</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-RADIOITEM-CAPS">GNOMEUIINFO_RADIOITEM()</title>
+<programlisting>#define     GNOMEUIINFO_RADIOITEM(label, tooltip, callback, xpm_data)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tooltip</parameter>&nbsp;:</entry>
+<entry>The tooltip that will popup.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry>Callback routine to invoke.
+</entry></row>
+<row><entry align="right"><parameter>xpm_data</parameter>&nbsp;:</entry>
+<entry>Pointer to a pixmap to display (in C-xpm format).
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-RADIOITEM-DATA-CAPS">GNOMEUIINFO_RADIOITEM_DATA()</title>
+<programlisting>#define     GNOMEUIINFO_RADIOITEM_DATA(label, tooltip, callback, user_data, xpm_data)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tooltip</parameter>&nbsp;:</entry>
+<entry>The tooltip that will popup.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry>Callback routine to invoke.
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>xpm_data</parameter>&nbsp;:</entry>
+<entry>Pointer to a pixmap to display (in C-xpm format).
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-ABOUT-ITEM-CAPS">GNOMEUIINFO_MENU_ABOUT_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_ABOUT_ITEM(cb, data)</programlisting>
+<para>
+Use this macro inside a GnomeUIInfo structure to include an "About"
+menu entry.  
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-CLEAR-ITEM-CAPS">GNOMEUIINFO_MENU_CLEAR_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_CLEAR_ITEM(cb, data)</programlisting>
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Clear"
+option.  This is used typically in the Edit menu. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-CLOSE-ITEM-CAPS">GNOMEUIINFO_MENU_CLOSE_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_CLOSE_ITEM(cb, data)</programlisting>
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Close"
+menu entry.  This is used typically in the File menu or the Game menu
+to close the toplevel window.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-CLOSE-WINDOW-ITEM-CAPS">GNOMEUIINFO_MENU_CLOSE_WINDOW_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_CLOSE_WINDOW_ITEM(cb, data)</programlisting>
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Close"
+option.  This is used typically in the Window menu if your application
+includes one.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-COPY-ITEM-CAPS">GNOMEUIINFO_MENU_COPY_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_COPY_ITEM(cb, data)</programlisting>
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Copy"
+option.  This is used typically in the Edit menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-CUT-ITEM-CAPS">GNOMEUIINFO_MENU_CUT_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_CUT_ITEM(cb, data)</programlisting>
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Cut"
+option.  This is used typically in the Edit menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-EDIT-TREE-CAPS">GNOMEUIINFO_MENU_EDIT_TREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_EDIT_TREE(tree)</programlisting>
+<para>
+Inserts a top-level "Edit" menu.  The argument is a pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-END-GAME-ITEM-CAPS">GNOMEUIINFO_MENU_END_GAME_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_END_GAME_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include an "End game" menu item.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-EXIT-ITEM-CAPS">GNOMEUIINFO_MENU_EXIT_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_EXIT_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include an "Exit" menu entry.  To be included in the
+"File" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-FILES-TREE-CAPS">GNOMEUIINFO_MENU_FILES_TREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_FILES_TREE(tree)</programlisting>
+<para>
+Inserts a top-level "Files" menu.  The argument is pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-FILE-TREE-CAPS">GNOMEUIINFO_MENU_FILE_TREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_FILE_TREE(tree)</programlisting>
+<para>
+Inserts a top-level "File" menu.  The argument is pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-FIND-AGAIN-ITEM-CAPS">GNOMEUIINFO_MENU_FIND_AGAIN_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_FIND_AGAIN_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Find again" menu entry.  To be included
+in the "Edit" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-FIND-ITEM-CAPS">GNOMEUIINFO_MENU_FIND_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_FIND_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Find" menu entry.  To be included in the
+"Edit" menu.
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-GAME-TREE-CAPS">GNOMEUIINFO_MENU_GAME_TREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_GAME_TREE(tree)</programlisting>
+<para>
+Inserts a top-level "Game" menu.  The argument is a pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-HELP-TREE-CAPS">GNOMEUIINFO_MENU_HELP_TREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_HELP_TREE(tree)</programlisting>
+<para>
+Inserts a top-level "Game" menu.  The argument is pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-HINT-ITEM-CAPS">GNOMEUIINFO_MENU_HINT_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_HINT_ITEM(cb, data)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-NEW-GAME-ITEM-CAPS">GNOMEUIINFO_MENU_NEW_GAME_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_NEW_GAME_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include an "New game" menu entry.  To be included in the
+"Game" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-NEW-ITEM-CAPS">GNOMEUIINFO_MENU_NEW_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_NEW_ITEM(label, tip, cb, data)</programlisting>
+<para>
+Use this macro to include a "New" menu entry.  To be included in the
+"File" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>tip</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-NEW-SUBTREE-CAPS">GNOMEUIINFO_MENU_NEW_SUBTREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_NEW_SUBTREE(tree)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-NEW-WINDOW-ITEM-CAPS">GNOMEUIINFO_MENU_NEW_WINDOW_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_NEW_WINDOW_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "New window" menu entry.  
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-OPEN-ITEM-CAPS">GNOMEUIINFO_MENU_OPEN_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_OPEN_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include an "Open" menu entry.  To be used in the
+"File" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-PASTE-ITEM-CAPS">GNOMEUIINFO_MENU_PASTE_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_PASTE_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Paste" menu entry.  To be used in the
+"Edit" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-PAUSE-GAME-ITEM-CAPS">GNOMEUIINFO_MENU_PAUSE_GAME_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_PAUSE_GAME_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Pause game" menu entry.  To be used in the
+"Game" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-PREFERENCES-ITEM-CAPS">GNOMEUIINFO_MENU_PREFERENCES_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_PREFERENCES_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Preferences" menu entry.  
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-PRINT-ITEM-CAPS">GNOMEUIINFO_MENU_PRINT_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_PRINT_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Print" menu entry.  To be used in the
+"File" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-PRINT-SETUP-ITEM-CAPS">GNOMEUIINFO_MENU_PRINT_SETUP_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_PRINT_SETUP_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Print setup" menu entry.  To be used in the
+"File" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-PROPERTIES-ITEM-CAPS">GNOMEUIINFO_MENU_PROPERTIES_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_PROPERTIES_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Properties" menu entry.  
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-REDO-ITEM-CAPS">GNOMEUIINFO_MENU_REDO_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_REDO_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Redo" menu entry.  Most likely to be put
+in the "Edit" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-REDO-MOVE-ITEM-CAPS">GNOMEUIINFO_MENU_REDO_MOVE_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_REDO_MOVE_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Redo move" menu entry.  Most likely to be put
+in the "Edit" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-REPLACE-ITEM-CAPS">GNOMEUIINFO_MENU_REPLACE_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_REPLACE_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Replace" menu entry.  
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-RESTART-GAME-ITEM-CAPS">GNOMEUIINFO_MENU_RESTART_GAME_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_RESTART_GAME_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Restart game" menu entry.  To be used in
+the "Game" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-REVERT-ITEM-CAPS">GNOMEUIINFO_MENU_REVERT_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_REVERT_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Revert" menu entry.  
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-SAVE-AS-ITEM-CAPS">GNOMEUIINFO_MENU_SAVE_AS_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_SAVE_AS_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Save as" menu entry.  To be used in
+the "File" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-SAVE-ITEM-CAPS">GNOMEUIINFO_MENU_SAVE_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_SAVE_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Save" menu entry.  To be used in
+the "File" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-SCORES-ITEM-CAPS">GNOMEUIINFO_MENU_SCORES_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_SCORES_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Scores" menu entry.  To be used in
+the "Game" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-SELECT-ALL-ITEM-CAPS">GNOMEUIINFO_MENU_SELECT_ALL_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_SELECT_ALL_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include a "Select all" menu entry.  Most likely to
+be used in the "Edit" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-SETTINGS-TREE-CAPS">GNOMEUIINFO_MENU_SETTINGS_TREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_SETTINGS_TREE(tree)</programlisting>
+<para>
+Inserts a top-level "Settings" menu.  The argument is a pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-UNDO-ITEM-CAPS">GNOMEUIINFO_MENU_UNDO_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_UNDO_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include an "Undo" menu entry.  Most likely to
+be used in the "Edit" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-UNDO-MOVE-ITEM-CAPS">GNOMEUIINFO_MENU_UNDO_MOVE_ITEM()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_UNDO_MOVE_ITEM(cb, data)</programlisting>
+<para>
+Use this macro to include an "Undo move" menu entry.  Most likely to
+be used in the "Edit" menu.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cb</parameter>&nbsp;:</entry>
+<entry>Specifies the routine to be invoked when the menu is selected
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>The data passed to your routine.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-VIEW-TREE-CAPS">GNOMEUIINFO_MENU_VIEW_TREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_VIEW_TREE(tree)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-MENU-WINDOWS-TREE-CAPS">GNOMEUIINFO_MENU_WINDOWS_TREE()</title>
+<programlisting>#define     GNOMEUIINFO_MENU_WINDOWS_TREE(tree)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOMEUIINFO-SUBTREE-HINT-CAPS">GNOMEUIINFO_SUBTREE_HINT()</title>
+<programlisting>#define     GNOMEUIINFO_SUBTREE_HINT(label, hint, tree)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>label</parameter>&nbsp;:</entry>
+<entry>The text that will be displayed
+</entry></row>
+<row><entry align="right"><parameter>hint</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry>array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-FILE-STRING-CAPS">GNOME_MENU_FILE_STRING</title>
+<programlisting>#define GNOME_MENU_FILE_STRING D_("_File")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-FILE-PATH-CAPS">GNOME_MENU_FILE_PATH</title>
+<programlisting>#define GNOME_MENU_FILE_PATH D_("_File/")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-EDIT-STRING-CAPS">GNOME_MENU_EDIT_STRING</title>
+<programlisting>#define GNOME_MENU_EDIT_STRING D_("_Edit")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-EDIT-PATH-CAPS">GNOME_MENU_EDIT_PATH</title>
+<programlisting>#define GNOME_MENU_EDIT_PATH D_("_Edit/")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-VIEW-STRING-CAPS">GNOME_MENU_VIEW_STRING</title>
+<programlisting>#define GNOME_MENU_VIEW_STRING D_("_View")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-VIEW-PATH-CAPS">GNOME_MENU_VIEW_PATH</title>
+<programlisting>#define GNOME_MENU_VIEW_PATH D_("_View/")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-SETTINGS-STRING-CAPS">GNOME_MENU_SETTINGS_STRING</title>
+<programlisting>#define GNOME_MENU_SETTINGS_STRING D_("_Settings")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-SETTINGS-PATH-CAPS">GNOME_MENU_SETTINGS_PATH</title>
+<programlisting>#define GNOME_MENU_SETTINGS_PATH D_("_Settings/")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-FILES-STRING-CAPS">GNOME_MENU_FILES_STRING</title>
+<programlisting>#define GNOME_MENU_FILES_STRING D_("Fi_les")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-FILES-PATH-CAPS">GNOME_MENU_FILES_PATH</title>
+<programlisting>#define GNOME_MENU_FILES_PATH D_("Fi_les/")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-WINDOWS-STRING-CAPS">GNOME_MENU_WINDOWS_STRING</title>
+<programlisting>#define GNOME_MENU_WINDOWS_STRING D_("_Windows")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MENU-WINDOWS-PATH-CAPS">GNOME_MENU_WINDOWS_PATH</title>
+<programlisting>#define GNOME_MENU_WINDOWS_PATH D_("_Windows/")
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeUIBuilderData">struct GnomeUIBuilderData</title>
+<programlisting>struct GnomeUIBuilderData {
+	GnomeUISignalConnectFunc connect_func;	/* Function that connects to the item's signals */
+	gpointer data;				/* User data pointer */
+	gboolean is_interp;			/* Should use gtk_signal_connect_interp or normal gtk_signal_connect? */
+	GtkCallbackMarshal relay_func;		/* Marshaller function for language bindings */
+	GtkDestroyNotify destroy_func;		/* Destroy notification function for language bindings */
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeUISignalConnectFunc">GnomeUISignalConnectFunc ()</title>
+<programlisting>void        (*GnomeUISignalConnectFunc)     (<link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="gchar">gchar</link> *signal_name,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>signal_name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uibdata</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-fill-menu">gnome_app_fill_menu ()</title>
+<programlisting>void        gnome_app_fill_menu             (<link linkend="GtkMenuShell">GtkMenuShell</link> *menu_shell,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accel_group,
+                                             <link linkend="gboolean">gboolean</link> uline_accels,
+                                             <link linkend="gint">gint</link> pos);</programlisting>
+<para>
+Fills the specified menu shell with items created from the specified
+info, inserting them from the item no. pos on.
+The accel group will be used as the accel group for all newly created
+sub menus and serves as the global accel group for all menu item
+hotkeys. If it is passed as NULL, global hotkeys will be disabled.
+The uline_accels argument determines whether underline accelerators
+will be featured from the menu item labels.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>menu_shell</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>accel_group</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uline_accels</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>pos</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-fill-menu-custom">gnome_app_fill_menu_custom ()</title>
+<programlisting>void        gnome_app_fill_menu_custom      (<link linkend="GtkMenuShell">GtkMenuShell</link> *menu_shell,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accel_group,
+                                             <link linkend="gboolean">gboolean</link> uline_accels,
+                                             <link linkend="gint">gint</link> pos);</programlisting>
+<para>
+Fills the specified menu shell with items created from the specified
+info, inserting them from item no. pos on and using the specified
+builder data -- this is intended for language bindings.
+The accel group will be used as the accel group for all newly created
+sub menus and serves as the global accel group for all menu item
+hotkeys. If it is passed as NULL, global hotkeys will be disabled.
+The uline_accels argument determines whether underline accelerators
+will be featured from the menu item labels.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>menu_shell</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uibdata</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>accel_group</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uline_accels</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>pos</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-ui-configure-configurable">gnome_app_ui_configure_configurable ()</title>
+<programlisting>void        gnome_app_ui_configure_configurable
+                                            (<link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);</programlisting>
+<para>
+Configure all user-configurable elements in the given UI info 
+structure.  This includes loading and setting previously-set options from
+GNOME config files.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME UI menu/toolbar info
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-create-menus">gnome_app_create_menus ()</title>
+<programlisting>void        gnome_app_create_menus          (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);</programlisting>
+<para>
+Constructs a menu bar and attaches it to the specified application
+window.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-create-menus-interp">gnome_app_create_menus_interp ()</title>
+<programlisting>void        gnome_app_create_menus_interp   (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkCallbackMarshal">GtkCallbackMarshal</link> relay_func,
+                                             <link linkend="gpointer">gpointer</link> data,
+                                             <link linkend="GtkDestroyNotify">GtkDestroyNotify</link> destroy_func);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>relay_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>destroy_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-create-menus-with-data">gnome_app_create_menus_with_data ()</title>
+<programlisting>void        gnome_app_create_menus_with_data
+                                            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-create-menus-custom">gnome_app_create_menus_custom ()</title>
+<programlisting>void        gnome_app_create_menus_custom   (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uibdata</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-fill-toolbar">gnome_app_fill_toolbar ()</title>
+<programlisting>void        gnome_app_fill_toolbar          (<link linkend="GtkToolbar">GtkToolbar</link> *toolbar,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accel_group);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>toolbar</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>accel_group</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-fill-toolbar-custom">gnome_app_fill_toolbar_custom ()</title>
+<programlisting>void        gnome_app_fill_toolbar_custom   (<link linkend="GtkToolbar">GtkToolbar</link> *toolbar,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accel_group);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>toolbar</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uibdata</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>accel_group</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-create-toolbar">gnome_app_create_toolbar ()</title>
+<programlisting>void        gnome_app_create_toolbar        (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);</programlisting>
+<para>
+Constructs a toolbar and attaches it to the specified application
+window.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-create-toolbar-interp">gnome_app_create_toolbar_interp ()</title>
+<programlisting>void        gnome_app_create_toolbar_interp (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkCallbackMarshal">GtkCallbackMarshal</link> relay_func,
+                                             <link linkend="gpointer">gpointer</link> data,
+                                             <link linkend="GtkDestroyNotify">GtkDestroyNotify</link> destroy_func);</programlisting>
+<para>
+Constructs a toolbar and attaches it to the specified application
+window -- this version is intended for language bindings.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>relay_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>destroy_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-create-toolbar-with-data">gnome_app_create_toolbar_with_data ()</title>
+<programlisting>void        gnome_app_create_toolbar_with_data
+                                            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Constructs a toolbar, sets all the user data pointers to
+<parameter>user_data</parameter>, and attaches it to <parameter>app</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-create-toolbar-custom">gnome_app_create_toolbar_custom ()</title>
+<programlisting>void        gnome_app_create_toolbar_custom (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata);</programlisting>
+<para>
+Constructs a toolbar and attaches it to the <parameter>app</parameter> window,
+using <parameter>uibdata</parameter> builder data -- intended for language bindings.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uibdata</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-find-menu-pos">gnome_app_find_menu_pos ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_app_find_menu_pos         (<link linkend="GtkWidget">GtkWidget</link> *parent,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="gint">gint</link> *pos);</programlisting>
+<para>
+finds menu item described by path starting
+in the GtkMenuShell top and returns its parent GtkMenuShell and the
+position after this item in pos:  gtk_menu_shell_insert(p, w, pos)
+would then insert widget w in GtkMenuShell p right after the menu item
+described by path.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> Root menu shell widget containing menu items to be searched
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> Specifies the target menu item by menu path
+</entry></row>
+<row><entry align="right"><parameter>pos</parameter>&nbsp;:</entry>
+<entry> (output) returned item position
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-remove-menus">gnome_app_remove_menus ()</title>
+<programlisting>void        gnome_app_remove_menus          (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="gint">gint</link> items);</programlisting>
+<para>
+removes num items from the existing app's menu structure
+beginning with item described by path</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>items</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-remove-menu-range">gnome_app_remove_menu_range ()</title>
+<programlisting>void        gnome_app_remove_menu_range     (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="gint">gint</link> start,
+                                             <link linkend="gint">gint</link> items);</programlisting>
+<para>
+Same as the gnome_app_remove_menus, except it removes the specified number
+of <parameter>items</parameter> from the existing app's menu structure begining with item described
+by path, plus the number specified by <parameter>start</parameter> - very useful for adding and
+removing Recent document items in the File menu.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>start</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>items</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-insert-menus-custom">gnome_app_insert_menus_custom ()</title>
+<programlisting>void        gnome_app_insert_menus_custom   (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo,
+                                             <link linkend="GnomeUIBuilderData">GnomeUIBuilderData</link> *uibdata);</programlisting>
+<para>
+inserts menus described by <parameter>uiinfo</parameter> in existing app's menu
+structure right after the item described by <parameter>path</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>menuinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>uibdata</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-insert-menus">gnome_app_insert_menus ()</title>
+<programlisting>void        gnome_app_insert_menus          (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>menuinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-insert-menus-with-data">gnome_app_insert_menus_with_data ()</title>
+<programlisting>void        gnome_app_insert_menus_with_data
+                                            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo,
+                                             <link linkend="gpointer">gpointer</link> data);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>menuinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-insert-menus-interp">gnome_app_insert_menus_interp ()</title>
+<programlisting>void        gnome_app_insert_menus_interp   (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *path,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo,
+                                             <link linkend="GtkCallbackMarshal">GtkCallbackMarshal</link> relay_func,
+                                             <link linkend="gpointer">gpointer</link> data,
+                                             <link linkend="GtkDestroyNotify">GtkDestroyNotify</link> destroy_func);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>menuinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>relay_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>destroy_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-install-appbar-menu-hints">gnome_app_install_appbar_menu_hints ()</title>
+<programlisting>void        gnome_app_install_appbar_menu_hints
+                                            (<link linkend="GnomeAppBar">GnomeAppBar</link> *appbar,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);</programlisting>
+<para>
+Install menu hints for the given GNOME app bar object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appbar</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app bar object.
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry> GNOME UI info for menu
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-install-statusbar-menu-hints">gnome_app_install_statusbar_menu_hints ()</title>
+<programlisting>void        gnome_app_install_statusbar_menu_hints
+                                            (<link linkend="GtkStatusbar">GtkStatusbar</link> *bar,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);</programlisting>
+<para>
+Install menu hints for the given status bar.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bar</parameter>&nbsp;:</entry>
+<entry> Pointer to Gtk+ status bar object
+</entry></row>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry> Gnome UI info for the menu to be changed
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-install-menu-hints">gnome_app_install_menu_hints ()</title>
+<programlisting>void        gnome_app_install_menu_hints    (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *uinfo);</programlisting>
+<para>
+Set menu hints for the GNOME app object's attached status bar.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object
+</entry></row>
+<row><entry align="right"><parameter>uinfo</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

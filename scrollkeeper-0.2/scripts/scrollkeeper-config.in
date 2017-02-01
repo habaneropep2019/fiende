@@ -1,0 +1,88 @@
+#! /bin/sh
+
+prefix=@prefix@
+localstatedir=@localstatedir@
+partial_db_dir=@SCROLLKEEPER_PARTIAL_DB_DIR@
+pkglocalstatedir=${localstatedir}/${partial_db_dir}
+pkgdatadir=${prefix}/share/scrollkeeper
+datadir=@datadir@
+
+usage()
+{
+    cat <<EOF
+Usage: scrollkeeper-config [OPTION]
+
+Known values for OPTION are:
+
+  --help                display this help and exit
+  --version             output version information
+  --prefix              print install directory	
+  --localstatedir       print localstatedir used at package build time
+  --pkglocalstatedir    print scrollkeeper data directory
+  --pkgdatadir          print scrollkeeper home directory	
+  --omfdir              print OMF files directory
+EOF
+
+    exit $1
+}
+
+if test $# -eq 0; then
+    usage 1
+fi
+
+while test $# -gt 0; do
+    case "$1" in
+    -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *) optarg= ;;
+    esac
+
+    case "$1" in
+    --prefix)
+	echo $prefix
+	exit 0
+	;;
+
+    --version)
+	echo @VERSION@
+	exit 0
+	;;
+
+    --help)
+	usage 0
+	exit 0
+	;;
+
+    --prefix)
+       	echo $prefix 
+	exit 0
+       	;;
+
+    --localstatedir)
+        echo $localstatedir
+        exit 0
+        ;;
+
+    --pkglocalstatedir)
+        echo $pkglocalstatedir
+        exit 0
+        ;;
+
+    --pkgdatadir)
+        echo $pkgdatadir
+        exit 0
+        ;;
+
+    --omfdir)
+	echo $datadir/omf
+	exit 0
+	;;
+
+    *)
+	usage
+	exit 1
+	;;
+    esac
+    shift
+done
+
+exit 0

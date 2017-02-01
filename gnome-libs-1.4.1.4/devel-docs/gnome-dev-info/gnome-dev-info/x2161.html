@@ -1,0 +1,602 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Utility functions if a GnomeApp is available</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Talking to the user: GnomeDialog, GnomeMessageBox,
+    GnomeAppBar, and utility functions."
+HREF="dialogapputil-docs.html"><LINK
+REL="PREVIOUS"
+TITLE="The abstract message utility functions"
+HREF="gnome-app-util.html"><LINK
+REL="NEXT"
+TITLE="Using GnomeDialog directly"
+HREF="gnome-dialog.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="gnome-app-util.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Talking to the user: <SPAN
+CLASS="TYPE"
+>GnomeDialog</SPAN
+>, <SPAN
+CLASS="TYPE"
+>GnomeMessageBox</SPAN
+>,
+    <SPAN
+CLASS="TYPE"
+>GnomeAppBar</SPAN
+>, and utility functions.</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="gnome-dialog.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2161"
+>Utility functions if a <SPAN
+CLASS="TYPE"
+>GnomeApp</SPAN
+> is available</A
+></H1
+><P
+>      When these functions return a <SPAN
+CLASS="TYPE"
+>GtkWidget*</SPAN
+>, they are
+      returning the created dialog, if any. If no dialog is created
+      they return NULL. In general this is useless, but in special
+      circumstances you might care. You should
+      <I
+CLASS="EMPHASIS"
+>never</I
+> modify the settings on the returned
+      dialog, such as how it's destroyed, where it's positioned, etc.;
+      you could confuse the library internals and/or override user
+      preferences.
+    </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2167"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_message</TT
+>
+      </CODE
+>(	GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+      , 	const gchar *<TT
+CLASS="PARAMETER"
+><I
+>message</I
+></TT
+>
+      );<P
+></P
+></DIV
+><P
+>      <TT
+CLASS="FUNCTION"
+>gnome_app_message()</TT
+> shows a simple message
+      of moderate importance. It will come in a dialog with an OK
+      button, or on the appbar; it will require the user to
+      acknowledge it somehow before it goes away.
+    </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2176"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_flash</TT
+>
+      </CODE
+>(	GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+      , 	const gchar *<TT
+CLASS="PARAMETER"
+><I
+>flash</I
+></TT
+>
+      );<P
+></P
+></DIV
+><P
+>      This is used for trivial messages that aren't very important; an
+      example might be the little Netscape messages telling which URL
+      is currently being fetched. If the user never sees these
+      messages, it's not a problem; in fact,
+      <TT
+CLASS="FUNCTION"
+>gnome_app_flash()</TT
+> is not guaranteed to show
+      the user the message (for example, if dialogs are turned off and
+      the <SPAN
+CLASS="TYPE"
+>GnomeApp</SPAN
+> has no appbar).
+    </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2186"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_error</TT
+>
+      </CODE
+>(	GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+      , 	const gchar *<TT
+CLASS="PARAMETER"
+><I
+>error</I
+></TT
+>
+      );<P
+></P
+></DIV
+><P
+>      An important error, issued if an operation fails entirely or
+      there's a major problem. This may do something obnoxious like
+      beep, and will probably require user acknowledgement.
+    </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2194"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_warning</TT
+>
+      </CODE
+>(	GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+      , 	const gchar *<TT
+CLASS="PARAMETER"
+><I
+>warning</I
+></TT
+>
+      );<P
+></P
+></DIV
+><P
+>      Just a warning; not as important as an error, but not as trivial
+      as a flash.
+    </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2202"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_question</TT
+>
+      </CODE
+>(	GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+      , 	const gchar *<TT
+CLASS="PARAMETER"
+><I
+>question</I
+></TT
+>
+      , 	GnomeReplyCallback <TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>
+      , 	gpointer <TT
+CLASS="PARAMETER"
+><I
+>data</I
+></TT
+>
+      );<P
+></P
+></DIV
+><P
+>      Ask the yes or no question <TT
+CLASS="PARAMETER"
+><I
+>question</I
+></TT
+>, and
+      call <TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+> to indicate a response or
+      if the user cancels (deleting the dialog or with control-G from
+      the eventual minibuffer widget).
+    </P
+><P
+>      <SPAN
+CLASS="TYPE"
+>GnomeReplyCallback</SPAN
+> is a typedef:
+      <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	typedef void (* GnomeReplyCallback)(gint reply, gpointer data);
+      </PRE
+></TD
+></TR
+></TABLE
+>
+      
+      The first argument received in the callback is a number
+      representing the user's reply. It will be either
+      <SPAN
+CLASS="SYMBOL"
+>GNOME_YES</SPAN
+> or <SPAN
+CLASS="SYMBOL"
+>GNOME_NO</SPAN
+>.  The
+      callback also receives a <SPAN
+CLASS="SYMBOL"
+>data</SPAN
+> argument, the
+      same one you passed in to
+      <TT
+CLASS="FUNCTION"
+>gnome_app_question()</TT
+>.
+
+    </P
+><P
+>      Keep in mind that the callback is <I
+CLASS="EMPHASIS"
+>not</I
+>
+      guaranteed to be called. If the user declines to answer the
+      question --- say, by destroying the dialog via the window
+      manager --- the callback is ignored. This is an area for API
+      improvement; it probably makes sense to call the callback with
+      reply <SPAN
+CLASS="SYMBOL"
+>GNOME_USER_CANCELLED</SPAN
+> or something like
+      that. However, this feature is <I
+CLASS="EMPHASIS"
+>not</I
+>
+      implemented yet, so don't assume your callback is going to
+      happen.
+    </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2227"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_question_modal</TT
+>
+      </CODE
+>(	GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+      , 	const gchar *<TT
+CLASS="PARAMETER"
+><I
+>question</I
+></TT
+>
+      , 	GnomeReplyCallback <TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>
+      , 	gpointer <TT
+CLASS="PARAMETER"
+><I
+>data</I
+></TT
+>
+      );<P
+></P
+></DIV
+><P
+>      This function is just the same as
+      <TT
+CLASS="FUNCTION"
+>gnome_app_question()</TT
+>, but it creates a
+      modal dialog or appbar prompt, so the user will be unable to
+      interact with other parts of the application until the dialog is
+      dealt with (either the question is answered, or the user cancels
+      by closing the dialog/control-G from the appbar). It's a
+      weakness waiting to be fixed that the modal question handles
+      cancels poorly. (see also comments in the intro on possibly
+      using a <SPAN
+CLASS="TYPE"
+>GtkObject</SPAN
+> here.)
+    </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2241"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_ok_cancel</TT
+>
+      </CODE
+>(	GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+      , 	const gchar *<TT
+CLASS="PARAMETER"
+><I
+>message</I
+></TT
+>
+      , 	GnomeReplyCallback <TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>
+      , 	gpointer <TT
+CLASS="PARAMETER"
+><I
+>data</I
+></TT
+>
+      );<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2252"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GtkWidget *<TT
+CLASS="FUNCTION"
+>gnome_app_ok_cancel_modal</TT
+>
+      </CODE
+>(	GnomeApp *<TT
+CLASS="PARAMETER"
+><I
+>app</I
+></TT
+>
+      , 	const gchar *<TT
+CLASS="PARAMETER"
+><I
+>message</I
+></TT
+>
+      , 	GnomeReplyCallback <TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>
+      , 	gpointer <TT
+CLASS="PARAMETER"
+><I
+>data</I
+></TT
+>
+      );<P
+></P
+></DIV
+><P
+>      These two functions exactly parallel the
+      <TT
+CLASS="FUNCTION"
+>gnome_app_question()</TT
+> functions, only they
+      ask the user for OK/Cancel instead of Yes/No, and the callback
+      receives <SPAN
+CLASS="SYMBOL"
+>GNOME_OK</SPAN
+> or
+      <SPAN
+CLASS="SYMBOL"
+>GNOME_CANCEL</SPAN
+>.
+    </P
+><P
+>      FIXME rest of the gnome-app-util functions.
+    </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gnome-app-util.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gnome-dialog.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The abstract message utility functions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="dialogapputil-docs.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Using <SPAN
+CLASS="TYPE"
+>GnomeDialog</SPAN
+> directly</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

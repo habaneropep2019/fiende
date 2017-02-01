@@ -1,0 +1,258 @@
+<refentry id="gnomeui-gnome-popup-menu">
+<refmeta>
+<refentrytitle>gnome-popup-menu</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-popup-menu</refname><refpurpose>Routines for attaching popup menus to widgets.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-popup-menu-new">gnome_popup_menu_new</link>            (<link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-popup-menu-new-with-accelgroup">gnome_popup_menu_new_with_accelgroup</link>
+                                            (<link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accelgroup);
+<link linkend="GtkAccelGroup">GtkAccelGroup</link>* <link linkend="gnome-popup-menu-get-accel-group">gnome_popup_menu_get_accel_group</link>
+                                            (<link linkend="GtkMenu">GtkMenu</link> *menu);
+void        <link linkend="gnome-popup-menu-attach">gnome_popup_menu_attach</link>         (<link linkend="GtkWidget">GtkWidget</link> *popup,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+void        <link linkend="gnome-popup-menu-do-popup">gnome_popup_menu_do_popup</link>       (<link linkend="GtkWidget">GtkWidget</link> *popup,
+                                             <link linkend="GtkMenuPositionFunc">GtkMenuPositionFunc</link> pos_func,
+                                             <link linkend="gpointer">gpointer</link> pos_data,
+                                             <link linkend="GdkEventButton">GdkEventButton</link> *event,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+int         <link linkend="gnome-popup-menu-do-popup-modal">gnome_popup_menu_do_popup_modal</link> (<link linkend="GtkWidget">GtkWidget</link> *popup,
+                                             <link linkend="GtkMenuPositionFunc">GtkMenuPositionFunc</link> pos_func,
+                                             <link linkend="gpointer">gpointer</link> pos_data,
+                                             <link linkend="GdkEventButton">GdkEventButton</link> *event,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    The routines in this module provide various ways of displaying popup
+    menus our application.
+  </para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-popup-menu-new">gnome_popup_menu_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_popup_menu_new            (<link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo);</programlisting>
+<para>
+This function behaves just like
+<link linkend="gnome-popup-menu-new-with-accelgroup">gnome_popup_menu_new_with_accelgroup</link>(), except that it creates an
+accelgroup for you and attaches it to the menu object.  Use
+<link linkend="gnome-popup-menu-get-accel-group">gnome_popup_menu_get_accel_group</link>() to get the accelgroup that is
+created.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a menu widget
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-popup-menu-new-with-accelgroup">gnome_popup_menu_new_with_accelgroup ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_popup_menu_new_with_accelgroup
+                                            (<link linkend="GnomeUIInfo">GnomeUIInfo</link> *uiinfo,
+                                             <link linkend="GtkAccelGroup">GtkAccelGroup</link> *accelgroup);</programlisting>
+<para>
+Creates a popup menu out of the specified uiinfo array.  Use
+<link linkend="gnome-popup-menu-do-popup">gnome_popup_menu_do_popup</link>() to pop the menu up, or attach it to a
+window with <link linkend="gnome-popup-menu-attach">gnome_popup_menu_attach</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uiinfo</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>accelgroup</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a menu widget
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-popup-menu-get-accel-group">gnome_popup_menu_get_accel_group ()</title>
+<programlisting><link linkend="GtkAccelGroup">GtkAccelGroup</link>* gnome_popup_menu_get_accel_group
+                                            (<link linkend="GtkMenu">GtkMenu</link> *menu);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>menu</parameter>&nbsp;:</entry>
+<entry> 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the accelgroup associated with the specified GtkMenu.  This
+is the accelgroup that was created by <link linkend="gnome-popup-menu-new">gnome_popup_menu_new</link>().  If
+you want to specify the accelgroup that the popup menu accelerators
+use, then use <link linkend="gnome-popup-menu-new-with-accelgroup">gnome_popup_menu_new_with_accelgroup</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-popup-menu-attach">gnome_popup_menu_attach ()</title>
+<programlisting>void        gnome_popup_menu_attach         (<link linkend="GtkWidget">GtkWidget</link> *popup,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Attaches the specified popup menu to the specified widget.  The
+menu can then be activated by pressing mouse button 3 over the
+widget.  When a menu item callback is invoked, the specified
+user_data will be passed to it.
+</para>
+<para>
+This function requires the widget to have its own window
+(i.e. GTK_WIDGET_NO_WINDOW (widget) == FALSE), This function will
+try to set the GDK_BUTTON_PRESS_MASK flag on the widget's event
+mask if it does not have it yet; if this is the case, then the
+widget must not be realized for it to work.
+</para>
+<para>
+The popup menu can be attached to different widgets at the same
+time.  A reference count is kept on the popup menu; when all the
+widgets it is attached to are destroyed, the popup menu will be
+destroyed as well.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>popup</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-popup-menu-do-popup">gnome_popup_menu_do_popup ()</title>
+<programlisting>void        gnome_popup_menu_do_popup       (<link linkend="GtkWidget">GtkWidget</link> *popup,
+                                             <link linkend="GtkMenuPositionFunc">GtkMenuPositionFunc</link> pos_func,
+                                             <link linkend="gpointer">gpointer</link> pos_data,
+                                             <link linkend="GdkEventButton">GdkEventButton</link> *event,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+You can use this function to pop up a menu.  When a menu item *
+callback is invoked, the specified user_data will be passed to it.
+</para>
+<para>
+The pos_func and pos_data parameters are the same as for
+<link linkend="gtk-menu-popup">gtk_menu_popup</link>(), i.e. you can use them to specify a function to
+position the menu explicitly.  If you want the default position
+(near the mouse), pass NULL for these parameters.
+</para>
+<para>
+The event parameter is needed to figure out the mouse button that
+activated the menu and the time at which this happened.  If you
+pass in NULL, then no button and the current time will be used as
+defaults.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>popup</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>pos_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>pos_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>event</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-popup-menu-do-popup-modal">gnome_popup_menu_do_popup_modal ()</title>
+<programlisting>int         gnome_popup_menu_do_popup_modal (<link linkend="GtkWidget">GtkWidget</link> *popup,
+                                             <link linkend="GtkMenuPositionFunc">GtkMenuPositionFunc</link> pos_func,
+                                             <link linkend="gpointer">gpointer</link> pos_data,
+                                             <link linkend="GdkEventButton">GdkEventButton</link> *event,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Same as above, but runs the popup menu modally and returns the
+index of the selected item, or -1 if none.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>popup</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>pos_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>pos_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>event</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+<!--
+Local variables:
+mode: sgml
+sgml-parent-document: ("../gnomeui-docs.sgml" "book" "sect1" "")
+End:
+-->
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

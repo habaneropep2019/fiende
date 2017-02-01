@@ -1,0 +1,96 @@
+## Makefile for building the gtk theme engines with gcc -mno-cygwin
+## Use: make -f makefile.cygwin 
+
+# Where the themes will be installed. This is where gtk+ looks for them
+# by default (replace /windows with your Windows directory)
+#THEMES = /windows/gtk+/themes
+# This is what I use as installation target, from where the installer-builder
+# will pick it up.
+THEMES = /src/themes
+
+################################################################
+
+# Nothing much configurable below
+
+ifndef THEME
+
+# This part is used from this directory
+
+SUBDIRS = metal notif redmond95 pixmap
+
+all :
+	for d in $(SUBDIRS); do $(MAKE) -f makefile.cygwin theme-all DIR=$$d; done
+
+install :
+	for d in $(SUBDIRS); do $(MAKE) -f makefile.cygwin theme-install DIR=$$d; done
+
+clean :
+	for d in $(SUBDIRS); do $(MAKE) -f makefile.cygwin theme-clean DIR=$$d; done
+
+ifdef DIR
+
+theme-all :
+	cd $(DIR); $(MAKE) -f ../makefile.cygwin THEME=$(DIR) this_is_$(DIR)=1 all
+
+theme-install :
+	cd $(DIR); $(MAKE) -f ../makefile.cygwin THEME=$(DIR) install
+
+theme-clean :
+	cd $(DIR); $(MAKE) -f ../makefile.cygwin THEME=$(DIR) clean
+
+endif
+
+
+else
+
+# This part is included by makefiles below
+
+GTK_VER = 1.3
+GLIB_VER = 1.3
+
+OPTIMIZE = -O
+
+CC = gcc -mno-cygwin -mpentium -fnative-struct
+
+INSTALL = install
+
+GTK = ../../gtk+
+GLIB = ../../glib
+GDK_IMLIB = ../../imlib/gdk_imlib
+
+ENGINES = $(THEMES)/engines
+ENGGTK = $(THEMES)/$(THEME)/gtk
+
+CFLAGS = -I. -I$(GLIB) -I$(GLIB)/gmodule -I$(GTK)/gdk -I$(GTK) -I$(GDK_IMLIB)
+
+ifdef this_is_pixmap
+EXTRALIBS = -L $(GDK_IMLIB) -lgdk_imlib
+endif
+
+ifndef OBJECTS
+OBJECTS = \
+	$(THEME)_theme_draw.o \
+	$(THEME)_theme_main.o 
+endif
+
+all : \
+	$(THEME).dll
+
+install : all
+	-mkdir $(ENGINES)
+	$(INSTALL) $(THEME).dll $(ENGINES)
+	-mkdir $(THEMES)/$(THEME)
+	-mkdir $(THEMES)/$(THEME)/gtk
+	-$(INSTALL) Theme/gtk/*.png $(ENGGTK)
+	$(INSTALL) Theme/gtk/gtkrc $(ENGGTK)
+
+$(THEME).dll : $(OBJECTS)
+	$(GLIB)/build-dll $(THEME) - ../engine.def $(OBJECTS) -L $(GTK)/gtk -lgtk-$(GTK_VER) -L $(GTK)/gdk -lgdk-$(GTK_VER) $(EXTRALIBS) -L $(GLIB) -lglib-$(GLIB_VER) -lgmodule-$(GLIB_VER) -lgdi32 -luser32 $(LDFLAGS)
+
+.c.o :
+	$(CC) $(CFLAGS) -c $<
+
+clean:
+	-rm *.dll *.o
+
+endif

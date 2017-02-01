@@ -1,0 +1,42 @@
+
+How to Upgrade Applications Created With Glade & GTK 1.0 to work with GTK 1.1
+=============================================================================
+
+There were quite a few changes between GTK 1.0 and 1.1, and so source code
+written for GTK 1.0 will not work with GTK 1.1.
+
+First, you need to recompile Glade with GTK 1.1.
+Then you can load your XML file into Glade and regenerate the source code.
+
+However, there are a couple of differences in the XML files used with GTK 1.0
+and GTK 1.1, due to changes in a few GTK widgets.
+
+I think the main problem is GtkCList - in GTK 1.0 it handles scrolling itself.
+In GTK 1.1 you have to put it inside a GtkScrolledWindow.
+You can edit the XML yourself and place a scrolled window around the CList,
+e.g.
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+
+      <widget>
+        <class>GtkCList</class>
+        ...
+
+      </widget>
+    </widget>
+
+You may also need to move any <child> options from the clist up to the
+scrolled window.
+
+
+If you used the GtkText widget you may also want to place that in a scrolled
+window as well. You'll also probably want to set the horizontal scrollbar
+policy to GTK_POLICY_NEVER so the horizontal scrollbar is never shown, since
+GtkText doesn't support horizontal scrolling.
+
+
+
+Let me know of any other changes needed, and I'll add them here.
+
+Damon

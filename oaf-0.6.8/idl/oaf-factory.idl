@@ -1,0 +1,38 @@
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*- */
+/*
+ * gnome-factory.idl: Basic object factory interface, based on CORBA
+ * LifeCycle version
+ */
+
+#ifndef __GNOME_FACTORY_IDL__
+#define __GNOME_FACTORY_IDL__
+
+#if !defined(GNOME_FACTORY_COMPILATION) && defined(__ORBIT_IDL__)
+%{
+#pragma include_defs liboaf/oaf-factory.h
+#pragma include_defs liboaf/oaf-factory-suppress.h
+%}
+#pragma inhibit push
+#endif
+
+module GNOME {
+	typedef sequence<string> stringlist;
+        
+	interface ObjectFactory {
+		exception CannotActivate { };
+
+		boolean manufactures (in string obj_oaf_id);
+
+		Object create_object (in string oaf_id, in stringlist params)
+			raises (CannotActivate);
+
+		void ref();
+		oneway void unref();
+	};
+};
+
+#if !defined(GNOME_FACTORY_COMPILATION) && defined(__ORBIT_IDL__)
+#pragma inhibit pop
+#endif
+
+#endif

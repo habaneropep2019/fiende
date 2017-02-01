@@ -1,0 +1,451 @@
+<refentry id="libart-Affine-transformation-matrices">
+<refmeta>
+<refentrytitle>Affine transformation matrices</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBART Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Affine transformation matrices</refname><refpurpose>Instantiate and manipulate Affine transforms.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+void        <link linkend="art-affine-point">art_affine_point</link>                (<link linkend="ArtPoint">ArtPoint</link> *dst,
+                                             const <link linkend="ArtPoint">ArtPoint</link> *src,
+                                             const <link linkend="double">double</link> affine[6]);
+void        <link linkend="art-affine-invert">art_affine_invert</link>               (<link linkend="double">double</link> dst_affine[6],
+                                             const <link linkend="double">double</link> src_affine[6]);
+void        <link linkend="art-affine-flip">art_affine_flip</link>                 (<link linkend="double">double</link> dst_affine[6],
+                                             const <link linkend="double">double</link> src_affine[6],
+                                             int horz,
+                                             int vert);
+void        <link linkend="art-affine-to-string">art_affine_to_string</link>            (char str[128],
+                                             const <link linkend="double">double</link> src[6]);
+void        <link linkend="art-affine-multiply">art_affine_multiply</link>             (<link linkend="double">double</link> dst[6],
+                                             const <link linkend="double">double</link> src1[6],
+                                             const <link linkend="double">double</link> src2[6]);
+void        <link linkend="art-affine-identity">art_affine_identity</link>             (<link linkend="double">double</link> dst[6]);
+void        <link linkend="art-affine-scale">art_affine_scale</link>                (<link linkend="double">double</link> dst[6],
+                                             <link linkend="double">double</link> sx,
+                                             <link linkend="double">double</link> sy);
+void        <link linkend="art-affine-rotate">art_affine_rotate</link>               (<link linkend="double">double</link> dst[6],
+                                             <link linkend="double">double</link> theta);
+void        <link linkend="art-affine-shear">art_affine_shear</link>                (<link linkend="double">double</link> dst[6],
+                                             <link linkend="double">double</link> theta);
+void        <link linkend="art-affine-translate">art_affine_translate</link>            (<link linkend="double">double</link> dst[6],
+                                             <link linkend="double">double</link> tx,
+                                             <link linkend="double">double</link> ty);
+<link linkend="double">double</link>      <link linkend="art-affine-expansion">art_affine_expansion</link>            (const <link linkend="double">double</link> src[6]);
+int         <link linkend="art-affine-rectilinear">art_affine_rectilinear</link>          (const <link linkend="double">double</link> src[6]);
+int         <link linkend="art-affine-equal">art_affine_equal</link>                (<link linkend="double">double</link> matrix1[6],
+                                             <link linkend="double">double</link> matrix2[6]);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+These API functions allow you to instantiate and manipulate
+Affine transforms. An Affine transformation is a geometrical
+transformation which is known to preserve the parallelism of 
+lines but not lengths and angles.
+</para>
+
+<figure>
+<title>Affine transforms</title>
+<graphic fileref="art-affines.png" scale="50"></graphic>
+</figure>
+
+<para>
+Affine transforms are usually represented using Homogeneous 
+coordinates: given a point (x,y) in the traditional plane, its
+canonical Homogenous coordinate is (x,y,1).
+The Affine transforms are represented in Homogeneous coordinates
+because the transformation of point A by any Affine transformation
+can be expressed by the multiplication of a 3x3 Matrix and a 3x1 
+Point vector.
+</para>
+
+<para>
+The above property is not trivial. For example, a translation in
+normal cartesian space results in the addition of a Point vector
+to the Point vector to transform while in Homogeneous space, the
+same translation transformation results in a matrix/vector 
+multiplication. To convince you that I am telling you the truth,
+the diagram below summarizes the different kinds of Affine matrixes
+used and shows the scaling of point (x,y) by multiplication with a
+scaling matrix in homogeneous space.
+</para>
+
+<figure>
+<title>Affine transform Matrixes in Homogenous space</title>
+<graphic fileref="art-affine-matrix.png" scale="50"></graphic>
+</figure>
+
+<para>
+To compose two Affine transforms, all you need to do is to multiply
+their matrices to get the matrix representing the resulting
+Affine transform. Given Affines A and B represented the matrices
+MA and MB, the Affine C = AoB is represented by the matrix MC = MA x MB.
+</para>
+
+<para>
+Hopefully, all the above gory details (which are unfortunatly necessary
+to understand the API) are more or less hidden by the API.
+LibArt thus represents an Affine transform by an array of six doubles:
+</para>
+
+<figure>
+<title>An Affine as seen by LibArt</title>
+<graphic fileref="art-affine-libart.png" scale="50"></graphic>
+</figure>
+
+<para>
+Those arrays of six doubles can be easily generated with the 
+<link linkend="art-affine-shear">art_affine_shear</link>, 
+<link linkend="art-affine-scale">art_affine_scale</link>,
+<link linkend="art-affine-rotate">art_affine_rotate</link>,
+<link linkend="art-affine-translate">art_affine_translate</link> and
+<link linkend="art-affine-identity">art_affine_identity</link> functions which 
+generate the affines corresponding to the given transformations.
+It is possible to composite Affine transformation's matrices with
+<link linkend="art-affine-multiply">art_affine_multiply</link>
+and to invert an Affine transformation:
+<link linkend="art-affine-invert">art_affine_invert</link>.
+Finally, I to apply an Affine transformation to a point, you can use
+<link linkend="art-affine-point">art_affine_point</link>
+</para>
+
+<para>
+Affine transformations are reused a little everywhere in LibArt: it is possible
+to apply them to Vector Paths and pixel buffers. 
+<link linkend="art-vpath-affine-transform">art_vpath_affine_transform</link>,
+<link linkend="art-bpath-affine-transform">art_bpath_affine_transform</link> and
+<link linkend="art-rgb-affine">art_rgb_affine</link> are such examples.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="art-affine-point">art_affine_point ()</title>
+<programlisting>void        art_affine_point                (<link linkend="ArtPoint">ArtPoint</link> *dst,
+                                             const <link linkend="ArtPoint">ArtPoint</link> *src,
+                                             const <link linkend="double">double</link> affine[6]);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Where the result point is stored.
+</entry></row>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> The original point.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> The affine transformation.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-invert">art_affine_invert ()</title>
+<programlisting>void        art_affine_invert               (<link linkend="double">double</link> dst_affine[6],
+                                             const <link linkend="double">double</link> src_affine[6]);</programlisting>
+<para>
+All non-degenerate affine transforms are invertible. If the original
+affine is degenerate or nearly so, expect numerical instability and
+very likely core dumps on Alpha and other fp-picky architectures.
+Otherwise, <parameter>dst</parameter> multiplied with <parameter>src</parameter>, or <parameter>src</parameter> multiplied with <parameter>dst</parameter>
+will be (to within roundoff error) the identity affine.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst_affine</parameter>&nbsp;:</entry>
+<entry> Where the resulting affine is stored.
+</entry></row>
+<row><entry align="right"><parameter>src_affine</parameter>&nbsp;:</entry>
+<entry> The original affine transformation.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-flip">art_affine_flip ()</title>
+<programlisting>void        art_affine_flip                 (<link linkend="double">double</link> dst_affine[6],
+                                             const <link linkend="double">double</link> src_affine[6],
+                                             int horz,
+                                             int vert);</programlisting>
+<para>
+Flips the affine transform. FALSE for both <parameter>horiz</parameter> and <parameter>vert</parameter> implements
+a simple copy operation. TRUE for both <parameter>horiz</parameter> and <parameter>vert</parameter> is a
+180 degree rotation. It is ok for <parameter>src_affine</parameter> and <parameter>dst_affine</parameter> to
+be equal pointers.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst_affine</parameter>&nbsp;:</entry>
+<entry> Where the resulting affine is stored.
+</entry></row>
+<row><entry align="right"><parameter>src_affine</parameter>&nbsp;:</entry>
+<entry> The original affine transformation.
+</entry></row>
+<row><entry align="right"><parameter>horz</parameter>&nbsp;:</entry>
+<entry> Whether or not to flip horizontally.
+</entry></row>
+<row><entry align="right"><parameter>vert</parameter>&nbsp;:</entry>
+<entry> Whether or not to flip horizontally.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-to-string">art_affine_to_string ()</title>
+<programlisting>void        art_affine_to_string            (char str[128],
+                                             const <link linkend="double">double</link> src[6]);</programlisting>
+<para>
+Converts an affine transform into a bit of PostScript code that
+implements the transform. Special cases of scaling, rotation, and
+translation are detected, and the corresponding PostScript
+operators used (this greatly aids understanding the output
+generated). The identity transform is mapped to the null string.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>str</parameter>&nbsp;:</entry>
+<entry> Where to store the resulting string.
+</entry></row>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> The affine transform.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-multiply">art_affine_multiply ()</title>
+<programlisting>void        art_affine_multiply             (<link linkend="double">double</link> dst[6],
+                                             const <link linkend="double">double</link> src1[6],
+                                             const <link linkend="double">double</link> src2[6]);</programlisting>
+<para>
+Multiplies two affine transforms together, i.e. the resulting <parameter>dst</parameter>
+is equivalent to doing first <parameter>src1</parameter> then <parameter>src2</parameter>. Note that the
+PostScript concat operator multiplies on the left, i.e.  "M concat"
+is equivalent to "CTM = multiply (M, CTM)";
+</para>
+<para>
+It is safe to call this function with <parameter>dst</parameter> equal to <parameter>src1</parameter> or <parameter>src2</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Where to store the result.
+</entry></row>
+<row><entry align="right"><parameter>src1</parameter>&nbsp;:</entry>
+<entry> The first affine transform to multiply.
+</entry></row>
+<row><entry align="right"><parameter>src2</parameter>&nbsp;:</entry>
+<entry> The second affine transform to multiply.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-identity">art_affine_identity ()</title>
+<programlisting>void        art_affine_identity             (<link linkend="double">double</link> dst[6]);</programlisting>
+<para>
+Sets up an identity matrix.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Where to store the resulting affine transform.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-scale">art_affine_scale ()</title>
+<programlisting>void        art_affine_scale                (<link linkend="double">double</link> dst[6],
+                                             <link linkend="double">double</link> sx,
+                                             <link linkend="double">double</link> sy);</programlisting>
+<para>
+Sets up a scaling matrix.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Where to store the resulting affine transform.
+</entry></row>
+<row><entry align="right"><parameter>sx</parameter>&nbsp;:</entry>
+<entry> X scale factor.
+</entry></row>
+<row><entry align="right"><parameter>sy</parameter>&nbsp;:</entry>
+<entry> Y scale factor.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-rotate">art_affine_rotate ()</title>
+<programlisting>void        art_affine_rotate               (<link linkend="double">double</link> dst[6],
+                                             <link linkend="double">double</link> theta);</programlisting>
+<para>
+Sets up a rotation matrix. In the standard libart coordinate
+system, in which increasing y moves downward, this is a
+counterclockwise rotation. In the standard PostScript coordinate
+system, which is reversed in the y direction, it is a clockwise
+rotation.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Where to store the resulting affine transform.
+</entry></row>
+<row><entry align="right"><parameter>theta</parameter>&nbsp;:</entry>
+<entry> Rotation angle in degrees.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-shear">art_affine_shear ()</title>
+<programlisting>void        art_affine_shear                (<link linkend="double">double</link> dst[6],
+                                             <link linkend="double">double</link> theta);</programlisting>
+<para>
+Sets up a shearing matrix. In the standard libart coordinate system
+and a small value for theta, || becomes \\. Horizontal lines remain
+unchanged.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Where to store the resulting affine transform.
+</entry></row>
+<row><entry align="right"><parameter>theta</parameter>&nbsp;:</entry>
+<entry> Shear angle in degrees.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-translate">art_affine_translate ()</title>
+<programlisting>void        art_affine_translate            (<link linkend="double">double</link> dst[6],
+                                             <link linkend="double">double</link> tx,
+                                             <link linkend="double">double</link> ty);</programlisting>
+<para>
+Sets up a translation matrix.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Where to store the resulting affine transform.
+</entry></row>
+<row><entry align="right"><parameter>tx</parameter>&nbsp;:</entry>
+<entry> X translation amount.
+</entry></row>
+<row><entry align="right"><parameter>ty</parameter>&nbsp;:</entry>
+<entry> Y translation amount.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-expansion">art_affine_expansion ()</title>
+<programlisting><link linkend="double">double</link>      art_affine_expansion            (const <link linkend="double">double</link> src[6]);</programlisting>
+<para>
+Finds the expansion factor, i.e. the square root of the factor
+by which the affine transform affects area. In an affine transform
+composed of scaling, rotation, shearing, and translation, returns
+the amount of scaling.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> The affine transformation.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the expansion factor.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-rectilinear">art_affine_rectilinear ()</title>
+<programlisting>int         art_affine_rectilinear          (const <link linkend="double">double</link> src[6]);</programlisting>
+<para>
+Determines whether <parameter>src</parameter> is rectilinear, i.e.  grid-aligned
+rectangles are transformed to other grid-aligned rectangles.  The
+implementation has epsilon-tolerance for roundoff errors.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> The original affine transformation.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if <parameter>src</parameter> is rectilinear.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-affine-equal">art_affine_equal ()</title>
+<programlisting>int         art_affine_equal                (<link linkend="double">double</link> matrix1[6],
+                                             <link linkend="double">double</link> matrix2[6]);</programlisting>
+<para>
+Determines whether <parameter>matrix1</parameter> and <parameter>matrix2</parameter> are equal, with
+epsilon-tolerance for roundoff errors.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>matrix1</parameter>&nbsp;:</entry>
+<entry> An affine transformation.
+</entry></row>
+<row><entry align="right"><parameter>matrix2</parameter>&nbsp;:</entry>
+<entry> Another affine transformation.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if <parameter>matrix1</parameter> and <parameter>matrix2</parameter> are equal.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

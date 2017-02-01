@@ -1,0 +1,154 @@
+# Note that this is NOT a relocatable package
+%define name     gnome-libs
+%define ver      1.4.1.4
+%define  RELEASE 1
+%define  rel     %{?CUSTOM_RELEASE} %{!?CUSTOM_RELEASE:%RELEASE}
+%define  prefix  /usr
+%define  sysconfdir /etc
+
+Summary: The libraries needed to run the GNOME GUI desktop environment.
+Name: %name
+Version: %ver
+Release: %rel
+Epoch:	 1
+Copyright: LGPL
+Group: System Environment/Libraries
+Source: ftp://ftp.gnome.org/pub/GNOME/sources/gnome-libs/%name-%{ver}.tar.gz
+URL: http://www.gnome.org/
+BuildRoot: /var/tmp/%{name}-root
+Requires: gtk+ >= 1.2.4
+Docdir: %{prefix}/doc
+
+%description
+GNOME (GNU Network Object Model Environment) is a user-friendly set of
+GUI applications and desktop tools to be used in conjunction with a
+window manager for the X Window System.  The gnome-libs package
+includes libraries that are needed to run GNOME.
+
+%package devel
+Summary: Libraries and include files for developing GNOME applications.
+Group: Development/Libraries
+Requires: %name = %{PACKAGE_VERSION}
+
+%description devel
+GNOME (GNU Network Object Model Environment) is a user-friendly set of
+GUI applications and desktop tools to be used in conjunction with a
+window manager for the X Window System. The gnome-libs-devel package
+includes the libraries and include files that you will need to develop
+GNOME applications.
+
+You should install the gnome-libs-devel package if you would like to
+develop GNOME applications.  You don't need to install gnome-libs-devel
+if you just want to use the GNOME desktop environment.
+
+%changelog
+* Mon Aug 30 1999 Elliot Lee <sopwith@redhat.com>
+- Merge in various minor
+* Mon Jun 14 1999 Gregory McLean <gregm@comstar.net>
+
+- Added the -q option to the setup stage, quiet please!
+
+* Tue Mar 2  1999 Gregory McLean <gregm@comstar.net>
+
+- Added some hackage in for the brain dead libtool on the alpha
+- Cleaned up the spec file abit to be more consistant.
+
+* Wed Feb 17 1999 Elliot Lee <sopwith@redhat.com>
+
+- Add debugging disabling flags to $CFLAGS
+
+* Fri Nov 20 1998 Pablo Saratxaga <srtxg@chanae.alphanet.ch>
+
+- use --localstatedir=/var/lib in config state (score files for games
+  for exemple will go there).
+- added several more files to %files section, in particular language
+  files and corba IDLs
+
+* Wed Sep 23 1998 Michael Fulbright <msf@redhat.com>
+
+- Updated to version 0.30
+
+* Mon Apr 13 1998 Marc Ewing <marc@redhat.com>
+- Added %{prefix}/lib/gnome-libs
+
+* Fri Mar 13 1998 Marc Ewing <marc@redhat.com>
+
+- Integrate into gnome-libs source tree
+
+%prep
+%setup -q
+
+%build
+%ifarch alpha
+MYARCH_FLAGS="--host=alpha-redhat-linux"
+%endif
+# Needed for snapshot releases.
+
+MYCFLAGS="$RPM_OPT_FLAGS"
+
+if [ ! -f configure ]; then
+  CFLAGS="$MYCFLAGS" ./autogen.sh $MYARCH_FLAGS --prefix=%prefix --localstatedir=/var/lib --sysconfdir=%{sysconfdir}
+else
+  CFLAGS="$MYCFLAGS" ./configure $MYARCH_FLAGS --prefix=%prefix --localstatedir=/var/lib --sysconfdir=%{sysconfdir}
+fi
+
+if [ "$SMP" != "" ]; then
+  make -j$SMP "MAKE=make -j$SMP"
+else
+  make
+fi
+
+%install
+rm -rf $RPM_BUILD_ROOT
+
+make sysconfdir=$RPM_BUILD_ROOT%{sysconfdir} prefix=$RPM_BUILD_ROOT%{prefix} install
+
+strip $RPM_BUILD_ROOT%{prefix}/bin/* $RPM_BUILD_ROOT%{prefix}/sbin/* ||:
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
+%files
+%defattr(-, root, root)
+
+%doc AUTHORS COPYING ChangeLog NEWS README
+%{prefix}/lib/lib*.so.*
+%{prefix}/bin/dns-helper
+%{prefix}/bin/gconfigger
+%{prefix}/bin/gnome-bug
+%{prefix}/bin/gnome-dump-metadata
+%{prefix}/bin/gnome-gen-mimedb
+%{prefix}/bin/gnome-moz-remote
+%{prefix}/bin/gnome-name-service
+%{prefix}/bin/gnome_segv
+%{prefix}/bin/goad-browser
+%{prefix}/bin/loadshlib
+%{prefix}/bin/new-object
+%attr(2775, root, utmp) %{prefix}/sbin/gnome-pty-helper
+%{prefix}/share/locale/*/*/*
+%{prefix}/share/idl/*
+%{prefix}/share/pixmaps/*
+%config %{prefix}/share/gtkrc*
+%{prefix}/share/mime-info/gnome.mime
+%{prefix}/share/type-convert/type.convert
+%config %{sysconfdir}/*
+%{prefix}/man/man1/*
+%{prefix}/man/man5/*
+
+%files devel
+%defattr(-, root, root)
+
+%doc devel-docs
+
+%{prefix}/bin/gnome-config
+%{prefix}/bin/libart-config
+%{prefix}/lib/lib*.so
+%{prefix}/lib/*.a
+%{prefix}/lib/*.sh
+%{prefix}/lib/gnome-libs
+%{prefix}/include/*
+%{prefix}/share/aclocal/*
+%{prefix}/share/doc/*

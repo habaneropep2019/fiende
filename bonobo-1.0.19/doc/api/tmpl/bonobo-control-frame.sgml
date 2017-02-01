@@ -1,0 +1,287 @@
+<!-- ##### SECTION Title ##### -->
+BonoboControlFrame
+
+<!-- ##### SECTION Short_Description ##### -->
+An implementation of the container's frame containing a Control
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The BonoboControlFrame object is used to embed a Control. Most
+people will want to use #BonoboWidget instead of the control frame
+since it provides lots of nice auxiliary features to make embedding
+easy.
+</para>
+
+<para>
+The control frame is coupled to an embedded control and is used
+to allow the Control to communicate with its environment, particuarly
+getting the #BonoboUIContainer for merging its menu / toolbar
+UI elements.
+</para>
+
+<para>
+  <example>
+    <title>A nice use of a BonoboControlFrame</title>
+    <programlisting>
+BonoboWidget *
+bonobo_widget_construct_control_from_objref (BonoboWidget      *bw,
+					     Bonobo_Control     control,
+					     Bonobo_UIContainer uic)
+{
+	GtkWidget    *control_frame_widget;
+
+	/*
+	 * Create a local ControlFrame for it.
+	 */
+	bw->priv->control_frame = bonobo_control_frame_new (uic);
+
+	bonobo_control_frame_bind_to_control (bw->priv->control_frame, control);
+
+	...
+
+	bonobo_control_frame_set_autoactivate (bw->priv->control_frame, TRUE);
+
+	/*
+	 * Grab the actual widget which visually contains the remote
+	 * Control.  This is a GtkSocket, in reality.
+	 */
+	control_frame_widget = bonobo_control_frame_get_widget (bw->priv->control_frame);
+
+	/*
+	 * Now stick it into this BonoboWidget.
+	 */
+	gtk_container_add (GTK_CONTAINER (bw),
+			   control_frame_widget);
+
+	/*
+	 * Always remember to show the widget before reporting bugs.
+	 */
+	gtk_widget_show (control_frame_widget);
+
+	if (uic != CORBA_OBJECT_NIL)
+		bw->priv->uic = bonobo_object_dup_ref (uic, NULL);
+
+	return bw;
+}
+    </programlisting>
+  </example>
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+  #BonoboWidget, bonobo_widget_new ()
+</para>
+
+<!-- ##### TYPEDEF BonoboControlFrame ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF BonoboControlFrameClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION bonobo_control_frame_new ##### -->
+<para>
+
+</para>
+
+@ui_container: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@uic: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_get_widget ##### -->
+<para>
+
+</para>
+
+@frame: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_set_ui_container ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@uic: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_control_activate ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_control_deactivate ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_set_autoactivate ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@autoactivate: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_get_autoactivate ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_get_control_property_bag ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@ev: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_set_propbag ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@propbag: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_get_propbag ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_control_set_state ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@state: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_set_autostate ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@autostate: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_get_autostate ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_bind_to_control ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@control: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_get_control ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_get_ui_container ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_construct ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@ui_container: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@uih: 
+@corba_control_frame: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_size_request ##### -->
+<para>
+
+</para>
+
+@control_frame: 
+@desired_width: 
+@desired_height: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_sync_realize ##### -->
+<para>
+
+</para>
+
+@frame: 
+
+
+<!-- ##### FUNCTION bonobo_control_frame_sync_unrealize ##### -->
+<para>
+
+</para>
+
+@frame: 
+
+
+<!-- ##### SIGNAL BonoboControlFrame::activated ##### -->
+<para>
+
+</para>
+
+@bonobocontrolframe: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL BonoboControlFrame::activate-uri ##### -->
+<para>
+
+</para>
+
+@bonobocontrolframe: the object which received the signal.
+@arg1: 
+@arg2: 
+

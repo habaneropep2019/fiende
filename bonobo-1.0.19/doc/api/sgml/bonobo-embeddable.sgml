@@ -1,0 +1,523 @@
+<refentry id="bonobo-bonobo-embeddable">
+<refmeta>
+<refentrytitle>BonoboEmbeddable</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboEmbeddable</refname><refpurpose>A compound document element's model</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboEmbeddable-struct">BonoboEmbeddable</link>;
+#define     <link linkend="BONOBO-VIEW-FACTORY-CAPS">BONOBO_VIEW_FACTORY</link>             (fn)
+<link linkend="BonoboView">BonoboView</link>* (<link linkend="BonoboViewFactory">*BonoboViewFactory</link>)            (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             const <link linkend="Bonobo-ViewFrame">Bonobo_ViewFrame</link> view_frame,
+                                             void *closure);
+<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link>* (<link linkend="GnomeItemCreator">*GnomeItemCreator</link>)  (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             void *user_data);
+void        (<link linkend="BonoboEmbeddableForeachViewFn">*BonoboEmbeddableForeachViewFn</link>)
+                                            (<link linkend="BonoboView">BonoboView</link> *view,
+                                             void *data);
+void        (<link linkend="BonoboEmbeddableForeachItemFn">*BonoboEmbeddableForeachItemFn</link>)
+                                            (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp,
+                                             void *data);
+struct      <link linkend="BonoboEmbeddableClass">BonoboEmbeddableClass</link>;
+<link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* <link linkend="bonobo-embeddable-new">bonobo_embeddable_new</link>     (<link linkend="BonoboViewFactory">BonoboViewFactory</link> factory,
+                                             void *data);
+<link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* <link linkend="bonobo-embeddable-new-canvas-item">bonobo_embeddable_new_canvas_item</link>
+                                            (<link linkend="GnomeItemCreator">GnomeItemCreator</link> item_factory,
+                                             void *data);
+<link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* <link linkend="bonobo-embeddable-construct">bonobo_embeddable_construct</link>
+                                            (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboViewFactory">BonoboViewFactory</link> factory,
+                                             void *data);
+<link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* <link linkend="bonobo-embeddable-construct-full">bonobo_embeddable_construct_full</link>
+                                            (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboViewFactory">BonoboViewFactory</link> factory,
+                                             void *factory_data,
+                                             <link linkend="GnomeItemCreator">GnomeItemCreator</link> item_factory,
+                                             void *item_factory_data);
+void        <link linkend="bonobo-embeddable-set-view-factory">bonobo_embeddable_set_view_factory</link>
+                                            (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboViewFactory">BonoboViewFactory</link> factory,
+                                             void *data);
+const char* <link linkend="bonobo-embeddable-get-uri">bonobo_embeddable_get_uri</link>       (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable);
+void        <link linkend="bonobo-embeddable-set-uri">bonobo_embeddable_set_uri</link>       (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             const char *uri);
+void        <link linkend="bonobo-embeddable-foreach-view">bonobo_embeddable_foreach_view</link>  (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboEmbeddableForeachViewFn">BonoboEmbeddableForeachViewFn</link> fn,
+                                             void *data);
+void        <link linkend="bonobo-embeddable-foreach-item">bonobo_embeddable_foreach_item</link>  (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboEmbeddableForeachItemFn">BonoboEmbeddableForeachItemFn</link> fn,
+                                             void *data);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+A BonoboEmbeddable is a component that is an element of a compound
+document. There is an implicit contract that anything implimenting
+the embeddable interface will also implement the following interfaces:
+  <itemizedlist>
+    <listitem><para><link linkend="BonoboPrint">BonoboPrint</link></para></listitem>
+    <listitem><para><link linkend="BonoboPersistStream">BonoboPersistStream</link></para></listitem>
+  </itemizedlist>
+</para>
+
+<para>
+An embeddable is not a Control - by this I mean that it does not control
+its own sizing, rendering or layout. It is entirely a slave to the parent
+with respect to this. An Embeddable should never render scroll bars into
+itself ( unless, exceptionaly if it is activated, and allows the user to
+pan around a larger area ). Essentialy a non-activated embeddable view
+should only show things that it will print, and should render WYSIWYG
+as much as possible. Embeddable's views scale linearly to obey the zoom
+level they are given.
+</para>
+
+<para>
+If you think your embeddable should have scroll bars, or other widgets
+inside it's view, you need to implement a <link linkend="BonoboControl">BonoboControl</link> first. Many
+applications will export a <link linkend="BonoboControl">BonoboControl</link> and several <link linkend="BonoboEmbeddable">BonoboEmbeddable</link>.
+eg. to embed a complete gnumeric application you would use the
+<link linkend="BonoboControl">BonoboControl</link>, to embed a cell range you would use a <link linkend="BonoboEmbeddable">BonoboEmbeddable</link>.
+</para>
+
+<para>
+Embeddables are model / view, that is the BonoboEmbeddable should be
+derived from and becomes the model, several <link linkend="BonoboView">BonoboView</link> or
+<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> views can be produced to render this information.
+</para>
+
+<para>
+Here is an example of how to create a BonoboEmbeddable interface:
+  <example>
+    <title>An embeddable interface</title>
+    <programlisting>
+static BonoboView *
+simple_view_factory (BonoboEmbeddable      *embeddable,
+                     const Bonobo_ViewFrame view_frame,
+		     void                  *closure)
+{
+	BonoboView *view = bonobo_view_new (
+		<link linkend="gtk-drawing-area-new">gtk_drawing_area_new</link>());
+
+	bonobo_view_set_view_frame (view, view_frame);
+
+	return view;
+}
+
+BonoboObject *
+<link linkend="create-embeddable">create_embeddable</link>()
+{
+	BonoboEmbeddable *embeddable;
+
+	embeddable = bonobo_embeddable_new (simple_view_factory, NULL);
+
+	... aggregate other interfaces ...
+
+	return BONOBO_OBJECT (embeddable);
+}
+    </programlisting>
+  </example>
+  Note, that this example returns a GtkDrawingArea with nothing in it -
+simply a white box. This is better than returning a widget - no widget
+can be a correct Embeddable view, since it cannot zoom.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboEmbeddable-struct">struct BonoboEmbeddable</title>
+<programlisting>struct BonoboEmbeddable;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-VIEW-FACTORY-CAPS">BONOBO_VIEW_FACTORY()</title>
+<programlisting>#define BONOBO_VIEW_FACTORY(fn) ((BonoboViewFactory)(fn))
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fn</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboViewFactory">BonoboViewFactory ()</title>
+<programlisting><link linkend="BonoboView">BonoboView</link>* (*BonoboViewFactory)            (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             const <link linkend="Bonobo-ViewFrame">Bonobo_ViewFrame</link> view_frame,
+                                             void *closure);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>closure</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeItemCreator">GnomeItemCreator ()</title>
+<programlisting><link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link>* (*GnomeItemCreator)  (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             void *user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboEmbeddableForeachViewFn">BonoboEmbeddableForeachViewFn ()</title>
+<programlisting>void        (*BonoboEmbeddableForeachViewFn)
+                                            (<link linkend="BonoboView">BonoboView</link> *view,
+                                             void *data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboEmbeddableForeachItemFn">BonoboEmbeddableForeachItemFn ()</title>
+<programlisting>void        (*BonoboEmbeddableForeachItemFn)
+                                            (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp,
+                                             void *data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>comp</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboEmbeddableClass">struct BonoboEmbeddableClass</title>
+<programlisting>struct BonoboEmbeddableClass {
+	BonoboXObjectClass parent_class;
+
+	POA_Bonobo_Embeddable__epv epv;
+
+	/* Signals */
+	void (*host_name_changed)  (BonoboEmbeddable *comp, const char *hostname);
+	void (*uri_changed)        (BonoboEmbeddable *comp, const char *uri);
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-new">bonobo_embeddable_new ()</title>
+<programlisting><link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* bonobo_embeddable_new     (<link linkend="BonoboViewFactory">BonoboViewFactory</link> factory,
+                                             void *data);</programlisting>
+<para>
+This routine creates a Bonobo::Embeddable CORBA server and activates it.  The
+<parameter>factory</parameter> routine will be invoked by this CORBA server when a request arrives
+to get a new view of the embeddable (embeddable should be able to provide
+multiple views of themselves upon demand).  The <parameter>data</parameter> pointer is passed
+to this factory routine untouched to allow the factory to get some context
+on what it should create.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>factory</parameter>&nbsp;:</entry>
+<entry> Factory routine that provides new views of the embeddable on demand
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> pointer passed to the <parameter>factory</parameter> routine to provide context.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a BonoboEmbeddable that contains an activated Bonobo::Embeddable
+CORBA server.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-new-canvas-item">bonobo_embeddable_new_canvas_item ()</title>
+<programlisting><link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* bonobo_embeddable_new_canvas_item
+                                            (<link linkend="GnomeItemCreator">GnomeItemCreator</link> item_factory,
+                                             void *data);</programlisting>
+<para>
+This routine creates a Bonobo::Embeddable CORBA server and activates it.  The
+<parameter>factory</parameter> routine will be invoked by this CORBA server when a request arrives
+to get a new view of the embeddable (embeddable should be able to provide
+multiple views of themselves upon demand).  The <parameter>data</parameter> pointer is passed
+to this factory routine untouched to allow the factory to get some context
+on what it should create.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item_factory</parameter>&nbsp;:</entry>
+<entry> Factory routine that provides new canvas items of the embeddable on demand
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> pointer passed to the <parameter>factory</parameter> routine to provide context.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a BonoboEmbeddable that contains an activated Bonobo::Embeddable
+CORBA server.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-construct">bonobo_embeddable_construct ()</title>
+<programlisting><link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* bonobo_embeddable_construct
+                                            (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboViewFactory">BonoboViewFactory</link> factory,
+                                             void *data);</programlisting>
+<para>
+This routine constructs a Bonobo::Embeddable CORBA server and activates it.  The
+<parameter>factory</parameter> routine will be invoked by this CORBA server when a request arrives
+to get a new view of the embeddable (embeddable should be able to provide
+multiple views of themselves upon demand).  The <parameter>data</parameter> pointer is passed
+to this factory routine untouched to allow the factory to get some context
+on what it should create.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry> BonoboEmbeddable object to construct.
+</entry></row>
+<row><entry align="right"><parameter>factory</parameter>&nbsp;:</entry>
+<entry> Factory routine that provides new views of the embeddable on demand
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> pointer passed to the <parameter>factory</parameter> routine to provide context.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The constructed object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-construct-full">bonobo_embeddable_construct_full ()</title>
+<programlisting><link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* bonobo_embeddable_construct_full
+                                            (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboViewFactory">BonoboViewFactory</link> factory,
+                                             void *factory_data,
+                                             <link linkend="GnomeItemCreator">GnomeItemCreator</link> item_factory,
+                                             void *item_factory_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>factory</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>factory_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>item_factory</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>item_factory_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-set-view-factory">bonobo_embeddable_set_view_factory ()</title>
+<programlisting>void        bonobo_embeddable_set_view_factory
+                                            (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboViewFactory">BonoboViewFactory</link> factory,
+                                             void *data);</programlisting>
+<para>
+This routine defines the view factory for this embeddable component.
+When a container requires a view, the routine specified in <parameter>factory</parameter>
+will be invoked to create a new BonoboView object to satisfy this request.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry> The embeddable object to operate on.
+</entry></row>
+<row><entry align="right"><parameter>factory</parameter>&nbsp;:</entry>
+<entry> A pointer to a function that can provide BonoboView objects on demand.
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> data to pass to the <parameter>factory</parameter> function.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-get-uri">bonobo_embeddable_get_uri ()</title>
+<programlisting>const char* bonobo_embeddable_get_uri       (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry> The embeddable object to operate on.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the URI that this object represents
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-set-uri">bonobo_embeddable_set_uri ()</title>
+<programlisting>void        bonobo_embeddable_set_uri       (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             const char *uri);</programlisting>
+<para>
+Sets the URI that this object represents.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry> The embeddable object to operate on.
+</entry></row>
+<row><entry align="right"><parameter>uri</parameter>&nbsp;:</entry>
+<entry> the URI this embeddable represents.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-foreach-view">bonobo_embeddable_foreach_view ()</title>
+<programlisting>void        bonobo_embeddable_foreach_view  (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboEmbeddableForeachViewFn">BonoboEmbeddableForeachViewFn</link> fn,
+                                             void *data);</programlisting>
+<para>
+Invokes the <parameter>fn</parameter> function for each existing view.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry> Embeddable on which we operate
+</entry></row>
+<row><entry align="right"><parameter>fn</parameter>&nbsp;:</entry>
+<entry> function to be invoked for each existing BonoboView
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> data to pass to function
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-embeddable-foreach-item">bonobo_embeddable_foreach_item ()</title>
+<programlisting>void        bonobo_embeddable_foreach_item  (<link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable,
+                                             <link linkend="BonoboEmbeddableForeachItemFn">BonoboEmbeddableForeachItemFn</link> fn,
+                                             void *data);</programlisting>
+<para>
+Invokes the <parameter>fn</parameter> function for each existing item.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry> Embeddable on which we operate
+</entry></row>
+<row><entry align="right"><parameter>fn</parameter>&nbsp;:</entry>
+<entry> function to be invoked for each existing GnomeItem
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> data to pass to function
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="BonoboView">BonoboView</link>, <link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link>, <link linkend="BonoboWidget">BonoboWidget</link>, <link linkend="BonoboControl">BonoboControl</link>, <link linkend="bonobo-widget-new">bonobo_widget_new</link>()
+</para>
+</refsect1>
+
+</refentry>

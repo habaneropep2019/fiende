@@ -1,0 +1,331 @@
+<HTML
+><HEAD
+><TITLE
+>Other ideas</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="ZVT Terminal Widget Reference Guide"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Implementation notes"
+HREF="zvtterm-notes.html"><LINK
+REL="PREVIOUS"
+TITLE="Window Hints"
+HREF="zvtterm-window-hints.html"><LINK
+REL="NEXT"
+TITLE="The zterm application"
+HREF="x1106.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>ZVT Terminal Widget Reference Guide</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="zvtterm-window-hints.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="x1106.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1086"
+>Other ideas</A
+></H1
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1088"
+>Adding a scrollbar</A
+></H2
+><P
+>Often a scrollbar will be added to the ZvtTerm widget to
+	  allow its scroll-back buffer to be controlled via a mouse (see
+	  ).  Each ZvtTerm
+	  provides this via an adjustment defined in the object structure
+	  as simply <TT
+CLASS="LITERAL"
+>adjustment</TT
+>.</P
+><P
+>Also note that mouse-wheel mice are automatically
+	  handled by the button event handler if the terminal widget has
+	  focus, and perform a page up/down function.
+	</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1094"
+></A
+><P
+><B
+>Example 4. Creating an appropriate scrollbar</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	    gtk_vscrollbar_new (GTK_ADJUSTMENT (ZVT_TERM (term)-&gt;adjustment));
+	    GTK_WIDGET_UNSET_FLAGS (scrollbar, GTK_CAN_FOCUS);
+	  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>You will normally want to disable focus on the
+	  scrollbar otherwise gtk may switch focus inappropriately.
+	</P
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1098"
+>Reading data from the screen</A
+></H2
+><P
+>There are no helper functions for this, but the same may
+	  be achieved simply using the following code fragment.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1101"
+></A
+><P
+><B
+>Example 5. Converting window coordinates to character
+	    coordinates.</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void mouse_to_char(ZvtTerm *term, int mousex, int mousey, int *x, int *y)
+{
+	*x = mousex/term-&gt;charwidth;
+	*y = mousey/term-&gt;charheight;
+}
+	  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>These values are then suitable for using with
+	   to let the
+	  application read data from the screen.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="zvtterm-window-hints.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="x1106.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Window Hints</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>The zterm application</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

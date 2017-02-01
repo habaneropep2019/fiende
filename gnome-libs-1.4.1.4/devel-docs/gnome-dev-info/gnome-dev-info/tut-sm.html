@@ -1,0 +1,1095 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Session Management</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="GNOME Developer's Tutorial."
+HREF="tutorial.html"><LINK
+REL="PREVIOUS"
+TITLE="Parsing parameters."
+HREF="tut-parsing.html"><LINK
+REL="NEXT"
+TITLE="Help and documentation."
+HREF="tut-doc.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="tut-parsing.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>GNOME Developer's Tutorial.</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="tut-doc.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUT-SM"
+>Session Management</A
+></H1
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/warning.gif"
+HSPACE="5"
+ALT="Warning"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>	This chapter is definitely under construction, But hold your
+	breath, it will (hopefully) be finished soon.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN169"
+>Session Management in general</A
+></H2
+><P
+>          The purpose of session management is to provide users a
+          possibility to save and restore their sessions.  A session
+          is a collection of applications, all of them having an
+          internal state.  This state may be the name of an open file,
+          a displayed image or the score of a game.
+        </P
+><P
+>          Every application that is session management aware connects
+          to one special server: the <I
+CLASS="EMPHASIS"
+>session
+          manager</I
+>.  A session manager sends commands to his
+          <I
+CLASS="EMPHASIS"
+>clients</I
+> telling them to save their
+          state or to terminate.  A client must provide the session
+          manager with all information, that is needed to restart the
+          client in the same state, as it is running now.  The session
+          manager's task is to take care of this information and to
+          use it when restarting a session.  In order to distinguish
+          all clients, the session manager assigns them a unique
+          identifier: the so called <I
+CLASS="EMPHASIS"
+>client id</I
+>.
+         </P
+><P
+>          The session management additionally includes a protocol to
+          sync the - so called - interact requests of applications.
+          Suppose you have three applications running.  Each of this
+          applications has one file opened, that you have just edited
+          without saving.  If you now log out, every application may
+          ask you, whether you want to save your changes or if you
+          want to abandon them.  It would be very annoying, if all
+          these three applications would pop up their dialog boxes at
+          the same time.  If these three applications have implemented
+          session management in the right way, a new dialog box only
+          pops up, if the previous one has been closed.
+      	 </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN177"
+>GNOME Session Management implementation</A
+></H2
+><P
+>          The GNOME project uses a special object - the GnomeClient
+          object - to implement session management.  This object
+          handles the connection to a session manager, the setting and
+          removing of properties and the handling of messages sent by
+          a session manager.
+        </P
+><P
+>          There are two functions in the GNOME libraries, that create
+          a new GnomeClient object:
+        </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN181"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GnomeClient
+	    *<TT
+CLASS="FUNCTION"
+>gnome_client_new</TT
+></CODE
+>();<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN185"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GnomeClient
+	    *<TT
+CLASS="FUNCTION"
+>gnome_client_new_without_connection</TT
+></CODE
+>();<P
+></P
+></DIV
+><P
+>          As one may guess from the functions names: The first
+          function tries to connect to a session manager
+          automatically, while the second one does not.  You may
+          connect or disconnect a GnomeClient after his creation using
+          the following functions:
+        </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN190"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_client_connect</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN195"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void
+	    <TT
+CLASS="FUNCTION"
+>gnome_client_disconnect</TT
+></CODE
+>(GnomeClient
+	    *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN200"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>gchar *<TT
+CLASS="FUNCTION"
+>gnome_client_get_id</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN205"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_client_set_id</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>, const gchar *<TT
+CLASS="PARAMETER"
+><I
+>client_id</I
+></TT
+>);<P
+></P
+></DIV
+><P
+>to be continued...</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN213"
+>Properties</A
+></H3
+><P
+>          </P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN216"
+>Signals</A
+></H3
+><P
+>            Whenever the session manager wants a client to do
+            something, these wishes are emitted as signals.
+          </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN219"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>gint <TT
+CLASS="FUNCTION"
+>save_yourself_signal</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>, gint <TT
+CLASS="PARAMETER"
+><I
+>phase</I
+></TT
+>, GnomeSaveStyle <TT
+CLASS="PARAMETER"
+><I
+>save_style</I
+></TT
+>, gint <TT
+CLASS="PARAMETER"
+><I
+>shutdown</I
+></TT
+>, GnomeInteractStyle <TT
+CLASS="PARAMETER"
+><I
+>interact_style</I
+></TT
+>, gint <TT
+CLASS="PARAMETER"
+><I
+>fast</I
+></TT
+>, gpointer <TT
+CLASS="PARAMETER"
+><I
+>client_data</I
+></TT
+>);<P
+></P
+></DIV
+><P
+>            This signal is probably the most important one, because it
+            causes the clients to save the programs state.
+          </P
+><P
+>            <TT
+CLASS="PARAMETER"
+><I
+>save_style</I
+></TT
+>.
+          </P
+><P
+>            The <TT
+CLASS="PARAMETER"
+><I
+>shutdown</I
+></TT
+> parameter indicates, whether this 
+          </P
+><P
+>            GNOME_INTERACT_NONE, GNOME_INTERACT_ERRORS, GNOME_INTERACT_ANY
+          </P
+><P
+>            If the <TT
+CLASS="PARAMETER"
+><I
+>fast</I
+></TT
+> parameter is 
+            TRUE, the client is wanted to save it's state
+            as fast as possible.
+          </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN244"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>gint <TT
+CLASS="FUNCTION"
+>die_signal</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>, gpointer <TT
+CLASS="PARAMETER"
+><I
+>client_data</I
+></TT
+>);<P
+></P
+></DIV
+><P
+>            The above signal is emitted, if the session manager wants
+            the client to terminate.  This will mostly happen, if the
+            user logs out from a running session.
+          </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN252"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>gint <TT
+CLASS="FUNCTION"
+>save_complete_signal</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>, gpointer <TT
+CLASS="PARAMETER"
+><I
+>client_data</I
+></TT
+>);<P
+></P
+></DIV
+><P
+>            The session manager sends this message, if all client have
+            finished saving their state.
+          </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN260"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>gint <TT
+CLASS="FUNCTION"
+>shutdown_cancelled_signal</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>, gpointer <TT
+CLASS="PARAMETER"
+><I
+>client_data</I
+></TT
+>);<P
+></P
+></DIV
+><P
+>            Whenever a shutdown, that has been announced in a
+            save_yourself signal, has been cancelled by the user, the
+            shutdown_cancelled message is sent.
+          </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN268"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>gint <TT
+CLASS="FUNCTION"
+>connect_signal</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>, gint <TT
+CLASS="PARAMETER"
+><I
+>restarted</I
+></TT
+>, gpointer <TT
+CLASS="PARAMETER"
+><I
+>client_data</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN277"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>gint <TT
+CLASS="FUNCTION"
+>disconnect_signal</TT
+></CODE
+>(GnomeClient *<TT
+CLASS="PARAMETER"
+><I
+>client</I
+></TT
+>, gpointer <TT
+CLASS="PARAMETER"
+><I
+>client_data</I
+></TT
+>);<P
+></P
+></DIV
+><P
+>            This signal is emitted, if the connection to the session
+            manager gets lost.
+          </P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN285"
+>The master client</A
+></H3
+><P
+>            To make life a little bit easier for GNOME developers, the
+            GNOME libraries feature a special client: the
+            <I
+CLASS="EMPHASIS"
+>master client</I
+>.  This client is
+            created automatically, when calling
+            <TT
+CLASS="FUNCTION"
+>gnome_init</TT
+>.  He gets some default
+            properties set and is in general also connected to the
+            session manager automatically.  the GNOME libraries also
+            notice, if a this client was restarted.  In this case, the
+            libraries try to connect the master client to the session
+            manager with the same client id as last time.  That means,
+            that an application calling
+            <TT
+CLASS="FUNCTION"
+>gnome_init</TT
+> will be recognized and be
+            restarted from a session manager without any extra lines
+            of code.  A developer has only to take care, that the
+            applications state is saved or restored correctly and that
+            the application is terminated, if she is wanted to.
+          </P
+><P
+>            Your get the master client by calling
+            <TT
+CLASS="FUNCTION"
+>gnome_master_client</TT
+>.
+          </P
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN293"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>GnomeClient
+	    *<TT
+CLASS="FUNCTION"
+>gnome_master_client</TT
+></CODE
+>();<P
+></P
+></DIV
+><P
+>            The master client has the following properties preset.
+          </P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN298"
+></A
+><P
+></P
+><TABLE
+BORDER="1"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><THEAD
+><TR
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+>property</TH
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+>value</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>current directory</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>current directory</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>process id</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>pid</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>user id</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>uid</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN314"
+>The cloned client</A
+></H3
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN317"
+>Continuing the tutorial</A
+></H2
+><P
+>           We want to implement session management, so we have to use
+           the master client.  To get access to this client, that was
+           created in <TT
+CLASS="FUNCTION"
+>gnome_init</TT
+>, you have to
+           call <TT
+CLASS="FUNCTION"
+>gnome_master_client</TT
+>.  Our
+           application should at least listen to the die and the
+           save_yourself signal, so insert the following lines of code
+           right after the <TT
+CLASS="FUNCTION"
+>gnome_init</TT
+> call.
+        </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  client= gnome_master_client ();
+
+  gtk_signal_connect (GTK_OBJECT (client), "save_yourself",
+                      GTK_SIGNAL_FUNC (save_state_cb), NULL);
+  gtk_signal_connect (GTK_OBJECT (client), "die",
+                      GTK_SIGNAL_FUNC (die_cb), NULL);</PRE
+></TD
+></TR
+></TABLE
+><P
+>           Now we have to implement our signal functions.  The die
+           signal function is rather easy to implement. We just have
+           to terminate our application.  Notice, that we must not
+           save the applications state in a die signal function.  If
+           the session manager would have wanted us to save the state,
+           he would have sent us a save_yourself signal right before
+           the die signal.  If you are writing a more complicated
+           application, you may want to close some files here or do
+           some other magic stuff.
+        </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static gint
+die (GnomeClient *client, gpointer client_data)
+{
+  gtk_exit (0);
+
+  return FALSE;
+}</PRE
+></TD
+></TR
+></TABLE
+><P
+>          Implementing the save_yourself signal is a little bit more
+          difficult, because we have to save the hole state of our
+          application.  Our tutorial application has only one state:
+          the window's position on the screen.  So we start our
+          save_yourself signal function like this:
+        </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>gint
+save_yourself (GnomeClient        *client,
+               gint                phase,
+               GnomeRestartStyle   restart_style,
+               gint                shutdown,
+               GnomeInteractStyle  interact_style,
+               gint                fast,
+               gpointer            client_data)
+{
+  gchar *argv[3];
+  gint x, y, w, h;
+
+  gdk_window_get_geometry (app-&#62;window, &#38;x, &#38;y, &#38;w, &#38;h, NULL);</PRE
+></TD
+></TR
+></TABLE
+><P
+>          Now that we have our application's state, we have to store
+          it.  One way to do this is to store the application's state
+          in the command line that we use to restart our application.
+          That's a quite useful method for storing a little set of
+          values.  In this tutorial we'll implement another way of
+          saving the applications state, that is even practical, if
+          you have a huge bunch of data to save.  We use the gnome
+          config files.  The
+          <TT
+CLASS="FUNCTION"
+>gnome_client_get_config_prefix</TT
+> gives us
+          a hint , where to store our information.
+        </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  /* Save the state using gnome-config stuff. */
+  gnome_config_push_prefix (gnome_client_get_config_prefix (client));
+
+  gnome_config_set_int ("Geometry/x", x);
+  gnome_config_set_int ("Geometry/y", y);
+  gnome_config_set_int ("Geometry/w", w);
+  gnome_config_set_int ("Geometry/h", h);
+
+  gnome_config_pop_prefix ();
+  gnome_config_sync();</PRE
+></TD
+></TR
+></TABLE
+><P
+>          Additionally we have to give the session manager some hints,
+          how to restart our application. That means, we have to use
+          the <TT
+CLASS="FUNCTION"
+>gnome_client_set_clone_command</TT
+> and
+          <TT
+CLASS="FUNCTION"
+>gnome_client_set_restart_command</TT
+>
+          functions.  Notice that we don't have to add the clients id
+          to these command; we don't even have to add the standard
+          GNOME command line options. Both is added by the GNOME
+          libraries. We also don't have to distinguish between the
+          restart command and the clone command.  This is also handled
+          by the libraries.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  gnome_client_set_clone_command (client, 1, argv);
+  gnome_client_set_restart_command (client, 1, argv);
+
+  return TRUE;                                               
+}</PRE
+></TD
+></TR
+></TABLE
+><P
+>          The attentive reader may have noticed, that we save the
+          applications state, but that we have no code to restore it.
+          This has to be changed!</P
+><P
+>          The following code snippets should be inserted directly
+          after the <TT
+CLASS="FUNCTION"
+>gtk_signal_connect</TT
+> calls,
+          that we inserted at the beginning of the session management
+          chapter.</P
+><P
+>          To restore the saved state, we use the cloned client.  We
+          get access to this client, by calling
+          <TT
+CLASS="FUNCTION"
+>gnome_cloned_client</TT
+>.  The creation of
+          the cloned client is handled by the GNOME libraries.  Our
+          application was only restarted by a session manager, if
+          <TT
+CLASS="FUNCTION"
+>gnome_cloned_client</TT
+> returns a non NULL
+          value.  That means, that, if
+          <TT
+CLASS="FUNCTION"
+>gnome_cloned_client</TT
+> returns NULL, we
+          don't have to restore any state, because there is no state
+          to restore.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  if (GNOME_CLIENT_CONNECTED (client))
+    {
+      GnomeClient *cloned= gnome_cloned_client ();
+
+      if (cloned)
+	{
+	  restarted= 1;</PRE
+></TD
+></TR
+></TABLE
+><P
+>          We now again use
+          <TT
+CLASS="FUNCTION"
+>gnome_client_get_config_prefix</TT
+> to get a
+          hint, where to find our saved state.  Notice, that we use
+          the cloned client when restoring and the master client when
+          saving the state.  The reason for this is, that the cloned
+          client's id may be another then the master client's one, and
+          so the config prefixes differ.  This may happen, if you clone
+          a client (something, that's not yet supported by the
+          <TT
+CLASS="APPLICATION"
+>gnome-session</TT
+> session management
+          server).  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  gnome_config_push_prefix (gnome_client_get_config_prefix
+	  (cloned));
+	  
+	  os_x = gnome_config_get_int ("Geometry/x");
+	  os_y = gnome_config_get_int ("Geometry/y");
+	  os_w = gnome_config_get_int ("Geometry/w");
+	  os_h = gnome_config_get_int ("Geometry/h");
+	  
+	  gnome_config_pop_prefix ();
+	}
+    }</PRE
+></TD
+></TR
+></TABLE
+><P
+>          Additionally the following lines should be included into the
+          <TT
+CLASS="FUNCTION"
+>prepare_app</TT
+> function, to really set the
+          values, we just red:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  if (restarted) {
+    gtk_widget_set_uposition (app, os_x, os_y);
+    gtk_widget_set_usize     (app, os_w, os_h);
+  }</PRE
+></TD
+></TR
+></TABLE
+><P
+>          We have still not finished this tutorial's chapter, because
+          right now, saving the application's state would fill our
+          harddisc.  So we have to remove our config files, if they
+          are not needed anymore.  This is supported by the session
+          manager, using the discard command property.</P
+><P
+>          We have to add a new command line option to our application,
+          that discards a save state (Hold you breath, I'll add the
+          code soon).  Additionally, we have to inform the session
+          manager, to call us with this command line option to discard
+          our state.  This is easily be done by using the
+          <TT
+CLASS="FUNCTION"
+>gnome_client_set_discard_command</TT
+>
+          function.  The following lines, inserted somewhere in the
+          <TT
+CLASS="FUNCTION"
+>save_yourself</TT
+> function, do exactly what
+          we want.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  argv[0] = program_invocation_name;
+  argv[1] = "--discard-session";
+  argv[2] = gnome_client_get_config_prefix (client);
+  gnome_client_set_discard_command (client, 3, argv);</PRE
+></TD
+></TR
+></TABLE
+><P
+>          still to be continued...</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tut-parsing.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tut-doc.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Parsing parameters.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Help and documentation.</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

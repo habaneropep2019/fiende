@@ -1,0 +1,307 @@
+<refentry id="GnomeCalculator">
+<refmeta>
+<refentrytitle>GnomeCalculator</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeCalculator</refname><refpurpose>Calculator widget.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeCalculator-struct">GnomeCalculator</link>;
+enum        <link linkend="GnomeCalculatorMode">GnomeCalculatorMode</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-calculator-new">gnome_calculator_new</link>            (void);
+void        <link linkend="gnome-calculator-clear">gnome_calculator_clear</link>          (<link linkend="GnomeCalculator">GnomeCalculator</link> *gc,
+                                             const <link linkend="gboolean">gboolean</link> reset);
+void        <link linkend="gnome-calculator-set">gnome_calculator_set</link>            (<link linkend="GnomeCalculator">GnomeCalculator</link> *gc,
+                                             <link linkend="gdouble">gdouble</link> result);
+#define     <link linkend="gnome-calculator-get-result">gnome_calculator_get_result</link>     (gc)
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBox">GtkBox</link>
+                     +----<link linkend="GtkVBox">GtkVBox</link>
+                           +----GnomeCalculator
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  This widget provides a simple calculator that you can embed in your
+  applications for doing quick computations.</para>
+
+<para>
+  The widget consists of a fully functional calculator including
+  standard arithmetic functions as well as trigonometric capabilities,
+  exponents, factorials, nested equations, and others.</para>
+
+<refsect2>
+  <title><structname>GnomeCalculator</structname> functions</title>
+
+  <para>The following is a list and description of each button represented on the GnomeCalculator widget</para>
+
+  <itemizedlist>
+	<listitem><para>
+		Calculations accurate to a maximum of 10 digits, or 9 decimal places.</para>
+	</listitem>
+
+    	<listitem><para>
+      		Numbers <literal>0</literal>-<literal>9</literal> for numerical input</para>
+	</listitem>
+ 
+    	<listitem><para>
+		Decimal point for decimal calculations</para>
+	</listitem>
+
+	<listitem><para>
+		+/- button for positive/negative number entry</para>
+	</listitem>
+
+	<listitem><para>
+		/ for Division, * for Multiplication, - for Subtraction, and + for Addition</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>PI</literal> feature to automatically use the value of <literal>PI</literal> at the touch of a button</para>
+	</listitem>	
+
+	<listitem><para>
+		<literal>X</literal>! calculates the factorial for the current resultant</para>
+
+		<para>i.e: If resultant is 5, 5 factorial is 5*4*3*2*1 = 120</para>
+	</listitem>
+
+	<listitem><para>
+		( and )</para>
+		
+		<para>Parenthesis used to force grouping of expressions to be evaluated in a
+		certain order.</para>
+	
+		<para>5 + 6 * 8 = 53 is ambiguous, if you really meant to add 5 + 6 together first.</para>
+		
+		<para>Use (5 + 6) * 8 = 88, to make sure your meaning is understood</para>
+	</listitem>
+
+	<listitem><para>
+		The <literal>DEG</literal> or <literal>RAD</literal> button will switch between the degree or radians mode.  Its often needed to measure in one mode or the other.  As an example, 90 degrees is the same as <literal>PI</literal>/2, 180 degrees is <literal>PI</literal>, 270 degrees is 3 PI/2, and 360 degrees is 2 <literal>PI</literal>.</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>C</literal> will clear the current result value.  <literal>AC</literal> will clear the current result, but will also clear all values stored in memory.</para>
+	</listitem>
+  </itemizedlist>
+</refsect2>
+
+<refsect2>
+  <title>Memory Functions</title>
+
+  <para>The following are <structname>GnomeCalculator</structname> widget's memory functions</para>
+
+  <itemizedlist>
+
+	<listitem><para>
+		<literal>STO</literal> stores the current result in the display into memory.</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>RCL</literal> will take the value stored in memory, and display it in the resultant.</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>SUM</literal> will take the current result in the display and add it to the current value stored in memory.  If nothing is in the memory, the current value will be placed in memory as it is.</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>EXC</literal> will take the current value in memory and exchange it with the current resultant.  The previous current result will be placed back in memory.</para>
+	</listitem>
+    </itemizedlist>
+</refsect2>
+
+<refsect2>
+  <title>Exponential functions</title>
+
+  <para>The following are <structname>GnomeCalculator</structname> widget's exponential functions</para>
+
+  <itemizedlist>
+
+	<listitem><para>
+		<literal>SQRT</literal> raises the current value to the 1/2 power.  This is the opposite of
+		squaring the number, seen below.</para>
+
+		<para>For example, the SQRT of 4 is 4^(1/2) = 2.</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>EE</literal> is used for scientific notation.  Use this for manipulating numbers such 
+		as 1e+50, 9e+10, and so forth.</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>x</literal>^2 is used to square the current number.  The square of a number is that 
+		same number multiplied by itself.  2^2 is 2 * 2 = 4.</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>x</literal>^y is used to take a number and raise it to the power of the 2nd number.</para>
+
+		<para>For example, entering a 3, pressing the x^y button, entering another 3
+		will lead to the result of 27.  In other words, 3^3, or 3 * 3 * 3, or 27.</para>
+	</listitem>
+  </itemizedlist>
+</refsect2>
+
+<refsect2>
+  <title>Trigonometric functions</title>
+
+    <itemizedlist>
+	<listitem><para>
+		<literal>SIN</literal> calculates the trigonometric sine function on the current value</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>COS</literal> calculates the trigonometric cosine function on the current value</para>
+	</listitem>
+
+	<listitem><para>
+		<literal>TAN</literal> calculates the trigonometric tangent function on the current value</para>
+	</listitem>
+
+	<listitem><para>
+		The <literal>INV</literal> button will reversie the previous three trig functions.  If the <literal>INV</literal> button is pressed, the <literal>SIN</literal> button will instead calculate the Inverse-Sine.  <literal>COS</literal> will calculate the Inverse-Cosine, and the <literal>TAN</literal> will calculate the Inverse-Tangent.</para>
+	</listitem>
+    </itemizedlist>
+</refsect2>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeCalculator-struct">struct GnomeCalculator</title>
+<programlisting>struct GnomeCalculator;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeCalculatorMode">enum GnomeCalculatorMode</title>
+<programlisting>typedef enum {
+	GNOME_CALCULATOR_DEG,
+	GNOME_CALCULATOR_RAD,
+	GNOME_CALCULATOR_GRAD
+} GnomeCalculatorMode;
+</programlisting>
+<para>
+   The way in which degrees are handled by the calculator, possible
+   values include: <literal>GNOME_CALCULATOR_DEG</literal>, <literal>GNOME_CALCULATOR_DEG</literal>,
+   <literal>GNOME_CACLULATOR_DRAG</literal>.
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-calculator-new">gnome_calculator_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_calculator_new            (void);</programlisting>
+<para>
+Creates a calculator widget, a window with all the common buttons and
+functions found on a standard pocket calculator.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+Pointer to newly-created calculator widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-calculator-clear">gnome_calculator_clear ()</title>
+<programlisting>void        gnome_calculator_clear          (<link linkend="GnomeCalculator">GnomeCalculator</link> *gc,
+                                             const <link linkend="gboolean">gboolean</link> reset);</programlisting>
+<para>
+Resets the calculator back to zero.  If <parameter>reset</parameter> is <literal>TRUE</literal>, results
+stored in memory and the calculator mode are cleared also.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gc</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME calculator widget.
+</entry></row>
+<row><entry align="right"><parameter>reset</parameter>&nbsp;:</entry>
+<entry> <literal>FALSE</literal> to zero, <literal>TRUE</literal> to reset calculator completely
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-calculator-set">gnome_calculator_set ()</title>
+<programlisting>void        gnome_calculator_set            (<link linkend="GnomeCalculator">GnomeCalculator</link> *gc,
+                                             <link linkend="gdouble">gdouble</link> result);</programlisting>
+<para>
+Sets the value stored in the calculator's result buffer to the given
+<parameter>result</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gc</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME calculator widget.
+</entry></row>
+<row><entry align="right"><parameter>result</parameter>&nbsp;:</entry>
+<entry> New value of calculator buffer.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-calculator-get-result">gnome_calculator_get_result()</title>
+<programlisting>#define     gnome_calculator_get_result(gc)</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gc</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME calculator widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+Value currently stored in calculator buffer.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="GnomeNumberEntry">GnomeNumberEntry</link>
+</para>
+</refsect1>
+
+</refentry>

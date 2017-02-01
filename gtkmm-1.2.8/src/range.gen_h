@@ -1,0 +1,206 @@
+/* $Id: range.gen_h,v 1.53 2000/02/13 02:22:09 kenelson Exp $ */
+
+/* range.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <gtk/gtkrange.h>
+
+CLASS_START(Gtk);
+class Adjustment;
+
+class Range : public Widget {
+  
+  WRAP_CLASS(Range,GtkRange,GTK_RANGE,GTK_IS_RANGE,range,Gtk::Widget,GtkWidget,GTK_WIDGET);
+public:
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_MEMBER(value,adjustment,adjustment,Gtk::Adjustment*,GtkAdjustment*);
+
+  WRAP_METHOD(
+    void gtk_range_set_adjustment(GtkRange*,GtkAdjustment*),
+    void set_adjustment( Gtk::Adjustment &adjustment));
+
+  WRAP_METHOD(
+    void gtk_range_set_adjustment(GtkRange*,GtkAdjustment*),
+    void set_adjustment( Gtk::Adjustment *adjustment=0));
+
+  WRAP_METHOD(void gtk_range_set_update_policy(GtkRange*, GtkUpdateType),
+	      void set_update_policy(GtkUpdateType policy));
+
+  SIGNAL_SPEC("draw_background",vfunc|impl,void draw_background(),gtk_range_draw_background);
+  SIGNAL_SPEC("clear_background",vfunc|impl,void clear_background(),gtk_range_clear_background);
+  SIGNAL_SPEC("draw_trough",vfunc|impl,void draw_trough(),gtk_range_draw_trough);
+  SIGNAL_SPEC("draw_slider",vfunc|impl,void draw_slider(),gtk_range_draw_slider);
+  SIGNAL_SPEC("draw_step_forw",vfunc|impl,void draw_step_forw(),gtk_range_draw_step_forw);
+  SIGNAL_SPEC("draw_step_back",vfunc|impl,void draw_step_back(),gtk_range_draw_step_back);
+  SIGNAL_SPEC("slider_update",vfunc|impl,void slider_update(),gtk_range_slider_update);
+
+  SIGNAL_SPEC("trough_click",vfunc|impl,gint trough_click(gint,gint,gfloat*),gtk_range_trough_click);
+
+  SIGNAL_SPEC("motion",impl,void motion(gint,gint));
+  SIGNAL_SPEC("trough_keys",impl,gint trough_keys(GdkEventKey*,GtkScrollType*,GtkTroughType*));
+  SIGNAL_SPEC("timer",impl,gint timer());
+  
+  WRAP_METHOD(void gtk_range_default_hslider_update(GtkRange*),
+	      void default_hslider_update());
+
+  WRAP_METHOD(void gtk_range_default_vslider_update(GtkRange*),
+	      void default_vslider_update());
+
+  WRAP_METHOD(void gtk_range_default_htrough_click(GtkRange*, gint, gint, gfloat*),
+	      void default_htrough_click(gint x, gint y, gfloat *jump_perc));
+
+  WRAP_METHOD(void gtk_range_default_vtrough_click(GtkRange*, gint, gint, gfloat*),
+	      void default_vtrough_click(gint x, gint y, gfloat *jump_perc));
+
+  WRAP_METHOD(void gtk_range_default_hmotion(GtkRange*, gint, gint),
+	      void default_hmotion(gint xdelta, gint ydelta));
+
+  WRAP_METHOD(void gtk_range_default_vmotion(GtkRange*, gint xdelta, gint ydelta),
+	      void default_vmotion(gint xdelta, gint ydelta));
+
+
+protected:
+  WRAP_CTOR_DEFAULT;
+};
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+IMPL_START;
+#include <gtk--/adjustment.h>
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Range)
+//. name: trough
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: slider
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: step_forw
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: step_back
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: x_click_point
+//. type: gint16
+//. get:
+//. set:
+//. desc:
+
+//. name: y_click_point
+//. type: gint16
+//. get:
+//. set:
+//. desc:
+
+//. name: button
+//. type: guint8
+//. get:
+//. set:
+//. desc:
+
+//. name: digits
+//. type: gint8
+//. get:
+//. set:
+//. desc:
+
+//. name: policy
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: scroll_type
+//. type: guint:3
+//. get:
+//. set:
+//. desc:
+
+//. name: in_child
+//. type: guint:3
+//. get:
+//. set:
+//. desc:
+
+//. name: click_child
+//. type: guint:3
+//. get:
+//. set:
+//. desc:
+
+//. name: need_timer
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: timer
+//. type: guint32
+//. get:
+//. set:
+//. desc:
+
+//. name: old_value
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: old_lower
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: old_upper
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: old_page_size
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: adjustment
+//. type: GtkAdjustment*
+//. get:
+//. set:
+//. desc:
+

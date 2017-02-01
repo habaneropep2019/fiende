@@ -1,0 +1,368 @@
+2001-07-05  Christian Rose  <menthos@menthos.com>
+
+	* mahjongg.desktop: Modified Swedish entries.
+
+2001-06-26  Juan Pablo Mendoza <pablo_juan@yahoo.com>
+
+	* help/ip/Makefile.am (figs): Remove some inexistents figures,
+	  now distcheck work fine.
+
+2001-05-26  Juan Pablo Mendoza <pablo_juan@yahoo.com>
+
+	* mahjongg.c (apply_preferences), (fill_tile_menu),
+	  (load_tiles): Plug memory leaks.
+
+2001-05-23  Juan Pablo Mendoza <pablo_juan@yahoo.com>
+
+	* mahjongg.c (properties_callback): Connect to close signal
+	  instead of delete_event. Fixes bug #53450.
+
+2000-10-19  Dan Mueth <d-mueth@uchicago.edu>
+
+	* help/C/topic.dat: Fixed
+	  er - I was being dumb below.  The menu item is now
+	  fine.  Just the properties dialog button remains.
+
+2000-10-19  Dan Mueth <d-mueth@uchicago.edu>
+
+	* Makefile.am: added SUBDIRS = help
+	* help/Makefile.am: Added this file, with SUBDIRS = C
+	* help/C/topic.dat: Added this file 
+	* help/C/Makefile.am: Added this file 
+	* mahjongg.c: I didn't change this.  It currently calls
+	  up the help doc okay, but we should change the call
+	  to list Help with the pretty logo instead of just
+	  listing 'mahjong'.  We also need to hook up a Help
+	  button in the preferences dialog.  I have to run
+	  now, so this will have to wait until later.
+
+2000-09-13  Eric Baudais  <baudais@okstate.edu>
+
+	* help/C/*: Added documentation to mahjongg.  It is not currently linked 
+	into the program.
+
+2000-05-12  Andreas Hyden  <a.hyden@cyberpoint.se>
+
+	* mahjongg.desktop: Added Swedish translation.
+
+2000-05-06  Tuomas Kuosmanen  <tigert@tigert.gimp.org>
+
+	* gnome-mahjongg.png: shaped up the icon a bit. It now has a shadow
+	and it is a bit brighter too.
+
+2000-04-26  Ian Peters  <itp@gnu.org>
+
+	* mahjongg.c: use GNOME_STOCK_BUTTON_OK like a good little gnome program
+
+2000-02-22  Chema Celorio <chema_gnome@celorio.com>
+
+	* solubility.c: Undefine CHEAT_DEBUG for release
+	
+	* mahjongg.c (shuffle_tiles_callback): Fix bugs #4555 and #4490.
+	Need to check for game_over == GAME_WON as well.
+
+	* seta.png: Fixed the PNG file to fix #3458
+
+1999-08-31  David Mansergh  <djm54@hermes.cam.ac.uk>
+
+	* mahjongg.c (you_won): typo fix
+	(check_free): corrected moves_left count
+	(update_moves_left): removed unnecessary reassignment of moves_left
+
+1999-08-09  Robert Brady  <rwb197@ecs.soton.ac.uk
+
+	* solubility.[ch] : applied Irix compiling fix from David Kaelbling 
+	  <drk@sgi.com> : [bug #1781].
+
+1999-08-06  Philippe Chavin  <Philippe.Chavin@wanadoo.fr>
+
+	* mahjongg.c (seed_dialog_clicked_cb): fixed to get the whole 
+	seed string.
+	(tile_event): added button 3 click to select tiles unconditionally.
+
+1999-07-21  Philippe Chavin  <Philippe.Chavin@wanadoo.fr>
+
+	* mahjongg.c (PAUSE_BUTTON): fixed index.
+	(game_over): removed wrong affectations.
+	(exit_game_callback_query): precondition fixed:
+	game must not be dead and one move must have been done.
+	(shuffle_tiles_callback): fixed; game does not continue if no 
+	config have been found.
+
+1999-07-20  Michael Meeks  <michael@imaginator.com>
+
+	* mahjongg.c: Re-enabled preferences, killed 'seed'.
+	Updated all char [4] buffers to char [16], perhaps safer.
+	(exit_game_callback): Add warning for broken case, add NEW_GAME.
+	various stylistic fixups.
+	Renumbered and named game_state enumeration to help debugging.
+	chain on to (exit_game_callback_query): correct 3 arg. function
+	for (main): delete_event. This fixes killing the window via the WM.
+
+1999-07-20  Philippe Chavin  <Philippe.Chavin@wanadoo.fr>
+
+	* mahjongg.c (load_images): fixed background loading to 
+	follow the current map.
+	(shuffle_tiles_callback): added, allow to continue playing when
+	no moves are left.
+	(you_won, scores_callback): fixed level name to use mapset.
+	Use stopped, not seconds for scoring, else we get current time.
+	show score board only if in top ten.
+	(exit_game_callback): asks for confirmation; replaces 
+	({new|restart|select|quit}_game_callback).
+	(apply_preferences): asks for a new game if mapset changed.
+	(properties_callback): two columns presentation. 
+	popup_config.warn replaces warn, popup_config.confirm added.
+	(ensure_pause_off): toggle off the pause button
+	(game_score): removed.
+	The buttons callbacks check the status of the game: running, won 
+	or lost. This should allow the game to  finish correctly in every 
+	cases.
+
+	* Makefile.am: installs mahjongg.easy.scores and 
+	mahjongg.difficult.scores
+	
+1999-07-18  Thomas Meeks <thomas@imaginator.com>
+
+	* mahjongg.c (show_tb_callback): Fixed re-draw
+	(main): fixed show load & save.
+
+1999-07-14  Michael Meeks <michael@edenproject.org>
+
+	* mahjongg.c (apply_preferences): Commented out 'Synced'
+	(game_score): moved contents to (you_won): manualy call
+	new_game_callback.
+	Use seconds, not stopped for scoring.
+	Removed redundant gtk_clock_set_seconds.
+
+1999-07-14  Philippe Chavin <Philippe.Chavin@wanadoo.fr>
+
+	* mahjongg.c: 
+	(scores_callback, chrono_start): scoring based on time.
+	(pause_callback, ensure_pause_off): pause features.
+	(hint_callback): added time penalty.
+	(*_callback): check for Pause.
+	(redo_tile_callback, undo_tile_calback, check_free): add 
+	available moves	left display.
+	(properties_callback, apply_preferences, create_mahjongg_board,
+	no_match): added option to choose between popup windows or 
+	display in the status bar.
+	(main): create timer widget.
+
+1999-07-14  Michael Meeks <michael@edenproject.org>
+
+	* mahjongg.c (about_callback): Added Philippe
+
+1999-07-11  Rosanna Yuen <rwsy@mit.edu>
+
+	* default.png: reversed the fortune character so that it isn't
+	backwards anymore.
+	
+1999-07-08  Michael Meeks  <michael@edenproject.org>
+
+	* mahjongg.c: Added <ctrl> H hint shortcut key.
+
+1999-06-20  Tuomas Kuosmanen  <tigert@gimp.org>
+
+	* Makefile.am: add the new file (bg4.png) so it gets installed
+	* bg1.png bg2.png bg3.png bg4.png: Changed the backgrounds a bit
+	(added 2 new ones)
+
+1999-04-17  Francisco Bustamante  <pancho@nuclecu.unam.mx>
+
+	* mahjongg.c: Now it is possible to change the background of the
+	tiles without changing the images on the tiles. At the same time I
+	added the option to have different tile backgrounds for each
+	layer, to make it easier to distinguish between them. The
+	background can be changed in the preferences dialog (also added)
+	* bg[123].png: Some backgrounds to show the new capabilities.
+
+Tue Apr  6 10:45:22 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* mahjongg.c: use g_strcasecmp instead of strcasecmp.
+
+1999-02-09  Tomas Ogren  <stric@ing.umu.se>
+
+	* mahjongg.c: Removed evil gtk_widget_realize call..
+
+1999-02-07  Tomas Ogren  <stric@ing.umu.se>
+
+	* mahjongg.c: Realize the main window and fvwm gets happier...
+
+1999-01-26  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* mahjongg.c (load_tiles): Warn the user in the GUI, not with a printf.
+	Kill file menu too.
+
+1999-01-10  Nat Friedman  <nat@nat.org>
+
+	* mahjongg.c (main): Added an AppBar.  Added a friendly welcome
+ 	message.
+
+	Standardized the menus.
+
+1999-01-08  Callum McKenzie <callum@physics.otago.ac.nz>
+	
+	* mahjongg.c : Fixed up the hint code to not crash. Also
+	changed the use of the "selected" field in tile to make
+	sure that hints and selection interacted nicely. 
+
+1998-12-16  Jonathan Blandford  <jrb@redhat.com>
+
+	* mahjongg.c (main): now use the new toolbar code.
+
+1998-12-14  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* mahjongg.c (create_mahjongg_board): Use gtk_widget_set_usize()
+	instead of gnome_canvas_set_size().
+
+1998-11-19  Francisco Bustamante <pancho@nuclecu.unam.mx>
+	* mahjongg.c: Changing the map works now. Memory leaking is
+	greatly reduced because images are destroyed after use. Changed
+	gnome_dialog_set_modal (or whatever) to
+	gtk_window_set_modal. Changing the tile images works
+	too. Compiling warnings are gone. Most warnings during the game
+	are gone too. Upped version to 0.99.1
+	
+1998-11-15  Francisco Bustamante <pancho@nuclecu.unam.mx>
+	* mahjongg.c: All the tile drawing is now done by
+	gnome-canvas. The code is somewhat cleaner, and the redraws are
+	definitely better. TODO: make changing map and changing tile
+	images work. When you use gnome_canvas_item_set to change the
+	image, do we need to destroy the old image? Version 0.99.0
+	* default.png: Someone did something to the transparent parts of
+	the image, so I put them again. This is to make tiles nicer.
+	
+1998-11-01  Yo Ric Dude  <ricdude@ix.netcom.com>
+
+	* mahjongg.c: Calculate x and y offsets to place tiles in the
+	center of the playfield (AREA_WIDTH x AREA_HEIGHT).  Calculate new 
+	values every time the map changes.
+
+1998-26-28  Erik Troan  <ewt@redhat.com>
+
+	* mahjongg.c: use gnome_color_picker instead of gnome_color_selector
+
+1998-10-18  Tuomas Kuosmanen  <tigert@gimp.org>
+
+	* added gnome-mahjongg.png: mahjongg icon
+	* Makefile.am mahjongg.desktop: Added the icon to the .desktop -file
+
+Tue Sep  8 21:44:03 CDT 1998
+	* default.xpm seta.xpm: Changed the images for png's for space reasons
+Tue Aug 25 17:45:00 BST 1998 Michael Meeks <michael@imaginator.com>
+	* mahjongg.c (load_callback): Fixed bug with duff pointers being
+	retained after being freed.
+	* mahjongg.c (set_backgnd_colour): (load_callback):
+	(colour_changes_cb): (properties_callback):
+	(create_mahjongg_board):
+	Background colour setting, major mangle / creation of all these.
+	* mahjongg.c (hint_callback): Added nicer prompt to the hint dialog.
+	
+Mon Aug 17 18:00:00 BST 1998 Michael Meeks <michael@imaginator.com>
+	* Major code mangle.
+	* Added extra map, renamed structures to acommodate
+	* Updated preference menu to cope
+	* Rewrote and documented structures
+	* Improved and documented placement debugging
+	* Added #warning on cheat
+	* Improved placing algorithem to favor higher sites
+	* Upped version to 0.5.0
+	* Fixed C++ style comments
+	* Padded 'Tiles Remaining' status to give less of a jump on decrement
+	* Implemented 'hint' function
+	* Updated Authors, and support mail address
+	* Several of Ganesh' fixes:
+	* Simplified check_free, it now works
+	* Fixed restart, undo destroys map
+	* Other useful feedback
+	
+1998-08-06  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* mahjongg.c (fill_menu): Allow more graphics formats to be used
+	for the tiles. 
+
+Mon Aug 3 04:33:57 BST 1998 Ganesh Sittampalam <ganesh.sittampalam@magd.ox.ac.uk>
+
+	* Fixed bug that left a tile selected when you restarted the game
+	* Got rid of the "No more movements" message when you won the game
+	* Made it decrement the tiles left when you redo a step, rather than
+	incrementing it.
+	* Fixed bug that left multiple removals with the same sequence number after
+	an undo followed by a different removal.
+
+1998-07-25  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* mahjongg.desktop: Added Portuguese translation.
+
+Fri Jun 12 11:56:33 EDT 1998 Gregory McLean <gregm@comstar.net>
+
+	* Applied another patch from Michael Meeks to fix some
+	potential problems.
+
+Fri Jun 12 10:08:22 EDT 1998 Gregory Mclean <gregm@comstar.net>
+
+	* Incorperated patch from Michael Meeks, this starts on one
+	of the TODO items. (solveable games.). 
+
+Thu Jun 11 17:40:43 BST 1998   Michael Meeks <michael@imaginator.com>
+
+	* Added module solubility.c
+	* Moved tile_free into this and altered to use dependancy trees.
+	* Added sequence number to each tile
+	* Implemented undo
+	* Implemented redo
+	* Removed redundant 'Tile-Set' icon, replaced with redo
+
+Wed May 27 16:30:18 CDT 1998
+	* mahjongg.c: Added preferences dialog. Changed
+	gnome_message_box_set_modal to gnome_dialog_set_modal to avoid
+	warnings. Loads selected tileset at startup. Allows you to change
+	tileset without starting a new game.
+	
+Mon May 11 21:05:50 EDT 1998  Jonathan Blandford  <jrb@mit.edu>
+	* default.xpm:  Was less brain-dead and changed the highlighted dragon
+	to face the correct way as well... (:
+	
+Mon May 11 04:08:04 EDT 1998  Jonathan Blandford  <jrb@mit.edu>
+	* default.xpm:  Changed green dragon to face the correct direction.
+	
+1998-04-24  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* mahjongg.c (create_mahjongg_board): Make the drawing area use
+	the correct visual.
+	(refresh): Fixed off-by-one error.
+	(main): Made it use GdkColorContext correctly (remember to
+	initialize the pixel and used arrays!).  Also, color values are in
+	[0, 65535].
+	Fixed compiler warnings.
+	(tile_gone): Fixed off-by-one.
+	(draw_selected_tile): Fixed off-by-one.
+	(redraw_area): Made it use gdk_rectangle_intersect for correct behavior.
+	(redraw_tile_in_area): Made it use gdk_rectangle_intersect for
+	simpler code and correct behavior.
+
+Sat Mar 21 15:36:39 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* mahjongg.c: Use gnome_message_box_*, not gnome_messagebox_*.
+
+Sun Mar  8 20:44:15 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (mahjongg_LDADD): Don't include libsupport.a.
+
+	* Makefile.am (INCLUDES): Added GNOME_INCLUDEDIR.
+
+Sat Mar  7 22:49:06 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* mahjongg.c (main): Use new gnome_init.
+
+1998-02-19  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* mahjongg.c (main): Added app_id "mahjongg".
+
+Mon Feb 16 22:32:02 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* mahjongg/mahjongg.c (MAH_VERSION): Renamed from VERSION to avoid
+	clash.
+	Include <config.h>.
+

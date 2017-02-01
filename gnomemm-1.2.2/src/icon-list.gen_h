@@ -1,0 +1,321 @@
+// -*- C++ -*- // this is for the .gen_h, I realize gensig puts one in
+/* $Id: icon-list.gen_h,v 1.31 2001/03/13 20:51:25 murrayc Exp $ */
+
+/* icon-list.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+///////////////// GnomeIconTextInfo is not wrapped; see gnome-icon-list.h
+
+#include <gtk--/container.h>
+#include <libgnomeui/gnome-icon-list.h>
+#include <gnome--/imlib.h>
+#include <gnome--/canvas.h>
+
+namespace Gtk { class Adjustment; }
+
+CLASS_START(Gnome);
+
+namespace IconList_Helpers {
+
+class SelectionList
+{
+public:
+  typedef int value_type;
+  typedef value_type & reference;
+  typedef const value_type & const_reference;
+   
+  typedef G_List_Iterator<value_type> iterator;
+  typedef G_List_ConstIterator<iterator> const_iterator;
+  typedef G_List_ReverseIterator<iterator> reverse_iterator;
+  typedef G_List_ConstIterator<reverse_iterator> const_reverse_iterator;
+   
+  typedef size_t difference_type;
+  typedef size_t size_type;
+  
+private:
+  GnomeIconList *parent_;
+   
+  GList*& glist() const; // front of list
+   
+  iterator begin_() const;
+  iterator end_() const;
+    
+public: 
+  inline iterator begin()
+  {return begin_();}  
+  inline iterator end()
+  {return end_();}
+  
+  inline const_iterator begin() const
+  { return const_iterator(begin_()); }
+  inline const_iterator end() const
+  { return const_iterator(end_()); }
+  inline reverse_iterator rbegin()
+  { return reverse_iterator(end_()); }
+  inline reverse_iterator rend()
+  { return reverse_iterator(begin_()); }
+   
+  inline const_reverse_iterator rbegin() const
+  { return const_reverse_iterator(reverse_iterator(end_())); }
+  inline const_reverse_iterator rend() const
+  { return const_reverse_iterator(reverse_iterator(begin_())); }
+   
+  size_type size(void) const;
+  inline size_type max_size(void) { return size_type(-1); }
+  inline bool empty(void) { return glist() == 0; }
+   
+  value_type operator[](size_type l) const;
+};
+   
+} /* namespace IconList_Helpers */
+
+class IconList : public Canvas
+{
+  WRAP_CLASS(IconList, GnomeIconList,
+             GNOME_ICON_LIST, GNOME_IS_ICON_LIST,
+             icon_list,
+             Canvas, GnomeCanvas, GNOME_CANVAS);
+public:
+  IconList(guint icon_width = 80,
+		   Gtk::Adjustment* adj = 0,
+		   bool is_editable = false);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+    
+  public:
+    typedef IconList_Helpers::SelectionList SelectionList;
+      
+  // Functions
+
+  WRAP_METHOD(void gnome_icon_list_set_selection_mode (GnomeIconList*, GtkSelectionMode),
+	      void set_selection_mode (GtkSelectionMode mode));
+
+  WRAP_METHOD(int gnome_icon_list_append (GnomeIconList*,
+					  const gchar*, const gchar*),
+	      int append (const Gtk::string &icon_filename,
+			  const Gtk::string &text));
+
+  WRAP_METHOD(int gnome_icon_list_append_imlib (GnomeIconList*,
+					  GdkImlibImage *, const gchar*),
+	      int append (const Gdk_Imlib::Image& im, const Gtk::string &text));
+
+
+  WRAP_METHOD(void gnome_icon_list_insert (GnomeIconList*, int,
+					   const gchar*, const gchar*),
+	      void insert (int pos,
+			   const Gtk::string &icon_filename, const Gtk::string &text));
+
+  WRAP_METHOD(void gnome_icon_list_insert_imlib (GnomeIconList *gil,
+						    int, GdkImlibImage*, const char*),
+						  void insert(int pos, const Gdk_Imlib::Image& im, const Gtk::string &text));
+
+  WRAP_METHOD(void gnome_icon_list_remove (GnomeIconList*, int),
+	      void remove (int pos));
+
+  WRAP_METHOD(void gnome_icon_list_clear (GnomeIconList*),
+	      void clear ());
+  
+  WRAP_METHOD(void gnome_icon_list_set_icon_data (GnomeIconList*,
+						  int, gpointer),
+	      void set_icon_data (int pos, gpointer data));
+
+  WRAP_METHOD(void gnome_icon_list_set_icon_data_full (GnomeIconList*,
+						       int, gpointer,
+						       GtkDestroyNotify),
+	      void set_icon_data_full (int pos, gpointer data,
+				       GtkDestroyNotify destroy));
+
+  WRAP_METHOD(gpointer gnome_icon_list_get_icon_data (GnomeIconList*, int),
+	      gpointer get_icon_data (int pos));
+
+  WRAP_METHOD(int gnome_icon_list_find_icon_from_data (GnomeIconList*,
+						       gpointer),
+	      int find_icon_from_data (gpointer data));
+  
+  WRAP_METHOD(void gnome_icon_list_freeze(GnomeIconList*),
+	      void freeze());
+
+  WRAP_METHOD(void gnome_icon_list_thaw(GnomeIconList*),
+	      void thaw());
+
+  WRAP_METHOD(void gnome_icon_list_moveto(GnomeIconList*, int, double),
+	      void moveto(int pos, double yalign));
+
+  WRAP_METHOD(GtkVisibility gnome_icon_list_icon_is_visible(GnomeIconList*,
+							    int),
+	      GtkVisibility icon_is_visible(int pos));
+  
+  WRAP_METHOD(void gnome_icon_list_set_row_spacing(GnomeIconList*, int),
+	      void set_row_spacing(int spacing));
+
+  WRAP_METHOD(void gnome_icon_list_set_col_spacing(GnomeIconList*, int),
+	      void set_col_spacing(int spacing));
+
+  WRAP_METHOD(void gnome_icon_list_set_text_spacing(GnomeIconList*, int),
+	      void set_text_spacing(int spacing));
+
+  WRAP_METHOD(void gnome_icon_list_set_icon_border(GnomeIconList*, int),
+	      void set_icon_border(int spacing));
+
+  WRAP_METHOD(void gnome_icon_list_set_icon_width (GnomeIconList*, int),
+	      void set_icon_width (int w));
+ 
+  WRAP_METHOD(void gnome_icon_list_set_separators (GnomeIconList*, const gchar*),
+	      void set_separators (const Gtk::string &sep));
+
+  WRAP_METHOD(int gnome_icon_list_get_icon_at(GnomeIconList*, int, int),
+	      int get_icon_at(int x, int y));
+
+  WRAP_METHOD(int gnome_icon_list_get_items_per_line (GnomeIconList*),
+	      int get_items_per_line ());
+
+  //TODO: redo cause_* ?
+  WRAP_METHOD(void gnome_icon_list_select_icon (GnomeIconList*, int),
+	      void cause_select_icon (int idx));
+
+  //TODO: redo cause_* ?
+  WRAP_METHOD(void gnome_icon_list_unselect_icon (GnomeIconList*, int),
+	      void cause_unselect_icon (int pos));
+
+  WRAP_METHOD(int gnome_icon_list_unselect_all (GnomeIconList*, GdkEvent*, gpointer),
+	      int unselect_all (GdkEvent *event, gpointer keep));
+
+
+  
+  // Signals
+  //: select_icon signal:
+  //- The first arg is the icon number.
+  //- The second arg is the event that caused the select.
+  SIGNAL_SPEC("select_icon", both, void select_icon(gint,GdkEvent*));
+  
+  //: Just like select_icon only it's unselect
+  SIGNAL_SPEC("unselect_icon", both, void unselect_icon(gint,GdkEvent*));
+
+  //: select_icon signal:
+  //- The first arg is the icon number.
+  //- The second arg is the new text.
+  SIGNAL_SPEC("text_changed", both, gboolean text_changed(gint,const gchar*));
+    
+  SelectionList& selection();
+  const SelectionList& selection() const; 
+};
+
+PRIVATE_START;
+#include <gnome--/private/canvas_p.h>
+IMPL_START;
+#include <gnome--/private/icon-list_p.h>
+
+/* icon-list.cc
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/adjustment.h>
+
+namespace Gnome {
+
+IconList::IconList(guint icon_width, Gtk::Adjustment* adj,
+			       bool is_editable)
+  : Canvas(GNOME_CANVAS(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+
+  gnome_icon_list_construct(gtkobj(),icon_width,
+			    adj ? adj->gtkobj() : 0,
+			    is_editable);
+}
+
+IconList::SelectionList& IconList::selection()
+{
+  return reinterpret_cast<SelectionList&>(gtkobject);
+}
+
+const IconList::SelectionList& IconList::selection() const
+{
+  return reinterpret_cast<const SelectionList&>(gtkobject);
+}
+      
+
+namespace IconList_Helpers {
+
+
+GList*& SelectionList::glist() const
+{ 
+  return parent_->selection; 
+}
+   
+SelectionList::value_type SelectionList::operator[](size_type l) const
+{ 
+  size_type j; iterator i; 
+  for (i=begin(),j=0;i!=end(),j<l;++i,++j);
+  return (*i);
+}
+   
+SelectionList::iterator SelectionList::begin_() const
+{
+  return iterator(glist(),glist());
+}
+  
+SelectionList::iterator SelectionList::end_() const
+{
+ return iterator(glist(),(GList*)0);
+}
+ 
+SelectionList::size_type SelectionList::size() const
+{
+  return g_list_length(glist()); 
+}
+  
+    
+} /* namespace IconList_Helpers */            
+                        
+
+// Commented out until further explaination. What is this
+// adjustment_widget ?
+//
+// IconList::IconList(GnomeIconList *castitem)
+//    : Canvas(GNOME_CANVAS(castitem))
+//  {
+//    g_assert(adjustment_widget);
+
+//    gnome_icon_list_construct(gtkobj(),castitem->pad13,
+//  			    adjustment_widget->gtkobj(),
+//  			    castitem->pad14);
+//  }
+
+
+} /* namespace Gnome */

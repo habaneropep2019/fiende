@@ -1,0 +1,317 @@
+<refentry id="bonobo-bonobo-win">
+<refmeta>
+<refentrytitle>BonoboWindow</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboWindow</refname><refpurpose>the toplevel application window implementation</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-window-construct">bonobo_window_construct</link>         (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             const char *win_name,
+                                             const char *title);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-window-new">bonobo_window_new</link>               (const char *win_name,
+                                             const char *title);
+void        <link linkend="bonobo-window-set-contents">bonobo_window_set_contents</link>      (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             <link linkend="GtkWidget">GtkWidget</link> *contents);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-window-get-contents">bonobo_window_get_contents</link>      (<link linkend="BonoboWindow">BonoboWindow</link> *win);
+void        <link linkend="bonobo-window-set-name">bonobo_window_set_name</link>          (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             const char *win_name);
+char*       <link linkend="bonobo-window-get-name">bonobo_window_get_name</link>          (<link linkend="BonoboWindow">BonoboWindow</link> *win);
+<link linkend="GtkAccelGroup">GtkAccelGroup</link>* <link linkend="bonobo-window-get-accel-group">bonobo_window_get_accel_group</link>
+                                            (<link linkend="BonoboWindow">BonoboWindow</link> *win);
+void        <link linkend="bonobo-window-add-popup">bonobo_window_add_popup</link>         (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             <link linkend="GtkMenu">GtkMenu</link> *popup,
+                                             const char *path);
+void        <link linkend="bonobo-window-remove-popup">bonobo_window_remove_popup</link>      (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             const char *path);
+<link linkend="BonoboUIEngine">BonoboUIEngine</link>* <link linkend="bonobo-window-get-ui-engine">bonobo_window_get_ui_engine</link> (<link linkend="BonoboWindow">BonoboWindow</link> *win);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The BonoboWindow class uses a <link linkend="BonoboUIEngine">BonoboUIEngine</link>, in combination
+with several <link linkend="BonoboUISync">BonoboUISync</link> classes to achieve a powerful new
+top-level window widget. It's API mandates the use of XML to
+specify your UI, it also strongly encourages the use of the
+<link linkend="BonoboUIComponent">BonoboUIComponent</link> API to create even the top-level UI. This
+incurs almost no penalty since ORBit's CORBA implementation is
+extremely fast in-processes. This in turn encourages people to
+ensure that even their top-level components are capable of being
+used as controls with minimal effort.
+</para>
+
+<para>
+  <example>
+    <title>Creating a BonoboWindow</title>
+    <programlisting>
+	BonoboUIContainer *ui_container;
+	BonoboUIComponent *ui_component;
+	BonoboWindow      *win;
+
+	win = BONOBO_WINDOW (
+		bonobo_window_new ("Win", "My Test Application"));
+
+	ui_container = <link linkend="bonobo-ui-container-new">bonobo_ui_container_new</link>();
+	bonobo_ui_container_set_win (ui_container, win);
+	
+	bonobo_ui_engine_config_set_path (
+		bonobo_window_get_ui_engine (win),
+		"/my-application-name/UIConfig/kvps");
+    </programlisting>
+  </example>
+  So, even for a toplevel window we also want to create a
+<link linkend="BonoboUIComponent">BonoboUIComponent</link> to merge our toplevel UI elements in:
+  <example>
+    <title>Setting up the window UI</title>
+    <programlisting>
+	ui_component = bonobo_ui_component_new ("my-app");
+
+	/* Associate the <link linkend="BonoboUIComponent">BonoboUIComponent</link> with the container */	
+	bonobo_ui_component_set_container (
+		ui_component, BONOBO_OBJREF (ui_container);
+
+	bonobo_ui_util_set_ui (
+		ui_component, MY_COMPILE_TIME_PREFIX,
+		"GNOME_MyApp.ui", "my-app");
+    </programlisting>
+  </example>
+  Where GNOME_MyApp.ui is the toplevel UI xml file.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="bonobo-window-construct">bonobo_window_construct ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_window_construct         (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             const char *win_name,
+                                             const char *title);</programlisting>
+<para>
+Construct a new BonoboWindow</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the window to construct
+</entry></row>
+<row><entry align="right"><parameter>win_name</parameter>&nbsp;:</entry>
+<entry> the window name
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> the window's title for the title bar
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a constructed window
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-new">bonobo_window_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_window_new               (const char *win_name,
+                                             const char *title);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win_name</parameter>&nbsp;:</entry>
+<entry> the window name
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> the window's title for the title bar
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a new BonoboWindow
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-set-contents">bonobo_window_set_contents ()</title>
+<programlisting>void        bonobo_window_set_contents      (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             <link linkend="GtkWidget">GtkWidget</link> *contents);</programlisting>
+<para>
+Insert a widget into the main window contents.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the bonobo window
+</entry></row>
+<row><entry align="right"><parameter>contents</parameter>&nbsp;:</entry>
+<entry> the new widget for it to contain.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-get-contents">bonobo_window_get_contents ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_window_get_contents      (<link linkend="BonoboWindow">BonoboWindow</link> *win);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the bonobo window
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the contained widget
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-set-name">bonobo_window_set_name ()</title>
+<programlisting>void        bonobo_window_set_name          (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             const char *win_name);</programlisting>
+<para>
+Set the name of the window - used for configuration
+serialization.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the bonobo window
+</entry></row>
+<row><entry align="right"><parameter>win_name</parameter>&nbsp;:</entry>
+<entry> the window name
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-get-name">bonobo_window_get_name ()</title>
+<programlisting>char*       bonobo_window_get_name          (<link linkend="BonoboWindow">BonoboWindow</link> *win);</programlisting>
+<para>
+Gets the name of a window.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the bonobo window
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the name of the window
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-get-accel-group">bonobo_window_get_accel_group ()</title>
+<programlisting><link linkend="GtkAccelGroup">GtkAccelGroup</link>* bonobo_window_get_accel_group
+                                            (<link linkend="BonoboWindow">BonoboWindow</link> *win);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the bonobo window
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the associated accelerator group for this window
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-add-popup">bonobo_window_add_popup ()</title>
+<programlisting>void        bonobo_window_add_popup         (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             <link linkend="GtkMenu">GtkMenu</link> *popup,
+                                             const char *path);</programlisting>
+<para>
+Add a popup <parameter>menu</parameter> at <parameter>path</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the window
+</entry></row>
+<row><entry align="right"><parameter>popup</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> the path
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-remove-popup">bonobo_window_remove_popup ()</title>
+<programlisting>void        bonobo_window_remove_popup      (<link linkend="BonoboWindow">BonoboWindow</link> *win,
+                                             const char *path);</programlisting>
+<para>
+Remove the popup at <parameter>path</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the window
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> the path
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-window-get-ui-engine">bonobo_window_get_ui_engine ()</title>
+<programlisting><link linkend="BonoboUIEngine">BonoboUIEngine</link>* bonobo_window_get_ui_engine (<link linkend="BonoboWindow">BonoboWindow</link> *win);</programlisting>
+<para>
+Gets the associated UIEngine.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> the bonobo window
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the <link linkend="BonoboUIEngine">BonoboUIEngine</link>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="BonoboUIEngine">BonoboUIEngine</link>, <link linkend="BonoboUISync">BonoboUISync</link>, <link linkend="BonoboUIComponent">BonoboUIComponent</link>
+</para>
+</refsect1>
+
+</refentry>

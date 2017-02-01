@@ -1,0 +1,32 @@
+.TH MEDUSA-IDLED 1 "February 8, 2001" Eazel
+.SH NAME
+medusa-idled \- keep medusa from indexing when the system is in use
+.SH SYNOPSIS
+.B medusa-idled
+.SH DESCRIPTION
+.B medusa-idled
+is normally run automatically at login.
+It puts itself in the background,
+connects to the X server specified in the
+.SM $DISPLAY
+environmental variable,
+and begins accepting connections on the local socket
+.BR /tmp/medusa-idled-service .
+.LP
+Each client that connects to the socket will immediately receive
+a message telling it whether the X server is, at that moment,
+idle or not.  The message will be either ``No user activity\en''
+or ``User activity\en''.
+Later, when the X server goes from being idle to being active,
+or vice versa, each of the connected clients will be sent a
+new message notifying it of the new display status.
+.SH FILES
+.TP
+/tmp/medusa-idled-service
+Socket on which
+.B medusa-idled
+communicates with
+.B medusa-indexd
+.SH SEE ALSO
+.BR medusa-indexd (8),
+.BR medusa-searchd (8)

@@ -1,0 +1,197 @@
+<refentry id="zvt-vtx">
+<refmeta>
+<refentrytitle>vtx</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>ZVT Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>vtx</refname><refpurpose></refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+#define     <link linkend="UPDATE-CHANGES-CAPS">UPDATE_CHANGES</link>
+#define     <link linkend="UPDATE-REFRESH-CAPS">UPDATE_REFRESH</link>
+#define     <link linkend="UPDATE-SCROLLBACK-CAPS">UPDATE_SCROLLBACK</link>
+enum        <link linkend="VT-SELTYPE-CAPS">VT_SELTYPE</link>;
+#define     <link linkend="VT-SELTYPE-MASK-CAPS">VT_SELTYPE_MASK</link>
+#define     <link linkend="VT-SELTYPE-BYEND-CAPS">VT_SELTYPE_BYEND</link>
+#define     <link linkend="VT-SELTYPE-BYSTART-CAPS">VT_SELTYPE_BYSTART</link>
+#define     <link linkend="VT-SELTYPE-MOVED-CAPS">VT_SELTYPE_MOVED</link>
+struct      <link linkend="vtx">vtx</link>;
+char*       <link linkend="vt-get-selection">vt_get_selection</link>                (struct <link linkend="vtx">_vtx</link> *vx,
+                                             int size,
+                                             int *len);
+void        <link linkend="vt-clear-selection">vt_clear_selection</link>              (struct <link linkend="vtx">_vtx</link> *vx);
+void        <link linkend="vt-fix-selection">vt_fix_selection</link>                (struct <link linkend="vtx">_vtx</link> *vx);
+void        <link linkend="vt-draw-selection">vt_draw_selection</link>               (struct <link linkend="vtx">_vtx</link> *vx);
+void        <link linkend="vt-update-rect">vt_update_rect</link>                  (struct <link linkend="vtx">_vtx</link> *vx,
+                                             int fill,
+                                             int sx,
+                                             int sy,
+                                             int ex,
+                                             int ey);
+void        <link linkend="vt-update">vt_update</link>                       (struct <link linkend="vtx">_vtx</link> *vt,
+                                             int state);
+void        <link linkend="vt-draw-cursor">vt_draw_cursor</link>                  (struct <link linkend="vtx">_vtx</link> *vx,
+                                             int state);
+void        <link linkend="vt-set-wordclass">vt_set_wordclass</link>                (struct <link linkend="vtx">_vtx</link> *vx,
+                                             unsigned char *s);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+A longer description goes here.
+</para>
+
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="UPDATE-CHANGES-CAPS">UPDATE_CHANGES</title>
+<programlisting>#define     UPDATE_CHANGES</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="UPDATE-REFRESH-CAPS">UPDATE_REFRESH</title>
+<programlisting>#define     UPDATE_REFRESH</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="UPDATE-SCROLLBACK-CAPS">UPDATE_SCROLLBACK</title>
+<programlisting>#define     UPDATE_SCROLLBACK</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="VT-SELTYPE-CAPS">enum VT_SELTYPE</title>
+<programlisting>typedef enum {
+  VT_SELTYPE_NONE=0,		/* selection inactive */
+  VT_SELTYPE_CHAR,		/* selection by char */
+  VT_SELTYPE_WORD,		/* selection by word */
+  VT_SELTYPE_LINE,		/* selection by whole line */
+  VT_SELTYPE_MAGIC		/* 'magic' or 'active tag' select */
+} VT_SELTYPE;
+</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="VT-SELTYPE-MASK-CAPS">VT_SELTYPE_MASK</title>
+<programlisting>#define VT_SELTYPE_MASK 0xff
+</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="VT-SELTYPE-BYEND-CAPS">VT_SELTYPE_BYEND</title>
+<programlisting>#define VT_SELTYPE_BYEND 0x8000
+</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="VT-SELTYPE-BYSTART-CAPS">VT_SELTYPE_BYSTART</title>
+<programlisting>#define VT_SELTYPE_BYSTART 0x4000
+</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="VT-SELTYPE-MOVED-CAPS">VT_SELTYPE_MOVED</title>
+<programlisting>#define VT_SELTYPE_MOVED 0x2000 /* has motion occured? */
+</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vtx">struct vtx</title>
+<programlisting>struct vtx
+{
+  struct vt_em vt;
+
+  /* when updating, background colour matches for whole contents of line */
+  unsigned int back_match:1;
+
+  /* selection stuff */
+  uint32 *selection_data;		/* actual selection */
+  int selection_size;
+
+  /* 256 bits of word class characters (assumes a char is 8 bits or more) */
+  unsigned char wordclass[32];
+
+  /* rendering buffer, for building output strings */
+  char *runbuffer_donotuse;	/* TBR! */
+  int runbuffer_size_donotuse;
+
+  /* true if something selected */
+  int selected;
+
+  /* if selection active, what type? (by char/word/line) */
+  VT_SELTYPE selectiontype;
+
+  int selstartx, selstarty;
+  int selendx, selendy;
+
+  /* previously rendered values */
+  int selstartxold, selstartyold;
+  int selendxold, selendyold;
+
+  /* rendering callbacks */
+  void (*draw_text)(void *user_data, struct vt_line *line, int row, int col, int len, int attr);
+  void (*scroll_area)(void *user_data, int firstrow, int count, int offset, int fill);
+  /* set the cursor on/off, return old state */
+  int  (*cursor_state)(void *user_data, int state);
+
+  /* added in gnome-libs 1.0.10
+     ... this shouldn't break bin compatibility? */
+  unsigned char scroll_type;	/* how we scroll (see VT_SCROLLTYPE enum) */
+};
+</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vt-get-selection">vt_get_selection ()</title>
+<programlisting>char*       vt_get_selection                (struct <link linkend="vtx">_vtx</link> *vx,
+                                             int size,
+                                             int *len);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vt-clear-selection">vt_clear_selection ()</title>
+<programlisting>void        vt_clear_selection              (struct <link linkend="vtx">_vtx</link> *vx);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vt-fix-selection">vt_fix_selection ()</title>
+<programlisting>void        vt_fix_selection                (struct <link linkend="vtx">_vtx</link> *vx);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vt-draw-selection">vt_draw_selection ()</title>
+<programlisting>void        vt_draw_selection               (struct <link linkend="vtx">_vtx</link> *vx);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vt-update-rect">vt_update_rect ()</title>
+<programlisting>void        vt_update_rect                  (struct <link linkend="vtx">_vtx</link> *vx,
+                                             int fill,
+                                             int sx,
+                                             int sy,
+                                             int ex,
+                                             int ey);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vt-update">vt_update ()</title>
+<programlisting>void        vt_update                       (struct <link linkend="vtx">_vtx</link> *vt,
+                                             int state);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vt-draw-cursor">vt_draw_cursor ()</title>
+<programlisting>void        vt_draw_cursor                  (struct <link linkend="vtx">_vtx</link> *vx,
+                                             int state);</programlisting>
+</refsect2>
+<refsect2>
+<title><anchor id="vt-set-wordclass">vt_set_wordclass ()</title>
+<programlisting>void        vt_set_wordclass                (struct <link linkend="vtx">_vtx</link> *vx,
+                                             unsigned char *s);</programlisting>
+</refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

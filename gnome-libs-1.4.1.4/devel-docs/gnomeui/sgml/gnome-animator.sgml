@@ -1,0 +1,935 @@
+<refentry id="GnomeAnimator">
+<refmeta>
+<refentrytitle>GnomeAnimator</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeAnimator</refname><refpurpose>A widget for adding simple animations to GNOME applications.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeAnimator-struct">GnomeAnimator</link>;
+enum        <link linkend="GnomeAnimatorStatus">GnomeAnimatorStatus</link>;
+enum        <link linkend="GnomeAnimatorLoopType">GnomeAnimatorLoopType</link>;
+struct      <link linkend="GnomeAnimatorFrame">GnomeAnimatorFrame</link>;
+struct      <link linkend="GnomeAnimatorPrivate">GnomeAnimatorPrivate</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-animator-new-with-size">gnome_animator_new_with_size</link>    (<link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);
+void        <link linkend="gnome-animator-set-loop-type">gnome_animator_set_loop_type</link>    (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GnomeAnimatorLoopType">GnomeAnimatorLoopType</link> loop_type);
+<link linkend="GnomeAnimatorLoopType">GnomeAnimatorLoopType</link> <link linkend="gnome-animator-get-loop-type">gnome_animator_get_loop_type</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);
+void        <link linkend="gnome-animator-set-playback-direction">gnome_animator_set_playback_direction</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="gint">gint</link> playback_direction);
+<link linkend="gint">gint</link>        <link linkend="gnome-animator-get-playback-direction">gnome_animator_get_playback_direction</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frame-from-imlib-at-size">gnome_animator_append_frame_from_imlib_at_size</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GdkImlibImage">GdkImlibImage</link> *image,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frame-from-imlib">gnome_animator_append_frame_from_imlib</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GdkImlibImage">GdkImlibImage</link> *image,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frame-from-file-at-size">gnome_animator_append_frame_from_file_at_size</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frame-from-file">gnome_animator_append_frame_from_file</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frames-from-imlib-at-size">gnome_animator_append_frames_from_imlib_at_size</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GdkImlibImage">GdkImlibImage</link> *image,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="gint">gint</link> x_unit,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frames-from-imlib">gnome_animator_append_frames_from_imlib</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GdkImlibImage">GdkImlibImage</link> *image,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="gint">gint</link> x_unit);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frames-from-file-at-size">gnome_animator_append_frames_from_file_at_size</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="gint">gint</link> x_unit,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frames-from-file">gnome_animator_append_frames_from_file</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="gint">gint</link> x_unit);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-append-frame-from-gnome-pixmap">gnome_animator_append_frame_from_gnome_pixmap</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GnomePixmap">GnomePixmap</link> *pixmap,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval);
+void        <link linkend="gnome-animator-start">gnome_animator_start</link>            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);
+void        <link linkend="gnome-animator-stop">gnome_animator_stop</link>             (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-animator-advance">gnome_animator_advance</link>          (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="gint">gint</link> num);
+void        <link linkend="gnome-animator-goto-frame">gnome_animator_goto_frame</link>       (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="guint">guint</link> frame_number);
+<link linkend="guint">guint</link>       <link linkend="gnome-animator-get-current-frame-number">gnome_animator_get_current_frame_number</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);
+<link linkend="GnomeAnimatorStatus">GnomeAnimatorStatus</link> <link linkend="gnome-animator-get-status">gnome_animator_get_status</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);
+void        <link linkend="gnome-animator-set-playback-speed">gnome_animator_set_playback_speed</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="gdouble">gdouble</link> speed);
+<link linkend="gdouble">gdouble</link>     <link linkend="gnome-animator-get-playback-speed">gnome_animator_get_playback_speed</link>
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----GnomeAnimator
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+<type>GnomeAnimator</type> is a widget that is able to play simple
+animations in the GTK+ event loop.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeAnimator-struct">struct GnomeAnimator</title>
+<programlisting>struct GnomeAnimator;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeAnimatorStatus">enum GnomeAnimatorStatus</title>
+<programlisting>typedef enum
+{
+    GNOME_ANIMATOR_STATUS_STOPPED,
+    GNOME_ANIMATOR_STATUS_RUNNING
+} GnomeAnimatorStatus;
+</programlisting>
+<para>
+This enumeration is used to determine if the animator object is running or
+not. Use <function><link linkend="gnome-animator-get-status">gnome_animator_get_status</link>()</function> to
+retrieve it.</para>
+
+<itemizedlist>
+  <listitem>
+    <para>
+      <literal>GNOME_ANIMATOR_STATUS_STOPPED</literal>: The value used 
+      when the GnomeAnimator object is not running.
+    </para>
+  </listitem>
+
+	<listitem><para><literal>GNOME_ANIMATOR_STATUS_RUNNING</literal>: The value used
+		when the GnomeAnimator object is running.
+	</para></listitem>
+</itemizedlist></refsect2>
+<refsect2>
+<title><anchor id="GnomeAnimatorLoopType">enum GnomeAnimatorLoopType</title>
+<programlisting>typedef enum
+{
+    /* No loop: after the last (first) frame is played, the animation
+       is stopped.  */
+    GNOME_ANIMATOR_LOOP_NONE,
+
+    /* After the last (first) frame is played, restart from the first
+       (last) frame.  */
+    GNOME_ANIMATOR_LOOP_RESTART,
+
+    /* After the last (first) frame is played, the playback direction
+       is reversed.  */
+    GNOME_ANIMATOR_LOOP_PING_PONG
+} GnomeAnimatorLoopType;
+</programlisting>
+<para>
+This enumeration is used to set the type of animation loop desired in the
+GnomeAnimator object.
+</para>
+
+<itemizedlist>
+	<listitem><para><literal>GNOME_ANIMATOR_LOOP_NONE</literal>: Do not use a loop in
+		the animation. When the animation is played, it will not
+		repeat when it is completed.</para></listitem>
+
+	<listitem><para><literal>GNOME_ANIMATOR_LOOP_RESTART</literal>: After the animation
+		is played, loop back to the beginning of the animation and
+		replay it. If the animation is playing forward, the loop
+		will return to the first frame; if it is being played
+		backward, the loop will return to the last frame in the
+		sequence.</para></listitem>
+
+	<listitem><para><literal>GNOME_ANIMATOR_LOOP_PING_PONG</literal>: When the animation
+		sequence is completed, the playback direction is reversed.
+		</para></listitem>
+</itemizedlist></refsect2>
+<refsect2>
+<title><anchor id="GnomeAnimatorFrame">struct GnomeAnimatorFrame</title>
+<programlisting>struct GnomeAnimatorFrame;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeAnimatorPrivate">struct GnomeAnimatorPrivate</title>
+<programlisting>struct GnomeAnimatorPrivate;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-new-with-size">gnome_animator_new_with_size ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_animator_new_with_size    (<link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);</programlisting>
+<para>
+Creates a new animator widget of the specified size.</para>
+<para>
+Create a GnomeAnimator object of the specified size.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> pixel width of animator widget
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> pixel height of animator widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Pointer to new animator widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-set-loop-type">gnome_animator_set_loop_type ()</title>
+<programlisting>void        gnome_animator_set_loop_type    (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GnomeAnimatorLoopType">GnomeAnimatorLoopType</link> loop_type);</programlisting>
+<para>
+Sets desired animation loop type.  Available loop
+types are <literal>GNOME_ANIMATOR_LOOP_NONE</literal> (play animation once only),
+<literal>GNOME_ANIMATOR_LOOP_RESTART</literal> (play animation over and over again),
+and <literal>GNOME_ANIMATOR_LOOP_PING_PONG</literal> (play animation over and over
+again, reversing the playing direction every time.)</para>
+<para>
+Sets the type of loop the animator will use.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>loop_type</parameter>&nbsp;:</entry>
+<entry> Type of animation loop desired
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-get-loop-type">gnome_animator_get_loop_type ()</title>
+<programlisting><link linkend="GnomeAnimatorLoopType">GnomeAnimatorLoopType</link> gnome_animator_get_loop_type
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);</programlisting>
+<para>
+Obtains current animator loop type.  Available loop
+types are <literal>GNOME_ANIMATOR_LOOP_NONE</literal> (play animation once only),
+<literal>GNOME_ANIMATOR_LOOP_RESTART</literal> (play animation over and over again),
+and <literal>GNOME_ANIMATOR_LOOP_PING_PONG</literal> (play animation over and over
+again, reversing the playing direction every time.)</para>
+<para>
+Determine the type of loop being used on the animator object.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be queried
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Loop type.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-set-playback-direction">gnome_animator_set_playback_direction ()</title>
+<programlisting>void        gnome_animator_set_playback_direction
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="gint">gint</link> playback_direction);</programlisting>
+<para>
+Sets direction (forwards or backwards) to play the
+animation.  If <parameter>playback_direction</parameter> is a positive number, the
+animation is played from the first to the last frame.  If
+<parameter>playback_direction</parameter> is negative, the animation is played from the
+last to the first frame.</para>
+<para>
+Set the direction the animation should be played back. Setting a positive
+value will cause the animator to play forward; a negative value will cause
+it to play backward.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>playback_direction</parameter>&nbsp;:</entry>
+<entry> Direction animation should be played.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-get-playback-direction">gnome_animator_get_playback_direction ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_animator_get_playback_direction
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);</programlisting>
+<para>
+Returns the current playing direction (forwards or
+backwards) for the animation.  If the returned value is a positive
+number, the animation is played from the first to the last frame.
+If it is negative, the animation is played from the last to the
+first frame.</para>
+<para>
+Determines the direction of playback.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Positive or negative number indicating direction.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frame-from-imlib-at-size">gnome_animator_append_frame_from_imlib_at_size ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frame_from_imlib_at_size
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GdkImlibImage">GdkImlibImage</link> *image,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);</programlisting>
+<para>
+Adds frame contained within a &amp;GdkImlibImage image at
+the end of the current animation.  If <parameter>width</parameter> and <parameter>height</parameter> are
+different from the actual <parameter>image</parameter> size, the image is scaled
+proportionally.  The frame display interval is <parameter>interval</parameter> is divided
+by the playback speed.</para>
+<para>
+Append a frame from a GdkImlibImage to the GnomeAnimator object and render
+it.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>image</parameter>&nbsp;:</entry>
+<entry> Image to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> pixel width of frame
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> pixel height of frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frame-from-imlib">gnome_animator_append_frame_from_imlib ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frame_from_imlib
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GdkImlibImage">GdkImlibImage</link> *image,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval);</programlisting>
+<para>
+Adds frame contained within a &amp;GdkImlibImage image at
+the end of the current animation.  The frame display interval is
+<parameter>interval</parameter> is divided by the playback speed.</para>
+<para>
+Adds frame contained within a GdkImlibImage image at the end of the
+current animation.  The frame display interval is divided by the playback
+speed.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>image</parameter>&nbsp;:</entry>
+<entry> Image to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frame-from-file-at-size">gnome_animator_append_frame_from_file_at_size ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frame_from_file_at_size
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);</programlisting>
+<para>
+Adds frame from the given file to the end of the
+current animation.  If <parameter>width</parameter> and <parameter>height</parameter> are different from the
+actual <parameter>image</parameter> size, the image is scaled proportionally.  The frame
+display interval is <parameter>interval</parameter> divided by the playback speed.</para>
+<para>
+Appends a frame from a file to a GnomeAnimator widget. If the specified
+width and height variables are different from the actual size of the
+image, it is scaled proportionally. The frame display interval is
+<parameter>interval</parameter> divided by the playback speed.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> File path of image to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> pixel width of frame
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> pixel height of frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frame-from-file">gnome_animator_append_frame_from_file ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frame_from_file
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval);</programlisting>
+<para>
+Adds frame from the given file to the end of the
+current animation.  The frame display interval is <parameter>interval</parameter> divided
+by the playback speed.</para>
+<para>
+Append a frame from a given file to a GnomeAnimator widget. The frame
+display interval is <parameter>interval</parameter> divided by the playback speed.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> File path of image to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frames-from-imlib-at-size">gnome_animator_append_frames_from_imlib_at_size ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frames_from_imlib_at_size
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GdkImlibImage">GdkImlibImage</link> *image,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="gint">gint</link> x_unit,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);</programlisting>
+<para>
+Adds multiple frames contained within a &amp;GdkImlibImage
+image at the end of the current animation.  Each frame within the
+image should be next to one another in a single, horizontal row.
+If <parameter>width</parameter> and <parameter>height</parameter> are different from the actual frame size, the
+image is scaled proportionally.  The frame display interval is
+<parameter>interval</parameter> divided by the playback speed.</para>
+<para>
+Appends multiple frames contained within a GdkImlibImage image to a
+GnomeAnimator widget. Each frame within the image should be next to one
+another in a single, horizontal row.  If <parameter>width</parameter> and/or <parameter>height</parameter> are
+different from the actual size of the frame, the image will be scaled
+proportionally.  The frame display interval is <parameter>interval</parameter> divided by the
+playback speed.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>image</parameter>&nbsp;:</entry>
+<entry> Image containing frames to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of a frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of a frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><parameter>x_unit</parameter>&nbsp;:</entry>
+<entry> pixel width of a single frame
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> pixel width of frame
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> pixel height of frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frames-from-imlib">gnome_animator_append_frames_from_imlib ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frames_from_imlib
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GdkImlibImage">GdkImlibImage</link> *image,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="gint">gint</link> x_unit);</programlisting>
+<para>
+Adds multiple frames contained within a &amp;GdkImlibImage
+image to the end of the current animation.  Each frame within the
+image should be next to one another in a single, horizontal row.
+The frame display interval is <parameter>interval</parameter> divided by the
+playbackspeed.</para>
+<para>
+Append multiple frames contained within a GdkImlibImage image to the end
+of a GnomeAnimator widget. Each frame within the image should be next to
+one another in a single, horizontal row.  The frame display interval is
+<parameter>interval</parameter> divided by the playback speed.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>image</parameter>&nbsp;:</entry>
+<entry> Image containing frames to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of a frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of a frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><parameter>x_unit</parameter>&nbsp;:</entry>
+<entry> pixel width of a single frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frames-from-file-at-size">gnome_animator_append_frames_from_file_at_size ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frames_from_file_at_size
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="gint">gint</link> x_unit,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);</programlisting>
+<para>
+Adds multiple frames contained within a single image
+file to the end of the current animation.  Each frame within the
+image should be next to one another in a single, horizontal row.
+If <parameter>width</parameter> and <parameter>height</parameter> are different from the actual frame size, the
+image is scaled proportionally.  The frame display interval is
+<parameter>interval</parameter> divided by the playback speed.</para>
+<para>
+Load and render an image containing multiple frames, and append those
+frames to the animator widget. Each frame within the image should be
+next to one another in a single, horizontal row. If <parameter>width</parameter> and/or <parameter>height</parameter>
+are different from the actual frame size, the image is scaled
+proportionally.  The frame display interval is <parameter>interval</parameter> divided by the
+playback speed.
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> File path to image containing frames to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of a frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of a frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><parameter>x_unit</parameter>&nbsp;:</entry>
+<entry> pixel width of a single frame
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> pixel width of frame
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> pixel height of frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frames-from-file">gnome_animator_append_frames_from_file ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frames_from_file
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval,
+                                             <link linkend="gint">gint</link> x_unit);</programlisting>
+<para>
+Adds multiple frames contained within a single image file
+to the end of the current animation.  Each frame within the image
+should be next to one another in a single, horizontal row.
+The frame display interval is <parameter>interval</parameter> divided by the playback_speed.</para>
+<para>
+Load and render an image containing multiple frames, and append those
+frames to the animator widget. Each frame within the image should be
+next to one another in a single, horizontal row. The frame display
+interval is <parameter>interval</parameter> divided by the playback speed.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> File path to image containing frames to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of a frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of a frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><parameter>x_unit</parameter>&nbsp;:</entry>
+<entry> pixel width of a single frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-append-frame-from-gnome-pixmap">gnome_animator_append_frame_from_gnome_pixmap ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_append_frame_from_gnome_pixmap
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="GnomePixmap">GnomePixmap</link> *pixmap,
+                                             <link linkend="gint">gint</link> x_offset,
+                                             <link linkend="gint">gint</link> y_offset,
+                                             <link linkend="guint32">guint32</link> interval);</programlisting>
+<para>
+Adds frame contained within a &amp;GnomePixmap image to
+the end of the current animation.  The frame display interval is
+<parameter>interval</parameter> divided by the playback speed.</para>
+<para>
+Appends a frame from a GnomePixmap image to the animator widget.  The
+frame display interval is <parameter>interval</parameter> divided by the playback speed.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>pixmap</parameter>&nbsp;:</entry>
+<entry> GNOME pixmap to be added to animator
+</entry></row>
+<row><entry align="right"><parameter>x_offset</parameter>&nbsp;:</entry>
+<entry> horizontal offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>y_offset</parameter>&nbsp;:</entry>
+<entry> vertical offset of frame within animator widget
+</entry></row>
+<row><entry align="right"><parameter>interval</parameter>&nbsp;:</entry>
+<entry> Number of milliseconds to delay before showing next frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if append succeeded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-start">gnome_animator_start ()</title>
+<programlisting>void        gnome_animator_start            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);</programlisting>
+<para>
+Initiate display of animated frames.</para>
+<para>
+Begin animating the widget.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be started
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-stop">gnome_animator_stop ()</title>
+<programlisting>void        gnome_animator_stop             (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);</programlisting>
+<para>
+Halts display of animated frames.  The current frame
+in the animation will remain in the animator widget.</para>
+<para>
+Stop an animator that is running.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be stopped
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-advance">gnome_animator_advance ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_animator_advance          (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="gint">gint</link> num);</programlisting>
+<para>
+Advance the animator <parameter>num</parameter> frames.  If <parameter>num</parameter> is
+positive, use the specified <parameter>playback_direction</parameter>; if it is negative,
+go in the opposite direction.  After the call, the animator is in
+the same state it would be if it had actually executed the specified
+number of iterations.</para>
+<para>
+Advance the animator widget <parameter>num</parameter> frames.  If <parameter>num</parameter> is positive, use the
+specified <parameter>playback_direction</parameter>; if it is negative, go in the opposite
+direction.  After the call, the animator is in the same state it would be
+if it had actually executed the sppecified number of iterations.
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>num</parameter>&nbsp;:</entry>
+<entry> Number of frames to advance by
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  <literal>TRUE</literal> if the animator is now stopped.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-goto-frame">gnome_animator_goto_frame ()</title>
+<programlisting>void        gnome_animator_goto_frame       (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="guint">guint</link> frame_number);</programlisting>
+<para>
+Jump to the specified <parameter>frame_number</parameter> and display it.</para>
+<para>
+Jump to the specified frame.  If <parameter>num_frame</parameter> is greater than the total
+number of frames, no action is taken.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>num_frame</parameter>&nbsp;:</entry>
+<entry>Frame number to be made current.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-get-current-frame-number">gnome_animator_get_current_frame_number ()</title>
+<programlisting><link linkend="guint">guint</link>       gnome_animator_get_current_frame_number
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);</programlisting>
+<para>
+Obtains current frame number from animator widget.</para>
+<para>
+Determine the current frame number of the animator widget.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be queried
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Current frame number.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-get-status">gnome_animator_get_status ()</title>
+<programlisting><link linkend="GnomeAnimatorStatus">GnomeAnimatorStatus</link> gnome_animator_get_status
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);</programlisting>
+<para>
+Obtains current status from animator widget.  Possible
+return values include <literal>GNOME_ANIMATOR_STATUS_STOPPED</literal> and
+<literal>GNOME_ANIMATOR_STATUS_RUNNING</literal>.</para>
+<para>
+Obtain the current status from the animator widget.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be queried
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Status constant.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-set-playback-speed">gnome_animator_set_playback_speed ()</title>
+<programlisting>void        gnome_animator_set_playback_speed
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator,
+                                             <link linkend="gdouble">gdouble</link> speed);</programlisting>
+<para>
+Sets the playback speed.  The delay between every
+frame is divided by this value before being used.  As a
+consequence, higher values give higher playback speeds.</para>
+<para>
+Sets the playback speed.  The delay between every frame is divided by this
+value before being used.  As a consequence, higher values give higher
+playback speeds.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be updated
+</entry></row>
+<row><entry align="right"><parameter>speed</parameter>&nbsp;:</entry>
+<entry> Rate multiplier for playback speed
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-animator-get-playback-speed">gnome_animator_get_playback_speed ()</title>
+<programlisting><link linkend="gdouble">gdouble</link>     gnome_animator_get_playback_speed
+                                            (<link linkend="GnomeAnimator">GnomeAnimator</link> *animator);</programlisting>
+<para>
+Returns the current playback speed.</para>
+<para>
+Obtain the current playback speed.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>animator</parameter>&nbsp;:</entry>
+<entry> Animator widget to be queried
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> &amp;double indicating the playback speed.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

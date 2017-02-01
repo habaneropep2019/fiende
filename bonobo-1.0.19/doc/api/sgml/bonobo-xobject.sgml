@@ -1,0 +1,387 @@
+<refentry id="bonobo-bonobo-xobject">
+<refmeta>
+<refentrytitle>BonoboXObject</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboXObject</refname><refpurpose>a simplified CORBA server object wrapper</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+#define     <link linkend="BONOBO-X-SERVANT-GET-OBJECT-CAPS">BONOBO_X_SERVANT_GET_OBJECT</link>     (o)
+#define     <link linkend="BONOBO-X-OBJECT-GET-SERVANT-CAPS">BONOBO_X_OBJECT_GET_SERVANT</link>     (o)
+struct      <link linkend="BonoboXObject-struct">BonoboXObject</link>;
+typedef     <link linkend="BonoboXObjectClass">BonoboXObjectClass</link>;
+void        (<link linkend="BonoboXObjectPOAFn">*BonoboXObjectPOAFn</link>)           (<link linkend="PortableServer-Servant">PortableServer_Servant</link> servant,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+<link linkend="BonoboXObject">BonoboXObject</link>* <link linkend="bonobo-x-object">bonobo_x_object</link>              (<link linkend="gpointer">gpointer</link> p);
+<link linkend="GtkType">GtkType</link>     <link linkend="bonobo-x-type-unique">bonobo_x_type_unique</link>            (<link linkend="GtkType">GtkType</link> parent_type,
+                                             <link linkend="BonoboXObjectPOAFn">BonoboXObjectPOAFn</link> init_fn,
+                                             <link linkend="BonoboXObjectPOAFn">BonoboXObjectPOAFn</link> fini_fn,
+                                             int epv_struct_offset,
+                                             const <link linkend="GtkTypeInfo">GtkTypeInfo</link> *info);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-x-type-setup">bonobo_x_type_setup</link>             (<link linkend="GtkType">GtkType</link> type,
+                                             <link linkend="BonoboXObjectPOAFn">BonoboXObjectPOAFn</link> init_fn,
+                                             <link linkend="BonoboXObjectPOAFn">BonoboXObjectPOAFn</link> fini_fn,
+                                             int epv_struct_offset);
+#define     <link linkend="BONOBO-X-TYPE-FUNC-FULL-CAPS">BONOBO_X_TYPE_FUNC_FULL</link>         (class_name, corba_name, parent, prefix)
+#define     <link linkend="BONOBO-X-TYPE-FUNC-CAPS">BONOBO_X_TYPE_FUNC</link>              (class_name, parent, prefix)
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+BonoboXObject provides an easy to use way of writing CORBA servers. It
+strongly deprecates <link linkend="BonoboObject">BonoboObject</link> ( with which it is compatible ). It
+drastically simplifies the issues of epv and vepv construction by
+automating these, and automatically instantiates a CORBA_Object on
+gtk_type_new. This removes clutter from construction time.
+</para>
+
+<para>
+The CORBA methods are associated with a Gtk class in the same
+way that standard Gtk+ methods and signals are. We insert the
+CORBA generated Entry Point Vector (epv) struct as the first
+element of the derived class eg.
+  <example>
+     <title>Setting up the GtkClass data</title>
+     <programlisting>
+typedef struct {
+	BonoboXObject base;
+
+	BonoboControlPrivate *priv;
+} BonoboControl;
+
+typedef struct {
+	BonoboXObjectClass      parent_class;
+
+	POA_Bonobo_Control__epv epv;
+
+	/* Signals. */
+	void (*set_frame)      (BonoboControl *control);
+	void (*activate)       (BonoboControl *control, gboolean state);
+} BonoboControlClass;
+     </programlisting>
+  </example>
+</para>
+
+<para>
+Then we set up the type using the <function>bonobo_x_type_unique</function>
+function instead of gtk_type_unique ( but otherwise in the standard Gtk+
+fashion ).
+  <example>
+     <title>Registering the type with bonobo</title>
+     <programlisting>
+GtkType
+bonobo_control_get_type (void)
+{
+	GtkType ptype;
+	static GtkType type = 0;
+
+	if (type == 0) {
+		static GtkTypeInfo info = {
+			"BonoboControl",
+			sizeof (BonoboControl),
+			sizeof (BonoboControlClass),
+			(GtkClassInitFunc)bonobo_control_class_init,
+			(GtkObjectInitFunc)bonobo_control_init,
+			NULL, NULL, (GtkClassInitFunc) NULL
+		};
+		ptype = (parent);
+		type = bonobo_x_type_unique (ptype,
+			POA_Bonobo_Control__init, NULL,
+			GTK_STRUCT_OFFSET (BonoboControlClass, epv),
+			&amp;info);
+	}
+	return type;
+}
+     </programlisting>
+  </example>
+  Alternatively one can use the simpler BONOBO_X_TYPE_FUNC_FULL
+macros to achieve the same thing thus:
+  <example>
+     <title>Registering the type more simply</title>
+     <programlisting>
+BONOBO_X_TYPE_FUNC_FULL (BonoboControl, Bonobo_Control,
+                         PARENT_TYPE, bonobo_control);
+     </programlisting>
+  </example>
+
+  The POA_Bonobo_Control__init function is used to construct the CORBA object
+and the GTK_STRUCT_OFFSET tells Bonobo where your epv structure is
+in the Class data, so it can build your epv for you.
+  The fini_fn function is not used in ORBit, so it is faster to use NULL here.
+</para>
+<para>
+After registering the type in the class initialization function, we
+must fill out the epv with our entry points, similar to the way we
+hook up virtual class functions. It may also be necessary to override
+the parent's epv's; this can be done by accessing the epv pointer for
+the parent class.
+  <example>
+     <title>Setting up the class' methods</title>
+     <programlisting>
+static void
+bonobo_control_class_init (BonoboControlClass *klass)
+{
+	GtkObjectClass *object_class = (GtkObjectClass *)klass;
+	POA_Bonobo_Control__epv *epv = &amp;klass->epv;
+
+	bonobo_control_parent_class = gtk_type_class (PARENT_TYPE);
+
+	...
+
+	object_class->destroy  = bonobo_control_destroy;
+	object_class->finalize = bonobo_control_finalize;
+
+	epv->activate       = impl_Bonobo_Control_activate;
+	epv->setSize        = impl_Bonobo_Control_setSize;
+	...
+	epv->realize        = impl_Bonobo_Control_realize;
+	epv->unrealize      = impl_Bonobo_Control_unrealize;
+}
+     </programlisting>
+  </example>
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BONOBO-X-SERVANT-GET-OBJECT-CAPS">BONOBO_X_SERVANT_GET_OBJECT()</title>
+<programlisting>#define     BONOBO_X_SERVANT_GET_OBJECT(o)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>o</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-X-OBJECT-GET-SERVANT-CAPS">BONOBO_X_OBJECT_GET_SERVANT()</title>
+<programlisting>#define BONOBO_X_OBJECT_GET_SERVANT(o) ((PortableServer_Servant)&amp;(o)-&gt;servant)
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>o</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboXObject-struct">struct BonoboXObject</title>
+<programlisting>struct BonoboXObject;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboXObjectClass">BonoboXObjectClass</title>
+<programlisting>typedef struct {
+	BonoboObjectClass          parent_class;
+
+	BonoboXObjectPOAFn         poa_init_fn;
+	BonoboXObjectPOAFn         poa_fini_fn;
+
+	POA_Bonobo_Unknown__vepv  *vepv;
+
+	/* The offset of this class' additional epv */
+	int                        epv_struct_offset;
+
+	POA_Bonobo_Unknown__epv    epv;
+} BonoboXObjectClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboXObjectPOAFn">BonoboXObjectPOAFn ()</title>
+<programlisting>void        (*BonoboXObjectPOAFn)           (<link linkend="PortableServer-Servant">PortableServer_Servant</link> servant,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>servant</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-x-object">bonobo_x_object ()</title>
+<programlisting><link linkend="BonoboXObject">BonoboXObject</link>* bonobo_x_object              (<link linkend="gpointer">gpointer</link> p);</programlisting>
+<para>
+This function can be passed a BonoboXObject * or a
+PortableServer_Servant, and it will return a BonoboXObject *.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>p</parameter>&nbsp;:</entry>
+<entry> a pointer to something
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a BonoboXObject or NULL.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-x-type-unique">bonobo_x_type_unique ()</title>
+<programlisting><link linkend="GtkType">GtkType</link>     bonobo_x_type_unique            (<link linkend="GtkType">GtkType</link> parent_type,
+                                             <link linkend="BonoboXObjectPOAFn">BonoboXObjectPOAFn</link> init_fn,
+                                             <link linkend="BonoboXObjectPOAFn">BonoboXObjectPOAFn</link> fini_fn,
+                                             int epv_struct_offset,
+                                             const <link linkend="GtkTypeInfo">GtkTypeInfo</link> *info);</programlisting>
+<para>
+This function is the main entry point for deriving bonobo
+server interfaces.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>parent_type</parameter>&nbsp;:</entry>
+<entry> the parent Gtk Type
+</entry></row>
+<row><entry align="right"><parameter>init_fn</parameter>&nbsp;:</entry>
+<entry> a POA initialization function
+</entry></row>
+<row><entry align="right"><parameter>fini_fn</parameter>&nbsp;:</entry>
+<entry> a POA finialization function or NULL
+</entry></row>
+<row><entry align="right"><parameter>epv_struct_offset</parameter>&nbsp;:</entry>
+<entry> the offset into the struct that the epv
+commences at, or 0 if we are inheriting a plain Gtk Object
+from a BonoboXObject, adding no new CORBA interfaces
+</entry></row>
+<row><entry align="right"><parameter>info</parameter>&nbsp;:</entry>
+<entry> the standard GtkTypeInfo.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the constructed Gtk Type.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-x-type-setup">bonobo_x_type_setup ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_x_type_setup             (<link linkend="GtkType">GtkType</link> type,
+                                             <link linkend="BonoboXObjectPOAFn">BonoboXObjectPOAFn</link> init_fn,
+                                             <link linkend="BonoboXObjectPOAFn">BonoboXObjectPOAFn</link> fini_fn,
+                                             int epv_struct_offset);</programlisting>
+<para>
+This function initializes a type derived from BonoboXObject, such that
+when you instantiate a new object of this type with gtk_type_new the
+CORBA object will be correctly created and embedded.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> The type to initialize
+</entry></row>
+<row><entry align="right"><parameter>init_fn</parameter>&nbsp;:</entry>
+<entry> the POA_init function for the CORBA interface or NULL
+</entry></row>
+<row><entry align="right"><parameter>fini_fn</parameter>&nbsp;:</entry>
+<entry> NULL or a custom POA free fn.
+</entry></row>
+<row><entry align="right"><parameter>epv_struct_offset</parameter>&nbsp;:</entry>
+<entry> the offset in the class structure where the epv is or 0
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE on success, FALSE on error.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-X-TYPE-FUNC-FULL-CAPS">BONOBO_X_TYPE_FUNC_FULL()</title>
+<programlisting>#define     BONOBO_X_TYPE_FUNC_FULL(class_name, corba_name, parent, prefix)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>class_name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>corba_name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>prefix</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-X-TYPE-FUNC-CAPS">BONOBO_X_TYPE_FUNC()</title>
+<programlisting>#define     BONOBO_X_TYPE_FUNC(class_name, parent, prefix)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>class_name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>prefix</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="BonoboObject">BonoboObject</link>
+</para>
+</refsect1>
+
+</refentry>

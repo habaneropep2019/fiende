@@ -1,0 +1,528 @@
+<refentry id="bonobo-bonobo-control">
+<refmeta>
+<refentrytitle>BonoboControl</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboControl</refname><refpurpose>An implementation of the control interface for GtkWidgets</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboControl">BonoboControl</link>;
+typedef     <link linkend="BonoboControlClass">BonoboControlClass</link>;
+<link linkend="BonoboControl">BonoboControl</link>* <link linkend="bonobo-control-new">bonobo_control_new</link>           (<link linkend="GtkWidget">GtkWidget</link> *widget);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-control-get-widget">bonobo_control_get_widget</link>       (<link linkend="BonoboControl">BonoboControl</link> *control);
+void        <link linkend="bonobo-control-set-automerge">bonobo_control_set_automerge</link>    (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="gboolean">gboolean</link> automerge);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-control-get-automerge">bonobo_control_get_automerge</link>    (<link linkend="BonoboControl">BonoboControl</link> *control);
+void        <link linkend="bonobo-control-set-property">bonobo_control_set_property</link>     (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             const char *first_prop,
+                                             ...);
+void        <link linkend="bonobo-control-get-property">bonobo_control_get_property</link>     (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             const char *first_prop,
+                                             ...);
+<link linkend="BonoboControl">BonoboControl</link>* <link linkend="bonobo-control-construct">bonobo_control_construct</link>     (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);
+<link linkend="BonoboUIComponent">BonoboUIComponent</link>* <link linkend="bonobo-control-get-ui-component">bonobo_control_get_ui_component</link>
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control);
+void        <link linkend="bonobo-control-set-ui-component">bonobo_control_set_ui_component</link> (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="BonoboUIComponent">BonoboUIComponent</link> *component);
+<link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> <link linkend="bonobo-control-get-remote-ui-container">bonobo_control_get_remote_ui_container</link>
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control);
+void        <link linkend="bonobo-control-set-control-frame">bonobo_control_set_control_frame</link>
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="Bonobo-ControlFrame">Bonobo_ControlFrame</link> control_frame);
+<link linkend="Bonobo-ControlFrame">Bonobo_ControlFrame</link> <link linkend="bonobo-control-get-control-frame">bonobo_control_get_control_frame</link>
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control);
+void        <link linkend="bonobo-control-set-properties">bonobo_control_set_properties</link>   (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb);
+<link linkend="BonoboPropertyBag">BonoboPropertyBag</link>* <link linkend="bonobo-control-get-properties">bonobo_control_get_properties</link>
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control);
+<link linkend="Bonobo-PropertyBag">Bonobo_PropertyBag</link> <link linkend="bonobo-control-get-ambient-properties">bonobo_control_get_ambient_properties</link>
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+void        <link linkend="bonobo-control-activate-notify">bonobo_control_activate_notify</link>  (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="gboolean">gboolean</link> activated);
+<link linkend="Bonobo-Control-windowId">Bonobo_Control_windowId</link> <link linkend="bonobo-control-windowid-from-x11">bonobo_control_windowid_from_x11</link>
+                                            (<link linkend="guint32">guint32</link> x11_id);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The BonoboControl object implements the CORBA interface for
+handling remote embeddable components. A Control is a light
+weight, single view, arbitrarily complex 'widget'. Controls
+typicaly expose much of their functionality through a
+property bag.
+</para>
+
+<para>
+A BonoboControl provides the server ( or component ) side
+implementation of a Control. The client that uses this
+control will probably use a <link linkend="BonoboWidget">BonoboWidget</link> to use the control
+in their program.
+</para>
+
+<para>
+</para>
+
+<para>
+If you want to expose your widget as a control it is very simple
+  <example>
+    <title>CORBA-ifying your GtkWidget</title>
+    <programlisting>
+BonoboControl *control;
+GtkWidget     *widget;
+Bonobo_Unknown corba_object;
+
+widget = <link linkend="make-my-widget">make_my_widget</link>();
+gtk_widget_show (widget);
+
+control = bonobo_control_new (widget);
+corba_object = BONOBO_OBJREF (control);
+    </programlisting>
+  </example>
+  The corba_object can then be passed off down the wire to anyone
+and the control popped into a <link linkend="BonoboWidget">BonoboWidget</link> or <link linkend="BonoboControlFrame">BonoboControlFrame</link>
+at the other end. Here is an even less useful example
+  <example>
+    <title>A pretty useless Control</title>
+    <programlisting>
+GtkWidget *widget;
+
+widget = gtk_button_new_with_label ("My Control");
+gtk_widget_show (widget);
+
+return bonobo_control_new (widget);
+    </programlisting>
+  </example>
+  If you learn only one thing from this example, it should be that
+you need to do a gtk_widget_show on your control. It is not
+sufficient to do a gtk_widget_show_all on the top level of the
+client side, since this will not ( and should not ) propagate
+over to the Control.
+</para>
+
+<para>
+One final thing worth thinking about is activation. When a control
+is embedded inside a <link linkend="BonoboControlFrame">BonoboControlFrame</link>, it is initialy inactive.
+In order for the control to recieve interactive input it is neccessary
+to use bonobo_control_frame_activate. This signals to the control
+that it is activated, at which point the Control should merge any
+UI elements it has with the associated <link linkend="BonoboUIComponent">BonoboUIComponent</link>. This
+needs to be done every time the control is activated.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboControl">BonoboControl</title>
+<programlisting>typedef struct {
+	BonoboXObject base;
+
+	BonoboControlPrivate *priv;
+} BonoboControl;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboControlClass">BonoboControlClass</title>
+<programlisting>typedef struct {
+	BonoboXObjectClass      parent_class;
+
+	POA_Bonobo_Control__epv epv;
+
+	/* Signals. */
+	void (*set_frame)      (BonoboControl *control);
+	void (*activate)       (BonoboControl *control, gboolean state);
+} BonoboControlClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-new">bonobo_control_new ()</title>
+<programlisting><link linkend="BonoboControl">BonoboControl</link>* bonobo_control_new           (<link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+This function creates a new BonoboControl object for <parameter>widget</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> a GTK widget that contains the control and will be passed to the
+container process.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a BonoboControl object that implements the Bonobo::Control CORBA
+service that will transfer the <parameter>widget</parameter> to the container process.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-get-widget">bonobo_control_get_widget ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_control_get_widget       (<link linkend="BonoboControl">BonoboControl</link> *control);</programlisting>
+<para>
+Returns the GtkWidget associated with a BonoboControl.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> a BonoboControl
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the BonoboControl's widget
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-set-automerge">bonobo_control_set_automerge ()</title>
+<programlisting>void        bonobo_control_set_automerge    (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="gboolean">gboolean</link> automerge);</programlisting>
+<para>
+Sets whether or not the control handles menu/toolbar merging
+automatically.  If automerge is on, the control will automatically
+register its BonoboUIComponent with the remote BonoboUIContainer
+when it is activated.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboControl">BonoboControl</link>.
+</entry></row>
+<row><entry align="right"><parameter>automerge</parameter>&nbsp;:</entry>
+<entry> Whether or not menus and toolbars should be
+automatically merged when the control is activated.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-get-automerge">bonobo_control_get_automerge ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_control_get_automerge    (<link linkend="BonoboControl">BonoboControl</link> *control);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboControl">BonoboControl</link>.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Whether or not the control is set to automerge its
+menus/toolbars.  See <link linkend="bonobo-control-set-automerge">bonobo_control_set_automerge</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-set-property">bonobo_control_set_property ()</title>
+<programlisting>void        bonobo_control_set_property     (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             const char *first_prop,
+                                             ...);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>first_prop</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-get-property">bonobo_control_get_property ()</title>
+<programlisting>void        bonobo_control_get_property     (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             const char *first_prop,
+                                             ...);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>first_prop</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-construct">bonobo_control_construct ()</title>
+<programlisting><link linkend="BonoboControl">BonoboControl</link>* bonobo_control_construct     (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-get-ui-component">bonobo_control_get_ui_component ()</title>
+<programlisting><link linkend="BonoboUIComponent">BonoboUIComponent</link>* bonobo_control_get_ui_component
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> The control
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the associated UI component
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-set-ui-component">bonobo_control_set_ui_component ()</title>
+<programlisting>void        bonobo_control_set_ui_component (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="BonoboUIComponent">BonoboUIComponent</link> *component);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>component</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-get-remote-ui-container">bonobo_control_get_remote_ui_container ()</title>
+<programlisting><link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> bonobo_control_get_remote_ui_container
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A BonoboControl object which is associated with a remote
+ControlFrame.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The Bonobo_UIContainer CORBA server for the remote BonoboControlFrame.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-set-control-frame">bonobo_control_set_control_frame ()</title>
+<programlisting>void        bonobo_control_set_control_frame
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="Bonobo-ControlFrame">Bonobo_ControlFrame</link> control_frame);</programlisting>
+<para>
+Sets the ControlFrame for <parameter>control</parameter> to <parameter>control_frame</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A BonoboControl object.
+</entry></row>
+<row><entry align="right"><parameter>control_frame</parameter>&nbsp;:</entry>
+<entry> A CORBA interface for the ControlFrame which contains this Controo.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-get-control-frame">bonobo_control_get_control_frame ()</title>
+<programlisting><link linkend="Bonobo-ControlFrame">Bonobo_ControlFrame</link> bonobo_control_get_control_frame
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A BonoboControl object whose Bonobo_ControlFrame CORBA interface is
+being retrieved.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The Bonobo_ControlFrame CORBA object associated with <parameter>control</parameter>, this is
+a CORBA_Object_duplicated object.  You need to CORBA_Object_release it when you are
+done with it.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-set-properties">bonobo_control_set_properties ()</title>
+<programlisting>void        bonobo_control_set_properties   (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb);</programlisting>
+<para>
+Binds <parameter>pb</parameter> to <parameter>control</parameter>.  When a remote object queries <parameter>control</parameter>
+for its property bag, <parameter>pb</parameter> will be used in the responses.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboControl">BonoboControl</link> object.
+</entry></row>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboPropertyBag">BonoboPropertyBag</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-get-properties">bonobo_control_get_properties ()</title>
+<programlisting><link linkend="BonoboPropertyBag">BonoboPropertyBag</link>* bonobo_control_get_properties
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboControl">BonoboControl</link> whose PropertyBag has already been set.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The <link linkend="BonoboPropertyBag">BonoboPropertyBag</link> bound to <parameter>control</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-get-ambient-properties">bonobo_control_get_ambient_properties ()</title>
+<programlisting><link linkend="Bonobo-PropertyBag">Bonobo_PropertyBag</link> bonobo_control_get_ambient_properties
+                                            (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboControl">BonoboControl</link> which is bound to a remote
+<link linkend="BonoboControlFrame">BonoboControlFrame</link>.
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> CORBA exception environment.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A <link linkend="Bonobo-PropertyBag">Bonobo_PropertyBag</link> bound to the bag of ambient
+properties associated with this <link linkend="Control">Control</link>'s <link linkend="ControlFrame">ControlFrame</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-activate-notify">bonobo_control_activate_notify ()</title>
+<programlisting>void        bonobo_control_activate_notify  (<link linkend="BonoboControl">BonoboControl</link> *control,
+                                             <link linkend="gboolean">gboolean</link> activated);</programlisting>
+<para>
+Notifies the remote ControlFrame which is associated with
+<parameter>control</parameter> that <parameter>control</parameter> has been activated/deactivated.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboControl">BonoboControl</link> object which is bound
+to a remote ControlFrame.
+</entry></row>
+<row><entry align="right"><parameter>activated</parameter>&nbsp;:</entry>
+<entry> Whether or not <parameter>control</parameter> has been activated.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-control-windowid-from-x11">bonobo_control_windowid_from_x11 ()</title>
+<programlisting><link linkend="Bonobo-Control-windowId">Bonobo_Control_windowId</link> bonobo_control_windowid_from_x11
+                                            (<link linkend="guint32">guint32</link> x11_id);</programlisting>
+<para>
+This mangles the X11 name into the ':' delimited
+string format "X-id: ..."</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>x11_id</parameter>&nbsp;:</entry>
+<entry> the x11 window id.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the string; free after use.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="BonoboWidget">BonoboWidget</link>, <link linkend="bonobo-widget-new">bonobo_widget_new</link>()
+</para>
+</refsect1>
+
+</refentry>

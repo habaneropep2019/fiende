@@ -1,0 +1,704 @@
+Sun Oct 14 21:04:04 2001 Abel Cheung <maddog@linux.org.hk>
+
+	* Makefile.am: GLADE_CFLAGS needed because libglade header
+	  is moved to another location.
+
+Mon Sep 03 06:18:59 2001  George Lebl <jirka@5z.com>
+
+	* glade/*.h: remove the .h files.  glade files are handled directly
+	  now
+
+2001-08-14  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* dialog-prefs.c: Hook up the help button to show some help.
+	* menus.c: s/gdk_colormap_get_system()/gtk_widget_get_colormap()
+	
+2001-08-08  Abel Cheung  <maddog@linux.org.hk>
+
+	* \*.desktop: Added zh_TW.Big5 (traditional Chinese) strings.
+
+Wed Jun 06 16:30:49 2001  George Lebl <jirka@5z.com>
+
+	* view-color-list.c: fix float range view bug, there are 255 not 256
+	  divisions
+
+Wed Jun 06 15:30:13 2001  George Lebl <jirka@5z.com>
+
+	* dialog-prefs.c, gcolorsel.c, mdi-color-generic.c, mdi-color.c,
+	  session.c: Fix some pref loading races, general cleanup, fix the
+	  mdi mode load/save foo
+
+Wed Jun 06 14:33:58 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am: fix the XLIBDIR define
+
+2001-06-06  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* dialog-prefs.c: Fix headers.
+	
+2001-06-05  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* glade/Makefile.am: Remove .glade.h files now that we use xml-i18n-tools.
+	
+2001-06-04  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gcolorsel.c (main): Remove unused var "goad_id".
+	
+2001-02-13 John Fleck <jfleck@inkstain.net>
+
+	* added doc/C/gcolorsel-C.omf, the omf file for scrollkeeper
+
+Fri Feb 09 03:27:51 2001  George Lebl <jirka@5z.com>
+
+	* mdi-color-generic.c: when removing a color make sure it's list is
+	  nulled, and check for that later
+
+	* mdi-color-virtual.c: when clearing the color thing, make a copy
+	  of a list before traverrsing it and wiping entries to avoid
+	  free list corruption
+
+2000-11-13  Tim Gerla  <timg@rrv.net>
+
+	* menus.c: Removed my name.
+
+2000-11-08  Gediminas Paulauskas  <menesis@delfi.lt>
+
+	* menus.c: make Exit last menu item.
+	* glade/dialog-new-doc.glade{.h}, dialog-new-view.glade{.h}:
+	Remove unused labels in clists.
+	
+2000-10-19  Eric Brayeur <eb@ibelgique.com>
+
+	Ok, this module is almost dead. The new version is now in CVS, 
+	see libgcolorsel2 and gcolorsel2 modules.
+
+	* glade/Makefile.am : added dialog-prefs.glade, dialog-prefs.glade.h
+
+	* *.c : replaced some g_assert with g_return_[val_]if_fail, so we 
+	  don't crash if we can't load glade files.
+
+	* gcolorsel.c, menus.c : removed applet code.
+
+	* view-color-list.c : set auto sort mode. Don't sort the clist.
+
+	* *.c : removed a lot of printf.
+
+	* menus.c : *_cb : don't use data for active view, it's a 
+	  GnomeMDI. call gnome_mdi_get_active_view to get it ... 	  
+
+2000-07-04 John Fleck <jfleck@inkstain.net>
+	* fixed doc/C/Makefile.am so it doesn't rebuild htmls on make and
+	make and make install, updated gcolorsel.sgml to prepare for release
+
+2000-06-12  Alexander Kirillov  <kirillov@math.sunysb.edu>
+
+	* doc/C/gcolorsel.sgml + screenshots: updated docs - still not
+	finished, but better now.
+
+2000-06-08 Gregory McLean <gregm@comstar.net>
+	
+	* Makefile.am: Backout build breaking changes commited by esca.
+	1.18 esca   May 29 12:57 *** empty log message ***
+        This didn't work on the majority of the systems and was broke.
+	next time please check your work more carefully.
+
+2000-05-29  Eric Brayeur    <eb2@ibelgique.com>
+
+	* Open-VMS exam ;-)
+
+	* mdi-color-generic.[ch], menus.c : rename other_views -> docs.          
+          other_views : new list, a list of views contained in applets.
+
+	* menus.c (menu_view_do_popup) : pass view, and use it as data 
+          for gnome_popup_menu_do_popup; so we don't use
+          gnome_mdi_get_active_child with a view in a applet.
+	  (*_cb) : check data != NULL ...
+
+	* gcolorsel.c : Start gcolorsel in applet mode, if called with
+          gcolorsel_applet and applet support.
+	  Start factory; in a first time, all applet = a view to the same
+          document (~/.gcolorsel_applet); So all applets are synchronized.
+
+	* menus.c (menu_configure_applet) : register menu for applet.
+
+	* gcolorsel.c : change size / change orient.
+
+2000-05-28  Eric Brayeur    <eb2@ibelgique.com>
+
+	* mdi-color-file.c : new flag, create (create file if not found).
+		
+	* session.c : create file ~/.gcolorsel_colors if not found.
+
+2000-05-27  Eric Brayeur    <eb2@ibelgique.com>
+
+	* session.c (session_create) : Rename 'System' -> 'System colors'.
+          Open another file : ~/.gcolorsel_colors in 'User colors',
+          and show it in a ColorList view.
+          Removed the ColorGrid view for the search document.
+          Made the search document search in system and user colors.
+          Drop a color -> append it in 'User colors'.
+
+	* menus.c :
+          'Save' -> 'Save palette' 'Open...' -> 'Open palette...'.
+          'Save As...' -> 'Save palette As...'
+	  'Properties...' -> 'Document/View properties'.
+	  	                  
+2000-05-20  Kjartan Maraas  <kmaraas@gnu.org>
+
+	* *.c: Added #include <config.h> many places to make translations
+	work. There are still issues. Some of the tabs aren't working.
+	
+2000-05-11  Karl Eichwalder  <ke@suse.de>
+
+	* menus.c: Mark more strings as translatable.
+
+2000-05-10  Eric Brayeur  <eb2@ibelgique.com>
+
+	* view-color-list.c (view_color_list_idle): 
+	(view_color_list_render_pixmap): fallback to GDK_ROOT_PARENT if
+	widget->window == NULL (in mdi modal mode).
+
+2000-05-09  Eric Brayeur  <eb2@ibelgique.com>
+
+	* menus.c : grab a color on the screen; 
+	
+2000-05-08  Eric Brayeur  <eb2@ibelgique.com>
+
+	* glade/dialog-prefs.glade : new file.
+
+	* dialog-prefs.c : new file; properties for : save /session ;
+	  MDI ; and configure events (double click, drop a color, etc ...).	
+
+	* gcolorsel.c : execute action : append / search /edit.
+	  show a warning if fail.
+
+	* view-color-edit.c : implement dnd for preview.
+
+	* gcolorsel.c : implement drop.
+	
+2000-05-07  Eric Brayeur  <eb2@ibelgique.com>
+
+	* menus.c, gcolorsel.c : support cut and paste; now you can paste 
+	  gcolorsel colors in gnumeric !
+
+	* mdi-color-generic (mdi_color_generic_append) : set col->owner.
+
+2000-05-06 Eric Brayeur <eb2@ibelgique.com>
+
+	* glade/dialog-new-view.glade : show only view type.
+
+	* dialog-new-view.c : add a view for current doc; no more doc selection.
+	
+2000-05-04  Alexander Kirillov  <kirillov@math.sunysb.edu>
+
+	* doc/C/gcolorsel.sgml: updated documentation; still far from being
+	finished, as the app itself is changing rapidly
+
+2000-05-02 Eric Brayeur <eb2@ibelgique.com>
+
+	* menus.c : don't break string, that make life harder for traductor.
+
+	* menus.c : (save_as) don't forget previous name, and restore it if
+	  file can't be saved.
+
+	* dialog-new-doc.c : finished. 
+	
+2000-05-01 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-generic.c (mdi_color_generic_apply) : call
+	  mdi_color_generic_set_name instead of gnome_mdi_child_set_name,
+	  so, no more problem with '*' if modified.
+	  (mdi_color_generic_sync) : take MDIColorGeneric name, not
+	  the one in GnomeMDIChild.
+
+	* mdi-color-file.c (mdi_color_generic_apply) : set document modified
+	  flag if header changed.
+
+	* mdi-color-*.c, view-color-*.c : remove printf.
+
+	* menu.c : destroy mcg or view properties widget if view / doc
+	  destroyed.
+
+	* glade/dialog-new-doc.glade : new file; 
+
+	* dialog-new-doc.c : new file
+
+	* menu.c (new_doc_cb) call new doc dialog.
+
+	* dialog-new-doc.c : finish first and second page : document name,
+	  document type, and parents document. Works well.
+	
+2000-04-30 Eric Brayeur <eb2@ibelgique.com>
+
+	* menu.[ch] (menu_edit) : new function, open an edit view.
+
+	* view-color-list.c : edit color on dbclick.
+
+	* view-color-grid.c : edit color on dbclick.
+
+	* session.c : some check to avoid crash if bad config file.
+	  Ask user 'do you want to create a new session'.
+
+	* mdi-color-file.c : assume "" == NULL when loading filename.
+          (load) do not fail if file empty.
+	  (save) do not add '\n' after header if we have already one '\n'.
+		
+2000-04-29 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-virtual.[ch]: split, it is now a small base class.
+
+	* mdi-color-virtual-rgb.[ch]: new files, specific code for searching 
+	  colors by RGB.
+
+	* mdi-color-virtual-monitor.[ch] : new files.
+
+	* menus.c : use the virtual-monitor in edit_cb. Show only the
+	  colors selected ...
+
+	* view-color-edit.[ch] : implement remove_selected
+
+	* view-color-generic.[ch] : new function to get the insert pos.
+	  (row selected, ...).
+
+	* view-color-list.[ch], view-color-grid.[ch] : insert pos.
+
+	* menus.c : implement insert color.
+
+	* widget-color-grid.c : fix a bug; now redraw color when RGB changed;
+
+	* mdi-color-generic.c (temp) : new member. TRUE means that the 
+	  view can be destroyed without warning.
+
+	* dialog-new-view (dialog_fill_clist_doc) : don't show temp doc.
+
+	* menus.c (close_view_cb) : Remove document when closing the last
+	  view.
+
+	* session.c (session_load) : remove temp view when loading a session.
+	  Because MDIColorVirtualMonitor can save list of monitored colors.
+	  (slow and won't be very useful ...).
+	  So Edit views aren't restored.
+
+	* menus.c (remove_cb) : remove temp view if no more colors to display.
+		
+2000-04-30 John Fleck <jfleck@inkstain.net>
+
+	* rebuilt images to fix GNOME help browser display glitch
+
+2000-04-30 John Fleck <jfleck@inkstain.net>
+
+	* fixed /doc/C/Makefile.am to install png's correctly
+
+2000-04-26 Eric Brayeur <eb2@ibelgique.com>
+
+	* gcolorsel.c, menu.c : polished save dialogs.
+
+	* session.c (session_load_data) : show a warning if file not found.
+	
+2000-04-25 Eric Brayeur <eb2@ibelgique.com>
+
+	* menus.c (close_view_cb) : show "do you want to close the document ?"
+	  if user close the last view of a document ...
+	  (close_doc_cb) : show warning.
+
+	* mdi-color-generic.c (mdi_color_generic_destroy) : move disconnect
+	  parent / other_views from gcolorsel to here.
+
+	* gcolorsel.c (mdi_remove_child) : ask user to save file if modified.
+	
+2000-04-24 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-file.c (mdi_color_file_load) : update progress when 
+	  loading.
+
+	* mdi-color-generic.c : destroy view object when view is destroyed.
+
+	* session.c, menus.c : set all GnomeAPP sensitivity to FALSE when 
+	  loading a file.
+
+	* idle.[ch] : new files, gtk-idle + block/unblock.
+
+	* gcolorsel.c (main) : destroy mdi after gtk_main (), so, all GdkPixmap
+	  are unreferenced; I think that X need that.
+
+	* view-color-list (view_color_list_destroy) : don't unref gc and font
+	  if == to NULL.
+
+	* glade/dialog-new-view.glade* : new dialog ...
+
+	* dialog-new-view.c : new file ...
+
+	* dialogs.h : new file, header for dialog-*.c
+
+	* gcolorsel.[ch] (views) : new tab, where we keep some informations
+	  about every view : name, pointer to _get_type () and to _new () 
+
+	* mdi-color-generic.c (create_view) : use views tab, to get rid of
+	  hardcoded view creation.
+	
+	* dialog-new-view.c : use the views tab to get a name for every  
+	  views. Finished this dialog.
+
+	* menus.c (close_cb) : small bug fix.
+
+Tue Apr 25 11:30:18 EDT 2000 Gregory McLean <gregm@comstar.net>
+
+	* menus.c : Added the new documentation to the help menu.
+
+2000-04-23 Eric Brayeur <eb2@ibelgique.com>
+
+	* view-color-list.c: save and restore column value width.
+
+	* view-color-grid.c (view_color_grid_button_press) : display popup.
+
+	* mdi-color-generic.c : now show '*' after document name if
+	  document have been modified.
+
+	* mdi-color-file.c (mdi_color_file_load) : fclose the file.
+	  (mdi_color_file_save) : new function.
+	  (mdi_color_file_load) : ignore GIMP Palette header; modify sscanf
+	  to read even '(' for name ...
+
+	* utils.c (display_todo) : new function.
+
+	* menus.c : use display_todo when we do nothing ...
+
+	* glade/mdi-color-file.glade : begin/end comments and header.
+
+	* mdi-color-file.c : gcolorsel can now read/edit/write header !
+
+	* gcolorsel.c : create a status bar for each window.
+
+	* menus.c : implement new/save/save as; with dialog if fail, ...
+
+	* mdi-color-file.c : display progress in statusbar.
+	
+2000-04-23 Eric Brayeur <eb2@ibelgique.com>
+
+	* menus.[ch] (toolbar) : new GNOMEUIINFO structure, for toolbar.
+
+	* gcolorsel.c (main) : set toolbar. Set default size to 320x400
+	  instead of 320x380.
+
+	* gcolorsel.c (main) : init i18n.
+	
+2000-04-22 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-*.[ch], view-color-*.[ch] : load/save properties works.
+
+	* session.[ch] : new files, save gcolorsel state and restore it.
+          Save all, from file loaded in MDIColorFile to SortColumn in ColorList.
+
+	* gcolorsel.c : try loading session; if fail, construct a new
+          session.
+	
+	* session.[ch] (session_create) : move gcolosel session creation
+	  here.
+
+2000-04-21 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-generic.c, widget-color-grid.c : optimization for
+	  remove case.
+
+2000-04-20 Eric Brayeur <eb2@ibelgique.com>
+
+	* widget-color-grid.c (color_grid_item_event) : small fix.
+
+2000-04-19 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-generic.c, gcolorsel.c, menus.[ch] : don't use GnomeMDi
+  	  to set Edit menu.
+
+	* view-color-list.c : don't autosize pixmap column; set width
+	  manually.
+	  
+	* view-color-list.c : use idle to redraw pixmap in CHANGE_POS case.
+	  Faster on remove case !!! 
+	  (view_color_list_redraw_all) : use idle. (faster in pixmap
+	  change size);
+	  (view_color_list_destroy) : new function.
+
+	* widget-color-grid.c (color_grid_init) : alloc color black, 
+	  white and red; faster when selecting a lot of colors ...
+
+	* widget-color-grid.c : Use the idle system I used for ColorList;
+	  now this widget is faster than before.
+
+2000-04-18 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-virtual.c (mdi_color_virtual_get_append_pos) 
+	  loop into the list from the first color OR from the last color.
+	  (2 x faster).
+
+2000-04-17 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color.[ch] : remove data member. 
+
+        * mdi-color-generic.[ch] (mdi_color_generic_append_new) : remove
+          data. (mdi_color_generic_append_new_set_data) : new function.
+
+        * mdi-color-virtual.c : remove MDIColor data usage.
+
+	* mdi-color.h : (phase_change) : new member.		
+	* mdi-color-generic.[ch] (phases_change) : new member. 
+	  (mdi_color_generic_post_change) : if phases_change equal to
+          MDIColor phase_change then color is already in the changes list. 
+	  Now, we don't have to loop to reset MDIColor.change
+
+	* widget-color-grid.[ch] (destroy) : new member for item; works like
+          GtkCList row destroy.
+
+	* mdi*, view* : use gtk_object_(un)ref on MDIColor.
+
+	* view-color-grid.c (color_grid_destroy) : new function, call
+          color_grid_clear on destroy.
+
+	* mdi-color-virtual.c (mdi_color_virtual_set) : fix a bug in
+          the decrease tolerance case.
+
+	* mdi-color.c (mdi_color_destroy) : new function, free name on
+	  destroy.
+
+	* mdi-color-virtual.c (mdi_color_virtual_changed) : always ref
+          the color even if we don't take it.
+
+	* view-color-edit.c : render pixmaps in an idle so search search
+	  is "faster".
+
+2000-04-16 Eric Brayeur <eb2@ibelgique.com>
+
+	* glade/Makefiles.am : add *.bak to CLEANFILES.
+
+	* view-color-generic.c : kill a warning.
+
+	* mdi-color.[ch] : new files, contains MDIColor, a GtkObject 
+	  derived version of MDIColorGenericCol. (now, it's easy to set
+	  data, destroy signal ...).
+	  *.[ch] : use MDIColor instead of MDIColorGenericCol, nothing more
+	  for now.
+
+2000-04-16 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-generic.[ch] (mdi_color_generic_post_change, 
+	  (mdi_color_generic_append, mdi_color_generic_remove, 
+	   mdi_color_generic_change_pos) : keep a pointer to the end of
+           col and changes list (faster in append case).
+	  
+2000-04-14 Eric Brayeur <eb2@ibelgique.com>
+
+	* mdi-color-generic.c (mdi_color_generic_view_realize) : disconnect.
+
+	* mdi-color-virtual.c : CHANGE_NAME and CHANGE_RGB works.
+
+	* view-color-edit.c : Change NAME works.
+	  (and sync edit if CHANGE_NAME or CHANGE_RGB request).
+	  Prev and Next button.
+	  Set sensitive on button.
+
+	* Fu** !!! I was calling gtk_signal_disconnect_by_data in 
+	  mdi-color-generic.c, and some other callbacks were disconnected
+	  too (popup menu, dnd, column click) ! Replace by 
+	  gtk_signal_disconnect_by_func.
+
+	* view-color-edit.c : set sensitive of view to FALSE if no more color
+	  to edit.
+
+2000-04-13 Eric Brayeur <eb2@ibelgique.com>
+
+	* glade/view-color-edit.glade : new file.
+	* view-color-edit.[ch] : new files; A view that let you edit colors.
+	  (do nothing, now ...)
+
+	* mdi-color-generic.c : change : send all the document colors
+	  when the document is connected to a view/other_document.
+	
+	* mdi-color-virtual.c : speed; didn't freeze the document in	
+	  data_changed.
+
+	* view-color-grid.c (view_color_grid_data_changed) correct a bug
+	  when remove request.
+
+	* widget-color-grid.c : SHIFT select works.
+
+	* view-color-edit.c : Append colors in combo; change RGB works.
+	* view-color-list.c, view-color-grid, widget-color-grid.c : support
+	  change RGB request.
+
+2000-04-12 Eric Brayeur <eb2@ibelgique.com>
+
+	* widget-color-grid.c : bug in allocate
+
+	* view-color-list.[ch] : replace hardcoded value for pixmap size
+          with col_width and col_height. (for properties).
+          Plus draw_numbers.
+
+	* view-color-list.c : properties (width/height and draw_numbers)
+	  (view-color-list-redraw-all) : new function.
+	  (view-color-list-data-changed) : update pixmap on change_pos only
+	  if draw_numbers.
+
+	* menu.c : keep a list of GnomePropertyBox, and keep them in sync
+	  each other.
+
+	* glade/view-color-generic.glade : (check-show-control) new widget.
+
+	* view-color-list.c : show control properties
+
+	* glade/mdi-color-file.glade : new file.
+	* mdi-color-file.c : properties ; filename (not editable).
+
+2000-04-11 Eric Brayeur <eb2@ibelgique.com>
+
+	* Makefile.am, gcolorsel.c : add libglade
+	* glade/ : new directory.
+
+	* view-*, mdi-* : get_control : new function that construct 
+	  properties widget. (uses libglade)
+
+	* glade/* new files for properties
+
+	* mdi-color-generic.c : implement change name
+	* view-color-grid.c   : implement color width/height properties
+
+2000-04-10 Eric Brayeur <eb2@ibelgique.com>
+
+	* view-color-generic.[ch] : new files; base class for views.
+	* widget-color-list.[ch] : removed.
+	* view-color-list.[ch] : ColorList is no longer a widget.
+
+	* widget-color-grid.c : Removed MDI stuff, implement set/get data
+	  for each color. Works like GtkCList now.
+	* view-color-grid.[ch] : Use ColorGrid widget.
+
+2000-04-06 Eric Brayeur <eb2@ibelgique.com>
+
+ 	* menus.[ch] (menu_view_do_popup) : new function. 
+	* widget-color-list.[ch], widget-color-grid.[ch] : enable popup menu.
+
+	* widget-color-grid.c (color_grid_item_event) : fix a bug with
+          SHIFT + BUTTON. (crash if no item selected)
+
+	* menus.c : Add new color, edit color and properties item to edit menu.
+
+	* widget-color-grid.c (color_grid_get_col_at) new function, return
+          the color situated on (top, right, left, bottom) of an other
+          color.
+          (color_grid_key_press_event) : new function; Move selected
+          color with keys.
+	 
+2000-04-05 Eric Brayeur <eb2@ibelgique.com>
+
+	* TODO : updated
+
+2000-04-04 Eric Brayeur <eb2@ibelgique.com>
+
+	* widget-control-virtual: Synchronization of Ranges works ...
+	  (J'en ai vraiment vu de toutes les couleurs avec ce truc ;-))
+
+	* menus.c (about_cb) : add my email.
+
+2000-04-03 Eric Brayeur <eb2@ibelgique.com>
+
+	* widget-color-grid: Selection; Works like GtkCList.
+			     Drag a color to move it.
+
+	* menus.c (remove_cb) : Delete ColorGrid selected items.
+
+	* mdi-color-generic.c : free MDIColorGenericCol.
+
+	* widget-control-virtual.c (preview_size_allocate_cb) : new
+          function, redraw color preview on resize.
+
+2000-04-02 Eric Brayeur <eb2@ibelgique.com>
+
+	Yeah, I think that it's now time to start a real ChangeLog ...
+
+	Again, lots of change; gcolorsel uses now GnomeMDI, and is 
+	fully based on document/view model.
+
+2000-03-12 Eric Brayeur <eb2@ibelgique.com>
+
+	* Lots of change, cleanup and reorganization ...
+
+	New widgets :
+
+	  ColorList, derived from CList.
+	  ColorSearch, contains a ColorList, preview, etc ...
+
+	You can now load/edit/save/create palette file.
+	(works with gimp palette).
+
+	Kill a bug that causes X to eat a lot of memory. (unref GdkPixmap).
+
+	It's possible to edit the name of each notebook tab, by dblclick on
+	it. (I have imported widget-editable-label.[ch] from gnumeric).
+
+	Lot's of question/warning/error dialogs.
+
+	Right click on notebook tab/color list display a popup menu. 
+	
+	gcolorsel saves the list of open file, position of each tab in 
+	notebook, symbolic name, ... in config.
+
+	Searching is now a bit faster.
+	
+	Draw a number in each pixmap that represent the position of color
+	in pixmap.
+	This is very useful in search case, instead of display relevant
+	information in an another column.
+
+	gcolorsel have now a statusbar with progress. 
+
+	* TODO: updated
+
+Thu Mar 02 20:57:56 2000  George Lebl <jirka@5z.com>
+
+	* gcolorsel.c: apply patch from Eric Brayeur <eb2@ibelgique.com>
+	  Which adds sort, search, DnD, settings menu, screen color grab
+	  and it just generally looks feels really cool
+
+2000-02-23  Peter Hawkins  <peterhawkins@ozemail.com.au>
+
+	* gcolorsel.c: Stopped about box from being opened multiple times at once.
+
+1999-04-28  Ettore Perazzoli  <ettore@comm2000.it>
+
+	* gcolorsel.desktop: Added Italian translations.
+
+1999-02-16  Tim P. Gerla  <timg@means.net>
+
+	* gcolorsel.c: Patch from Pablo Saratxaga to fix i18n.
+
+1999-02-09  Tomas Ogren  <stric@ing.umu.se>
+
+	* gcolorsel.c: Made it look for rgb.txt on different places..
+	Linux, Solaris/Openwin, AIX and IRIX should work now...
+	Also fixed some i18n issues
+
+Thu Jan 07 23:50:44 1999  George Lebl  <jirka@5z.com>
+
+	* gcolorsel.c: changed a name of the menu variable for file menu
+
+Wed Jan 06 23:08:24 1999  George Lebl  <jirka@5z.com>
+
+	* gcolorsel.c: standardize menus
+
+1998-12-17  Tim P. Gerla  <timg@means.net>
+
+	* s/gtk_clist_set_border/gtk_clist_set_shadow_type/
+	* s/About.../About/
+
+1998-12-16  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (EXTRA_DIST): Removed obsolete gnome-color-browser.png.
+
+1998-11-29  Justin Maurer  <justin@openprojects.net>
+
+	* Remove that evil gnome-gtk-util stuff 
+
+1998-11-15  Tim P. Gerla  <timg@means.net>
+
+        * mini-utils/gcolorsel/gcolorsel.c: General updates. Added a menubar
+	to make things more consistent, and changed border spacing to be 
+	like gcalc. Consistency forever!
+

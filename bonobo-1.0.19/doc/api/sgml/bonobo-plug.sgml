@@ -1,0 +1,131 @@
+<refentry id="bonobo-bonobo-plug">
+<refmeta>
+<refentrytitle>BonoboPlug</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboPlug</refname><refpurpose>Toplevel for embedding into other processes.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboPlug">BonoboPlug</link>;
+typedef     <link linkend="BonoboPlugClass">BonoboPlugClass</link>;
+void        <link linkend="bonobo-plug-construct">bonobo_plug_construct</link>           (<link linkend="BonoboPlug">BonoboPlug</link> *plug,
+                                             <link linkend="guint32">guint32</link> socket_id);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-plug-new">bonobo_plug_new</link>                 (<link linkend="guint32">guint32</link> socket_id);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+   This is an internal support routine of the X code in Bonobo.
+</para>
+
+<para>
+Together with <link linkend="BonoboSocket">BonoboSocket</link>, <link linkend="BonoboPlug">BonoboPlug</link> provides the ability
+to embed widgets from one process into another process
+in a fashion that is transparent to the user. One
+process creates a <link linkend="BonoboSocket">BonoboSocket</link> widget and, passes the
+XID of that widgets window to the other process, 
+which then creates a <link linkend="BonoboPlug">BonoboPlug</link> window with that XID.
+Any widgets contained in the <link linkend="BonoboPlug">BonoboPlug</link> then will appear
+inside the first applications window.
+</para>
+
+<para>
+  This code is a modified copy of <link linkend="GtkPlug">GtkPlug</link>, it is included in
+bonobo since this forked version could be effectively bug fixed,
+and integrated with the <link linkend="BonoboControl">BonoboControl</link> / <link linkend="BonoboControlframe">BonoboControlframe</link> CORBA
+pipe, to ensure synchronization between the X and CORBA transports.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboPlug">BonoboPlug</title>
+<programlisting>typedef struct {
+	GtkWindow window;
+
+	GdkWindow *socket_window;
+	gint same_app;
+} BonoboPlug;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboPlugClass">BonoboPlugClass</title>
+<programlisting>typedef struct {
+	GtkWindowClass parent_class;
+} BonoboPlugClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-plug-construct">bonobo_plug_construct ()</title>
+<programlisting>void        bonobo_plug_construct           (<link linkend="BonoboPlug">BonoboPlug</link> *plug,
+                                             <link linkend="guint32">guint32</link> socket_id);</programlisting>
+<para>
+Finish the creation of a <link linkend="BonoboPlug">BonoboPlug</link> widget. This function
+will generally only be used by classes deriving
+from <link linkend="BonoboPlug">BonoboPlug</link>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>plug</parameter>&nbsp;:</entry>
+<entry> The <link linkend="BonoboPlug">BonoboPlug</link>.
+</entry></row>
+<row><entry align="right"><parameter>socket_id</parameter>&nbsp;:</entry>
+<entry> the XID of the socket's window.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-plug-new">bonobo_plug_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_plug_new                 (<link linkend="guint32">guint32</link> socket_id);</programlisting>
+<para>
+Create a new plug widget inside the <link linkend="GtkSocket">GtkSocket</link> identified
+by <parameter>socket_id</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>socket_id</parameter>&nbsp;:</entry>
+<entry> the XID of the socket's window.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the new <link linkend="BonoboPlug">BonoboPlug</link> widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+   <link linkend="BonoboSocket">BonoboSocket</link>, <link linkend="BonoboControlFrame">BonoboControlFrame</link>.
+</para>
+</refsect1>
+
+</refentry>

@@ -1,0 +1,348 @@
+<STRUCT>
+<NAME>OAFActivationInfo</NAME>
+typedef struct
+{
+	char *iid;		/* Implementation ID */
+	char *user;		/* You owe this field to boc */
+	char *host;		/* DNS name or IP address */
+	char *domain;		/* This is not a DNS domain, but an activation domain */
+} OAFActivationInfo;
+</STRUCT>
+
+<ENUM>
+<NAME>OAF_PropertyType</NAME>
+   typedef enum
+   {
+      OAF_P_STRING,
+      OAF_P_NUMBER,
+      OAF_P_BOOLEAN,
+      OAF_P_STRINGV
+   }
+   OAF_PropertyType;
+</ENUM>
+
+<STRUCT>
+<NAME>OAF_Property</NAME>
+   typedef struct
+   {
+      CORBA_char *name;
+      OAF_PropertyValue v;
+   }
+   OAF_Property;
+</STRUCT>
+
+
+<STRUCT>
+<NAME>OAF_PropertyValue</NAME>
+   typedef struct
+   {
+      OAF_PropertyType _d;
+      union
+      {
+	 CORBA_char *value_string;
+	 CORBA_double value_number;
+	 CORBA_boolean value_boolean;
+	 GNOME_stringlist value_stringv;
+      }
+      _u;
+   }
+   OAF_PropertyValue;
+</STRUCT>
+
+<STRUCT>
+<NAME>OAF_ServerInfo</NAME>
+   typedef struct
+   {
+      OAF_ImplementationID iid;
+      CORBA_char *server_type;
+      CORBA_char *location_info;
+      CORBA_char *username;
+      CORBA_char *hostname;
+      CORBA_char *domain;
+      CORBA_sequence_OAF_Property props;
+   }
+   OAF_ServerInfo;
+</STRUCT>
+
+<ENUM>
+<NAME>OAF_RegistrationResult</NAME>
+   typedef enum
+   {
+      OAF_REG_SUCCESS,
+      OAF_REG_NOT_LISTED,
+      OAF_REG_ALREADY_ACTIVE,
+      OAF_REG_ERROR
+   }
+   OAF_RegistrationResult;
+</ENUM>
+
+<TYPEDEF>
+<NAME>OAF_ActivationFlags</NAME>
+   typedef CORBA_long OAF_ActivationFlags;
+#define OAF_FLAG_NO_LOCAL 1          /* no shared libraries */
+#define OAF_FLAG_PRIVATE 2           /* start a new server and don't register it */
+#define OAF_FLAG_EXISTING_ONLY 4     /* don't start the server if not started */
+</TYPEDEF>
+
+<TYPEDEF>
+<NAME>OAF_ActivationID</NAME>
+   typedef CORBA_char *OAF_ActivationID;
+</TYPEDEF>
+
+<TYPEDEF>
+<NAME>OAF_ImplementationID</NAME>
+   typedef CORBA_char *OAF_ImplementationID;
+</TYPEDEF>
+
+<FUNCTION>
+<NAME>oaf_actinfo_stringify</NAME>
+<RETURNS>char *</RETURNS>
+const OAFActivationInfo * actinfo
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>OAFActivationInfo *</RETURNS>
+<NAME>oaf_servinfo_to_actinfo</NAME>
+const OAF_ServerInfo * servinfo
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>void</RETURNS>
+<NAME>oaf_actinfo_free</NAME>
+OAFActivationInfo * actinfo
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>OAFActivationInfo *</RETURNS>
+<NAME>oaf_actinfo_new</NAME>
+void
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>OAFActivationInfo *</RETURNS>
+<NAME>oaf_actid_parse</NAME>
+const OAF_ActivationID actid
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>CORBA_Context </RETURNS>
+<NAME>oaf_context_get</NAME>
+void
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>CORBA_ORB </RETURNS>
+<NAME>oaf_orb_get</NAME>
+void
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>CORBA_ORB</RETURNS>
+<NAME>oaf_init</NAME>
+int argc, 
+char **argv
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>void</RETURNS>
+<NAME>oaf_set_test_components_enabled</NAME>
+gboolean val
+</FUNCTION>
+
+
+<FUNCTION>
+<RETURNS>gboolean</RETURNS>
+<NAME>oaf_get_test_components_enabled</NAME>
+void
+</FUNCTION>
+
+
+<FUNCTION>
+<RETURNS>gboolean</RETURNS>
+<NAME>oaf_is_initialized</NAME>
+void
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>const char *</RETURNS>
+<NAME>oaf_hostname_get</NAME>
+void
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>const char *</RETURNS>
+<NAME>oaf_domain_get</NAME>
+void
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>const char *</RETURNS>
+<NAME>oaf_session_name_get</NAME>
+void
+</FUNCTION>
+
+
+<MACRO>
+<NAME>oaf_username_get</NAME>
+#define oaf_username_get() g_get_user_name()
+</MACRO>
+
+<STRUCT>
+<NAME>OAFPluginObject</NAME>
+typedef struct
+{
+	const char *iid;
+
+	/* This routine should call oaf_plugin_use(servant, impl_ptr), 
+         * as should all routines which activate CORBA objects
+	 * implemented by this shared library. This needs to be done 
+         * before making any CORBA calls on the object, or
+	 * passing that object around. First thing after servant creation 
+         * always works. :) 
+         */
+
+        CORBA_Object (*activate) (PortableServer_POA poa,
+                                  const char *iid, 
+                                  gpointer impl_ptr,	/* This pointer should be stored by the implementation
+                                                         * to be passed to oaf_plugin_unuse() in the 
+                                                         * implementation's destruction routine. */
+				    CORBA_Environment * ev);
+}
+OAFPluginObject;
+</STRUCT>
+
+<STRUCT>
+<NAME>OAFPlugin</NAME>
+typedef struct
+{
+	const OAFPluginObject *plugin_object_list;
+	const char *description;
+}
+OAFPlugin;
+</STRUCT>
+
+
+
+<FUNCTION>
+<RETURNS>CORBA_Object</RETURNS>
+<NAME>oaf_server_activate_shlib</NAME>
+OAF_ActivationResult * sh, 
+                                        CORBA_Environment * ev
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>void</RETURNS>
+<NAME>oaf_plugin_unuse</NAME>
+gpointer impl_ptr
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>void</RETURNS>
+<NAME>oaf_plugin_use</NAME>
+PortableServer_Servant servant, 
+gpointer impl_ptr
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>OAF_ServerInfoList *</RETURNS>
+<NAME>oaf_query</NAME>
+const char *requirements,
+char *const *selection_order,
+CORBA_Environment * ev
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>CORBA_Object</RETURNS>
+<NAME>oaf_activate_from_id</NAME>
+const OAF_ActivationID aid,
+OAF_ActivationFlags flags,
+OAF_ActivationID * ret_aid,
+CORBA_Environment * ev
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>CORBA_Object</RETURNS>
+<NAME>oaf_activate</NAME>
+const char *requirements,
+char *const *selection_order,
+OAF_ActivationFlags flags,
+OAF_ActivationID * ret_aid,
+CORBA_Environment * ev
+</FUNCTION>
+
+<TYPEDEF>
+<NAME>OAFActivationCallback</NAME>
+typedef void (*OAFActivationCallback) (CORBA_Object   activated_object, 
+				       const char    *error_reason, 
+				       gpointer       user_data);
+
+</TYPEDEF>
+
+<FUNCTION>
+<RETURNS>void</RETURNS>
+<NAME>oaf_activate_async</NAME>
+const char *requirements,
+char *const *selection_order,
+OAF_ActivationFlags flags,
+OAFActivationCallback callback,
+gpointer user_data,
+CORBA_Environment * ev
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>void</RETURNS>
+<NAME>oaf_activate_from_id_async</NAME>
+const OAF_ActivationID aid,
+OAF_ActivationFlags flags,
+OAFActivationCallback callback,
+gpointer user_data,
+CORBA_Environment * ev
+</FUNCTION>
+
+
+<FUNCTION>
+<NAME>oaf_active_server_unregister</NAME>
+<RETURNS>void</RETURNS>
+const char *iid, 
+CORBA_Object obj
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>OAF_RegistrationResult</RETURNS>
+<NAME>oaf_active_server_register</NAME>
+const char *iid,
+						   CORBA_Object obj
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>const char *</RETURNS>
+<NAME>oaf_server_info_prop_lookup</NAME>
+OAF_ServerInfo * server,
+const char *prop_name,
+GSList * i18n_languages
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>OAF_Property *</RETURNS>
+<NAME>oaf_server_info_prop_find</NAME>
+OAF_ServerInfo * server,
+const char *prop_name
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>OAF_ServerInfo *</RETURNS>
+<NAME>OAF_ServerInfo_duplicate</NAME>
+const OAF_ServerInfo *original
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>CORBA_Object</RETURNS>
+<NAME>oaf_name_service_get</NAME>
+CORBA_Environment * ev
+</FUNCTION>
+
+<FUNCTION>
+<RETURNS>const char *</RETURNS>
+<NAME>oaf_activation_iid_get</NAME>
+void
+</FUNCTION>

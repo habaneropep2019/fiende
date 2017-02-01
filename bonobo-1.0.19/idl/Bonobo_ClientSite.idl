@@ -1,0 +1,58 @@
+/*
+ * Bonobo::ClientSite
+ *
+ * This interface must be provided by containers.
+ *
+ * Containers must provide an instance of ClientSite
+ * for every compound document object it contains.
+ *
+ * Copyright (C) 2000  Helix Code, Inc.
+ *
+ * Author:
+ *    Miguel de Icaza (miguel@gnu.org)
+ */
+
+#ifndef BONOBO_CLIENT_SITE_IDL
+#define BONOBO_CLIENT_SITE_IDL
+
+#include "Bonobo_Unknown.idl"
+#include "Bonobo_Persist.idl"
+#include "Bonobo_ItemContainer.idl"
+
+module Bonobo {
+
+interface ClientSite : Bonobo::Unknown {
+
+	/**
+	 * getContainer:
+	 *
+	 * Returns a pointer to the Container instance.
+	 */
+	ItemContainer getContainer ();
+	
+	/**
+	 * showWindow:
+	 * @show: boolean value, reports whether the
+	 * containee is showing its own separate editing window.
+	 *
+	 * Used by the containee to inform the parent process
+	 * when it shows its own separate editing window.
+	 *
+	 */
+	void showWindow (in boolean shown);
+	
+	/**
+	 * saveObject:
+	 * 
+	 * Saves the object that is attached to this client site.
+	 * This operation is syncronous and will be done by the time
+	 * the function returns.
+	 */
+	Persist::Status saveObject ();
+};
+
+};
+
+
+#endif /* BONOBO_CLIENT_SITE_IDL */
+

@@ -1,0 +1,116 @@
+// -*- C++ -*- // this is for the .gen_h, I realize gensig puts one in
+/* $Id: color-picker.gen_h,v 1.13 2001/04/24 14:39:35 murrayc Exp $ */
+
+/* color-picker.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <libgnomeui/gnome-color-picker.h>
+
+#include <gtk--/button.h>
+
+CLASS_START(Gnome);
+//: Button used to Select Colors
+//- This widget provides color selection facilities to your
+//- application. The widget appears as a button which contains a
+//- "color swatch" of the currently selected color. When the button
+//- is pressed, the widget presents the user with a color selection
+//- dialog where the color can be selected. 
+//-
+//- You can select the color to be displayed in a number of ways:
+//- floating point values for the red, green and blue channels,
+//- integers in the range 0 to 65,535, or integers in the range 0 to
+//- 255, depending on your needs.
+class ColorPicker : public Gtk::Button
+{
+   WRAP_CLASS(ColorPicker, GnomeColorPicker,
+             GNOME_COLOR_PICKER, GNOME_IS_COLOR_PICKER,
+             color_picker,
+             Gtk::Button, GtkButton, GTK_BUTTON);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+ 
+  //: Set the color in the picker.  Values are in [0.0, 1.0] 
+  WRAP_METHOD(void gnome_color_picker_set_d(GnomeColorPicker*,gdouble,gdouble, 
+      gdouble,gdouble),
+    void set (gdouble r, gdouble g, gdouble b, gdouble a));
+
+  //: Set the color in the picker.  Values are in [0, 255] 
+  WRAP_METHOD(void gnome_color_picker_set_i8(GnomeColorPicker*,guint8,guint8,
+      guint8,guint8),
+    void set (guint8 r, guint8 g, guint8 b, guint8 a));
+
+  //: Set the color in the picker.  Values are in [0, 65535] 
+  WRAP_METHOD(void gnome_color_picker_set_i16 (GnomeColorPicker*, gushort ,  
+      gushort , gushort , gushort),
+    void set (gushort r, gushort g, gushort b, gushort a));
+
+  void get (gdouble &r, gdouble &g, gdouble &b, gdouble &a) const;
+  void get (guint8 &r, guint8 &g, guint8 &b, guint8 &a) const;
+  void get (gushort &r, gushort &g, gushort &b, gushort &a) const;
+  
+  //: Sets whether the picker should dither the color sample or just
+  //  paint a solid rectangle
+  WRAP_METHOD(void gnome_color_picker_set_dither (GnomeColorPicker*, gboolean),
+    void set_dither (gboolean dither=true));
+  
+  //: Sets whether the picker should use the alpha channel or not 
+  WRAP_METHOD(void gnome_color_picker_set_use_alpha (GnomeColorPicker*, gboolean),
+    void set_use_alpha (gboolean use_alpha=true));
+  
+  //: Sets the title for the color selection dialog 
+  WRAP_METHOD(void gnome_color_picker_set_title (GnomeColorPicker*, const gchar*),
+    void set_title (const Gtk::string &title));
+
+  // Signals
+
+  // Args are r,g,b,a
+  SIGNAL_SPEC("color_set", both, void color_set(guint,guint,guint,guint));
+  
+protected:
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/button_p.h>
+IMPL_START;
+#include <gnome--/private/color-picker_p.h>
+
+void Gnome::ColorPicker::get (gdouble &r, gdouble &g, gdouble &b, gdouble &a) const
+  { 
+    gnome_color_picker_get_d(const_cast<GnomeColorPicker*>(gtkobj()),
+      &r, &g, &b, &a);
+  }
+
+void Gnome::ColorPicker::get (guint8 &r, guint8 &g, guint8 &b, guint8 &a) const
+  { 
+    gnome_color_picker_get_i8(const_cast<GnomeColorPicker*>(gtkobj()),
+      &r, &g, &b, &a);
+  }
+
+void Gnome::ColorPicker::get (gushort &r, gushort &g, gushort &b, gushort &a) const
+  { 
+    gnome_color_picker_get_i16(const_cast<GnomeColorPicker*>(gtkobj()),
+      &r, &g, &b, &a);
+  }
+

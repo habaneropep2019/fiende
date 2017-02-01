@@ -1,0 +1,331 @@
+<!-- ##### SECTION Title ##### -->
+GnomeDialog
+
+<!-- ##### SECTION Short_Description ##### -->
+
+Transient ("popup") dialogs.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+GnomeDialog gives dialogs a consistent look and feel, while making
+them more convenient to program. GnomeDialog makes it easy to use
+stock buttons, makes it easier to handle delete_event, and adds some
+cosmetic touches (such as a separator above the buttons, and a bevel
+around the edge of the window). 
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#GnomeAbout #GnomePropertyBox #GnomeMessageBox #GnomeScores
+</para>
+
+<!-- ##### STRUCT GnomeDialog ##### -->
+<para>
+struct _GnomeDialog
+{
+    	GtkWindow window;
+    	GtkWidget * vbox;
+      
+    	GtkWidget * action_area; /* A button box, not an hbox */
+      
+    	GList *buttons;
+    	GtkAccelGroup * accelerators;
+      
+    	unsigned int click_closes : 1;
+    	unsigned int just_hide : 1;
+      
+    	gpointer padding;
+};
+</para>
+
+<para>
+Only <structfield>vbox</structfield> should be accessed directly.
+</para>
+
+<example>
+  <title>Using GnomeDialog to implement yes/no/cancel</title>
+
+<programlisting>
+#include <gnome.h>
+
+/*
+ * This function demostrates how to use the GnomeDialog in
+ * modal mode to request a yes/no from the user.
+ *
+ * It sets the title to title and inserts the message in message.
+ *
+ * If main_window is not NULL, it also binds the dialog to that
+ * window (so if you minimize the main window, this dialog also
+ * gets minimized).
+ */
+int
+yes_no (GtkWindow *main_window, char *title, char *message)
+{
+	GtkWidget *dialog, *label;
+	int button;
+
+	dialog = gnome_dialog_new (
+		title,
+		GNOME_STOCK_BUTTON_YES,
+		GNOME_STOCK_BUTTON_NO,
+		NULL);
+        if (main_window)
+	        gnome_dialog_set_parent (GNOME_DIALOG (dialog), main_window);
+
+	label = gtk_label_new (message);
+        gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (dialog)->vbox), label, TRUE, TRUE, 0);
+
+	/*
+	 * Run the dialog and wait for the user to select yes or no.
+	 * If the user closes the window with the window manager, we
+	 * will get a -1 return value
+	 */
+	button = gnome_dialog_run_and_close (GNOME_DIALOG (dialog));
+
+	return button;
+}
+
+int
+main (int argc, char **argv)
+{
+       int button;
+       
+       gnome_init ("SampleProgram", "1.0", argc, argv);
+
+       button = yes_no ("Question?", "Do you like the Bonobos?");
+
+       switch (button){
+              case 0:
+	              printf ("User selected yes\n");
+		      break;
+	      case 1:
+	              printf ("User selected no\n");
+		      break;
+	      case -1:
+	              printf ("User closed the window with the window manager\n");
+		      break;
+       }
+       return 0;
+}
+
+</programlisting>
+</example>
+
+<!-- ##### FUNCTION gnome_dialog_new ##### -->
+<para>
+
+</para>
+
+@title: 
+@Varargs: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_dialog_newv ##### -->
+<para>
+
+</para>
+
+@title: 
+@buttons: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_dialog_set_parent ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@parent: 
+
+
+<!-- ##### FUNCTION gnome_dialog_button_connect ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@button: 
+@callback: 
+@data: 
+
+
+<!-- ##### FUNCTION gnome_dialog_button_connect_object ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@button: 
+@callback: 
+@obj: 
+
+
+<!-- ##### FUNCTION gnome_dialog_run ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_dialog_run_and_close ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_dialog_set_default ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@button: 
+
+
+<!-- ##### FUNCTION gnome_dialog_set_sensitive ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@button: 
+@setting: 
+
+
+<!-- ##### FUNCTION gnome_dialog_set_accelerator ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@button: 
+@accelerator_key: 
+@accelerator_mods: 
+
+
+<!-- ##### FUNCTION gnome_dialog_close ##### -->
+<para>
+
+</para>
+
+@dialog: 
+
+
+<!-- ##### FUNCTION gnome_dialog_close_hides ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@just_hide: 
+
+
+<!-- ##### FUNCTION gnome_dialog_set_close ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@click_closes: 
+
+
+<!-- ##### FUNCTION gnome_dialog_editable_enters ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@editable: 
+
+
+<!-- ##### FUNCTION gnome_dialog_append_buttons ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@first: 
+@Varargs: 
+
+
+<!-- ##### FUNCTION gnome_dialog_append_button ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@name: 
+
+
+<!-- ##### FUNCTION gnome_dialog_append_buttonsv ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@buttons: 
+
+
+<!-- ##### FUNCTION gnome_dialog_append_button_with_pixmap ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@name: 
+@pixmap: 
+
+
+<!-- ##### FUNCTION gnome_dialog_append_buttons_with_pixmaps ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@names: 
+@pixmaps: 
+
+
+<!-- ##### FUNCTION gnome_dialog_construct ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@title: 
+@ap: 
+
+
+<!-- ##### FUNCTION gnome_dialog_constructv ##### -->
+<para>
+
+</para>
+
+@dialog: 
+@title: 
+@buttons: 
+
+
+<!-- ##### SIGNAL GnomeDialog::clicked ##### -->
+<para>
+
+</para>
+
+@dialog: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL GnomeDialog::close ##### -->
+<para>
+
+</para>
+
+@dialog: the object which received the signal.
+@Returns: 
+

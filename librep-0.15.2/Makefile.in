@@ -1,0 +1,140 @@
+# Makefile.in for Jade version 4
+# Copyright (C) 1998 John Harper <john@dcs.warwick.ac.uk>
+# $Id: Makefile.in,v 1.32 2001/08/10 02:37:48 jsh Exp $
+#
+# This file is part of Jade.
+#
+# Jade is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# Jade is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Jade; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ETAGS:= etags
+
+top_builddir=.
+VPATH=@srcdir@
+
+ALL_SUBDIRS = intl src lisp man
+INSTALL_SUBDIRS = src lisp man
+
+all : build.h rules.mk DOC
+	for dir in $(ALL_SUBDIRS); do \
+	  [ -d $$dir ] && ( cd $$dir && $(MAKE) $@ ) || exit 1; \
+	done
+
+build.h : build-info config.status
+	$(SHELL) $< $(host_type) $(version) \
+	  '$(repdir)' '$(replispdir)' '$(repexecdir)' \
+	  '$(repdocfile)' '$(repcommonexecdir)' >$@
+
+rules.mk : rules.mk.sh config.status
+	$(SHELL) $< '$(repdir)' '$(repcommonexecdir)' '$(repdocfile)' >$@
+
+check :
+	for dir in $(ALL_SUBDIRS); do \
+	  [ -d $$dir ] && ( cd $$dir && $(MAKE) $@ ) || exit 1; \
+	done
+
+install : all installdirs
+	for dir in $(INSTALL_SUBDIRS); do \
+	  ( cd $$dir && $(MAKE) $@ ) || exit 1; \
+	done
+	$(INSTALL_DATA) DOC $(DESTDIR)$(repexecdir)
+	$(INSTALL_SCRIPT) emulate-gnu-tar $(DESTDIR)$(repexecdir)
+	$(INSTALL_SCRIPT) libtool $(DESTDIR)$(repcommonexecdir)
+	$(INSTALL_DATA) rules.mk $(DESTDIR)$(repcommonexecdir)
+	$(INSTALL_SCRIPT) install-aliases $(DESTDIR)$(repcommonexecdir)
+	$(INSTALL_DATA) rep-debugger.el $(DESTDIR)$(emacssitelispdir)
+
+	@echo "---------------------------------------------------------"
+	@echo "Trying to install rep.m4 in $(DESTDIR)$(aclocaldir);"
+	@echo "if this fails, install it manually in a suitable location"
+	@echo "---------------------------------------------------------"
+	-$(INSTALL_DATA) $(top_srcdir)/rep.m4 $(DESTDIR)$(aclocaldir)
+
+installdirs : mkinstalldirs
+	$(SHELL) $< $(DESTDIR)$(repdir)/$(version) \
+	  $(DESTDIR)$(bindir) $(DESTDIR)$(aclocaldir) \
+	  $(DESTDIR)$(repcommonexecdir) $(DESTDIR)$(repexecdir) \
+	  $(DESTDIR)$(emacssitelispdir)
+
+uninstall :
+	-for dir in $(INSTALL_SUBDIRS); do \
+	  ( cd $$dir && $(MAKE) $@ ) || exit 1; \
+	done
+	rm -rf $(DESTDIR)$(repdir)/$(version)
+	rm -rf $(DESTDIR)$(repexecdir)
+	rm -f $(DESTDIR)$(repcommonexecdir)/rules.mk
+	rm -f $(DESTDIR)$(repcommonexecdir)/install-aliases
+	rm -f $(DESTDIR)$(repcommonexecdir)/libtool
+	rm -f $(DESTDIR)$(emacssitelispdir)/rep-debugger.el
+	rm -f $(DESTDIR)$(aclocaldir)/rep.m4
+
+DOC : src/repdoc
+	src/repdoc DOC `find $(top_srcdir) -name '*.c' -print`
+
+src/repdoc :
+	( cd src && $(MAKE) repdoc )
+
+NEWS : man/news.texi
+	( cd man && $(MAKE) ../NEWS )
+
+tar :
+	tar -zcT FILES -f librep.tar.gz
+
+clean :
+	-for dir in $(ALL_SUBDIRS); do \
+	  [ -d $$dir ] && ( cd $$dir && $(MAKE) $@ ) || exit 1; \
+	done
+	rm -f *~ NEWS DOC TAGS build.h
+
+distclean :
+	-for dir in $(ALL_SUBDIRS); do \
+	  [ -d $$dir ] && ( cd $$dir && $(MAKE) $@ ) || exit 1; \
+	done
+	rm -f config.cache config.h config.log config.status Makefile libtool
+	rm -f *~ NEWS DOC TAGS build.h rules.mk librep.spec
+
+realclean : distclean
+
+tags: TAGS
+#
+# Use separate and explicit expressions rather than "(def.*" to avoid
+# grabbing:
+# ./lisp/rep.jl:54:       (default-error-handler (car error-data) [...]
+# ./lisp/define.jl:146:  (define-scan-internals body))
+#
+TAGS :
+	-rm -f $@
+	set -e;								      \
+	c_files=`find $(top_srcdir) -name '*.[hc]' -print`;		      \
+	rep_files=`find $(top_srcdir) -name '*.jl' -print`;		      \
+	${ETAGS} --language=c $$c_files					      \
+	  --language=none						      \
+	   --regex='/[ \t]*DEFSTRING[ \t]*([ \t]*\([^ \t,]+\)/\1/'	      \
+	   --regex='/[ \t]*DEFSYM[ \t]*([ \t]*\([^ \t,]+\)/Q\1/'	      \
+	   --regex='/[ \t]*DEFSYM[ \t]*([ \t]*[^ \t,]+[ \t,]+"\([^"]+\)/\1/'  \
+	   --regex='/[ \t]*DEFUN\(_INT\)?[ \t]*([ \t]*"\([^"]+\)/\2/'	      \
+		$$c_files						      \
+	  --language=lisp $$rep_files					      \
+	  --language=none						      \
+	   --regex='/[ \t]+([ \t]*defun[ \t]+(?[ \t]*\([^ \t)]+\)/\1/'	      \
+	   --regex='/[ \t]+([ \t]*define[ \t]+(?[ \t]*\([^ \t)]+\)/\1/'	      \
+	   --regex='/[ \t]+([ \t]*defmacro[ \t]+(?[ \t]*\([^ \t)]+\)/\1/'     \
+	   --regex='/[ \t]+([ \t]*defsubst[ \t]+(?[ \t]*\([^ \t)]+\)/\1/'     \
+	   --regex='/[ \t]+([ \t]*defconst[ \t]+(?[ \t]*\([^ \t)]+\)/\1/'     \
+	   --regex='/[ \t]+([ \t]*defvar[ \t]+(?[ \t]*\([^ \t)]+\)/\1/'	      \
+	   --regex="/[ \t]+([ \t]*define-file-handler[ \t]+'\([^ \t)]+\)/\1/" \
+	   --regex="/[ \t]+([ \t]*define-datum-printer[ \t]+'\([^ \t)]+\)/\1/"\
+		$$rep_files
+
+.PHONY: install uninstall tar nobak clean realclean TAGS tags distclean

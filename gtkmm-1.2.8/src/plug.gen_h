@@ -1,0 +1,75 @@
+/* $Id: plug.gen_h,v 1.22 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* plug.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/window.h>
+#include <gtk/gtkplug.h>
+
+CLASS_START(Gtk);
+//: Toplevel for embedding into other processes.
+//- Together with {\class Gtk::Socket}, {\class Gtk::Plug} provides the ability to
+//- embed widgets from one process into another process in a fashion that is
+//- transparent to the user. One process creates a {\class Gtk::Socket} widget and,
+//- passes the XID of that widgets window to the other process, which then creates
+//- a {\class Gtk::Plug} window with that XID. Any widgets contained in the
+//- {\class Gtk::Plug} then will appear inside the first applications window.
+class Plug : public Window
+{
+  WRAP_CLASS(Plug,GtkPlug,GTK_PLUG,GTK_IS_PLUG,plug,Gtk::Window,GtkWindow,GTK_WINDOW);
+public:
+
+  Plug (guint32 socket_id);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/window_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+
+Plug::Plug(guint32 socket_id)
+  : Window((GtkWindow*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gtk_plug_construct(gtkobj(), socket_id);
+}
+
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Plug)
+//. name: socket_window
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: same_app
+//. type: gint
+//. get:
+//. set:
+//. desc:
+

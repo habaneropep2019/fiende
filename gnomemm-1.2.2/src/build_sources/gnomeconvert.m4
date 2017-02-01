@@ -1,0 +1,67 @@
+define(`__HASH',`__`'translit(`$*',`ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]&*:, ',`abcdefghijklmnopqrstuvwxyzVBNMRSLC_')`'')
+
+GTKMM_EQUAL(`guint*',`unsigned int*')
+GTKMM_EQUAL(`guint&',`unsigned int&')
+GTKMM_EQUAL(`const gchar*',`const char*')
+GTKMM_EQUAL(`Gtk::nstring',`nstring')
+GTKMM_EQUAL(`Gtk::string',`string')
+GTKMM_EQUAL(`const Gtk::nstring&',`const nstring&')
+GTKMM_EQUAL(`const Gtk::string&',`const string&')
+
+GTKMM_CONVERSION(`char*',`nstring',`$3.gc_str()',`Gtk::nstring($3)')
+GTKMM_CONVERSION(`const char*',`nstring',`$3.gc_str()',`Gtk::nstring($3)')
+GTKMM_CONVERSION(`const char*',`const string&',`$3.c_str()')
+GTKMM_CONVERSION(`unsigned int*',`unsigned int&',`&$3',`*$3')
+GTKMM_CONVERSION(`double*',`double&',`&$3',`*$3')
+
+GTKMM_CONVERSION(GtkObject*,`Gnome::MDI*',__FP2PD,__RP2PD)
+GTKMM_CONVERSION(GtkWidget*,Gtk::Widget&,`$3.gtkobj()')
+GTKMM_CONVERSION(GtkWidget*,Gtk::Widget*,__FP2P,__RP2P)
+GTKMM_CONVERSION(GnomeApp*,Gnome::App&,`$3.gtkobj()',`*Gtk::wrap($3)')
+GTKMM_CONVERSION(GtkWidget*,Gtk::VBox*,__FP2PD,__RP2PD)
+GTKMM_CONVERSION(GtkWindow*,Gtk::Window&,`$3.gtkobj()')
+GTKMM_CONVERSION(GtkEditable*,Gtk::Editable&,`$3.gtkobj()')
+GTKMM_CONVERSION(GtkWidget*,Gtk::ProgressBar*,__FP2PD,__RP2PD)
+GTKMM_CONVERSION(GtkAdjustment*,Gtk::Adjustment*,__FP2P,__RP2P)
+GTKMM_CONVERSION(GtkAdjustment*,Gtk::Adjustment&,`$3.gtkobj()')
+GTKMM_CONVERSION(GdkImlibImage*,const Gdk_ImLib::Image&,`const_cast<$1>($3.gdkobj())')
+GTKMM_CONVERSION(`GtkObject*',`const Gtk::Object&',`const_cast<GtkObject*>($3.gtkobj())',`Gtk::wrap($3)')
+
+GTKMM_CONVERSION(GtkWidget*,Gtk::Container&,`$3.Gtk::Widget::gtkobj()')
+GTKMM_CONVERSION(GtkMenuBar*,Gtk::MenuBar&,`$3.gtkobj()')
+GTKMM_CONVERSION(GtkToolBar*,Gtk::Toolbar&,`$3.gtkobj()')
+GTKMM_CONVERSION(GnomePixmap*,Gnome::Pixmap&,`$3.gtkobj()')
+
+GTKMM_CONVERSION(GtkWidget*,Gnome::Dock*,__FP2PD,__RP2PD)
+GTKMM_CONVERSION(GtkWidget*,Gnome::Dialog*,__FP2PD,__RP2PD)
+GTKMM_CONVERSION(GnomeCanvasItem*,Gnome::CanvasGroup*,,`Gtk::wrap(GNOME_CANVAS_GROUP($3))')
+GTKMM_CONVERSION(GnomeCanvas*,Gnome::Canvas*,,`Gtk::wrap($3)')
+
+#
+# Other Gnome Conversions
+#
+GTKMM_CONVERSION(GnomeUIInfo*,const Gnome::UIInfo&,`const_cast<Gnome::UIInfo*>(&$3)')
+GTKMM_CONVERSION(GnomeUIInfo*,Gnome::UIInfo*,$3)
+GTKMM_CONVERSION(GnomeUIInfo*,Gnome::UIInfoTree&,$3.gtkobj())
+GTKMM_CONVERSION(GnomeMDIChild*,`Gnome::MDIChild&',`$3.gtkobj()')
+GTKMM_CONVERSION(GnomeMDIChild*,`Gnome::MDIChild*',,`Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeCanvasGroup*,`Gnome::CanvasGroup*',,`Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeCanvasItem*,`Gnome::CanvasItem*',,`Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeApp*,`Gnome::App*',,`Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeApp*,`const Gnome::App&',`const_cast<GnomeApp*>($3.gtkobj())')
+GTKMM_CONVERSION(GnomeDruidPage*,`const Gnome::DruidPage&',`const_cast<GnomeDruidPage*>($3.gtkobj())')
+
+GTKMM_CONVERSION( GnomeMDIMode,Mode,`$1($3)',`$2($3)')
+
+dnl DOCK STUFF
+GTKMM_CONVERSION(GnomeDock*,Dock&,`$3.gtkobj()')
+GTKMM_CONVERSION(GnomeDock*,Dock*,`($3)->gtkobj()', `Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeDock*,`Gnome::Dock*',,`Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeDock*,Gnome::Dock*,`($3)->gtkobj()', `Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeDockItem*,`DockItem&',`$3.gtkobj()')
+GTKMM_CONVERSION(GnomeDockItem*,`DockItem*',,`Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeDockItem*,`Gnome::DockItem&',`$3.gtkobj()')
+GTKMM_CONVERSION(GnomeDockItem*,`Gnome::DockItem*',,`Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeDockLayout*,`Gnome::DockLayout&',`$3.gtkobj()')
+GTKMM_CONVERSION(GnomeDockLayout*,`Gnome::DockLayout*',,`Gtk::wrap($3)')
+GTKMM_CONVERSION(GnomeDockPlacement*,GnomeDockPlacement&,`&$3',`*$3')

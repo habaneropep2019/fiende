@@ -1,0 +1,120 @@
+# Note that this is NOT a relocatable package
+%define name		eel
+%define ver		@VERSION@
+%define RELEASE		0_cvs_0
+%define rel		%{?CUSTOM_RELEASE} %{!?CUSTOM_RELEASE:%RELEASE}
+%define prefix		/usr
+%define sysconfdir	/etc
+
+Name:		%name
+Vendor:		GNOME
+Distribution:	CVS
+Summary:	Eazel Extensions Library
+Version: 	%ver
+Release: 	%rel
+Copyright: 	GPL
+Group:		System Environment/Libraries
+Source: 	%{name}-%{ver}.tar.gz
+URL: 		http://nautilus.eazel.com/
+BuildRoot:	/var/tmp/%{name}-%{ver}-root
+Docdir: 	%{prefix}/doc
+Requires:	glib >= @GLIB_REQUIRED@
+Requires:	gtk+ >= @GTK_REQUIRED@
+Requires:	libxml >= @LIBXML_REQUIRED@
+Requires:	gnome-libs >= @GNOME_LIBS_REQUIRED@
+Requires:	gnome-vfs >= @GNOME_VFS_REQUIRED@
+Requires:	gdk-pixbuf >= @GDK_PIXBUF_REQUIRED@
+Requires:	freetype >= @FREETYPE_REQUIRED@
+Requires:	libpng
+Requires:	GConf >= @GCONF_REQUIRED@
+Requires:	oaf >= @OAF_REQUIRED@
+Requires:	librsvg >= @LIBRSVG_REQUIRED@
+
+BuildRequires:	glib-devel >= @GLIB_REQUIRED@
+BuildRequires:	gtk+-devel >= @GTK_REQUIRED@
+BuildRequires:	libxml-devel >= @LIBXML_REQUIRED@
+BuildRequires:	gnome-libs-devel >= @GNOME_LIBS_REQUIRED@
+BuildRequires:	GConf-devel >= @GCONF_REQUIRED@
+BuildRequires:	oaf-devel >= @OAF_REQUIRED@
+BuildRequires:	gnome-vfs-devel >= @GNOME_VFS_REQUIRED@
+BuildRequires:	gdk-pixbuf-devel >= @GDK_PIXBUF_REQUIRED@
+BuildRequires:	libpng-devel
+BuildRequires:	librsvg-devel >= @LIBRSVG_REQUIRED@
+
+%description
+Eazel Extensions Library
+
+%package devel
+Summary:	Libraries and include files for developing with Eel.
+Group:		Development/Libraries
+Requires:	%name = %{PACKAGE_VERSION}
+
+%description devel
+This package provides the necessary development libraries and include
+files to allow you to develop with Eel.
+
+%changelog
+* Wed Apr 04 2000 Ramiro Estrugo <ramiro@eazel.com>
+- created this thing
+
+%prep
+%setup
+
+%build
+%ifarch alpha
+	MYARCH_FLAGS="--host=alpha-redhat-linux"
+%endif
+
+LC_ALL=""
+LINGUAS=""
+LANG=""
+export LC_ALL LINGUAS LANG
+
+## Warning!  Make sure there are no spaces or tabs after the \ 
+## continuation character, or else the rpm demons will eat you.
+CFLAGS="$RPM_OPT_FLAGS" ./configure $MYARCH_FLAGS --prefix=%{prefix} \
+	--sysconfdir=%{sysconfdir}
+
+make -k
+make check
+
+%install
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+make -k prefix=$RPM_BUILD_ROOT%{prefix} sysconfdir=$RPM_BUILD_ROOT%{sysconfdir} install
+for FILE in "$RPM_BUILD_ROOT/bin/*"; do
+	file "$FILE" | grep -q not\ stripped && strip $FILE
+done
+
+%clean
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+%post
+if ! grep %{prefix}/lib /etc/ld.so.conf > /dev/null ; then
+	echo "%{prefix}/lib" >> /etc/ld.so.conf
+fi
+/sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+%files
+
+%defattr(0555, bin, bin)
+%doc AUTHORS COPYING COPYING.LIB ChangeLog NEWS README
+%{_libdir}/*.so*
+
+%defattr (0444, bin, bin)
+%{_datadir}/locale/*/LC_MESSAGES/*.mo
+%{_datadir}/eel/fonts/urw/*.dir
+%{_datadir}/eel/fonts/urw/*.pfb
+%{_datadir}/eel/fonts/urw/*.afm
+%{_datadir}/eel/fonts/urw/*.pfm
+
+%files devel
+
+%defattr(0555, bin, bin)
+%{_libdir}/*.la
+%{_libdir}/*.sh
+%{_bindir}/eel-config
+
+%defattr(0444, bin, bin)
+%{_includedir}/eel-1/eel/*.h

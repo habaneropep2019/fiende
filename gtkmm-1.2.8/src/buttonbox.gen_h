@@ -1,0 +1,272 @@
+/* $Id: buttonbox.gen_h,v 1.37 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* buttonbox.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <gtk/gtkbbox.h>
+#include <gtk/gtkhbbox.h>
+#include <gtk/gtkvbbox.h>
+CLASS_START(Gtk);
+//: Base class for {Gtk::HButtonBox} and {Gtk::VButtonBox}.
+//- The primary purpose of this class is to keep track of the various properties of
+//- {Gtk::HButtonBox} and {Gtk::VButtonBox} widgets. 
+class ButtonBox : public Box
+{
+  WRAP_CLASS(ButtonBox,GtkButtonBox,GTK_BUTTON_BOX,GTK_IS_BUTTON_BOX,button_box,Gtk::Box,GtkBox,GTK_BOX);
+public:
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+// Per button box
+
+  WRAP_MEMBER(value,layout,layout_style,GtkButtonBoxStyle,GtkButtonBoxStyle);
+  //: Changes the way buttons are arranged in their container.
+  //- layout_style: The new layout style. Can be one of {\enum GTK_BUTTONBOX_DEFAULT_STYLE},
+  //- {\enum GTK_BUTTONBOX_SPREAD}, {\enum GTK_BUTTONBOX_EDGE}, {\enum GTK_BUTTONBOX_START},
+  //- {\enum GTK_BUTTONBOX_END}
+  WRAP_METHOD(
+	      void gtk_button_box_set_layout(GtkButtonBox*, GtkButtonBoxStyle),
+	      void set_layout(GtkButtonBoxStyle layout_style));
+
+  WRAP_MEMBER(value,child_size_width,child_min_width,gint,gint);
+  WRAP_MEMBER(value,child_size_height,child_min_height,gint,gint);
+  //: Sets a new default size for the children of a button box.
+  //- min_width: A default width for buttons in the widget.
+  //-
+  //- min_height: A default height for buttons in the widget. 
+  WRAP_METHOD(
+	      void gtk_button_box_set_child_size(GtkButtonBox*, gint, gint),
+	      void set_child_size(gint min_width, gint min_height));
+
+  WRAP_MEMBER(value,child_ipadding_x,child_ipad_x,gint,gint);
+  WRAP_MEMBER(value,child_ipadding_y,child_ipad_y,gint,gint);
+  //: Changes the amount of internal padding used by all buttons in a button box.
+  //- ipad_x: The horizontal padding that should be used by each button the widget.
+  //-
+  //- ipad_y: The vertical padding that should be used by each button the widget.
+  WRAP_METHOD(void gtk_button_box_set_child_ipadding (GtkButtonBox*,
+						      gint, gint),
+	      void set_child_ipadding(gint ipad_x,
+				      gint ipad_y));
+
+  WRAP_MEMBER(value,spacing,spacing,gint,gint);
+  //: Sets the amount of spacing between buttons in a button box.
+  //- spacing: The number of pixels of spacing.
+  WRAP_METHOD(void gtk_button_box_set_spacing (GtkButtonBox*, gint),
+	      void set_spacing(gint spacing));
+
+  // This is our own. 
+  void set_layout_spacing(GtkButtonBoxStyle layout,
+			  gint spacing);
+  
+
+
+// Global defaults  (layout and spacing in derived classes)
+
+  //:Retrieves the default minimum width for all buttons.
+  gint get_child_size_default_width() const;
+  //:Retrieves the default minimum height for all buttons.
+  gint get_child_size_default_height() const;
+  //:Sets the default size of child buttons.
+  //- min_width: Minimum default width for child buttons.
+  //-
+  //- min_height: Minimum default height for child buttons.
+  WRAP_METHOD(
+	      void gtk_button_box_set_child_size_default (gint, gint),
+	      static void set_child_size_default(gint min_width,
+						 gint min_height));
+
+
+  //: This function gets the default amount of horizontal padding.
+  //- The internal padding of a button is the amount of space between the outside of the button and the widget it contains.
+  gint get_child_ipadding_default_x() const;
+  //: This function gets the default amount of vertical padding.
+  //- The internal padding of a button is the amount of space between the outside of the button and the widget it contains.
+  gint get_child_ipadding_default_y() const;
+  WRAP_METHOD(void gtk_button_box_set_child_ipadding_default(gint ipad_x,
+							     gint ipad_y),
+	      static void set_child_ipadding_default(gint ipad_x,
+						     gint ipad_y));
+
+};
+
+
+//: A container for arranging buttons vertically.
+//- A button box should be used to provide a consistent layout of buttons throughout your application.
+//- There is one default layout and a default spacing value that are persistant across all VButtonBox widgets.
+//-
+//- The layout/spacing can then be altered by the programmer, or if desired, by the user to alter the
+//- 'feel' of a program to a small degree.
+class VButtonBox : public ButtonBox {
+  WRAP_CLASS(VButtonBox,GtkVButtonBox,GTK_VBUTTON_BOX,GTK_IS_VBUTTON_BOX,vbutton_box,Gtk::ButtonBox,GtkButtonBox,GTK_BUTTON_BOX);
+public:
+
+
+  // GtkButtonBoxStyle layout argument can have the following values:
+  // <ul><li>GTK_BUTTONBOX_DEFAULT_STYLE
+  // <li> GTK_BUTTONBOX_SPREAD
+  // <li>GTK_BUTTONBOX_EDGE
+  // <li> GTK_BUTTONBOX_START
+  // </ul>
+  VButtonBox(GtkButtonBoxStyle layout = GTK_BUTTONBOX_DEFAULT_STYLE,
+		 gint spacing = GTK_BUTTONBOX_DEFAULT);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Retrieves the current default spacing for vertical button boxes.
+  //- This is the number of pixels to be placed between the buttons when they are arranged.
+  //- {\var Returns}: The default number of pixels between buttons.
+  WRAP_METHOD(gint gtk_vbutton_box_get_spacing_default (),
+	      static gint get_spacing_default ());
+
+  //: Retrieves the current layout used to arrange buttons in button box widgets.
+  //- {\var Returns}: The current GtkButtonBoxStyle.
+  WRAP_METHOD(GtkButtonBoxStyle gtk_vbutton_box_get_layout_default(),
+	      static GtkButtonBoxStyle get_layout_default  ());
+  
+  //: Changes the default spacing that is placed between widgets in an vertical button box.
+  //- {\var spacing}: An integer value.
+  WRAP_METHOD(void gtk_vbutton_box_set_spacing_default (gint spacing),
+	      static void set_spacing_default (gint spacing));
+  
+  //: Sets a new layout mode that will be used by all button boxes.
+  //- {\var layout}: A new {\type GtkButtonBoxStyle}. This is one of:
+  //- {\enum   GTK_BUTTONBOX_DEFAULT_STYLE}, {\enum GTK_BUTTONBOX_SPREAD},
+  //- {\enum GTK_BUTTONBOX_EDGE}, {\enum GTK_BUTTONBOX_START}, or
+  //- {\enum GTK_BUTTONBOX_END}.
+  WRAP_METHOD(void gtk_vbutton_box_set_layout_default (GtkButtonBoxStyle layout),
+	      static void set_layout_default  (GtkButtonBoxStyle layout));
+
+};
+
+//: A container for arranging buttons horizontally.
+//- A button box should be used to provide a consistent layout of buttons
+//- throughout your application. There is one default layout and a default
+//- spacing value that are persistant across all HButtonBox widgets.
+//-
+//- The layout/spacing can then be altered by the programmer, or if desired,
+//- by the user to alter the 'feel' of a program to a small degree.
+class HButtonBox : public ButtonBox {
+  WRAP_CLASS(HButtonBox,GtkHButtonBox,GTK_HBUTTON_BOX,GTK_IS_HBUTTON_BOX,hbutton_box,Gtk::ButtonBox,GtkButtonBox,GTK_BUTTON_BOX);
+public:
+
+
+  // see <a href="Gtk_VButtonBox.html">VButtonBox</a>
+  //: Constructor.
+  //- layout: The way in which buttons will fit into the box. One of:
+  //- {\enum GTK_BUTTONBOX_DEFAULT_STYLE}, {\enum GTK_BUTTONBOX_SPREAD},
+  //- {\enum GTK_BUTTONBOX_EDGE}, {\enum GTK_BUTTONBOX_START},
+  //- {\enum GTK_BUTTONBOX_END}
+  //-
+  //- spacing: The number of pixels between widgets.
+  HButtonBox(GtkButtonBoxStyle layout = GTK_BUTTONBOX_DEFAULT_STYLE,
+		 gint spacing = GTK_BUTTONBOX_DEFAULT);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Retrieves the current default spacing for horizontal button boxes.
+  //- This is the number of pixels to be placed between the buttons when they are arranged.
+  //-
+  //- Returns: The default number of pixels between buttons.
+  WRAP_METHOD(gint gtk_hbutton_box_get_spacing_default (),
+	      static gint get_spacing_default ());
+
+  //: Retrieves the current layout used to arrange buttons in button box widgets.
+  //- Returns: The current {GtkButtonBoxStyle}.
+  WRAP_METHOD(GtkButtonBoxStyle gtk_hbutton_box_get_layout_default (),
+	      static GtkButtonBoxStyle get_layout_default  ());
+
+  //: Changes the default spacing that is placed between widgets in an horizontal button box.
+  //- spacing: an integer value.
+  WRAP_METHOD(void gtk_hbutton_box_set_spacing_default (gint spacing),
+	      static void set_spacing_default (gint spacing));
+
+  //: Sets a new layout mode that will be used by all button boxes.
+  //- layout: A new GtkButtonBoxStyle.
+  WRAP_METHOD(void gtk_hbutton_box_set_layout_default (GtkButtonBoxStyle layout),
+	      static void set_layout_default  (GtkButtonBoxStyle layout));
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+void ButtonBox::set_layout_spacing(GtkButtonBoxStyle layout, gint spacing)
+{
+  GtkButtonBox *bbox = gtkobj();
+
+  if(layout != GTK_BUTTONBOX_DEFAULT)
+    gtk_button_box_set_layout(bbox, layout);
+
+  if(spacing != GTK_BUTTONBOX_DEFAULT)
+    gtk_button_box_set_spacing(bbox, spacing);
+}
+
+HButtonBox::HButtonBox(GtkButtonBoxStyle layout, gint spacing)
+  :     ButtonBox((GtkButtonBox*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_layout_spacing(layout, spacing);
+}
+
+VButtonBox::VButtonBox(GtkButtonBoxStyle layout, gint spacing)
+  :     ButtonBox((GtkButtonBox*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_layout_spacing(layout, spacing);
+}
+
+gint ButtonBox::get_child_size_default_width() const
+{
+  gint w,h;
+  gtk_button_box_get_child_size_default(&w,&h);
+  return w;
+}
+
+gint ButtonBox::get_child_size_default_height() const
+{
+  gint w,h;
+  gtk_button_box_get_child_size_default(&w,&h);
+  return h;
+}
+
+gint ButtonBox::get_child_ipadding_default_x() const
+{
+  gint x,y;
+  gtk_button_box_get_child_ipadding_default(&x,&y);
+  return x;
+}
+
+gint ButtonBox::get_child_ipadding_default_y() const
+{
+  gint x,y;
+  gtk_button_box_get_child_ipadding_default(&x,&y);
+  return y;
+}
+
+
+}
+
+DOCUMENTATION_START;
+

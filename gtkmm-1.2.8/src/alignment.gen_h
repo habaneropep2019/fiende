@@ -1,0 +1,134 @@
+/* $Id: alignment.gen_h,v 1.34 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* alignment.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/bin.h>
+#include <gtk/gtkalignment.h>
+CLASS_START(Gtk);
+/* gtkalignment.h */
+//: A widget which controls the alignment and size of its child.
+//- Normally, a widget is allocated at least as much size as it requests.
+//- When a widget is allocated more size than it requests
+//- there is a question of how the widget should expand. By convention,
+//- most GTK widgets expand to fill their allocated space. Sometimes
+//- this behavior is not desired. The alignment widget allows the
+//- programmer to specify how a widget should expand and position itself
+//- to fill the area it is allocated.
+
+class Alignment : public Bin {
+  WRAP_CLASS(Alignment,GtkAlignment,GTK_ALIGNMENT,GTK_IS_ALIGNMENT,alignment,Gtk::Bin,GtkBin,GTK_BIN);
+public:
+
+  explicit Alignment(gfloat xalign=0.5,
+		gfloat yalign=0.5,
+		gfloat xscale=1.0,
+		gfloat yscale=1.0);
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Sets the properties for this widget.
+  //- Sets both the alignment and scale of the widget packed into it.
+  //-
+  //- xalign, yalign:    Valid range is [0, 1].  These variables specify how
+  //-                    to position the child
+  //-     widget when it is not allocated all the space available to it.
+  //-     A value of 0.0 positions the widget to the left or
+  //-     top of its allocated space. A value of 1.0 positions
+  //-     the widget to the right or bottom of its allocated space. Specifying
+  //-     0.5 will center the widget in its allocated space.
+  //-
+  //- xscale, yscale: Valid range is [0, 1].  Use these parameters to specify
+  //- how to scale the child
+  //-     widget. If the scale value is 0.0, the child widget is allocated
+  //-     exactly the size it requested in that dimension. If the scale value
+  //-     is 1.0, the child widget is allocated all of the space in a
+  //-     dimension. A scale value of 1.0 for both x and y is equivalent to
+  //-     not using an alignment widget. 
+  WRAP_METHOD(void gtk_alignment_set(GtkAlignment*,gfloat,gfloat,gfloat,gfloat),
+  void set(gfloat xalign=0.5,
+	   gfloat yalign=0.5,
+	   gfloat xscale=1.0,
+	   gfloat yscale=1.0));
+
+  WRAP_MEMBER(value,xalign,xalign,gfloat,gfloat);
+  WRAP_MEMBER(value,yalign,yalign,gfloat,gfloat);
+  WRAP_MEMBER(value,xscale,xscale,gfloat,gfloat);
+  WRAP_MEMBER(value,yscale,yscale,gfloat,gfloat);
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+Alignment::Alignment(gfloat xalign, gfloat yalign, gfloat xscale,
+			     gfloat yscale)
+  : Bin((GtkBin*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GtkAlignment *alignment=(GtkAlignment*)gtkobject;
+  alignment->xalign = CLAMP (xalign, 0.0, 1.0);
+  alignment->yalign = CLAMP (yalign, 0.0, 1.0);
+  alignment->xscale = CLAMP (xscale, 0.0, 1.0);
+  alignment->yscale = CLAMP (yscale, 0.0, 1.0);
+}
+
+}
+
+DOCUMENTATION_START;
+//+ PROPERTIES(Gtk_Alignment)
+
+//. name: xalign
+//. type: gfloat
+//. set: {set()}
+//. desc:    Specify how to position the child
+//.     widget when it is not allocated all the space available to it.
+//.     A value of 0.0 positions the widget to the left or
+//.     top of its allocated space. A value of 1.0 positions
+//.     the widget to the right or bottom of its allocated space. Specifying
+//.     0.5 will center the widget in its allocated space.
+//.
+//.     Range: 0.0 to 1.0
+
+//. name: yalign
+//. type: gfloat
+//. set: {set()}
+//. desc: see {xalign}
+
+//. name: xscale
+//. type: gfloat
+//. set: {set()}
+//. desc: Specify how to scale the child
+//.     widget. If the scale value is 0.0, the child widget is allocated
+//.     exactly the size it requested in that dimension. If the scale value
+//.     is 1.0, the child widget is allocated all of the space in a
+//.     dimension. A scale value of 1.0 for both x and y is equivalent to
+//.     not using an alignment widget. 
+//. 
+//. Range: 0.0 to 1.0
+
+//. name: yscale
+//. type: gfloat
+//. set:  {set()} 
+//. desc: see {xscale}
+

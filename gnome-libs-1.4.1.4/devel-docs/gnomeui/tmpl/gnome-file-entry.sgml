@@ -1,0 +1,184 @@
+<!-- ##### SECTION Title ##### -->
+GnomeFileEntry
+
+<!-- ##### SECTION Short_Description ##### -->
+An entry widget for file names.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+  This widget provides an entry box with history (a #GnomeEntry) and a
+  button which can pop up a file selector dialog box
+  (GtkFileSelection). It also accepts DND drops from the filemanager
+  and other sources.
+</para>
+
+<para>
+The following is an example of its use. It is a collection of excerpts
+from the sound section of the GNOME control center.</para>
+
+<informalexample>
+  <programlisting>
+static SoundProps *
+sound_properties_create(void)
+{
+   char *path;
+   GtkWidget *btn_filename;
+   SoundProps *retval;
+
+...
+   /* Create the gnome_file_entry widget, with a given title */
+
+   btn_filename = gnome_file_entry_new(NULL, _("Select sound file"));
+
+   /* sets the default path */
+   path = gnome_datadir_file ("sounds/");
+   gnome_file_entry_set_default_path(GNOME_FILE_ENTRY (retval->btn_filename), path);
+
+   /* Connect the function sound_properties_event_change_file to the
+   event "changed" of the entry widget of gnome_file_entry. The
+   function will be called with a pointer to the entry widget in the
+   gnome_file_entry and the "retval" value. Look at
+   sound_properties_event_change_file below. */
+
+   gtk_signal_connect(GTK_OBJECT(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(btn_filename))),
+                       "changed",
+                       GTK_SIGNAL_FUNC(sound_properties_event_change_file),
+                       retval);
+...
+
+}
+...
+
+/* This is the callback function for the "changed" event of the
+gnome_file_entry.  */
+
+static void
+sound_properties_event_change_file(GtkEditable *entry, SoundProps *props)
+{
+    char *tmp, *sounddir, *tmp2;
+    
+...
+    /* Get the current value of the gnome_file_entry */
+    tmp = gtk_entry_get_text(GTK_ENTRY(entry));
+
+...
+
+}
+
+...
+
+static void
+sound_properties_event_play(GtkWidget *widget, SoundProps *props)
+{
+    GtkWidget *entry;
+
+    /* This code shows how to read the current value of the widget,
+       you first have to get a pointer to the entry widget of the
+       gnome_file_entry*/
+
+    entry = gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(props->btn_filename));
+
+    gnome_sound_play(gtk_entry_get_text(GTK_ENTRY(entry)));
+}
+
+...
+
+/* This is the way that you set the value of the widget */
+
+GtkWidget *btn_filename;
+
+gtk_entry_set_text(GTK_ENTRY(gnome_file_entry_gtk_entry(GNOME_FILE_ENTRY(btn_filename))),
+ctmp);
+
+
+  </programlisting>
+</informalexample>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+  #GnomeEntry, #GnomeIconEntry, #GnomePixmapEntry, #GnomeNumberEntry
+</para>
+
+<!-- ##### STRUCT GnomeFileEntry ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnome_file_entry_new ##### -->
+<para>
+</para>
+
+@history_id: An id for the entry widget (see #GnomeEntry)
+@browse_dialog_title: Title for the dialog window.
+@Returns: A pointer to the widget, NULL if it cannot be created.
+
+
+<!-- ##### FUNCTION gnome_file_entry_gnome_entry ##### -->
+<para>
+</para>
+
+@fentry: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_file_entry_gtk_entry ##### -->
+<para>
+</para>
+
+@fentry: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_file_entry_set_title ##### -->
+<para>
+</para>
+
+@fentry: Pointer to the #GnomeFileEntry widget
+@browse_dialog_title: String with the new title
+
+
+<!-- ##### FUNCTION gnome_file_entry_set_default_path ##### -->
+<para>
+</para>
+
+@fentry: 
+@path: 
+
+
+<!-- ##### FUNCTION gnome_file_entry_set_directory ##### -->
+<para>
+
+</para>
+
+@fentry: 
+@directory_entry: 
+
+
+<!-- ##### FUNCTION gnome_file_entry_get_full_path ##### -->
+<para>
+
+</para>
+
+@fentry: 
+@file_must_exist: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_file_entry_set_modal ##### -->
+<para>
+
+</para>
+
+@fentry: 
+@is_modal: 
+
+
+<!-- ##### SIGNAL GnomeFileEntry::browse-clicked ##### -->
+<para>
+  Signal emitted when the "browse" button is clicked. This is so that you
+  can add stuff to the file selector or to override this method.
+</para>
+
+@fileentry: the object which received the signal.
+

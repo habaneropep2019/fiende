@@ -1,0 +1,147 @@
+<!-- ##### SECTION Title ##### -->
+Module Callbacks
+
+<!-- ##### SECTION Short_Description ##### -->
+registering for special callbacks from gnome-vfs module operations
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+Sometimes, a module operation will want to call back to the
+application before completing. For example, it may want to request
+that the application prompt the user for a username and password to
+access a particular URI. Or it may want to provide a status message
+that the application can display.
+</para>
+
+<para>
+Such callbacks are handled using the module callback mechanism.
+</para>
+
+<para>
+Module callbacks may be set globally for all threads, or they may be
+temporarilly overridden using a per-thread stack. Normally the stack
+is not inherited by new threads; however, async operations are run
+with a set of callbacks that corresponds to when the operation was
+tarted.
+</para>
+
+<para>
+There are also special async module callbacks. Async callbacks are
+only invoked from async module operations, and take precedence over
+sync callbacks in this case, if set. They are dispatched on the main
+thread. Also, unlike regular callbacks, they do not need to provide
+the answer right away. Instead, they can arrange to have a response
+function called at any later time. This enables async callbacks to pop
+up non-modal dialogs or schedule other async work before providing a
+response.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+<link linkend="gnome-vfs-Standard-Callbacks">Standard Callbacks</link>
+</para>
+
+<!-- ##### USER_FUNCTION GnomeVFSModuleCallback ##### -->
+<para>
+
+</para>
+
+@in: 
+@in_size: 
+@out: 
+@out_size: 
+@callback_data: 
+
+
+<!-- ##### USER_FUNCTION GnomeVFSModuleCallbackResponse ##### -->
+<para>
+
+</para>
+
+@response_data: 
+
+
+<!-- ##### USER_FUNCTION GnomeVFSAsyncModuleCallback ##### -->
+<para>
+
+</para>
+
+@in: 
+@in_size: 
+@out: 
+@out_size: 
+@callback_data: 
+@response: 
+@response_data: 
+
+
+<!-- ##### FUNCTION gnome_vfs_module_callback_set_default ##### -->
+<para>
+
+</para>
+
+@callback_name: 
+@callback: 
+@callback_data: 
+@destroy_notify: 
+<!-- # Unused Parameters # -->
+@notify: 
+
+
+<!-- ##### FUNCTION gnome_vfs_module_callback_push ##### -->
+<para>
+
+</para>
+
+@callback_name: 
+@callback: 
+@callback_data: 
+@destroy_notify: 
+<!-- # Unused Parameters # -->
+@notify: 
+
+
+<!-- ##### FUNCTION gnome_vfs_module_callback_pop ##### -->
+<para>
+
+</para>
+
+@callback_name: 
+
+
+<!-- ##### FUNCTION gnome_vfs_async_module_callback_set_default ##### -->
+<para>
+
+</para>
+
+@callback_name: 
+@callback: 
+@callback_data: 
+@destroy_notify: 
+<!-- # Unused Parameters # -->
+@user_data: 
+@notify: 
+
+
+<!-- ##### FUNCTION gnome_vfs_async_module_callback_push ##### -->
+<para>
+
+</para>
+
+@callback_name: 
+@callback: 
+@callback_data: 
+@destroy_notify: 
+<!-- # Unused Parameters # -->
+@user_data: 
+@notify: 
+
+
+<!-- ##### FUNCTION gnome_vfs_async_module_callback_pop ##### -->
+<para>
+
+</para>
+
+@callback_name: 
+
+

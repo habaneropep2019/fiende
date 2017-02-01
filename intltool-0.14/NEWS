@@ -1,0 +1,193 @@
+Version 0.14
+
+* Fix to work well with both new and old autoconf (ERDI Gergo)
+
+
+Version 0.13
+
+* Handle desktop file entries with regexp metacharacters (Darin)
+* Add support for .caves files (Juan Pablo Mendoza)
+* Fix intl-prepare bug [missing chomp] (Edgar Luna)
+* Escape backslashes in output of intl-prepare (Frederic Crozat)
+* Look for both POTFILES.skip and POTFILES.ignore (Darin)
+* Fix bug in intltool -M where it doesn't find glade files (Kenneth)
+* Implement trial version of a cache (Kenneth)
+* Remove file type tags from POTFILES (ERDI Gergo)
+
+
+Version 0.12
+
+* Handle whitespace properly in XML (Darin)
+* Add support for multiline msgids and msgstrs, including test cases (Darin)
+* Add support for glib-getttextize (Jacob, Darin)
+* Add doc-i18n-tool [disabled in Makefile for the moment] (Jonathan)
+* Fixes to spec file (Toralf Lund, Darin)
+* Fix bug in intltool-prepare if string has regex metacharacters in it (Darin)
+
+
+Version 0.11
+
+* Rename to intltool (Darin)
+* Fix split line bug (Darin)
+* Fix "no .po files" bug (Darin)
+* Add .scm support (Kenneth, Carlos)
+* Get rid of "\n" -> "n" escaping logic (Darin)
+* Make update ignore comment lines in POTFILES.in (Darin)
+* Remove "-?" option for compatibility with old Perl (Darin)
+* Fix longstanding undefined variable problem in *ize scripts (Peter Williams)
+
+
+Version 0.9.5
+
+* Fix .server support (Carlos)
+* Makefile fixes (Robin * Slomkowski)
+* Man-pages (not installed yet) (Carlos, Dan Muet, Kenneth)
+* Simplifications in prepare tool (Darin)
+* M4 files (Darin)
+* Fixes for evolution (Zbigniew)
+* Fix documentain errors (Zbigniew)
+* Removed buggy checks (Maciej)
+* UTF-8 support (Cyrille)
+* New XML_I18N_XML_KIND variable (Cyrille Chepelov)
+* Support for Dia's .sheet files (Cyrille Chepelov)
+* New testcases (Darin, Cyrille)
+* Made regexps more bulletproof (Darin)
+* Bugfixes for glade (Darin)
+* Generates UTF-8 or (as previously) broken XML files. (Cyrille Chepelov)
+* Generates UTF-8 or (as previously) mixed-encoding .keys files. (CC)
+* Support for Dia .sheet files (CC)
+* two optional arguments to the AC_PROG_XML_I18N_TOOLS: first is the
+  minimum required version, second is either blank or the [G2] string
+  (no brackets). (CC)
+* XML_I18N_TOOLS_NEWER_THAN_0_9 equals to "true" (CC)
+
+Please see the README for more information on these new features.
+
+
+Version 0.9
+
+* Self test fixes (Darin)
+* Merge translations in sorted order (Darin)
+* Autoconf 2.50 support (Maciej)
+* Bug fixes (Karl Eichwalder)
+* Support for .xml files (Laszlo Kovacs)
+* Build fixes (Darin)
+
+
+Version 0.8.4
+
+* Support for the new gettext 0.10.36 (Darin, Stanislav Brabec)
+* Backport of changes in branches to HEAD (Darin)
+* Better XML support (George)
+* More tests (Darin)
+* Handling of more extensions (Clahey, Laszlo, Kenneth) 
+* Spec file cleanup (Arik)
+* Updated documentation (Laszlo)
+* Misc bugfixes (Darin, Maciej, Laszlo, Kenneth)
+* New translations: hrm, this is a translation tool, why should it 
+  support translation - what a concept :)
+
+
+INITIAL ANNOUNCEMENT
+____________________
+
+Hi,
+
+I created the xml-i18n-tools module on CVS based on code by me, Darin
+and Kenneth Christiansen. This module contains some utility scripts
+and assorted auto* magic for internationalizing various kinds of XML
+files. This supersedes the earlier scripts that Kenny distributed to
+be checked into each module. In addition, it has an additional merging
+feature, currently only for oaf files.
+
+* Here's what this package does:
+
+** Automatically extracts translatable strings from oaf, glade, bonobo
+  ui, nautilus theme and other XML files into the po files.
+
+** Automatically merges translations from po files back into .oaf files
+  (encoding to be 7-bit clean). I can also extend this merging
+  mechanism to support other types of XML files.
+
+Having the translations directly in the XML file is critical for some
+file formats, and very helpful for others. When one package installs a
+file and a program from another package might at some time read it,
+you need to have the translations directly in the file, since the app
+reading the data file will not know which message catalog to use.
+
+The beauty of this extract and merge system is that it works through
+the existing po mechanism, so translators will be able to work in
+their normal way, and be notified of strings that change, or new
+strings that are added, with existing tools.
+
+I plan to enhance the system to support .desktop files, mime database
+files, and other files that normally embed translations. I would also
+be glad to add translation merging support for more XML file types if
+
+xml-i18n-tools has a script xml-i18n-toolize which copies the various
+scripts and does the other magic to your module, so users building
+from tarballs don't need xml-i18n-tools, only folks building from cvs.
+
+
+* xml-i18n-tools simple to use. To use it for your module you just do
+the following:
+
+** Add these lines to autogen.sh, after the call to gettextize:
+
+echo "Running xml-i18n-toolize... Ignore non-fatal messages."
+xml-i18n-toolize --copy --force --automake
+
+** Add this line to configure.in near the top
+
+AM_PROG_XML_I18N_TOOLS
+
+** Add the .xml and .glade files you want translated to POTFILES.in
+
+At this point, strings marked translatable will be automatically
+extracted to the .po files.
+
+* To get oaf translation extraction and merging requires a few more
+steps:
+
+** Rename your .oafinfo file to .oaf.in and put an underscore before
+   every value property for string attributes
+
+** Add the .oaf.in files to POTFILES.in
+
+** Put lines like these in every Makefile.am that installs oafinfo
+   files:
+
+--- start ----
+
+oafdir = $(datadir)/oaf
+
+oaf_in_files = My_OAF_info_file.oaf.in
+oaf_DATA = $(oaf_in_files:.oaf.in=.oaf)
+
+@XML_I18N_MERGE_OAF_RULE@
+
+EXTRA_DIST=$(oaf_in_files) $(oafinfo_DATA)
+
+--- end ----
+
+At this point, your oaf translations will be extracted and
+merged. Also, so long as you are renaming the .oafinfo files to
+.oaf.in, you should take the opportunity to rename them to the new base
+naming convention, with namespacing, for example:
+
+nautilus.oafinfo --> Nautilus_shell.oaf.in
+
+nautilus-rpm-view.oafinfo --> Nautilus_View_rpm.oaf.in
+
+
+I'm going to do all these steps for OAF, Ammonite and Nautilus
+shortly. I'd also plan to submit patches to do it for bonobo,
+gnumeric, evolution, at least, and I can help out with any other
+modules people want help with.
+
+Also, if the Glade, Bonobo, etc maintainers are interested in doing
+translation merging like OAF, I'd love to discuss a design for it.
+
+Regards,
+
+Maciej

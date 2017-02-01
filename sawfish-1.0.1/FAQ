@@ -1,0 +1,270 @@
+Frequently Asked Questions
+**************************
+
+  1. Why is it now called _Sawfish_?
+
+     Because the old name (`Sawmill') was already being used by another
+     company, who were in the process of registering it as a trademark.
+
+     The rename should be mostly painless, all old binaries still work
+     for the time being, but will be phased out over time. Where before
+     you would execute a program called `sawmill*', replace it by
+     `sawfish*'. E.g. `sawmill' becomes `sawfish', and `sawmill-client'
+     becomes `sawfish-client'.
+
+     Your `~/.sawmill' directory will automatically be renamed
+     `~/.sawfish' unless it would overwrite an existing file. Both
+     `~/.sawfishrc' and `~/.sawmillrc' will be checked currently
+     (though only one will be actually loaded).
+
+     My apologies for any inconvenience caused.
+
+  2. But why _Sawfish_, and not <insert your favourite alternative>?
+
+     Well I had to choose something! And hopefully it satisfies the main
+     requirements:
+
+        * There are no other computer-related users of the name (as
+          checked in April 2000,)
+
+        * It's similar enough to the old name to hopefully carry some
+          recognition across,
+
+        * It has no tenuous relationship to window-managing.
+
+  3. I installed Sawfish but it's not working!  All I see when I start
+     X is the default stipple background: no programs, no menus, no
+     pager.
+
+     This is exactly what it's supposed to do. Sawfish is a _window
+     manager_ and as such is not responsible for setting the background,
+     starting programs or displaying a pager--these can all be done
+     using separate applications (e.g. by using a desktop environment
+     such as GNOME).
+
+     The default menu binding is somewhat obscure; you must
+     middle-click on the background to bring up the menus. (If you have
+     a two-button mouse, try clicking both buttons simultaneously)
+
+     If, after reading this, you still think that sawfish isn't working,
+     please send mail describing the problem to the sawfish mailing list
+     <sawfish@lists.eazel.com>
+
+  4. How do I add customizations?
+
+     There are several files controlling this:
+
+    `~/.sawfishrc'
+          Hand written lisp code, loaded at startup. This is where
+          almost all explicit customization should be done.
+
+    `sawmill-defaults'
+          This lisp library is only loaded if there's no `.sawfishrc'
+          file.
+
+    `~/.sawfish/custom'
+          This stores customizations created by the configuration tool;
+          it shouldn't really be edited manually.
+
+          This file is loaded _after_ `sawmill-defaults', but _before_
+          `.sawfishrc'.
+
+  5. I created `.sawfishrc', now things have changed?
+
+     If a `~/.sawfishrc' file exists, it prevents `sawmill-defaults'
+     from being loaded. But it's `sawmill-defaults' that loads some of
+     the common window manager features, so add the line
+
+          (require 'sawmill-defaults)
+
+     to your `.sawfishrc' file if you want to start with all the
+     standard features loaded.
+
+  6. What's this `sawfish-client' program?
+
+     This allows you to connect to a window manager process and evaluate
+     arbitrary Lisp forms. Do `sawfish-client -?' for more details
+     (`sawfish-client -' for a read-eval-print loop)
+
+     By default you can only connect from the host running the wm
+     (through a unix-domain socket). To enable the network based
+     server, evaluate the lisp form `(server-net-init)'.
+
+     Note however that this connects through the X server, meaning that
+     anyone who can open windows on your display can also execute any
+     Lisp code on the host running the window manager (and by extension,
+     _execute any program_).
+
+     So _don't_ run the net server with X access control disabled
+     (unless you're not connected to a network)
+
+  7. How do I bind a key to execute a shell command?
+
+     Bind a key to the `run-shell-command' command; remember to enter
+     the shell command you want to execute in the string entry in the
+     `Edit binding' dialog window.
+
+  8. How do I make clicking on a window raise the window?
+
+     Bind the event `Button1-Click1' in the `window-keymap' to the
+     `raise-window-and-pass-through-click' command
+
+  9. How do I redefine the `Applications' menu?
+
+     See the `Popup Menus' node in the Info manual (*note Popup Menus::)
+
+ 10. How do I read the Info manual?
+
+     Either execute the command `info sawfish', or enter the Info mode
+     within Emacs (`C-h i') and type `g (sawfish) RET'.
+
+     If you're using GNOME, then try executing `gnome-help-browser
+     info:sawfish'.
+
+ 11. How do I create a new theme?
+
+     See the `Window Frames' node of the Info manual (*note Window
+     Frames::)
+
+     Basically though, create a directory `~/.sawfish/themes/FOO' where
+     FOO is the name of your theme. Then copy any images into this
+     directory and create a file `theme.jl' that will be loaded to
+     initialise the theme
+
+     The configuration tool will display the contents of a file called
+     `README' in the directory (but make it 80-column text, and only a
+     few lines)
+
+     Recent versions of sawfish include a program `sawfish-themer' that
+     allows simple themes to be created using a GTK+ interface. Ian
+     McKellar has created `GimpMill':
+
+          GimpMill is a GIMP plugin written in Python using James
+          Henstrige's really cool Python GIMP bindings. It allows the
+          construction of Sawmill themes within The GIMP - extending
+          the GIMP interface to allow theme creation like the GAP
+          extends it to allow animation creation.
+
+     GimpMill is available from
+     <http://www.yakk.net/projects.gimpmill.html>
+
+ 12. How do I port an Enlightenment theme to sawfish?
+
+     There's no automatic translation available. Get the images used in
+     the window border, then write a `theme.jl' file telling the window
+     manager how they are used to form a window frame
+
+     See the `themes/brushed-metal' directory for an example, and the
+     Info manual for the documentation
+
+ 13. Are there any other themes available?
+
+     Thanks to those nice people at themes.org, there's now
+     <http://sawmill.themes.org/> for your theming pleasure
+
+ 14. Why don't GTK themes work with sawfish?
+
+     There was a problem with older versions of the `gtk-engines'
+     package preventing engine based themes working with several
+     interpreted languages. Get the latest `gtk-engines' from
+     <ftp://ftp.gnome.org/>
+
+ 15. Why don't you use GUILE?
+
+     Mainly because I'm lazy; I had already written rep, and therefore
+     understood it completely, whereas I have never used GUILE. Also,
+     rep has some features not available in GUILE (byte-code
+     compilation, autoloading, built-in event-loop, ...)
+
+     But before you flame me: yes I do think scheme is a more elegant
+     language
+
+ 16. Will you add feature X?
+
+     Possibly. But only if it can be written in Lisp, or doesn't
+     conflict with the overall design aims.
+
+     These aims are to build a lightweight, generally applicable, set of
+     core window management functions, then write _all_ high-level
+     functionality as Lisp extensions
+
+ 17. Will you add background setting?
+
+     No. This can easily be done by a separate application (e.g. with
+     the GNOME hints, simply monitor property `_WIN_WORKSPACE' on the
+     root window).
+
+ 18. Is there a sawfish mailing list?
+
+     Yes. See <http://lists.eazel.com/mailman/listinfo/> for
+     subscription instructions and archived messages.
+
+ 19. Is there a sawfish IRC channel?
+
+     From Ryan Pavlik <rpav@mythosource.org>:
+
+          Sawmill has an irc channel too! It's on EFNet, and called (of
+          all crazy things), #sawmill. So break out your irc clients,
+          or hop on over if you're already addicted. Theme, lisp,
+          general sawmill, and most other random discussion welcome.
+
+          If you need an EFNet server, check www.efnet.net for a
+          listing.
+
+ 20. Why does sawfish look weird/crash on Solaris?
+
+     Sawfish works stably on Solaris, but you may need to do two things:
+
+       1. Disable use of MIT-SHM by Imlib (run the program
+          `imlib_config', the MIT-SHM option is on the `Rendering' page)
+
+       2. Recompile GTK+ using the `--disable-xim' option to configure
+
+ 21. Why don't some windows ever get focused?
+
+     If you don't have the option `give focus to windows even when they
+     haven't asked for it' checked (group Focus/Advanced), then windows
+     that don't ask for focus don't get it.
+
+     Windows ask to receive focus by setting their WM_HINTS property
+     appropriately; for example if I xprop a gnome-terminal:
+
+          WM_HINTS(WM_HINTS):
+                          Client accepts input or input focus: True
+                          Initial state is Normal State.
+                          window id # of group leader: 0x5c00001
+
+ 22. Why doesn't the GNOME desk-guide / tasklist show the true state of
+     my desktop?
+
+     It seems that there is a problem with these applets that only
+     occurs after restarting sawfish-they seem to lose track of the
+     current window states.
+
+     The simplest way to correct this is to execute the following shell
+     commands:
+
+          $ save-session
+          $ killall panel
+
+     (assuming you have a session manager to restart the panel
+     afterwards!)
+
+ 23. What do these `bytecode-error' messages mean?
+
+     It means that you're trying to execute Lisp code that was compiled
+     for an outdated version of the Lisp virtual machine. Recompile any
+     Lisp files that you have installed locally.
+
+ 24. How do I compile Lisp files?
+
+     Use the shell command:
+
+          sawfish --batch -l compiler -f compile-batch FILES...
+
+     where FILES... are the names of the files you want to compile.
+     They will normally have `.jl' suffixes, the compiler will create
+     associated files with `.jlc' suffixes containing the compiled Lisp
+     code.
+
+

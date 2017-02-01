@@ -1,0 +1,128 @@
+<refentry id="libart-Transformation-operations">
+<refmeta>
+<refentrytitle>Transformation operations</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBART Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Transformation operations</refname><refpurpose>Transformations which can be applied to bpaths or vpaths.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+<link linkend="ArtVpath">ArtVpath</link>*   <link linkend="art-vpath-perturb">art_vpath_perturb</link>               (<link linkend="ArtVpath">ArtVpath</link> *src);
+<link linkend="ArtVpath">ArtVpath</link>*   <link linkend="art-vpath-affine-transform">art_vpath_affine_transform</link>      (const <link linkend="ArtVpath">ArtVpath</link> *src,
+                                             const <link linkend="double">double</link> matrix[6]);
+<link linkend="ArtBpath">ArtBpath</link>*   <link linkend="art-bpath-affine-transform">art_bpath_affine_transform</link>      (const <link linkend="ArtBpath">ArtBpath</link> *src,
+                                             const <link linkend="double">double</link> matrix[6]);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+Once vpaths and bpaths are constructed, it is possible to apply a number of 
+transformations to these vector paths: <link linkend="art-vpath-perturb">art_vpath_perturb</link>
+should not be really used by applications (but you might have to use it so...) but
+<link linkend="art-vpath-affine-transform">art_vpath_affine_transform</link> and
+<link linkend="art-bpath-affine-transform">art_bpath_affine_transform</link> are both
+widely used to apply <link linkend="libart-Affine-transformation-matrices">affine transformations</link>.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="art-vpath-perturb">art_vpath_perturb ()</title>
+<programlisting><link linkend="ArtVpath">ArtVpath</link>*   art_vpath_perturb               (<link linkend="ArtVpath">ArtVpath</link> *src);</programlisting>
+<para>
+Perturbs each of the points by a small random amount. This is
+helpful for cheating in cases when algorithms haven't attained
+numerical stability yet.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> Source vpath.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Newly allocated vpath containing perturbed <parameter>src</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-vpath-affine-transform">art_vpath_affine_transform ()</title>
+<programlisting><link linkend="ArtVpath">ArtVpath</link>*   art_vpath_affine_transform      (const <link linkend="ArtVpath">ArtVpath</link> *src,
+                                             const <link linkend="double">double</link> matrix[6]);</programlisting>
+<para>
+Computes the affine transform of the vpath, using <parameter>matrix</parameter> as the
+transform. <parameter>matrix</parameter> is stored in the same format as PostScript, ie.
+x' = <parameter>matrix</parameter>[0] * x + <parameter>matrix</parameter>[2] * y + <parameter>matrix</parameter>[4]
+y' = <parameter>matrix</parameter>[1] * x + <parameter>matrix</parameter>[3] * y + <parameter>matrix</parameter>[5]</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> Source vpath to transform.
+</entry></row>
+<row><entry align="right"><parameter>matrix</parameter>&nbsp;:</entry>
+<entry> Affine transform.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the newly allocated vpath resulting from the transform.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-bpath-affine-transform">art_bpath_affine_transform ()</title>
+<programlisting><link linkend="ArtBpath">ArtBpath</link>*   art_bpath_affine_transform      (const <link linkend="ArtBpath">ArtBpath</link> *src,
+                                             const <link linkend="double">double</link> matrix[6]);</programlisting>
+<para>
+Affine transform the bezpath, returning a newly allocated <link linkend="ArtBpath">ArtBpath</link>
+(allocated using <link linkend="art-alloc">art_alloc</link>()).
+</para>
+<para>
+Result (x', y') = (matrix[0] * x + matrix[2] * y + matrix[4],
+                   matrix[1] * x + matrix[3] * y + matrix[5])</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> The source <link linkend="ArtBpath">ArtBpath</link>.
+</entry></row>
+<row><entry align="right"><parameter>matrix</parameter>&nbsp;:</entry>
+<entry> The affine transform.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the transformed <link linkend="ArtBpath">ArtBpath</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+The definition of <link linkend="libart-Affine-transformation-matrices">Affine matrices</link> and the
+<link linkend="libart-known-bugs">Known Bugs</link>
+</para>
+</refsect1>
+
+</refentry>

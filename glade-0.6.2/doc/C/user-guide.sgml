@@ -1,0 +1,1340 @@
+<!DOCTYPE Book PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+<!ENTITY version "0.57"> 
+]>
+
+<!-- INDEX -->
+
+<book id="index">
+
+  <bookinfo> 
+    <title>Glade Reference Manual</title>
+
+    <copyright>
+      <year>2000</year>
+      <holder>Michael Vance</holder>
+    </copyright>
+
+    <legalnotice>
+     <para>
+      Permission is granted to copy, distribute and/or modify this
+      document under the terms of the <citetitle>GNU Free Documentation
+      License</citetitle>, Version 1.1 or any later version published
+      by the Free Software Foundation with no Invariant Sections, no
+      Front-Cover Texts, and no Back-Cover Texts. You may obtain a copy
+      of the <citetitle>GNU Free Documentation License</citetitle> from
+      the Free Software Foundation by visiting <ulink type="http"
+      url="http://www.fsf.org">their Web site</ulink> or by writing to:
+      Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+      Boston, MA 02111-1307, USA.
+     </para>
+     <para>
+      Many of the names used by companies to distinguish their products and
+      services are claimed as trademarks. Where those names appear in any
+      GNOME documentation, and those trademarks are made aware to the members
+      of the GNOME Documentation Project, the names have been printed in caps
+      or initial caps.
+     </para>
+    </legalnotice>
+
+    <releaseinfo> 
+      Initial release of Glade Reference Manual.
+    </releaseinfo>
+
+  </bookinfo>
+
+<!-- INTRODUCTION -->
+
+  <chapter id="introduction">
+    <title>Introduction</title> 
+    
+    <para>
+      Glade is an application for creating
+      graphical user interfaces that use the Gtk+ and GNOME libraries.
+      Glade allows you to rapidly develope
+      these interfaces, and can
+      create source code in a variety of languages that will construct
+      the interfaces for you. Glade can
+      also be used in conjunction with
+      libglade to dynamically create user
+      interfaces from the XML description file that
+      Glade creates.
+    </para>
+
+    <para>
+       Glade can be obtained from <ulink
+       url="http://glade.pn.org/download.html"
+       type="http">here</ulink>. Links are provided there for various
+       package formats. Glade is also
+       available from the GNOME CVS server. See the <ulink
+       url="http://developer.gnome.org/tools/cvs.html" type="http">
+       GNOME CVS page</ulink> for more information on how to get
+       Glade from CVS.
+    </para>
+
+    <para>
+      In order to use Glade's GNOME
+      support, you will need to have a very recent version of GNOME,
+      or compile Glade with
+      <command>--disable-gnome</command>.
+    </para>
+
+    <para>
+      Once installed, Glade can be started
+      from the command-line by typing <command>glade</command>.
+    </para>
+
+  </chapter>
+
+<!-- USING --> 
+
+  <chapter id="using">
+    <title>Using Glade</title>
+
+    <para>
+      Glade is composed of several windows
+      which each server a particular purpose. The main window contains
+      the menu, toolbar and a list of top-level windows. The palette
+      lists the various UI objects which you can use to bulid an
+      inteface. The property editor lets you manipulate the properties
+      of widgets, such as their size, color, signal masks, etc.
+    </para>
+
+    <para>
+      Typically a Glade project begins with the construction of the
+      user interface. Using the palette, you composite and insert
+      widgets until you arrive at the desired interface. While doing
+      this you usually use the property editor to manipulate the
+      various packing settings, dimensions, etc., of the widgets.
+    </para>
+
+    <para> 
+      When the interface is finished, you then usually save the
+      project and build the C source files that will be used to generate
+      the user interface. Integration with your project logic then
+      follows. Some other things you may do:
+    </para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  Use libglade to build the interface
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+          Use Glade to set the signal
+          handlers for your widgets
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+          Emit Perl or Eiffel code instead of C
+	</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>
+      The various parts of Glade are
+      described in detail in the sections that follow.
+    </para>
+
+  </chapter>
+
+<!-- MENUS -->
+
+  <chapter id="menus">
+    <title>Menus</title>
+
+    <figure>
+      <title>Glade menu</title>
+      <screenshot>
+	<graphic fileref="user-guide-images/menu" format="png" srccredit="mkv"/>
+      </screenshot>
+    </figure>
+
+    <sect1 id="file-menu">
+      <title>File</title>
+
+      <figure>
+	<title>File menu</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/file-menu" format="png" srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="file-new-project">
+	<title>New Project</title>
+
+	<para>
+          Create a new, empty Glade
+          project. Glade will prompt you to
+          create a new project. If you have not saved an existing
+          project, select <command>Cancel</command> and then save
+          it. Otherwise, select <command>OK</command>. 
+        </para>
+
+      </sect2>
+
+      <sect2 id="file-open-project">
+	<title>Open</title>
+
+	<para>
+          Open an existing Glade project. A
+          standard Gtk+ dialog box
+          will appear allowing you to specify the project file. Note
+          that Gtk+ file dialog boxes have tab-completion in their
+          filename field. 
+        </para>
+
+      </sect2>
+
+      <sect2 id="file-save-project">
+	<title>Save</title>
+
+	<para>
+          Save your project. If you have never saved your project, you
+          will  be presented with the Project Options dialog, which
+          will have default values entered in it. If you have
+          specified the project settings in the past it will simply
+          save your your current projectwithout comment.
+	</para>
+
+      </sect2>
+
+      <sect2 id="file-build-source-code">
+	<title>Build Source Code</title>
+
+	<para>
+          Generate the desired source code (C, Perl, Ada, etc.). If
+          you have never saved your project, you will be presented
+          with the Project Options dialog, which will have defaults
+          values entered in it. If you have specified the project
+          settings in the past it will simply emit code without
+          comment.
+	</para>
+      </sect2>
+
+      <sect2 id="file-project-options">
+	<title>Project Options</title>
+
+	<para>
+          The project options dialog is described 
+          <link linkend="project-options">here</link>.
+	</para>
+
+      </sect2>
+
+      <sect2 id="exit-menu">
+	<title>Exit</title>
+
+	<para>
+          Exit Glade. Currently
+          Glade does not query you
+          to save unsaved project data (although it does ask you if
+          you wish to quit), so be sure to save your
+          project before exiting.
+	</para>
+
+      </sect2>
+
+    </sect1> <!-- File menu -->
+
+    <sect1 id="edit-menu">
+      <title>Edit menu</title>
+
+      <figure>
+	<title>Edit menu</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/edit-menu" format="png" srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="edit-cut">
+	<title>Cut</title>
+
+	<para>
+          This command will remove a widget from its parent and place
+          it on the clipboard.
+	</para>
+
+      </sect2>
+
+      <sect2 id="edit-copy">
+	<title>Copy</title>
+
+	<para>
+          This command will copy a widget to the clipboard. The original
+          widget remains attached to its parent.
+	</para>
+
+      </sect2>
+
+      <sect2 id="edit-paste">
+	<title>Paste</title>
+
+	<para>
+          If a widget currently exists on the clipboard, this command
+          will allow you to copy the widget from the clipboard 
+	</para>
+
+      </sect2>
+
+      <sect2 id="edit-clear">
+	<title>Clear</title>
+
+	<para>
+          If a widget is currently selected, this command will delete it
+          from its parent without moving it to the clipboard.
+	</para>
+
+      </sect2>
+
+    </sect1> <!-- Edit menu -->
+
+    <sect1 id="view-menu">
+      <title>View menu</title>
+
+      <figure>
+	<title>View menu</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/view-menu" format="png" srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <!-- FIXME: Link. -->
+
+      <sect2 id="view-palette">
+	<title>Show Palette</title>
+
+	<para>
+          Display the palette if it is currently hidden, or raise it
+          to the top of the window stack if it is obscured.
+	</para>
+
+      </sect2>
+
+      <sect2 id="view-property-editor">
+	<title>Show Property Editor</title>
+
+	<para>
+          Display the property editor dialog if it is currently
+          hidden, or raise it to the top of the window stack if it is
+          obscured.
+	</para>
+
+      </sect2>
+
+      <sect2 id="view-widget-tree">
+	<title>Show Widget Tree</title>
+
+	<para>
+          Display the widget tree dialog if it is currently hidden, or
+          raise it to the top of the window stack if it is obscured.
+	</para>
+
+      </sect2>
+
+      <sect2 id="view-clipboard">
+	<title>Show Clipboard</title>
+
+	<para>
+          Display the widget clipboard if it is currently hidden, or
+          raise it to the top of the window stack if it is obscured.
+	</para>
+
+      </sect2>
+
+    </sect1> <!-- View menu -->
+
+    <sect1 id="settings-menu">
+      <title>Settings menu</title>
+
+      <figure>
+	<title>Settings menu</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/settings-menu" format="png" srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="settings-show-grid">
+	<title>Show Grid</title>
+
+	<para>
+	  When placing widgets on a GtkFixed container, should
+          Glade draw a grid for easy widget
+          alignment?
+	</para>
+
+      </sect2>
+
+      <sect2 id="settings-snap-to-grid">
+	<title>Snap to Grid</title>
+
+	<para>
+	  When placing widgets on a GtkFixed container, do you want 
+          Glade to snap them to the grid?
+	</para>
+
+      </sect2>
+
+      <sect2 id="settings-show-widget-tooltips">
+	<title>Show Widget Tooltips</title>
+
+	<para>
+	  When resting your cursor over an widget, should it display
+          tooltips describing that widget?
+	</para>
+
+      </sect2>
+
+      <sect2 id="settings-grid-options">
+	<title>Grid Options</title>
+
+	<figure>
+	  <title>Grid options</title>
+	  <screenshot>
+	    <graphic fileref="user-guide-images/grid-options" format="png"
+             srccredit="mkv"/>
+	  </screenshot>
+	</figure>
+
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      Horizontal spacing - number of pixels to skip
+	      horizontally before drawing a line
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Vertical spacing - number of pixels to skip
+	      vertically before drawing a line
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      Grid style - should the grid be drawn as a series of
+              dots or as lines?
+	    </para>
+	  </listitem>
+        </itemizedlist>
+
+      </sect2>
+
+      <sect2 id="settings-snap-options">
+	<title>Snap Options</title>
+
+	<figure>
+	  <title>Snap Options</title>
+	  <screenshot>
+	    <graphic fileref="user-guide-images/snap-options" format="png"
+            srccredit="mkv"/>
+	  </screenshot>
+	</figure>
+
+	<itemizedlist>
+	  <listitem>
+	    <para>
+              Horizontal snapping - should
+              Glade snap the left and/or
+              right edges of a widget to the grid?
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+              Vertical snapping - should
+              Glade snap the top and/or
+              bottom edges of a widget to the grid?
+	    </para>
+	  </listitem>
+	</itemizedlist>
+
+      </sect2>
+
+    </sect1> <!-- Settings menu -->
+
+    <sect1 id="help-menu">
+      <title>Help menu</title>
+
+      <figure>
+	<title>Help menu</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/help-menu" format="png" srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="help-about">
+	<title>About</title>
+
+	<para>
+	  Displays the About dialog, which shows the
+          Glade logo, and provides
+          authorship and contact information for
+          Glade.
+	</para>
+
+      </sect2>
+
+    </sect1> <!-- Help menu -->
+
+    <sect1 id="toolbar">
+      <title>Toolbar</title>
+
+      <figure>
+	<title>Toolbar</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/toolbar" format="png" srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="toolbar-open">
+	<title>Open</title>
+
+	<para>
+	  Corresponds to <link linkend="file-open-project">
+          <command>File:Open</command></link>.
+	</para>
+
+      </sect2>
+
+      <sect2 id="toolbar-save">
+	<title>Save</title>
+
+	<para>
+	  Corresponds to <link linkend="file-save-project">
+          <command>File:Save</command></link>.
+	</para>
+
+      </sect2>
+
+      <sect2 id="toolbar-options">
+	<title>Options</title>
+
+	<para>
+	  Corresponds to <link linkend="file-project-options">
+          <command>File:Project Options</command></link>.
+	</para>
+
+      </sect2>
+
+      <sect2 id="toolbar-build">
+	<title>Build</title>
+
+	<para>
+	  Corresponds to <link linkend="file-build-source-code">
+          <command>File:Build</command></link>.
+	</para>
+
+      </sect2>
+
+    </sect1> <!-- Toolbar -->
+
+  </chapter> <!-- Menus -->
+
+<!-- PROJECTOPTIONS -->
+
+  <chapter id="project-options">
+    <title>Project Options</title>
+
+    <sect1 id="project-options-general">
+      <title>General</title>
+
+      <figure>
+	<title>General Options</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/options-general" format="png"
+           srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="project-options-general-basic">
+	<title>Basic Options</title>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term>Project Directory</term>
+	    <listitem>
+	      <para>
+                Directory in which the Glade project lies. You can
+                select this using a file dialog box by clicking on
+                <command>Browse</command>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Project Name</term>
+	    <listitem>
+	      <para>
+                Name of your project. Editing this will
+                cause your program name and project filename to change
+                automatically.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Program Name</term>
+	    <listitem>
+	      <para>
+                Name of the executable used when Glade
+                generates code for your project. Editing this will
+                cause the project file to automatically change.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Project File</term>
+	    <listitem>
+	      <para>
+                Filename of the Glade project file,
+                where all of your project information will be stored.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </sect2> <!-- Basic options -->
+
+      <sect2 id="project-options-general-subdirs">
+	<title>Subdirectories</title>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>Source Directory</term>
+	    <listitem>
+	      <para>
+                Directory where Glade should emit its source code when
+                told to do so.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Pixmaps Directory</term>
+	    <listitem>
+	      <para>
+                Directory where Glade should expect to find any
+                pixmaps that are used in the project.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </sect2> <!-- Subdirectories -->
+
+      <sect2 id="project-options-general-language">
+	<title>Language</title>
+
+	<!-- FIXME: per-language description? -->
+
+	<para>
+          Pick the programming language in which Glade should emit
+          code. As of the writing of this document C, C++,
+          Ada95, Perl and Eiffel are supported options.
+	</para>
+
+      </sect2> <!-- Language -->
+
+      <sect2>
+	<title>GNOME</title>
+
+	<para>
+          Should Glade emit code that uses the GNOME libraries?
+	</para>
+
+      </sect2>
+
+    </sect1> <!-- General options -->
+
+    <sect1>
+      <title>C Options</title>
+
+      <figure>
+	<title>C Options</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/options-c" format="png" srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="proejct-options-c-general">
+	<title>General Options</title>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term>Gettext Support</term>
+	    <listitem>
+	      <para>
+                Should Glade emit code to suppport GNU gettext for
+                internationalization?
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Set Widget Names</term>
+	    <listitem>
+	      <para>
+                Should Glade emit code to set the names of all
+                widgets? This is useful if you intend to use Gtk+
+                calls such as <function>gtk_widget_path()</function>. Also see
+                <function>gtk_widget_set_name()</function>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Backup Source Files</term>
+	    <listitem>
+	      <para>
+                Should Glade make a backup of all your source files
+                when you build new ones?
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </sect2>
+
+      <sect2 id="proejct-options-c-file">
+	<title>File Output Options</title>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term>Output <filename>main.c</filename> File</term>
+	    <listitem>
+	      <para>
+                Should Glade output a file,
+                <filename>main.c</filename>, which contains a simple 
+                bootstrap? If you enabled GNOME support, it will call
+                <function>gnome_init()</function>, otherwise it calls
+                <function>gtk_init()</function>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Output Support Functions</term>
+	    <listitem>
+	      <para>
+                Should Glade output a file,
+                <filename>support.c</filename>, which contains utility
+                functions for such tasks as creating a pixmap, or
+                looking for a widget by name?
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Output Build Files</term>
+	    <listitem>
+	      <para>
+                Should Glade output files to support configuring your
+                project through automake/autoconf? This option will
+                create several files:
+	      </para>
+	      <simplelist>
+		<member><filename>AUTHORS</filename> - Authorship file for contributors.</member>
+		<member><filename>ChangeLog</filename> - Log describing changes you've made.</member>
+		<member><filename>Makefile.am</filename> - Automake template for the project.</member>
+		<member><filename>NEWS</filename> - Announcements for new releases.</member>
+		<member><filename>README</filename> - Describes general information about the project.</member>
+		<member><filename>acconfig.h</filename> - Defines default preprocessor symbols for autoconf.</member>
+		<member><filename>autogen.sh</filename> - Script for building a configure script.</member>
+		<member><filename>configure.in</filename> - Template for building a configure script.</member>
+		<member><filename>macros/</filename> - Directory containing automake macros for Glade, GNOME, etc.</member>
+		<member><filename>stamp-h.in</filename> - Timestamp file.</member>
+		<member><filename>src/Makefile.am</filename> - Automake template for src/ directory.</member>
+	      </simplelist>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </sect2>
+
+      <sect2 id="proejct-options-c-interface">
+	<title>Interface Creation Functions</title>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term>Source File</term>
+	    <listitem>
+	      <para>
+                When emitting user interface code, store
+                it in this file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Header File</term>
+	    <listitem>
+	      <para>
+                When emitting user interface code, store
+                the function prototypes, etc., in this file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </sect2>
+
+      <sect2 id="proejct-options-c-signal">
+	<title>Signal Handler & Callback Functions</title>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term>Source File</term>
+	    <listitem>
+	      <para>
+                When emitting signal handler code, store
+                it in this file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Header File</term>
+	    <listitem>
+	      <para>
+                When emitting signal handler code, store
+                the function prototypes, etc., in this file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </sect2>
+
+      <sect2 id="proejct-options-c-support">
+	<title>Support Functions</title>
+
+	<variablelist>
+
+	  <varlistentry>
+	    <term>Source File</term>
+	    <listitem>
+	      <para>
+                When emitting the support function code,
+                store it in this file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>Header File</term>
+	    <listitem>
+	      <para>
+                When emitting the support function code,
+                store the function prototypes, etc., in this file.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+
+	</variablelist>
+
+      </sect2>
+
+    </sect1> <!-- C Options -->
+
+    <sect1>
+      <title>Libglade Options</title>
+
+      <figure>
+	<title>Libglade Options</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/options-libglade" format="png"
+           srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="project-options-libglade-trans">
+	<title>Save Translatable Strings</title>
+
+	<para>
+	  If you wish to internationalize your application, and want
+          to use libglade to construct the interface, you may wish to
+          save the translatable trings into a file. This option tells
+          Glade if you wish to do this.
+	</para>
+
+      </sect2>
+
+    </sect1> <!-- Libglade options -->
+
+  </chapter> <!-- Project options -->
+
+<!-- WINDOWS -->
+
+  <chapter id="windows">
+    <title>Windows</title>
+
+    <sect1 id="windows-main">
+      <title>Main Window</title>
+
+      <figure>
+	<title>Main window</title>
+	<screenshot>
+	  <graphic fileref="user-guide-images/window-main" format="png"
+           srccredit="mkv"/>
+	</screenshot>
+      </figure>
+
+      <sect2 id="windows-main-menu">
+	<title>Menu</title>
+
+	<para>
+          Menus are documented <link linkend="menus">
+          here</link>.
+        </para>
+
+      </sect2>
+
+      <sect2 id="windows-main-toolbar">
+	<title>Toolbar</title>
+
+	<para>
+          The toolbar is documented <link linkend="toolbar">
+          here</link>.
+        </para>
+
+      </sect2>
+
+      <sect2 id="windows-main-list">
+	<title>Top-Level Window List</title>
+
+	<para>
+          The main window displays a list of the top-level Gtk+ and
+          GNOME windows that are defined for the current project. This
+          includes:
+	</para>
+
+	<itemizedlist>
+	  <listitem><para><structname>GtkWindow</structname></para></listitem>
+	  <listitem><para><structname>GtkDialog</structname></para></listitem>
+	  <listitem><para><structname>GtkFileSelection</structname></para></listitem>
+	  <listitem><para><structname>GtkColorSelectionDialog</structname></para></listitem>
+	  <listitem><para><structname>GtkFontSelectionDialog</structname></para></listitem>
+	  <listitem><para><structname>GtkInputDialog</structname></para></listitem>
+	  <listitem><para><structname>GnomeApp</structname></para></listitem>
+	  <listitem><para><structname>GnomeDialog</structname></para></listitem>
+	  <listitem><para><structname>GnomeMessageBox</structname></para></listitem>
+	  <listitem><para><structname>GnomeAbout</structname></para></listitem>
+	  <listitem><para><structname>GnomePropertyBox</structname></para></listitem>
+	</itemizedlist>
+
+      </sect2>
+
+    </sect1>
+
+    <sect1 id="windows-palette">
+      <title>Palette</title>
+
+      <para>
+        The palette allows you to pick widgets to be added to your
+        current Glade proejct. There are three major modes of
+        operation to the palette. The first mode is selection, and can
+        be used by clicking on the large black arrow with "Selector"
+        labeled next to it. In this mode mouse clicks will select
+        already existing widgets from your project, allowing you to
+        edit them using the property editor. Selection mode is also
+        indicated by an arrow cursor.
+      </para>
+
+      <para>
+        The second mode of operation is widget placement. When
+        selecting most widgets, Glade will change the cursor to a
+        cross and then allow you to place widgets inside of
+        containers, top-level widgets, etc. After placing a widget
+        Glade returns to selection mode.
+      </para>
+
+      <para>
+        The third mode of operation is top level placement. For
+        certain <link linkend="windows-main-list">top-level
+        widgets</link>, selecting them in the palette will cause them
+        to instantly appear on your desktop for editing. This
+        contrasts with the usual mode of widget placement described
+        above. After selecting a top-level widget the mode is changed
+        back to selection.
+      </para>
+
+      <para>
+        The palette groups widgets into three distinct sections: Gtk+
+        Basic, Gtk+ Additional, and Gnome. The Gtk+ Basic category
+        contains often used Gtk+ widgets such as
+        <structname>GtkWindow</structname>, <structname>GtkLabel</structname>, etc. Gtk+
+        Additional contains widgets such as
+        <structname>GtkAlignment</structname>, <structname>GtkPacker</structname>,
+        and <structname>GtkCalendar</structname>. The Gnome category includes
+        all of the GNOME widgets that Glade supports.
+      </para>
+
+      <para>
+        A list of all widgets supported is provided below. In order to
+        determine exactly what a widget is in the palette (i.e., the
+        picture provided is not obvious), you can get a tooltip with a
+        description by resting your cursor over the widget in question.
+      </para>
+
+      <sect2 id="windows-palette-basic">
+	<title>Gtk+ Basic</title>
+
+	<para>
+
+	  <inlinemediaobject>
+	    <imageobject>
+	      <imagedata fileref="user-guide-images/window-palette-basic.png">
+	    </imageobject>
+	  </inlinemediaobject>
+
+          <table>
+	    <title>Gtk+ Basic</title>
+	    <tgroup cols="5" align="left">
+	      <tbody>
+		<row>
+		  <entry>
+		  </entry>
+		</row>
+		<row>
+		  <entry><structname>GtkWindow</structname></entry>
+		  <entry><structname>GtkMenuBar</structname></entry>
+		  <entry><structname>GtkToolbar</structname></entry>
+		  <entry><structname>GtkHandleBox</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkLabel</structname></entry>
+		  <entry><structname>GtkEntry</structname></entry>
+		  <entry><structname>GtkCombo</structname></entry>
+		  <entry><structname>GtkText</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkButton</structname></entry>
+		  <entry><structname>GtkToggleButton</structname></entry>
+		  <entry><structname>GtkCheckButton</structname></entry>
+		  <entry><structname>GtkRadioButton</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkList</structname></entry>
+		  <entry><structname>GtkTree</structname></entry>
+		  <entry><structname>GtkCList</structname></entry>
+		  <entry><structname>GtkCTree</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkOptionMenu</structname></entry>
+		  <entry><structname>GtkSpinButton</structname></entry>
+		  <entry><structname>GtkProgressBar</structname></entry>
+		  <entry><structname>GtkStatusbar</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkHSeparator</structname></entry>
+		  <entry><structname>GtkVSeparator</structname></entry>
+		  <entry><structname>GtkPixmap</structname></entry>
+		  <entry><structname>GtkDrawingArea</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkDialog</structname></entry>
+		  <entry><structname>GtkFileSelection</structname></entry>
+		  <entry><structname>GtkColorSelectionDialog</structname></entry>
+		  <entry><structname>GtkFontSelectionDialog</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkHBox</structname></entry>
+		  <entry><structname>GtkVBox</structname></entry>
+		  <entry><structname>GtkTable</structname></entry>
+		  <entry><structname>GtkFixed</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkHButtonBox</structname></entry>
+		  <entry><structname>GtkVButtonBox</structname></entry>
+		  <entry><structname>GtkHPaned</structname></entry>
+		  <entry><structname>GtkVPaned</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkNotebook</structname></entry>
+		  <entry><structname>GtkFrame</structname></entry>
+		  <entry><structname>GtkScrolledWindow</structname></entry>
+		  <entry><structname>GtkViewport</structname></entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </table>
+
+        </para>
+
+      </sect2>
+
+      <sect2 id="windows-palette-add">
+	<title>Gtk+ Additional</title>
+
+	<para>
+
+          <inlinemediaobject>
+	    <imageobject>
+	      <imagedata fileref="user-guide-images/window-palette-add.png">
+	    </imageobject>
+	  </inlinemediaobject>
+
+	  <table>
+	    <title>Gtk+ Additional</title>
+	    <tgroup cols="4" align="left">
+	      <tbody>
+		<row>
+		  <entry><structname>GtkHScale</structname></entry>
+		  <entry><structname>GtkVScale</structname></entry>
+		  <entry><structname>GtkHRuler</structname></entry>
+		  <entry><structname>GtkVRuler</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkAlignment</structname></entry>
+		  <entry><structname>GtkEventBox</structname></entry>
+		  <entry><structname>GtkAccelLabel</structname></entry>
+		  <entry><structname>GtkCalendar</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkLayout</structname></entry>
+		  <entry><structname>GtkPacker</structname></entry>
+		  <entry><structname>GtkAspectFrame</structname></entry>
+		  <entry><structname>GtkPopopMenu</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkCurve</structname></entry>
+		  <entry><structname>GtkGammaCurve</structname></entry>
+		  <entry><structname>GtkHScrollbar</structname></entry>
+		  <entry><structname>GtkVScrollbar</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkImage</structname></entry>
+		  <entry><structname>GtkPreview</structname></entry>
+		  <entry><structname>GtkColorSelection</structname></entry>
+		  <entry><structname>GtkFontSelection</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GtkInputDialog</structname></entry>
+		  <entry>Custom Widget</entry>
+		  <entry><structname>GtkArrow</structname></entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </table>
+
+        </para>
+
+      </sect2>
+
+      <sect2 id="windows-palette-gnome">
+	<title>GNOME</title>
+
+	<para>
+
+	  <inlinemediaobject>
+	    <imageobject>
+	      <imagedata fileref="user-guide-images/window-palette-gnome.png"
+	    </imageobject>
+	  </inlinemediaobject>
+
+	  <table>
+	    <title>Gnome</title>
+
+	    <tgroup cols="4" align="left">
+	      <tbody>
+		<row>
+		  <entry><structname>GnomeApp</structname></entry>
+		  <entry><structname>GnomeDialog</structname></entry>
+		  <entry><structname>GnomeMessageBox</structname></entry>
+		  <entry><structname>GnomeAbout</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GnomeColorPicker</structname></entry>
+		  <entry><structname>GnomeFontPicker</structname></entry>
+		  <entry><structname>GnomeIconEntry</structname></entry>
+		  <entry><structname>GnomeHRef</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GnomeEntry</structname></entry>
+		  <entry><structname>GnomeFileEntry</structname></entry>
+		  <entry><structname>GnomeNumberEntry</structname></entry>
+		  <entry><structname>GnomePixmapEntry</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GnomeDateEdit</structname></entry>
+		  <entry><structname>GtkDial</structname></entry>
+		  <entry><structname>GtkClock</structname></entry>
+		  <entry><structname>GnomeAppBar</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GnomeCalculator</structname></entry>
+		  <entry><structname>GnomeLess</structname></entry>
+		  <entry><structname>GnomePaperSelector</structname></entry>
+		  <entry><structname>GnomeSpell</structname> (deprecated)</entry>
+		</row>
+		<row>
+		  <entry><structname>GnomeCanvas</structname></entry>
+		  <entry><structname>GnomeIconList</structname></entry>
+		  <entry><structname>GnomeIconSelection</structname></entry>
+		  <entry><structname>GnomePropertyBox</structname></entry>
+		</row>
+		<row>
+		  <entry><structname>GnomeDruid</structname></entry>
+		  <entry><structname>GnomePixmap</structname></entry>
+		  <entry><structname>GnomeAnimator</structname></entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </table>
+
+	</para>
+
+      </sect2>
+
+    </sect1> <!-- Palette -->
+
+    <sect1 id="windows-editor">
+      <title>Property Editor</title>
+
+      <para>
+        FIXME
+      </para>
+
+    </sect1>
+
+    <sect1 id="windows-tree">
+      <title>Widget Tree</title>
+
+      <para>
+        FIXME
+      </para>
+
+    </sect1>
+
+    <sect1 id="windows-clipboard">
+      <title>Clipboard</title>
+
+      <para>
+        FIXME
+      </para>
+
+    </sect1>
+
+  </chapter> <!-- Windows -->
+
+<!-- OUTPUT -->
+
+  <chapter id="output">
+    <title>Output</title>
+
+    <para>
+      Please write me.
+    </para>
+
+  </chapter>
+
+<!-- LIBGLADE -->
+
+  <chapter id="libglade">
+    <title>Libglade</title>
+
+    <para>
+      Please write me.
+    </para>
+
+ </chapter>
+
+<!-- QUICKSTART -->
+
+  <chapter id="quickstart">
+    <title>Quick Start</title>
+
+    <para>
+      Please write me.
+    </para>
+
+  </chapter>
+
+<!-- HELLOWORLD -->
+
+  <chapter id="helloworld">
+    <title>Hello, World - A Simple Project</title>
+
+    <para>
+      Please write me.
+    </para>
+
+  </chapter>
+
+<!-- AUTHORS -->
+
+  <chapter id="authors">
+    <title>Authors</title>
+
+    <para>
+      Glade was written by Damon Chaplin
+      <email>damon@ximian.com</email>. To find more information
+      about Glade, please visit the Glade
+      <ulink url="http://glade.pn.org" type="http">web page</ulink>.
+    </para>
+
+    <para>
+      Please send all comments, suggestions, and bug reports to the
+      Glade mailing list. Information on
+      how to join this list is available at <ulink
+      url="http://glade.pn.org/lists.html" type="http">this
+      page</ulink>.
+    </para>
+
+    <para>
+      This reference manual is maintained by Michael Vance
+      <email>briareos@lokigames.com</email>. Please send all
+      comments, suggestions, and bug reports regarding the manual his
+      way.
+    </para>
+
+    <para>
+
+      <variablelist>
+	<title>Contributors</title>
+
+        <varlistentry>
+	  <term>Ray Barker <email>fatray@home.com</email></term>
+	  <listitem>
+	    <para>
+              Contributed menu dialog, file output documentation
+            </para>
+	  </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	  <term>
+            Paul J. Drongowski <email>pjd@ives.lkg.dec.com</email>
+          </term>
+	  <listitem>
+	    <para>
+              Contributed quick start tutorial
+            </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+
+    <para>
+      You can also add your comments online by using <ulink
+      type="http" url="http://www.gnome.org/gdp/doctable/">GNOME
+      Documentation Status Table</ulink>. 
+    </para>
+
+  </chapter>
+
+</book>

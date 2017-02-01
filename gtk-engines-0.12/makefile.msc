@@ -1,0 +1,110 @@
+## Makefile for building gtk-engines with Microsoft C
+## Use: nmake -f makefile.msc 
+
+# Where the themes will be installed. This is where gtk looks for them
+# by default (replace C:\windows with your Windows directory)
+#THEMES = C:\windows\gtk\themes
+# This is what I use as installation target, from where the installer-builder
+# will pick it up.
+THEMES = \src\themes
+
+################################################################
+
+# Nothing much configurable below
+
+!IFNDEF THEME
+
+# This part is used from this directory
+
+SUBDIRS = Metal Notif Redmond95 Pixmap
+
+all :
+	for %d in ($(SUBDIRS)) do nmake -nologo -f makefile.msc theme-all DIR=%d
+
+install :
+	for %d in ($(SUBDIRS)) do nmake -nologo -f makefile.msc theme-install DIR=%d
+
+clean :
+	for %d in ($(SUBDIRS)) do nmake -nologo -f makefile.msc theme-clean DIR=%d
+
+!IFDEF DIR
+
+theme-all :
+	cd $(DIR)
+	nmake -nologo -f ..\makefile.msc THEME=$(DIR) this_is_$(DIR)=1 all
+	cd ..
+
+theme-install :
+	cd $(DIR)
+	nmake -nologo -f ..\makefile.msc THEME=$(DIR) install
+	cd ..
+
+theme-clean :
+	cd $(DIR)
+	nmake -nologo -f ..\makefile.msc THEME=$(DIR) clean
+	cd ..
+
+!ENDIF
+
+
+!ELSE
+
+# This part is included by makefiles below
+
+GTK_VER = 1.3
+GLIB_VER = 1.3
+
+# cl -? describes the options
+CC = cl -G5 -GF -Ox -W3 -MD -nologo
+LDFLAGS = /link
+INSTALL = copy
+
+GTK = ..\..\gtk+
+GLIB = ..\..\glib
+GDK_IMLIB = ..\..\imlib\gdk_imlib
+
+ENGINES = $(THEMES)\engines
+ENGGTK = $(THEMES)\$(THEME)\gtk
+
+CFLAGS = -I. -I$(GLIB) -I$(GLIB)\gmodule -I$(GTK)\gdk\win32 -I$(GTK) -I$(GDK_IMLIB)
+
+!IFDEF this_is_Pixmap
+EXTRALIBS = $(GDK_IMLIB)\gdk_imlib.lib
+!ENDIF
+
+!IFNDEF OBJECTS
+OBJECTS = \
+	$(THEME)_theme_draw.obj \
+	$(THEME)_theme_main.obj 
+!ENDIF
+
+all : \
+	$(THEME).dll
+
+install : all
+	-mkdir $(ENGINES)
+	$(INSTALL) $(THEME).dll $(ENGINES)
+	-mkdir $(THEMES)\$(THEME)
+	-mkdir $(THEMES)\$(THEME)\gtk
+	$(INSTALL) Theme\gtk\*.png $(ENGGTK)
+	$(INSTALL) Theme\gtk\gtkrc $(ENGGTK)
+
+$(THEME).dll : $(OBJECTS)
+	$(CC) $(CFLAGS) -LD -Fe$(THEME).dll $(OBJECTS) $(GTK)\gtk\gtk-$(GTK_VER).lib $(GTK)\gdk\win32\gdk-$(GTK_VER).lib $(EXTRALIBS) $(GLIB)\glib-$(GLIB_VER).lib $(GLIB)\gmodule-$(GLIB_VER).lib gdi32.lib user32.lib $(LDFLAGS) /def:..\engine.def
+
+.c.obj :
+	$(CC) $(CFLAGS) -GD -c $<
+
+clean:
+	del *.exe
+	del *.obj
+	del *.dll
+	del *.lib
+	del *.exp
+	del *.err
+	del *.map
+	del *.sym
+	del *.pdb
+	del *.ilk
+
+!ENDIF

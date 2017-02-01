@@ -1,0 +1,333 @@
+<HTML
+><HEAD
+><TITLE
+>Terminal input and output</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="ZVT Terminal Widget Reference Guide"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Implementation notes"
+HREF="zvtterm-notes.html"><LINK
+REL="PREVIOUS"
+TITLE="As a color output device"
+HREF="x1035.html"><LINK
+REL="NEXT"
+TITLE="Fonts"
+HREF="x1065.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>ZVT Terminal Widget Reference Guide</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x1035.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="x1065.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ZVTTERM-INPUT-OUTPUT"
+>Terminal input and output</A
+></H1
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1044"
+>Display output</A
+></H2
+><P
+>The terminal engine receives display data from one of 2 sources.
+	</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Directly from the application</DT
+><DD
+><P
+>		 can be used to feed
+		output from the running application directly into the
+		terminal emulator.  Any such input will not be seen by
+		any subordinate application, but will behave as if
+		that application had generated it.  This normally used
+		when the ZvtTerm is only being used as a local
+		output device.</P
+></DD
+><DT
+>From the sub-ordinate application</DT
+><DD
+><P
+>If a child process has been launched via
+		zvt_term_forkpty(), then it will be executing
+		asynchronously to the GUI application.  If it generates
+		any output while it is executing this will automatically
+		be processed and displayed by the widget during the gtk
+		event loop processing.  This will never generate output if
+		zvt_term_forkpty() has not executed successfully.</P
+></DD
+></DL
+></DIV
+><P
+>Any input from any of the sources is treated the same - as
+	  xterm escape sequences or escape sequence fragments and simple text.  It would
+	  generally not make sense to use both methods of display
+	  generation at the same time as the display state may not be
+	  known between calls to the parser.</P
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1058"
+>Inserting keystrokes</A
+></H2
+><P
+>Within the ZvtTerm object definition there is available
+	  a file descriptor which is assigned to the application to
+	  "add" extra keystrokes to the child's input.  This file
+	  descriptor is stored in
+	  <TT
+CLASS="LITERAL"
+>term-&gt;vx-&gt;vt.keyfd</TT
+>.
+	  Input to this file descriptor will be
+	  processed as if they were typed in by the user.
+	  zvt_term_feed() cannot be used for this purpose as it
+	  by-passes the child's input and output streams and writes
+	  directly to the display engine.  Of course, this file
+	  descriptor is only valid if zvt_term_forkpty() was executed
+	  successfully on the terminal object.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1062"
+></A
+><P
+><B
+>Example 1. Adding characters to the input stream</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	    /* feeds in 'ls -l\r\n' into the current child process */
+	    write(term-&gt;vx-&gt;vt.keyfd, "ls -l\r\n", sizeof("ls -l\r\n"));
+	  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x1035.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="x1065.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>As a color output device</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Fonts</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

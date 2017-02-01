@@ -1,0 +1,705 @@
+<!DOCTYPE Article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+<!ENTITY VERSION "0.9"> 
+]>
+
+<article id="index" lang="it">
+ <artheader> 
+  <title>Bug-Buddy</title>
+  <copyright>
+   <year>2000</year>
+   <holder>Jacob Berkman</holder>
+  </copyright>
+  <copyright>
+   <year>2000</year>
+   <holder>Telsa Gwynne</holder>
+  </copyright>
+   <copyright>
+    <year>2000</year>
+    <holder>Giovanni Bortolozzo (traduzione in italiano)</holder>
+   </copyright>
+
+  <legalnotice id="legalnotice">
+   <para>Permission is granted to copy, distribute and/or modify this
+    document under the terms of the <ulink type="help"
+    url="gnome-help:fdl"><citetitle>GNU Free Documentation
+    License</citetitle></ulink>, Version 1.1 or any later version
+    published by the Free Software Foundation with no Invariant
+    Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy
+    of the license can be found <ulink type="help"
+    url="gnome-help:fdl">here</ulink>.</para>
+
+   <para>Many of the names used by companies to distinguish their
+    products and services are claimed as trademarks. Where those names
+    appear in any GNOME documentation, and those trademarks are made
+    aware to the members of the GNOME Documentation Project, the names
+    have been printed in caps or initial caps.</para>
+  </legalnotice>
+
+  <releaseinfo> 
+    Manuale versione 0.2: modificata la licenza nella FDL, riordinato
+    per rispecchiare il nuovo ordine delle schermate del programma. 
+  </releaseinfo>
+ </artheader>
+
+ <sect1 id="intro">
+  <title>Introduzione</title> 
+
+  <para>
+    Il programma <application>bug-buddy</application> è uno strumento
+    che vi guiderà, nel modo più indolore possibile, nel processo di
+    creazione di una notifica di errore («bug report»). In qualsiasi
+    momento si possono modificare le cose e poi inviare, salvare o
+    abbandonare la notifica prodotta. Questo documento descrive la
+    versione &VERSION; dell'applicazione
+    <application>bug-buddy</application>. 
+  </para>
+
+  <para>
+    <application>bug-buddy</application> può essere avviato in molti modi:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+      Aprendo il <guimenu>menu principale di GNOME</guimenu> e si
+      selezioni 
+      <menuchoice>
+       <guimenu>Programmi</guimenu>
+       <guisubmenu>Utilità</guisubmenu>
+       <guimenuitem>bug-buddy</guimenuitem>
+      </menuchoice>
+      .
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+      Lanciando <command>bug-buddy</command> al prompt di un terminale
+      tipo <application>gnome-terminal</application> o 
+      <application>xterm</application>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+      Se si sta usando gmc, il <application>file manager di
+      GNOME</application>, per avviarlo è sufficiente cliccare per due
+      volte con il proprio mouse su un file core.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+      Quando un programma di GNOME va in crash, è visualizzata una
+      <guilabel>finestra di dialogo di crash</guilabel>. Se nel
+      sistema è presente <application>bug-buddy</application>, allora
+      una delle opzioni della finestra di dialogo offrirà la
+      possibilità di inviare una notifica di errore. Selezionandola si
+      sarà guidati attraverso un'altra finestra di dialogo che mostra
+      i dettagli del programma che è andato in crash. A questo punto
+      se si continua verrà avviato <application>bug-buddy</application>.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+    <application>bug-buddy</application> è un programma molto
+    strutturato. In qualsiasi punto si può avanzare oppure tornare
+    indietro per correggere i dettagli precedenti.
+  </para>
+
+  <para>
+	Lo scopo di tutto questo è di essere in grado di collezionare
+    tutte le informazioni di cui uno sviluppatore avrà bisogno per
+    riprodurre lo stesso problema e poterlo risolvere. Alcune delle
+    informazioni generate potranno sembrare un po' pedanti, ma non le
+    si cancelli. Torneranno sicuramente utili.
+  </para>
+ </sect1>
+
+ <sect1 id="contact-info">
+  <title>Informazioni sul contatto</title>
+
+  <para>
+    Per prima cosa <application>bug-buddy</application> richiede
+    alcune informazioni, per essere in grado di inviare correttamente
+    la notifica. Solitamente ha delle ottime intuizioni e quindi si
+    dovrebbe poter passare direttamente alla schermata successiva.
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Il proprio nome</term>
+    <listitem>
+     <para>
+       GNOME lo indovina da sé, ma se lo si vuole cambiare lo si può
+       fare qui.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Indirizzo email</term>
+    <listitem>
+     <para>
+       Anche questo GNOME dovrebbe indovinarlo da solo. Non dovrebbe
+       essere necessario cambiarlo a meno che non si scarichi
+       abitualmente la posta da un altro account. In tal caso,
+       conviene mettere qui l'altro account in modo che qualsiasi
+       risposta alla propria notifica sia inviata a quell'indirizzo.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Percorso completo di sendmail</term>
+    <listitem>
+     <para>
+       Permette di verificare che bug-buddy cerchi nel posto giusto
+       quanto prova a inviare un'email. Quasi sicuramente non sarà
+       necessario modificarlo.
+     </para>
+    </listitem>
+   </varlistentry>
+
+  </variablelist>
+
+  <para>
+    Nell'angolo in basso c'è un pulsante
+    <guibutton>Informazioni</guibutton>, che permette l'accesso alla
+    finestra Informazioni e alla <ulink type="http"
+    url="http://bug-buddy.org/">home page di bug-buddy</ulink>. 
+  </para>
+ </sect1>
+
+ <sect1 id="report-info">
+  <title>Informazioni sulla notifica</title>
+
+  <para>
+    Le opzioni qui visualizzate variano a seconda dell'opzione
+    a discesa che si seleziona. Qualche volta è molto più utile
+    aggiungere informazioni ad una notifica già esistente piuttosto
+    che cominciarne una nuova (e talvolta ci si accorgerà di aver
+    dimenticato qualcosa in una delle proprie notifiche precedenti e
+    la si vuole aggiungere). È possibile cercare nei bug tracker di 
+    <ulink type="http" url="http://bugs.gnome.org/">GNOME</ulink>,
+    <ulink type="http" url="http://bugs.kde.org/">KDE</ulink>,
+    <ulink type="http" url="http://bugs.debian.org/">Debian</ulink> o
+    <ulink type="http" url="http://bugs.helixcode.com/">Helix Code</ulink>
+    per trovare la notifica di errore d'interesse e annotarsi il numero.
+  </para>
+
+  <para>
+    Se si seleziona <guibutton>Aggiungi informazioni ad una precedente
+    notifica di errore</guibutton> verrà chiesto di inserire il numero
+    dell'errore («bug number») di tale notifica.
+  </para>
+
+  <para>
+    Se si seleziona <guibutton>Crea una nuova notifica
+    d'errore</guibutton> allora sarà necessario indicare il nome del
+    pacchetto, la sua versione, la gravità e la classe dell'errore:
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Sistema di bug tracking</term>
+    <listitem>
+     <para>
+       <application>bug-buddy</application> può inviare notifiche a
+       parecchi posti diversi. È presente una lista a
+       scomparsa. Attualmente si possono segnalare errori ai
+       bug-tracker di KDE, GNOME, Debian, GNU/Linux, Helix Code e ad
+       altri progetti indipendenti che usino un sistema di bug
+       tracking che <application>bug-buddy</application> capisce.
+     </para>
+    </listitem>
+   </varlistentry>
+
+
+   <varlistentry>
+    <term>Pacchetto</term>
+    <listitem>
+     <para>
+       Si può cercare in una lista a scomparsa il nome corretto del
+       pacchetto al quale assegnare questo errore. Se si conosce
+       l'esatto nome del programma che si è lanciato e si usa rpm, si
+       può usare il comando <command>rpm -qf
+       <filename>/percorso/completo/al/file</filename></command> per
+       verificare a quale pacchetto appartiene. Se si usa Debian, si
+       può usare il comando <command>dpkg -S
+       <filename>/percorso/completo/al/file</filename></command>. Per
+       scoprire il percorso completo di, ad esempio, gnome-terminal o
+       kfloppy, si può usare il comando <command>which</command>: 
+       <command>which gnome-terminal</command> o <command>which 
+       kfloppy</command>. 
+     </para>
+     <para>
+       Se non si è ancora sicuri a quale pacchetto assegnare l'errore,
+       può essere molto utile cercare una parola chiave nei
+       bug-tracker in rete per capire come si sono comportati altri in
+       passato in condizioni simili. 
+     </para>
+     <para>
+       Poiché i possibili pacchetti sono tanti, la lista a scomparsa
+       è suddivisa alfabeticamente. Cliccando su un pacchetto che
+       comincia con «a», per esempio, sarà offerta un'ulteriore
+       selezione fra le molte altre applicazioni che cominciano con
+       «a». Quindi sarà necessario cliccare due volte su un pacchetto
+       e poi cercare nelle sottocategorie per cercare altri pacchetti.
+     </para>
+     <para>
+       Se non si seleziona un pacchetto, sarà lasciato «general»
+       (generico). Anche in questo caso la notifica verrà inoltrata
+       al sistema di bug tracking, ma poi là qualcuno dovrà assegnarla
+       manualmente ad un pacchetto, il che rallenta il processo.
+     </para>
+     <caution>
+      <para>
+        Se non si assegna qui un nome, molti bug-tracker risponderanno
+        automaticamente con una «La prossima volta si prega di
+        specificare un pacchetto». Alcuni altri scarteranno la
+        notifica. 
+      </para>
+     </caution>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Versione</term>
+    <listitem>
+     <para>
+       Una volta scelto il pacchetto, controllare il suo numero di
+       versione è molto più semplice. Per i programmi GNOME e KDE,
+       spesso sarà nella finestra «Informazioni» del programma.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Gravità</term>
+    <listitem>
+     <para>
+       Si può scegliere fra più livelli di gravità dell'errore. Se non
+       si è sicuri, spesso va bene «normale». Non ci dovrebbero essere
+       molti errori critici o gravi nel software di uso quotidiano
+       poiché tendono ad essere corretti velocemente. Non è quindi
+       frequente dover assegnare un errore ad una di queste categorie,
+       perciò prima di assegnare un errore ad una di queste, si
+       dovrebbe proprio scaricare l'ultima versione stabile e
+       verificare che il problema non sia già stato risolto.
+     </para>
+
+     <para>
+       Queste descrizioni sono adattate dalle <ulink type="http" 
+       url="http://bugs.debian.org/Bugs/Developer#severities">definizioni
+       di gravità</ulink> del bug tracker di Debian:
+     </para>
+
+     <variablelist>
+      <varlistentry>
+       <term>Critico</term>
+       <listitem>
+        <para>
+          Questo problema causa il malfunzionamento anche del software
+          non strettamente correlato (o dell'intero sistema), oppure
+          causa serie perdite di dati o introduce un buco di sicurezza
+          nel sistema dove si installi il software. Esempi possono
+          essere il blocco dell'intera macchina o la sovrascrittura di
+          file che non dovrebbero essere neanche toccati.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Grave</term>
+       <listitem>
+        <para>
+          Questo errore fa sì che il software in questione non sia
+          utilizzabile o quasi, oppure causa perdite di dati o
+          introduce un buco di sicurezza che permette l'accesso agli
+          account degli utenti che lo usano. Un programma che
+          costantemente si pianta all'avvio e produce file chiamati
+          <filename>core</filename> nella propria home directory può
+          tranquillamente rientrare nella categoria grave.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Normale</term>
+       <listitem>
+        <para>
+          Questo è quello che solitamente si vorrà: il valore predefinito.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Lista dei desideri</term>
+       <listitem>
+        <para>
+          Questa è una categoria utile per due ragioni: errori
+          veramente difficili da correggere e richieste di
+          funzionalità o miglioramenti («Sarebbe bello se...»).
+        </para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Classe</term>
+    <listitem>
+     <para>
+       La classe predefinita per un errore è quella dell'errore
+       software: «c'è qualcosa che non va nel programma». Praticamente
+       si selezionerà sempre questa classe. Talvolta non è proprio
+       quella di cui si ha bisogno. Si può scegliere la classe tra
+       alcune alternative: l'alternativa più comunemente necessaria è
+       un errore nella documentazione: qualsiasi cosa da errori di
+       battitura a documentazione obsoleta o mancante.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+
+ <sect1 id="description">
+  <title>Descrizione</title>
+  <para>
+    La sezione <guilabel>Oggetto, in breve, della notifica
+    d'errore</guilabel> sarà usata come oggetto della notifica
+    d'errore inviata via email. Non è necessario inserire il nome del
+    pacchetto se si è già assegnato l'errore a quel pacchetto. Ma non
+    è male essere il più possibile specifici. «Va in crash quando
+    provo a salvare» o «Si dimentica delle mie preferenze» sono
+    decisamente meglio di «Errore». Gli hacker leggeranno questi
+    riassunti quando cercheranno qualcosa che possono correggere e una
+    frase chiara catturerà la loro attenzione. Si deve riempire questa
+    sezione. Se non lo si fa, <application>bug-buddy</application> vi
+    ricorderà di farlo.
+  </para>
+
+  <para>
+    La sezione <guilabel>Descrizione completa dell'errore</guilabel> è
+    dove si deve descrivere quel che si è fatto, quel che è successo e
+    quel che ci si aspettava succedesse. Si deve completare anche
+    questo, altrimenti <application>bug-buddy</application> dirà di
+    farlo. Ottime cose da includere sono:
+  </para>
+   
+  <itemizedlist>
+   <listitem>
+    <para>
+      Le copie esatte di qualsiasi messaggio d'errore;
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      Il nome del proprio window manager e la versione (specialmente
+      nel caso che l'errore capiti spostando le cose in giro per lo
+      schermo o quando la finestra ottiene il fuoco);
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      Se lo si può far succedere in un modo ma non in un altro, lo si
+      dica. Se ci sono due modi per fare qualcosa (una selezione in un
+      menu oppure la scrittura di un comando, ad esempio) e solo uno di
+      questi provoca l'errore, lo si dica assolutamente;
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      Perché si pensa che questo sia un errore. Cosa sarebbe dovuto
+      succedere altrimenti. Sebbene in alcuni casi questo possa essere
+      ovvio («Non dovrebbe andare in crash quando provo a salvare il
+      file») in altri non lo è affatto. Si suggerisca un miglior
+      comportamento per il programma («Se non posso salvare il file,
+      dovrebbe dirmi che non dovrei continuare a modificarlo se non
+      sono ben conscio che andrò a perdere le mie modifiche.»).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      Talvolta, per dimostrare l'errore, possono essere utili delle
+      instantanee delle schermo (screenshot). Non le si invii assieme
+      alla notifica di bug-buddy! Se se ne hanno, lo si menzioni,
+      cosicché chi corregge l'errore, se vuole vederle, vi scriverà.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+    Se si ha un qualsiasi suggerimento su cosa possa aver causato
+    l'errore o su come correggerlo, ottimo; se non se ne hanno, non
+    ci si preoccupi. Si spieghi semplicemente cos'è successo. Se uno
+    sviluppatore ha bisogno di ulteriori informazioni, può contattarvi
+    per averle.
+  </para>
+
+  <para>
+    Se si ha un (breve!) file di testo che contiene informazioni d'uso
+    lo si può includere qui. Se si ha un piccolo file HTML che ha
+    causato il crash del proprio editor, o due insiemi di opzioni per
+    un programma il primo dei quali funziona mentre l'altro no, queste
+    sono il tipo di cose da includere qui. Si inserisca semplicemente il
+    nome del file nella casella <guilabel>Includi un file di
+    testo</guilabel> nella parte inferiore della finestra.
+  </para>
+ </sect1>
+
+ <sect1 id="debug-info">
+  <title>Informazioni di debugging</title>
+
+  <para>
+    Qui si ha la possibilità di scegliere una di queste tre opzioni.
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Ignora questo passo</term>
+    <listitem>
+     <para>
+       Se si sta notificando un errore nella documentazione, o uno che
+       non manda in crash il programma, oppure si sta notificando un
+       errore e non si ha un file core associato con esso, si
+       selezioni questa opzione e non ci si curi della sezione seguente
+       di questa guida. Questa è l'opzione predefinita.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Raccolta informazioni sul crash per il debugging</term>
+    <listitem>
+     <para>
+       Se <application>bug-buddy</application> è stato avviato perché
+       si è risposto sì a «Notifica un errore» nella finestra di
+       dialogo che dice che qualcosa è andato in crash, si selezioni
+       questa possibilità. Se lo si fa, verranno chieste due
+       cose. Le informazioni richieste dovrebbero già essere state
+       inserite, ma se non lo fossero:
+     </para>
+     
+     <itemizedlist>
+      <listitem>
+       <para>
+         <guilabel>Eseguibile</guilabel>: In questa casella si deve
+         inserire il nome del programma come lo si sarebbe scritto
+         alla riga di comando. Per esempio, se <application>Control
+         Center</application> è andato in crash, qui si dovrà inserire
+         <command>gnomecc</command>. 
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+         <guilabel>ID del processo</guilabel>: In questa casella si
+         deve inserire il process ID (ID del processo) o
+         <acronym>PID</acronym>. Probabilmente questa informazione era
+         disponibile nella finestra di dialogo originale dove si è
+         selezionato «Notifica un errore». Se si ha già chiuso questa
+         finestra, si può trovarlo avviando il <application>Gnome
+         System Monitor</application> scegliendo
+          <menuchoice>
+           <guimenu>Programmi</guimenu>
+           <guisubmenu>Utilità</guisubmenu>
+           <guimenuitem>System Monitor</guimenuitem>
+          </menuchoice>
+         o lanciando <command>gtop</command> da riga di comando. Si
+         troverà il PID nella colonna all'estrema sinistra e il
+         comando nella colonna all'estrema destra (per poter
+         visualizzare questa colonna potrebbe essere necessario
+         scorrere verso destra la finestra).
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Raccolta informazioni per il debug da un file core</term>
+    <listitem>
+     <para>
+       Se <application>bug-buddy</application> si è avviato perché nel
+       file manager si è cliccato per due volte su un file chiamato
+       <filename>core</filename>, si selezioni questa possibilità. La
+       si selezioni anche se si ha un file core che si sa essere stato
+       creato in conseguenza all'errore che si sta notificando. Verrà
+       visualizzata un'altra casella che mostrerà la posizione del
+       file core.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+
+ <sect1 id="collect-debug-info">
+  <title>Raccolta informazioni di debugging</title>
+  <para>
+    Questa pagina potrebbe intimidire un po'. La si vedrà se nella
+    schermata precedente si è selezionato «Raccolta informazioni sul
+    crash per il debugging» oppure «Raccolta informazioni per il debug
+    da un file core». 
+  </para>
+  <para>
+    Quando l'applicazione è andata in crash, è stata congelata una
+    copia di tutti dettagli su quel che il programma stava
+    facendo. Questi sono stati scaricati in un file core oppure
+    conservati sul posto. Quel che <application>bug-buddy</application>
+	sta facendo è di scorrere tutte queste informazioni per scoprire
+    quali passi il programma ha fatto per arrivare al crash. I
+    programmatori riescono a seguire questo output piuttosto criptico
+    e capire dove qualcosa ha cominciato ad andar storto. Questo
+    output sarà allegato automaticamente alla propria notifica
+    d'errore. Non lo si modifichi a meno che non si sappia esattamente
+    quel che si sta facendo.
+  </para>
+  <para>
+    Talvolta <application>bug-buddy</application> non sarà in grado di
+    generare le informazioni e dirà che non riesce a riconoscere il
+    file core. Se così fosse, si prosegua al passo
+    successivo. <emphasis>Non</emphasis> si invii il file core come
+    soluzione alternativa: bug-buddy vuole solo l'output.
+  </para>
+ </sect1>
+
+ <sect1 id="system-config">
+  <title>Configurazione di sistema</title>
+
+  <para>
+    Ci sono alcuni dettagli sul sistema che chi corregge l'errore
+    vuole sempre conoscere. Questi non sono dettagli che rivelano
+    informazioni private sul proprio
+    computer. <application>bug-buddy</application> parte e cerca i 
+    dettagli sulla macchina. Si può vedere esattamente quel che
+    colleziona nella finestra principale. Se ci si accorge che si usa
+    qualcosa di diverso da quanto elencato, qui si possono modificare
+    i dettagli. Non dovrebbe essere necessario farlo.
+  </para>
+
+  <para>
+    Se non si vuole vedere questa cosa ogni volta che si usa il
+    programma, si può selezionare l'opzione <guibutton>Accedi
+    automaticamente alla schermata successiva quando
+    completo</guibutton>. Se lo si fa e successivamente si vuole
+    tornare indietro e controllare, si può usare il pulsante
+    <guibutton>Indietro</guibutton> della schermata <link
+    linkend="submit-report">Invia la notifica</link> per tornare a
+    questa schermata.
+  </para>
+ </sect1>
+
+
+
+ <sect1 id="submit-report">
+  <title>Invia la notifica</title>
+  <para>
+    Una volta completata la notifica, la si può rivedere e decidere
+    cosa farne. Probabilmente si vorrà inviarla al sistema di
+    bug tracking, ma se per qualche motivo la si vuole inviare da
+    qualche altra parte, lo si può fare. Si può scegliere fra:
+  </para>
+  <variablelist>
+   <varlistentry>
+    <term>Invia la notifica</term>
+    <listitem>
+     <para>
+      Selezionando questa possibilità e cliccando su
+      <guibutton>Succ</guibutton> si invierà la notifica al bug
+      tracker. Si può inviarne una copia a se stessi attivando
+      l'apposita checkbox. Se si invia la notifica ad un bug tracker
+      indipendente, sarà necessario inserire a mano l'indirizzo di
+      destinazione. 
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Invia la notifica solamente al proprio indirizzo di posta</term>
+    <listitem>
+     <para>
+       Questa invia la notifica a se stessi. Se si è modificato
+       l'indirizzo email all'inizio, allora sarà usato il nuovo
+       indirizzo. 
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Salva la notifica in un file</term>
+    <listitem>
+     <para>
+       Selezionando questa possibilità verrà visualizzata una casella
+       per inserire il nome di un file nel quale salvare la notifica
+       dell'errore. Se il file esiste già, verrà chiesto se si vuole
+       sovrascriverlo. 
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+
+ <sect1 id="summary">
+  <title>Sommario</title>
+  <para>
+    <application>bug-buddy</application> mostrerà quel che fatto con
+    la notifica d'errore appena prodotta. Nient'altro.
+  </para>
+  <para>
+    Grazie per aver notificato l'errore.
+  </para>
+ </sect1>
+
+ <sect1 id="bugs">
+  <title>Errori noti e limitazioni</title>
+
+  <para>
+    <application>bug-buddy</application> ha veramente pochi errori o
+    limitazioni. Attualmente sono noti:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+      Esiste un'applet chiamata <application>Tick-A-Stat</application>
+      che può essere configurata per cercare i file core e marchiarli
+      con la loro posizione e
+      data. <application>bug-buddy</application> non può leggere i
+      file sui quali <application>Tick-A-Stat</application> ha fatto
+      questa cosa.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ 
+ <sect1 id="authors">
+  <title>Autori</title>
+
+  <para>
+    <application>bug-buddy</application> è stato scritto da Jacob Berkman
+    (<email>jberkman@andrew.cmu.edu</email>). Per maggiori
+    informazioni si visiti la <ulink type="http"
+    url="http://bug-buddy.org/">home page di bug-buddy</ulink>.
+  </para>
+
+  <para>
+     Si inviino tutti i commenti, suggerimenti e notifiche di errori
+     al <ulink url="http://bugs.gnome.org/" type="http">GNOME bug
+     tracking database</ulink>. Ovviamente il pacchetto è bug-buddy.
+  </para>
+  
+  <para>
+    Questa guida è stata scritta da Telsa Gwynne 
+    (<email>telsa@linuxchix.org</email>). Si inviino tutti i commenti
+    e suggerimenti che la riguardano al GNOME Documentation Project 
+    a <email>docs@gnome.org</email>. Alcune parti di questo documento
+    (le definizioni di "grave", "critico" e così via) sono state
+    direttamente derivate dalle <ulink type="http" 
+    url="http://bugs.debian.org/Bugs/Developer#severities">definizioni
+    di gravità</ulink> del Debian bug tracker e da altre pagine.
+  </para>
+
+   <para> 
+    Traduzione italiana a cura di Giovanni Bortolozzo
+    (<email>borto@pluto.linux.it</email>), al quale va inviato 
+    qualsiasi commento, suggerimento e correzioni su questa traduzione. 
+   </para> 
+ </sect1>
+</article>

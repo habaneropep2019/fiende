@@ -1,0 +1,768 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Getting started with the canvas</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="The GnomeCanvas widget"
+HREF="gnome-canvas.html"><LINK
+REL="PREVIOUS"
+TITLE="Attributes and object arguments"
+HREF="gnome-canvas-object-arguments.html"><LINK
+REL="NEXT"
+TITLE="Talking to the user: GnomeDialog, GnomeMessageBox,
+    GnomeAppBar, and utility functions."
+HREF="dialogapputil-docs.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="gnome-canvas-object-arguments.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>The <SPAN
+CLASS="TYPE"
+>GnomeCanvas</SPAN
+> widget</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="dialogapputil-docs.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GNOME-CANVAS-GETTING-STARTED"
+>Getting started with the canvas</A
+></H1
+><P
+>	This section presents a simple example of using the canvas to
+	display some items and manipulate them.  We will create a
+	blank canvas and provide a button that the user can click on
+	to insert random items in the canvas.  If the user
+	double-clicks on an item with mouse button 1, the color of
+	that item will be changed.  The user can also move items
+	around by pressing mouse button 1 and dragging.  In addition,
+	items may be deleted by pressing mouse button 3 over them.
+	Items will get a wide outline when the mouse passes over them,
+	and will return to a thin outline when the mouse leaves them.
+      </P
+><P
+>	We will present the program in small sections and explain each
+	of them separately.
+      </P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1978"
+></A
+><P
+><B
+>Example 1. Creating the main window and the canvas</B
+></P
+><P
+>	  Here we create a window for the canvas example and put a
+	  canvas widget into it.  we also create buttons that let the
+	  user insert a new item in the canvas and exit the program.
+	  We also define the auxiliary handlers for the clicked signal
+	  of the Exit button and the delete_event signal of the main
+	  window.
+	</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &#60;gnome.h&#62;
+
+
+/* This defines the size of the canvas, in pixels */
+
+#define CANVAS_SIZE 300
+
+
+/* Prototypes for the functions we will define later */
+
+static void add_object_clicked (GtkWidget *button, gpointer data);
+static void exit_clicked (GtkWidget *widget, gpointer data);
+static gint delete_event (GtkWidget *widget, GdkEvent *event, gpointer data);
+
+
+int
+main (int argc, char **argv)
+{
+	GtkWidget *window;
+	GtkWidget *vbox;
+	GtkWidget *frame;
+	GtkWidget *canvas;
+	GtkWidget *hbox;
+	GtkWidget *button;
+
+	gnome_init ("canvas-example", "1.0", argc, argv);
+
+	/* Create the main window and the main vbox */
+
+	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+
+	vbox = gtk_vbox_new (FALSE, 0);
+	gtk_container_add (GTK_CONTAINER (window), vbox);
+	gtk_widget_show (vbox);
+
+	/* Create a frame for the canvas and the canvas itself */
+
+	frame = gtk_frame_new (NULL);
+	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+	gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+	gtk_widget_show (frame);
+
+	canvas = gnome_canvas_new ();
+	gtk_widget_set_usize (canvas, CANVAS_SIZE, CANVAS_SIZE);
+	gnome_canvas_set_scroll_region (GNOME_CANVAS (canvas), 0.0, 0.0, CANVAS_SIZE, CANVAS_SIZE);
+
+	gtk_container_add (GTK_CONTAINER (frame), canvas);
+	gtk_widget_show (canvas);
+
+	/* Create the hbox for the buttons */
+
+	hbox = gtk_hbox_new (TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+	gtk_widget_show (hbox);
+
+	/* Create the button used to add objects -- we pass the canvas to the callback
+	 * in the user data.
+	 */
+
+	button = gtk_button_new_with_label ("Add an object");
+	gtk_signal_connect (GTK_OBJECT (button), "clicked",
+			    (GtkSignalFunc) add_object_clicked,
+			    canvas);
+	gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+	gtk_widget_show (button);
+
+	/* Create the button used to exit the program -- we pass the main window to the callback in
+	 * the user data.
+	 */
+
+	button = gtk_button_new_with_label ("Exit");
+	gtk_signal_connect (GTK_OBJECT (button), "clicked",
+			    (GtkSignalFunc) exit_clicked,
+			    window);
+	gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+	gtk_widget_show (button);
+
+	/* Connect to the delete_event signal and Run the application */
+
+	gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+			    (GtkSignalFunc) delete_event,
+			    NULL);
+
+	gtk_widget_show (window);
+	gtk_main ();
+	return 0;
+}
+
+/* Callback for the clicked signal of the Exit button */
+static void
+exit_clicked (GtkWidget *widget, gpointer data)
+{
+	gtk_widget_destroy (GTK_WIDGET (data)); /* the user data points to the main window */
+	gtk_main_quit ();
+}
+
+/* Callback for the delete_event signal of the main application window */
+static gint
+delete_event (GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	gtk_widget_destroy (widget); /* destroy the main window */
+	gtk_main_quit ();
+	return TRUE;
+}
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>	  As you can see, a new canvas is created using the
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_new()</TT
+> function.  Then we
+	  set the starting size of the canvas window and the extents
+	  of the scrolling region using the
+	  <TT
+CLASS="FUNCTION"
+>gtk_widget_set_usize()</TT
+> and
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_set_scroll_region()</TT
+>
+	  functions, respectively.  We will discuss the meaning of the
+	  scrolling region later; for now, we just set it to go from
+	  the origin to the canvas size in pixels &#8212; we will be
+	  using a canvas zoom factor of 1:1, that is, one pixel for
+	  each unit.
+	</P
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1986"
+></A
+><P
+><B
+>Example 2. Creating random items in the canvas</B
+></P
+><P
+>	  Here we define the callback function
+	  <TT
+CLASS="FUNCTION"
+>add_object_clicked()</TT
+> that is used by
+	  the "Add an object" button.  When the user presses this
+	  button, a rectangle or an ellipse will be created using
+	  random coordinates.
+	</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/* Prototype for the item event handler */
+
+static gint item_event (GnomeCanvasItem *item, GdkEvent *event, gpointer data);
+
+/* Callback for the clicked signal of the Add object button.  It creates a rectangle or an ellipse
+ * at a random position.  The canvas comes in the user data pointer.
+ */
+static void
+add_object_clicked (GtkWidget *button, gpointer data)
+{
+	GnomeCanvas *canvas;
+	GnomeCanvasItem *item;
+	guint type;
+	int x1, y1, x2, y2;
+	int tmp;
+
+	canvas = GNOME_CANVAS (data);
+
+	/* Compute some random coordinates, with the condition that (x1 &#60;= x2) and (y1 &#60;= y2), and
+	 * ensure that the objects are not too small.
+	 */
+
+	x1 = rand () % CANVAS_SIZE;
+	y1 = rand () % CANVAS_SIZE;
+	x2 = rand () % CANVAS_SIZE;
+	y2 = rand () % CANVAS_SIZE;
+
+	if (x1 &#62; x2) {
+		tmp = x1;
+		x1 = x2;
+		x2 = tmp;
+	}
+
+	if (y1 &#62; y2) {
+		tmp = y1;
+		y1 = y2;
+		y2 = tmp;
+	}
+
+	if ((x2 - x1) &#60; 10)
+		x2 += 10;
+
+	if ((y2 - y1) &#60; 10)
+		y2 += 10;
+
+	/* Pick a type for the item randomly */
+
+	if (rand () &#38; 1)
+		type = gnome_canvas_rect_get_type ();
+	else
+		type = gnome_canvas_ellipse_get_type ();
+
+	/* Create the item and make it white with black outline by default.  Also,
+	 * connect to its event signal so that we can know when events get to the
+	 * item.*/
+
+	item = gnome_canvas_item_new (gnome_canvas_root (canvas),
+				      type,
+				      "x1", (double) x1,
+				      "y1", (double) y1,
+				      "x2", (double) x2,
+				      "y2", (double) y2,
+				      "fill_color", "white",
+				      "outline_color", "black",
+				      "width_units", 1.0,
+				      NULL);
+	gtk_signal_connect (GTK_OBJECT (item), "event",
+			    (GtkSignalFunc) item_event,
+			    NULL);
+}
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>	  In this function, first we compute some random coordinates
+	  for the corners of the rectangle or ellipse that we will
+	  create.  We have to ensure that <SPAN
+CLASS="SYMBOL"
+>x1</SPAN
+> and
+	  <SPAN
+CLASS="SYMBOL"
+>y1</SPAN
+> are less than or equal to
+	  <SPAN
+CLASS="SYMBOL"
+>x2</SPAN
+> and <SPAN
+CLASS="SYMBOL"
+>y2</SPAN
+>, respectively.
+	</P
+><P
+>	  New items are created and inserted into the canvas using the
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_item_new()</TT
+> function.  The
+	  first parameter to this function specifies the canvas item
+	  group that will act as the new item's parent.  For this
+	  simple example, we insert all the items inside the toplevel
+	  canvas group, the root item, which we obtain by calling the
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_root()</TT
+> function.
+	</P
+><P
+>	  The second parameter to
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_item_new()</TT
+> specifies the
+	  type of item we want to create.  This is simply the Gtk type
+	  identifier used by the class of the item you want to create.
+	  We pick randomly between
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_rect_get_type()</TT
+> and
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_ellipse_get_type()</TT
+>, and
+	  then we pass this value to the
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_item_new()</TT
+> function.
+	</P
+><P
+>	  The following parameters are optional, and are a list of
+	  key/value pairs that specify which arguments to set for that
+	  particular item.  Internally these are handled using the Gtk
+	  object argument system.  The simplest way of using these is,
+	  for each argument you want to set, pass a string with the
+	  name of the argument, and then the value you want to set for
+	  that argument.
+
+	  <DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>	      You <I
+CLASS="EMPHASIS"
+>must</I
+> pass in values with the
+	      correct type!  Remember that the C compiler cannot warn
+	      you about incorrect types when you are using a variable
+	      argument list.
+	    </P
+><P
+>	      In this example, we must use doubles for the coordinates
+	      of the corners of the rectangle or ellipse.  Colors are
+	      passed using a string with a valid X color
+	      specification, and the width in units is passed as a
+	      double.
+	    </P
+><P
+>	      Please look at the reference part of the
+	      <SPAN
+CLASS="TYPE"
+>GnomeCanvas</SPAN
+> documentation for detailed
+	      information on the argument types supported by each
+	      canvas item.
+	    </P
+></TD
+></TR
+></TABLE
+></DIV
+>
+	</P
+><P
+>	  We pass NULL as the last argument to indicate that we have
+	  no more arguments to set for this item.
+	</P
+><P
+>	  Finally, we connect to the "event" signal of the item so
+	  that we can be notified when the item receives events from
+	  the mouse.
+	</P
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN2013"
+></A
+><P
+><B
+>Example 3. Defining behavior for the canvas items</B
+></P
+><P
+>	  Here we define the event handler for items in our canvas.
+	  Canvas items receive events just as X windows do.  In our
+	  sample event handler, the user can drag items around using
+	  button 1.  Items may be deleted by pressing button 3 on
+	  them.  If the user double-clicks on an item using mouse
+	  button 1, then that item's color will be changed randomly.
+	  Finally, the width of an item's outline will change
+	  depending on whether the mouse is inside or outside the
+	  item.
+	</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/* Prototype for the function that changes the item's color randomly */
+
+static void change_item_color (GnomeCanvasItem *item);
+
+/* Callback for the event signal of the canvas items.  If the user drags the item with button 1,
+ * then it will move appropriately.  If the user double clicks on the item, then its color will
+ * change randomly.  If the user clicks on an item with button 3, then the item will be destroyed.
+ * When the mouse enters an item, its outline width will be set to 3 units.  When the mouse leaves
+ * an item, its border width will be set to 1 unit.
+ */
+
+static gint
+item_event (GnomeCanvasItem *item, GdkEvent *event, gpointer data)
+{
+	static double x, y; /* used to keep track of motion coordinates */
+	double new_x, new_y;
+
+	switch (event-&#62;type) {
+	case GDK_BUTTON_PRESS:
+		if (event-&#62;button.button == 1) {
+			/* Remember starting position */
+			x = event-&#62;button.x;
+			y = event-&#62;button.y;
+			return TRUE;
+		} else if (event-&#62;button.button == 3) {
+			/* Destroy the item */
+			gtk_object_destroy (GTK_OBJECT (item));
+			return TRUE;
+		}
+		break;
+
+	case GDK_2BUTTON_PRESS:
+		if (event-&#62;button.button == 1) {
+			/* Change the item's color */
+			change_item_color (item);
+			return TRUE;
+		}
+		break;
+
+	case GDK_MOTION_NOTIFY:
+		if (event-&#62;button.state &#38; GDK_BUTTON1_MASK) {
+			/* Get the new position and move by the difference */
+
+			new_x = event-&#62;motion.x;
+			new_y = event-&#62;motion.y;
+
+			gnome_canvas_item_move (item, new_x - x, new_y - y);
+
+			x = new_x;
+			y = new_y;
+			return TRUE;
+		}
+		break;
+
+	case GDK_ENTER_NOTIFY:
+		/* Make the outline wide */
+		gnome_canvas_item_set (item,
+				       "width_units", 3.0,
+				       NULL);
+		return TRUE;
+
+	case GDK_LEAVE_NOTIFY:
+		/* Make the outline thin */
+		gnome_canvas_item_set (item,
+				       "width_units", 1.0,
+				       NULL);
+		return TRUE;
+
+	default:
+		break;
+	}
+
+	return FALSE;
+}
+
+/* Utility function to randomly change the fill color of a canvas item */
+static void
+change_item_color (GnomeCanvasItem *item)
+{
+	static const char *color_specs[] = {
+		"red",
+		"yellow",
+		"green",
+		"cyan",
+		"blue",
+		"magenta"
+	};
+
+	int n;
+
+	/* Pick a random color from the list */
+
+	n = rand () % (sizeof (color_specs) / sizeof (color_specs[0]));
+
+	gnome_canvas_item_set (item,
+			       "fill_color", color_specs[n],
+			       NULL);
+}
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>	  The "event" signal for canvas items is very similar to the
+	  "event" signal in Gtk widgets.  Handlers for this signal
+	  take in a pointer to the relevant item, a pointer to the
+	  event that the item received, and the normal user data
+	  pointer.  As with the "event" signal for widgets, handlers
+	  return FALSE if they did not process the event or if they
+	  want further processing to be done on it, or TRUE if they
+	  did handle the event and they do not want any further
+	  processing to be done on it.
+	</P
+><P
+>	  Our sample event handler is a switch statement that selects
+	  among the different event types.  We have the following cases:
+	</P
+><P
+></P
+><UL
+><LI
+><P
+>	      For a single button press with button 1, we remember
+	      this initial mouse position for if the user decides to
+	      drag the item around.
+	    </P
+><P
+>	      For a single button press with button 3, we destroy the
+	      item.  This will remove the item from the canvas and
+	      free its memory.
+	    </P
+></LI
+><LI
+><P
+>	      For double-clicks with button 1, we call a function that
+	      randomly changes the color of the item.
+	    </P
+></LI
+><LI
+><P
+>	      For motion events, we only handle them if button 1 is
+	      down; this means that the user is dragging with the
+	      button down.  We compute the deltas between the new and
+	      the old mouse coordinates, and move the item by that
+	      amount.  This is not the best way to do dragging of
+	      items for all applications, but it is good enough for
+	      our simple example.
+	    </P
+></LI
+><LI
+><P
+>	      For enter and leave notify events, we simply change the
+	      outline width of the item.  The outline will be made 3.0
+	      units thick when the mouse enters the item, and it will
+	      be made 1.0 units thick when the mouse leaves the item.
+	    </P
+></LI
+></UL
+><P
+>	  As with all event handlers, we return TRUE when we have
+	  handled the event, or FALSE if we did not process it.
+	</P
+><P
+>	  Note the use of the
+	  <TT
+CLASS="FUNCTION"
+>gnome_canvas_item_set()</TT
+>.  It is used to
+	  change the values of the item's arguments.  It is similar in
+	  use to <TT
+CLASS="FUNCTION"
+>gnome_canvas_item_new()</TT
+>, and it
+	  takes in the item for which we want to change attributes,
+	  and a NULL-terminated list of key/value pairs for the new
+	  attributes.
+	</P
+></DIV
+><P
+>	In the following sections, we will explain the canvas
+	internals in detail.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gnome-canvas-object-arguments.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="dialogapputil-docs.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Attributes and object arguments</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="gnome-canvas.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Talking to the user: <SPAN
+CLASS="TYPE"
+>GnomeDialog</SPAN
+>, <SPAN
+CLASS="TYPE"
+>GnomeMessageBox</SPAN
+>,
+    <SPAN
+CLASS="TYPE"
+>GnomeAppBar</SPAN
+>, and utility functions.</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,189 @@
+/* IDL interface for the GNOME VFS helper processes.  */
+/* Warning: this is not a nice IDL for external use; it's only meant to be used
+   within the GNOME VFS.  It also depends on ORBit's `oneway' behavior.  */
+
+#include "gnome-vfs-types.idl"
+
+module GNOME {
+module VFS {
+module Slave {
+
+	/* This is in the GNOME::VFS::Slave namespace because it heavily
+           depends on binary compatibility.  */
+	struct FileInfo {
+		Buffer data;
+
+		string name;
+		string symlink_name;
+		string mime_type;
+
+	};
+	typedef sequence<FileInfo> FileInfoList;
+	typedef unsigned long FileInfoOptions;
+
+	typedef unsigned short DirectoryFilterType;
+	typedef unsigned long DirectoryFilterOptions;
+	struct DirectoryFilter {
+		DirectoryFilterType type;
+		DirectoryFilterOptions options;
+		string pattern;
+	};
+
+	typedef unsigned short XferPhase;
+	typedef unsigned long XferOptions;
+	typedef unsigned short XferErrorMode;
+	typedef unsigned short XferOverwriteMode;
+
+	typedef sequence<string> FileNameList;
+	typedef sequence<string> URIList;
+
+        struct GetFileInfoResult {
+		string uri;
+		Result result;
+		FileInfo file_info;
+        };
+
+	typedef sequence<GetFileInfoResult> GetFileInfoResultList;
+
+	interface FileHandle;
+	interface Notify;
+
+	/* This is the interface used by the master to communicate with the
+           slave and request operations to it.  */
+	interface Request {
+		/* Open a file.  */
+		oneway void open (in string uri, in OpenMode open_mode);
+
+		/* Open a file and create a Unix domain socket from/to which we
+                   can read/write data.  */
+		oneway void open_as_channel (in string uri,
+					     in OpenMode open_mode,
+					     in unsigned long advised_block_size);
+
+		/* Create a file.  */
+		oneway void create (in string uri, in OpenMode open_mode,
+				    in boolean exclusive, in Permission perm);
+
+		/* Create a file and create a Unix domain socket from/to which
+                   we can read/write data.  */
+		oneway void create_as_channel (in string uri,
+					       in OpenMode open_mode,
+					       in boolean exclusive,
+					       in Permission perm);
+
+	        oneway void get_file_info (in URIList uri,
+					   in FileInfoOptions info_options);
+
+		/* Load a directory.  */
+		oneway void load_directory (in string uri,
+					    in FileInfoOptions info_options,
+					    in DirectoryFilter filter,
+					    in unsigned long items_per_notification);
+
+		/* Transfer files from a directory to another.  */
+		oneway void xfer (in URIList source_names,
+				  in URIList target_names,
+				  in XferOptions options,
+				  in XferOverwriteMode overwrite_mode);
+
+		/* Stop an operation.  */
+		oneway void stop ();
+
+		/* Reset the async process.  */
+		oneway void reset ();
+
+		/* Request the async process to die.  */
+		oneway void die ();
+	};
+
+	/* This interface is used to access open files.  */
+	interface FileHandle {
+		oneway void read (in unsigned long count);
+		oneway void write (in Buffer buffer);
+		oneway void close ();
+	};
+
+	/* This interface is used by the slave to notify the master about
+           operations performed via the `FileHandle' and `Request' interfaces.  */
+	interface Notify {
+		/* Open done.  */
+		void open  (in Result result, in FileHandle handle);
+
+		/* Open done.  Read/write from/to Unix domain socket
+                   `channel_path' to access the file.  */
+		void open_as_channel (in Result result,
+				      in string channel_path);
+
+		/* Close done.  */
+		void close (in Result result);
+
+		/* Read done.  */
+		void read  (in Result result, in Buffer data);
+
+		/* Write done.  */
+		void write (in Result result,
+			    in unsigned long bytes_written);
+
+		/* Directory segment loaded.  */
+		oneway void load_directory (in Result result, in FileInfoList files);
+
+	        /* File info is here. */
+	        oneway void get_file_info (in GetFileInfoResultList results);
+
+		/* Files have been collected (if necessary), and the transfer
+                   begins.  If `FALSE' is returned, operation is stopped.  */
+		boolean xfer_start (in unsigned long files_total,
+				    in unsigned long bytes_total);
+
+		/* Transfer between `source_uri' and `target_uri' begins.
+                   `bytes_to_copy' bytes will be transferred.  If `FALSE' is
+                   returned, operation is stopped.  */
+		boolean xfer_file_start (in string source_uri,
+					 in string target_uri,
+					 in unsigned long bytes_to_copy);
+
+		/* Transfer between the URIs reported by the last
+                   `xfer_file_start' is in progress, and so far `bytes_copied'
+                   have been copied for this file, `total_bytes_copied' since
+                   the beginning of the transfer.  If `FALSE' is returned,
+                   operation is stopped.  */
+		boolean xfer_file_progress (in unsigned long bytes_copied,
+					    in unsigned long total_bytes_copied);
+
+		/* Transfer between the URIs reported by the last
+                   `xfer_file_start' is finished successfully.  */
+		boolean xfer_file_done ();
+
+		/* Transfer completed.  */
+		void xfer_done ();
+
+		/* There was an error during transfer and operation has been
+                   aborted.  */
+		void xfer_error (in Result result);
+
+		/* There was an error during transfer, and we want to know what
+                   to do next.  The returned value is interpreted as a
+                   `GnomeVFSXferErrorAction'.  */
+		unsigned short xfer_query_for_error (in Result result,
+						     in XferPhase phase);
+
+		/* The file we are about to copy already exists, and we want to
+                   know what to do next.  The returned value is interpreted as
+		   a `GnomeVFSXferOverwriteAction'.  */
+		unsigned short xfer_query_for_overwrite (in string source_uri,
+							 in string target_uri);
+
+		/* An operation has been stopped.  */
+		void stop ();
+
+		/* The slave has been reset.  */
+		void reset ();
+
+		/* R.I.P.  This is sent just before the `exit()' call in the
+                   slave process.  */
+		void dying ();
+	};
+
+}; // Slave
+}; // VFS
+}; // GNOME

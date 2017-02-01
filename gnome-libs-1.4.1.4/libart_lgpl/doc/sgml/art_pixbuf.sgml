@@ -1,0 +1,422 @@
+<refentry id="libart-Pixel-Buffers">
+<refmeta>
+<refentrytitle>Pixel Buffers</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBART Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Pixel Buffers</refname><refpurpose></refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+void        (<link linkend="ArtDestroyNotify">*ArtDestroyNotify</link>)             (void *func_data,
+                                             void *data);
+struct      <link linkend="ArtPixBuf">ArtPixBuf</link>;
+enum        <link linkend="ArtPixFormat">ArtPixFormat</link>;
+<link linkend="ArtPixBuf">ArtPixBuf</link>*  <link linkend="art-pixbuf-new-rgb">art_pixbuf_new_rgb</link>              (<link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride);
+<link linkend="ArtPixBuf">ArtPixBuf</link>*  <link linkend="art-pixbuf-new-rgba">art_pixbuf_new_rgba</link>             (<link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride);
+<link linkend="ArtPixBuf">ArtPixBuf</link>*  <link linkend="art-pixbuf-new-const-rgb">art_pixbuf_new_const_rgb</link>        (const <link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride);
+<link linkend="ArtPixBuf">ArtPixBuf</link>*  <link linkend="art-pixbuf-new-const-rgba">art_pixbuf_new_const_rgba</link>       (const <link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride);
+<link linkend="ArtPixBuf">ArtPixBuf</link>*  <link linkend="art-pixbuf-new-rgb-dnotify">art_pixbuf_new_rgb_dnotify</link>      (<link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride,
+                                             void *dfunc_data,
+                                             <link linkend="ArtDestroyNotify">ArtDestroyNotify</link> dfunc);
+<link linkend="ArtPixBuf">ArtPixBuf</link>*  <link linkend="art-pixbuf-new-rgba-dnotify">art_pixbuf_new_rgba_dnotify</link>     (<link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride,
+                                             void *dfunc_data,
+                                             <link linkend="ArtDestroyNotify">ArtDestroyNotify</link> dfunc);
+void        <link linkend="art-pixbuf-free">art_pixbuf_free</link>                 (<link linkend="ArtPixBuf">ArtPixBuf</link> *pixbuf);
+void        <link linkend="art-pixbuf-free-shallow">art_pixbuf_free_shallow</link>         (<link linkend="ArtPixBuf">ArtPixBuf</link> *pixbuf);
+<link linkend="ArtPixBuf">ArtPixBuf</link>*  <link linkend="art-pixbuf-duplicate">art_pixbuf_duplicate</link>            (const <link linkend="ArtPixBuf">ArtPixBuf</link> *pixbuf);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="ArtDestroyNotify">ArtDestroyNotify ()</title>
+<programlisting>void        (*ArtDestroyNotify)             (void *func_data,
+                                             void *data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>func_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ArtPixBuf">struct ArtPixBuf</title>
+<programlisting>struct ArtPixBuf {
+  /*&lt; public &gt;*/
+  ArtPixFormat format;
+  int n_channels;
+  int has_alpha;
+  int bits_per_sample;
+
+  art_u8 *pixels;
+  int width;
+  int height;
+  int rowstride;
+  void *destroy_data;
+  ArtDestroyNotify destroy;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="ArtPixFormat">enum ArtPixFormat</title>
+<programlisting>typedef enum {
+  ART_PIX_RGB
+  /* gray, cmyk, lab, ... ? */
+} ArtPixFormat;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-new-rgb">art_pixbuf_new_rgb ()</title>
+<programlisting><link linkend="ArtPixBuf">ArtPixBuf</link>*  art_pixbuf_new_rgb              (<link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride);</programlisting>
+<para>
+Creates a generic data structure for holding a buffer of RGB
+pixels.  It is possible to think of an <link linkend="ArtPixBuf">ArtPixBuf</link> as a
+virtualization over specific pixel buffer formats.
+</para>
+<para>
+The <parameter>pixels</parameter> buffer is freed with <link linkend="art-free">art_free</link>() when the <link linkend="ArtPixBuf">ArtPixBuf</link> is
+destroyed. Thus, this function is suitable when the pixel data is
+allocated with <link linkend="art-alloc">art_alloc</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixels</parameter>&nbsp;:</entry>
+<entry> A buffer containing the actual pixel data.
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> The width of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> The height of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>rowstride</parameter>&nbsp;:</entry>
+<entry> The rowstride of the pixbuf.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly created <link linkend="ArtPixBuf">ArtPixBuf</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-new-rgba">art_pixbuf_new_rgba ()</title>
+<programlisting><link linkend="ArtPixBuf">ArtPixBuf</link>*  art_pixbuf_new_rgba             (<link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride);</programlisting>
+<para>
+Creates a generic data structure for holding a buffer of RGBA
+pixels.  It is possible to think of an <link linkend="ArtPixBuf">ArtPixBuf</link> as a
+virtualization over specific pixel buffer formats.
+</para>
+<para>
+The <parameter>pixels</parameter> buffer is freed with <link linkend="art-free">art_free</link>() when the <link linkend="ArtPixBuf">ArtPixBuf</link> is
+destroyed. Thus, this function is suitable when the pixel data is
+allocated with <link linkend="art-alloc">art_alloc</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixels</parameter>&nbsp;:</entry>
+<entry> A buffer containing the actual pixel data.
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> The width of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> The height of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>rowstride</parameter>&nbsp;:</entry>
+<entry> The rowstride of the pixbuf.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly created <link linkend="ArtPixBuf">ArtPixBuf</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-new-const-rgb">art_pixbuf_new_const_rgb ()</title>
+<programlisting><link linkend="ArtPixBuf">ArtPixBuf</link>*  art_pixbuf_new_const_rgb        (const <link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride);</programlisting>
+<para>
+Creates a generic data structure for holding a buffer of RGB
+pixels.  It is possible to think of an <link linkend="ArtPixBuf">ArtPixBuf</link> as a
+virtualization over specific pixel buffer formats.
+</para>
+<para>
+No action is taken when the <link linkend="ArtPixBuf">ArtPixBuf</link> is destroyed. Thus, this
+function is useful when the pixel data is constant or statically
+allocated.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixels</parameter>&nbsp;:</entry>
+<entry> A buffer containing the actual pixel data.
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> The width of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> The height of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>rowstride</parameter>&nbsp;:</entry>
+<entry> The rowstride of the pixbuf.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly created <link linkend="ArtPixBuf">ArtPixBuf</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-new-const-rgba">art_pixbuf_new_const_rgba ()</title>
+<programlisting><link linkend="ArtPixBuf">ArtPixBuf</link>*  art_pixbuf_new_const_rgba       (const <link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride);</programlisting>
+<para>
+Creates a generic data structure for holding a buffer of RGBA
+pixels.  It is possible to think of an <link linkend="ArtPixBuf">ArtPixBuf</link> as a
+virtualization over specific pixel buffer formats.
+</para>
+<para>
+No action is taken when the <link linkend="ArtPixBuf">ArtPixBuf</link> is destroyed. Thus, this
+function is suitable when the pixel data is constant or statically
+allocated.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixels</parameter>&nbsp;:</entry>
+<entry> A buffer containing the actual pixel data.
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> The width of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> The height of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>rowstride</parameter>&nbsp;:</entry>
+<entry> The rowstride of the pixbuf.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly created <link linkend="ArtPixBuf">ArtPixBuf</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-new-rgb-dnotify">art_pixbuf_new_rgb_dnotify ()</title>
+<programlisting><link linkend="ArtPixBuf">ArtPixBuf</link>*  art_pixbuf_new_rgb_dnotify      (<link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride,
+                                             void *dfunc_data,
+                                             <link linkend="ArtDestroyNotify">ArtDestroyNotify</link> dfunc);</programlisting>
+<para>
+Creates a generic data structure for holding a buffer of RGB
+pixels.  It is possible to think of an <link linkend="ArtPixBuf">ArtPixBuf</link> as a
+virtualization over specific pixel buffer formats.
+</para>
+<para>
+<parameter>dfunc</parameter> is called with <parameter>dfunc_data</parameter> and <parameter>pixels</parameter> as arguments when the
+<link linkend="ArtPixBuf">ArtPixBuf</link> is destroyed. Using a destroy notification function
+allows a wide range of memory management disciplines for the pixel
+memory. A NULL value for <parameter>dfunc</parameter> is also allowed and means that no
+special action will be taken on destruction.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixels</parameter>&nbsp;:</entry>
+<entry> A buffer containing the actual pixel data.
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> The width of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> The height of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>rowstride</parameter>&nbsp;:</entry>
+<entry> The rowstride of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>dfunc_data</parameter>&nbsp;:</entry>
+<entry> The private data passed to <parameter>dfunc</parameter>.
+</entry></row>
+<row><entry align="right"><parameter>dfunc</parameter>&nbsp;:</entry>
+<entry> The destroy notification function.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly created <link linkend="ArtPixBuf">ArtPixBuf</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-new-rgba-dnotify">art_pixbuf_new_rgba_dnotify ()</title>
+<programlisting><link linkend="ArtPixBuf">ArtPixBuf</link>*  art_pixbuf_new_rgba_dnotify     (<link linkend="art-u8">art_u8</link> *pixels,
+                                             int width,
+                                             int height,
+                                             int rowstride,
+                                             void *dfunc_data,
+                                             <link linkend="ArtDestroyNotify">ArtDestroyNotify</link> dfunc);</programlisting>
+<para>
+Creates a generic data structure for holding a buffer of RGBA
+pixels.  It is possible to think of an <link linkend="ArtPixBuf">ArtPixBuf</link> as a
+virtualization over specific pixel buffer formats.
+</para>
+<para>
+<parameter>dfunc</parameter> is called with <parameter>dfunc_data</parameter> and <parameter>pixels</parameter> as arguments when the
+<link linkend="ArtPixBuf">ArtPixBuf</link> is destroyed. Using a destroy notification function
+allows a wide range of memory management disciplines for the pixel
+memory. A NULL value for <parameter>dfunc</parameter> is also allowed and means that no
+special action will be taken on destruction.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixels</parameter>&nbsp;:</entry>
+<entry> A buffer containing the actual pixel data.
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> The width of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> The height of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>rowstride</parameter>&nbsp;:</entry>
+<entry> The rowstride of the pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>dfunc_data</parameter>&nbsp;:</entry>
+<entry> The private data passed to <parameter>dfunc</parameter>.
+</entry></row>
+<row><entry align="right"><parameter>dfunc</parameter>&nbsp;:</entry>
+<entry> The destroy notification function.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly created <link linkend="ArtPixBuf">ArtPixBuf</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-free">art_pixbuf_free ()</title>
+<programlisting>void        art_pixbuf_free                 (<link linkend="ArtPixBuf">ArtPixBuf</link> *pixbuf);</programlisting>
+<para>
+Destroys the <link linkend="ArtPixBuf">ArtPixBuf</link>, calling the destroy notification function
+(if non-NULL) so that the memory for the pixel buffer can be
+properly reclaimed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixbuf</parameter>&nbsp;:</entry>
+<entry> The <link linkend="ArtPixBuf">ArtPixBuf</link> to be destroyed.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-free-shallow">art_pixbuf_free_shallow ()</title>
+<programlisting>void        art_pixbuf_free_shallow         (<link linkend="ArtPixBuf">ArtPixBuf</link> *pixbuf);</programlisting>
+<para>
+Destroys the <link linkend="ArtPixBuf">ArtPixBuf</link> without calling the destroy notification function.
+</para>
+<para>
+This function is deprecated. Use the _dnotify variants for
+allocation instead.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixbuf</parameter>&nbsp;:</entry>
+<entry> The <link linkend="ArtPixBuf">ArtPixBuf</link> to be destroyed.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-pixbuf-duplicate">art_pixbuf_duplicate ()</title>
+<programlisting><link linkend="ArtPixBuf">ArtPixBuf</link>*  art_pixbuf_duplicate            (const <link linkend="ArtPixBuf">ArtPixBuf</link> *pixbuf);</programlisting>
+<para>
+Duplicates a pixbuf, including duplicating the buffer.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pixbuf</parameter>&nbsp;:</entry>
+<entry> The <link linkend="ArtPixBuf">ArtPixBuf</link> to duplicate.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The duplicated pixbuf.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

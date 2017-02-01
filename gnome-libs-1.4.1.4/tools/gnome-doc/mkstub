@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+#
+# mkstub
+# $Id: mkstub,v 1.1 1998/11/24 03:15:08 jgarzik Exp $
+#
+# This program takes input from "cproto file.c" on stdin,
+# and outputs GNOME API doc stubs to stdout.
+#
+
+while (<>) {
+  next if (/^\s*$/);
+  next if (m#^\s*/\*#);
+  if (/^\s*void/) {
+    $returns = 0;
+  } else {
+    $returns = 1;
+  }
+
+  ($funcname, $args) = (/\s+([^\(]+)\(([^\)]+)\)/);
+
+  $pointer_to = '';
+  while ($funcname =~ /^\*/) { 
+    $pointer_to = '  Pointer to';
+    $funcname = substr($funcname, 1);
+  }
+
+  print <<"EOM";
+/**
+ * $funcname
+EOM
+
+  @args = split(/,/, $args);
+  unless (($#args == 0) && ($args[0] =~ /void/)) {
+    foreach $arg (@args) {
+      @s = split(/\s+/, $arg);
+      $var = $s[$#s];
+      while ($var =~ /^\*/) { $var = substr($var, 1); }
+      print " * \@$var:\n";
+    }
+  }
+
+  print <<"EOM";
+ *
+ * Description:
+EOM
+
+ if ($returns) {
+  print <<"EOM";
+ *
+ * Returns:$pointer_to
+EOM
+ }
+
+ print " **/\n\n\n";
+}
+

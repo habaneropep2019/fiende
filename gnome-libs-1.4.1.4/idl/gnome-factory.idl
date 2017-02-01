@@ -1,0 +1,32 @@
+/*
+ * gnome-factory.idl: Basic object factory interface, based on CORBA
+ * LifeCycle version
+ */
+
+#ifndef __GNOME_FACTORY_IDL__
+#define __GNOME_FACTORY_IDL__
+
+#if !defined(__LIBGNORBA_COMPILATION) && defined(__ORBIT_IDL__)
+%{
+#pragma include_defs "libgnorba/gnome-factory.h"
+%}
+#pragma inhibit push
+#endif
+
+module GNOME {
+	typedef sequence<string> stringlist;
+
+	interface GenericFactory {
+		exception CannotActivate { };
+		boolean supports(in string obj_goad_id);
+
+		Object create_object(in string goad_id, in stringlist params)
+			raises(CannotActivate);
+	};
+};
+
+#if !defined(__LIBGNORBA_COMPILATION) && defined(__ORBIT_IDL__)
+#pragma inhibit pop
+#endif
+
+#endif

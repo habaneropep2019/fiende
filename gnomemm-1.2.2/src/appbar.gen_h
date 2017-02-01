@@ -1,0 +1,161 @@
+// -*- C++ -*-
+/* $Id: appbar.gen_h,v 1.20 2001/02/17 15:48:25 murrayc Exp $ */
+
+/* appbar.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <libgnomeui/gnome-appbar.h>
+#include <gtk--/box.h>
+#include <gtk--/progressbar.h>
+
+CLASS_START(Gnome);
+
+class AppBar : public Gtk::HBox
+{
+   WRAP_CLASS(AppBar, GnomeAppBar,
+             GNOME_APPBAR, GNOME_IS_APPBAR,
+             appbar,
+             Gtk::HBox, GtkHBox, GTK_HBOX);
+public:
+
+   //: Create a AppBar.
+  //- interactivity can be GNOME_PREFERENCES_NEVER, GNOME_PREFERENCES_USER,
+  //- GNOME_PREFERENCES_ALWAYS.
+  AppBar(bool has_progress = false,
+				 bool has_status = true ,
+				 GnomePreferencesType interactivity = GNOME_PREFERENCES_NEVER);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+ 
+
+  //: Get the progress bar. 
+  //- Not setable internal.  Use this to set the current progress
+  //- precentage.
+  WRAP_MEMBER(value, progress, progress, Gtk::ProgressBar*, GtkWidget*);
+
+/* Status message stack. */
+
+  WRAP_MEMBER(value, default, default_status, Gtk::nstring, gchar*);
+  WRAP_METHOD(void gnome_appbar_set_default(GnomeAppBar*,const gchar*),
+              void set_default      (const Gtk::string &default_status));
+
+
+  //: Replaces the current status with a new one.
+  WRAP_METHOD(void gnome_appbar_set_status(GnomeAppBar*,const gchar*),
+              void set_status       (const Gtk::string &status));
+
+  //: Places a new status message in the bar.
+  //- Temporarily sets status message.  It is cleared by {refresh()}
+  //- or set.  Does not affect the stack.
+  WRAP_METHOD(void gnome_appbar_push(GnomeAppBar*,const gchar*),
+              void push             (const Gtk::string &status));
+
+  //: Removes last status message.
+  //- This is okay to call on empty stack.  The previous message is 
+  //- displayed.
+  WRAP_METHOD(void gnome_appbar_pop(GnomeAppBar*),
+	      void pop());
+
+  //: Remove status on the stack.
+  WRAP_METHOD(void gnome_appbar_clear_stack(GnomeAppBar*),
+	      void clear_stack());
+
+  // useless sugar set_progress removed.
+
+  //: Reflect the current state of stack/default. 
+  //- Useful to force a {set_status()} to disappear.
+  WRAP_METHOD(void gnome_appbar_refresh(GnomeAppBar*),
+	      void refresh());
+
+/* prompting the user */
+  //: Get string of current prompt.
+  WRAP_MEMBER(value,prompt,prompt,Gtk::nstring,gchar*);
+
+  //: Prompt user for input. 
+  //- Put a prompt in the appbar and wait for a response. When the 
+  //- user responds or cancels, a user_response signal is emitted.
+  WRAP_METHOD(void gnome_appbar_set_prompt(GnomeAppBar*,const gchar*,bool),
+    void prompt(const Gtk::string &message, bool modal=true));
+
+  //: Remove any prompt.
+  SIGNAL_SPEC("clear_prompt",both,void clear_prompt(),
+    gnome_appbar_clear_prompt);
+ 
+  //: Get the response to the prompt, if any. 
+  Gtk::string get_response() const;
+  
+  //: Indicates use hit return or canceled.
+  SIGNAL_SPEC("user_response",both,void user_response());
+
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+
+/* appbar.cc
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+Gnome::AppBar::AppBar(bool has_progress,
+			   bool has_status,
+			   GnomePreferencesType interactivity)
+  : Gtk::HBox(GTK_HBOX(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gnome_appbar_construct(gtkobj(),has_progress,has_status,interactivity);
+}
+
+Gtk::string Gnome::AppBar::get_response() const
+  {
+    gchar* response=
+      gnome_appbar_get_response(const_cast<GnomeAppBar*>(gtkobj()));
+    if (response) 
+      {
+        Gtk::string s(response);
+        g_free(response);
+        return s;
+      }
+    return Gtk::string();
+  }
+
+DOCUMENTATION_START;
+

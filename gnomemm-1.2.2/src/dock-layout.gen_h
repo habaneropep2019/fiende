@@ -1,0 +1,105 @@
+/* $Id: dock-layout.gen_h,v 1.5 2000/08/29 18:36:29 kenelson Exp $ */
+
+
+/* dock-layout.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/object.h>
+#include <gnome--/dock.h>
+#include <gnome--/dock-item.h>
+#include <libgnomeui/gnome-dock-layout.h>
+
+
+CLASS_START(Gnome);
+
+class DockLayout : public Gtk::Object
+{
+  WRAP_CLASS(DockLayout, GnomeDockLayout,
+             GNOME_DOCK_LAYOUT, GNOME_IS_DOCK_LAYOUT,
+             dock_layout,
+             Gtk::Object, GtkObject, GTK_OBJECT);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+
+  WRAP_METHOD(gboolean gnome_dock_layout_add_item(GnomeDockLayout *layout,
+                                                  GnomeDockItem *item,
+                                                  GnomeDockPlacement placement,
+                                                  gint band_num,
+                                                  gint band_position,
+                                                  gint offset),
+              bool add_item(DockItem& item,
+                            GnomeDockPlacement placement,
+                            gint band_num,
+                            gint band_position,
+                            gint offset));
+   
+  WRAP_METHOD(gboolean gnome_dock_layout_add_floating_item(GnomeDockLayout*,
+                                                           GnomeDockItem*, 
+                                                           gint,gint,
+                                                           GtkOrientation),
+	            bool add_floating_item(DockItem& item,
+                                     gint x, gint y,
+	                                   GtkOrientation orientation));
+
+  //TODO: Wrap GnomeDockLayoutItem?
+  WRAP_METHOD(GnomeDockLayoutItem* gnome_dock_layout_get_item(GnomeDockLayout *layout,
+                                                              GnomeDockItem *item),
+              GnomeDockLayoutItem* get_item(DockItem& item));
+              
+  WRAP_METHOD(GnomeDockLayoutItem* gnome_dock_layout_get_item_by_name
+                                                (GnomeDockLayout *layout,
+                                                 const gchar *name),
+              GnomeDockLayoutItem* get_item_by_name(const Gtk::nstring& name));                                
+
+  WRAP_METHOD(gboolean gnome_dock_layout_remove_item
+                                                (GnomeDockLayout *layout,
+                                                 GnomeDockItem *item),
+              bool remove_item(DockItem& item));
+                                                 
+  WRAP_METHOD(gboolean gnome_dock_layout_remove_item_by_name
+                                                (GnomeDockLayout *layout,
+                                                 const gchar *name),
+              bool remove_item_by_name(const Gtk::nstring& name));
+
+  WRAP_METHOD(gchar* gnome_dock_layout_create_string(GnomeDockLayout *layout),
+              Gtk::nstring create_string());
+  
+  WRAP_METHOD(gboolean gnome_dock_layout_parse_string
+                                                (GnomeDockLayout *layout,
+                                                 const gchar* str),
+              bool parse_string(const Gtk::nstring& str));
+
+  WRAP_METHOD(gboolean gnome_dock_layout_add_to_dock(GnomeDockLayout *layout,
+                                                     GnomeDock *dock),
+              bool add_to_dock(Dock& dock));
+ 
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/object_p.h>
+IMPL_START;
+#include <gnome--/private/dock-layout_p.h>
+
+DOCUMENTATION_START;

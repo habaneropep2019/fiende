@@ -1,0 +1,212 @@
+/* $Id: entry.gen_h,v 1.42 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* entry.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/editable.h>
+#include <gtk/gtkentry.h>
+CLASS_START(Gtk);
+// this should be derived from Gtk_Editable
+//: A single line text entry field.
+//- The GtkEntry widget is a single line text entry widget. A fairly
+//- large set of key bindings are supported by default. If the entered
+//- text is longer than the allocation of the widget, the widget will
+//- scroll so that the cursor position is visible.
+class Entry : public Editable {
+  WRAP_CLASS(Entry,GtkEntry,GTK_ENTRY,GTK_IS_ENTRY,entry,Gtk::Editable,GtkEditable,GTK_EDITABLE);
+public:
+
+  //: Creates a new {\class Gtk::Entry} widget with the given maximum length.
+  //- max: The new maximum length.
+  explicit Entry(guint max);
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+	
+  //: Sets the text in the widget to the given value, replacing the current contents.
+  //- text: The new text.
+  WRAP_METHOD(void gtk_entry_set_text(GtkEntry*,const gchar*),
+  void set_text                (const string &text));
+
+  //: Retrieve the contents of the entry widget.
+  //- Returns: The contents of the text widget as a string.
+  WRAP_METHOD(gchar* gtk_entry_get_text(GtkEntry*),
+  string get_text              () const);
+
+  WRAP_MEMBER(value,text_length,text_length,unsigned int, unsigned int);
+
+
+  //: Appends the given text to the contents of the widget.
+  //- text: The text to append.
+  WRAP_METHOD(void gtk_entry_append_text(GtkEntry*,const gchar*),
+  void append_text             (const string &text));
+
+  //: Prepends the given text to the contents of the widget.
+  //- text: The text to prepend.
+  WRAP_METHOD(void gtk_entry_prepend_text(GtkEntry*,const gchar*),
+  void prepend_text            (const string &text));
+
+  //: Selects a region of text.
+  //- The characters that are selected are those characters at positions from
+  //- start_pos up to, but not including end_pos. If end_pos is negative, then the
+  //- characters selected will be those characters from start_pos to the end of the
+  //- text.
+  //-
+  //- start: The starting position.
+  //-
+  //- end: The end position.
+  WRAP_METHOD(void gtk_entry_select_region(GtkEntry*,gint,gint),
+  void select_region           (gint start, gint end));
+
+  //: Sets the cursor position in an entry to the given value.
+  //- position: The position of the cursor. The cursor is displayed before the
+  //- character with the given (base 0) index in the widget. The value must be less
+  //- than or equal to the number of characters in the widget. A value of -1
+  //- indicates that the position should be set after the last character in the
+  //- entry. Note that this position is in characters, not in bytes.
+  WRAP_METHOD(void gtk_entry_set_position(GtkEntry*,gint),
+  void set_position            (gint position));
+
+  //: Sets whether the contents of the entry are visible or not.
+  //- When visibility is set to FALSE, characters are displayed as asterisks (*'s),
+  //- and will also appear that way when the text in the entry widget is copied
+  //- elsewhere.
+  //-
+  //- visible: TRUE if the contents of the entry are displayed as plaintext.
+  WRAP_METHOD(void gtk_entry_set_visibility(GtkEntry*,gint),
+  void set_visibility          (bool visible));
+
+  //: Sets the maximum allowed length of the contents of the widget.
+  //- If the current contents are longer than the given length, then they will be truncated to fit.
+  //-
+  //- max: The new maximum length.
+  WRAP_METHOD(void gtk_entry_set_max_length(GtkEntry*,guint16),
+  void set_max_length          (guint16 max));
+};
+
+PRIVATE_START;
+#include <gtk--/private/editable_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+Entry::Entry(guint max)
+  :     Editable((GtkEditable*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_max_length(max);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Entry)
+//. name: text_area
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: backing_pixmap
+//. type: GdkPixmap*
+//. get:
+//. set:
+//. desc:
+
+//. name: cursor
+//. type: GdkCursor*
+//. get:
+//. set:
+//. desc:
+
+//. name: text
+//. type: GdkWChar*
+//. get:
+//. set:
+//. desc:
+
+//. name: text_size
+//. type: guint16
+//. get:
+//. set:
+//. desc: allocated size 
+
+//. name: text_length
+//. type: guint16
+//. get:
+//. set:
+//. desc: length in use 
+
+//. name: text_max_length
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: scroll_offset
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: visible
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: timer
+//. type: guint32
+//. get:
+//. set:
+//. desc:
+
+//. name: button
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: char_offset
+//. type: gint*
+//. get:
+//. set:
+//. desc: The x-offset of each character (including the last insertion position)
+//.    * only valid when the widget is realized 
+
+//. name: text_mb
+//. type: string
+//. get:
+//. set:
+//. desc: Same as 'text', but in multibyte 
+
+//. name: text_mb_dirty
+//. type: guint:1
+//. get:
+//. set:
+//. desc: If true, 'text' and 'text_mb' are not coherent 
+
+//. name: use_wchar
+//. type: guint:1
+//. get:
+//. set:
+//. desc: If true, we use the encoding of wchar_t as the encoding of 'text'.
+//.    * Otherwise we use the encoding of multi-byte characters instead. 
+

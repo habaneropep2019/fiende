@@ -1,0 +1,443 @@
+<HTML
+><HEAD
+><TITLE
+>Session Saving</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The GNOME Panel Libraries"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="The Art of Applet Writing"
+HREF="unnamed1.html"><LINK
+REL="PREVIOUS"
+TITLE="Advanced Menu Stuff"
+HREF="unnamed6.html"><LINK
+REL="NEXT"
+TITLE="Panel Orientation"
+HREF="unnamed11.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The GNOME Panel Libraries</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed6.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed11.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="UNNAMED10"
+>Session Saving</A
+></H1
+><P
+>	  The panel is session manager aware but the applets don't have to be,
+	  they can depend on the panel to save their information in a proper
+	  place. Basically session saving has two parts, loading the info, and 
+	  saving the info. Loading is pretty simple, after you do
+	  applet_widget_new, you can get the correct paths to load your 
+	  properties from the widget's structure. For example:
+
+	  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN79"
+></A
+><P
+><B
+>Example 7. Getting Private Data</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>gnome_config_push_prefix(APPLET_WIDGET(applet)-&gt;privcfgpath);
+hello = gnome_config_get_bool(&quot;section/hello=true&quot;);
+gnome_config_pop_prefix();
+	    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+	  will do the trick.
+	</P
+><P
+>	  For saving it's a little bit more complicated but not by much, let's
+	  make our original example save a global variable hello.
+
+	  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN83"
+></A
+><P
+><B
+>Example 8. Saving Private HelloWorld</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;config.h&gt;
+#include &lt;applet-widget.h&gt;
+
+/* useless variable that we want to save the state of*/
+gint hello = TRUE;
+
+/* sesion save signal handler*/
+static gint
+applet_save_session(GtkWidget *w,
+                    const char *privcfgpath,
+                    const char *globcfgpath)
+{
+        gnome_config_push_prefix(privcfgpath);
+        gnome_config_set_string(&quot;section/hello&quot;,hello);
+        gnome_config_pop_prefix();
+
+        gnome_config_sync();
+        /* you need to use the drop_all here since we're all writing to
+           one file, without it, things might not work too well */
+        gnome_config_drop_all();
+
+        /* make sure you return FALSE, otherwise your applet might not
+           work compeltely, there are very few circumstances where you
+           want to return TRUE. This behaves similiar to GTK events, in
+           that if you return FALSE it means that you haven't done
+           everything yourself, meaning you want the panel to save your
+           other state such as the panel you are on, position,
+           parameter, etc ... */
+        return FALSE;
+}
+
+
+int
+main(int argc, char **argv)
+{
+        GtkWidget *applet;
+        GtkWidget *label;
+
+        /* Initialize the i18n stuff */
+        bindtextdomain (PACKAGE, GNOMELOCALEDIR);
+        textdomain (PACKAGE);
+
+        /* intialize, this will basically set up the applet, corba and
+           call gnome_init */
+        applet_widget_init(&quot;hello_applet&quot;, NULL, argc, argv, NULL, 0, NULL);
+
+        /* create a new applet_widget */
+        applet = applet_widget_new(&quot;hello_applet&quot;);
+        /* in the rare case that the communication with the panel
+           failed, error out */
+        if (!applet)
+                g_error(&quot;Can't create applet!\n&quot;);
+
+        /* read the contents of the stored value of hello from the
+           config file */
+        gnome_config_push_prefix(APPLET_WIDGET(applet)-&gt;privcfgpath);
+        hello = gnome_config_get_bool(&quot;section/hello=true&quot;);
+        gnome_config_pop_prefix();
+
+        /* create the widget we are going to put on the applet */
+        label = gtk_label_new(_(&quot;Hello There!&quot;));
+        gtk_widget_show(label);
+
+        /* bind the session save signal */
+        gtk_signal_connect(GTK_OBJECT(applet),&quot;save_session&quot;,
+                           GTK_SIGNAL_FUNC(applet_save_session),
+                           NULL);
+
+        /* add the widget to the applet-widget, and thereby actually
+           putting it &quot;onto&quot; the panel */
+        applet_widget_add (APPLET_WIDGET (applet), label);
+        gtk_widget_show (applet);
+
+        /* special corba main loop */
+        applet_widget_gtk_main ();
+
+        return 0;
+}
+	    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+	</P
+><P
+>	  That's basically it. Make sure you return FALSE from the save_session
+	  handler, else the panel will not remember your applet next time. Also
+	  note the presence of gnome_config_drop_all, that needs to be done,
+	  especially for multi applets (discussed below), or your info might
+	  get lost.
+	</P
+><P
+>	  If you need to store information global to all applets you can use
+	  the globcfgpath counterpart of privcfgpath, which gives you a path 
+	  to a file which is the same for all applets.
+	</P
+><P
+>	  <I
+CLASS="EMPHASIS"
+>IMPORTANT!</I
+>
+	  Make sure you only use two levels of config path below
+	  privcfgpath/globcfgpath. Which means you only tack on
+	  &quot;section/key&quot;.
+	  Also don't just use &quot;key&quot;. You need to tack on both the 
+	  section and the key, no more, no less.
+
+	  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN90"
+></A
+><P
+><B
+>Example 9. Retrieving Global Data</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>gnome_config_push_prefix(APPLET_WIDGET(applet)-&gt;globcfgpath);
+hello = gnome_config_get_bool(&quot;all_hello_applets/hello=true&quot;);
+gnome_config_pop_prefix();
+	    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+	  Similarly for the save_session.
+	</P
+><P
+>	  <I
+CLASS="EMPHASIS"
+>Note:</I
+>
+	  When you update your configuration in some properties dialog, or
+	  however lse, you should call applet_widget_sync_config (AppletWidget
+	  *applet), it will tell the panel to send a session save signal to
+	  the applet with the correct paths etc. This is not 100&percnt; neccessary,
+	  but makes it nice so that configuration is not lost during crashes
+	  (when the panel couldn't do it's complete save during shutdown) [ed:
+	  you should still do this, even though the panel doesn't crash
+	  anymore]
+	</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed6.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed11.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Advanced Menu Stuff</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Panel Orientation</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

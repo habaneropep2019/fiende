@@ -1,0 +1,361 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Visuals</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Basic X concepts"
+HREF="x-concepts-docs.html"><LINK
+REL="PREVIOUS"
+TITLE="Basic X concepts"
+HREF="x-concepts-docs.html"><LINK
+REL="NEXT"
+TITLE="Graphics contexts"
+HREF="graphics-contexts.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x-concepts-docs.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Basic X concepts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="graphics-contexts.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="VISUALS"
+>Visuals</A
+></H1
+><P
+>	Visuals are a <I
+CLASS="EMPHASIS"
+>very important</I
+> concept that
+	is often overlooked.  Roughly, a visual defines the memory
+	representation that a piece of hardware uses to store the
+	contents of an image.  X supports different kinds of visuals to
+	suit the different kinds of hardware out there.
+      </P
+><P
+>	There are three basic kinds of visuals, each divided into two
+	classes:
+      </P
+><P
+></P
+><UL
+><LI
+><P
+>	    <I
+CLASS="EMPHASIS"
+>Grayscale</I
+> visuals are used for displays
+	    that use a single channel of color information.  Black and
+	    white or grayscale monitors (including amber and green
+	    monitors) may use this type of visual.  These visuals can be
+	    either <I
+CLASS="EMPHASIS"
+>static gray</I
+> or
+	    <I
+CLASS="EMPHASIS"
+>grayscale</I
+>.
+	  </P
+><P
+>	    Static gray visuals are those in which you cannot change the
+	    gray intensities of the hardware.  Plain monochrome (B/W)
+	    displays or fixed 4-gray displays may be of the static gray
+	    kind.  Grayscale visuals are those in which you can change
+	    the gray intensities used by the hardware.  Exotic 12-bit
+	    grayscale displays (as used for medical visualization) that
+	    let you change the gray intensities may be of the grayscale
+	    type.
+	  </P
+></LI
+><LI
+><P
+>	    <I
+CLASS="EMPHASIS"
+>Indexed</I
+> visuals use the
+	    "paint-by-number" concept:  each pixel value is an integer
+	    that indexes a table of colors.  So 0 may represent black, 1
+	    may represent pink, 2 may represent blue, etc.  These
+	    visuals can be either <I
+CLASS="EMPHASIS"
+>static color</I
+> or
+	    <I
+CLASS="EMPHASIS"
+>pseudo color</I
+>.
+	  </P
+><P
+>	    Static color visuals are those in which you cannot change
+	    the actual colors that the indexes correspond to.  Remember
+	    the old CGA cards with four fixed colors in graphics mode?
+	    These could be considered of the static color type.  Pseudo
+	    color visuals are those in which you can change the actual
+	    colors that the indexes correspond to.  Each index maps to
+	    an RGB triplet that defines the color that will be displayed
+	    on the screen.  You can change these RGB triplets for each
+	    index.  Pseudo color visuals are very common in graphics
+	    cards.  Graphics cards with 256 colors that you can change,
+	    for example, VGA cards, are of the pseudo color type.
+	  </P
+></LI
+><LI
+><P
+>	    <I
+CLASS="EMPHASIS"
+>Color</I
+> visuals are the "big fat ones".
+	    They usually provide the highest quality you can get from
+	    the hardware, and they also consume the largest amount of
+	    resources in terms of speed and memory.  Color visuals store
+	    explicit RGB values for every pixel, instead of storing a
+	    single value like indexed visuals.  Color visuals can be
+	    either <I
+CLASS="EMPHASIS"
+>true color</I
+> or <I
+CLASS="EMPHASIS"
+>direct
+	      color</I
+>.
+	  </P
+><P
+>	    The distinction between true color and direct color may be a
+	    bit difficult to grasp at first.  After all, both visual
+	    types use three values for every pixel.  What more could you
+	    ask for?  The difference is that true color visuals use the
+	    exact values you specified for a pixel as the color that
+	    gets displayed on the screen for that pixel.  Most "true
+	    color" SVGA cards are of this kind.
+	  </P
+><P
+>	    However, the values in a direct color visual go through an
+	    indirection step before being sent to the display.
+	    <I
+CLASS="EMPHASIS"
+>Each</I
+> of the R/G/B values you specify is
+	    an index in separate tables, and those tables contain a
+	    translated value.  So an RGB triplet gets translated into an
+	    R'G'B' triplet, i.e. the three tables together define an
+	    f(r, g, b) -&#62; (r', g', b') function.  For most purposes,
+	    your tables will be filled by the identity function and you
+	    will get linearly increasing intensity values for each of
+	    the RGB channels.  Things can become quite interesting,
+	    however, when you modify the tables to have a nonlinear
+	    mapping.  If you fill them using an exponential function,
+	    you can do color correction on hardware, for example
+	    (wheeee!).  Most high-end hardware (Sun/HP/SGI graphics
+	    hardware) supports direct color visuals for high weirdness
+	    and flexibility.
+	  </P
+></LI
+></UL
+><P
+>	These are the six visual classes supported by X (static gray,
+	grayscale, static color, pseudo color, true color, direct
+	color).  Why not deal directly with RGB triplets all the time,
+	you may ask?  Indeed that would make programming easier.  The
+	reason is that not all hardware thinks in terms of RGB triplets,
+	and X acts close to the metal in this respect, so we are forced
+	to deal with it.  Fortunately, this is not too hard to do.
+      </P
+><P
+>	To remind yourself of what the different visual classes mean,
+	think in terms of static gray, static color, and true color
+	having read-only intensity mappings, and grayscale, pseudo
+	color, and direct color having read/write mappings.
+      </P
+><P
+>	In addition to the visual class, each visual has a bit depth.
+	This is the number of significant bits that are used to encode
+	the value of every pixel.  Most 256-color PC video cards operate
+	on an 8-bit pseudocolor visual.  Better video cards operate on
+	24-bit true color visuals, with eight bits of information per
+	channel.  Some Amiga video cards operate on 12-bit pseudocolor
+	visuals, which leads to a palette of 4096 indexed colors.  Some
+	exotic hardware uses 8-bit truecolor visuals, using 3/3/2 bits
+	for the RGB channels, respectively.
+      </P
+><P
+>	The best way to know about the visual types your hardware
+	supports is to run the xdpyinfo command.  You will get a load of
+	interesting information.
+      </P
+><P
+>	As we mentioned in the previous section, one of the properties
+	of a drawable is its visual class.  This defines the image
+	format that must be used to paint stuff on the drawable.
+      </P
+><P
+>	Most low-end hardware supports a single visual class that is
+	used for all the drawables.  For example, a SVGA card may run
+	either in 8-bit pseudocolor or 24-bit truecolor; it is one or
+	the other but not both at the same time.
+      </P
+><P
+>	Higher-end hardware, however, may support different simultaneous
+	visual types.  For example, many Sun and SGI video cards can
+	handle 8-bit pseudocolor and 24-bit truecolor visuals
+	simultaneously.  This means you can operate on windows with
+	different visual types at the same time.  Go to an SGI box and
+	run an xterm and run xwininfo on the xterm window; it will
+	probably be using an 8-bit pseudocolor visual.  Now run xv or
+	Electric Eyes, and you may see that it uses a 24-bit truecolor
+	visual.  The hardware is smart enough to split its video memory
+	in different areas for the pseudocolor and truecolor
+	information, for example.
+      </P
+><P
+>	The reason why it is convenient to have drawables with different
+	visual types at the same time is performance.  For example,
+	image information on pseudocolor visuals usually takes up much
+	less space than that on truecolor visuals (a common example is 8
+	bits per pixel versus 24 bits per pixel, respectively).  Using
+	less memory also means that you can paint things faster, as
+	there is less information to push around.  This is why most
+	applications which are not graphics-intensive run in
+	lower-quality visuals while programs that require high-quality
+	images run on the fat visuals like truecolor and direct color.
+      </P
+><P
+>	Having different simultaneous visual types also has subtler
+	advantages.  Let us consider a piece of video hardware with
+	enough memory to store pseudocolor and truecolor information for
+	every pixel, plus one extra bit.  This bit is a flag that
+	selects whether to paint the pixel from the pseudocolor or
+	truecolor memory regions.  Say there is a hungry application
+	with some windows on the truecolor visual that are slow to
+	repaint (for example, a 3D rendering).  If the application needs
+	to pop up a menu that will soon go away, it is convenient to
+	create the menu on the pseudocolor visual, and set all the
+	toggle bits on the corresponding region to indicate that it will
+	use the pseudocolor visual instead of the truecolor one.  Since
+	the information on the truecolor memory region is not erased,
+	only not displayed, the X server can quickly un-pop the menu
+	when it is done by simply switching the toggle bits back to the
+	truecolor indication; there will be no need to request a repaint
+	of that region to the application.  This means things will be as
+	fast as possible.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x-concepts-docs.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="graphics-contexts.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Basic X concepts</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="x-concepts-docs.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Graphics contexts</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

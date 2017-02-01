@@ -1,0 +1,89 @@
+/* $Id: font-picker.gen_h,v 1.5 2000/08/30 18:13:36 kenelson Exp $ */
+
+
+/* font-picker.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/button.h>
+#include <libgnomeui/gnome-font-picker.h>
+
+CLASS_START(Gnome);
+class FontPicker : public Gtk::Button
+{
+  WRAP_CLASS(FontPicker, GnomeFontPicker,
+             GNOME_FONT_PICKER, GNOME_IS_FONT_PICKER,
+             font_picker,
+             Gtk::Button, GtkButton, GTK_BUTTON);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(void gnome_font_picker_set_title (GnomeFontPicker*, const gchar*),
+	      void set_title (const Gtk::string &title));
+
+  WRAP_METHOD(GnomeFontPickerMode gnome_font_picker_get_mode (GnomeFontPicker*),
+	      GnomeFontPickerMode get_mode ());
+	      
+  WRAP_METHOD(void gnome_font_picker_set_mode (GnomeFontPicker*, GnomeFontPickerMode),
+	      void set_mode (GnomeFontPickerMode mode));
+
+  WRAP_METHOD(void gnome_font_picker_fi_set_use_font_in_label (GnomeFontPicker*, gboolean , gint),
+	      void set_use_font_in_label (bool use_font_in_label, gint size));
+
+  WRAP_METHOD(void gnome_font_picker_fi_set_show_size (GnomeFontPicker*, gboolean),
+	      void set_show_size (bool show_size));
+
+  WRAP_METHOD(void gnome_font_picker_uw_set_widget (GnomeFontPicker*, GtkWidget*),
+	      void uw_set_widget (Gtk::Widget &widget));
+
+  WRAP_METHOD(gchar* gnome_font_picker_get_font_name (GnomeFontPicker *),
+	      Gtk::string get_font_name());
+
+  Gdk_Font get_font();
+
+  WRAP_METHOD(gboolean gnome_font_picker_set_font_name (GnomeFontPicker*, const gchar*),
+	      bool set_font_name (const Gtk::string &fontname));
+
+  WRAP_METHOD(gchar* gnome_font_picker_get_preview_text (GnomeFontPicker *),
+	      Gtk::string get_preview_text());
+
+  WRAP_METHOD(void gnome_font_picker_set_preview_text (GnomeFontPicker*, const gchar*),
+	      void set_preview_text (const Gtk::string &text));
+
+  SIGNAL_SPEC("font_set", both, void font_set(gchar*));
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/button_p.h>
+IMPL_START;
+#include <gnome--/private/font-picker_p.h>
+
+Gdk_Font
+Gnome::FontPicker::get_font()
+{
+  return gnome_font_picker_get_font(gtkobj());
+}
+
+
+DOCUMENTATION_START;
+

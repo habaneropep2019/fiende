@@ -1,0 +1,347 @@
+  <chapter id="x-concepts-docs">
+
+    <title>Basic X concepts</title>
+
+    <!-- Author: Federico Mena Quintero <federico@nuclecu.unam.mx> -->
+
+    <para>
+      The X Window System is a big and complex hairball.  The Gnome
+      libraries try to make things easy by wrapping the hard stuff with
+      nice wrappers.  Still, there are a few things you should keep in
+      mind in order to write better applications.
+    </para>
+
+    <para>
+      This chapter is aimed at programmers with little experience on X
+      programming.  If you do not know what graphics contexts,
+      drawables, and visuals are, you should definitely read this
+      chapter.  If you already know your way around the X way of doing
+      things, you may skip this chapter and move on to the fun stuff
+      (i.e. writing GNOME applications).
+    </para>
+
+    <para>
+      Please note that this chapter is intended to be a small crash
+      course on the X concepts you will need to keep in mind while
+      writing Gnome applications.  It is not a replacement for an Xlib
+      manual.  You should definitely get your hands on the Xlib
+      programmer's and reference manuals.
+    </para>
+
+    <sect1 id="drawables">
+
+      <title>Drawables</title>
+
+      <para>
+	Drawables are things which you can paint on.  X has two types of
+	drawables, <emphasis>windows</emphasis> and
+	<emphasis>pixmaps</emphasis>.  Pixmaps are off-screen entities
+	which you cannot see.  You can see a window when it is mapped
+	(shown) on the screen.
+      </para>
+
+      <para>
+	Windows can be nested in a tree structure.  All windows except
+	the root window have a single parent, but all windows may have
+	any number of children.  Pixmaps cannot be nested and they don't
+	have parents.
+      </para>
+
+      <para>
+	Windows have x/y/width/height properties that define their
+	position within their parent.  Pixmaps only have width and
+	height properties.
+      </para>
+
+      <para>
+	Windows and pixmaps have many other properties.  However, a very
+	important property is the <emphasis>visual class</emphasis> of
+	the drawable, which is what we will discuss next.
+      </para>
+
+    </sect1>
+
+    <sect1 id="visuals">
+
+      <title>Visuals</title>
+
+      <para>
+	Visuals are a <emphasis>very important</emphasis> concept that
+	is often overlooked.  Roughly, a visual defines the memory
+	representation that a piece of hardware uses to store the
+	contents of an image.  X supports different kinds of visuals to
+	suit the different kinds of hardware out there.
+      </para>
+
+      <para>
+	There are three basic kinds of visuals, each divided into two
+	classes:
+      </para>
+
+      <itemizedlist>
+
+	<listitem>
+	  <para>
+	    <emphasis>Grayscale</emphasis> visuals are used for displays
+	    that use a single channel of color information.  Black and
+	    white or grayscale monitors (including amber and green
+	    monitors) may use this type of visual.  These visuals can be
+	    either <emphasis>static gray</emphasis> or
+	    <emphasis>grayscale</emphasis>.
+	  </para>
+
+	  <para>
+	    Static gray visuals are those in which you cannot change the
+	    gray intensities of the hardware.  Plain monochrome (B/W)
+	    displays or fixed 4-gray displays may be of the static gray
+	    kind.  Grayscale visuals are those in which you can change
+	    the gray intensities used by the hardware.  Exotic 12-bit
+	    grayscale displays (as used for medical visualization) that
+	    let you change the gray intensities may be of the grayscale
+	    type.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    <emphasis>Indexed</emphasis> visuals use the
+	    "paint-by-number" concept:  each pixel value is an integer
+	    that indexes a table of colors.  So 0 may represent black, 1
+	    may represent pink, 2 may represent blue, etc.  These
+	    visuals can be either <emphasis>static color</emphasis> or
+	    <emphasis>pseudo color</emphasis>.
+	  </para>
+
+	  <para>
+	    Static color visuals are those in which you cannot change
+	    the actual colors that the indexes correspond to.  Remember
+	    the old CGA cards with four fixed colors in graphics mode?
+	    These could be considered of the static color type.  Pseudo
+	    color visuals are those in which you can change the actual
+	    colors that the indexes correspond to.  Each index maps to
+	    an RGB triplet that defines the color that will be displayed
+	    on the screen.  You can change these RGB triplets for each
+	    index.  Pseudo color visuals are very common in graphics
+	    cards.  Graphics cards with 256 colors that you can change,
+	    for example, VGA cards, are of the pseudo color type.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para>
+	    <emphasis>Color</emphasis> visuals are the "big fat ones".
+	    They usually provide the highest quality you can get from
+	    the hardware, and they also consume the largest amount of
+	    resources in terms of speed and memory.  Color visuals store
+	    explicit RGB values for every pixel, instead of storing a
+	    single value like indexed visuals.  Color visuals can be
+	    either <emphasis>true color</emphasis> or <emphasis>direct
+	      color</emphasis>.
+	  </para>
+
+	  <para>
+	    The distinction between true color and direct color may be a
+	    bit difficult to grasp at first.  After all, both visual
+	    types use three values for every pixel.  What more could you
+	    ask for?  The difference is that true color visuals use the
+	    exact values you specified for a pixel as the color that
+	    gets displayed on the screen for that pixel.  Most "true
+	    color" SVGA cards are of this kind.
+	  </para>
+
+	  <para>
+	    However, the values in a direct color visual go through an
+	    indirection step before being sent to the display.
+	    <emphasis>Each</emphasis> of the R/G/B values you specify is
+	    an index in separate tables, and those tables contain a
+	    translated value.  So an RGB triplet gets translated into an
+	    R'G'B' triplet, i.e. the three tables together define an
+	    f(r, g, b) -> (r', g', b') function.  For most purposes,
+	    your tables will be filled by the identity function and you
+	    will get linearly increasing intensity values for each of
+	    the RGB channels.  Things can become quite interesting,
+	    however, when you modify the tables to have a nonlinear
+	    mapping.  If you fill them using an exponential function,
+	    you can do color correction on hardware, for example
+	    (wheeee!).  Most high-end hardware (Sun/HP/SGI graphics
+	    hardware) supports direct color visuals for high weirdness
+	    and flexibility.
+	  </para>
+	</listitem>
+
+      </itemizedlist>
+
+      <para>
+	These are the six visual classes supported by X (static gray,
+	grayscale, static color, pseudo color, true color, direct
+	color).  Why not deal directly with RGB triplets all the time,
+	you may ask?  Indeed that would make programming easier.  The
+	reason is that not all hardware thinks in terms of RGB triplets,
+	and X acts close to the metal in this respect, so we are forced
+	to deal with it.  Fortunately, this is not too hard to do.
+      </para>
+
+      <para>
+	To remind yourself of what the different visual classes mean,
+	think in terms of static gray, static color, and true color
+	having read-only intensity mappings, and grayscale, pseudo
+	color, and direct color having read/write mappings.
+      </para>
+
+      <para>
+	In addition to the visual class, each visual has a bit depth.
+	This is the number of significant bits that are used to encode
+	the value of every pixel.  Most 256-color PC video cards operate
+	on an 8-bit pseudocolor visual.  Better video cards operate on
+	24-bit true color visuals, with eight bits of information per
+	channel.  Some Amiga video cards operate on 12-bit pseudocolor
+	visuals, which leads to a palette of 4096 indexed colors.  Some
+	exotic hardware uses 8-bit truecolor visuals, using 3/3/2 bits
+	for the RGB channels, respectively.
+      </para>
+
+      <para>
+	The best way to know about the visual types your hardware
+	supports is to run the xdpyinfo command.  You will get a load of
+	interesting information.
+      </para>
+
+      <para>
+	As we mentioned in the previous section, one of the properties
+	of a drawable is its visual class.  This defines the image
+	format that must be used to paint stuff on the drawable.
+      </para>
+
+      <para>
+	Most low-end hardware supports a single visual class that is
+	used for all the drawables.  For example, a SVGA card may run
+	either in 8-bit pseudocolor or 24-bit truecolor; it is one or
+	the other but not both at the same time.
+      </para>
+
+      <para>
+	Higher-end hardware, however, may support different simultaneous
+	visual types.  For example, many Sun and SGI video cards can
+	handle 8-bit pseudocolor and 24-bit truecolor visuals
+	simultaneously.  This means you can operate on windows with
+	different visual types at the same time.  Go to an SGI box and
+	run an xterm and run xwininfo on the xterm window; it will
+	probably be using an 8-bit pseudocolor visual.  Now run xv or
+	Electric Eyes, and you may see that it uses a 24-bit truecolor
+	visual.  The hardware is smart enough to split its video memory
+	in different areas for the pseudocolor and truecolor
+	information, for example.
+      </para>
+
+      <para>
+	The reason why it is convenient to have drawables with different
+	visual types at the same time is performance.  For example,
+	image information on pseudocolor visuals usually takes up much
+	less space than that on truecolor visuals (a common example is 8
+	bits per pixel versus 24 bits per pixel, respectively).  Using
+	less memory also means that you can paint things faster, as
+	there is less information to push around.  This is why most
+	applications which are not graphics-intensive run in
+	lower-quality visuals while programs that require high-quality
+	images run on the fat visuals like truecolor and direct color.
+      </para>
+
+      <para>
+	Having different simultaneous visual types also has subtler
+	advantages.  Let us consider a piece of video hardware with
+	enough memory to store pseudocolor and truecolor information for
+	every pixel, plus one extra bit.  This bit is a flag that
+	selects whether to paint the pixel from the pseudocolor or
+	truecolor memory regions.  Say there is a hungry application
+	with some windows on the truecolor visual that are slow to
+	repaint (for example, a 3D rendering).  If the application needs
+	to pop up a menu that will soon go away, it is convenient to
+	create the menu on the pseudocolor visual, and set all the
+	toggle bits on the corresponding region to indicate that it will
+	use the pseudocolor visual instead of the truecolor one.  Since
+	the information on the truecolor memory region is not erased,
+	only not displayed, the X server can quickly un-pop the menu
+	when it is done by simply switching the toggle bits back to the
+	truecolor indication; there will be no need to request a repaint
+	of that region to the application.  This means things will be as
+	fast as possible.
+      </para>
+
+    </sect1>
+
+    <sect1 id="graphics-contexts">
+
+      <title>Graphics contexts</title>
+
+      <para>
+	Graphics contexts (GCs) are used in most window systems to hold
+	the information about what attributes to use when drawing stuff.
+	Let us say that we want to draw a line to the screen.  It would
+	be cumbersome to have to specify line style, dash pattern,
+	thickness, drawing color, graphics operation, and such every
+	time we wanted to draw a line to the screen.  The solution is to
+	have a record structure which holds this information, and to
+	pass that structure to the functions that draw graphics
+	primitives.  Since you often want to paint groups of primitives
+	with the same attributes (color, line style, font, etc.), GCs
+	are an easy and convenient way to specify these values.
+      </para>
+
+    </sect1>
+
+    <sect1 id="event-driven-programming">
+
+      <title>Event-driven programming</title>
+
+      <para>
+	Programmers coming from a text console world may find GUI
+	programming a bit strange at first.  In "traditional"
+	programming, the program guides the user through several screens
+	of prompts and options, and the program is always in control of
+	what is going to happen next.
+      </para>
+
+      <para>
+	In GUI-land, you mostly give up the control flow of your
+	programs and let the system drive them for you.  It is the user
+	who is in control now &mdash; every time the program is run, the
+	user may choose a different way to work his way through the user
+	interface.  Menu options may be invoked at any time, and windows
+	may be opened and closed at will.
+      </para>
+
+      <para>
+	GUI programming generally operates on an
+	<emphasis>event-driven</emphasis> model.  This means that
+	applications get events from the system or the user and must
+	react to them.  This is different from the "traditional" model
+	where the program tells the user what to do next at every step.
+      </para>
+
+      <para>
+	Event-driven programs typically sit around in a loop waiting for
+	events to come.  When an event is received, the program figures
+	out what to do with it and proceeds accordingly.  An event could
+	be "the user pressed a mouse button", or "a window moved", or
+	even "you must terminate yourself".
+      </para>
+
+    </sect1>
+
+  </chapter>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:("gnome-dev-info.sgml" "book" "sect1" "")
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

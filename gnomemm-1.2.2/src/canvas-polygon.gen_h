@@ -1,0 +1,94 @@
+/* $Id: canvas-polygon.gen_h,v 1.12 2001/06/22 17:58:30 murrayc Exp $ */
+
+
+/* canvas-polygon.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/canvas-item.h>
+#include <gnome--/canvas-line.h>
+#include <libgnomeui/gnome-canvas-polygon.h>
+
+#m4 include(property.m4)
+#m4 GTKMM_CONVERSION(void*,Gdk_Pixmap,`Gdk_Pixmap((GdkPixmap*)$3)')
+#m4 GTKMM_CONVERSION(void*,Gdk_Color,`Gdk_Color(*(GdkColor*)$3)')
+#m4 GTKMM_CONVERSION(int,GdkCapStyle,`$2($3)')
+#m4 GTKMM_CONVERSION(int,GdkJoinStyle,`$2($3)')
+#m4 GTKMM_CONVERSION(int,GdkLineStyle,`$2($3)')
+#m4 GTKMM_CONVERSION(char*,const Gtk::string&,,`$3.c_str()')
+#m4 GTKMM_EQUAL(gdouble,double)
+
+CLASS_START(Gnome);
+
+class CanvasPolygon : public CanvasItem
+{
+  WRAP_CLASS(CanvasPolygon, GnomeCanvasPolygon,
+             GNOME_CANVAS_POLYGON, GNOME_IS_CANVAS_POLYGON,
+             canvas_polygon,
+             CanvasItem, GnomeCanvasItem, GNOME_CANVAS_ITEM);
+public:
+  CanvasPolygon(const CanvasGroup &parent,const CanvasPoints& points);
+  CanvasPolygon(const CanvasGroup &parent);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+ 
+  CANVAS_PROPERTY(points,points,const CanvasPoints&,GnomeCanvasPoints*)
+
+  CANVAS_PROPERTY(fill_color,fill_color,const Gtk::string&,char*)
+  CANVAS_PROPERTY(fill_color,fill_color_gdk,const Gdk_Color&,GdkColor*,Gdk_Color,void*,pointer_data)
+  //FIXME: fill_color_rgba?
+  CANVAS_PROPERTY(fill_stipple,fill_stipple,const Gdk_Pixmap&,GdkWindow*,Gdk_Pixmap,void*,pointer_data)
+
+  CANVAS_PROPERTY(outline_color,outline_color,const Gtk::string&,char*)
+  CANVAS_PROPERTY(outline_color,outline_color_gdk,const Gdk_Color&,GdkColor*,Gdk_Color,void*,pointer_data)
+  //FIXME: outline_color_rgba?
+  CANVAS_PROPERTY(outline_stipple,outline_stipple,const Gdk_Pixmap&,GdkWindow*,Gdk_Pixmap,void*,pointer_data)
+
+  CANVAS_PROPERTY(width_pixels,width_pixels,guint,guint)
+  CANVAS_PROPERTY(width_units,width_units,gdouble,gdouble)
+ 
+};
+
+
+
+PRIVATE_START;
+#include <gnome--/private/canvas-item_p.h>
+IMPL_START;
+#include <gnome--/private/canvas-polygon_p.h>
+
+namespace Gnome {
+
+CanvasPolygon::CanvasPolygon(const CanvasGroup &parent,const CanvasPoints& points)
+  : CanvasItem(GNOME_CANVAS_ITEM(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  item_construct(parent);
+  set_points(points);
+}
+
+CanvasPolygon::CanvasPolygon(const CanvasGroup &parent)
+    : CanvasItem(GNOME_CANVAS_ITEM(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  item_construct(parent);
+}
+
+} /* namespace Gnome */
+
+DOCUMENTATION_START;
+

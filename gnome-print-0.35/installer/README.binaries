@@ -1,0 +1,104 @@
+Notes for binary package builders
+
+Starting from thins version, gnome-print fontmap layout is
+much more flexible. This is mostly meant to make the life
+of package builders easier.
+
+First you should read README.installer, to get the idea.
+
+Most of 'make install' alchemy is just determining,
+whether and where user has installed fonts. Fortunately
+this should be no-problem for binaries, as you can rely
+on distribution-dependent font location.
+Also, there is no need for running font installer
+during package installation at all. if admin/user has
+specific fonts, it should be his/her responsibility to
+run gnome-font-install for those.
+
+
+So what should packagers do:
+
+Once you have working gnome-print (font installer) in build
+machine, run installer once for each Type1 font package for
+given system (ghostscript-fonts, x11-fonts etc.):
+
+  gnome-font-install --debug \
+                     --recursive \
+                     --clean \
+                     --static \
+                     --target=PACKAGENAME.fontmap \
+                     DIRS...
+
+where DIRS are directories, where font files for given
+font package reside.
+
+This will generate fontmap file, that contains entires for all usable
+Type1 fonts from given font package.
+
+Then include PACKAGENAME.fontmap into binary distribution,
+installable to static fontmap directory (often /usr/share/gnome/fonts).
+
+Better yet would be to include given fontmap with font
+package, so if user removes font package, fontmap will be
+removed as well. Alternately you should add
+
+  test="some_font_file_from_package"
+
+To <fontmap> node of generated file, so gnome-print can
+ignore full fontmap just by checking the presence of single
+file. Otherwise ghost fonts will appear in font parser, making
+users unhappy.
+
+
+IMPORTANT!!!
+
+The only complex piece are urw/adobe chimaeric fonts. To
+generate fontmap for those, you have to do:
+
+gnome-font-install --debug \
+                   --recursive \
+                   --clean \
+                   --static \
+                   --target=adobe-urw.fontmap \
+                   --aliases=PATH_TO_adobe_urw.font \
+                   DIRS_urw \
+                   DIRS_adobe_afms
+
+Where adobe-urw.font is file from gnome-print (it will
+be installed by default, but there is no strict need
+to include it in binary).
+DIRS_urw are directories, where URW pfb files for fonts
+like NimbusSanL reside
+DIRS_afm are directories, where standard adobe afm
+files reside. Set of those are included with gnome-print
+installation, so you can use $datadir/fonts/afms
+
+
+Doing so, you can get rid of running font-installer
+during postinstall - what according to my experience is
+single most common point of failure with gnome-print
+binaries.
+
+UPDATE: 05/11/2001
+
+There is now --smart argument for gnome-font-install, that
+tries to do everything automatically. It's default scan paths
+are defined in gnome-font-install.c - feel free to add more,
+if these are common on your system.
+
+The best way to do installing is now:
+
+1. Create and install prebuilt fontmaps
+2. Run gnome-font-install --smart in postinstall.
+   It does additional search, and registers fonts, that users
+   may have in system, but are not included in prebuilt fontmaps.
+
+Doing so guarantees, that even, if postinstall fails (I have
+encountered Type1 fonts that crash certain versions of FreeType),
+user still has set of standard fonts from prebuilt fontmaps.
+
+have fun
+Lauris Kaplinski <lauris@ximian.com>
+29.09.2001
+
+

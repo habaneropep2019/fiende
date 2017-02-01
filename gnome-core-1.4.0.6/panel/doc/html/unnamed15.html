@@ -1,0 +1,364 @@
+<HTML
+><HEAD
+><TITLE
+>Shared Library Applets</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The GNOME Panel Libraries"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="The Art of Applet Writing"
+HREF="unnamed1.html"><LINK
+REL="PREVIOUS"
+TITLE="Multiple Applet Support"
+HREF="unnamed14.html"><LINK
+REL="NEXT"
+TITLE="Building the Applets"
+HREF="unnamed16.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The GNOME Panel Libraries</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed14.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed16.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="UNNAMED15"
+>Shared Library Applets</A
+></H1
+><P
+>        It is possible to make applets which will not be separate processes, 
+	but will be loaded directly into the panel. This saves on memory, but
+	can make the panel less stable if the applet is less stable.
+      </P
+><P
+>        Here is an example, George will comment on stuff unless I sleep:
+
+	<DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN153"
+></A
+><P
+><B
+>Example 16. piCommander</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;config.&gt;
+#include &lt;applet-widget.h&gt;
+
+typedef struct {
+	GtkWidget *applet;
+	GtkWidget *fentry;
+	GtkWidget *gentry;
+	GtkWidget *entry;
+} PicoData;
+
+static void
+entry_activate (GtkWidget *w, PicoData *pico)
+{
+	char *s;
+	s = gtk_editable_get_chars (GTK_EDITABLE (pico-&gt;entry), 0, -1);
+	gtk_editable_delete_text (GTK_EDITABLE (pico-&gt;entry), 0, -1);
+	
+	if (strlen (s) == 0) {
+		g_free (s);
+		return;
+	}
+
+	gnome_execute_shell (NULL, s);
+
+	gnome_entry_save_history (GNOME_ENTRY (pico-&gt;gentry));
+	gnome_config_sync ();
+
+	g_free (s);	
+}
+
+static int
+applet_save_session (GtkWidget *applet,
+		     const char *privcfgpath,
+		     const char *globcfgpath,
+		     PicoData *pico)
+{
+	gnome_entry_save_history (GNOME_ENTRY (pico-&gt;gentry));
+	gnome_config_sync ();
+	return FALSE;
+}
+
+static void
+applet_destroy (GtkWidget *applet, PicoData *pico)
+{
+	g_free (pico);
+}
+
+static CORBA_Object
+pico_begin (PortableServer_POA poa,
+	    const char *goad_id,
+	    const char **params,
+	    gpointer *impl_ptr,
+	    CORBA_Environment *ev)
+{
+	PicoData *pico = g_new0 (PicoData, 1);
+
+	pico-&gt;applet = applet_widget_new (goad_id);
+	pico-&gt;fentry = gnome_file_entry_new (&quot;pico-commander&quot;, _(&quot;Run...&quot;));
+	pico-&gt;gentry = gnome_file_entry_gnome_entry (GNOME_FILE_ENTRY (pico-&gt;fentry));
+	pico-&gt;entry = gnome_file_entry_gtk_entry (GNOME_FILE_ENTRY (pico-&gt;fentry));
+
+	gnome_entry_set_max_saved (GNOME_ENTRY (pico-&gt;gentry), 50);
+	gnome_entry_prepend_history (GNOME_ENTRY (pico-&gt;gentry), FALSE, &quot;&quot;);
+	gtk_combo_set_use_arrows_always (GTK_COMBO (pico-&gt;gentry), TRUE);
+
+	applet_widget_add (APPLET_WIDGET (pico-&gt;applet), pico-&gt;fentry);
+
+	gtk_signal_connect (GTK_OBJECT (pico-&gt;entry), &quot;activate&quot;,
+			    GTK_SIGNAL_FUNC (entry_activate), pico);
+	gtk_signal_connect (GTK_OBJECT (pico-&gt;applet), &quot;save_session&quot;,
+			    GTK_SIGNAL_FUNC (applet_save_session), pico);
+	gtk_signal_connect (GTK_OBJECT (pico-&gt;applet), &quot;destroy&quot;,
+			    GTK_SIGNAL_FUNC (applet_destroy), pico);
+
+	gtk_widget_show_all (pico-&gt;applet);
+
+	return applet_widget_corba_activate (APPLET_WIDGET (pico-&gt;applet),
+					     poa, goad_id, params, 
+					     impl_ptr, ev);
+}
+
+static void
+pico_end (PortableServer_POA poa,
+	  const char *goad_id,
+	  gpointer impl_ptr,
+	  CORBA_Environment *ev)
+{
+	applet_widget_corba_deactivate (poa, goad_id, impl_ptr, ev);
+}
+
+static const char *repo_id[] = { &quot;IDL:GNOME/Applet:1.0&quot;, NULL };
+static GnomePluginObject applets_list[] = {
+	{ repo_id, &quot;pico-commander_applet&quot;, NULL, &quot;50 line launcher&quot;,
+	  &amp;pico_begin, &amp;pico_end },
+	{ NULL }
+};
+
+GnomePlugin GNOME_Plugin_info = { applets_list, NULL };
+	  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed14.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed16.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Multiple Applet Support</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Building the Applets</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

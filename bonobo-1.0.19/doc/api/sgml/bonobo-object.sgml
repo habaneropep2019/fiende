@@ -1,0 +1,818 @@
+<refentry id="bonobo-bonobo-object">
+<refmeta>
+<refentrytitle>BonoboObject</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboObject</refname><refpurpose>Base object for wrapping Bonobo::Unknown derived objects.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboObjectServant">BonoboObjectServant</link>;
+typedef     <link linkend="BonoboObject">BonoboObject</link>;
+typedef     <link linkend="BonoboObjectClass">BonoboObjectClass</link>;
+<link linkend="BonoboObject">BonoboObject</link>* <link linkend="bonobo-object-construct">bonobo_object_construct</link>       (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> corba_object);
+<link linkend="BonoboObject">BonoboObject</link>* <link linkend="bonobo-object-new-from-servant">bonobo_object_new_from_servant</link>
+                                            (void *servant);
+<link linkend="BonoboObject">BonoboObject</link>* <link linkend="bonobo-object-from-servant">bonobo_object_from_servant</link>    (<link linkend="PortableServer-Servant">PortableServer_Servant</link> servant);
+void        <link linkend="bonobo-object-bind-to-servant">bonobo_object_bind_to_servant</link>   (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             void *servant);
+<link linkend="PortableServer-Servant">PortableServer_Servant</link> <link linkend="bonobo-object-get-servant">bonobo_object_get_servant</link>
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object);
+<link linkend="POA-Bonobo-Unknown--epv">POA_Bonobo_Unknown__epv</link>* <link linkend="bonobo-object-get-epv">bonobo_object_get_epv</link>
+                                            (void);
+<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> <link linkend="bonobo-object-activate-servant">bonobo_object_activate_servant</link>
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             void *servant);
+<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> <link linkend="bonobo-object-activate-servant-full">bonobo_object_activate_servant_full</link>
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             void *servant,
+                                             <link linkend="gpointer">gpointer</link> shlib_id);
+void        <link linkend="bonobo-object-add-interface">bonobo_object_add_interface</link>     (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             <link linkend="BonoboObject">BonoboObject</link> *newobj);
+<link linkend="BonoboObject">BonoboObject</link>* <link linkend="bonobo-object-query-local-interface">bonobo_object_query_local_interface</link>
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             const char *repo_id);
+<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> <link linkend="bonobo-object-query-interface">bonobo_object_query_interface</link>
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             const char *repo_id);
+<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> <link linkend="bonobo-object-corba-objref">bonobo_object_corba_objref</link>   (<link linkend="BonoboObject">BonoboObject</link> *object);
+<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> <link linkend="bonobo-object-dup-ref">bonobo_object_dup_ref</link>        (<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> object,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+void        <link linkend="bonobo-object-release-unref">bonobo_object_release_unref</link>     (<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> object,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+void        <link linkend="bonobo-object-ref">bonobo_object_ref</link>               (<link linkend="BonoboObject">BonoboObject</link> *object);
+void        <link linkend="bonobo-object-unref">bonobo_object_unref</link>             (<link linkend="BonoboObject">BonoboObject</link> *object);
+void        <link linkend="bonobo-object-idle-unref">bonobo_object_idle_unref</link>        (<link linkend="BonoboObject">BonoboObject</link> *object);
+void        <link linkend="bonobo-object-init">bonobo_object_init</link>              (void);
+void        <link linkend="bonobo-object-trace-refs">bonobo_object_trace_refs</link>        (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             const char *fn,
+                                             int line,
+                                             <link linkend="gboolean">gboolean</link> ref);
+void        <link linkend="bonobo-object-dump-interfaces">bonobo_object_dump_interfaces</link>   (<link linkend="BonoboObject">BonoboObject</link> *object);
+void        <link linkend="bonobo-object-check-env">bonobo_object_check_env</link>         (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> corba_object,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+void        <link linkend="bonobo-object-list-unref-all">bonobo_object_list_unref_all</link>    (<link linkend="GList">GList</link> **list);
+void        <link linkend="bonobo-object-slist-unref-all">bonobo_object_slist_unref_all</link>   (<link linkend="GSList">GSList</link> **list);
+#define     <link linkend="BONOBO-OBJREF-CAPS">BONOBO_OBJREF</link>                   (o)
+#define     <link linkend="BONOBO-OBJECT-CHECK-CAPS">BONOBO_OBJECT_CHECK</link>             (o,c,e)
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-unknown-ping">bonobo_unknown_ping</link>             (<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> object);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+
+<para>
+  BonoboObject is the base object in Bonobo for wrapping CORBA servers
+  as Gtk+ objects. HOWEVER, since it's use is complicated, it is left
+  in bonobo for the benefit of Nautilus' binary compatibility. It is
+  strongly recommended that <link linkend="BonoboXObject">BonoboXObject</link> be used for all new CORBA
+  server implementations.
+</para>
+
+<para>
+  Again if you are looking to implement a CORBA interface you want to 
+see <link linkend="BonoboXObject">BonoboXObject</link>.
+</para>
+
+<para>
+  The <classname>Bonobo::Unknown</classname> interface (wrapped by
+  BonoboObject) is the foundation for the component system: it provides
+  life cycle management for objects as well as service discovery.
+</para>
+
+<para>
+  The Bonobo interfaces are all based on the
+  <classname>Bonobo::Unknown</classname> interface.  This
+  interface is very simple and provides two basic services:
+  object lifetime management and object
+  functionality-discovery.   This interface only contains three
+  methods, here it is:
+
+  <programlisting>
+  module Bonobo {
+      interface Unknown {
+          void void <link linkend="ref">ref</link>();
+          void void <link linkend="unref">unref</link>();
+          Object query_interface (in string repoid);
+      };
+  };
+  </programlisting>
+</para>
+
+<para>
+  The <function><link linkend="ref">ref</link>()</function> and <function><link linkend="unref">unref</link>()</function>
+  methods are used to control the lifetime of an object.  The
+  <function>query_interface</function> method is used to discover
+  optional functionality provided by the object implementation.
+</para>
+
+<para>
+  The lifetime management is based on reference counting: when a
+  component is initially launched, it starts life with a reference
+  count of one.  This reference is held by the component invoker.
+  Each time a reference is kept to this object (say, you store a
+  copy of the object in an array), the reference count is
+  incremented.  Every time a reference goes out of scope, the
+  reference count needs to be decremented.  When the reference
+  count reaches zero, the component knows that there are no
+  outstanding references to it, and it is safe to shutdown.  At
+  this point, the component shuts down.
+</para>
+
+<para>
+  It is possible to ask an object which implements the
+  <classname>Bonobo::Unknown</classname> interface if it supports
+  other CORBA interfaces.  For example, it would be possible to
+  ask an object whether it supports the
+  "IDL:Bonobo/EmbeddablePrint:1.0" interface to find out if it is
+  possible to print its contents.  If the return value from
+  invoking the <function>query_interface</function> method on the
+  interface is CORBA_OBJECT_NIL, then we know that the requested interface
+  is not supported.  Otherwise, we can invoke
+  IDL:Bonobo/EmbeddablePrint:1.0 methods on the returned CORBA
+  Object.
+</para>
+
+<para>
+  Clients of the <function>query_interface</function> method use
+  it to discover dynamically if a component supports a given
+  interface.  Sometimes the client code would require a specific
+  interface to exist, but many times it is possible to operate in
+  a "downgraded" mode.  You should design your code to be able to
+  cope with the lack of interfaces in objects.  This will allow
+  your program to deal with more components, and this also allows
+  components to work in more situations.
+</para>
+
+<para>
+  For example, a help browser can load an HTML renderer component and
+  ask this component which sort of features are supported by it:
+  <programlisting>
+stop_animations (BrowserHTML html)
+{
+  BrowserControl control
+
+  control = html->query_interface ("IDL:Browser/Control:1.0");
+  if (control)
+          control-><link linkend="stop-animations">stop_animations</link>();
+}
+  </programlisting>
+</para>
+
+<para>
+  The return value of the query_interface invocation contains a
+  reference to a CORBA object that is derived from the
+  <classname>Bonobo::Unknown</classname> interface or
+  CORBA_OBJECT_NIL if the interface is not supported by the
+  object.  And this interface would have been already
+  <function><link linkend="ref">ref</link>()</function>ed before it was returned.  It is up
+  to the caller to call <function><link linkend="unref">unref</link>()</function> when they are
+  done using the interface.
+</para>
+
+<para>
+  BonoboObject implements the Bonobo::Unknown interface and exports the
+  implementations of the methods in this class to simplify creating
+  new objects that inherit from Bonobo::Unknown.  This base object
+  provides default implementations for the ref, unref and
+  query_interface methods.
+</para>
+
+<para>
+  Other implementations reuse this implementation by listing on their
+  VEPV tables the bonobo_object_epv entry point vector.
+</para>
+
+<para>
+  The <classname>Bonobo::Unknown</classname> interface is inspired
+  by the Microsoft COM <classname>IUnknown</classname> interface
+  but it has been translated into the CORBA world.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboObjectServant">BonoboObjectServant</title>
+<programlisting>typedef struct {
+	POA_Bonobo_Unknown servant_placeholder;
+	gpointer           bonobo_object;
+} BonoboObjectServant;
+</programlisting>
+<para>
+  This structure defines the type for BonoboObject-based CORBA servants.
+</para>
+
+<para>
+  <link linkend="BonoboObject">BonoboObject</link> provides a mapping from the servant to the <link linkend="BonoboObject">BonoboObject</link>
+  by using the bonobo_object field in the structure.  Typically in the
+  C CORBA binding, per-servant information is piggy-backed to the POA
+  servant.  With the BonoboObject setup per-servant information is
+  typically attached to the BonoboObject (by using the regular
+  inheritance mechanism of Gtk+).  Going from a
+  <link linkend="PortableServer-Servant">PortableServer_Servant</link> to the actual <link linkend="BonoboObject">BonoboObject</link> is accomplished 
+  using the <link linkend="bonobo-object-from-servant">bonobo_object_from_servant</link>() routine.  
+</para>
+
+<para>
+  If you decide not to use this scheme for fetching your per-servant
+  information, but still want to inherit from a <link linkend="BonoboObject">BonoboObject</link> object,
+  just make sure that the second field of your servant is a gpointer.
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboObject">BonoboObject</title>
+<programlisting>typedef struct {
+	GtkObject            base;
+
+	Bonobo_Unknown       corba_objref;
+	gpointer             servant;
+	BonoboObjectPrivate *priv;
+} BonoboObject;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboObjectClass">BonoboObjectClass</title>
+<programlisting>typedef struct {
+	GtkObjectClass parent_class;
+
+	/*
+	 * signals.  
+	 */
+	void  (*query_interface) (BonoboObject *object, const char *repo_id,  CORBA_Object      *retval);
+	void  (*system_exception)(BonoboObject *object, CORBA_Object cobject, CORBA_Environment *ev);
+	gpointer expansion;
+} BonoboObjectClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-construct">bonobo_object_construct ()</title>
+<programlisting><link linkend="BonoboObject">BonoboObject</link>* bonobo_object_construct       (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> corba_object);</programlisting>
+<para>
+Initializes the provided BonoboObject <parameter>object</parameter>. This method is
+usually invoked from the construct method for other Gtk-based CORBA
+wrappers that derive from the Bonobo::Unknown interface</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> The GTK object server wrapper for the CORBA service.
+</entry></row>
+<row><entry align="right"><parameter>corba_object</parameter>&nbsp;:</entry>
+<entry> the reference to the real CORBA object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the initialized BonoboObject.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-new-from-servant">bonobo_object_new_from_servant ()</title>
+<programlisting><link linkend="BonoboObject">BonoboObject</link>* bonobo_object_new_from_servant
+                                            (void *servant);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>servant</parameter>&nbsp;:</entry>
+<entry> A Servant that implements the Bonobo::Unknown interface
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The servant <parameter>servant</parameter> wrapped in a BonoboObject.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-from-servant">bonobo_object_from_servant ()</title>
+<programlisting><link linkend="BonoboObject">BonoboObject</link>* bonobo_object_from_servant    (<link linkend="PortableServer-Servant">PortableServer_Servant</link> servant);</programlisting>
+<para>
+CORBA method implementations receive a parameter of type
+<link linkend="PortableServer-Servant">PortableServer_Servant</link> which is a pointer to the servant that was
+used to create this specific CORBA object instance.
+</para>
+<para>
+This routine allows the user to get the <link linkend="BonoboObject">BonoboObject</link> (ie, Gtk
+object wrapper) from the servant.  This <link linkend="BonoboObject">BonoboObject</link> is the Gtk
+object wrapper associated with the CORBA object instance whose
+method is being invoked.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>servant</parameter>&nbsp;:</entry>
+<entry> Your servant.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the <link linkend="BonoboObject">BonoboObject</link> wrapper associated with <parameter>servant</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-bind-to-servant">bonobo_object_bind_to_servant ()</title>
+<programlisting>void        bonobo_object_bind_to_servant   (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             void *servant);</programlisting>
+<para>
+This routine binds <parameter>object</parameter> to <parameter>servant</parameter>.  It establishes a one to
+one mapping between the <parameter>object</parameter> and the <parameter>servant</parameter>.  Utility routines
+are provided to go back and forth.  See <link linkend="bonobo-object-from-servant">bonobo_object_from_servant</link>()
+and <link linkend="bonobo-object-get-servant">bonobo_object_get_servant</link>().
+</para>
+<para>
+This routine is used internally by <link linkend="bonobo-object-activate-servant">bonobo_object_activate_servant</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> the BonoboObject to bind to the servant.
+</entry></row>
+<row><entry align="right"><parameter>servant</parameter>&nbsp;:</entry>
+<entry> A PortableServer_Servant to bind to the BonoboObject.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-get-servant">bonobo_object_get_servant ()</title>
+<programlisting><link linkend="PortableServer-Servant">PortableServer_Servant</link> bonobo_object_get_servant
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboObject">BonoboObject</link> which is associated with a servant.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The servant associated with <parameter>object</parameter>, or <literal>NULL</literal> if
+no servant is bound to <parameter>object</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-get-epv">bonobo_object_get_epv ()</title>
+<programlisting><link linkend="POA-Bonobo-Unknown--epv">POA_Bonobo_Unknown__epv</link>* bonobo_object_get_epv
+                                            (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the Bonobo Object epv.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-activate-servant">bonobo_object_activate_servant ()</title>
+<programlisting><link linkend="Bonobo-Unknown">Bonobo_Unknown</link> bonobo_object_activate_servant
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             void *servant);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>servant</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-activate-servant-full">bonobo_object_activate_servant_full ()</title>
+<programlisting><link linkend="Bonobo-Unknown">Bonobo_Unknown</link> bonobo_object_activate_servant_full
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             void *servant,
+                                             <link linkend="gpointer">gpointer</link> shlib_id);</programlisting>
+<para>
+This routine activates the <parameter>servant</parameter> which is wrapped inside the
+<parameter>object</parameter> on the bonobo_poa (which is the default POA).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> a BonoboObject
+</entry></row>
+<row><entry align="right"><parameter>servant</parameter>&nbsp;:</entry>
+<entry> The servant to activate.
+</entry></row>
+<row><entry align="right"><parameter>shlib_id</parameter>&nbsp;:</entry>
+<entry> an address to identify the shared library
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The CORBA_Object that is wrapped by <parameter>object</parameter> and whose
+servant is <parameter>servant</parameter>.  Might return CORBA_OBJECT_NIL on failure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-add-interface">bonobo_object_add_interface ()</title>
+<programlisting>void        bonobo_object_add_interface     (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             <link linkend="BonoboObject">BonoboObject</link> *newobj);</programlisting>
+<para>
+Adds the interfaces supported by <parameter>newobj</parameter> to the list of interfaces
+for <parameter>object</parameter>.  This function adds the interfaces supported by
+<parameter>newobj</parameter> to the list of interfaces support by <parameter>object</parameter>. It should never
+be used when the object has been exposed to the world. This is a firm
+part of the contract.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> The BonoboObject to which an interface is going to be added.
+</entry></row>
+<row><entry align="right"><parameter>newobj</parameter>&nbsp;:</entry>
+<entry> The BonoboObject containing the new interface to be added.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-query-local-interface">bonobo_object_query_local_interface ()</title>
+<programlisting><link linkend="BonoboObject">BonoboObject</link>* bonobo_object_query_local_interface
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             const char *repo_id);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboObject">BonoboObject</link> which is the aggregate of multiple objects.
+</entry></row>
+<row><entry align="right"><parameter>repo_id</parameter>&nbsp;:</entry>
+<entry> The id of the interface being queried.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A <link linkend="BonoboObject">BonoboObject</link> for the requested interface.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-query-interface">bonobo_object_query_interface ()</title>
+<programlisting><link linkend="Bonobo-Unknown">Bonobo_Unknown</link> bonobo_object_query_interface
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             const char *repo_id);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> A BonoboObject to be queried for a given interface.
+</entry></row>
+<row><entry align="right"><parameter>repo_id</parameter>&nbsp;:</entry>
+<entry> The name of the interface to be queried.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The CORBA interface named <parameter>repo_id</parameter> for <parameter>object</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-corba-objref">bonobo_object_corba_objref ()</title>
+<programlisting><link linkend="Bonobo-Unknown">Bonobo_Unknown</link> bonobo_object_corba_objref   (<link linkend="BonoboObject">BonoboObject</link> *object);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> A BonoboObject whose CORBA object is requested.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The CORBA interface object for which <parameter>object</parameter> is a wrapper.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-dup-ref">bonobo_object_dup_ref ()</title>
+<programlisting><link linkend="Bonobo-Unknown">Bonobo_Unknown</link> bonobo_object_dup_ref        (<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> object,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+This function returns a duplicated CORBA Object reference;
+it also bumps the ref count on the object. This is ideal to
+use in any method returning a Bonobo_Object in a CORBA impl.
+If object is CORBA_OBJECT_NIL it is returned unaffected.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> a Bonobo_Unknown corba object
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> Corba_Environment
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> duplicated &amp; ref'd corba object reference.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-release-unref">bonobo_object_release_unref ()</title>
+<programlisting>void        bonobo_object_release_unref     (<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> object,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+This function releases a CORBA Object reference;
+it also decrements the ref count on the bonobo object.
+This is the converse of bonobo_object_dup_ref. We
+tolerate object == CORBA_OBJECT_NIL silently.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> a Bonobo_Unknown corba object
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> Corba_Environment, optional
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-ref">bonobo_object_ref ()</title>
+<programlisting>void        bonobo_object_ref               (<link linkend="BonoboObject">BonoboObject</link> *object);</programlisting>
+<para>
+Increments the reference count for the aggregate BonoboObject.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> A BonoboObject you want to ref-count
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-unref">bonobo_object_unref ()</title>
+<programlisting>void        bonobo_object_unref             (<link linkend="BonoboObject">BonoboObject</link> *object);</programlisting>
+<para>
+Decrements the reference count for the aggregate BonoboObject.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> A BonoboObject you want to unref.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-idle-unref">bonobo_object_idle_unref ()</title>
+<programlisting>void        bonobo_object_idle_unref        (<link linkend="BonoboObject">BonoboObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-init">bonobo_object_init ()</title>
+<programlisting>void        bonobo_object_init              (void);</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-trace-refs">bonobo_object_trace_refs ()</title>
+<programlisting>void        bonobo_object_trace_refs        (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             const char *fn,
+                                             int line,
+                                             <link linkend="gboolean">gboolean</link> ref);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>fn</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>line</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ref</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-dump-interfaces">bonobo_object_dump_interfaces ()</title>
+<programlisting>void        bonobo_object_dump_interfaces   (<link linkend="BonoboObject">BonoboObject</link> *object);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-check-env">bonobo_object_check_env ()</title>
+<programlisting>void        bonobo_object_check_env         (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> corba_object,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+This routine verifies the <parameter>ev</parameter> environment for any fatal system
+exceptions.  If a system exception occurs, the object raises a
+"system_exception" signal.  The idea is that GtkObjects which are
+used to wrap a CORBA interface can use this function to notify
+the user if a fatal exception has occurred, causing the object
+to become defunct.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> The object on which we operate
+</entry></row>
+<row><entry align="right"><parameter>corba_object</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> CORBA Environment to check
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-list-unref-all">bonobo_object_list_unref_all ()</title>
+<programlisting>void        bonobo_object_list_unref_all    (<link linkend="GList">GList</link> **list);</programlisting>
+<para>
+This routine unrefs all valid objects in
+the list and then removes them from <parameter>list</parameter> if
+they have not already been so removed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>list</parameter>&nbsp;:</entry>
+<entry> A list of BonoboObjects *s
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-slist-unref-all">bonobo_object_slist_unref_all ()</title>
+<programlisting>void        bonobo_object_slist_unref_all   (<link linkend="GSList">GSList</link> **list);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>list</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-OBJREF-CAPS">BONOBO_OBJREF()</title>
+<programlisting>#define BONOBO_OBJREF(o)          (bonobo_object_corba_objref(BONOBO_OBJECT(o)))
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>o</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-OBJECT-CHECK-CAPS">BONOBO_OBJECT_CHECK()</title>
+<programlisting>#define     BONOBO_OBJECT_CHECK(o,c,e)</programlisting>
+<para>
+   Checks if the exception in <parameter>e</parameter> needs to be signaled.  If so, then
+   the proper exception signal is generated on the BonoboObject object
+   <parameter>o</parameter> for the CORBA reference <parameter>c</parameter>.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>o</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>c</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>e</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-unknown-ping">bonobo_unknown_ping ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_unknown_ping             (<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> object);</programlisting>
+<para>
+Pings the object <parameter>object</parameter> using the ref/unref methods from Bonobo::Unknown.
+You can use this one to see if a remote object has gone away.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> a CORBA object reference of type Bonobo::Unknown
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the Bonobo::Unknown <parameter>object</parameter> is alive.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="GtkObject">GtkObject</link>
+</para>
+</refsect1>
+
+</refentry>

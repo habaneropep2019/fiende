@@ -1,0 +1,156 @@
+/* $Id: label.gen_h,v 1.57 2000/02/13 02:22:09 kenelson Exp $ */
+
+
+/* label.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/misc.h>
+#include <gtk/gtklabel.h>
+
+CLASS_START(Gtk);
+//: Text string widget.
+//- A simple setable widget for holding a string.
+class Label : public Misc {
+  WRAP_CLASS(Label,GtkLabel,GTK_LABEL,GTK_IS_LABEL,label,Gtk::Misc,GtkMisc,GTK_MISC);
+public:
+
+  explicit Label(const nstring &label = 0,gfloat x=0.5,gfloat y=0.5);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Set the label text to match {\var str}.
+  //- Text can not be NULL.
+  WRAP_METHOD(
+    void  gtk_label_set_text(GtkLabel*,const char*),
+    void   set            (const string &str)); 
+
+  //: Alias for {set()}
+  WRAP_METHOD(
+    void  gtk_label_set_text(GtkLabel*,const char*),
+    void  set_text            (const string &str)); 
+
+  //: Return the current label text. 
+  //void gtk_label_get(GtkLabel*,char**),
+  string get            () const;
+
+  //: Return the current label text.
+  string get_text       () const;
+
+  //: Sets the justification for multiple lines.
+  WRAP_METHOD(
+    void gtk_label_set_justify(GtkLabel*,GtkJustification),
+    void set_justify(GtkJustification jtype));
+
+  // Returns the label field
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_label_set_pattern(GtkLabel*,const gchar*),
+    void set_pattern      (const nstring &pattern));
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    guint gtk_label_parse_uline(GtkLabel*,const gchar*),
+    guint parse_uline      (const string &str));
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_label_set_line_wrap (GtkLabel*,gboolean),
+    void set_line_wrap(bool wrap));
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/misc_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+
+Label::Label(const nstring &label,gfloat x,gfloat y)
+  :     Misc((GtkMisc*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_text(label);
+  set_alignment(x,y);
+}
+
+string
+Label::get() const
+{
+  gchar *str;
+  gtk_label_get(const_cast<GtkLabel*>(gtkobj()), &str);
+  return str;
+}
+
+string Label::get_text       () const {return get();}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Label)
+//. name: label
+//. type: string
+//. get: {get()},{get_text()}
+//. set: {set()},{set_text()}
+//. desc: Labels text.
+
+//. name: label_wc
+//. type: GdkWChar*
+//. get:
+//. set:
+//. desc: Label in wide characters. (not tested)
+
+//. name: pattern
+//. type: string
+//. get:
+//. set:
+//. desc:
+
+//. name: words
+//. type: GtkLabelWord*
+//. get:
+//. set:
+//. desc:
+
+//. name: max_width
+//. type: guint:16
+//. get:
+//. set:
+//. desc:
+
+//. name: jtype
+//. type: guint:2
+//. get:
+//. set: {set_justify()}
+//. desc: Specifies how label will behave with more
+//. than one line in it. 
+//. If you're looking for changing label alignment, check 
+//. {Gtk_Misc::set_alignment()}.
+//.
+//. Possible values: {\enum GTK_JUSTIFY_LEFT,
+//. GTK_JUSTIFY_RIGHT, GTK_JUSTIFY_CENTER, GTK_JUSTIFY_FILL}
+
+//. name: wrap
+//. type: gboolean
+//. get:
+//. set:
+//. desc:
+

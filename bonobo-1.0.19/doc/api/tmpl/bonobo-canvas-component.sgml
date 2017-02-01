@@ -1,0 +1,178 @@
+<!-- ##### SECTION Title ##### -->
+BonoboCanvasComponent
+
+<!-- ##### SECTION Short_Description ##### -->
+Class for exporting BonoboCanvasItems through BonoboEmbeddables to
+other applications.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+  The BonoboCanvasComponent objects are used to wrap GnomeCanvasItems
+  and export them to container applications.  Typically the
+  bonobo_component_canvas_new() function will be invoked in a callback
+  from a BonoboEmbeddable object.
+</para>
+
+<para>
+  Here is an example of how to export Gnome Canvas Items in a simple
+  way.  
+  <example>
+    <title>Wrapping a Gnome Canvas Item</title>
+    <programlisting>
+
+/*
+ * Here is where the GnomeCanvasItem (in this case an ellipse)
+ * is created and wrapped in a BonoboCanvasComponent.
+ *
+ * This function is invoked on demand on the embeddable
+ * argument.  Embeddables are the document model, and the
+ * items returned are the views.  
+ */
+BonoboCanvasComponent *
+my_item_creator (BonoboEmbeddable *embeddable,
+                 GnomeCanvas      *canvas,
+                 void             *data)
+{
+        GnomeCanvasItem *item = gnome_canvas_item_new (
+		gnome_canvas_root (canvas),
+                gnome_canvas_ellipse_get_type (),
+                "x1", 5.0,  "y1", 5.0,
+                "x2", 95.0, "y2", 95.0,
+                "fill_color", "white",
+                "outline_color", "black",
+                NULL);
+
+        return bonobo_canvas_component_new (item);
+}
+
+/*
+ * This is a routine that creates a BonoboEmbeddable that
+ * uses CanvasItems.
+ */
+BonoboEmbeddable *make_embeddable (void)
+{
+       return bonobo_embeddable_new_canvas_item (my_item_creator, NULL);
+}
+    </programlisting>
+  </example>
+</para>
+
+<para>
+  Applications that do not use the base #BonoboEmbeddable class, but
+  use their own types derived from the #BonoboEmbeddable can use the
+  bonobo_embeddable_construct() during their construction phase. 
+</para>
+
+<para>
+  On the client side (the application that will embed this component)
+  an object of the type #BonoboCanvasItem is used.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+  #BonoboEmbeddable, #BonoboCanvasItem
+</para>
+
+<!-- ##### TYPEDEF BonoboCanvasComponent ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF BonoboCanvasComponentClass ##### -->
+<para>
+  
+</para>
+
+
+<!-- ##### FUNCTION bonobo_canvas_new ##### -->
+<para>
+
+</para>
+
+@is_aa: 
+@proxy: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_canvas_component_construct ##### -->
+<para>
+
+</para>
+
+@comp: 
+@item: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@corba_canvas_comp: 
+@ccomp: 
+
+
+<!-- ##### FUNCTION bonobo_canvas_component_new ##### -->
+<para>
+
+</para>
+
+@item: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_canvas_component_get_item ##### -->
+<para>
+
+</para>
+
+@comp: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_canvas_component_get_ui_container ##### -->
+<para>
+
+</para>
+
+@comp: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_canvas_component_grab ##### -->
+<para>
+
+</para>
+
+@comp: 
+@mask: 
+@cursor: 
+@time: 
+
+
+<!-- ##### FUNCTION bonobo_canvas_component_ungrab ##### -->
+<para>
+
+</para>
+
+@comp: 
+@time: 
+
+
+<!-- ##### SIGNAL BonoboCanvasComponent::set-bounds ##### -->
+<para>
+
+</para>
+
+@bonobocanvascomponent: the object which received the signal.
+@arg1: 
+@arg2: 
+<!-- # Unused Parameters # -->
+@bbox: The bounding box.
+@ev: CORBA Environment to return errors on.
+
+<!-- ##### SIGNAL BonoboCanvasComponent::event ##### -->
+<para>
+
+</para>
+
+@bonobocanvascomponent: the object which received the signal.
+@arg1: 
+@Returns: 
+

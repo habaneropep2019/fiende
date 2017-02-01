@@ -1,0 +1,276 @@
+2001-06-10  Juan Pablo Mendoza <pablo_juan@yahoo.com>
+
+	* gyahtzee.c (quit_game): Don't destroy the window here.
+          Fix bug #24530
+
+2001-06-07  Juan Pablo Mendoza <pablo_juan@yahoo.com>
+
+	Apply patch from drk@sgi.com. Bug #52645.
+
+	* setup.c (parse_an_arg): Add `break' in default.
+	  (setup_game): Remove c++ style comment.
+	* yahtzee.h: DefaultPlayerNames is extern so declare it extern.
+
+2000-11-17  Martin Norbäck  <d95mback@licia.dtek.chalmers.se>
+
+	* setup.c: removed _() from untranslatable string
+
+2000-06-07  Scott D. Heavner  <sdh@po.cwru.edu>
+
+	* setup.c: Add additional games rules.
+	
+	Change default value of yahtzee bonus to 100 (per MB rules).
+	
+	Preserve all original options when selecting cancel.
+
+	Raise obstructed settings window when reselect prefs menu.
+
+2000-06-06  Scott D. Heavner  <sdh@po.cwru.edu>
+
+	* setup.c (do_setup): Move player rename into setup dialog and 
+	remove hook from clist.c
+
+2000-05-12  Andreas Hyden  <a.hyden@cyberpoint.se>
+
+	* gtali.desktop: Added Swedish translation.
+
+2000-05-09  Martin Baulig  <baulig@suse.de>
+
+	* gyahtzee.c (main): Move gnome_score_init () in front of
+	bindtextdomain () and textdomain ().
+
+1999-08-09  Robert Brady  <rwb197@ecs.soton.ac.uk
+
+	* clist.c : applied Irix compiling fix from David Kaelbling 
+	  <drk@sgi.com> : [bug #1781].
+
+1999-04-18  Scott D. Heavner  <sdh@fishmonger.dont.mail.me.here.net>
+
+	* NoGnome/Makefile.in: Update to reference config.h.in
+
+	* NoGnome/config.h.in: rename from acconfig.h
+
+	* scores.c (update_scorefile): Make sure to allocate scall if
+	HAVE_RENAME fails.
+
+1999-04-10  Scott D. Heavner  <sdh@fishmonger.dont.mail.me.here.net>
+
+	* clist.c (ShowoffPlayer): Setting the column heading buttons to
+	active/passive seems to force a redraw.  Leave as passive always. 
+
+	* Allow change of player names under gnome.
+
+	* *.c & *.h: Set default emacs tab width to 8 :)
+	             Also clean out unused #if's
+	
+	* Add & populate help directory.
+
+1999-03-29  Tuomas Kuosmanen  <tigert@gimp.org>
+
+	* pix/gnome-gtali.png: Replaced the icon with one that matches
+	better with the style of the rest of the desktop.. (all respect
+	for the original artist)
+
+1999-02-14  Ian Peters  <ipeters@acm.org>
+
+	* Name changed to GTali
+
+1999-01-26  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gyahtzee.c: Kill file menu.
+
+1999-01-10  Nat Friedman  <nat@nat.org>
+
+	* gyahtzee.c (GyahtzeeCreateMainWindow): Create a GnomeAppBar, not
+ 	a GtkStatusBar.  Installed menu hints.
+	(say): Use the appbar.
+
+	Standardized the menus.
+
+Mon Nov 23 16:58:42 EST 1998 Gregory McLean <gregm@comstar.net>
+
+	* clist.c : commented out the gtk_clist_set_policy function as
+	gtk 1.1.5 don't have it anymore.
+	This has been 'guarded' by a FIXME :)
+
+1998-10-24  Tuomas Kuosmanen  <tigert@gimp.org>
+
+	* pix/gnome-dice-*.xpm: Got into artistic mood and made some dice pics
+	I hope you like them ;)
+
+1998-10-18  Phil Schwan  <pschwan@cmu.edu>
+
+	* clist.c (select_row): This function is now called for both select and
+	unselect events.  It takes care of making sure that the row is actually
+	being selected/unselected, etc.  This takes care of the problem of
+	having to de-select and then re-select rows in multi-player games.
+	* (create_clist): Added unselect_row callback.
+
+	* gyahtzee.c: (NextPlayer): The old way of doing things would cause a
+	deadlock if player 2 had more yahtzees than player 1.
+	* (gnome_modify_dice): Added a DEBUG mode that allows the player to
+	shift-click on dice and change their values.  Was useful in testing the
+	deadlock fix.
+	* Added some "void"s and some "static"s so that it compiles
+	-Wall -Wstrict-prototypes -Wmissing-prototypes clean.
+
+	* yahtzee.c (play_score): The special case for yahtzees was broken,
+	never checking to see if the user actually had a yahtzee before
+	allowing them to use the slot twice--this allowed the user to click on
+	yahtzee any time they didn't like their roll, as long as they'd already
+	rolled a yahtzee earlier in the game.
+	* (HumansAreDone): commented out this function, as it's no longer
+	needed because of the change to gyahtzee.c
+
+	* yahtzee.h: removed HumansAreDone prototype.
+
+1998-07-25  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* gyahtzee.desktop: Added Portuguese translation.
+
+	* yahtzee.c, computer.c, clist.c: Some internationalization work. 
+
+Tue Jul  7 15:52:29 1998  Scott D. Heavner  <sdh@fishmonger.dont.mail.me.here.net>
+
+	* yahtzee.c: Add RegisterUndo() and ExecSingleUndo() allowing undo
+	of last round.  Cheater flag is activated and high scores will not
+	be saved.  Undo only available in gnome version.
+
+Sun Jun 28 19:08:55 1998  Scott D. Heavner  <sdh@po.cwru.edu>
+
+	* Summary:
+	1) Allow 0-6 humans to play, limit total players to 6
+	2) Fix scoring of multiple yahtzee's
+	3) Hack that adjusts column header to indicate current player
+	4) Comment call to gnome_message_box_new() until fixed in libs.
+
+	* gyahtzee.c (gnome_modify_dice): don't let player un/select dice
+	after game is over.
+	* (NextPlayer): Make computers keep playing after humans are done.
+	* (GyahtzeeNewGame): Allow 0 humans, when new game is started,
+	computers will play to end of game.
+	* (CheerWinner): Allow any one human to get a recordable high
+ 	score.  Should check all of the scores and see which are high, but
+ 	now, only check the high score.
+	* (play_score): Fix code for multiple yahtzees.  Now have to make
+ 	sure all computers are allowed extra turns, even if human is done.
+	* (HumansAreDone): Add new function to detect when only computers
+ 	are remaining.
+
+	* clist.c (select_row): don't let player select score row if game
+	over.  Use better #define's for row numbers we can't select.
+	Trouble for multiple players if they want to score in the row that
+	is already highlighted.
+	* (create_clist): Remove unused callbacks.
+	* (ShowoffPlayer): Rename Higlight and Unhiglight functions to
+ 	ShowoffPlayer.  Add some hacks that would be illegal under C++ to
+ 	mess with gtk internals to press buttons to indicate current
+ 	player.
+
+	* setup.c (do_setup): Only display player change warning if number
+	of players is changed.  Calling gnome_message_box_new() crashes my
+	machine with a segv.
+	* setup.c (MaxPlayersCheck): Synchronize num players/comp spinners
+	to never exceede max players.
+	* Add options for multiple humans.  High score is scored under the
+ 	login name of the user running gyahtzee.  It's hard to keep track
+ 	of who's up too, pay attention to "* -- you're up" in status box.
+
+	* cyahtzee.c: Add NLS support.
+
+
+Fri Jun 26 17:26:49 1998  Scott D. Heavner  <sdh@fishmonger.dont.mail.me.here.net>
+
+	* gyahtzee.c (main): Warned gnome_client_new_default is obsolet. 
+ 	Removed all refs to it, just rely on gnome_init() to do all the
+	work.
+
+	* gyahtzee.c/setup.c/clist.c: Update callback functions to return
+ 	gints.  I am still unsure about returning TRUE/FALSE.  I've
+ 	handled the events, so I should return TRUE but maybe some other
+ 	routine will handle button/menu cleanup if I return FALSE.
+	
+
+Fri Jun 26 14:42:22 1998  Scott D. Heavner  <sdh@po.cwru.edu>
+
+	* Makefile.am: Add cyahtzee back in as conditional build
+	* cyahtzee.c/h: update names of defines to match curses.m4
+
+1998-06-26  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (cyahtzee): Disable until Curses is properly
+	autoconfed. 
+	(Pixmap_DATA): Move to ...
+	* pix/Makefile.am: ... here.
+
+1998-06-25  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* setup.c (setup_game): Conditionally use new GtkSpinButton API.
+	Fixes Maciej's FIXME too.
+
+1998-06-25  Maciej Stachowiak  <maciej@roc-ny1-21.ix.netcom.com>
+
+	* setup.c (setup_game): FIXME: enums do _not_ result in the
+	members of the enumeration being #defined, at least on gcc, so the
+	`#ifdef GTK_UPDATE_SNAP_TO_TICKS' test is bogus.  Leaving only the
+	case that works on gtk+-1.0.4; is it worth supporting earlier
+	gtk's than that?
+
+Wed Jun 24 22:25:48 1998  Scott D. Heavner  <sdh@fishmonger.dont.mail.me.here.net>
+
+	* Commit to CVS.
+
+	* cyahtzee.c: Add color support.  gets->fgets.  Try to maintain
+	backward compatibilty with very old curses if NOCOLORCURSES defined.
+
+	* setup.c (setup_game): GTK_UPDATE_SNAP_TO_TICKS has dissapeared
+	in CVS - noticed & patch by Jaka Mocnik.  Should probably just
+	toss the old way, but leave for now in case anyone is using an old
+	snapshot.
+	
+
+Sun Jun 21 15:06:24 1998  Scott D. Heavner  <sdh@fishmonger.dont.mail.me.here.net>
+
+	* gyahtzee.c (ShowPlayer): Add bonus to upper total - that's where
+	zorst had it, but should it just go directly into grand total?
+
+	* Release version 980621a 
+        (980621 had probs w/Build script and missing config.h)
+
+	* add Build script - cleaner than makefile to determine gnome
+	setup on an unknown machine?
+
+	* computer.c:
+	  * remove be_computer()
+	  * Forgot to call RollSelectedDice() for each computer roll
+	  * Remove refs to global CurrentPlayer, each function should use
+	    value passed as parameter player
+
+	* gyahtzee.c / pix dir: update names inside xpm files to reflect
+	new names (gnome-dice-N.xpm), fix check for missing pixmap files -
+	will now use any pixmap files it finds, but fallback to compiled
+	in pixmaps.
+
+	* cyahtzee.c, cyahtzee.h: Add basic curses support - using zorst's
+ 	original version.  Will go back and add color hacks later.
+
+	* scores.c, scores.h: Curses version has own routines for dealing
+	with highscores.
+
+Thu Jun 18 12:53:32 1998  Scott D. Heavner  <sdh@fishmonger.dont.mail.me.here.net>
+
+	* gyahtzee.c (GyahtzeeCreateMainWindow): Put eventbox around
+	pixmaps which 1) makes it easier to select the X
+	pixmap, and 2) gets rid of the flicker on the menubar when we
+	unhide each pixmap for the first time.
+
+	* gyahtzee.c: add entries for keyboard accelerators 
+
+Wed Jun 17 23:00:00 1998  Scott D. Heavner  <sdh@fishmonger.dont.mail.me.here.net>
+
+	* Release version 980617
+	
+
+*Local Variables:
+*backup-inhibited: t
+*End:

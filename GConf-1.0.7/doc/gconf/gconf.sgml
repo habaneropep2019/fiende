@@ -1,0 +1,1389 @@
+<!DOCTYPE BOOK PUBLIC "-//Davenport//DTD DocBook V3.0//EN" [
+<!entity GConfClient SYSTEM "sgml/gconf-client.sgml">
+<!entity gconf-gconf-backend SYSTEM "sgml/gconf-backend.sgml">
+<!entity gconf-gconf-engine SYSTEM "sgml/gconf-engine.sgml">
+<!entity gconf-gconf-error SYSTEM "sgml/gconf-error.sgml">
+<!entity gconf-gconf-internals SYSTEM "sgml/gconf-internals.sgml">
+<!entity gconf-gconf-listeners SYSTEM "sgml/gconf-listeners.sgml">
+<!entity gconf-gconf-schema SYSTEM "sgml/gconf-schema.sgml">
+<!entity gconf-gconf-sources SYSTEM "sgml/gconf-sources.sgml">
+<!entity gconf-gconf-value SYSTEM "sgml/gconf-value.sgml">
+<!entity gconf-gconf SYSTEM "sgml/gconf.sgml">
+<!entity gconf-gconf-locale SYSTEM "sgml/gconf-locale.sgml">
+<!entity gconf-gconf-changeset SYSTEM "sgml/gconf-changeset.sgml">
+]>
+<book id="index">
+  <bookinfo>
+    <authorgroup>
+      <author>
+	<firstname>Havoc</firstname>
+	<surname>Pennington</surname>
+	<affiliation>
+	  <orgname>Red Hat Advanced Development Labs</orgname>
+	</affiliation>
+	<authorblurb>
+	  <para>
+	    <email>hp@redhat.com</email>
+	  </para>
+	</authorblurb>
+      </author>
+    </authorgroup>
+    <copyright>
+      <year>1999</year>
+      <holder>Havoc Pennington</holder>
+    </copyright>
+
+    <!-- GConf -->
+    <title>GConf Manual</title>
+    <abstract>
+      <para>
+        GConf is a system for storing configuration information, that is,
+        key-value pairs. GConf provides a notification service so applications
+        can be notified when a key's value is changed.  GConf also allows for
+        pluggable storage mechanisms (text files, databases, etc.); allows
+        administrators to install default values; and allows application authors
+        to document their configuration keys for the benefit of administrators.
+      </para>
+      
+    </abstract>
+
+
+    <legalnotice>
+      <para>
+	This document may be distributed subject to the terms and
+        conditions set forth in the Open Publication License, v1.0 or
+        later (the latest version is presently available at <ulink
+        url=" http://www.opencontent.org/openpub/"
+        type="http">http://www.opencontent.org/openpub/</ulink> )
+      </para>
+    </legalnotice>
+
+  </bookinfo>
+  
+  <!-- Introduction to GConf -->
+  <chapter>
+    <title>Introduction to GConf</title>
+
+    <para>
+      This chapter introduces GConf, including the basic terms and
+      concepts. After reading it, if you're a GNOME programmer looking
+      to dive in quickly, you might skip to <xref
+      linkend="gconfclient-example">. If you want to have
+      comprehensive knowledge of GConf, you might want to read the
+      whole manual.
+    </para>
+    
+    <!-- Motivation -->
+    <sect1>
+      <title>Motivation</title>
+      
+      <para>   
+        GConf is intended to store key-value pairs, where keys are
+        located in an infinite tree-structured namespace (similar to the
+        UNIX filesystem). It offers several useful features:
+        <itemizedlist mark="bullet">
+          <listitem>
+            <para>
+              Users can select a variety of data storage backends, such as XML
+              text files, ACAP, or databases (LDAP, DB, etc.). This makes it
+              easy to adapt GConf to local needs. It also avoids the age-old
+              "text files vs. binary registry" debate. (Note: the current GConf
+              only has an XML backend implemented, other backends are easy to
+              write though.)
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              GConf offers a notification service, so applications can 
+              ask to be notified when the value of a key changes. 
+              This allows settings to be applied to groups of
+              applications, without restarting them and without 
+              ugly hacks. It also allows a clean model-view
+              architecture for applications.              
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Each user has a "GConf search path" which is a list of 
+              configuration sources to scan for each value. 
+              For example, the configuration engine might look for 
+              values first in the local machine's database and 
+              then in a network-wide database.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              GConf is implemented as a per-user daemon, which makes 
+              locking a non-issue and allows aggressive caching.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The client API is simple and very abstract, which allows us to
+              change its implementation at a later time without a big headache.
+              Because a good implementation is a complex problem, this is
+              important.
+            </para>
+          </listitem>
+
+        </itemizedlist>
+      </para>
+
+      <para>
+        GConf was inspired by Wichert Akkerman's configuration system
+        specification, originally developed for the Debian project. See <ulink
+        url="http://www.debian.org/~wakkerma/config6"
+        type="http">http://www.debian.org/~wakkerma/config6</ulink> for his
+        specification. Other sources of ideas include the Windows registry, 
+        the ACAP specification, and Emacs customize mode (try typing
+        <literal>M-x customize-browse</literal> in Emacs).
+      </para>
+
+    </sect1>
+
+    <!-- Terms and Concepts -->
+    <sect1>
+      <title>Terms and Concepts</title>
+
+      <para>
+        This section introduces the basic GConf structure and terminology.
+      </para>
+
+      <sect2>
+        <title>Namespace</title>          
+        <para>
+          The GConf namespace is almost exactly like the UNIX filesystem; that
+          is, a tree structured directory hierarchy. Each name is either a
+          "file" (a configuration key storing a value) or a "directory" (a list
+          of child configuration key names). A name is specified with a
+          slash-separated path. A full path is referred to as a
+          <firstterm>key</firstterm>.  Characters in a path should be
+          alphanumeric or underscore. Path components may not start with a
+          period.
+        </para>
+      </sect2>
+
+      <!-- Data Types -->
+      <sect2>
+        <title>GConf Data Types</title>
+
+        <para>
+          GConf can only store a small, fixed set of data types. This keeps the
+          database implementation simple and efficient. GConf should
+          <emphasis>not</emphasis> be used to store data files or any other
+          large amount of information; <emphasis>it is designed for simple
+          configuration data only</emphasis>. There are any number of better
+          solutions available for storing documents and other large data
+          chunks. You might want to store a filename, URL, or Bonobo moniker in
+          GConf pointing to a larger piece of data, if you need the GConf
+          notification facilities.
+        </para>
+
+        <para>
+          Here are the GConf datatypes:
+          <variablelist>
+
+            <varlistentry>
+              <term>Integer</term>
+              <listitem><para>
+                  Integer values are simple C-style integers, that is, they are 
+                  limited to 32 bits and can be positive or negative.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>String</term> <listitem><para> String values can contain any
+              text you like, but not binary data (such as the NULL character).
+              GConf should handle any string the C library string functions can
+              handle.  </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Float</term> <listitem><para> Float values are floating
+                  point numbers.  Given differences between machine architectures
+                  and C libraries, there is no guaranteed degree of precision, other
+                  than "a reasonable degree."
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Bool</term> 
+              <listitem><para>
+                  Boolean values are true or false.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Schema</term>
+              <listitem><para>
+                  Schemas store a <structname>GConfSchema</structname> 
+                  data type, which contains meta-information about a key, such 
+                  as documentation and its type. 
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>List</term> 
+              <listitem><para> List values store a group of
+                  values. All values in a list must have the same primitive
+                  type. Heterogeneous lists are not allowed. Lists of lists and
+                  lists of pairs are not allowed.
+                </para></listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>Pair</term> 
+              <listitem><para> Pairs store two primitive
+                  values. The two values do not necessarily have the same
+                  type. Pairs can not contain pairs or lists, only primitive types.
+                </para></listitem>
+            </varlistentry>
+
+          </variablelist>
+        </para>
+
+      </sect2>
+      
+      <!-- Sources -->
+      <sect2>
+        <title>Configuration Sources</title>
+
+        <para> Users can specify <firstterm>configuration sources</firstterm>
+          which will be used by the <application>gconfd</application> per-user
+          configuration server.  <application>gconfd</application> loads the
+          file <filename>/etc/gconf/path</filename> (or
+          <filename>${sysconfdir}/gconf/path</filename>) on startup; this file
+          contains a list of <firstterm>configuration source
+          addresses</firstterm>.  A source address is similar to a URL; it
+          contains a "protocol" name (in this case, the name of the backend to
+          use), followed by a colon, standard flags separated by commands,
+          another colon, and then backend-specific information. For example, the
+          address <filename> xml:readonly:/home/hp/.gconf.xml</filename> refers
+          to an XML backend file tree rooted at
+          <filename>/home/hp/.gconf.xml</filename> that should be "mounted
+          readonly" so that no data is written to it.
+        </para>
+
+        <para>
+          <filename>/etc/gconf/path</filename> stores a list of
+          addresses, which form a <firstterm>configuration source
+          path</firstterm>. When looking up a value, GConf will begin
+          with the first source in the path, and continue checking
+          each source until the value is found or there are no more
+          sources.  When setting a value, GConf will use the first
+          <emphasis>writable</emphasis> source.  System
+          administrators can impose <emphasis>mandatory</emphasis>
+          settings on their users by placing a read-only source at the
+          front of the path (note that "mandatory" only means that
+          existing programs won't let them change the value, users
+          could hack their own copy of GConf that ignored system
+          settings). If a key has a value in a read-only source placed
+          before the first user-writable source, user applications
+          attempting to set that value will receive an error.
+          Administrators can provide <emphasis>default</emphasis>
+          values by placing a systemwide source at the end of the
+          configuration source path.
+        </para>
+        
+        <para>
+          The source configuration file can contain "include" statements and
+          some magic variables; you can use this to include a .gconf.path file
+          from the user's home directory. Variables are placed in
+          <symbol>$()</symbol>.  Two variables are built-in to GConf:
+          <symbol>$(HOME)</symbol> is the user's home directory, and
+          <symbol>$(USER)</symbol> is the username. You can also access any
+          environment variable by prepending <symbol>ENV_</symbol> to the
+          variable name. For example, <symbol>$(ENV_FOO)</symbol> will be
+          replaced by the <symbol>FOO</symbol> environment variable.
+        </para>
+
+        <para>
+          So once everything is working a
+          <filename>/etc/gconf/path</filename> file might look like
+          this:
+          <programlisting>
+            # GConf configuration path file with an include statement
+            xml:readonly:/etc/gconf.xml.mandatory
+            include "$(HOME)/.gconf.path"
+            xml:readonly:/etc/gconf.xml.defaults
+            # imaginary, no LDAP backend exists right now
+            ldap::/foo/bar/whatever/ldap/address
+          </programlisting>
+        </para>
+
+        <para>
+          Note that particular backend modules may have their own special
+          configuration. For example, you may need to configure the details of
+          an LDAP backend.
+        </para>
+
+      </sect2>
+
+      <!-- Schemas -->
+      <sect2 id="concepts-schemas">
+        <title>Schemas</title>
+
+        <para>
+          A <firstterm>schema</firstterm> describes some configuration
+          key. Its primary purpose is to provide documentation about
+          the key to system administrators manipulating the GConf
+          database. Secondarily, schemas contain a good default value
+          for the key; GConf will automatically return this value when
+          a key is unset. Schemas also include the name of the
+          application that created a key (useful when trying to clean
+          old junk out of the database, for example).
+        </para>
+
+        <para>
+          Schemas are normally installed from special schema
+          description files; the <application>gconftool</application>
+          program knows how to read these and install the schemas into
+          the GConf database. Normally, schemas are not installed by
+          application code, though the interface for doing so is a
+          public part of the GConf API.
+        </para>
+
+      </sect2>
+
+    </sect1>
+
+  </chapter>
+
+  <!-- Client Library -->
+  <chapter>
+    <title>C Language Client Library</title>
+    
+    <para>
+      The GConf client library is used by applications
+      to store or retrieve configuration data. This library presents 
+      the lowest-level (but still fairly convenient) mode of access
+      to the GConf database; the GConf database does not speak a
+      public protocol and can not be accessed directly. 
+    </para>
+
+    <para>
+      Convenience wrappers for the GConf client library are possible.
+      Right now a nice wrapper based on the GTK+ object system exists;
+      see <xref linkend="gtk-wrapper">.
+    </para>
+
+    <para>
+      Note that this is only a brief tutorial-style introduction to
+      the client library; have a look at <xref
+      linkend="gconf-reference"> for a complete reference.
+    </para>
+
+    <!-- Error Handling -->
+    <sect1>
+      <title>Error Handling</title>
+      
+      <para>
+        Error handling isn't exciting but it's unfortunately
+        necessary. Because even the initialization of the GConf
+        library can fail, we have to cover error handling first.
+      </para>
+
+      <para>
+        Errors are returned in a <structname>GError</structname> object.
+        <structname>GError</structname> has two public fields:
+        <structfield>str</structfield> is an error message, and
+        <structfield>num</structfield> is an <symbol>errno</symbol>-style
+        enumerated value with type <symbol>GConfError</symbol>, useful for
+        switching on an error and taking different actions depending on the
+        exact error that occurred.
+      </para>
+
+      <para>
+        GConf functions that potentially fail accept a
+        <symbol>GError**</symbol> argument, where they store a
+        <structname>GError</structname> object if the operation
+        fails. If no error occurs, the location pointed to by the
+        <symbol>GError**</symbol> is left unchanged. In all cases,
+        you can pass <symbol>NULL</symbol> as the
+        <symbol>GError**</symbol>, to ignore any errors.  Needless
+        to say, normally you should report errors instead of ignoring
+        them.
+      </para>
+
+      <para>
+        If an error is returned, you must free it with
+        <function>g_error_free()</function>:
+        <funcsynopsis>
+          <funcsynopsisinfo>#include &lt;gconf/gconf.h&gt;</funcsynopsisinfo>
+          <funcdef>void
+            <function>g_error_free</function>
+          </funcdef>
+          <paramdef>GError* <parameter>error</parameter></paramdef>          
+        </funcsynopsis>
+      </para>
+
+      <para>
+        Thus, a complete error-checking sequence might work like this:
+        <programlisting>
+          GError* err = NULL;
+
+          if (!gconf_init(&amp;err))
+            {
+              fprintf(stderr, _("Failed to init GConf: %s\n"), err->message);
+              g_error_free(err); 
+              err = NULL;
+            }
+        </programlisting>
+        Note that <function>gconf_init()</function> returns
+        <symbol>TRUE</symbol> on success and <symbol>FALSE</symbol> on failure,
+        other functions may have different ways of indicating
+        success/failure. Also note that the <symbol>err</symbol> variable is
+        initialized to <symbol>NULL</symbol>; this is
+        <emphasis>required</emphasis>.
+      </para>
+
+      <para>
+        Error checking is slightly inconvenient to use because we have to be
+        thread-safe; GConf originally had a system similar to
+        <symbol>errno</symbol>, but that doesn't work with threads.  GConf still
+        isn't thread-safe, but the API isn't inherently unsafe.
+      </para>
+
+      <para>
+        The available values for <symbol>GConfError</symbol> are:
+        <variablelist>
+          <varlistentry><term>GCONF_SUCCESS</term>
+            <listitem>
+              <para>
+                Indicates that there was no error.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_FAILED</term>
+            <listitem>
+              <para>
+                Indicates that the operation fatally failed for 
+                some fairly unpredictable and idiosyncratic reason
+                not covered by the more specific error values.
+                The error message will give details.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_NO_SERVER</term>
+            <listitem>
+              <para>
+                The <application>gconfd</application> configuration server
+                could not be contacted, and we couldn't or didn't
+                respawn it for whatever reason. The error message 
+                may give more details. This probably means either a
+                bug in <application>gconfd</application> or a hosed local
+                configuration.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_NO_PERMISSION</term>
+            <listitem>
+              <para>
+                User was denied permission to access some resource
+                at some point; perhaps a file in a file-based
+                configuration backend, perhaps some authentication 
+                tokens are wrong. The error message will give more details.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_BAD_ADDRESS</term>
+            <listitem>
+              <para>
+                A configuration source address was invalid.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_BAD_KEY</term>
+            <listitem>
+              <para>
+                A configuration key was invalid.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_PARSE_ERROR</term>
+            <listitem>
+              <para>
+                Something had to be parsed, and it couldn't
+                be. Typically, a string representation of a config 
+                value found in a config file or obtained from the 
+                user. Error message will often have more details.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_CORRUPT</term>
+            <listitem>
+              <para>
+                Typically means that the text files or binary database
+                used by some backend have gotten hosed. Most backends
+                will try to self-repair, within reason. If they can't
+                they will bail with this error.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_TYPE_MISMATCH</term>
+            <listitem>
+              <para>
+                Some routines in the GConf libraries impose type
+                constraints; if these are violated you get this error.
+                For example, <function>gconf_engine_get_int()</function>
+                returns this error if the value found is actually a 
+                string.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_IS_DIR</term>
+            <listitem>
+              <para>
+                This error is returned if you try to perform a key 
+                operation on a name that turns out to be a directory.
+                Some backends don't check for this error, they just 
+                report that the key isn't set...
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_IS_KEY</term>
+            <listitem>
+              <para>
+                This error is returned if you try to perform a
+                directory operation on a name that turns out to be 
+                a key. Some backends don't check for this error...
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry><term>GCONF_OVERRIDDEN</term>
+            <listitem>
+              <para>
+                This means that you tried to set a value, and a
+                read-only configuration source found before the first
+                user-writable source in the path has already set the
+                value. That is, setting the value would have no 
+                effect because the read-only source's setting would
+                override the new value. You should report to the user
+                that their setting will not take effect.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+
+      <para>
+        <function>gconf_error_new()</function> is used inside the
+        library and inside the library backends. It is typically not
+        useful to clients. It simply creates a new error, from a
+        <symbol>GConfError</symbol> and a
+        <function>printf()</function>-style format and variable
+        argument list.
+        <funcsynopsis>
+          <funcsynopsisinfo>#include &lt;gconf/gconf.h&gt;</funcsynopsisinfo>
+          <funcdef>void
+            <function>gconf_error_new</function>
+          </funcdef>
+          <paramdef>GConfError <parameter>en</parameter></paramdef>
+          <paramdef>const gchar*
+          <parameter>format</parameter></paramdef>
+          <paramdef><parameter>...</parameter></paramdef>
+        </funcsynopsis>
+      </para>
+
+    </sect1>
+
+
+    <!-- Initialization -->
+    <sect1>
+      <title>Initialization</title>
+      
+      <para>
+        The GConf client library must be initialized before use.
+        Initialization establishes a connection to the ORB (because
+        CORBA is currently used to implement GConf, though clients
+        never have to see this) and sets up some global data
+        structures. The arguments to <function>gconf_init()</function>
+        are an argc/argv pair to check for CORBA-related command line
+        options, and a location to place any error that
+        occurs. <function>gconf_init()</function> returns
+        <symbol>TRUE</symbol> on success.
+      </para>
+
+      <para>
+        You can check whether GConf is initialized with
+        <function>gconf_initialized()</function>.
+      </para>
+
+    </sect1>
+
+    <!-- GConfEngine object -->
+    <sect1>
+      <title>The <structname>GConfEngine</structname> object</title>
+      <para>
+        A <structname>GConfEngine</structname> object represents your
+        connection to a configuration database. Normally the database
+        you're connecting to is the user's default database, defined
+        by all the sources in their configuration source
+        path. <function>gconf_engine_get_default()</function> returns a handle to
+        this default
+        database. <function>gconf_engine_get_default_with_address()</function>
+        returns a handle to a single configuration source; normally,
+        applications will not use this function&mdash;it's intended
+        for system configuration tools and the like.        
+      </para>
+
+      <note>
+      <para>
+        In a GNOME context, you should use
+        <structname>GConfClient</structname> instead of
+        <structname>GConfEngine</structname>.
+      </para>
+      </note>
+
+      <para>
+        <funcsynopsis>
+          <funcsynopsisinfo>#include &lt;gconf/gconf.h&gt;</funcsynopsisinfo>
+          <funcdef>GConfEngine*
+            <function>gconf_engine_get_default</function>
+          </funcdef>
+          <void>
+        </funcsynopsis>        
+        <funcsynopsis>
+          <funcsynopsisinfo>#include &lt;gconf/gconf.h&gt;</funcsynopsisinfo>
+          <funcdef>GConfEngine*
+            <function>gconf_engine_get_default_with_address</function>
+          </funcdef>
+          <paramdef>const gchar* <parameter>address</parameter></paramdef>
+        </funcsynopsis>
+      </para>
+
+      <para>
+        The <structname>GConfEngine</structname> object is reference
+        counted; it begins with a count of 1, and is destroyed when
+        the count reaches 0. In other words, the creator of the
+        <structname>GConfEngine</structname> "owns" a reference to the 
+        <structname>GConfEngine</structname> as soon as it's created, and
+        should call <function>gconf_engine_unref()</function> to make it 
+        go away. <function>gconf_engine_ref()</function> creates a new
+        reference to the <structname>GConfEngine</structname>.
+        <funcsynopsis>
+          <funcsynopsisinfo>#include &lt;gconf/gconf.h&gt;</funcsynopsisinfo>
+          <funcdef>void
+            <function>gconf_engine_ref</function>
+          </funcdef>
+          <paramdef>GConfEngine* <parameter>conf</parameter></paramdef>
+        </funcsynopsis>
+
+        <funcsynopsis>
+          <funcsynopsisinfo>#include &lt;gconf/gconf.h&gt;</funcsynopsisinfo>
+          <funcdef>void
+            <function>gconf_engine_unref</function>
+          </funcdef>
+          <paramdef>GConfEngine* <parameter>conf</parameter></paramdef>
+        </funcsynopsis>
+      </para>
+
+    </sect1>
+
+    <!-- GConfValue -->
+    <sect1>
+      <title>The <structname>GConfValue</structname> Datatype</title>
+      
+      <para>
+        The <structname>GConfValue</structname> struct represents 
+        a value that can be obtained from or stored in the
+        configuration database. It is simply a type marker 
+        and a union of several value types, with constructor,
+        destructor, "setter" and "getter" functions. When possible 
+        the GConf library allows you to deal with simple C types
+        instead of a <structname>GConfValue</structname>, but 
+        sometimes there is simply no way to know the type of an 
+        object in advance. The <filename>libgnome/gnome-config.h</filename>
+        interface simply returns strings in this case, for the
+        programmer to parse manually; this was phenomenally broken and
+        GConf fixes it with <structname>GConfValue</structname>.        
+      </para>
+
+      <sect2>
+        <title>Accessing <structname>GConfValue</structname></title>
+        <para>
+          To read a <structname>GConfValue</structname>, you first 
+          determine its type and then read the value using one 
+          of its accessor macros. The following useless code should 
+          demonstrate this:
+          <programlisting>            
+void
+print_value(GConfValue* value)
+{    
+  switch (value->type)
+    {
+    case GCONF_VALUE_STRING:
+      printf("%s\n", gconf_value_get_string(value));
+      break;
+    case GCONF_VALUE_INT:
+      printf("%d\n", gconf_value_get_int(value));
+      break;
+    case GCONF_VALUE_FLOAT:
+      printf("%g\n", gconf_value_get_float(value));
+      break;
+    case GCONF_VALUE_BOOL:
+      printf("%s", gconf_value_get_bool(value) ? "true" : "false");
+      break;
+    case GCONF_VALUE_SCHEMA:
+      {
+        GConfSchema* schema = gconf_value_get_schema(value);
+
+        /* printing a schema would be complicated, you get the idea */
+      }
+      break;
+    case GCONF_VALUE_LIST:
+      {
+        GSList* iter = gconf_value_get_list(value);
+
+        while (iter != NULL)
+          {
+            GConfValue* element = iter->data;
+            
+            print_value(element);
+            
+            iter = g_slist_next(iter);
+          }
+      }
+      break;
+    case GCONF_VALUE_PAIR:
+      print_value(gconf_value_get_car(value));
+      print_value(gconf_value_get_cdr(value));
+      break;
+    case GCONF_VALUE_INVALID:
+      /* This is used internally by GConf, you can also
+         use it yourself to indicate errors and such. It
+         won't be returned from GConf functions though. */
+      printf("invalid value");
+      break;
+      
+    default:
+      g_assert_not_reached();
+      break;
+    }
+}
+          </programlisting>
+        </para>
+
+        <para>
+          A special note about values of type <symbol>GCONF_VALUE_LIST</symbol>:
+          the list contains <structname>GConfValue</structname> objects, and all
+          objects in the list must have the same type. You can get the type of
+          the list with the <function>gconf_value_get_list_type()</function> macro.
+        </para>
+
+      </sect2>
+
+      <sect2>
+        <title>Creating/destroying a <structname>GConfValue</structname></title>
+        <para>
+          Often you obtain a <structname>GConfValue</structname> from 
+          a GConf routine such as <function>gconf_engine_get ()</function>,
+          but you can also create them yourself with
+          <function>gconf_value_new()</function>.
+          <function>gconf_value_new()</function> takes a single
+          argument, the type of the newly-created value. Value types
+          can't be changed after creating the value.
+          <funcsynopsis>
+            <funcsynopsisinfo>#include &lt;gconf/gconf-value.h&gt;</funcsynopsisinfo>
+            <funcdef>GConfValue*
+              <function>gconf_value_new</function>
+            </funcdef>
+            <paramdef>GConfValueType <parameter>type</parameter></paramdef>
+          </funcsynopsis>
+          Note that <filename>gconf/gconf-value.h</filename> is
+          automatically included by <filename>gconf/gconf.h</filename>.          
+        </para>
+
+        <warning><title>You must initialize your values</title>
+          <para>
+            Newly-constructed values are invalid; if you use the accessor macros
+            before you set the contents of the value, the results are
+            undefined. Use <function>gconf_value_set_int()</function>,
+            <function>gconf_value_set_string()</function>, and so on to
+            initialize the value.
+          </para>
+        </warning>
+
+        <para>
+          You can destroy a <structname>GConfValue</structname> with 
+          <function>gconf_value_free()</function>, and copy one
+          with <function>gconf_value_copy()</function>. The copy is a
+          deep copy, that is, child values contained in lists or 
+          pairs are also copied.
+          <funcsynopsis>
+            <funcsynopsisinfo>#include &lt;gconf/gconf-value.h&gt;</funcsynopsisinfo>
+            <funcdef>GConfValue*
+              <function>gconf_value_copy</function>
+            </funcdef>
+            <paramdef>GConfValue* <parameter>src</parameter></paramdef>
+            <funcdef>void
+              <function>gconf_value_free</function>
+            </funcdef>
+            <paramdef>GConfValue* <parameter>value</parameter></paramdef>
+          </funcsynopsis>
+        </para>
+      </sect2>
+
+    </sect1>
+
+    <!-- Reading configuration values -->
+    <sect1>
+      <title>Reading/Writing Configuration Values</title>
+
+      <sect2>
+        <title>Reading</title>
+        <para>
+          The "raw" function for obtaining the value stored at a given key in the
+          configuration database is <function>gconf_engine_get ()</function>.
+          <function>gconf_engine_get ()</function> returns a
+          <structname>GConfValue</structname> if the key was set, or
+          <symbol>NULL</symbol> if the key was unset or an error occurred. If an
+          error occurred a <structname>GError</structname> is returned in the
+          location given as the final argument.
+        </para>
+        
+        <para>
+          There are also convenience functions that automatically convert
+          <structname>GConfValue</structname> to primitive C types. These include
+          <function>gconf_engine_get_int()</function>,
+          <function>gconf_engine_get_bool()</function>, and so on.
+        </para>
+
+      </sect2>
+
+      <sect2>
+        <title>Writing</title>
+        <para>
+          
+        </para>
+      </sect2>
+
+    </sect1>
+  </chapter>
+
+  <!-- GTK Object wrapper -->
+  <chapter id="gtk-wrapper">
+    <title><structname>GtkObject</structname> Convenience Wrapper</title>
+    
+    <para>
+      <structname>GConfClient</structname> is a
+      <structname>GtkObject</structname> subclass that replaces
+      <structname>GConfEngine</structname> in GNOME programs.
+    </para>
+
+    <sect1 id="gconfclient-example">
+      <title>A Complete Example</title>
+      
+      <para>
+
+      </para>
+      
+
+    </sect1>
+
+  </chapter>
+
+  <chapter id="conventions">
+    <title>GConf Conventions</title>
+
+    <para>
+      This chapter describes <emphasis>conventions</emphasis> that
+      GConf clients should obey, though the library does not enforce
+      them.
+    </para>
+
+    <sect1>
+      <title>Namespace division</title>
+
+      <para>
+        When choosing GConf keys, you should follow these conventions.
+      </para>
+
+      <para>
+        <itemizedlist mark="bullet">
+
+          <listitem>
+            <para>
+              Schemas should go under the <literal>/schemas</literal>
+              toplevel directory. Under <literal>/schemas</literal>,
+              the normal GConf namespace should be mirrored. So, if you have a
+              key <literal>/foo/bar/baz</literal>, the schema for that key should
+              be at <literal>/schemas/foo/bar/baz</literal>. If you apply the same
+              schema to multiple keys, then obviously the schema name will have
+              to differ from the key names; but you should mirror as much of the
+              key names as possible. For example, <literal>/foo/bar/baz</literal>
+              and <literal>/foo/bar/boo</literal> might have the schema
+              <literal>/schemas/foo/bar/baz_and_boo</literal>.
+            </para>
+          </listitem>
+
+
+          <listitem>
+            <para>
+              The GNOME libraries may store preferences for GNOME apps
+              under the
+              <literal>/apps/gnome-settings/<replaceable>appname</replaceable></literal>
+              directory.
+              <literal><replaceable>appname</replaceable></literal> will be
+              replaced with the name of your app, as passed in to
+              <function>gnome_init()</function> (perhaps canonicalized to be a
+              legal GConf key). You should not put your own
+              settings in this directory, because you may get notifications when
+              gnome-libs keys change and gnome-libs may get notifications when
+              your keys change. This would be confusing.
+            </para>
+          </listitem>
+
+          <listitem>
+            <para>
+              Preferences for applications should go under an
+              <literal>/apps/<replaceable>appname</replaceable></literal>
+              directory. Try to make
+              <literal><replaceable>appname</replaceable></literal> match the
+              one passed to <function>gnome_init()</function>, also used in the
+              <literal>/apps/gnome-settings/<replaceable>appname</replaceable></literal>
+              directory.  Vendors are encouraged to include their vendor name in
+              <replaceable>appname</replaceable>, to avoid namespace clashes.
+            </para>
+          </listitem>
+
+          <listitem>
+            <para>
+              Preferences for the desktop environment should go under
+              <literal>/desktop</literal>. None should be immediately
+              under <literal>/desktop</literal>, however. GNOME-specific
+              preferences should be under <literal>/desktop/gnome</literal>.
+              Settings standardized among multiple desktops should go under
+              <literal>/desktop/standard</literal>. Other specific desktops should
+              select a directory to use (<literal>/desktop/kde</literal>,
+              <literal>/desktop/xfce</literal>, etc.)
+            </para>
+          </listitem>
+
+          <listitem>
+            <para>
+              System-level preferences (such as the host name, though
+              I'm sure that specific example will never be in GConf) should go
+              under <literal>/system</literal>. None should be
+              immediately under <literal>/system</literal>, however; select a
+              descriptive subdirectory.
+            </para>
+          </listitem>
+
+          <listitem>
+            <para>
+              In general, keys under <literal>/system</literal> and
+              <literal>/desktop</literal> are for use by multiple applications,
+              and keys under
+              <literal>/apps/<replaceable>appname</replaceable></literal> are
+              for use by a single application.
+            </para>
+          </listitem>
+
+          <listitem>
+            <para>
+              If you have a "weird" key that doesn't fit into any of the above
+              categories, please mail me (<email>hp@redhat.com</email>) and ask
+              for a new directory to be invented. Alternatively, place your key
+              under the <literal>/extra</literal> toplevel directory.
+            </para>
+          </listitem>
+
+        </itemizedlist>
+      </para>
+
+    </sect1>
+
+  </chapter>
+
+  <!-- gconftool -->
+  <chapter id="gconftool">
+    <title><application>gconftool</application> Utility Program</title>
+
+    <para>
+      <application>gconftool</application> is used to control GConf
+      from the command line. 
+    </para>
+
+  </chapter>
+
+  <!-- Schema Files -->
+  <chapter>
+    <title>Schema Files</title>
+
+    <para>
+      This chapter covers the mechanics of writing and installing the
+      GConf schema files. Schema files describe your configuration
+      data and provide default values for it. See <xref
+      linkend="concepts-schemas"> for an explanation of schemas.  The
+      schema file is not understood by the GConf client library;
+      rather, <application>gconftool</application> (see <xref
+      linkend="gconftool">) knows how to parse it, and then uses the GConf
+      client library to install the information in the GConf database.
+    </para>
+
+    <sect1>
+      <title>Schema File Format</title>
+      <para>
+        Here is a sample schema file for a hypothetical application, 
+        <application>basic-gconf-app</application>, one of the
+        examples that comes with the GConf distribution.
+        <example>
+          <title>Sample schema file</title>
+          <programlisting>
+&lt;gconfschemafile&gt;
+    &lt;schemalist&gt;
+      &lt;schema&gt;
+      &lt;key&gt;/schemas/apps/basic-gconf-app/fooandbar&lt;/key&gt;
+      &lt;applyto&gt;/apps/basic-gconf-app/foo&lt;/applyto&gt;
+        &lt;applyto&gt;/apps/basic-gconf-app/bar&lt;/applyto&gt;
+      &lt;owner&gt;basic-gconf-app&lt;/owner&gt;
+      &lt;type&gt;string&lt;/type&gt;
+      &lt;locale name="C"&gt;
+        &lt;default&gt;Blah blah blurgh&lt;/default&gt;
+        &lt;short&gt;short description in C locale&lt;/short&gt;
+        &lt;long&gt;long description of foo and bar in C locale&lt;/long&gt;
+      &lt;/locale&gt;
+      &lt;locale name="no"&gt;
+        &lt;default&gt;some thing in norwegian&lt;/default&gt;
+        &lt;short&gt;short description in Norway&lt;/short&gt;
+        &lt;long&gt;Long description in Norway. long long long. this is a long sentence.&lt;/long&gt;
+      &lt;/locale&gt;
+    &lt;/schema&gt;
+      &lt;schema&gt;
+      &lt;key&gt;/schemas/apps/basic-gconf-app/baz&lt;/key&gt;
+      &lt;applyto&gt;/apps/basic-gconf-app/baz&lt;/applyto&gt;
+      &lt;owner&gt;basic-gconf-app&lt;/owner&gt;
+      &lt;type&gt;string&lt;/type&gt;
+      &lt;locale name="C"&gt;
+        &lt;default&gt;Zzzzzzzzzz&lt;/default&gt;
+        &lt;short&gt;short description in C locale&lt;/short&gt;
+        &lt;long&gt;long description of baz in C locale&lt;/long&gt;
+      &lt;/locale&gt;
+      &lt;locale name="no"&gt;
+        &lt;default&gt;some thing in norwegian&lt;/default&gt;
+        &lt;short&gt;short description in Norway&lt;/short&gt;
+        &lt;long&gt;Long description in Norway. long long long. this is a long sentence.&lt;/long&gt;
+      &lt;/locale&gt;
+    &lt;/schema&gt;
+      &lt;schema&gt;
+      &lt;key&gt;/schemas/apps/basic-gconf-app/blah&lt;/key&gt;
+      &lt;applyto&gt;/apps/basic-gconf-app/blah&lt;/applyto&gt;
+      &lt;owner&gt;basic-gconf-app&lt;/owner&gt;
+      &lt;type&gt;string&lt;/type&gt;
+      &lt;locale name="C"&gt;
+        &lt;default&gt;bllllllaaaaaaaaaaaaaaaaarrrrrrggggggghhhhh&lt;/default&gt;
+        &lt;short&gt;short description in C locale&lt;/short&gt;
+        &lt;long&gt;long description of blah in C locale&lt;/long&gt;
+      &lt;/locale&gt;
+      &lt;locale name="no"&gt;
+        &lt;default&gt;some thing in norwegian&lt;/default&gt;
+        &lt;short&gt;short description in Norway&lt;/short&gt;
+        &lt;long&gt;Long description in Norway. long long long. this is a long sentence.&lt;/long&gt;
+      &lt;/locale&gt;
+    &lt;/schema&gt;
+  &lt;/schemalist&gt;  
+&lt;/gconfschemafile&gt;
+          </programlisting>
+        </example>
+      </para>
+      
+      <para>
+        The file format is straightforward. The root node must be
+        called <literal>&lt;gconfschemafile&gt;</literal>. This
+        element contains one or more <literal>&lt;schemalist&gt;</literal>
+        elements; I can't think of a reason to use multiple
+        <literal>&lt;schemalist&gt;</literal> elements, but you can if 
+        you want, and <application>gconftool</application> will load
+        each one. The <literal>&lt;schemalist&gt;</literal> in turn 
+        contains one or more <literal>&lt;schema&gt;</literal>
+        elements. Each of these describes a single schema.        
+      </para>
+
+      <warning>
+        <para>
+          <application>gconftool</application> is not very tolerant
+          about whitespace right now; in particular it won't strip
+          whitespace from around key names, type names, etc. This is
+          broken and will be fixed, just watch out for now.
+        </para>
+      </warning>
+
+      <para>
+        Here are the fields of the <literal>&lt;schema&gt;</literal>
+        element:
+
+<informaltable pgwide=1 frame="none">
+<tgroup cols="2"><colspec colwidth="2*"><colspec colwidth="8*">
+<tbody>
+
+<row>
+<entry>&lt;key&gt;</entry>
+<entry>The key <emphasis>where the schema will be stored</emphasis>;
+                  see <xref linkend="conventions"> for naming
+                  conventions. There may be only one key per schema.
+</entry>
+
+</row>
+
+<row>
+<entry>&lt;applyto&gt;</entry>
+
+<entry>A key <emphasis>the schema will be applied to</emphasis>; that
+                  is, this schema <emphasis>describes</emphasis> this
+                  key.  See <xref linkend="conventions"> for naming
+                  conventions. There may be multiple &lt;applyto&gt;
+                  elements.</entry>
+
+</row>
+
+<row>
+<entry>&lt;owner&gt;</entry>
+
+<entry>Name of the application that uses this schema; may be the
+                  command line name, or a human-readable name. However
+                  you should use the same value for &lt;owner&gt; for
+                  all schemas your app installs. The primary purpose
+                  of this field is to enable sysadmins to locate the
+                  keys belonging to a given application.                  
+                </entry>
+
+</row>
+
+<row>
+<entry>&lt;type&gt;</entry>
+
+<entry>The type of values described by this schema. i.e. keys 
+the schema is applied to should store values of this type.
+Allowed values are: <literal>string</literal>, <literal>int</literal>,
+<literal>bool</literal>, <literal>float</literal>,
+                  <literal>list</literal>, <literal>pair</literal>
+                </entry>
+
+</row>
+
+<row>
+<entry>&lt;default&gt;</entry>
+
+<entry>The <literal>&lt;default&gt;</literal> element may 
+appear below <literal>&lt;schema&gt;</literal> (a default for all
+                  locales, often suitable for numeric values), 
+<emphasis>OR</emphasis> below a <literal>&lt;locale&gt;</literal>
+element, if the default should be localized. It simply contains the
+                  default value for the keys the schema is applied to.
+                  
+                </entry>
+
+</row>
+
+
+<row>
+<entry>&lt;locale&gt;</entry>
+
+                <entry>
+                  The <literal>&lt;locale&gt;</literal> element 
+                  contains locale-specific data, including the
+                  human-readable short and long descriptions, 
+                  and optionally the default value
+                  (<literal>&lt;default&gt;</literal> may also be
+                  placed directly underneath the
+                  <literal>&lt;schema&gt;</literal> element).
+                  There should be one
+                  <literal>&lt;locale&gt;</literal> element for each
+                  locale, with a <literal>name</literal> attribute 
+                  specifying the locale name.
+                </entry>
+
+</row>
+
+
+</tbody></tgroup></informaltable>        
+
+        A <literal>&lt;locale&gt;</literal> element can contain 
+a locale-specific <literal>&lt;default&gt;</literal>, and may also 
+contain short and long descriptions as follows:
+<informaltable pgwide=1 frame="none">
+<tgroup cols="2"><colspec colwidth="2*"><colspec colwidth="8*">
+<tbody>
+
+<row>
+<entry>&lt;short&gt;</entry>
+<entry>A short description of the purpose of this key, around 
+40 characters long (about half a line).
+</entry>
+
+</row>
+
+<row>
+<entry>&lt;long&gt;</entry>
+<entry>A long description of the configuration key, around a paragraph
+                  or two. Should describe the possible values of the 
+key and their effect on the application.
+</entry>
+
+</row>
+
+</tbody></tgroup></informaltable> 
+
+      </para>
+
+    </sect1>
+
+    <sect1>
+      <title>Installing Schemas</title>
+
+      <para>
+        There are several things that need to happen at "<literal>make
+        install</literal>" time. 
+        <itemizedlist mark="bullet">
+          <listitem>
+            <para>
+              The schemas should be installed into a GConf
+              configuration source; either the default source, or a
+              source specified by the user with a
+              <filename>configure</filename> option called
+              <literal>--enable-gconf-source</literal>. 
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The schema files should be installed to
+              <filename>$(sysconfdir)/gconf/schemas/</filename>,
+              making it easy for sysadmins to browse them or 
+              bulk-reinstall them into a new configuration source.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </para>
+
+      <para>
+	The <symbol>AM_GCONF_SOURCE</symbol> 
+	macro will get the default location to install
+	the schema. It will also add a 
+	<literal>--enable-gconf-source</literal>
+	option and it will look in 
+	<filename>$(sysconfdir)/gconf/schema-install-source</filename> 
+	for a path.
+	The <symbol>GCONF_SCHEMA_CONFIG_SOURCE</symbol> variable 
+	will be defined.
+      </para>
+      <para>
+	To get schemas installed properly add the macro to 
+	<filename>configure.in</filename>
+	<programlisting>
+	  AM_GCONF_SOURCE
+	</programlisting>  
+      </para>
+      <para>
+	And put something like this in <filename>Makefile.am</filename>
+	<programlisting>
+	  install-schemas:
+	      GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) \
+	      gconftool --makefile-install-rule my.schemas
+	</programlisting>
+      </para>
+    </sect1>
+
+    <sect1> 
+      <title>Schema File DTD</title>
+      
+      <para>
+        The following DTD was contributed by Mirko Streckenbach.
+      </para>
+
+      <para>
+        <programlisting>
+&lt;!ELEMENT gconfschemafile (schemalist)&gt;
+
+&lt;!ELEMENT schemalist (schema)*&gt;
+
+&lt;!ELEMENT schema  (key,applyto*,owner?,type,locale*)&gt;
+
+&lt;!ELEMENT key     (#PCDATA)&gt;
+
+&lt;!ELEMENT applyto (#PCDATA)&gt;
+
+&lt;!ELEMENT owner   (#PCDATA)&gt;
+
+&lt;!ELEMENT type    (#PCDATA)&gt;
+
+&lt;!ELEMENT locale  (default?,short?,long?)&gt;
+&lt;!ATTLIST locale  name CDATA #REQUIRED&gt;
+
+&lt;!ELEMENT short   (#PCDATA)&gt;
+&lt;!ELEMENT long    (#PCDATA)&gt;
+&lt;!ELEMENT default (#PCDATA)&gt;
+        </programlisting>
+      </para>   
+    </sect1>
+
+  </chapter>
+
+  <!-- Checklist/Summary -->
+  <chapter>
+    <title>Checklist/Summary</title>
+
+    <para>
+      This chapter summarizes the things to consider and actions to 
+      take when adding GConf support to an application.
+    </para>
+
+    <para>
+      
+    </para>
+
+  </chapter>
+
+  <!-- GConf reference -->
+  <chapter id="gconf-reference">
+    <title>GConf Reference Documentation</title>
+
+    &gconf-gconf-engine;
+    &gconf-gconf;
+    &gconf-gconf-error;
+    &gconf-gconf-value;
+    &gconf-gconf-schema;
+    &gconf-gconf-changeset;
+
+  </chapter>
+
+  <!-- GConfClient reference -->
+  <chapter id="gconf-client-reference">
+    <title><structname>GtkObject</structname> Wrapper Reference (<structname>GConfClient</structname>)</title>
+
+    &GConfClient;
+
+  </chapter>
+
+  <!-- GConf Internals Reference -->
+  <chapter id="gconf-internals-reference">
+    <title>GConf Internal Reference</title>
+
+    &gconf-gconf-backend;
+    &gconf-gconf-internals;
+    &gconf-gconf-listeners;
+    &gconf-gconf-locale;
+    &gconf-gconf-sources;
+    
+  </chapter>
+
+</book>
+<!-- Keep this comment at the end of the file
+Local variables:
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+sgml-auto-insert-required-elements:t
+sgml-balanced-tag-edit:t
+sgml-normalize-trims:t
+sgml-set-face:t
+sgml-parent-document:nil
+End:
+-->
+

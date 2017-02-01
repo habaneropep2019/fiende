@@ -1,0 +1,161 @@
+/* $Id: scale.gen_h,v 1.46 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* scale.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/range.h>
+#include <gtk/gtkscale.h>
+#include <gtk/gtkhscale.h>
+#include <gtk/gtkvscale.h>
+
+CLASS_START(Gtk);
+//: A base class for GtkHScale and GtkVScale.
+//- The {\class Gtk::Scale} widget is an abstract class, used only for deriving the subclasses {Gtk::HScale::} and {Gtk::VScale::}.
+class Scale : public Range {
+  WRAP_CLASS(Scale,GtkScale,GTK_SCALE,GTK_IS_SCALE,scale,Gtk::Range,GtkRange,GTK_RANGE);
+public:
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  gint get_digits () const;
+  //: Sets the number of decimal places that are displayed in the value.
+  //- {\var digits}: The number of decimal places to display, e.g. use 1 to display 1.0, 2 to display 1.00 etc. 
+  WRAP_METHOD(void gtk_scale_set_digits(GtkScale*, gint),
+	      void set_digits(gint digits));
+
+  //: Specifies whether the current value is displayed as a string next to the slider.
+  WRAP_METHOD(void gtk_scale_set_draw_value(GtkScale*, gint),
+	      void set_draw_value(gint draw_value));
+
+  //: Sets the position in which the current value is displayed.
+  //- {\var pos}: The position in which the current value is displayed. Possible values are:
+  //- {\enum GTK_POS_LEFT}, {\enum GTK_POS_RIGHT}, {\enum GTK_POS_TOP}, or
+  //- {\enum GTK_POS_BOTTOM}.
+  WRAP_METHOD(void gtk_scale_set_value_pos(GtkScale*, GtkPositionType),
+	      void set_value_pos(GtkPositionType pos));
+
+  //: An internal function used to get the maximum width needed to display the value string.
+  //- {\var Returns}: The maximum width needed to display the value string.
+  WRAP_METHOD(gint gtk_scale_get_value_width(GtkScale*),
+	      gint get_value_width() const);
+
+  SIGNAL_SPEC("draw_value",both,void draw_value(),gtk_scale_draw_value);
+protected:
+  WRAP_CTOR_DEFAULT;
+};
+
+//: A vertical slider widget for selecting a value from a range.
+//- The {\class Gtk::VScale} widget is used to allow the user to select a value
+//- using a horizontal slider. A {Gtk::Adjustment::} is used to set the
+//- initial value, the lower and upper bounds, and the step and page increments.
+//-
+//- The position to show the current value, and the number of decimal places shown can be
+//- set using the parent {Gtk::Scale::} class's functions.
+class VScale : public Scale {
+  WRAP_CLASS(VScale,GtkVScale,GTK_VSCALE,GTK_IS_VSCALE,vscale,Gtk::Scale,GtkScale,GTK_SCALE);
+public:
+  explicit VScale(Adjustment &adjustment);
+  VScale();
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+};
+
+
+//: A horizontal slider widget for selecting a value from a range.
+//- The {\class Gtk::HScale} widget is used to allow the user to select a value
+//- using a horizontal slider. A {Gtk::Adjustment::} is used to set the
+//- initial value, the lower and upper bounds, and the step and page increments.
+//-
+//- The position to show the current value, and the number of decimal places shown can be
+//- set using the parent {Gtk::Scale::} class's functions.
+class HScale : public Scale {
+  WRAP_CLASS(HScale,GtkHScale,GTK_HSCALE,GTK_IS_HSCALE,hscale,Gtk::Scale,GtkScale,GTK_SCALE);
+public:
+  explicit HScale(Adjustment &adjustment);
+  HScale();
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+};
+
+PRIVATE_START;
+#include <gtk--/private/range_p.h>
+IMPL_START;
+#include <gtk--/adjustment.h>
+namespace Gtk
+{
+
+// other things from range have their own get_digits
+gint Scale::get_digits () const
+{
+  return Range::gtkobj()->digits;
+}
+
+VScale::VScale(Adjustment &adjustment)
+  : Scale((GtkScale*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_adjustment(adjustment);
+}
+
+VScale::VScale()
+  : Scale((GtkScale*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  Adjustment *adjustment = manage(new Adjustment(0.0, 0.0, 0.0,
+						  0.0, 0.0, 0.0));
+  // The adjustment will be destroyed along with the object
+  set_adjustment(*adjustment);
+}
+
+
+HScale::HScale()
+  : Scale((GtkScale*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  Adjustment *adjustment = manage(new Adjustment(0.0, 0.0, 0.0,
+						  0.0, 0.0, 0.0));
+  // The adjustment will be destroyed along with the object
+  set_adjustment(*adjustment);
+}
+
+HScale::HScale(Adjustment &adjustment)
+  : Scale((GtkScale*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_adjustment(adjustment);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Scale)
+//. name: draw_value
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: value_pos
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+

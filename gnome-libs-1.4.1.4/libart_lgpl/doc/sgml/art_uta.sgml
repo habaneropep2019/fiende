@@ -1,0 +1,306 @@
+<refentry id="libart-Micro-Tile-Array">
+<refmeta>
+<refentrytitle>Micro Tile Array</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBART Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Micro Tile Array</refname><refpurpose></refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="ArtUtaBbox">ArtUtaBbox</link>;
+struct      <link linkend="ArtUta">ArtUta</link>;
+<link linkend="ArtUta">ArtUta</link>*     <link linkend="art-uta-from-vpath">art_uta_from_vpath</link>              (const <link linkend="ArtVpath">ArtVpath</link> *vec);
+<link linkend="ArtUta">ArtUta</link>*     <link linkend="art-uta-from-svp">art_uta_from_svp</link>                (const <link linkend="ArtSVP">ArtSVP</link> *svp);
+<link linkend="ArtUta">ArtUta</link>*     <link linkend="art-uta-from-irect">art_uta_from_irect</link>              (<link linkend="ArtIRect">ArtIRect</link> *bbox);
+void        <link linkend="art-uta-add-line">art_uta_add_line</link>                (<link linkend="ArtUta">ArtUta</link> *uta,
+                                             <link linkend="double">double</link> x0,
+                                             <link linkend="double">double</link> y0,
+                                             <link linkend="double">double</link> x1,
+                                             <link linkend="double">double</link> y1,
+                                             int *rbuf,
+                                             int rbuf_rowstride);
+<link linkend="ArtUta">ArtUta</link>*     <link linkend="art-uta-union">art_uta_union</link>                   (<link linkend="ArtUta">ArtUta</link> *uta1,
+                                             <link linkend="ArtUta">ArtUta</link> *uta2);
+<link linkend="ArtUta">ArtUta</link>*     <link linkend="art-uta-new">art_uta_new</link>                     (int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1);
+<link linkend="ArtUta">ArtUta</link>*     <link linkend="art-uta-new-coords">art_uta_new_coords</link>              (int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1);
+void        <link linkend="art-uta-free">art_uta_free</link>                    (<link linkend="ArtUta">ArtUta</link> *uta);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="ArtUtaBbox">ArtUtaBbox</title>
+<programlisting>typedef art_u32 ArtUtaBbox;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="ArtUta">struct ArtUta</title>
+<programlisting>struct ArtUta {
+  int x0;
+  int y0;
+  int width;
+  int height;
+  ArtUtaBbox *utiles;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="art-uta-from-vpath">art_uta_from_vpath ()</title>
+<programlisting><link linkend="ArtUta">ArtUta</link>*     art_uta_from_vpath              (const <link linkend="ArtVpath">ArtVpath</link> *vec);</programlisting>
+<para>
+Generates a uta covering <parameter>vec</parameter>. The resulting uta is of course
+approximate, ie it may cover more pixels than covered by <parameter>vec</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>vec</parameter>&nbsp;:</entry>
+<entry> The source vpath.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the new uta.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-uta-from-svp">art_uta_from_svp ()</title>
+<programlisting><link linkend="ArtUta">ArtUta</link>*     art_uta_from_svp                (const <link linkend="ArtSVP">ArtSVP</link> *svp);</programlisting>
+<para>
+Generates a uta covering <parameter>svp</parameter>. The resulting uta is of course
+approximate, ie it may cover more pixels than covered by <parameter>svp</parameter>.
+</para>
+<para>
+Note: I will want to replace this with a more direct
+implementation. But this gets the api in place.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>svp</parameter>&nbsp;:</entry>
+<entry> The source svp.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the new uta.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-uta-from-irect">art_uta_from_irect ()</title>
+<programlisting><link linkend="ArtUta">ArtUta</link>*     art_uta_from_irect              (<link linkend="ArtIRect">ArtIRect</link> *bbox);</programlisting>
+<para>
+Generates a uta exactly covering <parameter>bbox</parameter>. Please do not call this
+function with a <parameter>bbox</parameter> with zero height or width.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bbox</parameter>&nbsp;:</entry>
+<entry> The source rectangle.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the new uta.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-uta-add-line">art_uta_add_line ()</title>
+<programlisting>void        art_uta_add_line                (<link linkend="ArtUta">ArtUta</link> *uta,
+                                             <link linkend="double">double</link> x0,
+                                             <link linkend="double">double</link> y0,
+                                             <link linkend="double">double</link> x1,
+                                             <link linkend="double">double</link> y1,
+                                             int *rbuf,
+                                             int rbuf_rowstride);</programlisting>
+<para>
+Add the line (<parameter>x0</parameter>, <parameter>y0</parameter>) - (<parameter>x1</parameter>, <parameter>y1</parameter>) to <parameter>uta</parameter>, and also update the
+winding number buffer used for rendering the interior. <parameter>rbuf</parameter>
+contains the first partial difference (in the X direction) of the
+winding number, measured in grid cells. Thus, each time that a line
+crosses a horizontal uta grid line, an entry of <parameter>rbuf</parameter> is
+incremented if <parameter>y1</parameter> &gt; <parameter>y0</parameter>, decremented otherwise.
+</para>
+<para>
+Note that edge handling is fairly delicate. Please rtfs for
+details.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uta</parameter>&nbsp;:</entry>
+<entry> The uta to modify.
+</entry></row>
+<row><entry align="right"><parameter>x0</parameter>&nbsp;:</entry>
+<entry> X coordinate of line start point.
+</entry></row>
+<row><entry align="right"><parameter>y0</parameter>&nbsp;:</entry>
+<entry> Y coordinate of line start point.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> X coordinate of line end point.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Y coordinate of line end point.
+</entry></row>
+<row><entry align="right"><parameter>rbuf</parameter>&nbsp;:</entry>
+<entry> Buffer containing first difference of winding number.
+</entry></row>
+<row><entry align="right"><parameter>rbuf_rowstride</parameter>&nbsp;:</entry>
+<entry> Rowstride of <parameter>rbuf</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-uta-union">art_uta_union ()</title>
+<programlisting><link linkend="ArtUta">ArtUta</link>*     art_uta_union                   (<link linkend="ArtUta">ArtUta</link> *uta1,
+                                             <link linkend="ArtUta">ArtUta</link> *uta2);</programlisting>
+<para>
+Computes the union of <parameter>uta1</parameter> and <parameter>uta2</parameter>. The union is approximate,
+but coverage is guaranteed over all pixels included in either of
+the arguments, ie more pixels may be covered than the "exact"
+union.
+</para>
+<para>
+Note: this routine is used in the Gnome Canvas to accumulate the
+region that needs to be repainted. However, since it copies over
+the entire uta (which might be largish) even when the update may be
+small, it can be a performance bottleneck. There are two approaches
+to this problem, both of which are probably worthwhile. First, the
+generated uta's should always be limited to the visible window,
+thus guaranteeing that uta's never become large. Second, there
+should be a new, destructive union operation that only touches a
+small part of the uta when the update is small.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uta1</parameter>&nbsp;:</entry>
+<entry> One uta.
+</entry></row>
+<row><entry align="right"><parameter>uta2</parameter>&nbsp;:</entry>
+<entry> The other uta.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The new union uta.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-uta-new">art_uta_new ()</title>
+<programlisting><link linkend="ArtUta">ArtUta</link>*     art_uta_new                     (int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1);</programlisting>
+<para>
+Allocates a new microtile array. The arguments are in units of
+tiles, not pixels.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>x0</parameter>&nbsp;:</entry>
+<entry> Left coordinate of uta.
+</entry></row>
+<row><entry align="right"><parameter>y0</parameter>&nbsp;:</entry>
+<entry> Top coordinate of uta.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Right coordinate of uta.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Bottom coordinate of uta.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the newly allocated <link linkend="ArtUta">ArtUta</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-uta-new-coords">art_uta_new_coords ()</title>
+<programlisting><link linkend="ArtUta">ArtUta</link>*     art_uta_new_coords              (int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1);</programlisting>
+<para>
+Allocates a new microtile array. The arguments are in pixels</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>x0</parameter>&nbsp;:</entry>
+<entry> Left coordinate of uta.
+</entry></row>
+<row><entry align="right"><parameter>y0</parameter>&nbsp;:</entry>
+<entry> Top coordinate of uta.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Right coordinate of uta.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Bottom coordinate of uta.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the newly allocated <link linkend="ArtUta">ArtUta</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-uta-free">art_uta_free ()</title>
+<programlisting>void        art_uta_free                    (<link linkend="ArtUta">ArtUta</link> *uta);</programlisting>
+<para>
+Frees the microtile array structure, including the actual microtile
+data.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>uta</parameter>&nbsp;:</entry>
+<entry> The uta to free.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

@@ -1,0 +1,201 @@
+<!-- ##### SECTION Title ##### -->
+gnome-i18n
+
+<!-- ##### SECTION Short_Description ##### -->
+Support for localization and internationalization.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+  This module allows the programmer to internationalize his
+  application by providing a number of macros that can be used to tag his
+  texts, and some functions that control the internationalization of
+  the application or library.
+</para>
+
+<para>
+  Typically the programmer would enclose text strings that are
+  displayed to the user in a _() macro call.  This macro serves two
+  purposes: it is used to tag the string for translation (it is a
+  special sequence recognized by the GNU gettext framework) and it is
+  used at run-time to invoke the translation process on the current
+  string.
+
+  <example>
+    <title>Typical usage of the _ macro</title>
+    <programlisting>
+void print_hello (void)
+{
+        printf (_("Hello World"));
+}
+    </programlisting>
+  </example>
+</para>
+
+<para>
+  The macro _() can map to either an invocation to gettext (which
+  means that the string argument is translated in the default
+  application translation domain) or to dgettext (which means that the
+  string is translated into the
+  <emphasis>GNOME_EXPLICIT_TRANSLATION_DOMAIN</emphasis>.
+</para>
+
+<para>
+  Typically applications will just include the
+  <filename>gnome.h</filename> header file, the
+  <filename>libgnome.h</filename> or the
+  <filename>gnome-i18n.h</filename> header file and this will define
+  the _() macro as an invocation to gettext().  In the case of
+  libraries, shared object modules (dynamically linked libraries) or
+  shared object CORBA servers (CORBA servers implemented as shared
+  libraries), you should define the
+  <emphasis>GNOME_EXPLICIT_TRANSLATION_DOMAIN</emphasis> macro to your
+  package name (usually a define in the compilation Makefile or in the
+  config.h file will do it).  By doing this your library, shared
+  library or CORBA server will explicitly translate its string
+  messages in its own translation domain (rather than using the
+  application domain, which will not have a translation table for your
+  messages). 
+</para>
+
+<para>
+  All of the functions in this module do either map to an empty action
+  if the <emphasis>ENABLE_NLS</emphasis> macro is not defined or to
+  actual functions if it is defined.
+</para>
+
+<para>
+  See the Info page for GNU gettext to learn more on the
+  internationalization process for an application. 
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+  GNU gettext info page
+</para>
+
+<!-- ##### MACRO _ ##### -->
+<para>
+  Use this to tag strings in an executable path, this macro expands to
+  gettext() or dgettext() if the application supports
+  internationalization.
+</para>
+
+@String: 
+
+
+<!-- ##### MACRO N_ ##### -->
+<para>
+  This macro is just an identity macro, the only purpose of this macro
+  is to allow <filename>gettext</filename> to identify the string as a
+  translatable message.  This macro can be used in static
+  initializers, where the _() macros can not be used.
+
+  <example>
+    <title>Typical usage of the N_ macro</title>
+    <programlisting>
+char *days [5] = {
+    	N_("monday"), 
+    	N_("tuesday"), 
+    	N_("wednesday"), 
+    	N_("thursday"), 
+    	N_("friday")
+};
+
+void print_days (void)
+{
+        int i;
+
+        for (i = 0; i < 5; i++)
+             printf (_("The day of the week %s is"), _(days [i]));
+}
+    </programlisting>
+  </example>
+</para>
+
+@String: 
+
+
+<!-- ##### MACRO textdomain ##### -->
+<para>
+
+</para>
+
+@String: 
+
+
+<!-- ##### MACRO gettext ##### -->
+<para>
+
+</para>
+
+@String: 
+
+
+<!-- ##### MACRO dgettext ##### -->
+<para>
+
+</para>
+
+@Domain: 
+@Message: 
+
+
+<!-- ##### MACRO dcgettext ##### -->
+<para>
+
+</para>
+
+@Domain: 
+@Message: 
+@Type: 
+
+
+<!-- ##### MACRO bindtextdomain ##### -->
+<para>
+
+</para>
+
+@Domain: 
+@Directory: 
+
+
+<!-- ##### FUNCTION gnome_i18n_get_language ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_i18n_get_language_list ##### -->
+<para>
+
+</para>
+
+@category_name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_i18n_set_preferred_language ##### -->
+<para>
+
+</para>
+
+@val: 
+
+
+<!-- ##### FUNCTION gnome_i18n_get_preferred_language ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_i18n_init ##### -->
+<para>
+
+</para>
+
+
+

@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>The GDM Daemon</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Gnome Display Manager Reference Manual"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Overview"
+HREF="intro.html"><LINK
+REL="PREVIOUS"
+TITLE="Overview"
+HREF="intro.html"><LINK
+REL="NEXT"
+TITLE="	XDMCP
+      "
+HREF="x80.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Display Manager Reference Manual</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="intro.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Overview</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x80.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DAEMONOV"
+>The GDM Daemon</A
+></H1
+><P
+> 
+	GDM was written with simplicity and security in mind. The
+	overall design concept is this: 
+      </P
+><P
+> 
+	Upon startup the <TT
+CLASS="FILENAME"
+>gdm</TT
+> daemon parses its config file
+	<TT
+CLASS="FILENAME"
+>gdm.conf</TT
+>.  For each of the local displays <TT
+CLASS="FILENAME"
+>gdm</TT
+>
+	forks an Xserver and a slave process. The main <TT
+CLASS="FILENAME"
+>gdm</TT
+> process
+	will then listen to XDMCP requests from remote displays and
+	monitor the local display sessions.
+      </P
+><P
+> 
+	The <TT
+CLASS="FILENAME"
+>gdm</TT
+> slave process opens the display and starts
+	<TT
+CLASS="FILENAME"
+>gdmlogin</TT
+>, the graphical login
+	program. <TT
+CLASS="FILENAME"
+>gdmlogin</TT
+> runs as a dedicated
+	user and communicates asynchronously with the slave process
+	through a pipe.
+      </P
+><P
+> 
+	GDM relies heavily on the presence of PAM, Pluggable
+	Authentication Modules, but supports regular crypt() 
+	and shadow passwords on legacy systems.
+      </P
+><P
+>	Remote displays can connect to the XDMCP port on the GDM
+	host. <TT
+CLASS="FILENAME"
+>gdm</TT
+> will grant access to hosts specified in
+	the gdm service section in your TCP Wrappers configuration
+	file. GDM does not support remote display access control on
+	systems without TCP Wrappers. XDMCP support can be turned off
+	completely, however.
+      </P
+><P
+>	GDM includes several measures making it more resistant to
+	denial of service attacks on the XDMCP service. A lot of the
+	protocol parameters, handshaking timeouts etc. can be fine
+	tuned. The defaults should work for most systems, however.
+	Don't change them unless you know what you're doing.
+      </P
+><P
+>	In general GDM is very reluctant regarding reading/writing of
+	user files. For instance it refuses to touch anything but
+	regular files.  Links, sockets and devices are ignored.  The
+	value of the RelaxPermissions parameter determines whether GDM
+	should accept files writable by the user's group or others.
+	These are ignored by default.
+      </P
+><P
+>	All operations on user files are done with the effective
+	userid of the user. If the sanity check fails on the user's
+	<TT
+CLASS="FILENAME"
+>.Xauthority</TT
+> file, a fallback cookie is created in
+	<TT
+CLASS="FILENAME"
+>/tmp</TT
+>.
+      </P
+><P
+>	Finally, the sysadmin can specify the maximum file size GDM
+	should accept, and, if the face browser is enabled, a tunable
+	maximum icon size is also enforced.  On large systems it is
+	still advised to turn off the face browser for performance
+	reasons. Looking up icons in homedirs, scaling and rendering
+	face icons can take quite a long time. YMMV.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="intro.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x80.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Overview</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="intro.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>XDMCP</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

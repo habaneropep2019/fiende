@@ -1,0 +1,99 @@
+/* $Id: druid-page-standard.gen_h,v 1.6 2001/04/24 14:39:35 murrayc Exp $ */
+
+
+/* druid-page-standard.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/druid-page.h>
+#include <libgnomeui/gnome-druid-page-standard.h>
+#include <gnome--/imlib.h>
+
+namespace Gtk {
+class VBox;
+}
+
+CLASS_START(Gnome);
+class DruidPageStandard : public DruidPage
+{
+  WRAP_CLASS(DruidPageStandard, GnomeDruidPageStandard,
+             GNOME_DRUID_PAGE_STANDARD, GNOME_IS_DRUID_PAGE_STANDARD,
+             druid_page_standard,
+             DruidPage, GnomeDruidPage, GNOME_DRUID_PAGE);
+public:
+
+  DruidPageStandard();
+  DruidPageStandard(const Gtk::string &title,
+			  const Gdk_Imlib::Image &logo_image);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+
+  WRAP_METHOD(void gnome_druid_page_standard_set_bg_color (GnomeDruidPageStandard*, GdkColor*),
+	      void set_bg_color (const Gdk_Color &color));
+
+  WRAP_METHOD(void gnome_druid_page_standard_set_logo_bg_color (GnomeDruidPageStandard*, GdkColor*),
+	      void set_logo_bg_color (const Gdk_Color &color));
+
+  WRAP_METHOD(void gnome_druid_page_standard_set_title_color (GnomeDruidPageStandard*, GdkColor*),
+	      void set_title_color (const Gdk_Color &color));
+
+  WRAP_METHOD(void gnome_druid_page_standard_set_title (GnomeDruidPageStandard*, const gchar*),
+	      void set_title (const Gtk::string &title));
+
+  WRAP_METHOD(void gnome_druid_page_standard_set_logo (GnomeDruidPageStandard*, GdkImlibImage*),
+	      void set_logo (const Gdk_Imlib::Image &logo_image));
+
+  //: Pack widgets into the VBox.
+	WRAP_MEMBER(value,vbox, vbox, Gtk::VBox*, GtkWidget*);
+
+
+};
+
+
+
+PRIVATE_START;
+#include <gnome--/private/druid-page_p.h>
+
+IMPL_START;
+#include <gnome--/private/druid-page-standard_p.h>
+#include <gtk--/box.h>
+#include <gnome--/construct_copies.h>
+
+
+Gnome::DruidPageStandard::DruidPageStandard()
+  : DruidPage(GNOME_DRUID_PAGE(gtk_object_new(get_type(),0)))
+{
+  //Duplicated code from _new function:
+  gtkobj()->title = g_strdup ("");
+	gtkobj()->logo_image = NULL;
+	gnome_druid_page_standard_construct(gtkobj());
+}
+
+Gnome::DruidPageStandard::DruidPageStandard(const Gtk::string &title,
+						 const Gdk_Imlib::Image &logo_image)
+  : DruidPage(GNOME_DRUID_PAGE(gtk_object_new(get_type(),0)))
+{
+  //Duplicated code from _new function:
+  gtkobj()->title = g_strdup ("");
+	gtkobj()->logo_image = NULL;
+	gnome_druid_page_standard_construct(gtkobj());
+
+  set_title(title);
+  set_logo(logo_image);
+}

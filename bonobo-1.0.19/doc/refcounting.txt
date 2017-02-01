@@ -1,0 +1,141 @@
+
+Bonobo component reference counting, version 0.1
+by  Michael Meeks <mmeeks@gnu.org>
+and Mike Fleming <mfleming@eazel.com>
+
+* Bonobo Objects
+
+A bonobo object is a gtk object that implements an CORBA interface, it
+also contains a pointer to the BonoboAggregateObject that it is part
+of. A bonobo object has two reference counts; the first is a GtkObject
+reference count on the object. This should be 1 at all times except
+pre-finalization. The main reference count for the aggregate is stored
+in the
+
+	typedef struct {
+		int   ref_count;
+		GList *objs;
+	} BonoboAggregateObject;
+
+structure. Also in this structure is a list of all the objects
+implementing other interfaces in this aggregate. Clearly an object is
+always in its own aggregate hence:
+
+	  g_assert (g_list_find (object->priv->ao->objs, object) == object);
+
+	  Is always true. The object->priv->ao dereference is merely a
+nice way of encapsulating this information inside bonobo-object.c and
+ensuring that it can't be fiddled with elsewhere.
+
+
+* Ref counting
+
+The only ref count to manipulate is that on the aggregate obejct, this
+is done via the bonobo_object_ref / unref pair, it is also done
+remotely via the Bonobo_Object_ref / unref CORBA stubs. There is no
+'destroy' method, if you want this method you are probably confused
+about how Gtk+ deals with allocation.
+
+Some people try to use gtk_object_ref / unref on BonoboObjects; sadly
+this will cause very serious grief. This if you gtk_object_unref a
+bonobo object, then that object will be destroyed without consulting
+the aggregate ref-count, and without sorting out the aggregate. The
+net effect of this is that the aggregate is left including a finalized
+object. This is a very bad move indeed.
+
+
+* Reference leaks
+
+Catching reference leaks is evily difficult. The first approach is to
+re-build bonobo with BONOBO_OBJECT_DEBUG defined in bonobo-object.h.
+This combined with a call to bonobo_shutdown () before exiting your
+program should provide a dump of all object references floating in
+your code. Having re-build bonobo you will need to re-build your
+application, otherwise you will get link errors moaning about not
+being able to find 'bonobo_object_ref / unref'.
+
+A simpler but less verbose way to get ref count debugging without
+re-compiling everything is to simply define BONOBO_REF_HOOKS at the
+top of bonobo-object.c
+
+Another good way of catching leaks, having guessed which object is not
+getting freed is to fire up container and component in gdb, break in
+eg. bonobo_embeddable_new and insert a hardware watch point on the ref
+count [ see also debugging.txt ]:
+
+(gdb) p &((BonoboObject *)embeddable)->priv->ao->ref_count
+$N = (int *) 0x80808102
+(gdb) watch *0x80808102
+(gdb) cont
+
+This will result in gdb giving you control each time the ref count is
+changed. At this point halt the other end of the CORBA link and start
+logging traces at both ends. By the time the program exits you should
+have worked out where the reference went astray.
+
+* Ref Counting Conventions
+
+	And now for the important stuff:
+
+** Bonobo Ref Counting
+
+The Bonobo ref count convention is as follows.  (Mild rewording; same
+meaning as before)
+
+1. A function returning an object, either as the return value or
+by-reference, must always add a reference before returning.
+(Alternately: the callee must create a reference to the returned
+object that the caller owns)
+  
+2. A function that accepts a bonobo object as an in/out parameter must
+unreference the originally passed object once if the function wishes
+to change the value of the in/out parameter.  (The function must ref()
+new objects returned via this in/out in accordance with [1])
+
+3. An object passed into a function needs only be ref()'d if the
+ifunction wishes to retain a reference to the object beyond the scope
+of the function call.
+
+In addition, there's a consensus that interface designers should be
+advised against designing methods with in/out parameters.  In/out
+parameters can obscure the lifetime of the passed argument to casual
+code observers, and thus may cause hidden side-effects.
+
+
+** CORBA Ref-counting
+
+Since the ORB also maintains reference counts per interface handle,
+should you be returning a reference to an object it is imperative to
+
+	Bonobo_Unknown_ref (corba_object, ev);
+	return CORBA_Object_duplicate (corba_object, ev);
+
+To assist with this there are two functions:
+
+Bonobo_Unknown bonobo_object_dup_ref       (Bonobo_Unknown     object,
+                                            CORBA_Environment *ev);
+void           bonobo_object_release_unref (Bonobo_Unknown     object,
+                                            CORBA_Environment *ev);
+
+So to return an Unknown from a impl you can simply:
+
+	return bonobo_object_dup_ref (corba_object, ev);
+
+Warning; there is a caveat with this approach which is this:
+
+If you construct a BonoboObject in an impl_ whose reference you wish
+to hand back to the caller then the situation is slightly
+different. In this case you have an object with the following:
+
+Bonobo_Unknown: ref 1
+BonoboObject:   ref 1
+
+You want to hand a CORBA reference to this object to the client,
+without incrementing the BonoboObject reference. To do this you must
+do:
+
+	return CORBA_Object_duplicate (BONOBO_OBJREF (myobject));
+
+The mirror of this is that if you want to hand a ref to an impl you
+will need to CORBA_Object_duplicate the value before inserting it into
+a BonoboObjectClient.

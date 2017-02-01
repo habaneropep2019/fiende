@@ -1,0 +1,321 @@
+<refentry id="bonobo-bonobo-property-control">
+<refmeta>
+<refentrytitle>BonoboPropertyControl</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboPropertyControl</refname><refpurpose>an interface for exposing property editors as controls</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboPropertyControl-struct">BonoboPropertyControl</link>;
+typedef     <link linkend="BonoboPropertyControlClass">BonoboPropertyControlClass</link>;
+<link linkend="BonoboControl">BonoboControl</link>* (<link linkend="BonoboPropertyControlGetControlFn">*BonoboPropertyControlGetControlFn</link>)
+                                            (<link linkend="BonoboPropertyControl">BonoboPropertyControl</link> *control,
+                                             int page_number,
+                                             void *closure);
+<link linkend="BonoboPropertyControl">BonoboPropertyControl</link>* <link linkend="bonobo-property-control-new">bonobo_property_control_new</link>
+                                            (<link linkend="BonoboPropertyControlGetControlFn">BonoboPropertyControlGetControlFn</link> get_fn,
+                                             int num_pages,
+                                             void *closure);
+<link linkend="BonoboPropertyControl">BonoboPropertyControl</link>* <link linkend="bonobo-property-control-new-full">bonobo_property_control_new_full</link>
+                                            (<link linkend="BonoboPropertyControlGetControlFn">BonoboPropertyControlGetControlFn</link> get_fn,
+                                             int num_pages,
+                                             <link linkend="BonoboEventSource">BonoboEventSource</link> *event_source,
+                                             void *closure);
+<link linkend="BonoboPropertyControl">BonoboPropertyControl</link>* <link linkend="bonobo-property-control-construct">bonobo_property_control_construct</link>
+                                            (<link linkend="BonoboPropertyControl">BonoboPropertyControl</link> *property_control,
+                                             <link linkend="BonoboEventSource">BonoboEventSource</link> *event_source,
+                                             <link linkend="BonoboPropertyControlGetControlFn">BonoboPropertyControlGetControlFn</link> get_fn,
+                                             int num_pages,
+                                             void *closure);
+void        <link linkend="bonobo-property-control-changed">bonobo_property_control_changed</link> (<link linkend="BonoboPropertyControl">BonoboPropertyControl</link> *property_control,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+<link linkend="BonoboEventSource">BonoboEventSource</link>* <link linkend="bonobo-property-control-get-event-source">bonobo_property_control_get_event_source</link>
+                                            (<link linkend="BonoboPropertyControl">BonoboPropertyControl</link> *property_control);
+#define     <link linkend="BONOBO-PROPERTY-CONTROL-CHANGED-CAPS">BONOBO_PROPERTY_CONTROL_CHANGED</link>
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+This interface is designed to allow things that offer GUI
+customization a nice way to provide both multi and single
+page customization controls. Each page is exposed as a
+<link linkend="BonoboControl">BonoboControl</link>, and contain any arbitary widgets. Each
+control in a multi-page configuration should expose a
+string property named "bonobo:title" which contains a
+translated label suitable for using in a tabbed dialog.
+</para>
+
+<para>
+An interface is also provided for applying each page's
+contents, and requesting help for that page. The interface
+also provides a <link linkend="BonoboEventSource">BonoboEventSource</link> to which a <link linkend="BonoboListener">BonoboListener</link>
+can be connected. Changes can be listened for which will
+arrive on the event with name <link linkend="BONOBO-PROPERTY-CONTROL-CHANGED-CAPS">BONOBO_PROPERTY_CONTROL_CHANGED</link>.
+</para>
+
+<para>
+A new single page BonoboPropertyControl interface can
+be created thus:
+  <example>
+    <title>A simple property control interface</title>
+    <programlisting>
+static void
+stop_start_cb (GtkToggleButton *button, GtkClock *clock)
+{
+	if (button->active)
+		gtk_clock_start (clock);
+	else
+		gtk_clock_stop (clock);
+}
+
+static BonoboControl *
+get_page_fn (BonoboPropertyControl *control,
+             int                    page_number,
+             void                  *closure)
+{
+	GtkClock  *clock = closure;
+	GtkWidget *widget = gtk_checkbutton_new_with_label (
+		"Clock is running");
+	
+	gtk_widget_show (widget);
+
+	gtk_signal_connect (GTK_OBJECT (widget), "toggled",
+			    GTK_SIGNAL_FUNC (stop_start_cb), clock);
+
+	return bonobo_control_new (widget);
+}
+
+BonoboObject *
+add_property_interface (BonoboObject *aggregate, GtkClock *clock)
+{
+	BonoboPropertyControl *pc;
+
+	pc = bonobo_property_control_new (get_page_fn, 1, clock);
+
+	bonobo_object_add_interface (aggregate_object, BONOBO_OBJET (pc));
+
+	return aggregate_object;
+}
+    </programlisting>
+  </example>
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboPropertyControl-struct">struct BonoboPropertyControl</title>
+<programlisting>struct BonoboPropertyControl;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboPropertyControlClass">BonoboPropertyControlClass</title>
+<programlisting>typedef struct {
+	BonoboXObjectClass parent_class;
+
+	POA_Bonobo_PropertyControl__epv epv;
+
+	void (* action) (BonoboPropertyControl *property_control, 
+			 Bonobo_PropertyControl_Action action);
+} BonoboPropertyControlClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboPropertyControlGetControlFn">BonoboPropertyControlGetControlFn ()</title>
+<programlisting><link linkend="BonoboControl">BonoboControl</link>* (*BonoboPropertyControlGetControlFn)
+                                            (<link linkend="BonoboPropertyControl">BonoboPropertyControl</link> *control,
+                                             int page_number,
+                                             void *closure);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>page_number</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>closure</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-control-new">bonobo_property_control_new ()</title>
+<programlisting><link linkend="BonoboPropertyControl">BonoboPropertyControl</link>* bonobo_property_control_new
+                                            (<link linkend="BonoboPropertyControlGetControlFn">BonoboPropertyControlGetControlFn</link> get_fn,
+                                             int num_pages,
+                                             void *closure);</programlisting>
+<para>
+Creates a BonoboPropertyControl object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>get_fn</parameter>&nbsp;:</entry>
+<entry> The function to be called when the getControl method is called.
+</entry></row>
+<row><entry align="right"><parameter>num_pages</parameter>&nbsp;:</entry>
+<entry> The number of pages this property control has.
+</entry></row>
+<row><entry align="right"><parameter>closure</parameter>&nbsp;:</entry>
+<entry> The data to be passed into the <parameter>get_fn</parameter> routine
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A pointer to a newly created BonoboPropertyControl object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-control-new-full">bonobo_property_control_new_full ()</title>
+<programlisting><link linkend="BonoboPropertyControl">BonoboPropertyControl</link>* bonobo_property_control_new_full
+                                            (<link linkend="BonoboPropertyControlGetControlFn">BonoboPropertyControlGetControlFn</link> get_fn,
+                                             int num_pages,
+                                             <link linkend="BonoboEventSource">BonoboEventSource</link> *event_source,
+                                             void *closure);</programlisting>
+<para>
+Creates a BonoboPropertyControl object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>get_fn</parameter>&nbsp;:</entry>
+<entry> The function to be called when the getControl method is called.
+</entry></row>
+<row><entry align="right"><parameter>num_pages</parameter>&nbsp;:</entry>
+<entry> The number of pages this property control has.
+</entry></row>
+<row><entry align="right"><parameter>event_source</parameter>&nbsp;:</entry>
+<entry> The event source to use to emit events on.
+</entry></row>
+<row><entry align="right"><parameter>closure</parameter>&nbsp;:</entry>
+<entry> The data to be passed into the <parameter>get_fn</parameter> routine.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A pointer to a newly created BonoboPropertyControl object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-control-construct">bonobo_property_control_construct ()</title>
+<programlisting><link linkend="BonoboPropertyControl">BonoboPropertyControl</link>* bonobo_property_control_construct
+                                            (<link linkend="BonoboPropertyControl">BonoboPropertyControl</link> *property_control,
+                                             <link linkend="BonoboEventSource">BonoboEventSource</link> *event_source,
+                                             <link linkend="BonoboPropertyControlGetControlFn">BonoboPropertyControlGetControlFn</link> get_fn,
+                                             int num_pages,
+                                             void *closure);</programlisting>
+<para>
+Initialises the BonoboPropertyControl object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>property_control</parameter>&nbsp;:</entry>
+<entry> A BonoboPropertyControl object.
+</entry></row>
+<row><entry align="right"><parameter>event_source</parameter>&nbsp;:</entry>
+<entry> A BonoboEventSource object that will be aggregated onto the
+property control.
+</entry></row>
+<row><entry align="right"><parameter>get_fn</parameter>&nbsp;:</entry>
+<entry> Creation routine.
+</entry></row>
+<row><entry align="right"><parameter>num_pages</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>closure</parameter>&nbsp;:</entry>
+<entry> Data passed to closure routine.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly constructed BonoboPropertyControl.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-control-changed">bonobo_property_control_changed ()</title>
+<programlisting>void        bonobo_property_control_changed (<link linkend="BonoboPropertyControl">BonoboPropertyControl</link> *property_control,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+Tells the server that a value in the property control has been changed,
+and that it should indicate this somehow.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>property_control</parameter>&nbsp;:</entry>
+<entry> The BonoboPropertyControl that has changed.
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry> An optional CORBA_Environment for exception handling. 
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-control-get-event-source">bonobo_property_control_get_event_source ()</title>
+<programlisting><link linkend="BonoboEventSource">BonoboEventSource</link>* bonobo_property_control_get_event_source
+                                            (<link linkend="BonoboPropertyControl">BonoboPropertyControl</link> *property_control);</programlisting>
+<para>
+Returns the BonoboEventSource that <parameter>property_control</parameter> uses.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>property_control</parameter>&nbsp;:</entry>
+<entry> The BonoboPropertyControl.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A BonoboEventSource.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-PROPERTY-CONTROL-CHANGED-CAPS">BONOBO_PROPERTY_CONTROL_CHANGED</title>
+<programlisting>#define BONOBO_PROPERTY_CONTROL_CHANGED "Bonobo::PropertyControl_changed"
+</programlisting>
+<para>
+
+</para></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="BonoboProperty">BonoboProperty</link>, <link linkend="BonoboPropertyBag">BonoboPropertyBag</link>, <link linkend="BonoboControl">BonoboControl</link>
+</para>
+</refsect1>
+
+</refentry>

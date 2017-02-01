@@ -1,0 +1,460 @@
+<refentry id="GnomeDockItem">
+<refmeta>
+<refentrytitle>GnomeDockItem</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeDockItem</refname><refpurpose>A dockable widget.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeDockItem-struct">GnomeDockItem</link>;
+enum        <link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link>;
+#define     <link linkend="GNOME-DOCK-ITEM-NOT-LOCKED-CAPS">GNOME_DOCK_ITEM_NOT_LOCKED</link>      (x)
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-dock-item-new">gnome_dock_item_new</link>             (const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link> behavior);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-dock-item-get-child">gnome_dock_item_get_child</link>       (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);
+char*       <link linkend="gnome-dock-item-get-name">gnome_dock_item_get_name</link>        (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);
+void        <link linkend="gnome-dock-item-set-shadow-type">gnome_dock_item_set_shadow_type</link> (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item,
+                                             <link linkend="GtkShadowType">GtkShadowType</link> type);
+<link linkend="GtkShadowType">GtkShadowType</link> <link linkend="gnome-dock-item-get-shadow-type">gnome_dock_item_get_shadow_type</link>
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-item-set-orientation">gnome_dock_item_set_orientation</link> (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item,
+                                             <link linkend="GtkOrientation">GtkOrientation</link> orientation);
+<link linkend="GtkOrientation">GtkOrientation</link> <link linkend="gnome-dock-item-get-orientation">gnome_dock_item_get_orientation</link>
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);
+<link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link> <link linkend="gnome-dock-item-get-behavior">gnome_dock_item_get_behavior</link>
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-item-detach">gnome_dock_item_detach</link>          (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y);
+void        <link linkend="gnome-dock-item-attach">gnome_dock_item_attach</link>          (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y);
+void        <link linkend="gnome-dock-item-grab-pointer">gnome_dock_item_grab_pointer</link>    (<link linkend="GnomeDockItem">GnomeDockItem</link> *item);
+void        <link linkend="gnome-dock-item-drag-floating">gnome_dock_item_drag_floating</link>   (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y);
+void        <link linkend="gnome-dock-item-handle-size-request">gnome_dock_item_handle_size_request</link>
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GtkRequisition">GtkRequisition</link> *requisition);
+void        <link linkend="gnome-dock-item-get-floating-position">gnome_dock_item_get_floating_position</link>
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> *x,
+                                             <link linkend="gint">gint</link> *y);
+
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBin">GtkBin</link>
+                     +----GnomeDockItem
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+<type>GnomeDockItem</type> is a container widget that can be used to
+make widgets dockable.  "Making a widget dockable" means that the
+widget gets a handle through which users can drag it around the dock
+widget or detach it so that it gets displayed into its own window
+(thus becoming a "floating" item).
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeDockItem-struct">struct GnomeDockItem</title>
+<programlisting>struct GnomeDockItem;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeDockItemBehavior">enum GnomeDockItemBehavior</title>
+<programlisting>typedef enum
+{
+  GNOME_DOCK_ITEM_BEH_NORMAL = 0,
+  GNOME_DOCK_ITEM_BEH_EXCLUSIVE = 1 &lt;&lt; 0,
+  GNOME_DOCK_ITEM_BEH_NEVER_FLOATING = 1 &lt;&lt; 1,
+  GNOME_DOCK_ITEM_BEH_NEVER_VERTICAL = 1 &lt;&lt; 2,
+  GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL = 1 &lt;&lt; 3,
+  GNOME_DOCK_ITEM_BEH_LOCKED = 1 &lt;&lt; 4
+} GnomeDockItemBehavior;
+</programlisting>
+<para>
+This enumeration can be used to customize the behavior of a dock item.
+Every value represents a property bit, so that the properties can be
+combined together by using the OR (`|') operator.
+</para>
+
+<para>
+The special value GNOME_DOCK_ITEM_BEH_NORMAL specifies the ``normal''
+(default) behavior, and means to have all the properties disabled (and
+thus the corresponding bits set to zero).
+</para>
+
+<itemizedlist>
+<listitem><para>GNOME_DOCK_ITEM_BEH_EXCLUSIVE specifies that the dock
+item is always the only one in its band. </para></listitem>
+<listitem><para>GNOME_DOCK_ITEM_BEH_NEVER_FLOATING specifies that
+users cannot detach the dock item from the dock. </para> </listitem>
+<listitem><para>GNOME_DOCK_ITEM_BEH_NEVER_VERTICAL specifies that the
+dock item must be kept horizontal, and users cannot move it to a
+vertical band.</para></listitem>
+<listitem><para>GNOME_DOCK_ITEM_BEH_NEVER_HORIZONTAL specifies that
+the dock item must be kept horizontal, and users cannot move it to a
+vertical band.</para></listitem>
+<listitem><para>GNOME_DOCK_ITEM_BEH_LOCKED specifies that users cannot
+drag the item around.</para></listitem>
+</itemizedlist></refsect2>
+<refsect2>
+<title><anchor id="GNOME-DOCK-ITEM-NOT-LOCKED-CAPS">GNOME_DOCK_ITEM_NOT_LOCKED()</title>
+<programlisting>#define     GNOME_DOCK_ITEM_NOT_LOCKED(x)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-new">gnome_dock_item_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_dock_item_new             (const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link> behavior);</programlisting>
+<para>
+Create a new GnomeDockItem named <parameter>name</parameter>, with the
+specified <parameter>behavior</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Name for the new item
+</entry></row>
+<row><entry align="right"><parameter>behavior</parameter>&nbsp;:</entry>
+<entry> Behavior for the new item
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A new GnomeDockItem widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-get-child">gnome_dock_item_get_child ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_dock_item_get_child       (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);</programlisting>
+<para>
+Retrieve the child of <parameter>item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock_item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The child of <parameter>item</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-get-name">gnome_dock_item_get_name ()</title>
+<programlisting>char*       gnome_dock_item_get_name        (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);</programlisting>
+<para>
+Retrieve the name of <parameter>item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock_item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The name of <parameter>item</parameter> as a <link linkend="malloc">malloc</link>()ed zero-terminated
+string.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-set-shadow-type">gnome_dock_item_set_shadow_type ()</title>
+<programlisting>void        gnome_dock_item_set_shadow_type (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item,
+                                             <link linkend="GtkShadowType">GtkShadowType</link> type);</programlisting>
+<para>
+Set the shadow type for <parameter>dock_item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock_item</parameter>&nbsp;:</entry>
+<entry> A GnomeDockItem widget
+</entry></row>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> The shadow type for <parameter>dock_item</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-get-shadow-type">gnome_dock_item_get_shadow_type ()</title>
+<programlisting><link linkend="GtkShadowType">GtkShadowType</link> gnome_dock_item_get_shadow_type
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);</programlisting>
+<para>
+Retrieve the shadow type of <parameter>dock_item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock_item</parameter>&nbsp;:</entry>
+<entry> A GnomeDockItem widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <parameter>dock_item</parameter>'s shadow type.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-set-orientation">gnome_dock_item_set_orientation ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_item_set_orientation (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item,
+                                             <link linkend="GtkOrientation">GtkOrientation</link> orientation);</programlisting>
+<para>
+Set the orientation for <parameter>dock_item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock_item</parameter>&nbsp;:</entry>
+<entry> A GnomeDockItem widget
+</entry></row>
+<row><entry align="right"><parameter>orientation</parameter>&nbsp;:</entry>
+<entry> New orientation for <parameter>dock_item</parameter>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the operation succeeds, <literal>FALSE</literal> if it fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-get-orientation">gnome_dock_item_get_orientation ()</title>
+<programlisting><link linkend="GtkOrientation">GtkOrientation</link> gnome_dock_item_get_orientation
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);</programlisting>
+<para>
+Retrieve the orientation of <parameter>dock_item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock_item</parameter>&nbsp;:</entry>
+<entry> A GnomeDockItem widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The current orientation of <parameter>dock_item</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-get-behavior">gnome_dock_item_get_behavior ()</title>
+<programlisting><link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link> gnome_dock_item_get_behavior
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *dock_item);</programlisting>
+<para>
+Retrieve the behavior of <parameter>dock_item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock_item</parameter>&nbsp;:</entry>
+<entry> A GnomeDockItem widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The behavior of <parameter>dock_item</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-detach">gnome_dock_item_detach ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_item_detach          (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-attach">gnome_dock_item_attach ()</title>
+<programlisting>void        gnome_dock_item_attach          (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-grab-pointer">gnome_dock_item_grab_pointer ()</title>
+<programlisting>void        gnome_dock_item_grab_pointer    (<link linkend="GnomeDockItem">GnomeDockItem</link> *item);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-drag-floating">gnome_dock_item_drag_floating ()</title>
+<programlisting>void        gnome_dock_item_drag_floating   (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-handle-size-request">gnome_dock_item_handle_size_request ()</title>
+<programlisting>void        gnome_dock_item_handle_size_request
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GtkRequisition">GtkRequisition</link> *requisition);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>requisition</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-item-get-floating-position">gnome_dock_item_get_floating_position ()</title>
+<programlisting>void        gnome_dock_item_get_floating_position
+                                            (<link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> *x,
+                                             <link linkend="gint">gint</link> *y);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="GnomeDock">GnomeDock</link>
+<link linkend="GnomeDockBand">GnomeDockBand</link>
+<link linkend="GnomeDockLayout">GnomeDockLayout</link>
+</para>
+</refsect1>
+
+</refentry>

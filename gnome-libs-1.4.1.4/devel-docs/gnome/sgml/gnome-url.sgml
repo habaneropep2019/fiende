@@ -1,0 +1,113 @@
+<refentry id="gnome-gnome-url">
+<refmeta>
+<refentrytitle>gnome-url</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-url</refname><refpurpose>
+Launch viewers for documents based on their URL</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+void        <link linkend="gnome-url-show">gnome_url_show</link>                  (const char *url);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+<link linkend="gnome-url-show">gnome_url_show</link>() provides a simple way to display information to the
+user.  <link linkend="gnome-url-show">gnome_url_show</link>() knows about the <type>man:</type>,
+<type>info:</type> and <type>ghelp:</type> special URL prefixes and
+will invoke the proper display program for those. </para>
+
+<para>
+Any other URL is passed to the default information display handler
+(usually this defaults to the <filename>gnome-moz-remote</filename>
+program (which uses Mozilla to display the URL). </para>
+
+<para><link linkend="gnome-url-show">gnome_url_show</link>() uses the user configured programs for the
+different URL types.  The settings for each one of these handlers is
+stored in the configuration file <filename>~/.gnome/Gnome</filename>
+in the section "URL Handlers".  The possible keys are:</para>
+
+<itemizedlist>
+  <listitem>
+    <para><emphasis>info-show:</emphasis> The command to display an
+    <type>info:</type> URL.</para></listitem>
+
+  <listitem>
+    <para><emphasis>man-show:</emphasis> The command to display an
+    <type>man:</type> URL.</para></listitem>
+
+  <listitem>
+    <para><emphasis>ghelp-show:</emphasis> The command to display an
+    <type>ghelp:</type> URL (this is a GNOME-relative help
+    document).</para></listitem>
+
+  <listitem>
+    <para><emphasis>default-show:</emphasis> The command to display
+    any URL type which is not covered by the other cases.</para></listitem>
+
+</itemizedlist>
+
+<para>The command specification should include a
+<filename><literal>s</literal></filename> specification.  The <filename><literal>s</literal></filename>
+will be substituted with the URL thas was passed to the gnome_url_show
+function.</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-url-show">gnome_url_show ()</title>
+<programlisting>void        gnome_url_show                  (const char *url);</programlisting>
+<para>
+Loads the given URL in an appropriate viewer.  The viewer is deduced from
+the protocol part of the URL.  That is all that the caller should know
+about the function.
+</para>
+<para>
+Internally, the handler for a given URL is deduced by looking in the
+/Gnome/URL Handlers/&lt;protocol&gt;-show key in the user's configuration
+files.  The key is a string that will be passed to <link linkend="gnome-execute-shell">gnome_execute_shell</link>(),
+after the <literal>s</literal> is replaced with with the URL.  If that key can't be found,
+it falls back to /Gnome/URL Handlers/default-show, and if that isn't
+found, uses the contents of the DEFAULT_HANDLER macro in this file.
+</para>
+<para>
+If no /Gnome/URL Handlers keys are set, some sensible defaults are added
+to the user's configuration files.
+</para>
+<para>
+We really need a capplet so a user can configure the behaviour of this
+function.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>url</parameter>&nbsp;:</entry>
+<entry> URL to show
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

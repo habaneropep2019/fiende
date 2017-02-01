@@ -1,0 +1,551 @@
+NEWS in 0.20
+
+* New `cname' option for field specifiers.  You can now specify what
+  name to use on the C side for field accessors.  For example, to
+  access the allocation.x subfield of a GtkWidget structure, you can use
+
+    (fields
+      (int allocation-x (cname allocation.x)))
+
+  The value of the option can be either a symbol or a string.
+
+* New cstring type added to deal with const char *str declarations.
+
+* Guile-gtk will now start the usual `top-repl' of Guile.  The
+  processing of Gtk events will happen in a separate handler thread.
+  When your Guile doesn't support threading, you get the old event
+  driven repl.
+
+* `gdk-event-button-state' and `gdk-event-key-state' have been
+  replaced by `gdk-event-state'.  The new function will return a
+  GtkModifierType which is a list of symbol such as
+
+    (shift-mask control-mask)
+
+* Automatic *.h->*defs translator
+
+* Threads support 
+
+* Experimental GTK+ 2.0 support 
+
+* RPM spec file corrected
+
+* Lots of additions and corrections to the *.defs files
+
+* Various bug fixes
+
+NEWS in 0.19
+
+* Guile-gtk now supports new guile 1.4
+
+NEWS in 0.18
+
+* Guile-gtk now calls gtk_set_locale during initialization.
+
+* Support for type conversions with composites due to libltdl support from libguile.
+
+* Lots of improvements with the build-guile-gtk script.
+
+* Functions for getting the Gtk+ and guile-gtk version.
+
+* Lots of additions and corrections to the *.defs files.
+
+* The usual, uncountable number of minor and major bug fixes. 
+
+NEWS in 0.17
+
+* Some additions and corrections to the *.defs files.
+  New objects and functions.
+
+* New mailing list.
+
+* New calendar example.
+
+* New spec rpm file.
+
+* New web homepage and mirrors.
+
+* Bug fixes, of course including:
+ -Bug fix of protection code that was not safe to be run during GC.
+ -Old guile deprecated functions were substituted. 
+ -etc.
+
+NEWS in 0.16
+
+* New function `gdk-get-leader-window-id' in the (gtk gdk) module.
+
+* A short blurb about composite types can now be found in the README.
+
+* Bug fixes.
+
+NEWS in 0.15
+
+* We now support gtk-1.2 and gtk-1.3.  Support for gtk-1.0 and gtk-1.1
+  has been removed.
+
+* The Scheme functions gtk-object-new, gtk-object-set, etc can now do
+  type conversions on boxed types.  That is, you can use plain strings
+  for fonts and colors and all that good stuff.
+
+* New module (gtk config) that contains all the things configure has
+  found out.
+
+* When we detect a libtool that seems to be able to do inter library
+  dependencies, the (gtk dynlink) module dumbs down and lets dlopen do
+  all the work.  Guile-gtk is shipped with such a winning libtool.
+
+* Bug fixes.
+
+NEWS in 0.14
+
+* Bug fixes.  0.13 had a serious bug in the garbage collector, please
+  don't use it.  Guile-gtk should now work again with Gtk-1.0.
+
+NEWS in 0.13
+
+* The *.defs.guile files are gone.  Their contents has been merged
+  into the corresponding *.defs files.  The program build-guile-gtk
+  will no longer look for these *.defs.guile files.
+
+* The *.defs files are now installed in <pfix>/share/guile-gtk.  The
+  old location <pfix>/gtk/ is cleared during "make install".
+
+* The file event-repl.scm has been moved into the gtk module and is
+  now accessible as (gtk event-repl).  The old installed file is
+  deleted during "make install".
+
+* New type `point'.  A point in Scheme is just a pair of numbers.  It
+  is translated into a GdkPoint struct.
+
+* New type `type'.  A type in Scheme is either a special value that
+  has been retrieved from Gtk (like #<GtkType GtkWidget>), or a symbol
+  that is the name of a known type.  You can use types for
+  gtk-object-new, etc.
+
+* First steps towards exporting the Gtk+ object system to Scheme.  Not
+  useable yet, because Gtk+ needs to be patched first.
+
+* The deprectated _interp functions of gtk-1.1 are no longer used.
+
+* build-guile-gtk has a new option `liblibs' that spits out the
+  libraries needed to build a new shared library.  See the
+  examples/configure.in and Makefile.am for an application.
+
+* test-gtk.scm has been much improved thanks to Matthias Clasen.
+
+* More work on composites.  They are beginning to be useful, but I'm
+  not going to tell you how to use them just yet.
+
+* Bug fixes and updates.
+
+NEWS in 0.12
+
+* We now have individual support for gtk-1.0 and gtk-1.1.  That means
+  that we no longer have to target the least common denominator of
+  gtk-1.0 and gtk-1.1.  See the README for details.
+
+* The pre-generated glue code is no longer distributed.  It will be
+  generated at make time.
+
+* Dynamic linking is working on FreeBSD.
+
+* Configure works with both Guile 1.3 and Guile 1.2.  Support for
+  Guile 1.2 will be dropped in the future.
+
+* New type "full-callback" supported in defs files.  This can be used
+  to describe the "_full" variants of Gtk+ functions that have a
+  callback as one of their arguments.  From the Scheme side, a
+  "full-callback" is just like a "callback".  (This was already in
+  0.11)
+
+* Bug fixes, of course.
+
+NEWS in 0.11
+
+* Bug fixes.
+
+* Guile-gtk does no longer register missing types with Gtk+.  This was
+  a questionable practice and was causing trouble for third-party
+  libraries.  This change should have no user visible consequences and
+  if you don't know what I'm talking about you don't need to worry.
+
+* New type "double" supported in defs files.
+
+* The attribute names used with gtk-object-set, etc. are now treated
+  differently when using the long form `class::attribute'.  Just as
+  for the short form, the attribute is searched from more specific
+  classes towards the root class, but the search starts at the class
+  identified by the `class' portion of `class::attribute'.
+
+  Previously, the attribute was searched *only* in the class denoted
+  by the `class' portion.
+
+* New example program "continuations.scm" that demonstrates the
+  coolnes of continuations.  Hmm, cooltinuations? cultinuations?
+
+* There are some traces of composite types like lists and arrays.
+
+NEWS in 0.10
+
+* Dynamic linking has been changed again.  We no longer need a patched
+  libtool.
+
+* There is now an example for integrating external widgets and other
+  Gtk stuff into guile-gtk.  Have a look at examples/Makefile.am, etc.
+
+NEWS in 0.9
+
+* Gtk+ version 1.0 is required from now on.
+
+* The module has been renamed to (gtk gtk) from (toolkits gtk).  The
+  Gdk bindings have been moved to the module (gtk gdk).
+
+* Dynamic linking of compiled code modules works differently from the
+  usual setup of Guile.  No strange symlinks are made.  See the README
+  and "gtk/dynlink.scm" for details.
+
+* The Scheme code (gtk/*.scm and event-repl.scm) is now
+  installed under the prefix of this package, not under the prefix
+  where Guile was installed.  This will not make a difference most of
+  the time, because Guile and this package will likely be installed
+  with the same prefix, but being too clever about where to install
+  Scheme files caused trouble for package maintainers, I think.
+
+  When Guile is part of a distribution and sits in /usr, I expect it
+  to still have /usr/local/share/guile in its path.  Is this
+  unreasonable?
+
+* New Scheme function `gtk-standalone?' that returns whether the Guile
+  interpreter is running a Gtk-aware read-eval-print-loop or not.
+  When `(gtk-standalone?)' returns true you should call `gtk-main' or
+  `gtk-exit' from your script at the approriate times.  When it
+  returns false, you can assume that someone else will take care of
+  running the Gtk event loops and quitting the interpreter.
+
+  It would be ideal to arrange thins so that gtk-standalone could
+  always return false.  I'm not at all sure how to achieve this, tho.
+
+* New Scheme function `gtk-standalone-main' that can be used to
+  conditionally run a stand-alone session.
+
+	gtk-standalone-main TOPLEVEL
+
+  When (gtk-standlone?) is true: connect gtk-exit to the "destroy"
+  signal of TOPLEVEL and call gtk-main.
+
+* New Scheme function `gtk-callback-trampoline' that can be used to
+  intercept every callback to a Scheme procedure.  Currently, this is
+  used to catch errors that occur in callbacks and popup a window
+  showing the error message with a backtrace.
+
+* The types `int' and `uint' from the definition files are now handled
+  properly.
+
+* The type `string' can now be used as the return type of functions.
+  Be sure to understand that the string is assumed to to be in
+  malloced memory and that the caller takes ownership of that memory.
+  Whe you want to return a string whose memory should not be freed by
+  the caller, use the type `static_string' instead.
+
+* New Scheme functions `gtk-object-new' and `gtk-object-set'.
+  They can be used to create new GtkObjects or set their attributes
+  with a variable-length keyword/value list.  `gtk-widget-new' and
+  `gtk-widget-set' are provided, too.
+
+    (gtk-object-new TYPE KEY VAL KEY VAL ...)
+    (gtk-widget-new TYPE KEY VAL KEY VAL ...)
+    (gtk-object-set OBJ KEY VAL KEY VAL ...)
+    (gtk-widget-set OBJ KEY VAL KEY VAL ...)
+	
+  TYPE is the name of the type that the new object should be created
+  of.  It should be a symbol.  KEY is either a symbole or a keyword.
+  It can be a fully qualified attribute name like "GtkWidget::parent",
+  or it can be a shortened version like "parent".  See
+  "examples/simple.scm" for an example.  Here is a very short one:
+
+    (gtk-object-new 'GtkButton 'label "Hi")
+
+  The TYPE names must already be known to either Guile-Gtk or Gtk+.
+  This means that they must either be listed in some *.defs file that
+  has been translated into glue code and the initialization function
+  of that code has been called; or that the type has already been used
+  somewhere else (and can thus be found with `gtk_type_from_name').
+
+  The "GtkObject::signal::<name>" form is not supported.
+
+* New Scheme function `gtk-object-get' and `gtk-widget-get'.  Use them
+  like
+
+     (gtk-widget-get label 'label)
+
+* Guile-gtk now uses the improved reference counting of Gtk+.  This
+  should not be too visible from the outside.
+
+  The difference is that no GtkObject will silently disappear when
+  Scheme still has a reference to it.  Destruction of a GtkObject is
+  now decoupled from its `finalization'.  Calling `gtk-widget-destroy'
+  continues to remove a widget from the display and clean it up in
+  other ways, but the actual GtkWidget structure will only be freed
+  when the last reference to it has been revoked.  Thus, reference
+  counting is now only a resource management technique (as it should
+  be) and because Scheme has automatic garbage collection you do not
+  need to worry about it.  Consequently, the `gtk_object_ref' and
+  `gtk_object_unref' calls are not exported to Scheme.
+
+  Another consequence is that the Scheme value that stands in for a
+  particular GtkObject will not vanish as long as the GtkObject is
+  there.  This means that you can have weak references to them that
+  will only then be invaliddated when truely no-one cares about the
+  GtkObject any longer (both from within Scheme and from the outside).
+
+  Unfortunately, it is possible to form cycles of GtkObjects and other
+  Scheme values that are not detected by the garbage collector.  These
+  cycles will not be collected altho they are garbage.  The explicit
+  destruction of a GtkObject that is part of this cycle will very
+  likely break it and make all members collectable; so as long as you
+  destroy all your object, everything should be fine.
+
+  For a cycle to go undetected, it must involve one or more Scheme
+  value (because GtkObject do not form cycles themselves) and at least
+  one `untraced' pointer from one GtkObject to another one.  Currently
+  only the parent->child link is traced, but the plan is to extend
+  this tracing to all inter-object pointers and thus to eliminate the
+  potential for cycles completely.
+
+  Another drawback of untraced references is that they cause certain
+  GtkObjects to be collected later than necessary.  For example, a
+  GtkAdjustment that is in use by a GtkRange *and* known to Scheme has
+  a reference count of 2, one from the GtkRange, the other from the
+  Scheme proxy object.  The GC might discover that the GtkRange is
+  garbage and collect it, thus releasing one referece to the
+  GtkAdjustment.  The GtkAdjustment, however, has not been detected as
+  garbage, because there was an unidentified (untraced) reference to
+  it.  Only the next GC will collect the GtkAdjustment.
+
+* The function `gtk-destroyed?' has been removed, as a consequence of
+  the ref_counting changes.  In some cases, it might be possible to
+  use `gtk-object-destroyed' instead.  This function determines
+  whether `gtk-object-destroy' has been called on a GtkObject.
+
+* Access to information contained in GdkEvents is almost there.  There
+  is a fair number of accessor functions defined in gdk.defs.guile,
+  but I'm not too happy about this approach.  GdkEvent is a quite
+  complicated structure, we should not export this complexity to
+  Scheme.
+
+* Boxed types are implemented differently and can now be reliably compared
+  with `eq?`.
+
+* The syntax of `define-boxed' has been changed to allow for the
+  definition of options (like `fields', see below).  It is now just
+
+    (define-boxed NAME OPTION...)
+
+  The copy, free and size parameters are now specified with the
+  options `copy', `free', and `size'.  The `size' option is, erm,
+  optional, but `copy' and `free' are mandatory.  For example,
+
+    (define-boxed GdkEvent
+      gdk_event_copy
+      gdk_event_free
+      "sizeof(GdkEvent)")
+
+  becomes
+
+    (define-boxed GdkEvent
+      (copy gdk_event_copy)
+      (free gdk_event_free)
+      (size "sizeof(GdkEvent)"))
+
+* Boxed types can now have `fields', like object types.
+
+* The `field' option for object and boxed types can now also specify
+  settable fields by including the `setter' option for an individual
+  field.  For example, within the defintion for GtkAdjustement,
+
+    (fields
+      (float value (setter #t)))
+
+  will generate a function
+
+    gtk-adjustement-set-value! ADJ VALUE
+
+* The `gen-typeinfo' script has been renamed to `build-guile-gtk' and
+  is installed.  It is almost ready to be used for generating glue
+  code for external *.defs files.
+
+  The usage of build-guile-gtk is
+
+     guile-guile-gtk [GLOBAL-OPTIONS] CMD [CMD-OPTIONS] DEFS...
+
+  Supported global options are
+
+     -I DIR          Add DIR to the search path for *.defs files.
+
+  Supported CMDs are
+
+  * glue
+
+  The command "glue" will write glue code for the definitions from the
+  file DEFS to stdout.  DEFS is the name of a file with the familiar
+  feature definitions.  When DEFS does not exist, it is searched for
+  in the `import path' which initially consist of the directory
+  "$(prefix)/share/gtk".  You can add directories to the import path
+  with the -I global option.
+
+  From with a DEFS file you can import other files with the statement
+  
+     (import DEFS)
+
+  This will read DEFS and make all type definitions in it available.
+  No glue code will be generated for the definitions in DEFS.  DEFS is
+  searched in the same way as the file given on the command line.
+
+  After reading the foo.defs file (either from the command line or due
+  to a import statement) build-guile-gtk tries to read a file named
+  "foo.defs.guile".
+
+  The statement
+
+     (add-options SYM OPTS...)
+
+  can be used to add extra `options' to arbitrary features from a
+  *.defs file.  SYM identifies the feature, it is either a type or
+  function name.  OPTS is a list of options.  An option is itself a
+  list of the form
+
+     (NAME VALS...)
+
+  where NAME is symbol that identifies the option.  The statement
+  `add-options' is Guile-gtk specific and should only be used in
+  *.defs.guile files.  In addition, there is also a statement
+
+     (options OPTS)
+
+  that can be used to set global options.  The exact set of options is
+  rather ad-hoc currently.
+
+  * link
+
+  Generate, compile and link a program that is just like guile-gtk but
+  with all bindings from the DEFS files preloaded.  This is useful for
+  systems that can't do dynamic linking of the bindings.  All
+  arguments after "link" that are not *.defs files are passed to the
+  compiler unchanged.
+
+  When you want to have more control, you might find these commands
+  useful:
+
+  * main
+
+  The "main" command will output, to stdout, C code for a main
+  function that initializes all definitions from the DEFS files given
+  as arguments.
+
+  * cflags
+
+  Output necessary options to compile the generated glue code or the
+  output of the "main" command.
+
+  * libs
+
+  Output necessary linker options to link the main function.
+  
+* The `guile.details' file is gone.  Its function is now performed by
+  the options mentioned in the last paragraph.
+
+* The file `gtk.defs' has been split into `gdk.defs' and `gtk.defs',
+  mostly to test out the new features of build-guile-gtk.
+
+* There is a new example program `test-gdk.scm' that shows how one
+  might go about drawing from Scheme.
+
+NEWS in 0.8
+
+* Version 0.8 was never really released.  Or has it?
+
+NEWS in 0.7
+
+* Gtk is only initialized if it hasn't been already.
+
+* The define-func syntax in gtk.defs has changed.  It is now
+
+    (define-func NAME RETURN-TYPE (PARAM ...))
+
+  That is, the params are gathered into their own list and are no
+  longer simply the tail of the whole form.
+
+* New function to initialize libguilegtk: sgtk_init_argv
+
+* We no longer link libguilegtk against the guile libs, on the
+  assumption that they are already included in the base guile
+  application.  In particular, the static libqt.a was causing problems
+  on Solaris.
+
+NEWS in 0.6
+
+* Only bug fixes.
+
+NEWS in 0.5
+
+* Please apply the gtk-interp.patch, Guile-gtk will work much better.
+
+* The Gtk function are now contained in a module, (toolkits gtk).
+  Start your programs with something like
+
+    (use-modules (toolkits gtk))
+
+  This should even work for the vanilla Guile interpreter when dynamic
+  linking of modules works for you.
+
+  To statically link libguilegtk into your application and make it
+  available as a module, use
+
+    scm_init_toolkits_gtkstubs_module ();
+
+  instead of
+
+    sgtk_init (&argc, &argv);
+
+  If you continue to use sgtk_init you will get the old behaviour but
+  the event driven repl wont work.
+
+* Guile-gtk can now run a event driven repl.  This means that you can
+  interactively test your programs.
+
+  The repl is only started when Guile-gtk enters `interactive' mode,
+  that is, when it is not started with the `-c' or `-s' switches.  The
+  event driven repl also starts the main event processing loop (aka
+  gtk-main).
+
+  Therefore, scripts that are run with the -s switch to Guile-gtk
+  should contain their own call to gtk-main (because the repl is not
+  running), but code that will be loaded with -l, or interactively
+  with `load' or from Emacs, etc, should *not* contain a call to
+  gtk-main.
+
+  To compensate, you might want to write your programs like this
+
+    #! /usr/local/bin/guile-gtk \
+    -e main -s
+    !#
+
+    (use-modules (toolkits gtk))
+
+    ...
+    setup your gui
+    ...
+
+    (define (main args)
+      (gtk-main))
+
+  When dynamic linking of modules works for you, you can replace
+  "guile-gtk" in the first line with just "guile".
+
+  To make a vanilla Guile boot into the event driven repl, use this:
+
+    % guile -c "(use-modules (toolkits gtk)) (gtk-repl)"
+
+  Implemantarywise, there should be enough hooks to run arbitrary
+  event driven repls, not just one on the terminal.
+

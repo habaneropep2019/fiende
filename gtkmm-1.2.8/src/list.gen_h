@@ -1,0 +1,328 @@
+/* $Id: list.gen_h,v 1.53 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* list.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gtk--/listitem.h>
+#include <gtk/gtklist.h>
+CLASS_START(Gtk);
+
+
+namespace List_Helpers
+{
+#m4 include(list.m4)
+  GP_LIST(ItemList,List,ListItem)
+  GP_LIST_ELEM(ListItem)
+  GP_LIST_CONTAINER_REMOVE()
+  GP_LIST_ITER(G_List_Cpp_Iterator<GtkListItem,ListItem>)
+  GP_LIST_END()
+
+  GP_LIST(SelectionList,List,ListItem,selection)
+  GP_LIST_READONLY()
+  GP_LIST_ELEM(ListItem)
+  GP_LIST_ITER(G_List_Cpp_Iterator<GtkListItem,ListItem>)
+  GP_LIST_END()
+
+};
+
+//: Widget for packing a list of selectable items.
+//- The {\class Gtk::List} widget is a container whose children are displayed
+//- vertically in order, and can be selected. The list has many selection
+//- modes, which are programmer selective and depend on how many elements
+//- are able to be selected at the same time.
+// Gtk_List is somewhat broken. To insert anything useful to list at its
+// current state, use Gtk_Container::add(Gtk_Widget*)
+class List : public Container {
+  WRAP_CLASS(List,GtkList,GTK_LIST,GTK_IS_LIST,list,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+  typedef List_Helpers::ItemList ItemList;
+  typedef List_Helpers::SelectionList SelectionList;
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: The selection of the widget has just changed.
+  SIGNAL_SPEC("selection_changed",both,void selection_changed());
+
+#m4 GTKMM_CHECK(g_return_if_fail(p1!=0);)
+  //: The child widget has just been selected.
+  SIGNAL_SPEC("select_child",both,
+    void select_child(Gtk::Widget&),
+    void gtk_list_select_child(GtkList*,GtkWidget*));
+
+#m4 GTKMM_CHECK(g_return_if_fail(p1!=0);)
+  //: The child widget has just been unselected.
+  SIGNAL_SPEC("unselect_child",both,
+    void unselect_child(Gtk::Widget&),
+    void gtk_list_unselect_child(GtkList*,GtkWidget*));
+
+  template <class iterator>
+  void append_items(iterator start,iterator stop);
+  template <class iterator>
+  void prepend_items(iterator start,iterator stop);
+  template <class iterator>
+  void insert_items(iterator start,iterator stop,int pos);
+  template <class iterator>
+  void remove_items(iterator start,iterator stop);
+
+  //: Inserts items into the list at the position position.
+  //- items: The items.
+  //- position: The position to insert items, starting at 0.
+  WRAP_METHOD(
+    void gtk_list_insert_items(GtkList*,GList*,gint),
+    void insert_items(GList *items, gint position));
+
+  //: Adds items to the end of the list.
+  //- items: The items.
+  WRAP_METHOD(
+    void gtk_list_append_items(GtkList*,GList*),
+    void append_items(GList *items));
+
+  //: Inserts items at the beginning of the list.
+  //- items: The items.
+  WRAP_METHOD(
+    void gtk_list_prepend_items(GtkList*,GList*),
+    void prepend_items(GList *items));
+
+  //: Removes the items from the list.
+  //- items: The items to remove.
+  WRAP_METHOD(
+    void gtk_list_remove_items(GtkList*,GList*),
+    void remove_items(GList *items));
+
+  //: Removes the items from the list, without unreferencing them.
+  //: It may be useful if you want to move the items from one list to another.
+  //- items: The items.
+  WRAP_METHOD(
+    void gtk_list_remove_items_no_unref(GtkList*,GList*),
+    void remove_items_no_unref(GList *items));
+
+  //: Removes the items between index start (included) and end (excluded) from the list.
+  //- If end is negative, or greater than the number of children of list, it's assumed
+  //- to be exactly the number of elements. If start is greater than or equal to end,
+  //- nothing is done.
+  //-
+  //- start: The index of the first item to remove.
+  //-
+  //- end: The index of the lest item to remove plus one.
+  WRAP_METHOD(
+    void gtk_list_clear_items(GtkList*,gint,gint),
+    void clear_items(gint start, gint end));
+
+  //: Selects the child number item of the list.
+  //- Nothing happens if item is out of bounds. The signal {Gtk::List::select-child}
+  //- will be emitted.
+  //-
+  //- item: The index of the child to select.
+  WRAP_METHOD(
+    void gtk_list_select_item(GtkList*,gint),
+    void select_item(gint item));
+
+  //: Unselects the child number item of the list.
+  //- Nothing happens if item is out of bounds. The signal {Gtk::List::unselect-child}
+  //- will be emitted.
+  //-
+  //- item: The index of the child to unselect.
+  WRAP_METHOD(
+    void gtk_list_unselect_item(GtkList*,gint),
+    void unselect_item(gint item));
+
+  // need to fix gtk+ on the const
+  //: Searches the children of list for the index of child.
+  //- child: The child to look for.
+  //- 
+  //- Returns: The index of the child, -1 if not found.
+  WRAP_METHOD(
+    gint gtk_list_child_position(GtkList*,GtkWidget*) const,
+    gint child_position(Gtk::Widget &child)); 
+
+  //: Set the list selection mode.
+  //- The selection mode can be any value in {Gtk::SelectionMode}:
+  //-
+  //- {\enum GTK_SELECTION_SINGLE}: Zero or one element may be selected.
+  //-
+  //- {\enum GTK_SELECTION_BROWSE}: Exactly one element is always selected (this
+  //- can be false after you have changed the selection mode).
+  //-
+  //- {\enum GTK_SELECTION_MULTIPLE}: Any number of elements may be selected.
+  //- Clicks toggle the state of an item.
+  //-
+  //- {\enum GTK_SELECTION_EXTENDED}: Any number of elements may be selected.
+  //- Click-drag selects a range of elements; the Ctrl key may be used to enlarge
+  //- the selection, and Shift key to select between the focus and the child pointed
+  //- to.
+  //-
+  //- mode: The new selection mode.
+  WRAP_METHOD(
+    void gtk_list_set_selection_mode(GtkList*,GtkSelectionMode),
+    void set_selection_mode(GtkSelectionMode  mode));
+
+
+  ItemList& items()             
+    { return reinterpret_cast<ItemList&>(list_self); }
+  const ItemList& items() const 
+    { return reinterpret_cast<const ItemList&>(list_self); }
+
+  SelectionList& selection()             
+    { return reinterpret_cast<SelectionList&>(list_self); }
+  const SelectionList& selection() const 
+    { return reinterpret_cast<const SelectionList&>(list_self); }
+
+}; 
+
+template <class iterator>
+void List::insert_items(iterator start, iterator stop, gint pos)
+  {
+    GList* items=gtkmm_build_glist(start,stop);
+    if (items) gtk_list_insert_items(gtkobj(),items,pos);
+  }
+
+template <class iterator>
+void List::prepend_items(iterator start, iterator stop)
+  {
+    GList* items=gtkmm_build_glist(start,stop);
+    if (items) gtk_list_prepend_items(gtkobj(),items);
+  }
+
+template <class iterator>
+void List::append_items(iterator start, iterator stop)
+  {
+    GList* items=gtkmm_build_glist(start,stop);
+    if (items) gtk_list_append_items(gtkobj(),items);
+  }
+
+template <class iterator>
+void List::remove_items(iterator start, iterator stop)
+  {
+    GList* items=gtkmm_build_glist(start,stop);
+    if (items) gtk_list_remove_items(gtkobj(),items);
+    g_list_free(items);
+  }
+
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+List_Helpers::ItemList::iterator
+List_Helpers::ItemList::insert(iterator pos, ListItem& e)
+  {
+   GList* items=g_list_append(0,e.gtkobj());
+   if (pos==begin())
+     parent_->prepend_items(items);
+   else if (pos==end())
+     parent_->append_items(items);
+   else
+     parent_->insert_items(items,parent_->child_position(**pos));
+   return --pos;
+  };
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_List)
+//. name: children
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: selection
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: undo_selection
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: undo_unselection
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: last_focus_child
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: undo_focus_child
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: htimer
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: vtimer
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: anchor
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: drag_pos
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: anchor_state
+//. type: GtkStateType
+//. get:
+//. set:
+//. desc:
+
+//. name: selection_mode
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: drag_selection
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: add_mode
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

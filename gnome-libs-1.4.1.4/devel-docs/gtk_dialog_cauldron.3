@@ -1,0 +1,499 @@
+.\" Copyright (c) 1990, 1991 Paul Sheer
+.\"
+.\" The information in this file is provided without warranty
+.\" for its accuracy or completeness.
+.\"
+.TH GTK_DIALOG_CAULDRON 3  "27 September 1998" "Linux Manpage" "Linux Programmer's Manual"
+.SH NAME
+gtk_dialog_cauldron, gtk_dialog_cauldron_parse \- produce gtk/gnome dialog boxes from format strings
+.SH SYNOPSIS
+.B #include <gtk/gtk.h>
+.br
+.B #include <libgnomeui/libgnomeui.h>
+.sp
+\fB\fIgchar *\fPgtk_dialog_cauldron (\fIgchar * title\fP, \fIglong options\fP,
+\fIconst gchar * format\fP,\fI...\fP)\fP
+.br
+.sp
+\fB\fIgchar *\fPgtk_dialog_cauldron_parse (\fIgchar * title\fP, \fIglong options\fP,
+\fIconst gchar * format\fP, \fIGtkCauldronNextArgCallback next_arg\fP,
+\fIgpointer user_data\fP)\fP
+.br
+.SH DESCRIPTION
+The \fBgtk_dialog_cauldron\fP function parses a \fIformat\fP string with
+a variable length list of arguments. The \fIformat\fP string describes a
+dialog box and has intuitive tokens to represent different frames and
+widgets. The dialog box is drawn whereupon \fBgtk_dialog_cauldron\fP
+blocks until closed or until an appropriate button is pushed. Results
+from the widgets are then stored into appropriate variables passed in
+the argument list in order to be retrieved by the caller.
+
+The \fBgtk_dialog_cauldron_parse\fP function parses a \fIformat\fP
+string exactly like \fBgtk_dialog_cauldron\fP, however it derives
+arguments for the format string from a user function \fInext_arg\fP.
+\fBGtk_dialog_cauldron_parse\fP is primarily used for creating
+wrappers for interpreted languages.
+
+The \fBgtk_dialog_cauldron\fP function has had a wrapper coded for the
+\fBPython\fP programming language and is available with the
+\fBpygnome\fP package. See \fBUSAGE FROM WITHIN PYTHON\fP below.
+
+Arguments are:
+.TP
+\fItitle\fP
+is a literal string displayed on the window managers title bar.
+.TP
+\fIoption\fP
+is the inclusive \fBOR\fP of several predefined macros described below
+under \fBGLOBAL OPTIONS\fP, dictating look and behaviour.
+.TP
+\fIformat\fP
+Is a string containing a list of bracketing tokens and format specifiers.
+.TP
+\fIuser_data\fP
+Is passed to \fInext_arg\fP below and is not interpreted.
+.TP
+\fInext_arg\fP
+Must be of the prototype
+
+.nf
+    \fIvoid\fP \fB(*next_arg) (\fP\fIgint cauldron_type\fP\fB,\fP
+       \fIgpointer user_data\fP\fB,\fP \fIvoid *result\fP\fB);\fP
+.fi
+
+Each subsequent call to \fInext_arg\fP must assign to \fI*result\fP a
+pointer to data of the type specified by \fIcauldron_type\fP. (An
+example can be found in \fIgtk_dialog_cauldron.c\fP and the
+\fBpygnome\fP package.) The \fIcauldron_type\fP's are a small set of
+types used for specifying and returning widget data. They are
+enumerated as
+\fIGTK_CAULDRON_TYPE_*\fP in the header file \fIgtkcauldron.h\fP.
+.PP
+.SH EXAMPLE WITH EXPLANATION
+The following simple example shows basic usage of \fBgtk_dialog_cauldron\fP
+for those writing dialogs for GUI applications:
+\fB
+.nf
+    gtk_dialog_cauldron ("Search", 0,
+        " ( (Enter search string:) | %Eod ) / ( %Bqrxfp || %Bqxfp ) ", 
+            &search_string, "Ok", "Cancel");
+.fi
+\fP
+The \fIformat\fP string consists of a list of frames or widgets which
+are packed consecutively into the top-level window. Each frame is
+specified with an opening and closing frame token (a bracket). Each
+widget specifier consists of a % followed by one or more capital letters
+indicating the widget type, followed by zero or more small letters
+indicating various packing, behaviour and/or data options.
+
+A list of frames or widgets are seperated by one of several
+\fIseperator-tokens\fP. Their meanings are.
+.TP
+\fB|\fP
+Pack side by side.
+.TP
+\fB||\fP
+Pack side by side with homogenous spacing - that is, the widget or frames
+to the left or right will always have the same size.
+.TP
+\fB/\fP
+Pack on top of each other.
+.TP
+\fB//\fP
+Pack on top of each other with homogenous spacing.
+.PP
+If no seperator is specified, then a \fI|\fP seperator is implied.
+Frames can be nested infinitely within each other. Only one type of
+seperator can be used within a single frame. If more than one kind of
+seperator is used within a single frame, then each seperator within that
+frame will revert to the type of the first seperator within that frame.
+
+In the above example, the \fIE\fP stands for Entry-widget and the
+\fIB\fP stands for Button-widget. Each of these widgets incurs one
+format conversion: in the case of the entry widget, a \fIchar **\fP must
+be passed, while in that case of the button widget, a \fIchar *\fP must
+be passed. The entry widget will store its result into 
+\fIsearch_string\fP if the dialog is not cancelled and hence
+\fIsearch_string\fP must be writable. The entry widget also derives its
+default text from this variable.
+
+The dialog consists of two frames placed above each other, (defined by
+the two pairs of brackets). The buttons are of the same size, while the
+label and entry widgets are spaced as they require.
+.PP
+.SH REFERENCE
+The following is a complete list of the widgets. Each widget can take
+additional options which are described in \fBOPTIONS\fP below.
+.TP
+.I %L
+Label. Causes one va_arg conversion of type \fIgchar *\fP dictating the
+label's text. This is identical to inline label given in the example
+above, however this allows for internationalisation.
+.TP
+\fI%F\fP, \fI%N\fP, \fI%E\fP, \fI%P\fP
+Entry. This is one of a \fIF\fPile, \fIN\fPumber, plain text \fIE\fPntry
+or \fIP\fPassword entry widget. Causes one va_arg conversion of type
+\fIgchar **\fP which  must contain the default text to be inserted into the
+entry widget, and must be writable to return the result. If the \fIg\fP
+option is present then entries are the gnome versions of those entries
+instead. In the case of \fIF\fP and \fIN\fP, two more \fIgchar *\fP are
+converted - the history_id and the file browser or calculator window
+title respectively. In the case of \fIE\fP, only one more \fIgchar *\fP
+is converted: the history_id.
+.TP
+\fI%D\fP
+Date edit widget. Causes two va_arg conversions of type \fIgdouble *\fP
+and type \fIgint\fP. The first represents the time in seconds since Jan
+1 1970 and is used to initialise the widget as well as to store the
+result - it is cast internally to \fBtime_t\fP. The second is the
+options flag and is the inclusive \fBOR\fP of one or more of
+\fBGNOME_DATE_EDIT_SHOW_TIME\fP, \fBGNOME_DATE_EDIT_24_HR\fP, and
+\fBGNOME_DATE_EDIT_WEEK_STARTS_ON_MONDAY\fP.
+.TP
+\fI%B\fP
+Button with label. One va_arg conversion of type \fIchar *\fP, dictating
+the button label. If this is NULL, then gtk_button_new is called instead
+of gtk_button_new_with_label. If the \fIg\fP option is present then a
+Gnome stock button is drawn, in which case you can pass a Gnome stock
+pixmap macro instead of a string.
+.TP
+\fI%C\fP
+Check box. Two va_arg conversions of type \fIgchar *label\fP and \fIgint
+*state\fP. If label is NULL the same applies as with \fIB\fP. result is
+stored in \fIstate\fP.
+.TP
+\fI%R\fP
+Radio button. Two va_arg conversions of type \fIgchar *label\fP and
+\fIgint *state\fP. Multiple radio buttons within the same frame are
+grouped together. If \fIlabel\fP is NULL then same applies as with \fIB\fP.
+.TP
+\fI%S\fP
+Seperator. Vertical or horizontal automatically determined.
+.TP
+\fI%SB\fP
+Spin button. Two va_arg conversions of type \fIdouble climb_rate\fP and
+\fIgint digits\fP. This is not particularly useful on its own and must
+be used with option \fIj\fP which causes conversion of an
+\fIadjustment\fP parameter set.
+.TP
+\fI%T\fP
+Text. One va_arg conversion of the type \fIgchar **text\fP. Must be
+writable if option \fIe\fP is used to indicate that the text is
+\fIe\fPditable.
+.TP
+\fI%X\fP
+User defined widget. This specifier causes two va_arg conversions: a
+function of type \fIGtkWidget *(*func) (GtkWidget * widget, gpointer user_data)\fP
+and \fIgpointer user_data\fP to be passed to the function. The function
+takes two arguments: the toplevel window widget (which is just to fill in
+a first argument and needn't have any use), and the user data. The
+function must return a widget which will then be packed into its
+enclosing frame.
+.PP
+.SH FRAMES
+Different kinds of brackets specify different kinds of frames. These
+may also take an option, although the option must be specified after the
+closing bracket and not after the opening bracket.
+.TP
+.I [
+A visible frame encloses the widget specified between the brackets.
+.TP
+.I %[
+A frame with a title. Results in one va_arg conversion of type \fIchar
+*title\fP.
+.TP
+.I (
+Invisible hbox or vbox, depending on the enclosed seperators.
+.TP
+.I {
+Pane box (visible frame with adjustable seperator). Only two objects may
+be packed inside, further objects are ignored. It is best to pack only
+other containers into a pane.
+
+The closing bracket may be followed by options. Eg
+\fB
+.nf
+    [ %B ]seo
+.fi
+\fP
+is a button inside an shadowed frame. The \fIs\fPhadow is of type \fIe\fPtched
+\fIo\fPuter.
+
+The closing ) may be followed by the options \fIv\fP or \fIh\fP. This
+indicates that the box must be packed into a scrollable window. Hence
+\fB
+.nf
+    ( %C // %C // %C )v
+.fi
+\fP
+are checkboxes inside a scrollable window with a vertical scrollbar but
+an automatic horizontal bar (\fIautomatic\fP means it appears only if
+necesary).
+
+A very useful option is the \fIn\fP option. This creates a \fBnotebook
+page\fP from the frame. Eg,
+\fB
+.nf
+    ( %C // %C )n ( %L / %E )n ( %Te )n
+.fi
+\fP
+This creates a three page notebook. The \fIn\fP causes one additional
+conversion of type \fIchar *\fP, which is the text to go onto the tag.
+If the \fIv\fP option is given in addition to the \fIn\fP option, then
+the  notebook will have its tags placed to the left descending
+vertically, otherwise the tags are place in the conventional position
+above the notebook.
+
+.SH OPTIONS
+Conversions caused by an option happen in the following order,
+regardless of the order in which the options are given: \fIg\fP,
+\fIj\fP, \fIa\fP, \fIu\fP then \fIc\fP.
+
+.TP
+.I x
+expand, (see gtk_box_pack_start)
+.TP
+.I f
+fill, (see gtk_box_pack_start)
+.TP
+.I p
+padding, (see gtk_box_pack_start). This may be specified more than once
+for additional padding. Padding is in units of 3 pixels per \fIp\fP
+specified. This default can be changed, see \fBGLOBAL OPTIONS\fP below.
+.TP
+.I d
+default, causes default fill, expand, and padding of the widget into
+its parent box. This must not be used with \fIx\fP, \fIf\fP, or \fIp\fP.
+.TP
+\fIsi\fP, \fIso\fP, \fIsei\fP, \fIseo\fP
+Shadow, (see gtk_frame_set_shadow_type). This stands for one of
+\fIi\fPnner, \fIo\fPuter, \fIe\fPtched \fIi\fPnner and \fIe\fPtched
+\fIo\fPuter. The s option must follow the \fI]\fP and not the \fI[\fP.
+.TP
+.I c
+callback. Indicates that we want a callback function to be run after the
+widget is created and packed. It causes two va_arg conversions: a function
+of type \fI*(*func) (GtkWidget * widget, gpointer user_data)\fP and
+\fIgpointer user_data\fP to be passed to the function. The function
+takes two arguments: the widget itself, and \fIuser_data\fP. This option
+may be used if their are additional things we want to do to the widget
+that are out of the scope of the options.
+.TP
+.I r
+results. For a button widget, causes clicking on the button to assign
+the current state of each widgets to any user pointers given. This may
+be given as an option to an `Apply' button, and will necesarily be given
+as an option to an `Ok' button.
+.TP
+.I q
+quit. For a button widget, causes the button to exit the dialog.
+.TP
+.I j
+adjustment. For the Spin Button widget, passes and adjustment object to
+the Spin Button. This causes 6 convertions: a \fIdouble *\fP where the
+initial value is obtained and where the result is stored, and five more
+\fIdouble\fP conversions containing: the lower bound, upper bound, step
+increment, page increment, and page size. (Note that page size must be
+more than the page increment).
+.TP
+.I e
+editable. For the text widget, set it to be editable. In this case, the
+result is assigned to the passed arg. By default the text widget only
+shows the text and does not allow modification.
+.TP
+.I t
+inactive. Use gtk_widget_set_sensitive to disabled (gray-out) the widget.
+.TP
+.I v
+vertical scrollbar. For the text widget and for the \fI[\fP \fI]\fP
+frame, this adds a vertical scrollbar.
+.TP
+.I h
+horizontal scrollbar. For the text widget and for the \fI[\fP \fI]\fP
+frame, this adds a horizontal scrollbar.
+.TP
+.I a
+accelerator. Causes \fIgchar *signal\fP, \fIgint key\fP, \fIgint
+modifier\fP to be converted. This will add an accelerator in the obvious
+way. Note that for most widgets, an accelerator need not be added,
+because the appropriate accelerator is added automatically with the use
+of an ampersand, \fI&\fP, before the accelerator hotkey in the label. (See
+\fBACCELERATOR AMPERSANDS\fP below.)
+.TP
+.I u
+accelerator. This accelerator is used for dialogs that are to be
+internationalised and is similar to \fIa\fP. Causes \fIgchar *signal\fP,
+\fIgchar *key\fP, \fIgint modifier\fP to be converted. To the \fIkey\fP
+argument is passed the same label that is used to label the widget. The
+widget will contain an underbar under the character following the &
+symbol. For example "clicked", "&Cancel", GDK_MOD1_MASK. Binds the
+widget to Alt-C and completely ignores the remaining characters. You can
+then use the same label for the actual contents of the cancel button to
+cause an underbar to be written under the `C'. Note that for most
+widgets, an accelerator need not be added, because the appropriate
+accelerator is added automatically with the use of an ampersand,
+\fI&\fP, before the accelerator hotkey in the label. (See
+\fBACCELERATOR AMPERSANDS\fP below.)
+.TP
+.I o
+focus. Sets the input focus to this widget. Only one widget must have
+this option. (Most dialogs have a default widget accepting keyboard
+input to avoid having to manually set focus with the mouse.)
+.TP
+.I g
+gnome. Use the Gnome version of the widget. May cause additional
+conversions, see \fI%E\fP above.
+.TP
+.I n
+notebook. Cause a \fI[\fP \fI]\fP to be become a notebook page. See
+\fBFRAMES\fP above.
+.PP
+.SH ACCELERATOR AMPERSANDS
+\fBAny\fP widget's text having an \fI&\fP sign in it will have an
+underbar placed below the letter after the \fI&\fP sign. The \fI&\fP
+will not be shown. To draw an actual & sign, use a double ampersand:
+\fI&&\fP
+
+\fBButtons\fP, \fBcheck-boxes\fP, and \fBradio-buttons\fP will also have
+an accelerator automatically added to them along with the underbar. It
+will be bound to the key Alt-X where X is the letter following the
+ampersand.
+.PP
+.SH RETURN VALUES
+NULL is returned if the dialog is cancelled. \fIGTK_CAULDRON_ENTER\fP is
+returned if the user pressed enter (return-on-enter can be overridden -
+see \fBGLOBAL OPTIONS\fP below), and \fIGTK_CAULDRON_ESCAPE\fP is
+returned if the user pressed escape. Otherwise the label of the widget
+that was used to exit the dialog is returned.
+.PP
+.SH EXAMPLES
+
+.nf
+    gtk_dialog_cauldron ("Search", 0,
+    " ( %Ld | %Eod ) / %[ ( %Cd // %Cd // %Cd ) ]seo / ( %Bqrxfp || %Bqxfp ) ", 
+/* %L */		"Enter search string:",
+/* %E */		&search_string,
+/* %[ */		"Search options",
+/* %C */		"Case sensitive", &case_sensitive,
+/* %C */		"Whole words only", &whole_word,
+/* %C */		"Regular expression", &regular_expression,
+/* %B */		"Ok",
+/* %B */		"Cancel");
+.fi
+
+Interwidget spacing can be increased by inserting more space
+characters between format specifiers, however only the first gab is
+looked at. Eg, spreading out the check boxes can be done with:
+\fB
+.nf
+    " ( %Ld | %Ed ) / %[ ( %Cd           // %Cd // %Cd ) ]seo / 
+( %Bqrefp || %Bqefp ) ", 
+.fi
+\fP
+The space between the widget and its parent box can be adjusted
+by adding space after the bracket, eg:
+\fB
+.nf
+    " (          %Ld | %Ed ) / %[ ( %Cd // %Cd // %Cd ) ]seo /
+( %Bqrefp || %Bqefp ) ", 
+.fi
+\fP
+Each space character counts 3 pixels by default. This default can
+be changed, see \fBGLOBAL OPTIONS\fP.
+.PP
+.SH GLOBAL OPTIONS
+The second argument of \fIgtk_dialog_cauldron\fP is an inclusive
+\fIOR\fP of one or more of the following macros OR'd together:
+.PP
+.TP
+\fIGTK_CAULDRON_TOPLEVEL\fP or \fIGTK_CAULDRON_DIALOG\fP or \fIGTK_CAULDRON_POPUP\fP
+These are options translated to the top level window. eg
+\fIGTK_WINDOW_TOPLEVEL\fP.
+.TP
+\fIGTK_CAULDRON_SPACE\fP\fBx\fP
+Specify the equivalent width in pixels of each space or \fIp\fP
+characters. \fBx\fP can have a range of 1 to 15.
+.TP
+.I GTK_CAULDRON_IGNOREESCAPE
+Normalling, pressing the Escape key terminates the dialog. This prevents
+this.
+.TP
+.I GTK_CAULDRON_IGNOREENTER
+Normalling, pressing the Enter/Return key assigns the values and
+terminates. This prevents this.
+.TP
+.I GTK_CAULDRON_GRAB
+Causes a grab on the dialog - that is, no other widgets in the
+application will work until the dialog exits.
+.TP
+.I GTK_CAULDRON_PARENT
+Window managers sometimes allow specification of a parent window so that
+the behaviour of the dialog and some other top level window are associated.
+Gtk allows you to set the parent of the dialog. If you want to enable this,
+use this flag and add in an extra parent argument after the options. The new
+protype becomes:
+.br
+.sp
+\fB\fIgchar *\fPgtk_dialog_cauldron (\fIgchar * title\fP, \fIglong options\fP,
+\fIGtkWidget * parent\fP, \fIconst gchar * format\fP,\fI...\fP)\fP
+.br
+.PP
+.SH USAGE FROM WITHIN PYTHON
+This example should be self explanatary. Note that as in C the results
+are assigned only if the 'r' option in the button is present, otherwise,
+the default values of the widgets are returned regardless of changes
+made by the user. This functionality is available with the \fBpygnome\fP
+and \fBpygtk\fP packages.
+.PP
+.nf
+s = [""]
+
+def user_widget(window,b):
+    def cb_func(w, b):
+	b[0] = "Hello Pressed"
+    w = gtk_button_new_with_label("Hello")
+    gtk_signal_connect(w, "clicked", cb_func, (b,))
+    return w
+
+(button, search_string, case_sens, whole_words, reg_exp) = \
+    gtk_dialog_cauldron (
+	"Search",
+	0,
+	" ( %Ld | %Eod ) / %[ ( %Cd // %Cd // %Cd ) ]seo / 
+( %Bqrxfp || %Bqxfp ) / ( %Xxf ) ",
+	("Enter search string:",
+	"some default search string",
+	"Search options",
+	"Case sensitive", 1,
+	"Whole words only", 0,
+	"Regular expression", 0,
+	"Ok",
+	"Cancel",
+	user_widget, (s,))
+	)
+
+print s[0]
+print (button)
+print (search_string)
+print ("%d %d %d" % (case_sens, whole_words, reg_exp))
+.fi
+.PP
+.SH STANDARDS
+\fBGtk_dialog_cauldron\fP is completely my own invention.
+.SH AVAILABILITY
+\fBGtk_dialog_cauldron\fP comes with Gnome and is part of the libgnomeui
+library. See \fBwww.gnome.org\fP.
+.SH AUTHORS
+Paul Sheer <psheer@obsidian.co.za>
+.SH BUGS
+The outer must braces should \fBnot\fP be present, because extra
+outermost braces are always added to make parsing easier. Adding your
+own will cause an extra frame to encapsulate your outermost frame which
+is harmless but inefficient.
+
+It is not possible to have a user defined widget that clears the dialog
+or returns the results. This must be done using a \fIB\fP or \fIBg\fP
+button.
+
+
+

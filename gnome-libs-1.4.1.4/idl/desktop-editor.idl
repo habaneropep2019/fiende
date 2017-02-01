@@ -1,0 +1,36 @@
+#ifndef __DESKTOP_EDITOR_IDL__
+#define __DESKTOP_EDITOR_IDL__
+
+#if defined(__ORBIT_IDL__)
+%{
+#pragma include_defs desktop-textviewer.h
+%}
+#pragma inhibit push
+#endif
+
+#include "desktop-textviewer.idl"
+
+#if defined(__ORBIT_IDL__)
+#pragma inhibit pop
+#endif
+
+
+module Desktop {
+
+	/* kept this because it looks cleaner (IMHO) when you use this */
+	interface EditorFactory : TextViewerFactory {
+	};
+
+	interface Editor : TextViewer {
+		void insert   (in unsigned long      pos,
+		               in string             new);
+		void delete   (in unsigned long      pos,
+		               in unsigned long      charcount);
+		short replace (in string             regexp,
+		               in string             newstring,
+		               in SEEKFROM           whence,
+		               in SearchOption       flags) raises (NotFound);
+	};
+};
+
+#endif /* __DESKTOP_EDITOR_IDL__ */

@@ -1,0 +1,219 @@
+# copyright (c) 2000 Sun Microsystems, Inc.
+
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(toc/src/toc.h)
+
+AC_ISC_POSIX
+
+AC_CANONICAL_SYSTEM
+
+dnl Checks for programs.
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+dnl Checks for libraries.
+
+dnl Checks for header files.
+AC_HEADER_STDC
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+dnl Checks for library functions.
+AC_FUNC_ALLOCA
+AC_FUNC_MMAP
+AC_CHECK_FUNCS(getcwd getwd putenv strdup)
+
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(scrollkeeper,0.2)
+AM_PROG_LIBTOOL
+
+ALL_LINGUAS="da de el es fr hu ja ko nl no pt_BR ru sk sl sv tr uk"
+
+AC_PATH_PROG(XML_CONFIG,xml-config,no)
+if test x$XML_CONFIG = xno; then
+  AC_MSG_ERROR(Couldn't find xml-config please install the libxml package)
+fi
+XML_LIBS=`$XML_CONFIG --libs`
+XML_CFLAGS=`$XML_CONFIG --cflags`
+AC_SUBST(XML_LIBS)
+AC_SUBST(XML_CFLAGS)
+
+AM_GNU_GETTEXT
+
+dnl Turn on more warnings and make them errors for cvs version
+dnl to force contributors to pay attention to warnings.
+AC_ARG_ENABLE(more-warnings,
+[  --enable-more-warnings  Maximum compiler warnings],
+set_more_warnings="$enableval",[
+if test -f $srcdir/CVSVERSION; then
+        set_more_warnings=yes
+else
+        set_more_warnings=no
+fi
+])
+
+if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
+        echo "enable compile warnings = $set_more_warnings"
+        CFLAGS="$CFLAGS \
+        -Wall \
+        -Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
+        -Wnested-externs -Wpointer-arith \
+        -Werror"
+
+        for option in -Wsign-promo -Wno-sign-compare; do
+                SAVE_CFLAGS="$CFLAGS"
+                CFLAGS="$CFLAGS $VFS_CFLAGS $option"
+                AC_MSG_CHECKING([whether gcc understands $option])
+                AC_TRY_COMPILE([], [],
+                        has_option=yes,
+                        has_option=no,)
+                CFLAGS="$SAVE_CFLAGS"
+                if test $has_option = yes; then
+                  VFS_CFLAGS="$VFS_CFLAGS $option"
+                fi
+                AC_MSG_RESULT($has_option)
+                unset has_option
+                unset SAVE_CFLAGS
+        done
+        unset option
+fi
+
+AC_MSG_RESULT(setting up partial database directory ...)
+case "$host_os" in
+   freebsd*)
+	SCROLLKEEPER_PARTIAL_DB_DIR=db/scrollkeeper
+	;;
+   *)
+        SCROLLKEEPER_PARTIAL_DB_DIR=lib/scrollkeeper
+	;;
+esac
+AC_SUBST(SCROLLKEEPER_PARTIAL_DB_DIR)
+AC_MSG_RESULT(partial database directory is $SCROLLKEEPER_PARTIAL_DB_DIR)
+
+AC_OUTPUT(
+libs/Makefile
+cl/Makefile
+cl/src/Makefile
+cl/templates/Makefile
+cl/templates/C/Makefile
+cl/templates/af/Makefile
+cl/templates/ar/Makefile
+cl/templates/az/Makefile
+cl/templates/bg/Makefile
+cl/templates/bg_BG/Makefile
+cl/templates/bg_BG.cp1251/Makefile
+cl/templates/bo/Makefile
+cl/templates/br/Makefile
+cl/templates/bs/Makefile
+cl/templates/ca/Makefile
+cl/templates/cs/Makefile
+cl/templates/cy/Makefile
+cl/templates/da/Makefile
+cl/templates/de/Makefile
+cl/templates/de_AT/Makefile
+cl/templates/el/Makefile
+cl/templates/en/Makefile
+cl/templates/en_AU/Makefile
+cl/templates/en_GB/Makefile
+cl/templates/en_SE/Makefile
+cl/templates/en_UK/Makefile
+cl/templates/en_US/Makefile
+cl/templates/eo/Makefile
+cl/templates/es/Makefile
+cl/templates/es_DO/Makefile
+cl/templates/es_ES/Makefile
+cl/templates/es_GT/Makefile
+cl/templates/es_HN/Makefile
+cl/templates/es_MX/Makefile
+cl/templates/es_PA/Makefile
+cl/templates/es_PE/Makefile
+cl/templates/es_SV/Makefile
+cl/templates/et/Makefile
+cl/templates/eu/Makefile
+cl/templates/fi/Makefile
+cl/templates/fr/Makefile
+cl/templates/ga/Makefile
+cl/templates/gd/Makefile
+cl/templates/gl/Makefile
+cl/templates/gu/Makefile
+cl/templates/gv/Makefile
+cl/templates/he/Makefile
+cl/templates/hi/Makefile
+cl/templates/hr/Makefile
+cl/templates/hs/Makefile
+cl/templates/hu/Makefile
+cl/templates/id/Makefile
+cl/templates/is/Makefile
+cl/templates/it/Makefile
+cl/templates/ja/Makefile
+cl/templates/ja_JP.eucJP/Makefile
+cl/templates/km/Makefile
+cl/templates/ko/Makefile
+cl/templates/kw/Makefile
+cl/templates/li/Makefile
+cl/templates/lt/Makefile
+cl/templates/mi/Makefile
+cl/templates/mk/Makefile
+cl/templates/mr/Makefile
+cl/templates/nb/Makefile
+cl/templates/nl/Makefile
+cl/templates/nn/Makefile
+cl/templates/no/Makefile
+cl/templates/no_NY/Makefile
+cl/templates/oc/Makefile
+cl/templates/pl/Makefile
+cl/templates/pt/Makefile
+cl/templates/pt_BR/Makefile
+cl/templates/pt_PT/Makefile
+cl/templates/ro/Makefile
+cl/templates/ru/Makefile
+cl/templates/se/Makefile
+cl/templates/sk/Makefile
+cl/templates/sl/Makefile
+cl/templates/sp/Makefile
+cl/templates/sr/Makefile
+cl/templates/sr_YU/Makefile
+cl/templates/sv/Makefile
+cl/templates/sv_SE/Makefile
+cl/templates/ta/Makefile
+cl/templates/th/Makefile
+cl/templates/tr/Makefile
+cl/templates/uk/Makefile
+cl/templates/wa/Makefile
+cl/templates/zh/Makefile
+cl/templates/zh_CN/Makefile
+cl/templates/zh_CN.GB2312/Makefile
+cl/templates/zh_TW/Makefile
+cl/templates/zh_TW.Big5/Makefile
+toc/Makefile
+toc/src/Makefile
+scripts/scrollkeeper-config
+scripts/scrollkeeper-get-content-list
+scripts/scrollkeeper-get-extended-content-list
+scripts/scrollkeeper-get-toc-from-id
+scripts/scrollkeeper-get-toc-from-docpath
+scripts/scrollkeeper-rebuilddb
+scripts/Makefile
+man/Makefile
+man/man8/Makefile
+doc/Makefile
+doc/scrollkeeper_manual/Makefile
+doc/scrollkeeper_manual/C/Makefile
+omf-install/Makefile
+intl/Makefile
+po/Makefile.in
+Makefile
+scrollkeeper.spec)
+
+echo "
+
+Scrollkeeper database directory: $localstatedir/$SCROLLKEEPER_PARTIAL_DB_DIR
+
+"

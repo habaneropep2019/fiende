@@ -1,0 +1,375 @@
+<refentry id="bonobo-bonobo-view">
+<refmeta>
+<refentrytitle>BonoboView</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboView</refname><refpurpose>View object for exporting a view of a BonoboEmbeddable component</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboView-struct">BonoboView</link>;
+typedef     <link linkend="BonoboViewClass">BonoboViewClass</link>;
+#define     <link linkend="BONOBO-VIEW-VERB-FUNC-CAPS">BONOBO_VIEW_VERB_FUNC</link>           (fn)
+void        (<link linkend="BonoboViewVerbFunc">*BonoboViewVerbFunc</link>)           (<link linkend="BonoboView">BonoboView</link> *view,
+                                             const char *verb_name,
+                                             void *user_data);
+<link linkend="BonoboView">BonoboView</link>* <link linkend="bonobo-view-construct">bonobo_view_construct</link>           (<link linkend="BonoboView">BonoboView</link> *view,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);
+<link linkend="BonoboView">BonoboView</link>* <link linkend="bonobo-view-new">bonobo_view_new</link>                 (<link linkend="GtkWidget">GtkWidget</link> *widget);
+void        <link linkend="bonobo-view-set-embeddable">bonobo_view_set_embeddable</link>      (<link linkend="BonoboView">BonoboView</link> *view,
+                                             <link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable);
+<link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* <link linkend="bonobo-view-get-embeddable">bonobo_view_get_embeddable</link>
+                                            (<link linkend="BonoboView">BonoboView</link> *view);
+void        <link linkend="bonobo-view-set-view-frame">bonobo_view_set_view_frame</link>      (<link linkend="BonoboView">BonoboView</link> *view,
+                                             <link linkend="Bonobo-ViewFrame">Bonobo_ViewFrame</link> view_frame);
+<link linkend="Bonobo-ViewFrame">Bonobo_ViewFrame</link> <link linkend="bonobo-view-get-view-frame">bonobo_view_get_view_frame</link> (<link linkend="BonoboView">BonoboView</link> *view);
+<link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> <link linkend="bonobo-view-get-remote-ui-container">bonobo_view_get_remote_ui_container</link>
+                                            (<link linkend="BonoboView">BonoboView</link> *view);
+<link linkend="BonoboUIComponent">BonoboUIComponent</link>* <link linkend="bonobo-view-get-ui-component">bonobo_view_get_ui_component</link>
+                                            (<link linkend="BonoboView">BonoboView</link> *view);
+void        <link linkend="bonobo-view-activate-notify">bonobo_view_activate_notify</link>     (<link linkend="BonoboView">BonoboView</link> *view,
+                                             <link linkend="gboolean">gboolean</link> activated);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+   <link linkend="BonoboView">BonoboView</link> objects are typically created on the view factory
+   callback of a <link linkend="BonoboEmbeddable">BonoboEmbeddable</link> object.  Bonobo components should be
+   able to provide as many view objects as requested by the
+   <link linkend="BonoboEmbeddable">BonoboEmbeddable</link> object on demand.
+</para>
+
+<para>
+   It is the programmer's responsibility to keep the contents of all the
+   views displaying the same information (modulo per-view state, like
+   the zoom factor). Since GtkWidgets do not support linear zooming,
+   it is essential to understand that you cannot use GtkWidgets inside
+   your view - you must write custom rendering code.
+</para>
+
+<para>
+An embeddable view is not a Control - by this I mean that it does not
+control its own sizing, rendering or layout. It is entirely a slave
+to the parent with respect to this. A View should never render
+scroll bars into itself ( unless, exceptionaly if it is activated,
+and allows the user to pan around a larger area ). Essentialy a
+non-activated view should only show things that it will print, and
+should render WYSIWYG as much as possible. Embeddable's views
+scale linearly to obey the zoom level they are given.
+</para>
+
+<para>
+   If your component provides menus, then you use the
+<link linkend="bonobo-view-get-remote-ui-container">bonobo_view_get_remote_ui_container</link>() to retrieve a Bonobo_UIContainer
+handle to merge your menu / toolbar items into.
+</para>
+
+<para>
+   <link linkend="BonoboView">BonoboView</link> objects get a chance to tell their containers their
+   desired size by responding to the "size_query" signal.  They will
+   get their size assigned later.  The size assignment happens on the
+   GtkWidget using the normal Gtk+ size allocation procedure.
+</para>
+
+<para>
+   Your component must support zooming to be a true embeddable. There
+are two ways to support zoom.
+  <itemizedlist>
+    <listitem>
+      <para>
+        Zoom to fit - for simple items such as images this makes sense
+      the item simply displays all of itself scaled to the available
+      size allocated to the GtkWidget.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Scaled - this obeys the zoom factor as set by the container,
+      it also crops the display of the image to the GtkWindow. Connect
+      to the "set_zoom_factor" signal.  This signal gives a floating
+      point value that indicates the desired zoom factor set by your
+      container.
+      </para>
+    </listitem>
+  </itemizedlist>
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboView-struct">struct BonoboView</title>
+<programlisting>struct BonoboView;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboViewClass">BonoboViewClass</title>
+<programlisting>typedef struct {
+	BonoboControlClass       parent_class;
+
+	POA_Bonobo_View__epv     epv;
+
+	/* Signals */
+	void (*do_verb)         (BonoboView *view,
+				 const CORBA_char *verb_name);
+	void (*set_zoom_factor) (BonoboView *view, double zoom);
+
+} BonoboViewClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-VIEW-VERB-FUNC-CAPS">BONOBO_VIEW_VERB_FUNC()</title>
+<programlisting>#define BONOBO_VIEW_VERB_FUNC(fn) ((BonoboViewVerbFunc)(fn))
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fn</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboViewVerbFunc">BonoboViewVerbFunc ()</title>
+<programlisting>void        (*BonoboViewVerbFunc)           (<link linkend="BonoboView">BonoboView</link> *view,
+                                             const char *verb_name,
+                                             void *user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>verb_name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-construct">bonobo_view_construct ()</title>
+<programlisting><link linkend="BonoboView">BonoboView</link>* bonobo_view_construct           (<link linkend="BonoboView">BonoboView</link> *view,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+<parameter>item_creator</parameter> might be NULL for widget-based views.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> The BonoboView object to be initialized.
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> A GtkWidget contains the view and * will be passed to the container
+process's ViewFrame object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the intialized BonoboView object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-new">bonobo_view_new ()</title>
+<programlisting><link linkend="BonoboView">BonoboView</link>* bonobo_view_new                 (<link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+This function creates a new BonoboView object for <parameter>widget</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> a GTK widget that contains the view and will be passed to the
+container process.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a BonoboView object that implements the Bonobo::View CORBA
+service that will transfer the <parameter>widget</parameter> to the container process.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-set-embeddable">bonobo_view_set_embeddable ()</title>
+<programlisting>void        bonobo_view_set_embeddable      (<link linkend="BonoboView">BonoboView</link> *view,
+                                             <link linkend="BonoboEmbeddable">BonoboEmbeddable</link> *embeddable);</programlisting>
+<para>
+This function associates <parameter>view</parameter> with the specified GnomeEmbeddabe
+object, <parameter>embeddable</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A BonoboView object.
+</entry></row>
+<row><entry align="right"><parameter>embeddable</parameter>&nbsp;:</entry>
+<entry> The BonoboEmbeddable object for which <parameter>view</parameter> is a view.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-get-embeddable">bonobo_view_get_embeddable ()</title>
+<programlisting><link linkend="BonoboEmbeddable">BonoboEmbeddable</link>* bonobo_view_get_embeddable
+                                            (<link linkend="BonoboView">BonoboView</link> *view);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A BonoboView object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboEmbeddable object for which <parameter>view</parameter> is a BonoboView.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-set-view-frame">bonobo_view_set_view_frame ()</title>
+<programlisting>void        bonobo_view_set_view_frame      (<link linkend="BonoboView">BonoboView</link> *view,
+                                             <link linkend="Bonobo-ViewFrame">Bonobo_ViewFrame</link> view_frame);</programlisting>
+<para>
+Sets the ViewFrame for <parameter>view</parameter> to <parameter>view_frame</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A BonoboView object.
+</entry></row>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> A CORBA interface for the ViewFrame which contains this View.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-get-view-frame">bonobo_view_get_view_frame ()</title>
+<programlisting><link linkend="Bonobo-ViewFrame">Bonobo_ViewFrame</link> bonobo_view_get_view_frame (<link linkend="BonoboView">BonoboView</link> *view);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A BonoboView object whose Bonobo_ViewFrame CORBA interface is
+being retrieved.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The Bonobo_ViewFrame CORBA object associated with <parameter>view</parameter>, this is
+a CORBA_object_duplicated object.  You need to CORBA_free it when you are
+done with it.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-get-remote-ui-container">bonobo_view_get_remote_ui_container ()</title>
+<programlisting><link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> bonobo_view_get_remote_ui_container
+                                            (<link linkend="BonoboView">BonoboView</link> *view);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A BonoboView object which is bound to a remote BonoboViewFrame.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The Bonobo_UIContainer CORBA server for the remote BonoboViewFrame.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-get-ui-component">bonobo_view_get_ui_component ()</title>
+<programlisting><link linkend="BonoboUIComponent">BonoboUIComponent</link>* bonobo_view_get_ui_component
+                                            (<link linkend="BonoboView">BonoboView</link> *view);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A BonoboView object for which a BonoboUIComponent has been created and set.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboUIComponent which was associated with <parameter>view</parameter> when it was created.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-activate-notify">bonobo_view_activate_notify ()</title>
+<programlisting>void        bonobo_view_activate_notify     (<link linkend="BonoboView">BonoboView</link> *view,
+                                             <link linkend="gboolean">gboolean</link> activated);</programlisting>
+<para>
+This function notifies <parameter>view</parameter>'s remote ViewFrame that the activation
+state of <parameter>view</parameter> has changed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A BonoboView object which is bound to a remote BonoboViewFrame..
+</entry></row>
+<row><entry align="right"><parameter>activated</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+   <link linkend="BonoboViewFrame">BonoboViewFrame</link>,  <link linkend="BonoboEmbeddable">BonoboEmbeddable</link>, <link linkend="BonoboWidget">BonoboWidget</link>, <link linkend="bonobo-widget-new">bonobo_widget_new</link>()
+</para>
+</refsect1>
+
+</refentry>

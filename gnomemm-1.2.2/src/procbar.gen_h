@@ -1,0 +1,134 @@
+/* $Id: procbar.gen_h,v 1.7 2001/04/24 14:39:35 murrayc Exp $ */
+
+
+/* procbar.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <gtk--/label.h>
+#include <libgnomeui/gnome-procbar.h>
+#include <vector>
+
+
+CLASS_START(Gnome);
+
+using std::vector;
+
+class ProcBar : public Gtk::HBox
+{
+  WRAP_CLASS(ProcBar, GnomeProcBar,
+             GNOME_PROC_BAR, GNOME_IS_PROC_BAR,
+             proc_bar,
+             Gtk::HBox, GtkHBox, GTK_HBOX);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+
+  ProcBar(const Gtk::Label &label,
+		const vector<Gdk_Color*> &colors,
+		gint (*cb)());
+
+  void set_values (const vector<unsigned> &values);
+
+  WRAP_METHOD(void gnome_proc_bar_set_orient (GnomeProcBar*, gboolean),
+	      void set_orient (bool vertical));
+
+  WRAP_METHOD(void gnome_proc_bar_start (GnomeProcBar*, gint , gpointer),
+	      void start (gint gtime, gpointer data));
+
+  WRAP_METHOD(void gnome_proc_bar_stop (GnomeProcBar*),
+	      void stop ());
+
+  void update (const vector<Gdk_Color*> &colors);
+private:
+  void update_internal_gdk_colors(const vector<Gdk_Color*> &colors);
+  GdkColor *colors_;
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+#include <gnome--/private/procbar_p.h>
+
+namespace Gnome {
+
+ProcBar::ProcBar(const Gtk::Label &label,
+			     const vector<Gdk_Color*> &colors,
+			     gint (*cb)())
+  : Gtk::HBox(GTK_HBOX(gtk_object_new(get_type(),0))),
+    colors_(0)
+{
+  initialize_class();
+
+  update_internal_gdk_colors(colors);
+  
+  gnome_proc_bar_construct(gtkobj(),
+			   GTK_WIDGET(const_cast<GtkLabel*>(label.gtkobj())),
+			   colors.size(),
+			   colors_,
+			   cb);
+}
+
+ProcBar::~ProcBar()
+{
+  delete colors_;
+}
+
+void
+ProcBar::set_values(const vector<unsigned int> &values)
+{
+  // OK, passing the address of the 1st element of the vector is not
+  // guaranteed to work, but I don't know of an implementation where
+  // it doesn't - e.g. the vector stores data contiguously. Also, the
+  // values are copied by the function, the widget does not keep a
+  // pointer to the array. Otherwise, there would be troubles as soon
+  // as the vector re-allocs its internal data.
+  //
+  gnome_proc_bar_set_values (gtkobj(), &values[0]);
+}
+
+void
+ProcBar::update_internal_gdk_colors(const vector<Gdk_Color*> &colors)
+{
+  delete colors_;
+  
+  colors_ = new GdkColor[colors.size()];
+
+  for(unsigned int i = 0; i < colors.size(); ++i)
+    {
+      colors_[i] = *(colors[i]->gdkobj());
+    }
+}
+
+
+
+void
+ProcBar::update(const vector<Gdk_Color*> &colors)
+{
+  update_internal_gdk_colors(colors);
+  gnome_proc_bar_update(gtkobj(), colors_);
+}
+
+} /* namespace Gnome */
+
+
+DOCUMENTATION_START;
+

@@ -1,0 +1,169 @@
+			Design for the POA
+
+...Important concepts in the POA...
+
+A "servant" - language specific object. This _has_ to be abstracted in
+a language-independant manner, so that in the future when we want to
+have an ORB for Objective C and guile or such, we can do it easily.
+
+For a servant in C, we will need a structure that points to the
+implementation for all the methods on a function, plus a "user-data"
+field perhaps.
+
+Need a data structure to translate between servants and CORBA_Objects.
+Two GHashTable's might do the trick.
+	- Possibility of using gperf as in TAO (it's a cool idea,
+	  but getting a list of all 
+
+-- Elliot
+
+<Append your ideas>
+
+
+<Phil>
+
+There are 5 stages to demultiplexing the request from outside up to
+the servant. Depending on context, the orb could potentually
+short-circuit any or all of them.
+
+To take advantage of this, ORBit needs an architecture that allows it
+to colaborate with the client and server stubs to determine the most
+optimal (safe) route and 'wire' it up.
+
+Here's my stab at it:
+
+
+The object reference struct contains:
+
+1) A pointer to a dispatch function, which takes a GIOP request and
+returns a GIOP reply.
+
+2) A pointer to a Lookup function, which takes an object key &
+operation name, and returns a direct pointer to a servant operation.
+
+3) A pointer to a Flattened EPV containing pointers for all the
+operations supported by the object.
+
+4) A pointer to an object 'key'
+
+
+The client talks to a thin layer (macros?) which forward all calls
+through a the EPV in the object reference struct.
+
+The idl compiler generates two stubs which implement this epv
+interface: a marshalling stub and a collation stub.
+
+
+
+Client-side ORB: Wiring up the object reference
+-----------------------------------------------
+
+When the client orb recieves a request for an object reference, it
+checks the IOR of the object with a collation table to determine the
+location of the server.
+
+1) If client and server are in a seperate address space, it hooks up
+the marshalling stub, and connects the orb transport dispatch function
+to the dispatch member in the object reference.
+
+2) If client and server are in the same address space, it hooks up the
+marshalling stub and connects a dispatch function from some point in
+the demux chain-of-responsibility (more on this later).
+
+3) If client and server are in the same address space, and can both
+talk through the binary operation interface (this is specified at
+IDL->stub compile time) the orb hooks up a collation stub and a lookup
+function to the object reference.
+
+4) If client and server are in the same address space, and certain
+stringent conditions exist (real time poa, 1 servant per object, both
+client and servant stubs agree that this is safe etc.), the orb hooks
+up the servant EPV *directly* to the object reference, and sets the
+object key pointer to point to the servant.
+
+
+
+Client-side stub: Invoking an object request
+--------------------------------------------
+
+1) If Marshalling stub is used, request is marshalled into a GIOP
+structure and the dispatch function on the Object reference is called.
+
+2) If Collation stub is used (i.e both client and server can talk
+through the binary interface), the stub calls the 'Lookup' function
+with the object key and operation name, which returns a pointer to the
+servant operation. The stub then calls this operation directly.
+
+3) If the servant EPV is used directly... well you know the rest.
+
+
+
+Server-side orb: Connecting up the dispatch and lookup functions
+----------------------------------------------------------------
+
+The full demultiplexing process from the client to the server goes
+through the following steps:
+
+1) Demux to server process ORB
+2) Demux to POA
+3) Demux to servant
+4) Demux to operation skeleton
+5) Handle replies, exceptions and location forwarding.
+
+Depending on context, the ORB can potentually optimise out any or all
+of these steps. In order to do this each level has a common interface
+providing a dispatch and a lookup function.
+
+
+1) If client and server are in the same process, the dispatch and
+lookup functions on the object reference can be wired directly to the
+ORB, thus bypassing stage 1.
+
+2) If (1), and the POA is static within the orb (won't be destroyed),
+the dispatch and lookup functions can be wired directly to the POA.
+
+3) If (2), and the object adaptor is a real-time POA, the dispatch and
+lookup functions can be wired directly to the servant thus bypassing
+the first 3 stages.
+
+4) If (3) and the Client knows the layout of the EPV explicitly and
+doesn't require special server logic to handle downcasting
+etc.. (e.g. client knows that server is only single inheriteted, or is
+willing to break the C-language mapping and use explicit casting
+macros) the orb can wire the epv to the servant and bypass all of the
+stages completely.
+
+
+
+Other bits
+----------
+
+
+Why a flat EPV? 
+
+I don't think the VEPV->EPV layout specified by the C-mapping actually
+gives us anything except for extra overhead. Of course we'll still
+have to create it for the server POA skeleton in order to remain corba
+compliant, but I think it'd be better if we used a flat epv internally.
+
+
+Don't some of these things 'break' the corba spec?
+
+Yes, although the emerging real-time poa spec allows the server to
+make certain assumptions about the availability of a RTPoa which gives
+us more optimisation leverage.
+I think our basic strategy should be to provide compliant operation by
+default, and then let the user overide this with flags to the idl
+compiler and orb. All of the 'breakages' above are carefully
+encapsulated by the idl stubs and the orb operation, so the users code
+would still be corba 2.2 compliant. 
+
+The only exception to this is if the user decides to enable and use
+IDL-compiler generated explicit cast macros to efficiently solve the MI
+problem. Although this does break the C-language mapping in the user
+code, it would be trivial to write a 'porting' script which
+takes these macros out of user code if he/she ever wants to use the
+it with a different orb.
+
+
+</Phil>

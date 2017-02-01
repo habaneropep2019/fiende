@@ -1,0 +1,1223 @@
+<!-- ##### SECTION Title ##### -->
+gnome-app-helper
+
+<!-- ##### SECTION Short_Description ##### -->
+Simplified menu and toolbar creation.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The GNOME App Helper module contains macros, functions and data
+structures used to simplify the creation of menus and toolbars
+for GNOME applications.</para>
+
+<para>Menus and toolbars created with GnomeApp helper ensure
+a consistent user interface.</para>
+
+<para> The basic building block is an array of
+<structname>GnomeUIInfoType</structname> structures.  You can use a
+number of macros to fill in each one of these structure entries, or
+you can fill each parameter manually if you wish to do so (although,
+it is not recommended, as it is an error-prone task).</para>
+
+  <refsect2>
+    <title>GNOME user interface recomendations for
+    applications</title>
+
+    <para>
+      The following is a list of suggestions to improve the
+      consistency of your application with the rest of the GNOME
+      tools
+    </para>
+
+    <itemizedlist>
+      <listitem><para>The order of the toplevel menus should be:</para>
+
+	  <para>File, &lt; any MDI child menus &gt;, Edit, View, Game, CUSTOM MENUS,
+	  Settings, Windows and Help</para>
+
+          <para>The Help menu should not be right-justified.</para>
+
+          <para>CUSTOM MENUS is where you should put your
+          application-specific top-level menus, such as Gnumeric's
+          "Insert" menu.  These are all optional except Help.</para>
+      </listitem>
+
+      <listitem><para>The prescribed order of standard menu items in
+          the "File" menu is the following:</para>
+
+          <para>New Window, SEPARATOR, New, Open, Save, Save As, Revert,
+          SEPARATOR, Print, Print Setup, SEPARATOR, Close, and Exit</para>
+
+          <para>The first menu must always be the "File" menu (unless
+          there are no files in your application, for example, in a
+          game you can call this "Game"), and it must always be called
+          "_File".</para>
+
+         <para>The main reason for this is that it is important for
+         the menu accelerators to be consistent.  Your application is
+         required to have at the very least a "File" menu containing
+         at the very least "Exit".</para>
+
+         <para>The New Window menu item should be a subtree if there
+         are different types of new windows which can be spawned.</para>
+
+         <para>All of these are optional, except Exit.</para>
+     </listitem>
+
+     <listitem><para>The prescribed order of standard menu items in the "Edit"
+         menu is the following:</para>
+
+         <para>Undo, Redo, SEPARATOR, Cut, Copy, Paste, Clear, Select
+         All, SEPARATOR, Add, SEPARATOR, Find, Find Again, and Replace</para>
+
+         <para>The "Add" item should be used to insert new editable
+         items, e.g. a new card in a rolodex app.  If there is more
+         than one type of insertable editable item, "Add" should be a
+         menu subtree.</para>
+     </listitem>
+
+     <listitem><para>The 'Windows' menu should be used by MDI
+        applications to contain a list of the document windows.  It
+        should be structured like this:</para>
+ 
+		<para>MDI window list</para>
+     </listitem>
+
+     <listitem><para>For standard menu items (Save, Save As, Close,
+        Quit, etc), use the macros defined in gnome-app-helper.h,
+        e.g.</para>
+
+<informalexample>
+<programlisting>
+	     GNOMEUIINFO_MENU_EXIT_ITEM(CB, DATA)
+</programlisting>
+</informalexample>
+
+     <para>except for New where the define is:</para>
+
+<informalexample>
+<programlisting>
+	     GNOMEUIINFO_MENU_NEW_ITEM(LABEL,TIP,CB,DATA)
+</programlisting>
+</informalexample>
+
+         <para>Where LABEL is the the text which appears in the menu
+         for this menu item.  You should put LABEL in the form of
+         N_("_New Document"), or whatever is appropriate for your
+         application.  TIP should be the description of this menu
+         item's function, e.g. N_("Create a new document").  This
+         ensures that your application menus can be translated to the
+         language of the user.</para>
+   </listitem>
+
+   <listitem><para>The standard print menu item should immediately print
+         the document without popping up a dialog.  If the user wants
+         a dialog, he will use the print_setup menu item.</para>
+
+         <para>For some standard toplevel menus (File, Edit, Help,
+         etc), you should use the macros GNOMEUIINFO_*_MENU(tree).</para></listitem>
+      
+   <listitem><para>For the help menu, you should have this:
+     %GNOMEUIINFO_HELP(app_name), %GNOMEUIINFO_MENU_ABOUT_ITEM(cb,
+     data), %GNOMEUIINFO_END</para></listitem>
+
+   <listitem><para>Ellipsis ("...") should be used on menu items that
+     require the application to prompt the user for extra information
+     before the command can execute.  "Save as..." is one of these
+     because the application needs to ask the user for the filename.
+     "About" is not because the command *is* to pop up an about box,
+     and it does not need to prompt for information before doing that.</para></listitem>
+
+   <listitem><para>Your menu hints should not have a trailing period.
+     They should be phrased like commands, e.g. "Open a new file".  Do
+     not phrase them like a description, e.g. "Opens a new file".</para></listitem>
+
+   <listitem><para> All menu text should be internationalized.  Use
+     the N_() macro, e.g.  N_("Open new mailbox")</para></listitem>
+
+   <listitem><para>You may notice that most of these guidelines seem
+     geared towards "productivity" applications (editors,
+     spreadsheets, ...).  If you're writing a game, most of your menu
+     items won't be appropriate in these menus.  The solution is to
+     create a "Game" menu which contains the game-related menu items.
+     The contents of the Game menu are as follows:</para>
+
+	 <para>New Game, Pause Game, Restart Game, SEPARATOR, Undo Move,
+	 Redo Move, Hint, SEPARATOR, Scores, and End game</para>
+
+     <para>End game should just end the current game -- it shouldn't
+     close the application.  That's the job of File/Exit.</para></listitem>
+      
+    </itemizedlist>
+  </refsect2>
+
+  <refsect2>
+    <title>Defining menus and toolbars.</title>
+
+    <para>All of the macros prefixed with %GNOMEUIINFO_MENU_ can be
+    used to simplify the task of making your application consistent
+    with the GNOME user interface recomendations.  The macros include
+    the default texts to show, images (in case they have one), pop-up
+    tooltips and in some cases default key-bindings. </para>
+
+    <para>A toplevel menu (like the one used by the GnomeApp widget)
+    is just an array of structures of type
+    <structname>GnomeUIInfoType</structname>.  Each record of type
+    <structname>GnomeUIInfoType</structname> in this array can
+    represent a menu item that the user can select, a radio-button, a
+    check-box, a division line, or a submenu.</para>
+
+    <para>There are a number of macros that will help you fill in this
+    structure to make your application conform to the GNOME user
+    interface guidelines.</para>
+
+    <para>The following macros can be used to create consistent
+    toplevel menus and they provide the standard naming for your
+    toplevel menus as well as translated texts for the various
+    languages supported by the GNOME libraries:</para>
+
+      <itemizedlist>
+
+	<listitem><para>%GNOMEUIINFO_MENU_FILE_TREE: Used for the
+	program "File" menu.  </para></listitem>
+
+	<listitem><para>%GNOMEUIINFO_MENU_EDIT_TREE: Used for the
+	program "Edit" menu.  </para></listitem>
+
+	<listitem><para>%GNOMEUIINFO_MENU_VIEW_TREE: Used for the
+	program "View" menu.  </para></listitem>
+
+	<listitem><para>%GNOMEUIINFO_MENU_SETTINGS_TREE: Used for the
+	program "Settings" menu.  </para></listitem>
+
+	<listitem><para>%GNOMEUIINFO_MENU_FILES_TREE: Used for the
+	program "Files" menu.  </para></listitem>
+
+	<listitem><para>%GNOMEUIINFO_MENU_WINDOWS_TREE: Used for the
+	program "Windows" menu.  </para></listitem>
+
+	<listitem><para>%GNOMEUIINFO_MENU_HELP_TREE: Used for the
+	program "Help" menu.  </para></listitem>
+
+	<listitem><para>%GNOMEUIINFO_MENU_GAME_TREE: Used for the
+	program "Game" menu.  Games should use the "Game" menu is used
+	instead of the "File" menu as the main menu entry in the GNOME
+	user interface guidelines </para></listitem>
+
+      </itemizedlist>
+  </refsect2>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### ENUM GnomeUIInfoType ##### -->
+<para>
+This enumeration is used to set the value in a
+<structname>GnomeUIInfo</structname> record to specify the type of the
+record.  There are macros that can do all the work for you.  Use
+those instead of these macros.  It is defined as follows:</para>
+
+<itemizedlist>
+	<listitem><para>%GNOME_APP_UI_ENDOFINFO: Use this to denote
+	     the end of the records in a #GnomeUIInfo array.
+	     </para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_ITEM: Use this for a normal
+             item, or radio item if it is inside a radioitems group.
+             </para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_TOGGLEITEM: Use this for a
+             toggle (check box) item. </para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_RADIOITEMS: Use this for a radio
+	     item group.</para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_SUBTREE: Use this to define a
+	     subtree or a submenu.  Set the
+	     <structfield>moreinfo</structfield> field in the
+	     structure to point to another array of #GnomeUIInfo
+	     structures.</para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_SEPARATOR: Use this to introduce
+	     a separator line (for menus) or a blank (for toolbars).
+	     </para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_HELP: Use this to create a list
+             of help topics.  This is usually employed on the Help
+             menu.</para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_BUILDER_DATA: Specifies the
+	     builder data for the following entries, see code for
+	     further info.</para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_ITEM_CONFIGURABLE: A
+	     configurable menu item.  You should be careful when using
+	     gnome_app_create_*_[custom|interp|with_data]() functions
+	     with GnomeUIInfo arrays containing
+	     GNOME_APP_UI_BUILDER_DATA items since their
+	     GnomeUIBuilderData structures completely override the
+	     ones generated or supplied by the above
+	     functions. </para></listitem>
+
+	<listitem><para>%GNOME_APP_UI_SUBTREE_STOCK: Use this to
+              specifiy a subtree/submenu. Same as
+              GNOME_APP_UI_SUBTREE, but the texts should be looked up
+              in the gnome-libs catalog. </para></listitem>
+
+</itemizedlist>
+
+
+<!-- ##### ENUM GnomeUIInfoConfigurableTypes ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM GnomeUIPixmapType ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GnomeUIInfo ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNOMEUIINFO_KEY_UIDATA ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOMEUIINFO_KEY_UIBDATA ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOMEUIINFO_END ##### -->
+<para>
+Use this macro to tag the end of a menu or toolbar definition.
+</para>
+
+
+
+<!-- ##### MACRO GNOMEUIINFO_SEPARATOR ##### -->
+<para>
+Use this macro to include a separator in your menu.
+</para>
+
+
+
+<!-- ##### MACRO GNOMEUIINFO_ITEM ##### -->
+<para>
+Generic menu or toolbar item which includes a label, a tooltip and an
+optional pixmap (in xpm format) to be displayed next to the entry. 
+</para>
+
+@label: The text that will be displayed
+@tooltip: The tooltip that will popup.
+@callback: Callback routine to invoke.
+@xpm_data: Pointer to a pixmap to display (in C-xpm format).
+
+
+<!-- ##### MACRO GNOMEUIINFO_ITEM_STOCK ##### -->
+<para>
+Use this macro to include an item in your menu that includes a
+GNOME-stock image.
+</para>
+
+@label: The text that will be displayed
+@tooltip: The tooltip that will popup.
+@callback: Callback routine to invoke.
+@stock_id: A GNOME-stock pixmap name.
+
+
+<!-- ##### MACRO GNOMEUIINFO_ITEM_NONE ##### -->
+<para>
+Use this macro to add an item to the menu that has no pixmap
+associated with it. 
+</para>
+
+@label: The text that will be displayed
+@tooltip: The tooltip that will popup.
+@callback: Callback routine to invoke.
+
+
+<!-- ##### MACRO GNOMEUIINFO_ITEM_DATA ##### -->
+<para>
+Use this macro to create a menu item and keep some information in the
+structure.
+</para>
+
+@label: The text that will be displayed
+@tooltip: The tooltip that will popup.
+@callback: Callback routine to invoke.
+@user_data: Data passed around.
+@xpm_data: Pointer to a pixmap to display (in C-xpm format).
+
+
+<!-- ##### MACRO GNOMEUIINFO_TOGGLEITEM ##### -->
+<para>
+Creates a toggle-item (a checkbox) in a menu, this includes an xpm
+graphic. 
+</para>
+
+@label: The text that will be displayed
+@tooltip: The tooltip that will popup.
+@callback: Callback routine to invoke.
+@xpm_data: Pointer to a pixmap to display (in C-xpm format).
+
+
+<!-- ##### MACRO GNOMEUIINFO_TOGGLEITEM_DATA ##### -->
+<para>
+Creates a toggle-item (a checkbox) in a menu, this includes an xpm
+graphic.  Allows you to specify the data to be passed around to your
+callback routine.
+</para>
+
+@label: The text that will be displayed
+@tooltip: The tooltip that will popup.
+@callback: Callback routine to invoke.
+@user_data: Data to pass to callback routine.
+@xpm_data: Pointer to a pixmap to display (in C-xpm format).
+
+
+<!-- ##### MACRO GNOMEUIINFO_HELP ##### -->
+<para>
+This special item inserts all of the topics defined by the application
+in the <filename>topic.dat</filename> file.  The menu is constructed
+from the information stored in the file associated with the @app_name
+you provide.  The information is usually taken from
+<filename>$(datadir)/help/@app_name/$LANG/topic.dat</filename>.  Where
+$LANG is the language chosen when running the application.
+</para>
+
+@app_name: The application name.  Used to locate the correct topic.dat file.
+
+
+<!-- ##### MACRO GNOMEUIINFO_SUBTREE ##### -->
+<para>
+Creates a submenu or a sub-tree in the menu structure.  The argument
+passed is an array of <structname>GnomeUIInfo</structname>.
+</para>
+
+@label: The text that will be displayed
+@tree: A pointer to a <structname>GnomeUIInfo</structname>.
+
+
+<!-- ##### MACRO GNOMEUIINFO_SUBTREE_STOCK ##### -->
+<para>
+Creates a submenu or a sub-tree in the menu structure with a stock
+pixmap displayed.  The argument
+passed is an array of <structname>GnomeUIInfo</structname>.
+</para>
+
+@label: The text that will be displayed
+@tree: A pointer to a <structname>GnomeUIInfo</structname>.
+@stock_id: A GNOME-stock pixmap name.
+
+
+<!-- ##### MACRO GNOMEUIINFO_RADIOLIST ##### -->
+<para>
+
+</para>
+
+@list: 
+
+
+<!-- ##### MACRO GNOMEUIINFO_RADIOITEM ##### -->
+<para>
+
+</para>
+
+@label: The text that will be displayed
+@tooltip: The tooltip that will popup.
+@callback: Callback routine to invoke.
+@xpm_data: Pointer to a pixmap to display (in C-xpm format).
+
+
+<!-- ##### MACRO GNOMEUIINFO_RADIOITEM_DATA ##### -->
+<para>
+
+</para>
+
+@label: The text that will be displayed
+@tooltip: The tooltip that will popup.
+@callback: Callback routine to invoke.
+@user_data: 
+@xpm_data: Pointer to a pixmap to display (in C-xpm format).
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_ABOUT_ITEM ##### -->
+<para>
+Use this macro inside a GnomeUIInfo structure to include an "About"
+menu entry.  
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_CLEAR_ITEM ##### -->
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Clear"
+option.  This is used typically in the Edit menu. 
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_CLOSE_ITEM ##### -->
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Close"
+menu entry.  This is used typically in the File menu or the Game menu
+to close the toplevel window.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_CLOSE_WINDOW_ITEM ##### -->
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Close"
+option.  This is used typically in the Window menu if your application
+includes one.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_COPY_ITEM ##### -->
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Copy"
+option.  This is used typically in the Edit menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_CUT_ITEM ##### -->
+<para>
+Use this macro inside a GnomeUIInfo structure to include a "Cut"
+option.  This is used typically in the Edit menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_EDIT_TREE ##### -->
+<para>
+Inserts a top-level "Edit" menu.  The argument is a pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_END_GAME_ITEM ##### -->
+<para>
+Use this macro to include an "End game" menu item.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_EXIT_ITEM ##### -->
+<para>
+Use this macro to include an "Exit" menu entry.  To be included in the
+"File" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_FILES_TREE ##### -->
+<para>
+Inserts a top-level "Files" menu.  The argument is pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_FILE_TREE ##### -->
+<para>
+Inserts a top-level "File" menu.  The argument is pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_FIND_AGAIN_ITEM ##### -->
+<para>
+Use this macro to include a "Find again" menu entry.  To be included
+in the "Edit" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_FIND_ITEM ##### -->
+<para>
+Use this macro to include a "Find" menu entry.  To be included in the
+"Edit" menu.
+
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_GAME_TREE ##### -->
+<para>
+Inserts a top-level "Game" menu.  The argument is a pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_HELP_TREE ##### -->
+<para>
+Inserts a top-level "Game" menu.  The argument is pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_HINT_ITEM ##### -->
+<para>
+
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_NEW_GAME_ITEM ##### -->
+<para>
+Use this macro to include an "New game" menu entry.  To be included in the
+"Game" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_NEW_ITEM ##### -->
+<para>
+Use this macro to include a "New" menu entry.  To be included in the
+"File" menu.
+</para>
+
+@label: The text that will be displayed
+@tip: 
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_NEW_SUBTREE ##### -->
+<para>
+
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_NEW_WINDOW_ITEM ##### -->
+<para>
+Use this macro to include a "New window" menu entry.  
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_OPEN_ITEM ##### -->
+<para>
+Use this macro to include an "Open" menu entry.  To be used in the
+"File" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_PASTE_ITEM ##### -->
+<para>
+Use this macro to include a "Paste" menu entry.  To be used in the
+"Edit" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_PAUSE_GAME_ITEM ##### -->
+<para>
+Use this macro to include a "Pause game" menu entry.  To be used in the
+"Game" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_PREFERENCES_ITEM ##### -->
+<para>
+Use this macro to include a "Preferences" menu entry.  
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_PRINT_ITEM ##### -->
+<para>
+Use this macro to include a "Print" menu entry.  To be used in the
+"File" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_PRINT_SETUP_ITEM ##### -->
+<para>
+Use this macro to include a "Print setup" menu entry.  To be used in the
+"File" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_PROPERTIES_ITEM ##### -->
+<para>
+Use this macro to include a "Properties" menu entry.  
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_REDO_ITEM ##### -->
+<para>
+Use this macro to include a "Redo" menu entry.  Most likely to be put
+in the "Edit" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_REDO_MOVE_ITEM ##### -->
+<para>
+Use this macro to include a "Redo move" menu entry.  Most likely to be put
+in the "Edit" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_REPLACE_ITEM ##### -->
+<para>
+Use this macro to include a "Replace" menu entry.  
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_RESTART_GAME_ITEM ##### -->
+<para>
+Use this macro to include a "Restart game" menu entry.  To be used in
+the "Game" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_REVERT_ITEM ##### -->
+<para>
+Use this macro to include a "Revert" menu entry.  
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_SAVE_AS_ITEM ##### -->
+<para>
+Use this macro to include a "Save as" menu entry.  To be used in
+the "File" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_SAVE_ITEM ##### -->
+<para>
+Use this macro to include a "Save" menu entry.  To be used in
+the "File" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_SCORES_ITEM ##### -->
+<para>
+Use this macro to include a "Scores" menu entry.  To be used in
+the "Game" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_SELECT_ALL_ITEM ##### -->
+<para>
+Use this macro to include a "Select all" menu entry.  Most likely to
+be used in the "Edit" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_SETTINGS_TREE ##### -->
+<para>
+Inserts a top-level "Settings" menu.  The argument is a pointer to
+<structname>GnomeUIInfo</structname> that will contain the submenu to
+insert. 
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_UNDO_ITEM ##### -->
+<para>
+Use this macro to include an "Undo" menu entry.  Most likely to
+be used in the "Edit" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_UNDO_MOVE_ITEM ##### -->
+<para>
+Use this macro to include an "Undo move" menu entry.  Most likely to
+be used in the "Edit" menu.
+</para>
+
+@cb: Specifies the routine to be invoked when the menu is selected
+@data: The data passed to your routine.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_VIEW_TREE ##### -->
+<para>
+
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_MENU_WINDOWS_TREE ##### -->
+<para>
+
+</para>
+
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOMEUIINFO_SUBTREE_HINT ##### -->
+<para>
+
+</para>
+
+@label: The text that will be displayed
+@hint: 
+@tree: array of <structname>GnomeUIInfo</structname> structures for
+the submenu.
+
+
+<!-- ##### MACRO GNOME_MENU_FILE_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_FILE_PATH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_EDIT_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_EDIT_PATH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_VIEW_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_VIEW_PATH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_SETTINGS_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_SETTINGS_PATH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_FILES_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_FILES_PATH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_WINDOWS_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNOME_MENU_WINDOWS_PATH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT GnomeUIBuilderData ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION GnomeUISignalConnectFunc ##### -->
+<para>
+
+</para>
+
+@uiinfo: 
+@signal_name: 
+@uibdata: 
+
+
+<!-- ##### FUNCTION gnome_app_fill_menu ##### -->
+<para>
+
+</para>
+
+@menu_shell: 
+@uiinfo: 
+@accel_group: 
+@uline_accels: 
+@pos: 
+<!-- # Unused Parameters # -->
+@insert_shortcuts: 
+
+
+<!-- ##### FUNCTION gnome_app_fill_menu_custom ##### -->
+<para>
+
+</para>
+
+@menu_shell: 
+@uiinfo: 
+@uibdata: 
+@accel_group: 
+@uline_accels: 
+@pos: 
+<!-- # Unused Parameters # -->
+@insert_shortcuts: 
+
+
+<!-- ##### FUNCTION gnome_app_ui_configure_configurable ##### -->
+<para>
+
+</para>
+
+@uiinfo: 
+
+
+<!-- ##### FUNCTION gnome_app_create_menus ##### -->
+<para>
+
+</para>
+
+@app: 
+@uiinfo: 
+
+
+<!-- ##### FUNCTION gnome_app_create_menus_interp ##### -->
+<para>
+
+</para>
+
+@app: 
+@uiinfo: 
+@relay_func: 
+@data: 
+@destroy_func: 
+
+
+<!-- ##### FUNCTION gnome_app_create_menus_with_data ##### -->
+<para>
+
+</para>
+
+@app: 
+@uiinfo: 
+@user_data: 
+
+
+<!-- ##### FUNCTION gnome_app_create_menus_custom ##### -->
+<para>
+
+</para>
+
+@app: 
+@uiinfo: 
+@uibdata: 
+
+
+<!-- ##### FUNCTION gnome_app_fill_toolbar ##### -->
+<para>
+
+</para>
+
+@toolbar: 
+@uiinfo: 
+@accel_group: 
+
+
+<!-- ##### FUNCTION gnome_app_fill_toolbar_custom ##### -->
+<para>
+
+</para>
+
+@toolbar: 
+@uiinfo: 
+@uibdata: 
+@accel_group: 
+
+
+<!-- ##### FUNCTION gnome_app_create_toolbar ##### -->
+<para>
+
+</para>
+
+@app: 
+@uiinfo: 
+
+
+<!-- ##### FUNCTION gnome_app_create_toolbar_interp ##### -->
+<para>
+
+</para>
+
+@app: 
+@uiinfo: 
+@relay_func: 
+@data: 
+@destroy_func: 
+
+
+<!-- ##### FUNCTION gnome_app_create_toolbar_with_data ##### -->
+<para>
+
+</para>
+
+@app: 
+@uiinfo: 
+@user_data: 
+
+
+<!-- ##### FUNCTION gnome_app_create_toolbar_custom ##### -->
+<para>
+
+</para>
+
+@app: 
+@uiinfo: 
+@uibdata: 
+
+
+<!-- ##### FUNCTION gnome_app_find_menu_pos ##### -->
+<para>
+
+</para>
+
+@parent: 
+@path: 
+@pos: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnome_app_remove_menus ##### -->
+<para>
+
+</para>
+
+@app: 
+@path: 
+@items: 
+
+
+<!-- ##### FUNCTION gnome_app_remove_menu_range ##### -->
+<para>
+
+</para>
+
+@app: 
+@path: 
+@start: 
+@items: 
+
+
+<!-- ##### FUNCTION gnome_app_insert_menus_custom ##### -->
+<para>
+
+</para>
+
+@app: 
+@path: 
+@menuinfo: 
+@uibdata: 
+
+
+<!-- ##### FUNCTION gnome_app_insert_menus ##### -->
+<para>
+
+</para>
+
+@app: 
+@path: 
+@menuinfo: 
+
+
+<!-- ##### FUNCTION gnome_app_insert_menus_with_data ##### -->
+<para>
+
+</para>
+
+@app: 
+@path: 
+@menuinfo: 
+@data: 
+
+
+<!-- ##### FUNCTION gnome_app_insert_menus_interp ##### -->
+<para>
+
+</para>
+
+@app: 
+@path: 
+@menuinfo: 
+@relay_func: 
+@data: 
+@destroy_func: 
+
+
+<!-- ##### FUNCTION gnome_app_install_appbar_menu_hints ##### -->
+<para>
+
+</para>
+
+@appbar: 
+@uiinfo: 
+
+
+<!-- ##### FUNCTION gnome_app_install_statusbar_menu_hints ##### -->
+<para>
+
+</para>
+
+@bar: 
+@uiinfo: 
+
+
+<!-- ##### FUNCTION gnome_app_install_menu_hints ##### -->
+<para>
+
+</para>
+
+@app: 
+@uinfo: 
+
+

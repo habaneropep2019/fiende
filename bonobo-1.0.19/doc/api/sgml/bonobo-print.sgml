@@ -1,0 +1,239 @@
+<refentry id="bonobo-bonobo-print">
+<refmeta>
+<refentrytitle>BonoboPrint</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboPrint</refname><refpurpose>A print interface all embeddables should implement</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboPrint">BonoboPrint</link>;
+typedef     <link linkend="BonoboPrintClass">BonoboPrintClass</link>;
+<link linkend="GtkType">GtkType</link>     <link linkend="bonobo-print-get-type">bonobo_print_get_type</link>           (void);
+<link linkend="BonoboPrint">BonoboPrint</link>* <link linkend="bonobo-print-construct">bonobo_print_construct</link>         (<link linkend="BonoboPrint">BonoboPrint</link> *p,
+                                             <link linkend="BonoboPrintRenderFn">BonoboPrintRenderFn</link> *render,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+<link linkend="BonoboPrint">BonoboPrint</link>* <link linkend="bonobo-print-new">bonobo_print_new</link>               (<link linkend="BonoboPrintRenderFn">BonoboPrintRenderFn</link> *render,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+This interfaces is implemented by an embeddable ( compound document item ).
+It exposes a simple render method that allows its child to print itself.
+The component renders itself ( or a sub-window of itself ) with the
+specified dimensions to the provided GnomePrintContext.
+</para>
+<para>
+In addition to proxying the render request, the context also converts the
+scribbled on context to a meta file, and returns a stream to the callee
+such that the information can be transfered to the caller. A nice wrapper
+interface is available in <link linkend="BonoboPrintClient">BonoboPrintClient</link> that makes this very simple
+to use.
+</para>
+
+<para>
+First of course, the interface has to be constructed add associated
+with the <link linkend="BonoboEmbeddable">BonoboEmbeddable</link> 's <link linkend="BonoboObject">BonoboObject</link> using the
+bonobo_object_add_interface method.
+  <example>
+    <title>Aggregating a new BonoboPrint interface</title>
+    <programlisting>
+HelloBonoboEmbeddable *
+hello_bonobo_embeddable_construct (HelloBonoboEmbeddable *embeddable)
+{
+	BonoboPrint         *print;
+
+	g_return_val_if_fail (HELLO_BONOBO_IS_EMBEDDABLE (embeddable), NULL);
+
+	bonobo_embeddable_construct (BONOBO_EMBEDDABLE (embeddable),
+				     hello_bonobo_view_factory, NULL);
+
+	/* Register the Bonobo::Print interface */
+	print = bonobo_print_new (hello_object_print, embeddable);
+	if (!print) {
+		bonobo_object_unref (BONOBO_OBJECT (embeddable));
+		return NULL;
+	}
+
+	bonobo_object_add_interface (BONOBO_OBJECT (embeddable),
+				     BONOBO_OBJECT (print));
+	return embeddable;
+}
+    </programlisting>
+  </example>
+</para>
+
+<para>
+Having aggregated the print interface to the embeddable, and passed
+in the 'embeddable' itself as the user_data, we can then implement
+the <link linkend="BonoboPrintRenderFn">BonoboPrintRenderFn</link> method and make the interface actually
+useful, in this case we extract the text from the embeddable->text
+pointer, and print 'Value:' with the text under it, and some
+miscellaneous lines:
+  <example>
+    <title>A simple print function</title>
+    <programlisting>
+void
+hello_object_print (GnomePrintContext         *ctx,
+		    double                     width,
+		    double                     height,
+		    const Bonobo_PrintScissor *scissor,
+		    gpointer                   user_data)
+{
+	HelloBonoboEmbeddable *embeddable = user_data;
+	GnomeFont             *font;
+	double                 w, w2, h;
+	const char            *str, *descr;
+
+	str = embeddable->text ? embeddable->text : "No text";
+	descr = "Value:";
+
+	gnome_print_setlinewidth (ctx, 2);
+	font = gnome_font_new ("Helvetica", 12.0);
+	g_return_if_fail (font != NULL);
+	gnome_print_setrgbcolor (ctx, 0.0, 0.0, 0.0);
+	gnome_print_setfont (ctx, font);
+
+	w  = gnome_font_get_width_string (font, descr);
+	w2 = gnome_font_get_width_string (font, str);
+	h  = gnome_font_get_ascender (font) +
+	     gnome_font_get_descender (font);
+
+	gnome_print_moveto (ctx, (width / 2) - (w / 2), (height / 2) + h * 2);
+	gnome_print_show (ctx, descr);
+	gnome_print_moveto (ctx, (width / 2) - (w2 / 2), height / 2 - h);
+	gnome_print_show (ctx, str);
+
+	gtk_object_unref (GTK_OBJECT (font));
+}
+    </programlisting>
+  </example>
+</para>
+
+<para>
+In the above example the Scissor context is not used. In many
+applications it will not, however the scissor context specifies
+how the printed item will be cropped inside the container application,
+this allows the component to adjust its printed output to best fit
+this situation if neccessary.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboPrint">BonoboPrint</title>
+<programlisting>typedef struct {
+        BonoboXObject        object;
+
+	BonoboPrintRenderFn *render;
+	gpointer             user_data;
+} BonoboPrint;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboPrintClass">BonoboPrintClass</title>
+<programlisting>typedef struct {
+	BonoboXObjectClass   parent;
+
+	POA_Bonobo_Print__epv epv;
+
+	BonoboPrintRenderFn *render;
+} BonoboPrintClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-get-type">bonobo_print_get_type ()</title>
+<programlisting><link linkend="GtkType">GtkType</link>     bonobo_print_get_type           (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the GtkType for a BonoboPrint object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-construct">bonobo_print_construct ()</title>
+<programlisting><link linkend="BonoboPrint">BonoboPrint</link>* bonobo_print_construct         (<link linkend="BonoboPrint">BonoboPrint</link> *p,
+                                             <link linkend="BonoboPrintRenderFn">BonoboPrintRenderFn</link> *render,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Construct <parameter>p</parameter> setting its <parameter>render</parameter> and <parameter>user_data</parameter> pointers</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>p</parameter>&nbsp;:</entry>
+<entry> the print object
+</entry></row>
+<row><entry align="right"><parameter>render</parameter>&nbsp;:</entry>
+<entry> the render method
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> the render method's user data
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a constructed BonoboPrint object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-print-new">bonobo_print_new ()</title>
+<programlisting><link linkend="BonoboPrint">BonoboPrint</link>* bonobo_print_new               (<link linkend="BonoboPrintRenderFn">BonoboPrintRenderFn</link> *render,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Create a new bonobo-print implementing BonoboObject
+interface.
+</para>
+<para>
+This interface is called to ask a component to
+<parameter>render</parameter> itself to a print context with the specified
+width and height, and scissoring data.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>render</parameter>&nbsp;:</entry>
+<entry> the render function
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> the render's user data function
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a new BonoboPrint interface
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

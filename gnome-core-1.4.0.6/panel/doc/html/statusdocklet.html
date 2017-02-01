@@ -1,0 +1,927 @@
+<HTML
+><HEAD
+><TITLE
+>StatusDocklet</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The GNOME Panel Libraries"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="GNOME Status Docklet Library"
+HREF="r1373.html"><LINK
+REL="PREVIOUS"
+TITLE="GNOME Status Docklet Library"
+HREF="r1373.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The GNOME Panel Libraries</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="r1373.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="r1373.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+>&nbsp;</TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="STATUSDOCKLET"
+>StatusDocklet</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN1382"
+></A
+><H2
+>Name</H2
+>StatusDocklet&nbsp;--&nbsp;Simple way to embed a small window in the panel</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN1385"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;status-docklet.h&gt;
+
+
+struct      <A
+HREF="statusdocklet.html#STATUSDOCKLET-STRUCT"
+>StatusDocklet</A
+>;
+<GTKDOCLINK
+HREF="GTKOBJECT"
+>GtkObject</GTKDOCLINK
+>*  <A
+HREF="statusdocklet.html#STATUS-DOCKLET-NEW"
+>status_docklet_new</A
+>              (void);
+<GTKDOCLINK
+HREF="GTKOBJECT"
+>GtkObject</GTKDOCLINK
+>*  <A
+HREF="statusdocklet.html#STATUS-DOCKLET-NEW-FULL"
+>status_docklet_new_full</A
+>         (int maximum_retries,
+                                             <GTKDOCLINK
+HREF="GBOOLEAN"
+>gboolean</GTKDOCLINK
+> handle_restarts);
+void        <A
+HREF="statusdocklet.html#STATUS-DOCKLET-RUN"
+>status_docklet_run</A
+>              (<A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> *docklet);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN1396"
+></A
+><H2
+>Object Hierarchy</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;  <GTKDOCLINK
+HREF="GTKOBJECT"
+>GtkObject</GTKDOCLINK
+>
+   +----StatusDocklet</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN1400"
+></A
+><H2
+>Signal Prototypes</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;&quot;<A
+HREF="statusdocklet.html#STATUSDOCKLET-BUILD-PLUG"
+>build-plug</A
+>&quot;
+            void        user_function      (<A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> *statusdocklet,
+                                            <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> arg1,
+                                            <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN1407"
+></A
+><H2
+>Description</H2
+><P
+>Some apps want to embed a very small icon or widget in the panel to display
+the status of the app.  This can be done without the operational overhead of
+an applet.  The status docklet will embed a 22 by 22 window inside the panel.
+This is not a separate applet and thus is minimally intrusive to the user and
+is meant for very temporary status displays for which a full applet would not
+be appropriate.</P
+><P
+>The way <A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> works is a little different from how the <A
+HREF="appletwidget.html"
+>AppletWidget</A
+>
+works.  Firstly, <A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> object is not a widget, it is just an abstract
+GTK+ object.  You create a new <A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> object with <A
+HREF="statusdocklet.html#STATUS-DOCKLET-NEW"
+>status_docklet_new</A
+>
+or <A
+HREF="statusdocklet.html#STATUS-DOCKLET-NEW"
+>status_docklet_new</A
+> and then bind the "build_plug" signal which is emitted
+when the panel was contacted and a widget must be built.  After binding the
+"build_plug" signal, you call <A
+HREF="statusdocklet.html#STATUS-DOCKLET-RUN"
+>status_docklet_run</A
+> to actually start trying to
+contacting the panel.  <A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> is safe to use without a panel.  By
+default it will try to locate a panel for 15 minutes and after that it will
+give up.  It will also handle panel restarts by default.  If it does, your
+widget will be destroyed and "build_plug" will be emitted again when the new
+panel starts.  Even though the panel will never restart by itself, the user
+might not run session management and thus might restart panel by hand, or due
+to a bug, the panel might crash and restart itself.</P
+><P
+>Note that you should use <GTKDOCLINK
+HREF="GNOME-CORBA-INIT"
+>gnome_CORBA_init</GTKDOCLINK
+> rather then <GTKDOCLINK
+HREF="GNOME-INIT"
+>gnome_init</GTKDOCLINK
+> when you
+want to use the status docklet as corba has to be initialized for the status
+docklet to work.</P
+><P
+>Here is a short example of how to use the status docklet
+
+  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1423"
+></A
+><P
+><B
+>Example 1. Sample usage of the StatusDocklet object</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/* this can be a global since you probably only need one status window
+   for your app */
+GtkObject *status;
+
+...
+
+static void
+build_our_plug(StatusDocklet *docklet, GtkWidget *plug, gpointer data)
+{
+        GtkWidget *label;
+	/* an extremely simple status, you probably want an icon */
+	label = gtk_label_new("#");
+	gtk_widget_show(label);
+
+	/* add the status to the plug */
+	gtk_container_add(GTK_CONTAINER(plug), label);
+}
+
+...
+
+/* in your main function you would do something like */
+status = <A
+HREF="statusdocklet.html#STATUS-DOCKLET-NEW"
+>status_docklet_new</A
+>();
+
+/* connect our widget building function */
+gtk_signal_connect(GTK_OBJECT(status), "build_plug",
+                   GTK_SIGNAL_FUNC(build_our_plug),
+		   NULL);
+
+/* "run" the docklet */
+status_docklet_run(STATUS_DOCKLET(status));
+
+...
+    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN1427"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1429"
+></A
+><H3
+><A
+NAME="STATUSDOCKLET-STRUCT"
+></A
+>struct StatusDocklet</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>struct StatusDocklet {
+	GtkWidget		*plug; /* a pointer to the current GtkPlug
+					  holding the docklet */
+	
+};</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1434"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFF0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="LEFT"
+VALIGN="TOP"
+><GTKDOCLINK
+HREF="GTKWIDGET"
+>GtkWidget</GTKDOCLINK
+> *<TT
+CLASS="STRUCTFIELD"
+><I
+>plug</I
+></TT
+></TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The <GTKDOCLINK
+HREF="GTKPLUG"
+>GtkPlug</GTKDOCLINK
+> widget that's embedded inside the panel&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1445"
+></A
+><H3
+><A
+NAME="STATUS-DOCKLET-NEW"
+></A
+>status_docklet_new ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="GTKOBJECT"
+>GtkObject</GTKDOCLINK
+>*  status_docklet_new              (void);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Creates a new status docklet object with the default
+parameters.  By default the docklet object will try to contact a panel
+<TT
+CLASS="LITERAL"
+>STATUS_DOCKLET_DEFAULT_RETRIES</TT
+> times (20).  It will try to find a
+panel every 15 seconds.  You need to bind the build_plug signal
+in which you build your own widget and add it to the provided container.
+By default the docklet object will handle a panel restart, in which case
+your widget will be destroyed and when the panel is contacted again the
+build_plug signal will be emitted again.  You also must call the
+<A
+HREF="statusdocklet.html#STATUS-DOCKLET-RUN"
+>status_docklet_run</A
+> function after you bind the build_plug signal.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1454"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> new status docklet object.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1463"
+></A
+><H3
+><A
+NAME="STATUS-DOCKLET-NEW-FULL"
+></A
+>status_docklet_new_full ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="GTKOBJECT"
+>GtkObject</GTKDOCLINK
+>*  status_docklet_new_full         (int maximum_retries,
+                                             <GTKDOCLINK
+HREF="GBOOLEAN"
+>gboolean</GTKDOCLINK
+> handle_restarts);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Creates a neew status docklet object with the specified
+parameters.  See the description of <A
+HREF="statusdocklet.html#STATUS-DOCKLET-NEW"
+>status_docklet_new</A
+> for details.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1472"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>maximum_retries</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>  Maximum number of times to try to contact panel</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>handle_restarts</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>  If you handle panel restarts</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>  a new docklet object</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1489"
+></A
+><H3
+><A
+NAME="STATUS-DOCKLET-RUN"
+></A
+>status_docklet_run ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        status_docklet_run              (<A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> *docklet);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Search for the panel and add the plug if it finds it.  This
+function is also called internally from the timeout.  If called externally
+more times, a panel lookup will be forced and one try will be wasted.  You
+need to call this function at least once after binding the build_plug
+signal to tell the status docklet to start looking for the panel.
+If the status docklet handles restarts you don't have to call this
+function ever again.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1496"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>docklet</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> <A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> to run</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN1506"
+></A
+><H2
+>Signals</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1508"
+></A
+><H3
+><A
+NAME="STATUSDOCKLET-BUILD-PLUG"
+></A
+>The &quot;build-plug&quot; signal</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        user_function                  (<A
+HREF="statusdocklet.html"
+>StatusDocklet</A
+> *statusdocklet,
+                                            <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> arg1,
+                                            <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This signal is emitted when you actually need to build the widget that
+you want to place inside the status docklet.  It should be 22 by 22, and
+if it is larger it will be cropped.</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1516"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>statusdocklet</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the object which received the signal.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>arg1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>user data set when the signal handler was connected.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN1533"
+></A
+><H2
+>See Also</H2
+><P
+><A
+HREF="appletwidget.html"
+>AppletWidget</A
+>, <GTKDOCLINK
+HREF="GTKPLUG"
+>GtkPlug</GTKDOCLINK
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="r1373.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="r1373.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>GNOME Status Docklet Library</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+>&nbsp;</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

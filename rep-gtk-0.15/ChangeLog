@@ -1,0 +1,709 @@
+2000-12-04  John Harper  <jsh@eazel.com>
+
+	* configure.in: version 0.15
+
+2000-11-25  John Harper  <jsh@eazel.com>
+
+	* gtk.defs (gtk_window_set_transient_for): marked that PARENT
+	arg may be null
+
+2000-10-31  John Harper  <jsh@eazel.com>
+
+	* gnomeui.defs: added most definitions from the
+	<libgnomeui/gnome-winhints.h> header file. Left out some
+	meaningless stuff that never made it to the actual wm-spec
+
+2000-09-26  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gnome-canvas.defs (gnome_canvas_item_scale,
+	gnome_canvas_item_rotate): commented out, these functions are
+	apparently MIA in recent gnome-libs
+
+2000-09-20  John Harper  <john@dcs.warwick.ac.uk>
+
+	* configure.in: version 0.14
+
+2000-09-18  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_init_with_args): after calling gtk_set_locale
+	() call setlocale (LC_NUMERIC, "C") for rep's benefit (floating
+	point lameness)
+
+	* configure.in, config.h.in: check for <locale.h> and setlocale ()
+
+2000-09-11  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk.defs (gtk_editable_get_chars): changed return type from
+	`none' to `string'. Pointed out by Gregory Merchan
+	<merchan@baton.phys.lsu.edu>
+
+2000-09-04  John Harper  <john@dcs.warwick.ac.uk>
+
+	* configure.in: version 0.14pre1
+
+2000-08-29    <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.spec.in: rep-gtk-gnome and rep-gtk-libglade both
+	require exactly @version@ of rep-gtk
+
+2000-08-03  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk.defs (gtk_menu_get_attach_widget): added missing arg-name
+
+	* autogen.sh: added
+
+2000-07-24  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.spec.in: updated
+
+2000-07-23  John Harper  <john@dcs.warwick.ac.uk>
+
+	Changed the module hierarchy, now:
+
+		gui.gtk.{gtk,libglade,gdk-pixbuf}
+		gui.gnome.{lib,ui,canvas,canvas-pixbuf,libglade}
+
+	the old names all still work
+
+	* Makefile.in: various changes
+
+	* rep-gtk.c: renamed module, export rep-gtk-version
+
+	* libglade-support.c, gnomeui-support.c, gnomelib-support.c,
+	gnome-canvas-support.c, rep-types.c: renamed modules, added
+	aliases
+
+	* gnome-canvas-pixbuf.defs, gdk-pixbuf.defs: add alias
+	definitions
+
+	* configure.in: require rep 0.13 (unreleased)
+
+	* build-gtk.jl: added new global option `alias'
+
+2000-07-20  John Harper  <john@dcs.warwick.ac.uk>
+
+	* Makefile.in: include --mode argument to libtool (from David
+	Kaelbling <drk@sgi.com>)
+
+	* rep-gtk.c: remove ^M that got into a macro definition somehow
+	(from David Kaelbling <drk@sgi.com>)
+
+2000-07-12  John Harper  <john@dcs.warwick.ac.uk>
+
+	* configure.in: version 0.13a
+
+2000-07-11  John Harper  <john@dcs.warwick.ac.uk>
+
+	* configure.in: make the various permutations of libraries work
+	correctly. Only compile gnome-canvas-pixbuf if both gnomeui and
+	gdk-pixbuf libraries are being built. Also, don't error out if
+	a library FOO can't be found, unless --with-FOO was specified
+
+	[ some of this is from a patch by Ceri Storey ]
+
+2000-07-10  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.spec.in: remembered that g[td]k-1.2.defs is now
+	called g[td]k.defs
+
+2000-07-09  John Harper  <john@dcs.warwick.ac.uk>
+
+	* configure.in: version 0.13
+
+	* Makefile.in: gnome-canvas-pixbuf requires gnomeui, not
+	gnome-canvas
+
+	* gnomeui-support.c (sgtk_gnome_init): preserve rep's fatal
+	signal handlers, they're more useful than the gnome handler
+
+	* gnomeui-support.c (sgtk_gnome_string_callback): handle a null
+	string being passed in
+
+	* configure.in: require rep 0.12+
+
+	* rep-gtk.h, rep-gtk.c, libglade-support.c, gnomelib-support.c,
+	gnome-canvas-support.c: removed rep < 0.12 compatibility junk
+
+	* rep-types.c (rep_dl_init): create a proper (but empty)
+	module, instead of just returning a symbol
+
+2000-07-06  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gnomeui.defs (GnomeDialog): cleaned up
+	(GnomeStockPixmapNameType): new string-enum
+
+	* gtk.defs (gtk_clist_select_row, gtk_clist_unselect_row):
+	column parameters default to zero
+
+2000-07-05  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk.defs (gtk_window_position): reinstated this pseudonym for
+	gtk_window_set_position
+
+	* examples/canvas-test: connected `delete_event' signal
+
+	* gnomeui.defs (gnome_icon_entry_set_icon): added
+
+	* gnomeui-support.c (sgtk_gnome_init): #if 0 the code to pass
+	options to and from gnome_init (). It's so fucking braindead
+	that on seeing an option it doesn't understand, it terminates
+	the program
+
+2000-07-04  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c: some fixes for arg conversion from repv to
+	GTK_TYPE_POINTER. Kludged type support for GdkPixbuf. Fixed
+	some string-enum stuff
+
+	* build-gtk.jl: support `define-string-enum' form. Added extra
+	global option `(system-init-code STRING)' for code that should
+	only be run when REP_GTK_DONT_INITIALIZE isn't set
+
+	* gdk-pixbuf.defs, gnome-canvas-pixbuf.defs, configure.in,
+	Makefile.in: wrap these two libraries
+
+	* gdk-1.2.defs, gtk-1.2.defs: removed the `-1.2' from the file
+	names
+
+	* gtk.defs: merged a bunch of stuff from guile-gtk HEAD
+
+	* gnomeui.defs: unhid the GnomeStock definitions
+
+	* gnomeui-support.c: always call gnome_init (). Take the app id
+	and version from `*gnome-app-id*' and `*gnome-app-version*',
+	else make something up
+
+	* rep-types.c (sgtk_char_to_rep): new function
+
+	* examples/canvas-pixbuf-test: new test program
+
+	* gnomelib.defs (gnome_mime_nametemplate): deleted, this
+	function has been removed from recent gnome-libs?
+
+2000-07-02  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.12
+
+2000-07-01  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs (gtk_window_add_accel_group,
+	gtk_window_remove_accel_group, gtk_window_set_transient_for,
+	gtk_window_set_default_size, gtk_window_set_modal): new functions
+	(gtk_window_position): renamed gtk_window_set_position
+
+2000-06-28  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs: changed some int's to bool's, added some more
+	function definitions
+
+2000-06-23  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_is_a_gtkobj): check for GTK_IS_OBJECT and
+	!GTK_OBJECT_DESTROYED (avoids segmentation faults)
+
+2000-06-18  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c: various cleanups to help 64-bit targets, from
+	George Lebl <jirka@5z.com>
+
+2000-06-16  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.11
+
+	* rep-gtk.spec.in: require rep 0.12+
+
+2000-06-14  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gnomeui.defs (gnome-dialog-new): fixed typo
+
+2000-05-27  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs: added GtkTearoffItemMenu type and constructor
+
+2000-05-26  John Harper  <john@dcs.warwick.ac.uk>
+
+	* libglade.defs (GladeXML): specify a custom getter for
+	textdomain field
+
+	* libglade-support.c (sgtk_glade_xml_textdomain): getter for
+	glade-xml-textdomain
+
+	* configure.in, config.h.in: check <glade/glade-xml.h> to test
+	if the `textdomain' field of the GladeXML structure has been
+	renamed to `txtdomain'. Define LIBGLADE_XML_TXTDOMAIN if so
+
+2000-05-09  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.10
+
+2000-04-17  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gnomeui.defs (gnome_stock_pixmap_widget,
+	gnome_stock_pixmap_widget_at_size): made window argument
+	null-ok
+
+2000-04-16  John Harper  <john@dcs.warwick.ac.uk>
+
+	Added support for using libglade with GNOME widgets
+
+	* libglade-support.c (GLADE_INIT_FUNC): macro naming the
+	function to call to initialize libglade, defaults to glade_init
+
+	* configure.in, Makefile.in: if wrapping both GNOME and
+	libglade, build an extra module `libglade-gnome' which is
+	exactly the same as `libglade' but linked against the GNOME
+	libs and calls glade_gnome_init () instead of glade_init ()
+
+	* examples/test-libglade: pass `--gnome' option to use GNOME
+	version of libglade wrappers
+
+2000-04-14  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs (GtkAccelGroup): new boxed type
+	(gtk_widget_add_accelerator, gtk_widget_remove_accelerator,
+	gtk_widget_remove_accelerators, gtk_widget_accelerator_signal,
+	gtk_widget_add_events, gtk_label_set_pattern,
+	gtk_label_parse_uline, gtk_menu_shell_select_item,
+	gtk_menu_shell_deselect, gtk_menu_shell_activate_item,
+	gtk_menu_set_accel_group, gtk_menu_get_uline_accel_group,
+	gtk_menu_ensure_uline_accel_group, gtk_menu_get_attach_widget,
+	gtk_menu_set_tearoff_state, gtk_menu_set_title,
+	gtk_menu_reorder_child): wrap these functions
+
+	[ partly from a patch by Richard Kilgore
+	<rkilgore@kilgoresolutions.com> ]
+
+2000-04-09  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c, libglade-support.c, gnomeui-support.c,
+	gnomelib-support.c, gnome-canvas-support.c: put all subroutines
+	into suitably named modules if rep supports them; remove all
+	direct references to symbols' `value' fields
+
+2000-04-07  John Harper  <john@dcs.warwick.ac.uk>
+
+	* build-gtk.jl (output-footer): emit code to define the
+	subroutines in a module of the correct name (suitably ifdef'ed
+	by rep version)
+
+2000-03-26  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gnomelib-support.c (rep_dl_init): provide `gnomelib' not `gnome'
+
+2000-03-11  John Harper  <john@dcs.warwick.ac.uk>
+
+	* config.sub, config.guess: updated from libtool-1.3.4
+
+	* Makefile.in: changed how rep is called to not assume that
+	load-path contains `.' (it doesn't anymore)
+
+2000-03-08  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-types.c (sgtk_rep_to_cvec): cast cvec.ptr to char* before
+	doing arithmetic on it (patch from Aron Griffis
+	<agriffis@bigfoot.com>)
+
+	* rep-gtk.c (timeout_callback): set timed_out even if not going
+	to break out of gtk-main
+	(set_timeout): only create timeout if one doesn't already exist
+
+2000-03-06  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.9.1
+
+	* rep-gtk.h: include config.h
+
+2000-03-05  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.9
+
+2000-03-01  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_event_loop): when exiting, only restart the
+	outer timeout if it hasn't already fired
+
+2000-02-29  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (timeout_callback): only propagate the timeout if
+	it's from the innermost event loop
+	(sgtk_event_loop): call set_timeout () before exiting
+
+	* gtk-compat.c (menu_popup_position): ensure that the chosen
+	position always leaves the menu totally on-screen (using code
+	borrowed from gtk/gtkmenu.c)
+
+	* gdk-1.2.defs: added gdk_screen_width and gdk_screen_height
+	functions
+
+	* gtk-1.2.defs: added field `allocation' to GtkWidget
+	* gtk-support.c (sgtk_gtk_widget_get_allocation): new function
+
+	* build-gtk.jl: new option in object fields, (getter FUNCTION)
+
+2000-02-27  John Harper  <john@dcs.warwick.ac.uk>
+
+	* Makefile.in: don't link against REP_LIBS, it's not necessary
+	and may cause problems when there's static libraries there
+
+	* rep-gtk.h: put #ifndef's around GTK compatibility functions
+	decls
+
+2000-02-25  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-types.c, rep-gtk.c: use non-fixnum numeric types where
+	appropriate
+
+2000-02-23  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_event_loop): fix the idle handling
+
+2000-02-13  John Harper  <john@dcs.warwick.ac.uk>
+
+	* build-gtk.jl: support `in', `out' and `inout' modes for
+	composite types. Support the `extra-init-code' option. Add a
+	new option `(provide FEATURE)' for generating rep dl stubs
+
+	* gtk-1.2.defs: define enum GtkAnchorType (for canvas), and
+	object GtkProgress
+
+	* rep-types.c: new file, the rep conversions for basic C/GLIB
+	types. This is built into it's own dl module `sgtk-types'
+
+	* rep-gtk.c (sgtk_set_protect, sgtk_get_protect,
+	sgtk_new_protect): functions for manipulating the gc protection
+	shells
+
+	* build-gtk.jl: new directive `include', like `import' but for
+	the same module; new directive `define-type', the same as the
+	function of the same name. Only add type info structures if
+	they're non-null. New protection type `*result*' for callbacks,
+	protect function for lifetime of result object. Implemented
+	cvec-to-rep conversion, and `tvec' types. New argument option
+	`protect-during', add gc protection for the lifetime of the
+	function call. Output finish options _after_ converting result
+
+	* rep-gnome.h, gnomelib.defs, gnomelib-support.c, gnomeui.defs,
+	gnomeui-support.c, gnome-canvas.defs, gnome-canvas-support.c,
+	gnome-canvas-glue.c: initial GNOME binding. Lots of this was
+	grabbed from guile-gnome
+
+	* rep-gtk.spec.in, configure.in, Makefile.in: updated for GNOME
+	bindings
+
+2000-02-08  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_event_loop): rewritten to use
+	rep_max_sleep_for (), has the bonus of cleaning up the idle
+	timeout
+
+2000-02-06  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_event_loop): if threads are waiting, don't
+	call gtk_main (), handle all events then yield
+
+	* rep-gtk.c: invoke callbacks within dynamic roots
+
+	* rep-gtk.h: define rep_INTERFACE if not already
+
+2000-01-11  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_init_with_args): call gtk_set_locale ()
+	before gtk_init ()
+
+2000-01-09  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.8
+
+1999-12-31  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs (gtk_paned_set_position): new function
+	(GtkCList): added fields `rows' and `cols'
+
+1999-12-26  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_rep_to_flags): be more defensive in what we
+	accept
+
+1999-12-18  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-ui.glade, rep-ui: example of using libglade with rep--a
+	simple lisp front end
+
+	* rep-gtk.c (make_gtkobj): don't add the proxy to its list of
+	protects, we'll mark it manually
+	(gtkobj_marker_hook): mark the proxy when it's referenced; mark
+	its protects _always_ (since they're added to the globally
+	protected data if the proxy is freed)
+
+	* rep-gtk.c (sgtk_proxy_object): remove the prevp field which I
+	had erroneously copied from the 0.17 diffs (I rejected it the
+	first time for a reason)
+
+1999-12-17  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c: merged diffs from guile-gtk 0.16->0.17; most
+	notably this maintains protection over data associated with
+	gc'd proxies. Also adds support for GdkRectangle types
+
+	* build-gtk.jl, libglade-support.c: c-type of `full-callback'
+	is now `sgtk_protshell*' not `repv'
+
+	* Makefile.in: add "rep_requires='gtk'" to the libglade .la
+	file to cause gtk to automagically get loaded first
+
+	* rep-gtk.c, libglade-support.c: don't use rep_dl_feature
+	anymore, it breaks when any libraries are opened RTLD_GLOBAL
+
+1999-12-16  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.spec.in: added new package, rep-gtk-libglade
+
+	* libglade-support.c (sgtk_glade_xml_new_from_string): new
+	function, calls glade_xml_new_from_memory
+	* libglade.defs (glade-xml-new-from-string): added
+
+	* libglade-support.c (rep_dl_init): look for
+	REP_GTK_DONT_INITIALIZE environment setting
+
+	* configure.in: added --with[out]-libglade options
+
+	* build-gtk.jl: use `const char *' for static_string types, not
+	just `char *'
+
+	* libglade.defs: API definition for libglade (constructs widget
+	trees from Glade-created XML files)
+
+	* libglade-support.c: signal connection code, and dl stubs
+
+	* configure.in, Makefile.in: recognize and build libglade
+	wrapper when available
+
+1999-12-15  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-support.c (gdk_event_visibility_state): removed //
+	comment (pointed out by Daniel Burrows
+	<Daniel_Burrows@brown.edu>)
+
+1999-12-06  John Harper  <john@dcs.warwick.ac.uk>
+
+	* Makefile.in: include LDFLAGS when linking (from Ralf Fassel
+	<ralf@akutech.de>)
+
+1999-12-05  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.7
+
+	* gtk-compat.c (gtk_widget_draw_interp): new function, calls
+	gtk_widget_draw () with a null second argument
+
+	* gtk-1.2.defs (gtk_widget_draw_interp, gtk_preview_put,
+	gtk_preview_draw_row): defined these functions
+
+1999-12-02  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c, gtk-1.2.defs, gdk-1.2.defs: i18n changes from
+	Yukihiro Nakai <nakai@internetsolutions.co.jp>
+
+1999-11-30  John Harper  <john@dcs.warwick.ac.uk>
+
+	* build-gtk.jl: make separate glue for each set of definitions
+
+	* rep-gtk.c (rep_dl_init): just call sgtk_init_gtk_gtk_glue ()
+	instead of initialising everything manually
+
+	* rep-gtk.c (sgtk_init_with_args): not running stand-a-lone if
+	rep_recurse_depth >= 0, not < 0 (why did this work before?)
+
+1999-11-28  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.6
+
+1999-11-25  John Harper  <john@dcs.warwick.ac.uk>
+
+	* build-gtk.jl: updated for single namespace etc
+
+1999-11-17  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_init_with_args): if REP_GTK_DONT_INITIALIZE
+	is defined non-zero in the environment, then don't call
+	gtk_init (), this helps when compiling scripts
+
+1999-11-10  John Harper  <john@dcs.warwick.ac.uk>
+
+	* configure.in: require rep 0.8+ (lexical scope), bump rep-gtk
+	version to 0.6
+
+	* build-gtk.jl (output-field-accessors): fixed for lexical
+	scoping
+
+1999-10-29  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs (gtk_widget_lock_accelerators,
+	gtk_widget_unlock_accelerators,
+	gtk_widget_accelerators_locked): new function definitions
+
+1999-10-24  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.5
+
+1999-10-22  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-compat.c, gtk-1.2.defs (gtk_menu_popup_interp): added an
+	extra (optional) argument, a cons cell defining the position at
+	which to show the menu
+
+1999-10-20  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c: accept long integers for all but character types,
+	create long integers when values are too large
+
+1999-10-03  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.4.2
+
+1999-10-01  John Harper  <john@dcs.warwick.ac.uk>
+
+	* config.sub, config.guess: updated from libtool 1.3.3
+
+1999-09-18  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.4.1
+
+	* Makefile.in: added $(installdir) to help rpm builds
+
+1999-09-12  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.4
+
+1999-09-08  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs: added the GtkPlug and GtkSocket widgets
+	* gdk-1.2.defs, gtk-support.c: added a made-up gdk_window_xid
+	function
+
+1999-08-31  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.3
+
+1999-08-29  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs (GtkCheckMenuItem): changed type of `active'
+	field from uint to bool
+
+1999-08-26  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs (GtkCheckMenuItem): define the `active' field
+
+1999-08-16  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.2
+
+1999-08-15  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs (gtk_clist_moveto): the row_align and
+	column_align arguments now default to 0.5
+
+1999-08-10  John Harper  <john@dcs.warwick.ac.uk>
+
+	* gtk-1.2.defs (gtk_label_set_justify,
+	gtk_label_set_line_wrap): define these functions
+	(gtk_signal_connect, gtk_box_pack_start, gtk_box_pack_start):
+	remove optional boolean parameters, since there's no way of
+	telling a non-specified option from a specified-as-nil option
+
+1999-08-03  John Harper  <john@dcs.warwick.ac.uk>
+
+	* version 0.1
+
+1999-06-06  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_init_substrate): use rep_map_inputs to add
+	all existing registered input fds to the GTK scheme of things
+	(rep_dl_kill): new function, try to unhook as many of the GTK
+	functions as possible
+
+1999-06-04  John Harper  <john@dcs.warwick.ac.uk>
+
+	* build-gtk.jl (output-function): when splitting arguments from
+	a list, don't signal errors if some don't exist; just set them
+	to nil
+
+1999-05-29  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c: only call gtk_main_quit () if gtk_main_level ()
+	returns non-zero
+
+1999-05-19  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c: should have solved the SIGCHLD problem under Linux
+	now (turned out to be a bug in gdm)
+
+1999-04-28  John Harper  <john@dcs.warwick.ac.uk>
+
+	* build-gtk.jl: some fixes, support null helper_valid functions
+
+	* README.guile-gtk, rep-gtk.h, rep-gtk.c, gtk-support.c,
+	gdk-1.2.defs: synchronised with release 0.16 of guile-gtk
+
+	* Makefile.in: compile build-gtk before executing it
+
+1999-04-18  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (reset_idle_timeout): always reset
+	idle_timeout_counter to zero, not just when there's no timeout
+	already set
+
+1999-03-28  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (idle_timeout_callback): ensure that the first time
+	rep_on_idle is called each idle period, it's passed zero
+	(sgtk_callback_postfix, idle_timeout_callback): call
+	rep_proc_periodically to ensure no subprocess deaths are
+	overlooked
+
+1999-03-23  John Harper  <john@dcs.warwick.ac.uk>
+
+	* build-gtk.jl (output-type-predicate): outputs type
+	predicates, TYPE-p for each boxed or object type
+
+	* rep-gtk.c (sgtk_callback_marshal): pass the object invoking
+	the callback as the first argument to the function
+	(Fgtk_callback_trampoline): now a Lisp DEFUN
+	(sgtk_register_input_fd, sgtk_deregister_input_fd): hooks for
+	librep input handling
+	(sgtk_callback_postfix): should be called after any callback
+	that might invoke lisp code, handles catch/throw and redisplay
+	(sgtk_event_loop): handles the librep one-second idle timeouts,
+	and calls the rep_proc_periodically function to reap
+	subprocesses
+	(sgtk_sigchld_callback): new function, calls gtk_main_quit so
+	that the sgtk_event_loop is entered and the process can be
+	collected
+	(Fgtk_standalone_p): now a Lisp DEFUN
+	(sgtk_init_with_args): set standalone to false if gtk_init was
+	called before we tried to
+	(rep_dl_init): set rep_dl_feature to `gtk'
+
+	* build-gtk.jl: outputs field accessor functions, for TYPE and
+	FIELD, these will be called `TYPE-FIELD', and `TYPE-FIELD-set'
+	(if the field is settable), for example `gtk-widget-style'
+
+	* gtk-1.2.defs: added the `parent' field to GtkWidget
+
+	* configure.in: add some warning options if using GNU CC
+
+	* examples/hello.jl, examples/clist.jl: cleaned up
+
+1999-03-19  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c: hijack the rep event loop and input registering
+	functions
+
+	* rep-gtk.c (rep_dl_init): return t
+
+1999-03-18  John Harper  <john@dcs.warwick.ac.uk>
+
+	* rep-gtk.c (sgtk_object_proxy): removed the `prevp' field,
+	just use a next field, then regenerate the entire list when
+	sweeping
+

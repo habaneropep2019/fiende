@@ -1,0 +1,352 @@
+#!/usr/bin/env perl
+# Gtk-- 1.0.x to 1.2.x converter
+#
+# Copyright (C) 2000 Karl Einar Nelson
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+#
+# You should have received a copy of the GNU General Public
+# License along with this program; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+
+use strict;
+my @files;
+my @empty;
+my $test=0;
+
+while (@ARGV)
+  {
+    $_=shift @ARGV;
+    if ( /^-/ )
+      {
+        if ( /-help/) {&usage();}
+        elsif ( /-tips/) {&tips();}
+        elsif ( /-test/) {$test=1;}
+        else
+          {
+            print "unknown argument $_\n";
+            exit;
+          }
+      }
+    else
+      {
+        push(@files,$_);
+      }
+  }
+if (!@files) {&usage();}
+
+foreach (@files)
+  {
+    &convert($_);
+  }
+
+sub convert
+  {
+    my $filename=shift;
+    my $buffer;
+    my @tokens;
+    my $token;
+    my @out;
+    my @lout;
+    my $line;
+
+    print "Convert $filename\n" if (!$test);
+    return if ( ! -f "$filename");
+
+    # read the file into a buffer 
+    open (FILE,"<$filename");
+    while (<FILE>) { $buffer.=$_; };
+    close (FILE);
+
+    @tokens=token_split($buffer);
+    while (@tokens) 
+      {
+        $token=shift @tokens;
+        next if ($token eq "");
+        if ($token =~ /^connect_to_((method)|(function)|(signal))$/) 
+          {
+            # gather the line til the ;
+            $line=$token;
+            while (@tokens&&$tokens[0] ne ";") 
+              {$line.=shift @tokens;}
+             
+            # make a conversion 
+            $line=~s/\s+/ /g;
+            $line=~s/connect_to_([a-z]+)\s*\(//;
+            if ($1 eq "method")
+              {
+                $line=~s/\)\s*$//;
+                $line=~s/\s+//g;
+                my ($signal,$object,$func,$arg)=split /,/, $line;
+                unshift(@lout,"#warning \"method pointer without class name\"\n")
+                  if ($func !~ /::/);
+                if ($arg eq "" )
+                  {$line="$signal.connect(SigC::slot($object,$func))"; }
+                else
+                  {$line="$signal.connect(SigC::bind(SigC::slot($object,$func),$arg))";}
+              }
+            elsif ($1 eq "function")
+              {
+                $line=~s/\)\s*$//;
+                $line=~s/\s+//g;
+                my ($signal,$func,$arg)=split /,/, $line;
+                if ($arg eq "" )
+                  {$line="$signal.connect(SigC::slot($func))"; }
+                else
+                  {$line="$signal.connect(SigC::bind(SigC::slot($func),$arg))";}
+              }
+            elsif ($1 eq "signal")
+              {
+                $line=~s/\)\s*$//;
+                $line=~s/\s+//g;
+                my ($signal,$signal2,$arg)=split /,/, $line;
+                if ($arg eq "" )
+                  {$line="$signal.connect($signal2.slot())"; }
+                else
+                  {$line="$signal.connect(SigC::bind($signal2.slot(),$arg))";}
+              }
+
+            # place line back for more processing
+            unshift(@tokens,token_split("$line")); 
+          }
+
+        # handle Signals
+        elsif ($token =~ /^Signal([0-9])(_R)*$/)
+          {
+            if ($1 eq "0" && $2 eq "_R")
+              {push(@lout,"SigC::Signal0");}
+            elsif ($1 eq "0" && $2 ne "_R")
+              {push(@lout,"SigC::Signal0<void>");}
+            else 
+              {
+                my $num=$1;
+                $line="";
+                while (@tokens&&$tokens[0] ne ">") 
+                  {$line.=shift @tokens;}
+                $line=~s/^\s*<\s*//;
+                my @args=split(",",$line);
+                unshift(@args,"void") if ($#args!=$num );
+                $line="SigC::Signal$num<";
+                $line.=join(",",@args);
+                push(@lout,"$line"); 
+
+              }
+          }
+
+        # handle Gtk_ObjectHandle 
+        elsif ($token =~ /^Gtk_ObjectHandle$/) 
+          {
+            $line="";
+            while (@tokens&&$tokens[0] ne ">") 
+              {$line.=shift @tokens;}
+            shift @tokens;
+            $line=~s/\s*<\s*//;
+            $line=~s/\s*$//;
+            unshift(@lout,"#warning \"handle to pointer conversion ($line)\"\n");
+            unshift(@tokens,token_split("$line*")); 
+          }
+
+        # handle Gtk_ => Gtk::
+        elsif ($token =~ /^Gtk_/) 
+          {
+            $token=~s/Gtk_/Gtk::/;
+            push(@lout,"$token"); 
+          }
+
+        # handle _gtk_string => Gtk::nstring
+        elsif ($token eq "_gtk_string") 
+          {
+            push(@lout,"Gtk::nstring"); 
+          }
+
+        # handle Connection => SigC::Connection
+        elsif ($token eq "Connection") 
+          {
+            push(@lout,"SigC::Connection"); 
+          }
+
+        else
+          {
+            push(@lout,"$token"); 
+            if ($token =~ /\n/) 
+              {
+                push @out,@lout;
+                @lout=@empty;
+              }
+          }
+      }
+
+   $buffer=join("",@out);
+   
+   # misc nontoken changes
+   $buffer=~
+      s/Gtk::Main\s+(\S+\s*\()\s*&(\S+\s*,\s*)&(\s*\S+\s*\))/Gtk::Main $1$2$3/g;
+   $buffer=~
+      s/append_page\s*\(([^;]+),([^;]+)\)/pages().push_back(Gtk::Notebook_Helpers::TabElem\($1,$2\)\)/g;
+   $buffer=~
+      s/prepend_page\s*\(([^;]+),([^;]+)\)/pages().push_front(Gtk::Notebook_Helpers::TabElem\($1,$2\)\)/g;
+   $buffer=~s/connect\(([^;]*\&\s*Gtk::Main::quit\))/connect(Gtk::Main::quit.slot()/g;
+
+   if ($test) 
+     {
+       print "$buffer";
+     }
+   else
+     {
+       system("mv $filename $filename.bak");
+       open(FILE,">$filename");
+       print FILE $buffer;
+       close(FILE);
+     }
+  }
+    
+sub token_split 
+  {
+    split(/([A-z_][A-z0-9_:]*)|(>+)|(;)|(\n)|(\s+)|([0-9.])/,join("",@_));
+  }
+
+sub usage 
+  {
+    print "usage: gtkmmconvert [--help|--tips] | filename ...\n";
+    print "Converts a list of files from gtk-- 1.0.x to 1.2.x\n";
+    print "  --help - this message\n";
+    print "  --test - don't do the conversion, just dump output.\n";
+    print "  --tips - useful tips on completing the conversion\n";
+    exit();
+  }
+
+sub tips 
+  {
+   open (FILE,"|less")||open (FILE,"|less")||open (FILE,"|cat");
+   print FILE
+'Tips & Hints
+======================================================================
+
+1.0 Conversions
+===========
+This program performs the following conversions.  The represent
+the bulk of the changes required to convert signal system declarations
+and some gtk-- common changes.
+
+  Signal#_R<.*>  => SigC::Signal#<.*>
+  Signal#<.*>    => SigC::Signal#<void,.*> if there are not # parameters
+
+  connect_to_method($1,$2,$3) 
+                 => $1.connect(SigC::slot($2,$3)) (warns)
+  connect_to_method($1,$2,$3,$4) 
+                 => $1.connect(SigC::bind(SigC::slot($2,$3),$4)) (warns)
+  connect_to_function($1,$2)
+                 => $1.connect(SigC::slot($2))
+  connect_to_function($1,$2,$3)
+                 => $1.connect(SigC::bind(SigC::slot($2),$3)
+  connect_to_signal($1,$2)
+                 => $1.connect($2.slot())
+  connect_to_signal($1,$2,$3)
+                 => $1.connect(SigC::bind($2.slot(),$3))
+
+  Connection => SigC::Connection
+
+  Gtk_ => Gtk::
+  _gtk_string => Gtk::nstring
+
+  notebook.append_page(page,label) 
+    => notebook.pages().push_back(Gtk::Notebook_Helpers::TabElem(page,label))
+  notebook.prepend_page(page,label) 
+    => notebook.pages().push_front(Gtk::Notebook_Helpers::TabElem(page,label))
+ 
+  connect.*(.*,&Gtk_Main::quit) 
+                 => connect.*(.*,Gtk::Main::quit.slot())
+
+  Gtk_ObjectHandle<.*> => .*\*  (warns)
+
+1.1 Touching Up Automatic Conversions
+=====================================
+Gtk-- now fully supports namespaces.  This means that many of those
+Gtk:: and SigC:: are not necessary if you want to import the namespace
+or part of it.  It is best to import only part to avoid symbol conflicts. 
+
+The SigC:: can be largely removed by adding the following lines to the
+top of your source.
+
+  using SigC::slot;
+  using SigC::bind; 
+  using SigC::Connection; 
+
+1.2 #warning statements
+=======================
+Some conversions can be made by the convertion script which are not
+necessarily the complete conversion.  These include places where
+there was not a Class name with a method pointer (required for gcc 2.95)
+or Gtk_ObjectHandle conversions.
+
+In those places a #warning statement was inserted.  You should go
+find those lines, check the conversion, and remove them.
+
+
+2.0 Removed Interfaces
+======================
+
+The following interfaces where changed drastically and will likely not 
+work properly without manual changes.  Please see documentation on
+these widgets for further details.
+
+  ItemFactory: completely removed, use Gtk::Menu_Helpers instead.
+  Toolbar: add_* methods removed use Gtk::Toolbar_Helpers.
+
+
+3.0 Fixing Errors
+=================
+Once converted you may find a get a few errors.  Here are
+some common meanings.
+
+(1) add private
+  /usr/local/include/gtk--/container.h:95: \`void Gtk::Container::add
+  (Gtk::Widget *)\' is private
+
+means
+  Pointers are not used in the add method any longer.  Add a * to
+  take the contents.  (be sure to NULL check if you do not know
+  that it is non-zero.)
+
+(2) No matching function
+  file.cc:19: no matching function for call to `Gtk::HBox::pack_start 
+  (Gtk::Button *)\'
+means
+  Pointers are not allowed in most container adding methods.  Add a *
+  to take the contents of the pointer.
+  
+(3) method pointer errors
+  file.cc:3: taking the address of a non-static member function
+  file.cc:3: to form a pointer to member function, say \'&MyClass::my_method\' 
+
+means
+  gcc 2.95 introducted much tighter checking of member function addresses.
+  This was not a gtk-- change but frequently appears.
+  You need to add the MyClass:: explicitly on all address of member functions.
+
+  ie:  connect(slot(this,&foo)) => connect(slot(this,&MyWindow::foo))
+
+(4) SArray errors
+  /usr/local/include/gtk--/base.h: In method \`Gtk::SArray::SArray<GList *>
+    (GList *const &)\':
+  file.cc:17:   instantiated from here
+  /usr/local/include/gtk--/base.h:583: request for member \`begin\' in 
+    \`c\', which is of non-aggregate type \`GList *\'
+means
+  That interface has been switched to use STL methods.  You should
+  use a standard STL (or STL complient) container for that operation.
+
+   
+';
+   close(FILE);
+    exit();
+  }

@@ -1,0 +1,1565 @@
+<HTML
+><HEAD
+><TITLE
+>bonobo-exception</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Bonobo API Reference Manual"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Object Activation and Lifecycle"
+HREF="bonobo-object-activation.html"><LINK
+REL="PREVIOUS"
+TITLE="BonoboGenericFactory"
+HREF="bonobo-bonobo-generic-factory.html"><LINK
+REL="NEXT"
+TITLE="Properties"
+HREF="bonobo-properties.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>Bonobo API Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="bonobo-bonobo-generic-factory.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="bonobo-object-activation.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="bonobo-properties.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="BONOBO-BONOBO-EXCEPTION"
+>bonobo-exception</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN2586"
+></A
+><H2
+>Name</H2
+>bonobo-exception&nbsp;--&nbsp;maps CORBA exceptions to user readable text, + helper macros</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN2589"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;
+
+#define     <A
+HREF="bonobo-bonobo-exception.html#BONOBO-EX-CAPS"
+>BONOBO_EX</A
+>                       (ev)
+#define     <A
+HREF="bonobo-bonobo-exception.html#BONOBO-USER-EX-CAPS"
+>BONOBO_USER_EX</A
+>                  (ev,id)
+#define     <A
+HREF="bonobo-bonobo-exception.html#BONOBO-RET-EX-CAPS"
+>BONOBO_RET_EX</A
+>                   (ev)
+#define     <A
+HREF="bonobo-bonobo-exception.html#BONOBO-RET-VAL-EX-CAPS"
+>BONOBO_RET_VAL_EX</A
+>               (ev,v)
+char*       (<A
+HREF="bonobo-bonobo-exception.html#BONOBOEXCEPTIONFN"
+>*BonoboExceptionFn</A
+>)            (<GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev,
+                                             <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data);
+#define     <A
+HREF="bonobo-bonobo-exception.html#BONOBO-RETURN-IF-FAIL"
+>bonobo_return_if_fail</A
+>           (expr,opt_ev)
+#define     <A
+HREF="bonobo-bonobo-exception.html#BONOBO-RETURN-VAL-IF-FAIL"
+>bonobo_return_val_if_fail</A
+>       (expr,val,opt_ev)
+#define     <A
+HREF="bonobo-bonobo-exception.html#BONOBO-EXCEPTION-SET"
+>bonobo_exception_set</A
+>            (opt_ev,repo_id)
+char*       <A
+HREF="bonobo-bonobo-exception.html#BONOBO-EXCEPTION-GET-TEXT"
+>bonobo_exception_get_text</A
+>       (<GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);
+void        <A
+HREF="bonobo-bonobo-exception.html#BONOBO-EXCEPTION-ADD-HANDLER-STR"
+>bonobo_exception_add_handler_str</A
+>
+                                            (const char *repo_id,
+                                             const char *str);
+void        <A
+HREF="bonobo-bonobo-exception.html#BONOBO-EXCEPTION-ADD-HANDLER-FN"
+>bonobo_exception_add_handler_fn</A
+> (const char *repo_id,
+                                             <A
+HREF="bonobo-bonobo-exception.html#BONOBOEXCEPTIONFN"
+>BonoboExceptionFn</A
+> fn,
+                                             <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data,
+                                             <GTKDOCLINK
+HREF="GDESTROYNOTIFY"
+>GDestroyNotify</GTKDOCLINK
+> destroy_fn);
+char*       <A
+HREF="bonobo-bonobo-exception.html#BONOBO-EXCEPTION-REPOID-TO-TEXT"
+>bonobo_exception_repoid_to_text</A
+> (const char *repo_id);&#13;</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2610"
+></A
+><H2
+>Description</H2
+><P
+>This module contains some useful helper functions
+that can be used to set various exceptions inside your
+CORBA methods. It also contains code to map between
+complex CORBA_Environment exceptions and helpful
+strings suitable for display to the user.</P
+><P
+>Typically to test for exceptions the BONOBO_EX macro
+is used thus:
+  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN2614"
+></A
+><P
+><B
+>Example 1. Bonobo exception trapping and reporting</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>int
+do_something (CORBA_Environment *ev)
+{
+	...
+
+	retval = Foo_Baa_method (object, ev);
+
+	if (BONOBO_EX (ev)) {
+		if (BONOBO_USER_EX (ev, ex_CosNaming_NamingContext_NotFound)) {
+		        g_warning ("Not found");
+		} else {
+		        char *str;
+
+			g_warning ("Exception '<TT
+CLASS="LITERAL"
+>s</TT
+>' occured",
+				(str = bonobo_exception_get_text (ev)));
+			g_free (str);
+		}
+		return -1;
+	}
+	...
+}
+     </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>&#13;</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2618"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2620"
+></A
+><H3
+><A
+NAME="BONOBO-EX-CAPS"
+></A
+>BONOBO_EX()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define BONOBO_EX(ev)         ((ev) &amp;&amp; (ev)-&gt;_major != CORBA_NO_EXCEPTION)</PRE
+></TD
+></TR
+></TABLE
+><P
+>This macro returns TRUE if <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> flags an exception.</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2626"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the exception environment
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2635"
+></A
+><H3
+><A
+NAME="BONOBO-USER-EX-CAPS"
+></A
+>BONOBO_USER_EX()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define     BONOBO_USER_EX(ev,id)</PRE
+></TD
+></TR
+></TABLE
+><P
+>This macro returns TRUE if <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> contains a user exception
+of type <TT
+CLASS="PARAMETER"
+><I
+>id</I
+></TT
+>.</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2642"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the exception environment</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>id</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the repo_id of the exception
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2655"
+></A
+><H3
+><A
+NAME="BONOBO-RET-EX-CAPS"
+></A
+>BONOBO_RET_EX()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define     BONOBO_RET_EX(ev)</PRE
+></TD
+></TR
+></TABLE
+><P
+>returns if there is an exception flagged in <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>.</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2661"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the exception environment 
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2670"
+></A
+><H3
+><A
+NAME="BONOBO-RET-VAL-EX-CAPS"
+></A
+>BONOBO_RET_VAL_EX()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define     BONOBO_RET_VAL_EX(ev,v)</PRE
+></TD
+></TR
+></TABLE
+><P
+>returns <TT
+CLASS="PARAMETER"
+><I
+>v</I
+></TT
+> if there is an exception flagged in <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2677"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the exception environment </TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>v</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the value to return
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2690"
+></A
+><H3
+><A
+NAME="BONOBOEXCEPTIONFN"
+></A
+>BonoboExceptionFn ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char*       (*BonoboExceptionFn)            (<GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev,
+                                             <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data);</PRE
+></TD
+></TR
+></TABLE
+><P
+>The prototype for user registerable exception decoders.</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2697"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>the exception environment </TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>user data to be passed to the function</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>a g_malloc'd copy of a translated user readable error string.
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2714"
+></A
+><H3
+><A
+NAME="BONOBO-RETURN-IF-FAIL"
+></A
+>bonobo_return_if_fail()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define     bonobo_return_if_fail(expr,opt_ev)</PRE
+></TD
+></TR
+></TABLE
+><P
+>this macro is used for bonobo preconditons on argument types,
+usualy inside skels if <TT
+CLASS="PARAMETER"
+><I
+>expr</I
+></TT
+> is FALSE a warning is printed and
+<TT
+CLASS="PARAMETER"
+><I
+>opt_ev</I
+></TT
+> is set to ex_Bonobo_BadArg.</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2721"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>expr</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>an expression that should be true </TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>opt_ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>an optional corba exception environment.
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2734"
+></A
+><H3
+><A
+NAME="BONOBO-RETURN-VAL-IF-FAIL"
+></A
+>bonobo_return_val_if_fail()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define     bonobo_return_val_if_fail(expr,val,opt_ev)</PRE
+></TD
+></TR
+></TABLE
+><P
+>this macro is used for bonobo preconditons on argument types,
+usualy inside skels if <TT
+CLASS="PARAMETER"
+><I
+>expr</I
+></TT
+> is FALSE a warning is printed and
+<TT
+CLASS="PARAMETER"
+><I
+>opt_ev</I
+></TT
+> is set to ex_Bonobo_BadArg.</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2741"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>expr</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>an expression that should be true </TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>val</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>a value to return on failure.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>opt_ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>an optional corba exception environment.
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2758"
+></A
+><H3
+><A
+NAME="BONOBO-EXCEPTION-SET"
+></A
+>bonobo_exception_set()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define     bonobo_exception_set(opt_ev,repo_id)</PRE
+></TD
+></TR
+></TABLE
+><P
+>This macro sets the stateless user exception with <TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+> on
+<TT
+CLASS="PARAMETER"
+><I
+>opt_ev</I
+></TT
+> or warns if <TT
+CLASS="PARAMETER"
+><I
+>opt_ev</I
+></TT
+> == NULL</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2766"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>opt_ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>an optional corba exception environment.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>repoid of the exception to set.
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2779"
+></A
+><H3
+><A
+NAME="BONOBO-EXCEPTION-GET-TEXT"
+></A
+>bonobo_exception_get_text ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char*       bonobo_exception_get_text       (<GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Returns a user readable description of the exception.  First
+checks <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> against builtin Bonobo exceptions, then falls back to
+exception names added through bonobo_exception_add_handler_str
+or bonobo_exception_add_handler_fn.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2787"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the corba environment.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> A g_malloc'd description, which the caller must free.
+NULL is never returned.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2800"
+></A
+><H3
+><A
+NAME="BONOBO-EXCEPTION-ADD-HANDLER-STR"
+></A
+>bonobo_exception_add_handler_str ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        bonobo_exception_add_handler_str
+                                            (const char *repo_id,
+                                             const char *str);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This routine adds a simple string mapping for an exception
+with repository id <TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+>, such that when we call
+bonobo_exception_get_text on an exception of id <TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+> we
+get <TT
+CLASS="PARAMETER"
+><I
+>str</I
+></TT
+> back.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2809"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> exception repository id</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>str</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the user readable, translated exception text.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2822"
+></A
+><H3
+><A
+NAME="BONOBO-EXCEPTION-ADD-HANDLER-FN"
+></A
+>bonobo_exception_add_handler_fn ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        bonobo_exception_add_handler_fn (const char *repo_id,
+                                             <A
+HREF="bonobo-bonobo-exception.html#BONOBOEXCEPTIONFN"
+>BonoboExceptionFn</A
+> fn,
+                                             <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data,
+                                             <GTKDOCLINK
+HREF="GDESTROYNOTIFY"
+>GDestroyNotify</GTKDOCLINK
+> destroy_fn);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This routine adds a method mapping for an exception
+with repository id <TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+>, such that when we call
+bonobo_exception_get_text on an exception of id <TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+>
+the <TT
+CLASS="PARAMETER"
+><I
+>fn</I
+></TT
+> is called and passed <TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>.
+When the handler is removed the <TT
+CLASS="PARAMETER"
+><I
+>destroy_fn</I
+></TT
+> is called
+on its <TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2837"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> exception repository id</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fn</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> function to make exception human readable</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the user data</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>destroy_fn</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> user data destroy function or NULL.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2858"
+></A
+><H3
+><A
+NAME="BONOBO-EXCEPTION-REPOID-TO-TEXT"
+></A
+>bonobo_exception_repoid_to_text ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char*       bonobo_exception_repoid_to_text (const char *repo_id);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This maps builtin bonobo exceptions that the system
+knows about to user readable strings.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2864"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>repo_id</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> exception repository id</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a user string or NULL for an unknown repo_id</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="bonobo-bonobo-generic-factory.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="bonobo-object-activation.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="bonobo-properties.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>BonoboGenericFactory</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Properties</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

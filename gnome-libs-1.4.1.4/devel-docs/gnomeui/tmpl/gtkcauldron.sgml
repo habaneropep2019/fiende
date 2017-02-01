@@ -1,0 +1,652 @@
+<!-- ##### SECTION Title ##### -->
+gtkcauldron
+
+<!-- ##### SECTION Short_Description ##### -->
+Produce gtk/gnome dialog boxes from format strings.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The following simple example shows basic usage of gtk_dialog_cauldron()
+for those writing dialogs for GUI applications:
+</para>
+
+<informalexample>
+  <programlisting>
+    gtk_dialog_cauldron ("Search", 0,
+        " ( (Enter search string:) | %Eod ) / ( %Bqrxfp || %Bqxfp ) ", 
+            &amp;search_string, "Ok", "Cancel");
+  </programlisting>
+</informalexample>
+
+<para>The <type>format</type> string consists of a list of frames or widgets which
+are packed consecutively into the top-level window. Each frame is
+specified with an opening and closing frame token (a bracket). Each
+widget specifier consists of a % followed by one or more capital letters
+indicating the widget type, followed by zero or more small letters
+indicating various packing, behaviour and/or data options.</para>
+
+<para>A list of frames or widgets are seperated by one of several
+<type>seperator-tokens</type>. Their meanings are:</para>
+
+<itemizedlist>
+   <listitem><para><emphasis>|</emphasis> Pack side by side.
+   </para></listitem>
+
+   <listitem><para><emphasis>||</emphasis> Pack side by side with
+     homogenous spacing - that is, the widget or frames to the left or
+     right will always have the same size.  </para></listitem>
+
+   <listitem><para><emphasis>/</emphasis> Pack on top of each other.
+   </para></listitem>
+
+   <listitem><para><emphasis>//</emphasis> Pack on top of each other
+     with homogenous spacing. </para></listitem>
+
+</itemizedlist>
+
+<para>If no seperator is specified, then a <emphasis>|</emphasis>
+seperator is implied.  Frames can be nested infinitely within each
+other. Only one type of seperator can be used within a single
+frame. If more than one kind of seperator is used within a single
+frame, then each seperator within that frame will revert to the type
+of the first seperator within that frame.</para>
+
+<para>In the above example, the <emphasis>E</emphasis> stands for
+Entry-widget and the <emphasis>B</emphasis> stands for
+Button-widget. Each of these widgets incurs one format conversion: in
+the case of the entry widget, a <type>char **</type> must be passed,
+while in that case of the button widget, a <type>char *</type> must be
+passed. The entry widget will store its result into
+<emphasis>search_string</emphasis> if the dialog is not cancelled and
+hence <emphasis>search_string</emphasis> must be writable. The entry
+widget also derives its default text from this variable.</para>
+
+<para>The dialog consists of two frames placed above each other,
+(defined by the two pairs of brackets). The buttons are of the same
+size, while the label and entry widgets are spaced as they
+require.</para> 
+
+<refsect2>
+   <title>Reference</title> 
+     <para>The following is a complete list of
+       the widgets. Each widget can take additional options which are
+       described in options section below.</para>
+
+     <itemizedlist>
+       <listitem><para><emphasis>%L</emphasis> Label. Causes one
+         va_arg conversion of type <type>gchar *</type> dictating the
+         label's text. This is identical to inline label given in the
+         example above, however this allows for
+         internationalisation.</para></listitem>
+
+       <listitem><para><emphasis>%F, %N, %E, %P</emphasis> Entry. This
+         is one of a File, Number, plain text Entry or Password entry
+         widget. Causes one va_arg conversion of type <type>char
+         **</type> which must contain the default text to be inserted
+         into the entry widget, and must be writable to return the
+         result. If the <emphasis>g</emphasis> option is present then
+         entries are the gnome versions of those entries instead. In
+         the case of <emphasis>F</emphasis> and
+         <emphasis>N</emphasis>, two more <type>gchar *</type> are
+         converted - the history_id and the file browser or calculator
+         window title respectively. In the case of <emphasis>E</emphasis>, only one
+         more <type>gchar *</type> is converted: the history_id.</para></listitem>
+
+       <listitem><para><emphasis>%D</emphasis> Date edit widget. Causes
+         two va_arg conversions of type <type>gdouble *</type> and type
+	 <type>gint</type>. The first represents the time in seconds
+	 since Jan 1 1970 and is used to initialise the widget as well
+	 as to store the result - it is cast internally to
+	 <type>time_t</type>. The second is the options flag and is the
+	 inclusive <emphasis>OR</emphasis> of one or more of
+         <emphasis>GNOME_DATE_EDIT_SHOW_TIME</emphasis>, <emphasis>GNOME_DATE_EDIT_24_HR</emphasis>, and
+         <emphasis>GNOME_DATE_EDIT_WEEK_STARTS_ON_MONDAY</emphasis>.
+         </para>
+       </listitem>
+
+       <listitem><para><emphasis>%B </emphasis> Button with label. One
+         va_arg conversion of type <type>char *</type>, dictating the
+         button label. If this is NULL, then gtk_button_new is called
+         instead of gtk_button_new_with_label. If the
+         <emphasis>g</emphasis> option is present then a Gnome stock
+         button is drawn, in which case you can pass a Gnome stock
+         pixmap macro instead of a string.</para></listitem>
+
+       <listitem><para><emphasis>%C </emphasis> Check box. Two va_arg
+         conversions of type <type>gchar *label</type> and <type>gint
+         *state</type>. If label is NULL the same applies as with
+         <emphasis>B</emphasis>. result is stored in
+         <emphasis>state</emphasis>. </para></listitem>
+   
+       <listitem><para><emphasis>%R </emphasis> Radio button. Two
+         va_arg conversions of type <type>char *label</type> and
+         <type>gint *state</type>. Multiple radio buttons within the
+         same frame are grouped together. If label is NULL then same
+         applies as with <emphasis>B</emphasis>.</para></listitem>
+
+       <listitem><para><emphasis>%S </emphasis> Seperator. Vertical or
+         horizontal automatically determined. </para></listitem>
+
+       <listitem><para><emphasis>%SB </emphasis> Spin button. Two
+         va_arg conversions of type <type>double climb_rate</type> and
+         <type>gint digits</type>. This is not particularly useful on its own
+         and must be used with option \fIj\fP which causes conversion
+         of an <emphasis>adjustment</emphasis> parameter set. </para></listitem>
+
+       <listitem><para><emphasis>%T </emphasis> Text. One va_arg
+         conversion of the type <type>gchar **text</type>. Must be writable
+         if option <emphasis>e</emphasis> is used to indicate that the text is
+         editable.</para></listitem>
+
+       <listitem><para><emphasis>%X </emphasis> User defined
+         widget. This specifier causes two va_arg conversions: a
+         function of type <emphasis>GtkWidget *(*func) (GtkWidget * widget,
+         gpointer user_data)</emphasis> and <type>gpointer user_data</type> to be
+         passed to the function. The function takes two arguments: the
+         toplevel window widget (which is just to fill in a first
+         argument and needn't have any use), and the user data. The
+         function must return a widget which will then be packed into
+         its enclosing frame.  </para></listitem>
+
+   </itemizedlist>
+</refsect2>
+
+<refsect2>
+   <title>Frames</title> 
+     
+     <para>Different kinds of brackets specify different kinds of
+       frames. These may also take an option, although the option must
+       be specified after the closing bracket and not after the
+       opening bracket.</para>
+
+     <itemizedlist>
+
+       <listitem><para><emphasis>[</emphasis>A visible frame encloses
+         the widget specified between the brackets. </para></listitem>
+
+       <listitem><para><emphasis>%[</emphasis>A frame with a
+         title. Results in one va_arg conversion of type <type>char
+         *title</type> </para></listitem>
+
+       <listitem><para><emphasis>(</emphasis>Invisible hbox or vbox, depending on the enclosed seperators.
+       </para></listitem>
+
+       <listitem><para><emphasis>{</emphasis>Pane box (visible frame
+         with adjustable seperator). Only two objects may be packed
+         inside, further objects are ignored. It is best to pack only
+         other containers into a pane.</para>
+
+         <para>The closing bracket may be followed by options. Eg</para>
+<informalexample>
+<programlisting>
+    [ %B ]seo
+</programlisting>
+</informalexample>
+
+         <para>is a button inside an shadowed frame. The shadow is of type
+         etched outer.</para>
+
+         <para>The closing <emphasis>) </emphasis> may be followed by
+          the options <emphasis>v </emphasis> or <emphasis>h
+          </emphasis>. This indicates that the box must be packed into
+          a scrollable window. Hence <emphasis> ( %C // %C // %C )v
+          </emphasis> are checkboxes inside a scrollable window with a
+          vertical scrollbar but an automatic horizontal bar
+          (automatic means it appears only if necesary).</para>
+
+         <para>A very useful option is the \fIn\fP option. This
+           creates a <emphasis>notebook page </emphasis> from the
+           frame. Eg,</para>
+
+<informalexample>
+<programlisting>
+    ( %C // %C )n ( %L / %E )n ( %Te )n
+</programlisting>
+</informalexample>
+
+         <para> This creates a three page notebook. The <emphasis>n
+          </emphasis> causes one additional conversion of type
+          <type>char *</type>, which is the text to go onto the tag.
+          If the <emphasis>v </emphasis> option is given in addition
+          to the <emphasis>n </emphasis> option, then the notebook
+          will have its tags placed to the left descending vertically,
+          otherwise the tags are place in the conventional position
+          above the notebook.</para></listitem>
+
+     </itemizedlist>
+</refsect2>
+
+<refsect2>
+   <title>Options</title> 
+
+     <para>Conversions caused by an option happen in the following
+       order, regardless of the order in which the options are given:
+       <emphasis>g</emphasis>, <emphasis>j</emphasis>,
+       <emphasis>a</emphasis>, <emphasis>u</emphasis> then
+       <emphasis>c</emphasis>.</para>
+
+     <itemizedlist>
+       <listitem><para><emphasis> x </emphasis>expand, (see
+       gtk_box_pack_start). </para></listitem>
+
+       <listitem><para><emphasis> f </emphasis> fill, (see
+       gtk_box_pack_start) </para></listitem>
+
+       <listitem><para><emphasis> p </emphasis>padding, (see
+         gtk_box_pack_start). This may be specified more than once for
+         additional padding. Padding is in units of 3 pixels per
+         <emphasis>p</emphasis> specified. This default can be
+         changed, see global options below. </para></listitem>
+
+       <listitem><para><emphasis> d </emphasis>default, causes default
+         fill, expand, and padding of the widget into its parent
+         box. This must not be used with <emphasis>x</emphasis>,
+         <emphasis>f</emphasis>, or <emphasis>p</emphasis>. </para></listitem>
+
+       <listitem><para><emphasis>si</emphasis>,
+         <emphasis>so</emphasis>, <emphasis>sei</emphasis>,
+         <emphasis>seo</emphasis> Shadow, (see
+         gtk_frame_set_shadow_type). This stands for one of
+         <emphasis>i</emphasis>nner, <emphasis>o</emphasis>uter,
+         <emphasis>e</emphasis>tched <emphasis>i</emphasis>nner and
+         <emphasis>e</emphasis>tched <emphasis>o</emphasis>uter. The s
+         option must follow the <emphasis>]</emphasis> and not the
+         <emphasis>[</emphasis>. </para></listitem>
+
+       <listitem><para><emphasis> c </emphasis> callback. Indicates
+         that we want a callback function to be run after the widget
+         is created and packed. It causes two va_arg conversions: a
+         function of type <emphasis>*(*func) (GtkWidget * widget,
+         gpointer user_data)</emphasis> and <emphasis>gpointer
+         user_data</emphasis> to be passed to the function. The
+         function takes two arguments: the widget itself, and
+         <emphasis>user_data</emphasis>. This option may be used if
+         their are additional things we want to do to the widget that
+         are out of the scope of the options.</para></listitem>
+
+       <listitem><para><emphasis> r </emphasis>results. For a button
+          widget, causes clicking on the button to assign the current
+          state of each widgets to any user pointers given. This may
+          be given as an option to an `Apply' button, and will
+          necesarily be given as an option to an `Ok' button. </para></listitem>
+
+       <listitem><para><emphasis> q </emphasis> quit. For a button
+       widget, causes the button to exit the dialog.</para></listitem>
+
+       <listitem><para><emphasis> j </emphasis> adjustment. For the
+         Spin Button widget, passes and adjustment object to the Spin
+         Button. This causes 6 convertions: a <emphasis>double
+         *</emphasis> where the initial value is obtained and where
+         the result is stored, and five more
+         <emphasis>double</emphasis> conversions containing: the lower
+         bound, upper bound, step increment, page increment, and page
+         size. (Note that page size must be more than the page
+         increment).</para></listitem>
+
+       <listitem><para><emphasis> e </emphasis> editable. For the text
+         widget, set it to be editable. In this case, the result is
+         assigned to the passed arg. By default the text widget only
+         shows the text and does not allow modification.</para></listitem>
+
+       <listitem><para><emphasis> e </emphasis> inactive. Use 
+         <emphasis>gtk_widget_set_sensitive</emphasis> to disabled
+	 (gray-out) the widget.</para></listitem>
+
+       <listitem><para><emphasis> v </emphasis> vertical
+         scrollbar. For the text widget and for the
+         <emphasis>[</emphasis> <emphasis>]</emphasis> frame, this
+         adds a vertical scrollbar.</para></listitem>
+
+       <listitem><para><emphasis> h </emphasis> horizontal
+         scrollbar. For the text widget and for the
+         <emphasis>[</emphasis> <emphasis>]</emphasis> frame, this
+         adds a horizontal scrollbar.</para></listitem>
+
+        <listitem><para><emphasis> a </emphasis> accelerator. Causes
+          <type>gchar *signal</type>, <type>gint
+          key</type>, <type>gint modifier</type> to be
+          converted. This will add an accelerator in the obvious
+          way. Note that for most widgets, an accelerator need not be
+          added, because the appropriate accelerator is added
+          automatically with the use of an ampersand,
+          <emphasis>&</emphasis>, before the accelerator hotkey in the
+          label. (See accelerator ampersands below.)</para></listitem>
+
+       <listitem><para><emphasis> u </emphasis> accelerator. This
+         accelerator is used for dialogs that are to be
+         internationalised and is similar to
+         <emphasis>a</emphasis>. Causes <emphasis>gchar
+         *signal</emphasis>, <emphasis>gchar *key</emphasis>,
+         <emphasis>gint modifier</emphasis> to be converted. To the
+         <emphasis>key</emphasis> argument is passed the same label
+         that is used to label the widget. The widget will contain an
+         underbar under the character following the & symbol. For
+         example "clicked", "&amp;Cancel", GDK_MOD1_MASK. Binds the widget
+         to Alt-C and completely ignores the remaining characters. You
+         can then use the same label for the actual contents of the
+         cancel button to cause an underbar to be written under the
+         `C'. Note that for most widgets, an accelerator need not be
+         added, because the appropriate accelerator is added
+         automatically with the use of an ampersand,
+         <emphasis>&</emphasis>, before the accelerator hotkey in the
+         label. (See accelerator ampersands below.)</para></listitem>
+
+       <listitem><para><emphasis> o </emphasis> focus. Sets the input
+         focus to this widget. Only one widget must have this
+         option. (Most dialogs have a default widget accepting
+         keyboard input to avoid having to manually set focus with the
+         mouse.)</para></listitem>
+
+       <listitem><para><emphasis> g </emphasis> gnome. Use the Gnome
+         version of the widget. May cause additional conversions, see
+         <emphasis>%E</emphasis> above. </para></listitem>
+
+       <listitem><para><emphasis> n </emphasis> notebook. Cause a
+         <emphasis>[</emphasis> <emphasis>]</emphasis> to be become a
+         notebook page. See frames above.</para></listitem>
+
+     </itemizedlist>
+</refsect2>
+
+<refsect2>
+  <title>Accelerator ampersands</title> 
+  
+    <para>Any widget's text having an <emphasis>&</emphasis> sign in
+    it will have an underbar placed below the letter after the
+    <emphasis>&</emphasis> sign. The <emphasis>&</emphasis> will not
+    be shown. To draw an actual & sign, use a double ampersand:
+    <emphasis>&&</emphasis></para>
+
+    <para>Buttons, check-boxes, and radio-buttonsP will also have an
+     accelerator automatically added to them along with the
+     underbar. It will be bound to the key Alt-X where X is the letter
+     following the ampersand.</para>
+</refsect2>
+
+<refsect2>
+   <title>Examples</title>
+<informalexample>
+<programlisting>
+    gtk_dialog_cauldron ("Search", 0,
+    " ( %Ld | %Eod ) / %[ ( %Cd // %Cd // %Cd ) ]seo / ( %Bqrxfp || %Bqxfp ) ", 
+/* %L */		"Enter search string:",
+/* %E */		&amp;search_string,
+/* %[ */		"Search options",
+/* %C */		"Case sensitive", &amp;case_sensitive,
+/* %C */		"Whole words only", &amp;whole_word,
+/* %C */		"Regular expression", &amp;regular_expression,
+/* %B */		"Ok",
+/* %B */		"Cancel");
+</programlisting>
+</informalexample>
+
+<para>Interwidget spacing can be increased by inserting more space
+characters between format specifiers, however only the first gab is
+looked at. Eg, spreading out the check boxes can be done with:</para>
+
+<informalexample>
+<programlisting>
+
+    " ( %Ld | %Ed ) / %[ ( %Cd           // %Cd // %Cd ) ]seo / 
+( %Bqrefp || %Bqefp ) ", 
+</programlisting>
+</informalexample>
+
+<para>The space between the widget and its parent box can be adjusted
+by adding space after the bracket, eg:</para>
+
+<informalexample>
+<programlisting>
+    " (          %Ld | %Ed ) / %[ ( %Cd // %Cd // %Cd ) ]seo /
+( %Bqrefp || %Bqefp ) ", 
+</programlisting>
+</informalexample>
+
+<para>Each space character counts 3 pixels by default. This default can
+be changed, see global options.</para>
+
+</refsect2>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### MACRO GTK_CAULDRON_TOPLEVEL ##### -->
+<para>
+This is translated to the top level window (%GTK_WINDOW_TOPLEVEL)
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_DIALOG ##### -->
+<para>
+This is translated to the top level window (%GTK_WINDOW_TOPLEVEL)
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_POPUP ##### -->
+<para>
+This is translated to the top level window (%GTK_WINDOW_TOPLEVEL)
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE_SHIFT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE_MASK ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE1 ##### -->
+<para>
+Specify a width of 1 pixels of each space or p
+characters. 
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE2 ##### -->
+<para>
+Specify a width of 2 pixels of each space or p
+characters. 
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE3 ##### -->
+<para>
+Specify a width of 3 pixels of each space or p
+characters. 
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE4 ##### -->
+<para>
+Specify a width of 4 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE5 ##### -->
+<para>
+
+Specify a width of 5 pixels of each space or p
+characters. 
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE6 ##### -->
+<para>
+Specify a width of 6 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE7 ##### -->
+<para>
+Specify a width of 7 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE8 ##### -->
+<para>
+Specify a width of 8 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE9 ##### -->
+<para>
+Specify a width of 9 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE10 ##### -->
+<para>
+Specify a width of 10 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE11 ##### -->
+<para>
+Specify a width of 11 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE12 ##### -->
+<para>
+Specify a width of 12 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE13 ##### -->
+<para>
+Specify a width of 13 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE14 ##### -->
+<para>
+Specify a width of 14 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_SPACE15 ##### -->
+<para>
+Specify a width of 15 pixels of each space or p
+characters. 
+
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_IGNOREESCAPE ##### -->
+<para>
+Normalling, pressing the Escape key terminates the dialog. This prevents
+this.
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_IGNOREENTER ##### -->
+<para>
+Normalling, pressing the Enter/Return key assigns the values and
+terminates. This prevents this.
+</para>
+
+
+
+<!-- ##### MACRO GTK_CAULDRON_GRAB ##### -->
+<para>
+Causes a grab on the dialog - that is, no other widgets in the
+application will work until the dialog exits.
+</para>
+
+
+
+<!-- ##### USER_FUNCTION GtkCauldronNextArgCallback ##### -->
+<para>
+
+</para>
+
+@cauldron_type: 
+@user_data: 
+@result: 
+
+
+<!-- ##### USER_FUNCTION GtkCauldronCustomCallback ##### -->
+<para>
+
+</para>
+
+@widget: 
+@user_data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gtk_dialog_cauldron ##### -->
+<para>
+
+</para>
+
+@title: 
+@options: 
+@Varargs: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@fmt: 
+
+
+<!-- ##### FUNCTION gtk_dialog_cauldron_parse ##### -->
+<para>
+
+</para>
+
+@title: 
+@options: 
+@format: 
+@next_arg: 
+@user_data: 
+@parent: 
+@Returns: 
+
+

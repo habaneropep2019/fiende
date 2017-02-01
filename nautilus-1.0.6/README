@@ -1,0 +1,357 @@
+This file contains build instructions for Nautilus, the GNOME shell
+and file manager. At some point we probably should move these to
+INSTALL or HACKING and put a user-oriented README here instead.
+
+====================
+0: Table of contents
+====================
+
+0: Table of contents
+1: Hacking
+2: Introduction
+3: Distribution-specific notes
+4: Compiling
+5: Issues when running Nautilus
+6: Mozilla support
+7: FreeType issues
+
+==========
+1: Hacking
+==========
+
+If you would like to hack on Nautilus, or have patches, please send
+mail to the Nautilus maintainer: Darin Adler <darin@bentspoon.com>.
+Patches should also be sent to the Nautilus mailing list:
+<nautilus-list@lists.eazel.com>
+
+The HACKING file contains other things you should know when hacking on
+Nautilus and when contributing code. Please, make sure you check the
+coding style document in docs/style-guide.html and other documents
+found in the "docs" directory.
+
+===============
+2: Introduction
+===============
+
+To build Nautilus without interfering with an existing GNOME install,
+you will need to build several components either from CVS or from 
+tarballs into a separate prefix. Detailed instructions on how
+to accomplish this are available in section 4.
+
+==============================
+3: Distribution-specific notes
+==============================
+
+The following describes the libraries that Nautilus hackers use for
+development and what we have tested with. At the moment, we make no
+guarantees one way or another about whether Nautilus will work with
+other versions.
+
+You will also need the library package that is associated with each
+development package, these versions are for Red Hat 6.2 and Debian
+"potato":
+
+library         Red Hat                     Debian                          approx. version
+--------------  ------------------------    ------------------------------  ------------------
+audiofile       audiofile-devel-0.1.9-3     libaudiofile-dev (0.1.9-0.1)    0.1.9
+esound          esound-0.2.20               ?                               0.2
+libc            glibc-devel-2.1.3-15        libc6-dev (2.1.3-10)            2.1.3
+libc++          egcs-c++-1.1.2-30           libstdc++2.10-dev (2.95.2-12)   2.9.0, 2.10
+libjpeg         libjpeg-devel-6b-10         libjpeg62-dev (6b-1.2)          6b 1.0-1.2
+libpng          libpng-devel-1.0.5-3        libpng2-dev (1.0.5-1)           1.0.5
+libtiff         libtiff-devel-3.5.4-5       libtiff3g-dev (3.5.4-5)         3.5.4
+libungif        libungif-devel-4.1.0-4      libungif3g-dev (3.0-3)          3.0 or 4.1.0
+Xlib            XFree86-devel-3.3.6-20      xlib6g-dev (3.3.6-7)            3.3.6
+zlib            zlib-devel-1.1.3-6          zlib1g-dev (1.1.3-5)            1.1.3
+freetype2       freetype2-devel-1.0beta8    ?                               1.0beta8
+scrollkeeper    scrollkeeper-0.1.0-1        ?                               0.1.0
+
+Other modules for Red Hat users:
+
+        - For most modules, the versions in Red Hat 6.1 or 6.2 will do (listed above).
+        - ORBit requires popt-1.5, which can be fetched from:
+
+        ftp://ftp.valinux.com/pub/mirrors/redhat/rawhide/i386/RedHat/RPMS/popt-1.5-0.45.i386.rpm
+        ftp://ftp.valinux.com/pub/mirrors/redhat/redhat/redhat-6.2/i386/RedHat/RPMS/popt-1.5-0.48.i386.rpm
+
+        - FreeType packages are available here:
+
+        http://developer.eazel.com/eazel-hacking/updates/redhat62/freetype2/freetype-2.0.1-4.i386.rpm
+        http://developer.eazel.com/eazel-hacking/updates/redhat62/freetype2/freetype-devel-2.0.1-4.i386.rpm
+
+	- ScrollKeeper source and packages are available here:
+
+	http://sourceforge.net/project/showfiles.php?group_id=11543
+
+Replace "redhat62" with "redhat70" if you are using RedHat Linux 7.0.
+
+Other modules for Debian users: using potato, or possibly woody
+
+If you need to get a copy of popt from source: 
+
+        CVSROOT=:pserver:anonymous@cvs.rpm.org:/cvs/devel
+        The default password is a carriage return.  You should do a cvs co popt
+
+Which RPM version you need depends on your distribution. If you have
+Red Hat 6.2, you need at least 3.0.4. If you have Red Hat 7.0, you
+need 4.0. Unfortunately, the released rpms from RedHat have bug (a
+header file is missing), so for Red Hat 7.0 you will need the Eazel
+Hacking rpm's for RPM, available from:
+
+        http://developer.eazel.com/eazel-hacking/updates/redhat70/rpm/
+
+=====================
+4: Compiling from cvs
+=====================
+
+Compiling from cvs a lot of work, and some packages may not compile at
+any given moment when you check them out.
+
+First, make sure you have installed the packages detailed below. If
+you are running GNOME from binaries (Helix Code or your native
+distribution binaries), please make sure you have installed the
+corresponding development packages. (i.e.: the *-devel packages which
+provide the necessary C header files.
+
+Then, make sure you have no old version of the packages nautilus
+depends on on your system. You can check the version of the relevant
+packages by trying to execute "package-config --version" (ie:
+gnome-config --version will report gnome-libs version, gconf-config
+--version will report gconf's version).
+
+The following lists the packages and the versions that are required.
+
+    module             branch             configure options
+    ------             ------             -----------------
+    popt:              <1.5, not from GNOME CVS, see above>
+    rpm                <see above>
+    glib:              glib-1-2
+    gtk+:              gtk-1-2
+    imlib:             HEAD
+    gnome-xml:         LIB_XML_1_BRANCH
+    ORBit:             orbit-stable-0-5
+    gnome-libs:        gnome-libs-1-0     --enable-prefer-db1
+    gnome-http:        HEAD
+    intltool:          HEAD
+    oaf:               HEAD
+    gconf:             gconf-1-0          --disable-debug
+    gdk-pixbuf:        HEAD               --enable-canvas-pixbuf
+    gnome-print:       gnome-1-4-branch
+    gnome-vfs:         gnome-vfs-1
+    control-center     control-center-1-0
+    bonobo:            HEAD
+    librsvg:	       librsvg-1-0
+    eel:	       eel-1-0
+    nautilus:          nautilus-gnome-1
+
+One difference between tarball and cvs compilation is that when you
+get stuff from cvs, you don't get a configure script. This script has
+to be generated.  This script is usually generated with the help of
+another script available from cvs named "autogen.sh". For those
+interested, "autogen.sh" will run in turn aclocal, automake, autoconf
+and configure. You thus need versions of the GNU tools for the
+following packages:
+
+        package         version       command
+        -------         -------       -------
+        automake        1.4           automake --version
+        autoconf        2.13          autoconf --version
+
+Earlier versions might work but no one has tested them.
+
+You will need to create the ${prefix}/share/aclocal directory
+before compiling any package and setup the following environment
+variable:
+
+        export ACLOCAL_FLAGS="$ACLOCAL_FLAGS -I ${prefix}/share/aclocal"
+
+We assume you want to install these packages in another prefix than
+/usr since you want to keep a working system. For the following, we
+assume you are installing in /usr/local. ie: ${prefix}=/usr/local
+
+Redefine your PATH environment variable:
+
+        export PATH=$PATH:${prefix}/bin
+
+Redefine your LD_LIBRARY_PATH environment variable:
+
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${prefix}/lib
+
+Redefine your GNOME_PATH environment variable:
+
+        export GNOME_PATH=$GNOME_PATH:${prefix}
+
+In the order defined above and with the specific options detailed
+above for each package, you should run the autogen scripts:
+
+        ./autogen.sh --prefix=${prefix} <special-options>
+
+Then:
+
+        make
+
+Then get root and:
+
+        make install.
+
+===============================
+5: Issues when running Nautilus
+===============================
+
+There's a script named nautilus-clean.sh, at the top level of the
+Nautilus sources. If OAF or GConf changes, you may need to run this
+script to get Nautilus to work properly. One way to invoke it is like
+this:
+
+        nautilus-clean.sh -x
+
+==================
+6: Mozilla support
+==================
+
+Nautilus includes support for browsing HTML content on the local
+computer as well as remote web servers. HTML content is handled by the
+Nautilus Mozilla component. This component can be optionally built
+with Nautilus. It is automatically enabled at configure time if
+Mozilla development libraries are detected on your system.
+
+The recommended version of Mozilla for use with Nautilus is 0.9.5.
+
+The latest Mozilla packages can be found here:
+
+ftp://ftp.mozilla.org/pub/mozilla/releases/mozilla0.9.5/
+
+After installing these packages (RPMs for example) you can build Nautilus
+with Mozilla support as follows:
+
+        cd nautilus
+        rm -f config.cache config.status
+        ./configure
+
+The configure script should automatically detect and use the Mozilla
+development libraries.
+
+Alternatively, you can build Mozilla from source and use that.  Lets
+say that you built Mozilla in /foo/bar.  You can build nautilus with
+support for that Mozilla build as follows:
+
+        cd nautilus
+        rm -f config.cache config.status
+        ./configure --with-mozilla-lib-place=/foo/bar/mozilla/dist/bin
+            --with-mozilla-include-place=/foo/bar/mozilla/dist/include
+
+NOTE: The above configure command should be issued in one line. It is
+split into two lines in this document for readability.
+
+NOTE: If you are building mozilla from source (NOT from the rpm), you
+need to do some environment setup for the Mozilla component:
+
+        export MOZILLA_FIVE_HOME=/foo/bar/mozilla/dist/bin
+        export LD_LIBRARY_PATH=/foo/bar/mozilla/dist/bin:$LD_LIBRARY_PATH
+
+If you experience linking problems (e.g. undefined reference to
+`nsString type_info node'), please note that both applications
+(mozilla and nautilus) must be compiled not only with the same version
+of compiler, but also with the same compiler flags. Download the right
+mozilla package for your distribution (see upper).
+
+If you have built Mozilla from source, Mozilla by default adds
+CXXFLAGS -fno-rtti and -fno-exceptions or -fno-handle-exceptions
+(depends on gcc version).  You have two chances to make things in
+sync:
+
+1) Compile mozilla with this .mozconfig script: (You must place it in
+your home directory):
+
+        # sh
+        # Build configuration script
+        #
+        # See http://www.mozilla.org/build/unix.html for build instructions.
+        #
+
+        # Options for 'configure' (same as command-line options).
+        ac_add_options --disable-tests
+        ac_add_options --disable-debug
+        ac_add_options --enable-strip-libs
+        ac_add_options --enable-cpp-rtti
+        ac_add_options --disable-mailnews
+        ac_add_options --enable-optimize
+
+2) Configure mozilla with standard configure script and compile it.
+Before configuring Nautilus set proper CXXFLAGS. For example with
+latest gcc it means:
+
+        CXXFLAGS='-fno-rtti -fno-exceptions'
+        export CXXFLAGS
+
+For more, see configure.in in mozilla source. You can save some space
+by disabling RTTI.
+
+As an alternative, if you don't want to use the Nautilus web page
+viewer that uses Mozilla, you can disable the Mozilla component (even
+if Mozilla development libraries are installed in your system) as
+follows:
+
+        ./configure --disable-mozilla-component
+
+Mike Fleming has written some useful information about common
+Mozilla problems and how to fix them.  This information can be
+found in the Nautilus Support FAQ:
+
+	http://www.eazel.com/nautilus-faq.html
+
+==================
+7: FreeType issues
+==================
+
+Nautilus includes support for rendering anti aliased text (smooth
+mode). For smooth mode to work, the Nautilus library librsvg needs
+to detect and use FreeType2 in your system.
+
+To learn more about FreeType2, please see:
+
+        http://freetype.sourceforge.net/
+
+If you are using a RedHat 6.x or greater system, then you can easily
+add FreeType2 support by installing the rpms found here:
+
+        http://developer.eazel.com/eazel-hacking/updates/redhat62/freetype2
+
+Replace "redhat62" with "redhat70" if you are using RedHat Linux 7.0.
+
+Originally, the Freetype 2 rpm that we used for Nautilus was called "freetype2".
+Now that RedHat 7.1 is is coming around, they have included freetype 2 in their 
+distribution.  They called the rpm "freetype-2" (Freetype Version 2).  Their 
+freetype-2 rpm contains both Freetype version 1 and Freetype version 2.  In
+order to avoid naming conflicts, we have renamed our freetype2 rpm to freetype-2.
+This will cause problems for people upgrading from our old rpms to our new ones.
+To remove the old rpms,
+
+1) su
+   <password>
+2) rpm -e --nodeps freetype2 freetype2-devel
+3) Install the new Freetype-2 rpms: rpm -Uvh freetype*2.0.1*.rpm
+
+=======================
+8: Scrollkeeper support
+=======================
+
+Scrollkeeper is the documentation cataloging system based on document metadata.
+It works with Nautilus to manage the documentation of installed packages
+on your system.
+
+Nautilus documentation is set up with metadata needed by Scrollkeeper. In order 
+to get the docs fully installed by Scrollkeeper the latest Scrollkeeper has to be 
+installed from here:
+
+	http://sourceforge.net/project/showfiles.php?group_id=11543
+
+This is needed for building and for installing Nautilus.
+
+The RPM installs below /usr. Scrollkeeper does a pre-install during build. Here it
+doesnt matter where Scrollkeeper is installed.
+
+At Nautilus install time Scrollkeeper installs the docs only if the metadata 
+is in $prefix/share/omf. This will be correct only if Nautilus and Scrollkeeper 
+are installed below the same prefix. If the Nautilus docs are not in the Nautilus 
+help sidebar then this did not happen.

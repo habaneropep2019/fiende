@@ -1,0 +1,99 @@
+/* $Id: canvas-widget.gen_h,v 1.26 2001/04/30 05:47:13 kenelson Exp $ */
+
+/* canvas-widget.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/canvas-item.h>
+#include <libgnomeui/gnome-canvas-widget.h>
+#m4 include(property.m4)
+
+CLASS_START(Gnome);
+class CanvasGroup;
+class CanvasWidget : public CanvasItem
+{
+  WRAP_CLASS(CanvasWidget, GnomeCanvasWidget,
+             GNOME_CANVAS_WIDGET, GNOME_IS_CANVAS_WIDGET,
+             canvas_widget,
+             CanvasItem, GnomeCanvasItem, GNOME_CANVAS_ITEM);
+public:
+  CanvasWidget(const CanvasGroup &parent, gdouble x, gdouble y, Gtk::Widget& w);
+  CanvasWidget(const CanvasGroup &parent);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  CANVAS_PROPERTY(x,x,gdouble,gdouble,gdouble,gdouble,double_data)
+  CANVAS_PROPERTY(y,y,gdouble,gdouble,gdouble,gdouble,double_data)
+  CANVAS_PROPERTY(width,width,gdouble,gdouble,gdouble,gdouble,double_data)
+  CANVAS_PROPERTY(height,height,gdouble,gdouble,gdouble,gdouble,double_data)
+  CANVAS_PROPERTY(anchor,anchor,GtkAnchorType,GtkAnchorType,GtkAnchorType,int,int_data)
+
+  CANVAS_PROPERTY(size_pixels,size_pixels,bool,gboolean)
+
+};
+
+PRIVATE_START;
+#include <gnome--/private/canvas-item_p.h>
+IMPL_START;
+#include <gnome--/private/canvas-widget_p.h>
+
+/* canvas-widget.cc
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+#include <stdarg.h>
+#include <gtk--/widget.h>
+
+namespace Gnome {
+
+
+CanvasWidget::CanvasWidget(const CanvasGroup &parentx, gdouble x, gdouble y,
+                           Gtk::Widget& w)
+  : CanvasItem(GNOME_CANVAS_ITEM(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  item_construct(parentx);
+  set("x",x,"y",y,"widget",w.gtkobj(),0);
+}
+
+CanvasWidget::CanvasWidget(const CanvasGroup &parentx)
+  : CanvasItem(GNOME_CANVAS_ITEM(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  item_construct(parentx);
+}
+
+} /* namespace Gnome */

@@ -1,0 +1,417 @@
+<refentry id="bonobo-bonobo-generic-factory">
+<refmeta>
+<refentrytitle>BonoboGenericFactory</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboGenericFactory</refname><refpurpose>The basic, generic Bonobo object factory implementation</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboGenericFactory-struct">BonoboGenericFactory</link>;
+<link linkend="BonoboObject">BonoboObject</link>* (<link linkend="BonoboGenericFactoryFn">*BonoboGenericFactoryFn</link>)     (<link linkend="BonoboGenericFactory">BonoboGenericFactory</link> *Factory,
+                                             void *closure);
+<link linkend="BonoboObject">BonoboObject</link>* (<link linkend="GnomeFactoryCallback">*GnomeFactoryCallback</link>)       (<link linkend="BonoboGenericFactory">BonoboGenericFactory</link> *factory,
+                                             const char *component_id,
+                                             <link linkend="gpointer">gpointer</link> closure);
+typedef     <link linkend="BonoboGenericFactoryClass">BonoboGenericFactoryClass</link>;
+<link linkend="BonoboGenericFactory">BonoboGenericFactory</link>* <link linkend="bonobo-generic-factory-new">bonobo_generic_factory_new</link>
+                                            (const char *oaf_iid,
+                                             <link linkend="BonoboGenericFactoryFn">BonoboGenericFactoryFn</link> factory,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+<link linkend="BonoboGenericFactory">BonoboGenericFactory</link>* <link linkend="bonobo-generic-factory-new-multi">bonobo_generic_factory_new_multi</link>
+                                            (const char *oaf_iid,
+                                             <link linkend="GnomeFactoryCallback">GnomeFactoryCallback</link> factory_cb,
+                                             <link linkend="gpointer">gpointer</link> data);
+<link linkend="BonoboGenericFactory">BonoboGenericFactory</link>* <link linkend="bonobo-generic-factory-construct">bonobo_generic_factory_construct</link>
+                                            (const char *oaf_iid,
+                                             <link linkend="BonoboGenericFactory">BonoboGenericFactory</link> *c_factory,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> corba_factory,
+                                             <link linkend="BonoboGenericFactoryFn">BonoboGenericFactoryFn</link> factory,
+                                             <link linkend="GnomeFactoryCallback">GnomeFactoryCallback</link> factory_cb,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+void        <link linkend="bonobo-generic-factory-set">bonobo_generic_factory_set</link>      (<link linkend="BonoboGenericFactory">BonoboGenericFactory</link> *c_factory,
+                                             <link linkend="BonoboGenericFactoryFn">BonoboGenericFactoryFn</link> factory,
+                                             void *data);
+<link linkend="POA-GNOME-ObjectFactory--epv">POA_GNOME_ObjectFactory__epv</link>* <link linkend="bonobo-generic-factory-get-epv">bonobo_generic_factory_get_epv</link>
+                                            (void);
+<link linkend="CORBA-Object">CORBA_Object</link> <link linkend="bonobo-generic-factory-corba-object-create">bonobo_generic_factory_corba_object_create</link>
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             <link linkend="gpointer">gpointer</link> shlib_id);
+#define     <link linkend="BONOBO-OAF-FACTORY-CAPS">BONOBO_OAF_FACTORY</link>              (oafiid, descr, version, fn, data)
+#define     <link linkend="BONOBO-OAF-FACTORY-MULTI-CAPS">BONOBO_OAF_FACTORY_MULTI</link>        (oafiid, descr, version, fn, data)
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The vast majority of Bonobo objects are created by the
+<link linkend="BonoboGenericFactory">BonoboGenericFactory</link> implementation. This provides a
+very simple C sugar wrapper of the GNOME::ObjectFactory
+IDL interface, used by OAF to instantiate new objects.
+</para>
+
+<para>
+Most applications when they start up will register their
+Bonobo object factory with OAF, this can be done like this:
+  <example>
+    <title>How to register a factory with OAF</title>
+    <programlisting>
+BonoboGenericFactory *factory;
+
+factory = bonobo_generic_factory_new_multi (
+	"OAFIID:GNOME_MyApp_myId",
+	my_factory_function, NULL);
+bonobo_running_context_auto_exit_unref (BONOBO_OBJECT (factory));
+    </programlisting>
+  </example>
+  This registers the factory with OAF, associated with your
+factory's OAFIID ( as specified in the installed .oaf file ).
+The running_context_auto_exit_unref function is used to ensure
+that the program exits the gtk main loop when all of the factory's
+( or any derived ) objects are destroyed.
+</para>
+<para>
+When an object that is created by your factory is demanded from
+OAF the my_factory_function will be called:
+  <example>
+    <title>A simple factory</title>
+    <programlisting>
+static BonoboObject *
+my_factory_fn (BonoboGenericFactory *this,
+               const char           *object_id,
+               void                 *data)
+{
+	BonoboObject *object = NULL;
+	
+	g_return_val_if_fail (object_id != NULL, NULL);
+
+	if (!strcmp (object_id, "OAFIID:Bonobo_Sample_Clock"))
+		object = <link linkend="bonobo-clock-control-new">bonobo_clock_control_new</link>();
+	else
+		g_warning ("Unknown OAFIID '<literal>s</literal>'", object_id);
+
+	return object;
+}
+     </programlisting>
+  </example>
+  This will return the newly constructed object via OAF to
+the Object requestor.
+</para>
+
+<para>
+The generic factory works in two modes, multi and plain,
+it is recommended that the multi mode be used. Also, there
+is a macro that can be used for simple components to remove
+the burden of writing the main function and getting the
+initialization correct, see <link linkend="BONOBO-OAF-FACTORY-MULTI-CAPS">BONOBO_OAF_FACTORY_MULTI</link>.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboGenericFactory-struct">struct BonoboGenericFactory</title>
+<programlisting>struct BonoboGenericFactory;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboGenericFactoryFn">BonoboGenericFactoryFn ()</title>
+<programlisting><link linkend="BonoboObject">BonoboObject</link>* (*BonoboGenericFactoryFn)     (<link linkend="BonoboGenericFactory">BonoboGenericFactory</link> *Factory,
+                                             void *closure);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Factory</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>closure</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeFactoryCallback">GnomeFactoryCallback ()</title>
+<programlisting><link linkend="BonoboObject">BonoboObject</link>* (*GnomeFactoryCallback)       (<link linkend="BonoboGenericFactory">BonoboGenericFactory</link> *factory,
+                                             const char *component_id,
+                                             <link linkend="gpointer">gpointer</link> closure);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>factory</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>component_id</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>closure</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboGenericFactoryClass">BonoboGenericFactoryClass</title>
+<programlisting>typedef struct {
+	BonoboObjectClass parent_class;
+
+	/* Virtual methods */
+	BonoboObject *(*new_generic) (BonoboGenericFactory *c_factory,
+				      const char           *component_id);
+} BonoboGenericFactoryClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-generic-factory-new">bonobo_generic_factory_new ()</title>
+<programlisting><link linkend="BonoboGenericFactory">BonoboGenericFactory</link>* bonobo_generic_factory_new
+                                            (const char *oaf_iid,
+                                             <link linkend="BonoboGenericFactoryFn">BonoboGenericFactoryFn</link> factory,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+This is a helper routine that simplifies the creation of factory
+objects for GNOME objects.  The <parameter>factory</parameter> function will be
+invoked by the CORBA server when a request arrives to create a new
+instance of an object supporting the Bonobo::Generic interface.
+The factory callback routine is passed the <parameter>data</parameter> pointer to provide
+the creation function with some state information.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>oaf_iid</parameter>&nbsp;:</entry>
+<entry> The GOAD id that this factory implements
+</entry></row>
+<row><entry align="right"><parameter>factory</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A BonoboGenericFactory object that has an activated
+Bonobo::GenericFactory object that has registered with the GNOME
+name server.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-generic-factory-new-multi">bonobo_generic_factory_new_multi ()</title>
+<programlisting><link linkend="BonoboGenericFactory">BonoboGenericFactory</link>* bonobo_generic_factory_new_multi
+                                            (const char *oaf_iid,
+                                             <link linkend="GnomeFactoryCallback">GnomeFactoryCallback</link> factory_cb,
+                                             <link linkend="gpointer">gpointer</link> data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>oaf_iid</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>factory_cb</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-generic-factory-construct">bonobo_generic_factory_construct ()</title>
+<programlisting><link linkend="BonoboGenericFactory">BonoboGenericFactory</link>* bonobo_generic_factory_construct
+                                            (const char *oaf_iid,
+                                             <link linkend="BonoboGenericFactory">BonoboGenericFactory</link> *c_factory,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> corba_factory,
+                                             <link linkend="BonoboGenericFactoryFn">BonoboGenericFactoryFn</link> factory,
+                                             <link linkend="GnomeFactoryCallback">GnomeFactoryCallback</link> factory_cb,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Initializes <parameter>c_factory</parameter> with the command-line arguments and registers
+the new factory in the name server.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>oaf_iid</parameter>&nbsp;:</entry>
+<entry> The GOAD id that the new factory will implement.
+</entry></row>
+<row><entry align="right"><parameter>c_factory</parameter>&nbsp;:</entry>
+<entry> The object to be initialized.
+</entry></row>
+<row><entry align="right"><parameter>corba_factory</parameter>&nbsp;:</entry>
+<entry> The CORBA object which supports the
+Bonobo::GenericFactory interface and which will be used to
+construct this BonoboGenericFactory Gtk object.
+</entry></row>
+<row><entry align="right"><parameter>factory</parameter>&nbsp;:</entry>
+<entry> A callback which is used to create new GnomeGeneric object instances.
+</entry></row>
+<row><entry align="right"><parameter>factory_cb</parameter>&nbsp;:</entry>
+<entry> A Multi object factory callback.
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> The closure data to be passed to the <parameter>factory</parameter> callback routine.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The initialized BonoboGenericFactory object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-generic-factory-set">bonobo_generic_factory_set ()</title>
+<programlisting>void        bonobo_generic_factory_set      (<link linkend="BonoboGenericFactory">BonoboGenericFactory</link> *c_factory,
+                                             <link linkend="BonoboGenericFactoryFn">BonoboGenericFactoryFn</link> factory,
+                                             void *data);</programlisting>
+<para>
+Sets the callback and callback closure for <parameter>c_factory</parameter> to
+<parameter>factory</parameter> and <parameter>data</parameter>, respectively.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>c_factory</parameter>&nbsp;:</entry>
+<entry> The BonoboGenericFactory object whose callback will be set.
+</entry></row>
+<row><entry align="right"><parameter>factory</parameter>&nbsp;:</entry>
+<entry> A callback routine which is used to create new object instances.
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> The closure data to be passed to the <parameter>factory</parameter> callback.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-generic-factory-get-epv">bonobo_generic_factory_get_epv ()</title>
+<programlisting><link linkend="POA-GNOME-ObjectFactory--epv">POA_GNOME_ObjectFactory__epv</link>* bonobo_generic_factory_get_epv
+                                            (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The EPV for the default BonoboGenericFactory implementation.  
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-generic-factory-corba-object-create">bonobo_generic_factory_corba_object_create ()</title>
+<programlisting><link linkend="CORBA-Object">CORBA_Object</link> bonobo_generic_factory_corba_object_create
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object,
+                                             <link linkend="gpointer">gpointer</link> shlib_id);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>shlib_id</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-OAF-FACTORY-CAPS">BONOBO_OAF_FACTORY()</title>
+<programlisting>#define     BONOBO_OAF_FACTORY(oafiid, descr, version, fn, data)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>oafiid</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>descr</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>version</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>fn</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-OAF-FACTORY-MULTI-CAPS">BONOBO_OAF_FACTORY_MULTI()</title>
+<programlisting>#define     BONOBO_OAF_FACTORY_MULTI(oafiid, descr, version, fn, data)</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>oafiid</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>descr</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>version</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>fn</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

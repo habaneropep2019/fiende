@@ -1,0 +1,70 @@
+/* $Id: dateedit.gen_h,v 1.5 2000/05/07 04:59:59 kenelson Exp $ */
+
+
+/* dateedit.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <time.h>
+#include <gtk--/box.h>
+#include <libgnomeui/gnome-dateedit.h>
+
+CLASS_START(Gnome);
+//: Date and time entry widget.
+//- The GnomeDateEdit widget provides a way to enter dates and
+//- times with a helper calendar to let the user select the date.
+class DateEdit : public Gtk::HBox
+{
+  WRAP_CLASS(DateEdit, GnomeDateEdit,
+             GNOME_DATE_EDIT, GNOME_IS_DATE_EDIT,
+             date_edit,
+             Gtk::HBox, GtkHBox, GTK_HBOX);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(void gnome_date_edit_set_time (GnomeDateEdit*, time_t),
+	      void set_time (time_t the_time));
+
+  WRAP_METHOD(void gnome_date_edit_set_popup_range (GnomeDateEdit*, int , int),
+	      void set_popup_range (int low_hour, int up_hour));
+
+  WRAP_METHOD(time_t gnome_date_edit_get_date (GnomeDateEdit*),
+	      time_t get_date ());
+
+  WRAP_METHOD(void gnome_date_edit_set_flags (GnomeDateEdit*, GnomeDateEditFlags),
+	      void set_flags (GnomeDateEditFlags flags));
+
+  WRAP_METHOD(int gnome_date_edit_get_flags (GnomeDateEdit*),
+	      int get_flags ());
+
+  SIGNAL_SPEC("date_changed", both, void date_changed());
+  SIGNAL_SPEC("time_changed", both, void time_changed());
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+#include <gnome--/private/dateedit_p.h>
+
+DOCUMENTATION_START;
+

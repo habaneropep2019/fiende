@@ -1,0 +1,251 @@
+/* $Id: accelgroup.gen_h,v 1.45 2000/08/21 19:24:36 kenelson Exp $ */
+
+/* accelgroup.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk/gtkaccelgroup.h>
+#include <gtk--/object.h>
+
+CLASS_START(Gtk);
+
+class Object;
+class Widget;
+class Menu;
+class ItemFactoryParent;
+class Window;
+class AccelGroup;  
+
+inline AccelGroup *wrap(GtkAccelGroup* o)
+{
+  return (AccelGroup*)o;
+}
+
+class AccelEntry : protected GtkAccelEntry
+{
+  friend class AccelGroup;
+private:
+  AccelEntry(GtkAccelEntry *castitem);
+
+protected:
+  AccelEntry(void* do_not_derive_me);
+
+public:
+  ~AccelEntry();
+
+  AccelGroup*     get_accel_group() const { return (AccelGroup*)accel_group; }
+  Object*         get_object()      const { return wrap(object); }
+  GtkAccelFlags   get_flags()       const { return accel_flags; }
+  guint           get_key()         const { return accelerator_key; }
+  GdkModifierType get_mods()        const { return accelerator_mods; }
+
+  GtkAccelEntry*       gtkobj()           { return this; }
+  const GtkAccelEntry* gtkobj()     const { return this; }
+  
+};
+
+
+// This object must be created on heap.
+class AccelGroup : protected GtkAccelGroup
+{
+public:
+  typedef AccelGroup          CppObjectType;
+  typedef GtkAccelGroup           BaseObjectType;
+
+private:
+
+  AccelGroup(const AccelGroup&);
+  AccelGroup operator=(const AccelGroup&);
+
+public:
+  friend class Object;
+  friend class Widget;
+  friend class Menu;
+  friend class ItemFactory;
+  friend class Window;
+
+private:
+  AccelGroup(GtkAccelGroup *castitem);
+  AccelGroup();
+
+protected:
+  AccelGroup(void* do_not_derive_me);
+
+public:
+  ~AccelGroup();
+
+  static AccelGroup* create();
+
+  void lock  ();
+  void unlock();
+
+  void ref();
+  void unref();
+
+  //: activates an accelerator in all groups belonging to an object
+  static bool activate(Gtk::Object&,guint key,GdkModifierType mods);
+  static const AccelGroup* get_default();
+
+  //: activates an accelerator in this group
+  bool activate(guint key,GdkModifierType mods);
+
+  // Accelerator functions
+  //
+  static bool valid(guint keyval, GdkModifierType modifiers);
+  static void parse(const string & accelerator,
+		    guint &accelerator_key, // out arg
+		    GdkModifierType &accelerator_mods); // out arg
+
+  static string name(guint accelerator_key,
+		     GdkModifierType accelerator_mods);
+
+  static void  set_default_mod_mask(GdkModifierType default_mod_mask);
+  static guint get_default_mod_mask();
+
+  inline GtkAccelGroup* gtkobj() { return this; }
+  inline const GtkAccelGroup* gtkobj() const { return this; }
+};
+
+inline GtkAccelGroup* unwrap(Gtk::AccelGroup* a) {return (a?a->gtkobj():0);}
+
+PRIVATE_START;
+IMPL_START;
+namespace Gtk
+{
+
+AccelGroup* AccelGroup::create()
+{
+  return (AccelGroup*)gtk_accel_group_new();
+}
+
+void
+AccelGroup::ref()
+{
+  gtk_accel_group_ref(gtkobj());
+}
+
+void
+AccelGroup::unref()
+{
+  gtk_accel_group_unref(gtkobj());
+}
+
+
+AccelGroup::~AccelGroup()
+{}
+
+
+bool 
+AccelGroup::activate(Object& obj,
+				guint accel_key, GdkModifierType accel_mod)
+{
+  return (gtk_accel_groups_activate(obj.gtkobj(), accel_key, accel_mod))?true:false;
+}
+
+bool 
+AccelGroup::activate(guint accel_key, GdkModifierType accel_mod)
+{
+  return (gtk_accel_group_activate(gtkobj(), accel_key, accel_mod))?true:false;
+}
+
+void 
+AccelGroup::lock()
+{
+  gtk_accel_group_lock(gtkobj());
+}
+
+void 
+AccelGroup::unlock()
+{
+  gtk_accel_group_unlock(gtkobj());
+}
+
+
+bool 
+AccelGroup::valid(guint keyval, GdkModifierType modifiers) 
+{
+  return (gtk_accelerator_valid(keyval, modifiers))?true:false;
+}
+
+void 
+AccelGroup::parse(const string & accelerator,
+		  guint &accelerator_key, // out arg
+		  GdkModifierType &accelerator_mods) // out arg
+{
+  gtk_accelerator_parse(accelerator.c_str(),
+			&accelerator_key,
+			&accelerator_mods);
+}
+
+string 
+AccelGroup::name(guint accelerator_key,
+		     GdkModifierType accelerator_mods) 
+{
+  return gtk_accelerator_name(accelerator_key,
+			      accelerator_mods);
+}
+
+const AccelGroup*
+AccelGroup::get_default()
+{
+  return (AccelGroup*) gtk_accel_group_get_default();
+}
+
+void 
+AccelGroup::set_default_mod_mask(GdkModifierType default_mod_mask) 
+{
+  gtk_accelerator_set_default_mod_mask(default_mod_mask);
+}
+
+guint AccelGroup::get_default_mod_mask() 
+{
+  return gtk_accelerator_get_default_mod_mask();
+}
+
+AccelEntry::~AccelEntry()
+{}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Accelgroup)
+//. name: ref_count
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: lock_count
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: modifier_mask
+//. type: GdkModifierType
+//. get:
+//. set:
+//. desc:
+
+//. name: attach_objects
+//. type: GSList*
+//. get:
+//. set:
+//. desc:
+

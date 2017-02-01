@@ -1,0 +1,146 @@
+/* $Id: frame.gen_h,v 1.50 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* frame.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+#include <gtk--/bin.h>
+#include <gtk/gtkframe.h>
+CLASS_START(Gtk);
+
+//: A decrative border
+//- The frame widget puts a simple border around what ever widget is packed
+//- into it. It can also contain a lable to identify the widget(s) inside.
+class Frame : public Bin {
+  WRAP_CLASS(Frame,GtkFrame,GTK_FRAME,GTK_IS_FRAME,frame,Gtk::Bin,GtkBin,GTK_BIN);
+public:
+
+  Frame(const nstring &label);
+  WRAP_CTOR_CAST;
+  WRAP_CTOR_DEFAULT;
+  WRAP_DTOR;
+
+  //: Adds a label to appear in the top edge of the frame.
+  //- Label alignment defaults to the upper left corner of the frame.
+  //- {str} can be a NULL pointer.
+  WRAP_METHOD(void gtk_frame_set_label(GtkLabel*,const gchar*),
+  void set_label(const nstring &str));
+
+  //: Returns a copy of the label which appears in the frame.
+  //- If there is no label, the string will be empty.
+  string get_label() const; 
+
+  //: Sets the alignment of a frame's label.  
+  //- {xalign} sets the horizontal label position and  
+  //- should be between 0 (left) and 1.0 (right).
+  //- {yalign} does not appear to have any effect in this
+  //- version of gtk+.  Defaults to (0.0,0.5).
+  WRAP_METHOD(void gtk_frame_set_label_align(GtkFrame*,gfloat,gfloat),
+  void set_label_align(gfloat xalign=0.0,
+		       gfloat yalign=0.5));
+
+  //: Returns the current horizontal label position.  
+  //- Range from 0 (left) to 1.0 (right).
+  WRAP_MEMBER(value,xalign,label_xalign,float,float);
+
+  //: Returns the current vertical label position.  
+  //- Range from 0 (top) to 1.0 (bottom).
+  WRAP_MEMBER(value,yalign,label_yalign,float,float);
+    
+  //: Sets shadow type of the frame. 
+  //- The possible choices are: {\enum
+  //-  GTK_SHADOW_NONE,GTK_SHADOW_IN,GTK_SHADOW_OUT,GTK_SHADOW_ETCHED_IN,
+  //-   GTK_SHADOW_ETCHED_OUT}
+  //- 
+  //- declaration of the enum GtkShadowType can be found from gtkenums.h
+  WRAP_METHOD(void gtk_frame_set_shadow_type(GtkFrame*,GtkShadowType),
+	      void set_shadow_type(GtkShadowType type));
+
+  //: Returns the current shadow type of a frame.
+  WRAP_MEMBER(value,shadow_type,shadow_type,GtkShadowType,gint16);
+    
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+  // nothing to do; no label to set.
+
+Frame::Frame(const nstring &label)
+  :     Bin((GtkBin*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_label(label);
+}
+
+string 
+Frame::get_label() const {
+  string str;
+  if (gtkobj()->label==0)
+    str=string();
+  else
+    str=string(gtkobj()->label);
+  return str;
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Frame)
+//. name: label
+//. type: string
+//. get:
+//. set:
+//. desc:
+
+//. name: shadow_type
+//. type: gint16
+//. get:
+//. set:
+//. desc:
+
+//. name: label_width
+//. type: gint16
+//. get:
+//. set:
+//. desc:
+
+//. name: label_height
+//. type: gint16
+//. get:
+//. set:
+//. desc:
+
+//. name: label_xalign
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: label_yalign
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+

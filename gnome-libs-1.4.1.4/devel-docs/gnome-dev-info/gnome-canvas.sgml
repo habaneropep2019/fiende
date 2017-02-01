@@ -1,0 +1,788 @@
+<!-- <!doctype chapter PUBLIC "-//Davenport//DTD DocBook V3.0//EN" []> -->
+
+  <chapter id="gnome-canvas">
+
+    <docinfo>
+      <title>The <type>GnomeCanvas</type> widget</title>
+
+      <authorgroup>
+	<author>
+	  <firstname>Federico</firstname>
+	  <surname>Mena Quintero</surname>
+	  <authorblurb>
+	    <simpara><email>federico@nuclecu.unam.mx</email></simpara>
+	  </authorblurb>
+	</author>
+      </authorgroup>
+
+      <copyright>
+	<year>1998</year>
+	<holder>The Free Software Foundation</holder>
+      </copyright>
+    </docinfo>
+
+    <title>The <type>GnomeCanvas</type> widget</title>
+
+    <sect1 id="gnome-canvas-introduction">
+
+      <title>Introduction</title>
+
+      <para>
+	The <type>GnomeCanvas</type> widget is a high-level engine for
+	creating structured graphics.  A canvas displays a collection of
+	items, which can be lines, rectangles, ellipses, and text.
+	Items have attributes associated to them that you can change,
+	like fill color, position, and size.  Items may be moved and
+	re-stacked in the canvas, and organized in hierarchical groups.
+	You can receive mouse and keyboard events from the items and
+	perform actions on them based on these events.
+      </para>
+
+      <para>
+	The canvas is useful for when you want to create interactive
+	graphics displays which would be hard or cumbersome to implement
+	with raw calls to Gdk, or when writing a custom widget for Gtk
+	is inconvenient.
+      </para>
+
+      <para>
+	The canvas is also useful to create displays of graphs,
+	diagrams, and many other types of structured drawings.  It can
+	even be used as a general display engine &mdash; for example,
+	the Gnumeric spreadsheet and the Achtung presentations program
+	both use the GnomeCanvas widget as their display engine.
+      </para>
+
+      <para>
+	If the predefined canvas item types do not suit your needs, you
+	can easily write new item types.  These can be primitive items,
+	which paint their own displays, or composite items, which are
+	built on top of canvas item groups.
+      </para>
+
+    </sect1>
+
+    <sect1 id="gnome-canvas-organization-of-items">
+
+      <title>Organization of items</title>
+
+      <para>
+	Items in the canvas are organized in a tree hierarchy.  Items
+	can be groups (nodes in the tree), or terminal items (leaves in
+	the tree).  Groups can contain any number of children, which can
+	be terminal items or other groups.  Thus, items can be nested to
+	an arbitrary depth inside a canvas.
+      </para>
+
+      <para>
+	A canvas has a single root group.  For simple drawings, it is
+	likely that you will want to put all your items directly inside
+	this group.  For more complex drawings, it may be convenient to
+	use a hierarchical structure of nested canvas groups.
+      </para>
+
+      <para>
+	For example, consider a circuit editor.  You could define
+	groups that contain the items that are necessary to draw a
+	certain type of logic gate.  Then you could define groups for
+	different components.  A group representing an adder would
+	contain several logic gates and some wires.  You would then
+	group some adders with other components to form a more complex
+	circuit.  This makes it convenient to handle whole hierarchies
+	as single entities, for when you want to move all the items
+	that define a chain of adders, for example.
+      </para>
+
+      <sect2 id="gnome-canvas-stacking-order">
+
+	<title>Stacking order</title>
+
+	<para>
+	  The items you put inside groups are stacked on top of each
+	  other, and items nearer the top of the stack obscure the items
+	  below them.  When an item is created, it is put on top of all
+	  the items in its parent group.
+	</para>
+
+	<para>
+	  The canvas provides several functions to let you change the
+	  stacking order of items inside groups.  You can move items
+	  to the top or bottom of their parent group, and raise or
+	  lower them by an arbitrary number of positions.
+	</para>
+
+      </sect2>
+
+      <sect2 id="gnome-canvas-behavior-and-events">
+
+	<title>Behavior and events</title>
+
+	<para>
+	  The canvas does <emphasis>not</emphasis> have any predefined
+	  behavior for items.  You can define the behavior of items by
+	  explicitly operating on them (change the color if item Foo
+	  when the user selects a menu item), or by defining actions
+	  that should take place when items receive events (let the
+	  user drag items with the mouse).
+	</para>
+
+	<para>
+	  The rationale behind this is that the canvas should be as
+	  general-purpose as possible.  If it had predefined behavior
+	  for items, it may not be suitable to all kinds of
+	  applications &mdash; a program for drawing schematic
+	  diagrams may benefit from having dragging functionality
+	  predefined in the canvas, but this would not be very useful
+	  (or even desirable) for a calendar display program.
+	</para>
+
+      </sect2>
+
+    </sect1>
+
+    <sect1 id="gnome-canvas-coordinates">
+
+      <title>Coordinates</title>
+
+      <para>
+	The canvas uses a world coordinate system with coordinates
+	specified as floating point numbers.  World coordinates mean
+	that units can represent whatever is most convenient to you:
+	meters, pixels, parsecs, etc.
+      </para>
+
+      <para>
+	Coordinates are calculated from the origin of the canvas,
+	which has coordinates (0.0, 0.0).  Positive X coordinates go
+	to the right of the origin, and positive Y coordinates go
+	down, like in the rest of the X Window System.
+      </para>
+
+      <para>
+	Coordinates of items are calculated with respect to their
+	parent group.  When a group is moved, its children's logical
+	coordinates do not change, although their physical position
+	does.  A group stores a single pair of coordinates which
+	define its origin relative to its parent group.  The canvas'
+	root group starts with its origin in world position (0.0,
+	0.0).
+      </para>
+
+      <para>
+	For example, let us say you have a toplevel group at (5.0,
+	3.0).  If you insert an item in it with coordinates (2.0,
+	1.0), the item will appear to be at coordinates (7.0, 4.0).
+	Coordinates of items are always relative to their parent
+	group.
+      </para>
+
+      <para>
+	You will normally only need use this floating point, world
+	coordinate system.  The canvas also has a different coordinate
+	system which works in terms of pixel offsets.  This coordinate
+	system is used internally to control scrolling of the canvas.
+	You won't need to know about it unless you want to do
+	scrolling by hand (as opposed to letting scrollbars handle
+	this for you), or when you create your own canvas item types.
+	We will discuss this pixel coordinate system later.
+      </para>
+
+      <sect2 id="gnome-canvas-zooming-and-scale">
+
+	<title>Zooming and scale</title>
+
+	<para>
+	  You can change the zoom factor of the canvas so that all the
+	  objects in it will appear larger or smaller.  To control the
+	  zoom factor, you specify the number of <emphasis>pixels per
+	  unit</emphasis> that the canvas will use when converting
+	  world coordinates to display coordinates.  The default is to
+	  use 1.0 pixels per unit, so an object that is 10 units wide
+	  will be displayed as 10 pixels wide.  If you set the canvas
+	  to use 5 pixels per unit, then that object will be displayed
+	  as 50 pixels wide.
+	</para>
+
+	<para>
+	  Sometimes you may want some features of your drawing to have
+	  the same displayed size regardless of the zoom factor of the
+	  canvas.  For example, in a display of a graph composed of
+	  vertices and edges, you may want the edges to keep the same
+	  displayed width even if you zoom in closer to the graph, as
+	  well as having arrowheads keep the same size regardless of
+	  the zoom factor of the canvas.
+	</para>
+
+	<para>
+	  Canvas items like lines and rectangles which support an
+	  outline width parameter let you select whether the outline
+	  width is specified in absolute pixels (which will keep the
+	  same displayed size regardless of the zoom factor of the
+	  canvas), or normal units (which will get scaled when the
+	  zoom factor is changed).
+	</para>
+
+      </sect2>
+
+    </sect1>
+
+    <sect1 id="gnome-canvas-object-arguments">
+
+      <title>Attributes and object arguments</title>
+
+      <para>
+	The canvas makes extensive use of the Gtk object argument
+	system &mdash; all the items' attributes are configured and
+	queried through it.  You only need to have only a minimal
+	knowledge of how the argument system works, so do not worry if
+	you do not want to learn all the details.  Here we will
+	explain everything you need to know.
+      </para>
+
+      <para>
+	Using the Gtk argument system to to configure and query the
+	canvas item arguments has the advantage of making it easy for
+	language bindings to do their job, and it also avoids having
+	many API entry points for all the canvas items.
+      </para>
+
+    </sect1>
+
+    <sect1 id="gnome-canvas-getting-started">
+
+      <title>Getting started with the canvas</title>
+
+      <para>
+	This section presents a simple example of using the canvas to
+	display some items and manipulate them.  We will create a
+	blank canvas and provide a button that the user can click on
+	to insert random items in the canvas.  If the user
+	double-clicks on an item with mouse button 1, the color of
+	that item will be changed.  The user can also move items
+	around by pressing mouse button 1 and dragging.  In addition,
+	items may be deleted by pressing mouse button 3 over them.
+	Items will get a wide outline when the mouse passes over them,
+	and will return to a thin outline when the mouse leaves them.
+      </para>
+
+      <para>
+	We will present the program in small sections and explain each
+	of them separately.
+      </para>
+
+      <example>
+
+	<title>Creating the main window and the canvas</title>
+
+	<para>
+	  Here we create a window for the canvas example and put a
+	  canvas widget into it.  we also create buttons that let the
+	  user insert a new item in the canvas and exit the program.
+	  We also define the auxiliary handlers for the clicked signal
+	  of the Exit button and the delete_event signal of the main
+	  window.
+	</para>
+
+	<programlisting role="C">
+#include &lt;gnome.h&gt;
+
+
+/* This defines the size of the canvas, in pixels */
+
+#define CANVAS_SIZE 300
+
+
+/* Prototypes for the functions we will define later */
+
+static void add_object_clicked (GtkWidget *button, gpointer data);
+static void exit_clicked (GtkWidget *widget, gpointer data);
+static gint delete_event (GtkWidget *widget, GdkEvent *event, gpointer data);
+
+
+int
+main (int argc, char **argv)
+{
+	GtkWidget *window;
+	GtkWidget *vbox;
+	GtkWidget *frame;
+	GtkWidget *canvas;
+	GtkWidget *hbox;
+	GtkWidget *button;
+
+	gnome_init ("canvas-example", "1.0", argc, argv);
+
+	/* Create the main window and the main vbox */
+
+	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+
+	vbox = gtk_vbox_new (FALSE, 0);
+	gtk_container_add (GTK_CONTAINER (window), vbox);
+	gtk_widget_show (vbox);
+
+	/* Create a frame for the canvas and the canvas itself */
+
+	frame = gtk_frame_new (NULL);
+	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+	gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+	gtk_widget_show (frame);
+
+	canvas = gnome_canvas_new ();
+	gtk_widget_set_usize (canvas, CANVAS_SIZE, CANVAS_SIZE);
+	gnome_canvas_set_scroll_region (GNOME_CANVAS (canvas), 0.0, 0.0, CANVAS_SIZE, CANVAS_SIZE);
+
+	gtk_container_add (GTK_CONTAINER (frame), canvas);
+	gtk_widget_show (canvas);
+
+	/* Create the hbox for the buttons */
+
+	hbox = gtk_hbox_new (TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+	gtk_widget_show (hbox);
+
+	/* Create the button used to add objects -- we pass the canvas to the callback
+	 * in the user data.
+	 */
+
+	button = gtk_button_new_with_label ("Add an object");
+	gtk_signal_connect (GTK_OBJECT (button), "clicked",
+			    (GtkSignalFunc) add_object_clicked,
+			    canvas);
+	gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+	gtk_widget_show (button);
+
+	/* Create the button used to exit the program -- we pass the main window to the callback in
+	 * the user data.
+	 */
+
+	button = gtk_button_new_with_label ("Exit");
+	gtk_signal_connect (GTK_OBJECT (button), "clicked",
+			    (GtkSignalFunc) exit_clicked,
+			    window);
+	gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 0);
+	gtk_widget_show (button);
+
+	/* Connect to the delete_event signal and Run the application */
+
+	gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+			    (GtkSignalFunc) delete_event,
+			    NULL);
+
+	gtk_widget_show (window);
+	gtk_main ();
+	return 0;
+}
+
+/* Callback for the clicked signal of the Exit button */
+static void
+exit_clicked (GtkWidget *widget, gpointer data)
+{
+	gtk_widget_destroy (GTK_WIDGET (data)); /* the user data points to the main window */
+	gtk_main_quit ();
+}
+
+/* Callback for the delete_event signal of the main application window */
+static gint
+delete_event (GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	gtk_widget_destroy (widget); /* destroy the main window */
+	gtk_main_quit ();
+	return TRUE;
+}
+	</programlisting>
+
+	<para>
+	  As you can see, a new canvas is created using the
+	  <function>gnome_canvas_new()</function> function.  Then we
+	  set the starting size of the canvas window and the extents
+	  of the scrolling region using the
+	  <function>gtk_widget_set_usize()</function> and
+	  <function>gnome_canvas_set_scroll_region()</function>
+	  functions, respectively.  We will discuss the meaning of the
+	  scrolling region later; for now, we just set it to go from
+	  the origin to the canvas size in pixels &mdash; we will be
+	  using a canvas zoom factor of 1:1, that is, one pixel for
+	  each unit.
+	</para>
+
+      </example>
+
+      <example>
+
+	<title>Creating random items in the canvas</title>
+
+	<para>
+	  Here we define the callback function
+	  <function>add_object_clicked()</function> that is used by
+	  the "Add an object" button.  When the user presses this
+	  button, a rectangle or an ellipse will be created using
+	  random coordinates.
+	</para>
+
+	<programlisting role="C">
+/* Prototype for the item event handler */
+
+static gint item_event (GnomeCanvasItem *item, GdkEvent *event, gpointer data);
+
+/* Callback for the clicked signal of the Add object button.  It creates a rectangle or an ellipse
+ * at a random position.  The canvas comes in the user data pointer.
+ */
+static void
+add_object_clicked (GtkWidget *button, gpointer data)
+{
+	GnomeCanvas *canvas;
+	GnomeCanvasItem *item;
+	guint type;
+	int x1, y1, x2, y2;
+	int tmp;
+
+	canvas = GNOME_CANVAS (data);
+
+	/* Compute some random coordinates, with the condition that (x1 &lt;= x2) and (y1 &lt;= y2), and
+	 * ensure that the objects are not too small.
+	 */
+
+	x1 = rand () % CANVAS_SIZE;
+	y1 = rand () % CANVAS_SIZE;
+	x2 = rand () % CANVAS_SIZE;
+	y2 = rand () % CANVAS_SIZE;
+
+	if (x1 &gt; x2) {
+		tmp = x1;
+		x1 = x2;
+		x2 = tmp;
+	}
+
+	if (y1 &gt; y2) {
+		tmp = y1;
+		y1 = y2;
+		y2 = tmp;
+	}
+
+	if ((x2 - x1) &lt; 10)
+		x2 += 10;
+
+	if ((y2 - y1) &lt; 10)
+		y2 += 10;
+
+	/* Pick a type for the item randomly */
+
+	if (rand () & 1)
+		type = gnome_canvas_rect_get_type ();
+	else
+		type = gnome_canvas_ellipse_get_type ();
+
+	/* Create the item and make it white with black outline by default.  Also,
+	 * connect to its event signal so that we can know when events get to the
+	 * item.*/
+
+	item = gnome_canvas_item_new (gnome_canvas_root (canvas),
+				      type,
+				      "x1", (double) x1,
+				      "y1", (double) y1,
+				      "x2", (double) x2,
+				      "y2", (double) y2,
+				      "fill_color", "white",
+				      "outline_color", "black",
+				      "width_units", 1.0,
+				      NULL);
+	gtk_signal_connect (GTK_OBJECT (item), "event",
+			    (GtkSignalFunc) item_event,
+			    NULL);
+}
+	</programlisting>
+
+	<para>
+	  In this function, first we compute some random coordinates
+	  for the corners of the rectangle or ellipse that we will
+	  create.  We have to ensure that <symbol>x1</symbol> and
+	  <symbol>y1</symbol> are less than or equal to
+	  <symbol>x2</symbol> and <symbol>y2</symbol>, respectively.
+	</para>
+
+	<para>
+	  New items are created and inserted into the canvas using the
+	  <function>gnome_canvas_item_new()</function> function.  The
+	  first parameter to this function specifies the canvas item
+	  group that will act as the new item's parent.  For this
+	  simple example, we insert all the items inside the toplevel
+	  canvas group, the root item, which we obtain by calling the
+	  <function>gnome_canvas_root()</function> function.
+	</para>
+
+	<para>
+	  The second parameter to
+	  <function>gnome_canvas_item_new()</function> specifies the
+	  type of item we want to create.  This is simply the Gtk type
+	  identifier used by the class of the item you want to create.
+	  We pick randomly between
+	  <function>gnome_canvas_rect_get_type()</function> and
+	  <function>gnome_canvas_ellipse_get_type()</function>, and
+	  then we pass this value to the
+	  <function>gnome_canvas_item_new()</function> function.
+	</para>
+
+	<para>
+	  The following parameters are optional, and are a list of
+	  key/value pairs that specify which arguments to set for that
+	  particular item.  Internally these are handled using the Gtk
+	  object argument system.  The simplest way of using these is,
+	  for each argument you want to set, pass a string with the
+	  name of the argument, and then the value you want to set for
+	  that argument.
+
+	  <important>
+	    <para>
+	      You <emphasis>must</emphasis> pass in values with the
+	      correct type!  Remember that the C compiler cannot warn
+	      you about incorrect types when you are using a variable
+	      argument list.
+	    </para>
+
+	    <para>
+	      In this example, we must use doubles for the coordinates
+	      of the corners of the rectangle or ellipse.  Colors are
+	      passed using a string with a valid X color
+	      specification, and the width in units is passed as a
+	      double.
+	    </para>
+
+	    <para>
+	      Please look at the reference part of the
+	      <type>GnomeCanvas</type> documentation for detailed
+	      information on the argument types supported by each
+	      canvas item.
+	    </para>
+	  </important>
+	</para>
+
+	<para>
+	  We pass NULL as the last argument to indicate that we have
+	  no more arguments to set for this item.
+	</para>
+
+	<para>
+	  Finally, we connect to the "event" signal of the item so
+	  that we can be notified when the item receives events from
+	  the mouse.
+	</para>
+
+      </example>
+
+      <example>
+	
+	<title>Defining behavior for the canvas items</title>
+
+	<para>
+	  Here we define the event handler for items in our canvas.
+	  Canvas items receive events just as X windows do.  In our
+	  sample event handler, the user can drag items around using
+	  button 1.  Items may be deleted by pressing button 3 on
+	  them.  If the user double-clicks on an item using mouse
+	  button 1, then that item's color will be changed randomly.
+	  Finally, the width of an item's outline will change
+	  depending on whether the mouse is inside or outside the
+	  item.
+	</para>
+
+	<programlisting role="C">
+/* Prototype for the function that changes the item's color randomly */
+
+static void change_item_color (GnomeCanvasItem *item);
+
+/* Callback for the event signal of the canvas items.  If the user drags the item with button 1,
+ * then it will move appropriately.  If the user double clicks on the item, then its color will
+ * change randomly.  If the user clicks on an item with button 3, then the item will be destroyed.
+ * When the mouse enters an item, its outline width will be set to 3 units.  When the mouse leaves
+ * an item, its border width will be set to 1 unit.
+ */
+
+static gint
+item_event (GnomeCanvasItem *item, GdkEvent *event, gpointer data)
+{
+	static double x, y; /* used to keep track of motion coordinates */
+	double new_x, new_y;
+
+	switch (event-&gt;type) {
+	case GDK_BUTTON_PRESS:
+		if (event-&gt;button.button == 1) {
+			/* Remember starting position */
+			x = event-&gt;button.x;
+			y = event-&gt;button.y;
+			return TRUE;
+		} else if (event-&gt;button.button == 3) {
+			/* Destroy the item */
+			gtk_object_destroy (GTK_OBJECT (item));
+			return TRUE;
+		}
+		break;
+
+	case GDK_2BUTTON_PRESS:
+		if (event-&gt;button.button == 1) {
+			/* Change the item's color */
+			change_item_color (item);
+			return TRUE;
+		}
+		break;
+
+	case GDK_MOTION_NOTIFY:
+		if (event-&gt;button.state & GDK_BUTTON1_MASK) {
+			/* Get the new position and move by the difference */
+
+			new_x = event-&gt;motion.x;
+			new_y = event-&gt;motion.y;
+
+			gnome_canvas_item_move (item, new_x - x, new_y - y);
+
+			x = new_x;
+			y = new_y;
+			return TRUE;
+		}
+		break;
+
+	case GDK_ENTER_NOTIFY:
+		/* Make the outline wide */
+		gnome_canvas_item_set (item,
+				       "width_units", 3.0,
+				       NULL);
+		return TRUE;
+
+	case GDK_LEAVE_NOTIFY:
+		/* Make the outline thin */
+		gnome_canvas_item_set (item,
+				       "width_units", 1.0,
+				       NULL);
+		return TRUE;
+
+	default:
+		break;
+	}
+
+	return FALSE;
+}
+
+/* Utility function to randomly change the fill color of a canvas item */
+static void
+change_item_color (GnomeCanvasItem *item)
+{
+	static const char *color_specs[] = {
+		"red",
+		"yellow",
+		"green",
+		"cyan",
+		"blue",
+		"magenta"
+	};
+
+	int n;
+
+	/* Pick a random color from the list */
+
+	n = rand () % (sizeof (color_specs) / sizeof (color_specs[0]));
+
+	gnome_canvas_item_set (item,
+			       "fill_color", color_specs[n],
+			       NULL);
+}
+	</programlisting>
+
+	<para>
+	  The "event" signal for canvas items is very similar to the
+	  "event" signal in Gtk widgets.  Handlers for this signal
+	  take in a pointer to the relevant item, a pointer to the
+	  event that the item received, and the normal user data
+	  pointer.  As with the "event" signal for widgets, handlers
+	  return FALSE if they did not process the event or if they
+	  want further processing to be done on it, or TRUE if they
+	  did handle the event and they do not want any further
+	  processing to be done on it.
+	</para>
+
+	<para>
+	  Our sample event handler is a switch statement that selects
+	  among the different event types.  We have the following cases:
+	</para>
+
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      For a single button press with button 1, we remember
+	      this initial mouse position for if the user decides to
+	      drag the item around.
+	    </para>
+
+	    <para>
+	      For a single button press with button 3, we destroy the
+	      item.  This will remove the item from the canvas and
+	      free its memory.
+	    </para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      For double-clicks with button 1, we call a function that
+	      randomly changes the color of the item.
+	    </para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      For motion events, we only handle them if button 1 is
+	      down; this means that the user is dragging with the
+	      button down.  We compute the deltas between the new and
+	      the old mouse coordinates, and move the item by that
+	      amount.  This is not the best way to do dragging of
+	      items for all applications, but it is good enough for
+	      our simple example.
+	    </para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      For enter and leave notify events, we simply change the
+	      outline width of the item.  The outline will be made 3.0
+	      units thick when the mouse enters the item, and it will
+	      be made 1.0 units thick when the mouse leaves the item.
+	    </para>
+	  </listitem>
+	</itemizedlist>
+
+	<para>
+	  As with all event handlers, we return TRUE when we have
+	  handled the event, or FALSE if we did not process it.
+	</para>
+
+	<para>
+	  Note the use of the
+	  <function>gnome_canvas_item_set()</function>.  It is used to
+	  change the values of the item's arguments.  It is similar in
+	  use to <function>gnome_canvas_item_new()</function>, and it
+	  takes in the item for which we want to change attributes,
+	  and a NULL-terminated list of key/value pairs for the new
+	  attributes.
+	</para>
+      </example>
+
+      <para>
+	In the following sections, we will explain the canvas
+	internals in detail.
+      </para>
+
+    </sect1>
+
+  </chapter>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:("gnome-dev-info.sgml" "book" "sect1" "")
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

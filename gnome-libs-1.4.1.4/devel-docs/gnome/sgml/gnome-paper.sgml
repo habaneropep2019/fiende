@@ -1,0 +1,358 @@
+<refentry id="gnome-gnome-paper">
+<refmeta>
+<refentrytitle>gnome-paper</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-paper</refname><refpurpose>Paper dimensions, printing unit conversions.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+typedef     <link linkend="Paper">Paper</link>;
+typedef     <link linkend="Unit">Unit</link>;
+<link linkend="GList">GList</link>*      <link linkend="gnome-paper-name-list">gnome_paper_name_list</link>           (void);
+const <link linkend="GnomePaper">GnomePaper</link>* <link linkend="gnome-paper-with-name">gnome_paper_with_name</link>     (const <link linkend="gchar">gchar</link> *papername);
+const <link linkend="GnomePaper">GnomePaper</link>* <link linkend="gnome-paper-with-size">gnome_paper_with_size</link>     (<link linkend="double">double</link> pswidth,
+                                             <link linkend="double">double</link> psheight);
+const <link linkend="gchar">gchar</link>* <link linkend="gnome-paper-name">gnome_paper_name</link>               (const <link linkend="GnomePaper">GnomePaper</link> *paper);
+<link linkend="gdouble">gdouble</link>     <link linkend="gnome-paper-pswidth">gnome_paper_pswidth</link>             (const <link linkend="GnomePaper">GnomePaper</link> *paper);
+<link linkend="gdouble">gdouble</link>     <link linkend="gnome-paper-psheight">gnome_paper_psheight</link>            (const <link linkend="GnomePaper">GnomePaper</link> *paper);
+<link linkend="gdouble">gdouble</link>     <link linkend="gnome-paper-lmargin">gnome_paper_lmargin</link>             (const <link linkend="GnomePaper">GnomePaper</link> *paper);
+<link linkend="gdouble">gdouble</link>     <link linkend="gnome-paper-tmargin">gnome_paper_tmargin</link>             (const <link linkend="GnomePaper">GnomePaper</link> *paper);
+<link linkend="gdouble">gdouble</link>     <link linkend="gnome-paper-rmargin">gnome_paper_rmargin</link>             (const <link linkend="GnomePaper">GnomePaper</link> *paper);
+<link linkend="gdouble">gdouble</link>     <link linkend="gnome-paper-bmargin">gnome_paper_bmargin</link>             (const <link linkend="GnomePaper">GnomePaper</link> *paper);
+const <link linkend="gchar">gchar</link>* <link linkend="gnome-paper-name-default">gnome_paper_name_default</link>       (void);
+<link linkend="GList">GList</link>*      <link linkend="gnome-unit-name-list">gnome_unit_name_list</link>            (void);
+const <link linkend="GnomeUnit">GnomeUnit</link>* <link linkend="gnome-unit-with-name">gnome_unit_with_name</link>       (const <link linkend="gchar">gchar</link> *unitname);
+<link linkend="gdouble">gdouble</link>     <link linkend="gnome-paper-convert">gnome_paper_convert</link>             (<link linkend="double">double</link> psvalue,
+                                             const <link linkend="GnomeUnit">GnomeUnit</link> *unit);
+<link linkend="double">double</link>      <link linkend="gnome-paper-convert-to-points">gnome_paper_convert_to_points</link>   (<link linkend="double">double</link> othervalue,
+                                             const <link linkend="GnomeUnit">GnomeUnit</link> *unit);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The gnome-paper module provides a way of querying a database of
+existing paper dimensions, as well as the known or user-configured
+values for the margins.
+</para>
+
+<para>Support for converting values to and from PostScript points is
+also supported.</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="Paper">Paper</title>
+<programlisting>typedef GnomePaper Paper;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="Unit">Unit</title>
+<programlisting>typedef GnomeUnit Unit;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-name-list">gnome_paper_name_list ()</title>
+<programlisting><link linkend="GList">GList</link>*      gnome_paper_name_list           (void);</programlisting>
+<para>
+grants access to the hardcoded internal list of paper specifications</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> internal list of paper specifications
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-with-name">gnome_paper_with_name ()</title>
+<programlisting>const <link linkend="GnomePaper">GnomePaper</link>* gnome_paper_with_name     (const <link linkend="gchar">gchar</link> *papername);</programlisting>
+<para>
+searches internal list of paper sizes, searching
+for one with the name 'papername'</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>papername</parameter>&nbsp;:</entry>
+<entry> human name of desired paper type
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> paper specification with given name, or NULL
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-with-size">gnome_paper_with_size ()</title>
+<programlisting>const <link linkend="GnomePaper">GnomePaper</link>* gnome_paper_with_size     (<link linkend="double">double</link> pswidth,
+                                             <link linkend="double">double</link> psheight);</programlisting>
+<para>
+create a custom paper type with given dimensions</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pswidth</parameter>&nbsp;:</entry>
+<entry> width of paper
+</entry></row>
+<row><entry align="right"><parameter>psheight</parameter>&nbsp;:</entry>
+<entry> height of paper
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> paper specification
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-name">gnome_paper_name ()</title>
+<programlisting>const <link linkend="gchar">gchar</link>* gnome_paper_name               (const <link linkend="GnomePaper">GnomePaper</link> *paper);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>paper</parameter>&nbsp;:</entry>
+<entry> paper specification
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> human readable name for paper type
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-pswidth">gnome_paper_pswidth ()</title>
+<programlisting><link linkend="gdouble">gdouble</link>     gnome_paper_pswidth             (const <link linkend="GnomePaper">GnomePaper</link> *paper);</programlisting>
+<para>
+returns the width of the paper, including the margins</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>paper</parameter>&nbsp;:</entry>
+<entry> paper specification
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> width of paper (in points)
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-psheight">gnome_paper_psheight ()</title>
+<programlisting><link linkend="gdouble">gdouble</link>     gnome_paper_psheight            (const <link linkend="GnomePaper">GnomePaper</link> *paper);</programlisting>
+<para>
+returns the height of the paper, including the margins</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>paper</parameter>&nbsp;:</entry>
+<entry> paper specification
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> height of paper (in points)
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-lmargin">gnome_paper_lmargin ()</title>
+<programlisting><link linkend="gdouble">gdouble</link>     gnome_paper_lmargin             (const <link linkend="GnomePaper">GnomePaper</link> *paper);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>paper</parameter>&nbsp;:</entry>
+<entry> paper specification
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> paper specification
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-tmargin">gnome_paper_tmargin ()</title>
+<programlisting><link linkend="gdouble">gdouble</link>     gnome_paper_tmargin             (const <link linkend="GnomePaper">GnomePaper</link> *paper);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>paper</parameter>&nbsp;:</entry>
+<entry> paper specification
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> size of top margin (in points)
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-rmargin">gnome_paper_rmargin ()</title>
+<programlisting><link linkend="gdouble">gdouble</link>     gnome_paper_rmargin             (const <link linkend="GnomePaper">GnomePaper</link> *paper);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>paper</parameter>&nbsp;:</entry>
+<entry> paper specification
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> size of right margin (in points)
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-bmargin">gnome_paper_bmargin ()</title>
+<programlisting><link linkend="gdouble">gdouble</link>     gnome_paper_bmargin             (const <link linkend="GnomePaper">GnomePaper</link> *paper);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>paper</parameter>&nbsp;:</entry>
+<entry> paper specification
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> size of bottom margin (in points)
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-name-default">gnome_paper_name_default ()</title>
+<programlisting>const <link linkend="gchar">gchar</link>* gnome_paper_name_default       (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> human readable name for default paper type
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-unit-name-list">gnome_unit_name_list ()</title>
+<programlisting><link linkend="GList">GList</link>*      gnome_unit_name_list            (void);</programlisting>
+<para>
+grants access to the hardcoded internal list
+of units</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> internal list of units
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-unit-with-name">gnome_unit_with_name ()</title>
+<programlisting>const <link linkend="GnomeUnit">GnomeUnit</link>* gnome_unit_with_name       (const <link linkend="gchar">gchar</link> *unitname);</programlisting>
+<para>
+searches internal list of units, searching
+for one with the name 'unitname'</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>unitname</parameter>&nbsp;:</entry>
+<entry> name of desired unit
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Unit with given name or NULL
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-convert">gnome_paper_convert ()</title>
+<programlisting><link linkend="gdouble">gdouble</link>     gnome_paper_convert             (<link linkend="double">double</link> psvalue,
+                                             const <link linkend="GnomeUnit">GnomeUnit</link> *unit);</programlisting>
+<para>
+converts from value represented in points
+to value represented in given units.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>psvalue</parameter>&nbsp;:</entry>
+<entry> value in points
+</entry></row>
+<row><entry align="right"><parameter>unit</parameter>&nbsp;:</entry>
+<entry> unit to convert to
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> value in given units
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-paper-convert-to-points">gnome_paper_convert_to_points ()</title>
+<programlisting><link linkend="double">double</link>      gnome_paper_convert_to_points   (<link linkend="double">double</link> othervalue,
+                                             const <link linkend="GnomeUnit">GnomeUnit</link> *unit);</programlisting>
+<para>
+Needed for gnome-paper-selector.
+converts from value represented in points
+to value represented in given units.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>othervalue</parameter>&nbsp;:</entry>
+<entry> value in points
+</entry></row>
+<row><entry align="right"><parameter>unit</parameter>&nbsp;:</entry>
+<entry> unit to convert to
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> value in points
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

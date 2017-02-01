@@ -1,0 +1,263 @@
+<!-- ##### SECTION Title ##### -->
+BonoboControl
+
+<!-- ##### SECTION Short_Description ##### -->
+An implementation of the control interface for GtkWidgets
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The BonoboControl object implements the CORBA interface for
+handling remote embeddable components. A Control is a light
+weight, single view, arbitrarily complex 'widget'. Controls
+typicaly expose much of their functionality through a
+property bag.
+</para>
+
+<para>
+A BonoboControl provides the server ( or component ) side
+implementation of a Control. The client that uses this
+control will probably use a #BonoboWidget to use the control
+in their program.
+</para>
+
+<para>
+</para>
+
+<para>
+If you want to expose your widget as a control it is very simple
+  <example>
+    <title>CORBA-ifying your GtkWidget</title>
+    <programlisting>
+BonoboControl *control;
+GtkWidget     *widget;
+Bonobo_Unknown corba_object;
+
+widget = make_my_widget ();
+gtk_widget_show (widget);
+
+control = bonobo_control_new (widget);
+corba_object = BONOBO_OBJREF (control);
+    </programlisting>
+  </example>
+  The corba_object can then be passed off down the wire to anyone
+and the control popped into a #BonoboWidget or #BonoboControlFrame
+at the other end. Here is an even less useful example
+  <example>
+    <title>A pretty useless Control</title>
+    <programlisting>
+GtkWidget *widget;
+
+widget = gtk_button_new_with_label ("My Control");
+gtk_widget_show (widget);
+
+return bonobo_control_new (widget);
+    </programlisting>
+  </example>
+  If you learn only one thing from this example, it should be that
+you need to do a gtk_widget_show on your control. It is not
+sufficient to do a gtk_widget_show_all on the top level of the
+client side, since this will not ( and should not ) propagate
+over to the Control.
+</para>
+
+<para>
+One final thing worth thinking about is activation. When a control
+is embedded inside a #BonoboControlFrame, it is initialy inactive.
+In order for the control to recieve interactive input it is neccessary
+to use bonobo_control_frame_activate. This signals to the control
+that it is activated, at which point the Control should merge any
+UI elements it has with the associated #BonoboUIComponent. This
+needs to be done every time the control is activated.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+  #BonoboWidget, bonobo_widget_new()
+</para>
+
+<!-- ##### TYPEDEF BonoboControl ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF BonoboControlClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION bonobo_control_new ##### -->
+<para>
+
+</para>
+
+@widget: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_get_widget ##### -->
+<para>
+
+</para>
+
+@control: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_set_automerge ##### -->
+<para>
+
+</para>
+
+@control: 
+@automerge: 
+
+
+<!-- ##### FUNCTION bonobo_control_get_automerge ##### -->
+<para>
+
+</para>
+
+@control: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_set_property ##### -->
+<para>
+
+</para>
+
+@control: 
+@first_prop: 
+@Varargs: 
+
+
+<!-- ##### FUNCTION bonobo_control_get_property ##### -->
+<para>
+
+</para>
+
+@control: 
+@first_prop: 
+@Varargs: 
+
+
+<!-- ##### FUNCTION bonobo_control_construct ##### -->
+<para>
+
+</para>
+
+@control: 
+@widget: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@corba_control: 
+
+
+<!-- ##### FUNCTION bonobo_control_get_ui_component ##### -->
+<para>
+
+</para>
+
+@control: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_set_ui_component ##### -->
+<para>
+
+</para>
+
+@control: 
+@component: 
+
+
+<!-- ##### FUNCTION bonobo_control_get_remote_ui_container ##### -->
+<para>
+
+</para>
+
+@control: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_set_control_frame ##### -->
+<para>
+
+</para>
+
+@control: 
+@control_frame: 
+
+
+<!-- ##### FUNCTION bonobo_control_get_control_frame ##### -->
+<para>
+
+</para>
+
+@control: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_set_properties ##### -->
+<para>
+
+</para>
+
+@control: 
+@pb: 
+
+
+<!-- ##### FUNCTION bonobo_control_get_properties ##### -->
+<para>
+
+</para>
+
+@control: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_get_ambient_properties ##### -->
+<para>
+
+</para>
+
+@control: 
+@ev: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_control_activate_notify ##### -->
+<para>
+
+</para>
+
+@control: 
+@activated: 
+
+
+<!-- ##### FUNCTION bonobo_control_windowid_from_x11 ##### -->
+<para>
+
+</para>
+
+@x11_id: 
+@Returns: 
+
+
+<!-- ##### SIGNAL BonoboControl::set-frame ##### -->
+<para>
+
+</para>
+
+@bonobocontrol: the object which received the signal.
+
+<!-- ##### SIGNAL BonoboControl::activate ##### -->
+<para>
+
+</para>
+
+@bonobocontrol: the object which received the signal.
+@arg1: 
+

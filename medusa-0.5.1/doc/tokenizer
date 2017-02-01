@@ -1,0 +1,48 @@
+
+The tokenizing feature
+
+Tokenizing is a way of creating a correspondence between strings and n
+bits of information.
+
+The number of bits is set a database creation time.
+
+This functionality will be used to create databases of information where
+strings can be placed in fixed length fields.
+
+The correspondences will be stored in a database, and read using the
+medusa_db api.
+
+
+Here is a brief description of the database file format
+
+magic #    version #     free space at file end
+string addresses
+\0string\0string\0
+
+
+magic # is 9121, used to verify that the file is actually a medusa token file.
+version # is presently 0.1, used in case format changes in future version.
+
+free space at file end is needed because mmap cannot extend files.
+Hence the buffer space is available to add new strings to the
+database.  In future versions this may be eliminated on database
+closing as an option, to save disk space.
+
+string addresses are the actual tokens corresponding to each string.
+They specify an offset in the later part of the file where the
+corresponding string is stored.  0 means that no string corresponds to
+that token.  here an example data file:
+
+
+9121     0.1     10
+0, 6, 0, 1, 0, 0, 10, 0 
+\0bill\0bob\0frank\0\0\0\0\0\0\0\0\0\0\0
+
+would encode the correspondence
+bill = 3
+bob = 1
+frank = 6
+
+
+
+

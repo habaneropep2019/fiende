@@ -1,0 +1,173 @@
+AC_INIT(control-center)
+
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(control-center, 1.4.0.3)
+
+AM_MAINTAINER_MODE
+
+AM_ACLOCAL_INCLUDE(macros)
+
+AM_PROG_XML_I18N_TOOLS
+
+dnl
+dnl let applications configure for gnome
+dnl
+gnome_cv_use_gnome=yes
+
+GNOME_INIT
+
+AC_ISC_POSIX
+AC_PROG_CC
+AC_STDC_HEADERS
+AC_ARG_PROGRAM
+AM_PROG_LIBTOOL
+AM_PROG_LEX
+AC_PROG_YACC
+
+GNOME_COMPILE_WARNINGS
+
+GNOME_X_CHECKS
+
+dnl Check for new enough gnome-libs
+CFLAGS_save=$CFLAGS
+LIBS_save=$LIBS
+CFLAGS=`$GNOME_CONFIG --cflags gnomeui`
+LIBS=`$GNOME_CONFIG --libs gnomeui`
+
+AC_CHECK_LIB(gnomeui, gnome_window_icon_set_default_from_file, ,[
+AC_MSG_ERROR(gnome-libs 1.0.60 or higher is required.)])
+
+CFLAGS=$CFLAGS_save
+LIBS=$LIBS_save
+
+dnl utility conditional
+AM_CONDITIONAL(FALSE, test "x" = "y")
+
+ALL_LINGUAS="az bg ca cs da de el en_GB es et eu fi fr ga gl hr hu it ja ko lt nl nn no pl pt pt_BR ro ru sk sl sv tr uk wa zh_CN.GB2312 zh_TW"
+AM_GNOME_GETTEXT
+
+AC_SUBST(CFLAGS)
+AC_SUBST(LDFLAGS)
+
+AC_CHECK_HEADERS(dlfcn.h dl.h)
+AC_CHECK_LIB(dl, dlopen, DL_LIB="-ldl",[
+AC_CHECK_LIB(dld, shl_load, DL_LIB="-ldld",[
+AC_CHECK_FUNCS(dlopen, DL_LIB="",
+AC_MSG_ERROR(Dynamic linking is not available on this platform.  Some
+apps, like panel, will not run properly.))
+])])
+AC_SUBST(DL_LIB)
+
+AC_CHECK_FUNCS(usleep flockfile getline)
+
+dnl keyboard-properties-capplet
+AC_CHECK_HEADERS(X11/extensions/xf86misc.h, XF86MISC_LIBS="-lXxf86misc")
+AC_SUBST(XF86MISC_LIBS)
+
+for dir in `(IFS=:; for i in $PATH; do echo $i ; done)` ; do
+  if test -f $dir/orbit-idl ; then
+     orbit_prefix=`echo $dir | sed 's%/bin$%%' |sed 's%/bin/$%%'`
+     break
+  fi
+done
+
+ORB_LIBS="$ORBIT_LIBS"
+ORB_CFLAGS="$ORBIT_CFLAGS"
+
+AC_SUBST(ORB_LIBS)
+AC_SUBST(ORB_CFLAGS)
+
+dnl
+dnl GdkPixBuf
+dnl
+AC_MSG_CHECKING(for GdkPixbuf library >= 0.7.0)
+PIXBUF_CFLAGS=`$GNOME_CONFIG --cflags gdk_pixbuf`
+PIXBUF_LIBS=`$GNOME_CONFIG --libs gdk_pixbuf`
+if test "x$PIXBUF_CFLAGS" != x ; then
+    vers=`gdk-pixbuf-config --version | awk 'BEGIN { FS = "."; } { printf "%d", ($1 * 1000 + $2) * 1000 + $3;}'`
+    if test "$vers" -ge 0007000; then
+        AC_MSG_RESULT(found)
+    else
+       AC_MSG_ERROR(You need at least GdkPixbuf version 0.7.0 for the panel)
+    fi
+else
+    AC_MSG_ERROR(Did not find GdkPixbuf installed)
+fi
+AC_SUBST(PIXBUF_CFLAGS)
+AC_SUBST(PIXBUF_LIBS)
+CFLAGS="`gnome-config --cflags gdk_pixbuf`${CFLAGS}"
+
+dnl esd-manager
+have_libesd=no
+AM_PATH_ESD(,have_libesd=yes,
+[AC_MSG_WARN([*** \`esd-manager' will not be built ***])])
+AM_CONDITIONAL(HAVE_LIBESD, test yes = $have_libesd)
+if test "$have_libesd" = yes; then
+	AC_DEFINE(HAVE_ESD)
+	AC_DEFINE(HAVE_LIBESD)
+fi
+
+dnl session-properties
+AM_CONDITIONAL(SESSION, test "$GNOME_HAVE_SM" = true)
+
+AM_PATH_IMLIB(1.8.2, , [
+echo "ERROR: Needs a system with Imlib 1.8.2 or higher"
+echo "You can obtain it from:"
+echo "ftp://ftp.enlightenment.org/pub/enlightenment/"
+echo "ftp://www.rasterman.com/pub/enlightenment/"
+echo "ftp://ftp.labs.redhat.com/pub/imlib/"
+AC_MSG_ERROR([Fatal Error: no Imlib detected.])])
+
+
+dnl
+dnl gnome-vfs
+dnl
+AC_MSG_CHECKING(for gnome-vfs library >= 0.9)
+VFS_CFLAGS=`gnome-vfs-config --cflags`
+VFS_LIBS=`gnome-vfs-config --libs`
+if test "x$VFS_CFLAGS" != x ; then
+    vers=`gnome-vfs-config --version | awk 'BEGIN { FS = "."; } { printf "%d", ($1 * 1000 + $2) * 1000 + $3;}'`
+    if test "$vers" -ge 0009000; then
+        AC_MSG_RESULT(found)
+    else
+       AC_MSG_ERROR(You need at least gnome-vfs version 0.9 for control-center)
+    fi
+else
+    AC_MSG_ERROR(Did not find gnome-vfs installed)
+fi
+AC_SUBST(VFS_CFLAGS)
+AC_SUBST(VFS_LIBS)
+
+
+
+AC_DEFINE_UNQUOTED(GNOME_ICONDIR, "${prefix}/share/pixmaps")
+
+AC_OUTPUT([
+control-center.spec
+Makefile
+po/Makefile.in
+doc/Makefile
+doc/C/Makefile
+macros/Makefile
+control-center/Makefile
+capplets/Makefile
+capplets/mouse-properties/Makefile
+capplets/file-types/Makefile
+capplets/file-types/libuuid/Makefile
+capplets/keyboard-properties/Makefile
+capplets/desktop-links/Makefile
+capplets/background-properties/Makefile
+capplets/screensaver-properties/Makefile
+capplets/screensaver-properties/screensaver-desktops/Makefile
+capplets/sound-properties/Makefile
+capplets/theme-switcher/Makefile
+capplets/ui-properties/Makefile
+capplets/url-properties/Makefile
+capplets/gnome-edit-properties/Makefile
+capplets/wm-properties/Makefile
+capplets/wm-properties/wm-desktops/Makefile
+idl/Makefile
+intl/Makefile
+man/Makefile
+omf-install/Makefile])
+

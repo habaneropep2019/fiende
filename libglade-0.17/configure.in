@@ -1,0 +1,109 @@
+-*- mode: m4 -*-
+AC_PREREQ(2.52)
+AC_INIT(libglade, 0.17,
+        [http://bugzilla.gnome.org/enter_bug.cgi?product=libglade])
+AC_CONFIG_SRCDIR([test-libglade.c])
+AM_CONFIG_HEADER(config.h)
+
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+AM_MAINTAINER_MODE
+
+dnl get the GNOME macros
+AM_ACLOCAL_INCLUDE(macros)
+
+AC_ARG_ENABLE(debug,
+  AC_HELP_STRING([--enable-debug], [enable debugging output]),,
+  [enable_debug=no])
+
+if test "x$enable_debug" != xno; then
+  AC_DEFINE(DEBUG)
+fi
+
+AC_PROG_CC
+AC_ISC_POSIX
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h, AC_DEFINE(HAVE_UNISTD_H))
+
+AC_ARG_PROGRAM
+
+AM_PROG_LIBTOOL
+
+AM_PATH_GTK(1.2.0)
+
+AC_PATH_PROG(XML_CONFIG,xml-config,no)
+if test x$XML_CONFIG = xno; then
+  AC_MSG_ERROR(Couldn't find xml-config)
+fi
+XML_LIBS=`xml-config --libs`
+XML_CFLAGS=`xml-config --cflags`
+AC_SUBST(XML_LIBS)
+AC_SUBST(XML_CFLAGS)
+
+dnl Check to make sure that we have libxml >= 1.7.2 installed
+old_LIBS="$LIBS"
+LIBS="$XML_LIBS $LIBS"
+AC_CHECK_FUNC(xmlSAXUserParseFile,,
+AC_MSG_ERROR([*** libxml >= 1.7.2 is required to compile libglade]))
+LIBS="$old_LIBS"
+
+
+have_gnome=false
+GNOME_INIT_HOOK([
+	have_gnome=true
+	AC_DEFINE(ENABLE_GNOME)
+])
+AM_CONDITIONAL(GNOME_SUPPORT, $have_gnome)
+
+AC_ARG_ENABLE(bonobo,
+  AC_HELP_STRING([--enable-bonobo], [enable bonobo support]),,
+  [enable_bonobo=no])
+have_bonobo=false
+if test x$enable_bonobo != xno; then
+  AM_PATH_BONOBO(0.27, have_bonobo=true)
+fi
+AM_CONDITIONAL(BONOBO_SUPPORT, $have_bonobo)
+
+AC_ARG_ENABLE(gnomedb,
+  AC_HELP_STRING([--enable-gnomedb], [enable gnome-db support]),,
+  [enable_gnomedb=yes])
+have_gnomedb=false
+if test x$enable_gnomedb != xno && test x$have_gnome != xfalse; then
+  AC_PATH_PROG(GNOMEDB_CONFIG, gnomedb-config, no)
+  AC_MSG_CHECKING(for gnome-db)
+  if test x$GNOMEDB_CONFIG != xno; then
+    have_gnomedb=true
+    GNOMEDB_CFLAGS="`gnomedb-config --cflags`"
+    GNOMEDB_LIBS="`gnomedb-config --libs`"
+    AC_MSG_RESULT(found)
+  else
+    AC_MSG_RESULT(not found)
+  fi
+fi
+AM_CONDITIONAL(GNOMEDB_SUPPORT, $have_gnomedb)
+AC_SUBST(GNOMEDB_LIBS)
+AC_SUBST(GNOMEDB_CFLAGS)
+
+GNOME_COMPILE_WARNINGS
+
+AC_CHECK_PROG(GTKDOC, gtkdoc-mkdb, true, false)
+AM_CONDITIONAL(HAVE_GTK_DOC, $GTKDOC)
+
+dnl gettext stuff ... there is no message catalog for libglade -- libglade
+dnl provides translation for the XML files it reads in.
+ALL_LINGUAS=""
+AM_GNOME_GETTEXT
+
+AC_CONFIG_FILES([Makefile
+libglade.spec
+macros/Makefile
+intl/Makefile
+glade/Makefile
+doc/Makefile
+libglade-config
+libgladeConf.sh
+libglade.pc
+libglade-gnome.pc
+libglade-bonobo.pc
+libglade-gnomedb.pc])
+
+AC_OUTPUT

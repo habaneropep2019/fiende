@@ -1,0 +1,725 @@
+<!DOCTYPE Article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+<!ENTITY version "1.2">
+]>
+
+<article id="index">
+  <artheader> 
+    <title>stripchart</title>
+
+    <copyright>
+      <year>2000, 2001</year>
+      <holder>John Kodis</holder>
+    </copyright>
+
+    <!-- translators: uncomment this:
+    <copyright>
+      <year>2000</year>
+      <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
+    </copyright>
+    -->
+
+    <legalnotice>
+      <para>Permission is granted to copy, distribute and/or modify this document
+	under the terms of the <ulink type="help"
+	url="gnome-help:fdl"><citetitle>GNU Free Documentation
+	    License</citetitle></ulink>, Version 1.1 or any later version 
+	published by the Free Software Foundation with no Invariant Sections, 
+	no Front-Cover Texts, and no Back-Cover Texts.  A copy of the license
+	can be found <ulink type="help" url="gnome-help:fdl">here</ulink>.
+      </para>
+
+      <para>Many of the names used by companies to distinguish their
+      products and services are claimed as trademarks. Where those
+      names appear in any GNOME documentation, and those trademarks
+      are made aware to the members of the GNOME Documentation
+      Project, the names have been printed in caps or initial
+      caps.</para>
+    </legalnotice>
+
+    <releaseinfo>
+      This is version 1.0 of the stripchart manual.
+    </releaseinfo>
+  </artheader>
+
+  <sect1 id="intro">
+    <title>Introduction</title> 
+
+    <para>The GNOME <application>stripchart</application> program
+    charts various user-specified parameters as a function of time.
+    Its main use is to chart system performance parameters such as CPU
+    load, CPU utilization, network traffic levels, and the like.
+    Other more ingenious uses are left as an exercise for the
+    interested user.  It is included in the package
+    <filename>gnome-utils</filename>, which is a part of the GNOME
+    desktop environment. This document describes version &version; of
+    the <application>stripchart</application> program.</para>
+
+    <para>The <application>stripchart</application> program
+    periodically reads data from a file, extracts a value, and
+    displays these values in one of several formats.  The default
+    format is a graphical display similar to that of a stripchart
+    recorder.  Hence the name,
+    <application>stripchart</application>.</para>
+
+    <figure id="StripchartPlotterMainWindow">
+      <title>Stripchart Plotter Main Window</title>
+    <screenshot>
+      <screeninfo>Stripchart Plotter Main Window</screeninfo>
+      <graphic fileref="figures/main" format="png" srccredit="John Kodis">
+	  </graphic>
+    </screenshot>
+    </figure>
+
+    <para>On systems such as Linux, in which system parameters are
+    available in human-readable form in the /proc directory, the
+    <application>stripchart</application> program makes a dandy
+    performance monitoring tool, similar to but more versatile than
+    <application>xload</application>.</para>
+
+    <para>Instead of being limited to a few standard performance
+    parameters, the <application>stripchart</application> program can
+    plot any time-variant parameter than can be read from a file or
+    pipe.  This ability to read data from a pipe provides a very
+    versatile and easy to use method of setting up custom
+    displays.</para>
+
+    <para>The <application>stripchart</application> program is
+    available both as a stand-alone program, and as a Gnome panel
+    applet.  The program can be started by selecting
+    <guimenuitem>Stripchart Plotter</guimenuitem> item from the
+    <guisubmenu>Utilities</guisubmenu> submenu of the <guimenu>Main
+    Menu</guimenu>, by selecting <guimenuitem>Stripchart
+    Plotter</guimenuitem> item from the
+    <guisubmenu>Monitors</guisubmenu> submenu of the Gnome panel
+    <guimenu>Applets</guimenu>, or by running the command
+    <command>stripchart</command> or
+    <command>stripchart-applet</command> from the command line.</para>
+
+    <figure id="stripchartappletmainwindow">
+      <title>Stripchart Plotter Applet Window</title>
+    <screenshot>
+      <screeninfo>Stripchart Plotter Applet Window</screeninfo>
+      <graphic fileref="figures/applet" format="png" srccredit="John Kodis">
+	  </graphic>
+    </screenshot>
+    </figure>
+
+  </sect1>
+
+  <sect1 id="usage"> 
+    <title>Using stripchart</title>
+
+    <para>Although the <application>stripchart</application> program
+    can be used to plot very nearly any parameter that is of interest,
+    the default configuration will produce a useful overview of the
+    performance parameters of the system that it's being run on.  This
+    section describes basic usage of the
+    <application>stripchart</application> program in its default
+    configuration.  A description of how to customize the parameters
+    that are plotted is provided later in this document.</para>
+
+    <para>When you first start <application>stripchart</application>,
+    you see the <interface>main window</interface>, as shown in 
+    <xref linkend="main"> or in <xref linkend="applet">.
+      <figure id="main">
+	<title>Stripchart Plotter Main Window</title>
+	<screenshot>
+	  <screeninfo>Stripchart Plotter Main Window</screeninfo>
+	  <graphic fileref="figures/main" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+      <figure id="applet">
+	<title>Stripchart Plotter Applet Window</title>
+	<screenshot>
+	  <screeninfo>Stripchart Plotter Applet Window</screeninfo>
+	  <graphic fileref="figures/applet" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    </para>
+
+    <para>In its default configuration, the
+    <application>stripchart</application> program creates a 200 by 50
+    pixel window that contains two main elements &mdash; a scrolling
+    "strip" on the left, and a series of "pens" on the right.  The
+    <application>stripchart</application> applet is similar, but its
+    size adapts to the size of the panel in which it is run.  When
+    using the default configuration, there will be a "pen" and a
+    "strip" line showing the current and recently past values of
+    system's CPU utilization in blue, the one minute load average in
+    yellow, the percentage of swap space in use in white, and the
+    inbound and outbound network traffic volumes in red and green,
+    respectively.  If a PPP interface is currently active, a green
+    indicator light will be displayed in the upper left corner of the
+    main window.</para>
+
+    <para>Clicking on the <application>stripchart</application>
+    <interface>main window</interface> with mouse button one will pop
+    up a <interface>numeric value</interface> window.  The
+    <interface>numeric value</interface> window corresponding to the
+    main window shown in the previous figures is shown below in <xref
+    linkend="text">.
+      <figure id="text">
+	<title>Parameter Numeric Value Window</title>
+	<screenshot>
+	  <screeninfo>Parameter Numeric Value Window</screeninfo>
+	  <graphic fileref="figures/text" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    This window provides a multi-line, text-based display of the name,
+    current value, full-scale value, and scaling (linear or
+    logarithmic) of each of the parameters being plotted.  It can be
+    dismissed either by clicking on the <guibutton>close</guibutton>
+    button in the title bar of the <interface>numeric
+    value</interface> window, or by a second mouse click in the
+    <interface>main window</interface>.</para>
+
+    <para>Clicking on the <application>stripchart</application>
+    <interface>main window</interface> with mouse button three will
+    pop up an <guimenu>Application</guimenu> menu containing
+    <guimenuitem>Help</guimenuitem>, <guimenuitem>About</guimenuitem>,
+    <guimenuitem>Show values</guimenuitem>, <guimenuitem>Edit
+    Prefs</guimenuitem>, <guimenuitem>Edit Params</guimenuitem>, and
+    <guimenuitem>Exit</guimenuitem> menu items, as shown below in
+    <xref linkend="menu">.
+      <figure id="menu">
+	<title>Main Window with Pop-Up Menu</title>
+	<screenshot>
+	  <screeninfo>Main Window with Pop-Up Menu</screeninfo>
+	  <graphic fileref="figures/menu" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    The <guimenuitem>Help</guimenuitem> and
+    <guimenuitem>About</guimenuitem> menu items display this help
+    information and the usual about box, respectively, and the
+    <guimenuitem>Exit</guimenuitem> menu item terminates the execution
+    of the <application>stripchart</application> program.  The
+    <guimenuitem>Show values</guimenuitem> menu item will pop up a
+    <interface>numeric value</interface> window, as described
+    above.</para>
+
+    <para>The operation of the <application>stripchart</application>
+    application can be customized by editing the application
+    preferences and the parameters that are plotted.  The
+    <guimenuitem>Edit Prefs</guimenuitem> menu item displays an
+    application preferences editing window, as shown in <xref
+    linkend="prefs">.  The settings in the Preferences Window are
+    described in <xref linkend="preferences">.
+      <figure id="prefs">
+	<title>Preferences Window</title>
+	<screenshot>
+	  <screeninfo>Preferences Window</screeninfo>
+	  <graphic fileref="figures/prefs" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    </para>
+
+    <para>The <guimenuitem>Edit Params</guimenuitem> menu item displays a
+    window containing a notebook with a page describing the details of
+    each parameter, as shown in <xref linkend="param">.  Parameters
+    can be edited as described in <xref linkend="parameters">.
+      <figure id="param">
+	<title>Parameter Window</title>
+	<screenshot>
+	  <screeninfo>Parameter Window</screeninfo>
+	  <graphic fileref="figures/param" format="png" srccredit="John Kodis">
+	  </graphic>
+	</screenshot>
+      </figure>
+    </para>
+  </sect1>
+
+  <sect1 id="options">
+    <title>Command-Line Options</title>
+
+    <para>There are a few command line switches that can be used to
+    alter the behavior of the program.  In addition to the common
+    help, usage, version, Gnome, Gtk, and Session management options,
+    the following stripchart-specific options are available:</para>
+
+    <variablelist>
+      <varlistentry>
+	<term> --geometry <replaceable>GEOMETRY-SPEC</replaceable> </term> 
+	<listitem>
+	  <para>A standard X11 geometry specification of the form
+	  <replaceable>WxH&plusmn;X&plusmn;Y</replaceable>. </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term> --config-file <replaceable>FILENAME</replaceable> </term>
+	<listitem>
+	  <para>Specifies a file from which to read configuration
+	  information, overriding the normal configuration file search
+	  order described in <xref linkend="files" />.  You can change
+	  the parameters monitored by an instance of the stripchart
+	  program by specifying an alternate configuration
+	  file.</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </sect1>
+
+  <sect1 id="preferences">
+    <title>Preference Settings</title>
+
+    <para>The Preferences Window provides a way to adjust settings
+    which have an effect on the overall operation of the
+    <application>stripchart</application> program.  Separate sets of
+    controls are provided for the operation of the pens and for the
+    operation of the main chart window.</para>
+
+    <figure id="stripchartpreferenceswindow">
+      <title>Preferences Window</title>
+    <screenshot>
+      <screeninfo>Preferences Window</screeninfo>
+      <graphic fileref="figures/prefs" format="png" srccredit="John Kodis"></graphic>
+    </screenshot>
+    </figure>
+
+    <para>Both the chart and the pens have their own adjustments for
+    the update interval and for the level of smoothing to be
+    performed.  The update interval determines how frequently a new
+    set of data points should be collected and displayed.  This
+    defaults to once per second for the pens, and once every 5 seconds
+    for the chart lines.  The smoothing value determines how sharp of
+    a low-pass filter should be applied to the raw data values prior
+    to displaying them.  This value defaults to 0.5 for both the pens
+    and the chart lines.  Setting the smoothing to zero eliminates
+    this filtering of the raw data, resulting updates which are more
+    responsive but which can appear jumpy or jagged.  Setting the
+    smoothing to one freezes the current values in place.
+    Intermediate values generate a new plot value by taking the
+    difference between the last value and the new raw parameter value,
+    multiplying by the smoothing constant, and adding this to the last
+    value.</para>
+
+    <para>The chart portion of the Preferences Window also has a
+    check-box to enable or disable the display of tick marks along the
+    time axis of the stripchart display.  When the display of tick
+    marks is enabled, the intervals between minor and major tick marks
+    can be adjusted.  The default settings provide for a minor tick
+    mark every twelve pixels and a major tick mark every five minor
+    tick marks.  With the default five second chart update interval,
+    these values will place a minor tick mark every minute and a major
+    tick mark every five minutes.</para>
+
+    <para>The pen portion of the Preferences Window provides a
+    check-box to enable or disable the display of the pen portion of
+    the stripchart display.  While the pens provide a rapidly updating
+    view of the parameters being monitored, this constant motion could
+    become distracting.  Adjust to taste.</para>
+
+    <para>The standard "Okay", "Apply", and "Cancel" buttons are
+    available to apply new settings and close the Preferences dialog
+    window, to apply new settings without closing the Preferences
+    dialog window, and to close the Preferences dialog window without
+    altering the current preference settings, respectively.</para>
+
+  </sect1>
+
+  <sect1 id="parameters">
+    <title>Parameter Settings</title>
+
+    <para>The parameters displayed by the
+    <application>stripchart</application> can be examined and edited
+    using the <interface>Parameter Editor</interface> window.
+    Although <application>stripchart</application> provides great
+    potential for adding custom parameters, most users will initially
+    be satisfied with the selecting from the list of pre-configured
+    parameters supplied.  Adding or deleting these parameters is
+    described in <xref linkend="param-quickstart">.</para>
+
+    <figure id="stripchartparameterwindow">
+      <title>Parameter Window</title>
+    <screenshot>
+      <screeninfo>Parameter Window</screeninfo>
+      <graphic fileref="figures/param" format="png"
+	       srccredit="John Kodis"></graphic>
+    </screenshot>
+    </figure>
+
+    <sect2 id="param-quickstart">
+      <title>Parameter Editor Quickstart Guide</title>
+
+      <para>To delete one of the currently active parameters:
+      <itemizedlist>
+
+	<listitem><para>Select the parameter to be deleted by clicking
+        on its tab at the bottom of the <interface>Parameter
+        Editor</interface> window;</para></listitem>
+
+	<listitem><para>Select the <guimenu>Edit</guimenu> menu
+	item;</para></listitem>
+
+	<listitem><para>Select the <guimenu>Delete Parameter</guimenu> menu
+	item.</para></listitem>
+
+      </itemizedlist></para>
+
+      <para>To add one of the pre-defined parameters:
+      <itemizedlist>
+
+	<listitem><para>Select the <guimenu>Edit</guimenu> menu
+	item;</para></listitem>
+
+	<listitem><para>Select either the <guimenu>Add Parameter
+	Before</guimenu> or the <guimenu>Add Parameter
+	Before</guimenu> menu item to insert a new empty parameter
+	page;</para></listitem>
+
+	<listitem><para>Select one of the pre-defined parameters from
+	the parameter itemlist on the "Parameter" line of the
+	page.  This will fill in the required fields for the newly
+	created parameter, and begin plotting it.</para></listitem>
+
+      </itemizedlist></para>
+
+    </sect2>
+
+    <sect2 id="custom">
+      <title>Creating Custom Parameters</title>
+
+      <para>The creation of a custom parameter can be done by editing
+      an existing parameter, by adding a new parameter and editing it,
+      or by adding a new parameter and filling in the parameter fields
+      from scratch.  Many of the parameter fields can be left blank.
+      While good style dictates that a parameter name and description
+      be provided for documentation purposes, the only mandatory
+      fields are those required to obtain a value to be plotted.
+      Generally, the Equation field will fill this role.  The details
+      of each of these fields are described below.</para>
+
+      <variablelist>
+
+        <varlistentry>
+	  <term>Parameter</term>
+	  <listitem>
+
+	    <para>A short descriptive name for the parameter.</para>
+
+	  </listitem>
+        </varlistentry>
+
+        <varlistentry>
+	  <term>Description</term>
+	  <listitem>
+
+	    <para>A longer description of the parameter.</para>
+
+	  </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	  <term>Filename</term>
+	  <listitem>
+
+	    <para>The name of a file from which equation parameters
+	    are obtained.  On each iteration, a line is read from this
+	    file.  If a pattern was supplied, lines are read until one
+	    is found that contains the pattern string anywhere in the
+	    line.  This line is split into a series of whitespace
+	    separated fields, each of which is interpreted as a
+	    floating point number.  The first (or only) value is
+	    denoted by $1, the next by $2, and so forth.  The
+	    difference between the field values from the previous to
+	    the current iteration is denoted by ~1, ~2, and so
+	    forth.</para>
+
+	    <para>If a filename beginning with a "|" is supplied,
+	    input lines will be read from a pipe instead of a file.
+	    Lines read from this pipe will be processed identically to
+	    lines read from a file as described previously.</para>
+
+	    <para>If a filename beginning with a "?" is supplied, the
+	    file status determines the value to be plotted: -1 for a
+	    non-existent file, 0 for a file of zero length, 1 for a
+	    file with an access time that is newer than its
+	    modification time, and 2 for a file with a modification
+	    time that is newer than its access time.  These values are
+	    useful in displaying the status of a mailbox file.</para>
+
+	  </listitem>
+	</varlistentry>
+
+        <varlistentry>
+	  <term>Equation</term>
+	  <listitem>
+
+	    <para>An equation used to obtain the value to be plotted
+            for this parameter.  The equation is made up of parameters
+            which are combined using the usual infix arithmetic
+            operators.</para>
+
+	    <para>There are several sources for equation
+	    parameters.</para>
+
+            <itemizedlist>
+
+	      <listitem><para>The parameters can be obtained by
+	      reading a line from a file.  This method of obtaining
+	      equation parameters is described under the previous
+	      Filename section.</para></listitem>
+
+	      <listitem><para>There are a number of built-in
+	      parameters.  The elapsed time in seconds between the
+	      last and current iteration is ~t.  The elapsed time in
+	      seconds since the <application>stripchart</application>
+	      program was started is $t.</para></listitem>
+
+	      <listitem><para>There are a number of parameters
+	      provided by the libgtop library.  These are described in
+	      <xref linkend="libgtop">.</para></listitem>
+
+            </itemizedlist>
+
+	    <para>The usual infix arithmetic operators &mdash;
+	    addition (+), subtraction (-), multiplication (*),
+	    division (/), and remaindering (&percnt;) &mdash; are available,
+	    along with parenthesis for grouping subexpressions, and
+	    unary minus (-) to negate a value.  Grouping and negation
+	    have the highest precedence; multiplication, division, and
+	    remaindering have the next highest precedence; and
+	    addition and subtraction have the lowest
+	    precedence.</para>
+
+	  </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	  <term>Pattern</term>
+	  <listitem>
+
+	    <para>If the filename field specifies a file containing
+	    more than a single line of text, the pattern field can be
+	    used to select the line from which equation parameter
+	    values will be obtained.  Lines will be read from the file
+	    until a line containing the specified pattern is found, or
+	    until the end of file is reached.  If no pattern is
+	    provided, the first line of the file is used.</para>
+
+	  </listitem>
+	</varlistentry>
+
+        <varlistentry>
+	  <term>Top Min</term>
+	  <term>Top Max</term>
+	  <term>Bottom Min</term>
+	  <term>Bottom Max</term>
+	  <listitem>
+
+	    <para>The minimum and maximum to be used for the value at
+	    the top and bottom of the chart.</para>
+
+	  </listitem>
+        </varlistentry>
+
+        <varlistentry>
+	  <term>Scale</term>
+	  <listitem>
+
+	    <para>The type of scaling to be performed on the parameter
+	    values before they are plotted: either linear or
+	    logarithmic.</para>
+
+	  </listitem>
+        </varlistentry>
+
+        <varlistentry>
+	  <term>Type</term>
+	  <listitem>
+
+	    <para>The type of plot to be generated for this parameter
+	    value.  The value can be plotted as an indicator, a small
+	    square in the upper left corner of the window; as a line
+	    drawn between successive parameter values; as a point for
+	    each parameter value; or as a solid, with the area below
+	    each parameter value solidly filled in.</para>
+
+	  </listitem>
+        </varlistentry>
+
+        <varlistentry>
+	  <term>Color</term>
+	  <listitem>
+
+	    <para>The color or colors to be used when plotting this
+	    parameter value.  For an indicator plot, a series of
+	    colors are used, the first for parameter values of one,
+	    plus or minus one-half, two, plus or minus one-half,
+	    three, plus or minus one-half, and so on.  For line,
+	    point, and solid plot types, only a single color is
+	    used.</para>
+
+	  </listitem>
+        </varlistentry>
+
+      </variablelist>
+
+    </sect2>
+
+    <sect2 id="libgtop">
+      <title>libgtop Values</title>
+
+      <para>Normally, the <application>stripchart</application>
+      program will be built with the libgtop library linked in.  The
+      libgtop library provides a portable and well-standardized method
+      of accessing common system performance parameters.  This is the
+      preferred method of obtaining a value to be plotted.</para>
+
+      <para>The following libgtop parameters are available: </para>
+
+      <itemizedlist>
+	<listitem> <para>CPU Statistics &mdash; cpu_total,
+	    cpu_user, cpu_nice, cpu_sys, cpu_idle, and cpu_freq
+	    </para> </listitem>
+
+	<listitem> <para>Memory Statistics &mdash; mem_total,
+	    mem_used, mem_free, mem_shared, mem_buffer, mem_cached,
+	    mem_user, mem_locked </para> </listitem>
+
+	<listitem> <para>Swap Statistics &mdash; swap_total,
+	    swap_used, swap_free, swap_pagein, swap_pageout </para>
+	</listitem>
+
+	<listitem> <para>Uptime Statistics &mdash; uptime, idletime
+	    </para> </listitem>
+
+	<listitem> <para>Loadavg Statistics &mdash; load_running,
+	    load_tasks, load_1m, load_5m, load_15m </para> </listitem>
+
+	<listitem> <para>Network Statistics &mdash; net_pkts_in,
+	    net_pkts_out, net_pkts_total, net_bytes_in, net_bytes_out,
+	    net_bytes_total, net_errs_in, net_errs_out, net_errs_total
+	    </para> 
+
+	  <para>Note that the network statistic values don't use the
+	    libgtop library.  Instead, they are read directly from
+	    /proc/net/dev, and so are only available under
+	    Linux. </para> </listitem>
+      </itemizedlist>
+
+      <para>These are all signed long integer quantities, except for
+      uptime, idletime, and the five load values which are floating
+      point values. </para>
+
+    </sect2>
+  </sect1>
+
+  <sect1 id="files">
+    <title>Configuration and Parameter Files</title> 
+
+    <para>The <application>stripchart</application> program
+    determines the parameters to display by reading a configuration
+    file.  The <application>stripchart</application> program will
+    look for a configuration file in the following order:
+    <itemizedlist>
+
+      <listitem> <para>first, for a file specified on the command
+      line, </para> </listitem>
+
+      <listitem> <para>then, for a file named
+      <filename>stripchart.conf</filename> in the current working
+      directory, </para> </listitem>
+
+      <listitem> <para>then, for a file named
+      <filename>.stripchart.conf</filename> in the users home
+      directory, </para> </listitem>
+
+      <listitem> <para>then, for a file named
+      <filename>/etc/stripchart.conf</filename>, </para> </listitem>
+
+      <listitem> <para>and finally, for a file named
+      <filename>stripchart.conf</filename> in the
+      <replaceable>CONFDIR</replaceable> directory, which will usually
+      be either <filename
+      class="directory">/usr/share/stripchart/</filename> or
+      <filename
+      class="directory">/usr/local/share/stripchart/</filename>.
+      </para> </listitem>
+
+    </itemizedlist>
+
+    If no configuration file is found, the program displays an error
+    message and exits.</para>
+
+    <para>The canned parameters that are displayed in the
+    <interface>Parameter Editor</interface> window are read from the
+    <filename>stripchart.param</filename> file in the <filename
+    class="directory"> <replaceable> {prefix}/share/stripchart
+    </replaceable> </filename> directory.</para>
+
+  </sect1>
+
+  <sect1 id="bugs">
+    <title>Known bugs and limitations</title>
+
+    <para>The --geometry option doesn't interpret negative
+    position arguments correctly.</para>
+
+    <para>The network traffic parameters are only available under
+    Linux.</para>
+
+  </sect1>
+
+  <sect1 id="authors">
+    <title>Authors</title>
+
+    <para>The <application>Stripchart Plotter</application> was
+    written by John Kodis (<email>kodis@jagunet.com</email>). Please
+    send all comments, suggestions, and bug reports to the <ulink
+    url="http://bugzilla.gnome.org" type="http">GNOME bug tracking
+    database</ulink>. (Instructions for submitting bug reports can be
+    found <ulink url="http://bugs.gnome.org/Reporting.html"
+    type="http"> on-line</ulink>.) If you are using GNOME 1.1 or
+    later, you can also use <application>Bug Report Tool</application>
+    (<command>bug-buddy</command>), available in the
+    <guisubmenu>Utilities</guisubmenu> submenu of <guimenu>Main
+    Menu</guimenu>, for submitting bug reports.</para>
+
+    <para>This manual was written by John Kodis
+    (<email>kodis@jagunet.com</email>). Please send all comments and
+    suggestions regarding this manual to the <ulink type="http"
+    url="http://www.gnome.org/gdp">GNOME Documentation Project</ulink>
+    by sending an email to <email>docs@gnome.org</email>. You can also
+    add your comments online by using the <ulink type="http"
+    url="http://www.gnome.org/gdp/doctable/">GNOME Documentation
+    Status Table</ulink>.</para>
+
+    <!-- For translations: uncomment this:
+    <para>Latin translation was done by ME
+    (<email>MYNAME@MYADDRESS</email>).  Please send all comments and
+    suggestions regarding this translation to SOMEWHERE.</para>
+    -->
+  </sect1>
+
+  <sect1 id="license">
+    <title>License</title> <para>This program is free software; you
+    can redistribute it and/or modify it under the terms of the
+    <citetitle>GNU General Public License</citetitle> as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.</para>
+
+    <para>This program is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the <citetitle>GNU General Public License</citetitle> for more
+    details.</para>
+
+    <para>A copy of the <citetitle>GNU General Public
+    License</citetitle> is included as an appendix to the
+    <citetitle>GNOME Users Guide</citetitle>.  You may also obtain a
+    copy of the <citetitle>GNU General Public License</citetitle> from
+    the Free Software Foundation by visiting <ulink type="http"
+    url="http://www.fsf.org">their Web site</ulink> or by writing to
+    <address>Free Software Foundation, Inc.  <street>59 Temple
+    Place</street> - Suite 330 <city>Boston</city>, <state>MA</state>
+    <postcode>02111-1307</postcode> <country>USA</country>
+    </address></para>
+
+  </sect1>
+</article>

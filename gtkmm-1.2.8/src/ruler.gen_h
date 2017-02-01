@@ -1,0 +1,173 @@
+/* $Id: ruler.gen_h,v 1.31 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* ruler.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <gtk/gtkruler.h>
+#include <gtk/gtkhruler.h>
+#include <gtk/gtkvruler.h>
+
+CLASS_START(Gtk);
+//: Abstract Ruler
+//- Ruler is an abstraction used as the base for Gtk_HRuler and
+//- Gtk_VRuler.  Users should only instantiate those types. 
+class Ruler : public Widget {
+  WRAP_CLASS(Ruler,GtkRuler,GTK_RULER,GTK_IS_RULER,ruler,Gtk::Widget,GtkWidget,GTK_WIDGET);
+public:
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Gets the metric of the ruler.
+  GtkMetricType get_metric() const; 
+
+  //: Sets the desired metric of the ruler.  The possible choices are:
+  //- {\enum GTK_PIXELS}, {\enum GTK_INCHES}, or {\enum GTK_CENTIMETERS}.
+  //- The default metric is {\enum GTK_PIXELS}.
+  WRAP_METHOD(void gtk_ruler_set_metric(GtkRuler*, GtkMetricType),
+	      void set_metric(GtkMetricType metric=GTK_PIXELS));
+
+  WRAP_MEMBER(value,range_lower,lower,gfloat,gfloat);
+  WRAP_MEMBER(value,range_upper,upper,gfloat,gfloat);
+
+  //: sets the range of the ruler.
+  //- upper, lower: The extents of the Ruler.
+  //-
+  //- max_size: The largest number displayed by the ruler.
+  //-
+  //- position: The initial value of the ruler.  
+  //-
+  //- Rulers do not have sane defaults so this function should always be called. 
+  WRAP_METHOD(void gtk_ruler_set_range(GtkRuler*, gfloat, gfloat,
+				       gfloat, gfloat),
+	      void set_range(gfloat lower, gfloat upper,
+			     gfloat position, gfloat max_size));
+
+  //: Draw tick marks on the ruler.
+  WRAP_METHOD(void gtk_ruler_draw_ticks(GtkRuler*),
+	      void draw_ticks());
+
+  //: Draw a position indicator on the ruler.
+  WRAP_METHOD(void gtk_ruler_draw_pos(GtkRuler*),
+	      void draw_pos());
+
+protected:
+  WRAP_CTOR_DEFAULT;
+};
+
+
+//: A vertical ruler.
+//- The {\class Gtk::VRuler} widget is a widget arranged vertically
+//- creating a ruler that is utilized around other widgets such as a
+//- text widget. The ruler is used to show
+//- the location of the mouse on the window and to show the size of
+//- the window in specified units. The available units of measurement are {\enum GTK_PIXELS},
+//- {\enum GTK_INCHES} and {\enum GTK_CENTIMETERS}. {\enum GTK_PIXELS} is the default.
+class VRuler : public Ruler {
+  WRAP_CLASS(VRuler,GtkVRuler,GTK_VRULER,GTK_IS_VRULER,vruler,Gtk::Ruler,GtkRuler,GTK_RULER);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+};
+
+
+//: A Horizontal ruler.
+//- The HRuler widget is a widget arranged horizontally creating a ruler
+//- that is utilized around other widgets such as a text widget. The
+//- ruler is used to show the location of the mouse on the window and to
+//- show the size of the window in specified units. The available units
+//- of measurement are {\enum GTK_PIXELS}, {\enum GTK_INCHES} and
+//- {\enum GTK_CENTIMETERS}. {\enum GTK_PIXELS} is the default.
+class HRuler : public Ruler {
+  WRAP_CLASS(HRuler,GtkHRuler,GTK_HRULER,GTK_IS_HRULER,hruler,Gtk::Ruler,GtkRuler,GTK_RULER);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+};
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+GtkMetricType Ruler::get_metric() const
+{
+  GtkMetricType t=GTK_PIXELS;
+  if (!strcmp(gtkobj()->metric->abbrev,"In")) t=GTK_INCHES;
+  if (!strcmp(gtkobj()->metric->abbrev,"Cn")) t=GTK_CENTIMETERS;
+  return t;
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Ruler)
+//. name: backing_store
+//. type: GdkPixmap*
+//. get:
+//. set:
+//. desc:
+
+//. name: non_gr_exp_gc
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: metric
+//. type: GtkRulerMetric*
+//. get:
+//. set:
+//. desc:
+
+//. name: slider_size
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: lower
+//. type: gfloat
+//. get:
+//. set:
+//. desc: The upper limit of the ruler (in points) 
+
+//. name: upper
+//. type: gfloat
+//. get:
+//. set:
+//. desc: The lower limit of the ruler 
+
+//. name: position
+//. type: gfloat
+//. get:
+//. set:
+//. desc: The position of the mark on the ruler 
+
+//. name: max_size
+//. type: gfloat
+//. get:
+//. set:
+//. desc: The maximum size of the ruler 
+

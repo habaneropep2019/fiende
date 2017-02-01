@@ -1,0 +1,922 @@
+<refentry id="zvt-zvtterm">
+<refmeta>
+<refentrytitle>ZvtTerm widget API description.</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>ZVT Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>ZvtTerm widget API description.</refname><refpurpose>The API description for the ZvtTerm Gtk widget.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+#define     <link linkend="ZVT-TERM-CAPS">ZVT_TERM</link>                        (obj)
+#define     <link linkend="ZVT-TERM-CLASS-CAPS">ZVT_TERM_CLASS</link>                  (klass)
+#define     <link linkend="ZVT-IS-TERM-CAPS">ZVT_IS_TERM</link>                     (obj)
+struct      <link linkend="ZvtTerm-struct">ZvtTerm</link>;
+struct      <link linkend="ZvtTermClass">ZvtTermClass</link>;
+#define     <link linkend="ZVT-TERM-DO-UTMP-LOG-CAPS">ZVT_TERM_DO_UTMP_LOG</link>
+#define     <link linkend="ZVT-TERM-DO-WTMP-LOG-CAPS">ZVT_TERM_DO_WTMP_LOG</link>
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="zvt-term-new">zvt_term_new</link>                    (void);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="zvt-term-new-with-size">zvt_term_new_with_size</link>          (int cols,
+                                             int rows);
+void        <link linkend="zvt-term-feed">zvt_term_feed</link>                   (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             char *text,
+                                             int len);
+int         <link linkend="zvt-term-forkpty">zvt_term_forkpty</link>                (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int do_uwtmp_log);
+int         <link linkend="zvt-term-closepty">zvt_term_closepty</link>               (<link linkend="ZvtTerm">ZvtTerm</link> *term);
+int         <link linkend="zvt-term-killchild">zvt_term_killchild</link>              (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int signal);
+void        <link linkend="zvt-term-bell">zvt_term_bell</link>                   (void *zvt_term);
+<link linkend="guint">guint</link>       <link linkend="zvt-term-get-type">zvt_term_get_type</link>               (void);
+void        <link linkend="zvt-term-set-scrollback">zvt_term_set_scrollback</link>         (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int lines);
+char*       <link linkend="zvt-term-get-buffer">zvt_term_get_buffer</link>             (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int *len,
+                                             int type,
+                                             int sx,
+                                             int sy,
+                                             int ex,
+                                             int ey);
+void        <link linkend="zvt-term-set-font-name">zvt_term_set_font_name</link>          (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             char *name);
+void        <link linkend="zvt-term-set-fonts">zvt_term_set_fonts</link>              (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             <link linkend="GdkFont">GdkFont</link> *font,
+                                             <link linkend="GdkFont">GdkFont</link> *font_bold);
+void        <link linkend="zvt-term-hide-pointer">zvt_term_hide_pointer</link>           (<link linkend="ZvtTerm">ZvtTerm</link> *term);
+void        <link linkend="zvt-term-show-pointer">zvt_term_show_pointer</link>           (<link linkend="ZvtTerm">ZvtTerm</link> *term);
+void        <link linkend="zvt-term-set-bell">zvt_term_set_bell</link>               (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);
+<link linkend="gboolean">gboolean</link>    <link linkend="zvt-term-get-bell">zvt_term_get_bell</link>               (<link linkend="ZvtTerm">ZvtTerm</link> *term);
+void        <link linkend="zvt-term-set-blink">zvt_term_set_blink</link>              (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);
+void        <link linkend="zvt-term-set-scroll-on-keystroke">zvt_term_set_scroll_on_keystroke</link>
+                                            (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);
+void        <link linkend="zvt-term-set-scroll-on-output">zvt_term_set_scroll_on_output</link>   (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);
+void        <link linkend="zvt-term-set-color-scheme">zvt_term_set_color_scheme</link>       (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             <link linkend="gushort">gushort</link> *red,
+                                             <link linkend="gushort">gushort</link> *grn,
+                                             <link linkend="gushort">gushort</link> *blu);
+void        <link linkend="zvt-term-set-default-color-scheme">zvt_term_set_default_color_scheme</link>
+                                            (<link linkend="ZvtTerm">ZvtTerm</link> *term);
+void        <link linkend="zvt-term-set-del-key-swap">zvt_term_set_del_key_swap</link>       (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);
+void        <link linkend="zvt-term-set-wordclass">zvt_term_set_wordclass</link>          (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             unsigned char *klass);
+void        <link linkend="zvt-term-set-background">zvt_term_set_background</link>         (<link linkend="ZvtTerm">ZvtTerm</link> *terminal,
+                                             char *pixmap_file,
+                                             int transparent,
+                                             int flags);
+void        <link linkend="zvt-term-set-shadow-type">zvt_term_set_shadow_type</link>        (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             <link linkend="GtkShadowType">GtkShadowType</link> type);
+void        <link linkend="zvt-term-set-size">zvt_term_set_size</link>               (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);
+<link linkend="guint32">guint32</link>     <link linkend="zvt-term-get-capabilities">zvt_term_get_capabilities</link>       (<link linkend="ZvtTerm">ZvtTerm</link> *term);
+<link linkend="GtkAdjustment">GtkAdjustment</link>* <link linkend="zvt-term-get-adjustment">zvt_term_get_adjustment</link>      (<link linkend="ZvtTerm">ZvtTerm</link> *terminal);
+void        <link linkend="zvk-term-set-adjustment">zvk_term_set_adjustment</link>         (<link linkend="ZvtTerm">ZvtTerm</link> *dial,
+                                             <link linkend="GtkAdjustment">GtkAdjustment</link> *adjustment);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+Here is the API decription of the Zvt Widget.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="ZVT-TERM-CAPS">ZVT_TERM()</title>
+<programlisting>#define ZVT_TERM(obj)          GTK_CHECK_CAST (obj, zvt_term_get_type (), ZvtTerm)
+</programlisting>
+<para>
+Casts the <parameter>obj</parameter> GtkObject into a ZvtTerm object class.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>obj</parameter>&nbsp;:</entry>
+<entry>A GtkObject
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ZVT-TERM-CLASS-CAPS">ZVT_TERM_CLASS()</title>
+<programlisting>#define ZVT_TERM_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, zvt_term_get_type (), ZvtTermClass)
+</programlisting>
+<para>
+Casts the <parameter>klass</parameter> GtkObjectClass into a ZvtTermClass class.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>klass</parameter>&nbsp;:</entry>
+<entry>A GtkClass
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ZVT-IS-TERM-CAPS">ZVT_IS_TERM()</title>
+<programlisting>#define ZVT_IS_TERM(obj)       GTK_CHECK_TYPE (obj, zvt_term_get_type ())
+</programlisting>
+<para>
+Returns TRUE if the <parameter>obj</parameter> argument is a GtkObject of type ZvtTerm.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>obj</parameter>&nbsp;:</entry>
+<entry>A Gtk Object.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ZvtTerm-struct">struct ZvtTerm</title>
+<programlisting>struct ZvtTerm;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="ZvtTermClass">struct ZvtTermClass</title>
+<programlisting>struct ZvtTermClass
+{
+  GtkWidgetClass parent_class;
+
+  void (* child_died) (ZvtTerm *term);    
+  void (* title_changed) (ZvtTerm *term, VTTITLE_TYPE type, char *newtitle);
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="ZVT-TERM-DO-UTMP-LOG-CAPS">ZVT_TERM_DO_UTMP_LOG</title>
+<programlisting>#define ZVT_TERM_DO_UTMP_LOG 1
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="ZVT-TERM-DO-WTMP-LOG-CAPS">ZVT_TERM_DO_WTMP_LOG</title>
+<programlisting>#define ZVT_TERM_DO_WTMP_LOG 2
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-new">zvt_term_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  zvt_term_new                    (void);</programlisting>
+<para>
+Creates a new ZVT Terminal widget.  By default the terminal will be
+setup as 80 colmns x 24 rows, but it will size automatically to its
+encompassing widget, and may be smaller or larger upon realisation.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A pointer to a &amp;ZvtTerm widget is returned, or <literal>NULL</literal>
+on error.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-new-with-size">zvt_term_new_with_size ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  zvt_term_new_with_size          (int cols,
+                                             int rows);</programlisting>
+<para>
+Creates a new ZVT Terminal widget of the given character dimentions.
+If the encompassing widget is resizable, then this size may change
+afterwards, but should be correct at realisation time.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cols</parameter>&nbsp;:</entry>
+<entry> Number of columns required.
+</entry></row>
+<row><entry align="right"><parameter>rows</parameter>&nbsp;:</entry>
+<entry> Number of rows required.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A pointer to a &amp;ZvtTerm widget is returned, or <literal>NULL</literal>
+on error.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-feed">zvt_term_feed ()</title>
+<programlisting>void        zvt_term_feed                   (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             char *text,
+                                             int len);</programlisting>
+<para>
+This makes the terminal emulator process the stream of
+characters in <parameter>text</parameter> for <parameter>len</parameter> bytes.  The text is interpreted
+by the terminal emulator as if it were generated by a child
+process.
+</para>
+<para>
+This is used by code that needs a terminal emulator, but
+does not use a child process.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>text</parameter>&nbsp;:</entry>
+<entry> The text to feed.
+</entry></row>
+<row><entry align="right"><parameter>len</parameter>&nbsp;:</entry>
+<entry>  The text length.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-forkpty">zvt_term_forkpty ()</title>
+<programlisting>int         zvt_term_forkpty                (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int do_uwtmp_log);</programlisting>
+<para>
+Fork a child process, with a master controlling terminal.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>do_uwtmp_log</parameter>&nbsp;:</entry>
+<entry> If <literal>TRUE</literal>, then log the session in wtmp(4) and utmp(4).
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-closepty">zvt_term_closepty ()</title>
+<programlisting>int         zvt_term_closepty               (<link linkend="ZvtTerm">ZvtTerm</link> *term);</programlisting>
+<para>
+Close master pty to the child process.  It is upto the child to
+recognise its pty has been closed, and to exit appropriately.
+</para>
+<para>
+Note that a child process must have first been started using
+<link linkend="zvt-term-forkpty">zvt_term_forkpty</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> See close(2).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-killchild">zvt_term_killchild ()</title>
+<programlisting>int         zvt_term_killchild              (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int signal);</programlisting>
+<para>
+Send the signal <parameter>signal</parameter> to the child process.  Note that a child
+process must have first been started using <link linkend="zvt-term-forkpty">zvt_term_forkpty</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>signal</parameter>&nbsp;:</entry>
+<entry> A signal number.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> See kill(2).
+See Also: signal(5).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-bell">zvt_term_bell ()</title>
+<programlisting>void        zvt_term_bell                   (void *zvt_term);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>zvt_term</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-get-type">zvt_term_get_type ()</title>
+<programlisting><link linkend="guint">guint</link>       zvt_term_get_type               (void);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-scrollback">zvt_term_set_scrollback ()</title>
+<programlisting>void        zvt_term_set_scrollback         (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int lines);</programlisting>
+<para>
+Set the maximum number of scrollback lines for the widget <parameter>term</parameter> to
+<parameter>lines</parameter> lines.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>lines</parameter>&nbsp;:</entry>
+<entry> Number of lines desired for the scrollback buffer.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-get-buffer">zvt_term_get_buffer ()</title>
+<programlisting>char*       zvt_term_get_buffer             (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int *len,
+                                             int type,
+                                             int sx,
+                                             int sy,
+                                             int ex,
+                                             int ey);</programlisting>
+<para>
+Convert the buffer memory into a contiguous array which may be
+saved or processed.  Note that this is not gauranteed to match the
+order of characters processed by the terminal, only the order in
+which they were displayed.  Tabs will normally be preserved in
+the output.
+</para>
+<para>
+All inputs are range-checked first, so it is possible to fudge
+a full buffer grab.
+</para>
+<para>
+Examples:
+ data = zvt_term_get_buffer(term, NULL, VT_SELTYPE_LINE,
+      -term-&gt;vx-&gt;vt.scrollbackmax, 0,
+       term-&gt;vx-&gt;vt.height, 0);
+ or, as a rule -
+ data = zvt_term_get_buffer(term, NULL, VT_SELTYPE_LINE,
+      -10000, 0, 10000, 0);
+</para>
+<para>
+Will return the contents of the entire scrollback and on-screen
+buffers, remembering that all inputs are range-checked first.
+</para>
+<para>
+ data = zvt_term_get_buffer(term, NULL, VT_SELTYPE_CHAR,
+      0, 0, 5, 10);
+</para>
+<para>
+Will return the first 5 lines of the visible screen, and the 6th
+line upto column 10.
+</para>
+<para>
+Return value: A pointer to a <literal>NUL</literal> terminated buffer containing the
+raw text from the buffer.  If memory could not be allocated, then</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> Valid &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>len</parameter>&nbsp;:</entry>
+<entry> Placeholder to store the length of text selected.  May be
+      <literal>NULL</literal> in which case the value is not returned.
+</entry></row>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> Type of selection.  <literal>VT_SELTYPE_LINE</literal>, select by line,
+      <literal>VT_SELTYPE_WORD</literal>, select by word, or <literal>VT_SELTYPE_CHAR</literal>, select
+      by character.
+</entry></row>
+<row><entry align="right"><parameter>sx</parameter>&nbsp;:</entry>
+<entry> Start of selection, horizontal.
+</entry></row>
+<row><entry align="right"><parameter>sy</parameter>&nbsp;:</entry>
+<entry> Start of selection, vertical.  0 is the top of the visible
+     screen, &lt;0 is scrollback lines, &gt;0 is visible lines (upto the
+     height of the window).
+</entry></row>
+<row><entry align="right"><parameter>ex</parameter>&nbsp;:</entry>
+<entry> End of selection, horizontal.
+</entry></row>
+<row><entry align="right"><parameter>ey</parameter>&nbsp;:</entry>
+<entry> End of selection, vertical, as above.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>NULL</literal>.  Note that it is upto the caller to free the memory,
+using g_free(3c).  If <parameter>len</parameter> was supplied, then the length of data is
+stored there.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-font-name">zvt_term_set_font_name ()</title>
+<programlisting>void        zvt_term_set_font_name          (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             char *name);</programlisting>
+<para>
+Set a font by name only.  If font aliases such as 'fixed' or
+'10x20' are passed to this function, then both the bold and
+non-bold font will be identical.  In colour mode bold fonts are
+always the top 8 colour scheme entries, and so bold is still
+rendered.
+</para>
+<para>
+Tries to calculate bold font name from the base name.  This only
+works with fonts where the names are alike.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> A full X11 font name string.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-fonts">zvt_term_set_fonts ()</title>
+<programlisting>void        zvt_term_set_fonts              (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             <link linkend="GdkFont">GdkFont</link> *font,
+                                             <link linkend="GdkFont">GdkFont</link> *font_bold);</programlisting>
+<para>
+Load a set of fonts into the terminal.
+</para>
+<para>
+These fonts should be the same size, otherwise it could get messy ...</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>font</parameter>&nbsp;:</entry>
+<entry> Font used for regular text.
+</entry></row>
+<row><entry align="right"><parameter>font_bold</parameter>&nbsp;:</entry>
+<entry> Font used for bold text.  May be null, in which case the bold
+font is rendered by over-striking.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-hide-pointer">zvt_term_hide_pointer ()</title>
+<programlisting>void        zvt_term_hide_pointer           (<link linkend="ZvtTerm">ZvtTerm</link> *term);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-show-pointer">zvt_term_show_pointer ()</title>
+<programlisting>void        zvt_term_show_pointer           (<link linkend="ZvtTerm">ZvtTerm</link> *term);</programlisting>
+<para>
+Hide the pointer.  In reality the pointer is changed to a
+single-pixel black dot.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-bell">zvt_term_set_bell ()</title>
+<programlisting>void        zvt_term_set_bell               (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);</programlisting>
+<para>
+Enable or disable the terminal bell.  If <parameter>state</parameter> is <literal>TRUE</literal>, then the
+bell is enabled.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>state</parameter>&nbsp;:</entry>
+<entry> New bell state.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-get-bell">zvt_term_get_bell ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    zvt_term_get_bell               (<link linkend="ZvtTerm">ZvtTerm</link> *term);</programlisting>
+<para>
+get the terminal bell state.  If the bell on then <literal>TRUE</literal> is
+returned, otherwise <literal>FALSE</literal>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-blink">zvt_term_set_blink ()</title>
+<programlisting>void        zvt_term_set_blink              (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);</programlisting>
+<para>
+Use this to control the way the cursor is displayed (blinking/solid)</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>state</parameter>&nbsp;:</entry>
+<entry> The blinking state.  If <literal>TRUE</literal>, the cursor will blink.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-scroll-on-keystroke">zvt_term_set_scroll_on_keystroke ()</title>
+<programlisting>void        zvt_term_set_scroll_on_keystroke
+                                            (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);</programlisting>
+<para>
+If <parameter>state</parameter> is <literal>TRUE</literal>, forces the terminal to jump out of the
+scrollback buffer whenever a keypress is received.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>state</parameter>&nbsp;:</entry>
+<entry> Desired state.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-scroll-on-output">zvt_term_set_scroll_on_output ()</title>
+<programlisting>void        zvt_term_set_scroll_on_output   (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);</programlisting>
+<para>
+If <parameter>state</parameter> is <literal>TRUE</literal>, forces the terminal to scroll on output
+being generated by a child process or by <link linkend="zvt-term-feed">zvt_term_feed</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>state</parameter>&nbsp;:</entry>
+<entry> Desired state.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-color-scheme">zvt_term_set_color_scheme ()</title>
+<programlisting>void        zvt_term_set_color_scheme       (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             <link linkend="gushort">gushort</link> *red,
+                                             <link linkend="gushort">gushort</link> *grn,
+                                             <link linkend="gushort">gushort</link> *blu);</programlisting>
+<para>
+This function sets the colour palette for the terminal <parameter>term</parameter>.  Each
+pointer points to a gushort array of 18 elements.  White is 0xffff
+in all elements.
+</para>
+<para>
+The elements 0 trough 15 are the first 16 colours for the terminal,
+with element 16 and 17 the default foreground and background colour
+respectively.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>red</parameter>&nbsp;:</entry>
+<entry>  pointer to a gushort array of 18 elements with red values.
+</entry></row>
+<row><entry align="right"><parameter>grn</parameter>&nbsp;:</entry>
+<entry>  pointer to a gushort array of 18 elements with green values.
+</entry></row>
+<row><entry align="right"><parameter>blu</parameter>&nbsp;:</entry>
+<entry>  pointer to a gushort array of 18 elements with blue values.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-default-color-scheme">zvt_term_set_default_color_scheme ()</title>
+<programlisting>void        zvt_term_set_default_color_scheme
+                                            (<link linkend="ZvtTerm">ZvtTerm</link> *term);</programlisting>
+<para>
+Resets the color values to the default color scheme.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-del-key-swap">zvt_term_set_del_key_swap ()</title>
+<programlisting>void        zvt_term_set_del_key_swap       (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             int state);</programlisting>
+<para>
+Sets the mode for interpreting the DEL and Backspace keys.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry>   A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>state</parameter>&nbsp;:</entry>
+<entry>  If true it swaps the del/backspace definitions
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-wordclass">zvt_term_set_wordclass ()</title>
+<programlisting>void        zvt_term_set_wordclass          (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             unsigned char *klass);</programlisting>
+<para>
+Sets the list of characters (character class) that are considered
+part of a word, when selecting by word.  The <parameter>class</parameter> is defined
+the same was as a regular expression character class (as normally
+defined using []'s, but without those included).  A leading or trailing
+hypen (-) is used to include a hyphen in the character class.
+</para>
+<para>
+Passing a <literal>NULL</literal> <parameter>class</parameter> restores the default behaviour of alphanumerics
+plus "_"  (i.e. "A-Za-z0-9_").</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>klass</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-background">zvt_term_set_background ()</title>
+<programlisting>void        zvt_term_set_background         (<link linkend="ZvtTerm">ZvtTerm</link> *terminal,
+                                             char *pixmap_file,
+                                             int transparent,
+                                             int flags);</programlisting>
+<para>
+Sets the background of the <parameter>terminal</parameter>.  If <parameter>pixmap_file</parameter> and
+<parameter>transparent</parameter> are <literal>NULL</literal> and <literal>FALSE</literal>, then a standard filled background
+is set.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>terminal</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>pixmap_file</parameter>&nbsp;:</entry>
+<entry> file containing the pixmap image
+</entry></row>
+<row><entry align="right"><parameter>transparent</parameter>&nbsp;:</entry>
+<entry> true if we want to run in transparent mode
+</entry></row>
+<row><entry align="right"><parameter>shaded</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-shadow-type">zvt_term_set_shadow_type ()</title>
+<programlisting>void        zvt_term_set_shadow_type        (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             <link linkend="GtkShadowType">GtkShadowType</link> type);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-set-size">zvt_term_set_size ()</title>
+<programlisting>void        zvt_term_set_size               (<link linkend="ZvtTerm">ZvtTerm</link> *term,
+                                             <link linkend="guint">guint</link> width,
+                                             <link linkend="guint">guint</link> height);</programlisting>
+<para>
+Causes the terminal to attempt to resize to the absolute character
+size of <parameter>width</parameter> rows by <parameter>height</parameter> columns.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><parameter>width</parameter>&nbsp;:</entry>
+<entry> Width of terminal, in columns.
+</entry></row>
+<row><entry align="right"><parameter>height</parameter>&nbsp;:</entry>
+<entry> Height of terminal, in rows.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-get-capabilities">zvt_term_get_capabilities ()</title>
+<programlisting><link linkend="guint32">guint32</link>     zvt_term_get_capabilities       (<link linkend="ZvtTerm">ZvtTerm</link> *term);</programlisting>
+<para>
+Gets the compiled in capabilities of the terminal widget.
+</para>
+<para>
+<literal>ZVT_TERM_PIXMAP_SUPPORT</literal>; Pixmaps can be loaded into the background
+using the background setting function.
+</para>
+<para>
+<literal>ZVT_TERM_PIXMAPSCROLL_SUPPORT</literal>; The background scrolling flag of the
+background setting function is honoured.
+</para>
+<para>
+<literal>ZVT_TERM_EMBOLDEN_SUPPORT</literal>; Bold fonts are autogenerated, and can
+be requested by setting the bold_font of the font setting function
+to NULL.
+</para>
+<para>
+<literal>ZVT_TERM_MATCH_SUPPORT</literal>; The <link linkend="zvt-term-add-match">zvt_term_add_match</link>() functions exist,
+and can be used to receive the match_clicked signal when the user
+clicks on matching text.
+</para>
+<para>
+<literal>ZVT_TERM_TRANSPARENCY_SUPPORT</literal>; A transparent background can be
+requested on the current display.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>term</parameter>&nbsp;:</entry>
+<entry> A &amp;ZvtTerm widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a bitmask of the capabilities
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvt-term-get-adjustment">zvt_term_get_adjustment ()</title>
+<programlisting><link linkend="GtkAdjustment">GtkAdjustment</link>* zvt_term_get_adjustment      (<link linkend="ZvtTerm">ZvtTerm</link> *terminal);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>terminal</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="zvk-term-set-adjustment">zvk_term_set_adjustment ()</title>
+<programlisting>void        zvk_term_set_adjustment         (<link linkend="ZvtTerm">ZvtTerm</link> *dial,
+                                             <link linkend="GtkAdjustment">GtkAdjustment</link> *adjustment);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dial</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>adjustment</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

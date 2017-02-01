@@ -1,0 +1,27 @@
+#! /bin/sh
+
+prefix=@prefix@
+localstatedir=@localstatedir@
+
+usage()
+{
+    cat <<EOF
+Usage: scrollkeeper-get-toc-from-id <DOCID>
+EOF
+
+    exit $1
+}
+
+if test $# -ne 1; then
+    usage 1
+fi
+
+scrollkeeper_dir=`scrollkeeper-config --pkglocalstatedir`
+
+if test -f $scrollkeeper_dir/TOC/$1; then
+    echo $scrollkeeper_dir/TOC/$1
+else
+    echo No Table of Contents for id $1!!!
+fi
+
+exit 0

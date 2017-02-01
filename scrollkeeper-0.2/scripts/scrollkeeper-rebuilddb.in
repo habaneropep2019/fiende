@@ -1,0 +1,56 @@
+#! /bin/sh
+
+prefix=@prefix@
+localstatedir=@localstatedir@
+
+usage()
+{
+    cat <<EOF
+Usage: scrollkeeper-rebuilddb [-v] [-p <SCROLLKEEPER_DB_DIR>] 
+EOF
+
+    exit $1
+}
+
+if test $# -ne 0 -a $# -ne 1 -a $# -ne 2 -a $# -ne 3; then
+        usage 1
+fi
+
+if test $# -eq 0; then # no flag
+    scrollkeeper_db_dir=`scrollkeeper-config --pkglocalstatedir`
+    verbose=""
+else
+    if test $# -eq 1; then # -v flag
+	if test $1 != "-v"; then
+	    usage 1
+	fi	
+	scrollkeeper_db_dir=`scrollkeeper-config --pkglocalstatedir`
+	verbose="-v"
+    fi
+    if test $# -eq 2; then # -p flag
+	if test $1 != "-p"; then
+            usage 1
+        fi
+	scrollkeeper_db_dir=$2
+	verbose=""
+    fi
+    if test $# -eq 3; then # -p and -v flag
+	if test $1 = "-v" -a $2 = "-p"; then 
+	    scrollkeeper_db_dir=$3
+	    verbose="-v"
+	else
+	    if test $1 = "-p" -a $3 = "-v"; then
+		scrollkeeper_db_dir=$2
+                verbose="-v"
+	    else
+	    	usage 1
+	    fi
+	fi
+    fi
+fi
+
+rm -rf $scrollkeeper_db_dir/*
+
+scrollkeeper-update $verbose -p $scrollkeeper_db_dir
+
+exit 0

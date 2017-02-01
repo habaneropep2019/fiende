@@ -1,0 +1,97 @@
+<refentry id="libglade-Libglade-Initialisation">
+<refmeta>
+<refentrytitle>Libglade Initialisation</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBGLADE Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Libglade Initialisation</refname><refpurpose>Routines used to initialise libglade.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;glade/glade.h&gt;
+
+
+void        <link linkend="glade-init">glade_init</link>                      (void);
+void        <link linkend="glade-gnome-init">glade_gnome_init</link>                (void);
+void        <link linkend="glade-load-module">glade_load_module</link>               (const char *module);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+These routines are used to initialise libglade, and to load addon modules
+that recognise extra widget sets.  The <filename>glade_init</filename>
+routine must be called before any libglade routines are used, and the
+<filename>glade_load_module</filename> routine would be used to load
+extra modules.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="glade-init">glade_init ()</title>
+<programlisting>void        glade_init                      (void);</programlisting>
+<para>
+Should be called before creating any GladeXML objects.  Currently all it
+does is register all the widget building routines, so they can be found
+by widget name.  In the future it may do some more initialisation work.</para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="glade-gnome-init">glade_gnome_init ()</title>
+<programlisting>void        glade_gnome_init                (void);</programlisting>
+<para>
+This function performs initialisation of glade, similar to what glade_init
+does (in fact it calls glade_init for you).  The difference is that it
+also initialises the GNOME widget building routines.
+</para>
+<para>
+As well as calling this initialisation function, GNOME programs should
+also link with the libglade-gnome library, which contains all the
+GNOME libglade stuff.</para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="glade-load-module">glade_load_module ()</title>
+<programlisting>void        glade_load_module               (const char *module);</programlisting>
+<para>
+This routine loads the shared library <parameter>module</parameter>, and calls the function
+glade_init_module.  If the file doesn't exist, or it doesn't contain
+a glade_init_module function, the loading fails.  The idea of this
+function is to allow new widget building routines to be loaded into
+libglade at runtime.
+</para>
+<para>
+This would be a lot more useful if special tags in the XML file could
+trigger the loading of modules.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>module</parameter>&nbsp;:</entry>
+<entry> the shared library.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

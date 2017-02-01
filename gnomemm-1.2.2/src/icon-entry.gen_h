@@ -1,0 +1,90 @@
+/* $Id: icon-entry.gen_h,v 1.5 2000/08/30 18:13:36 kenelson Exp $ */
+
+
+/* icon-entry.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <libgnomeui/gnome-icon-entry.h>
+#include <gnome--/file-entry.h>
+#include <gnome--/entry.h>
+#include <gtk--/entry.h>
+
+
+CLASS_START(Gnome);
+
+class IconEntry : public Gtk::VBox
+{
+  WRAP_CLASS(IconEntry, GnomeIconEntry,
+             GNOME_ICON_ENTRY, GNOME_IS_ICON_ENTRY,
+             icon_entry,
+             Gtk::VBox, GtkVBox, GTK_VBOX);
+public:
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  IconEntry(const Gtk::string &history_id,
+		  const Gtk::string &browse_dialog_title);
+
+  WRAP_METHOD(void gnome_icon_entry_set_pixmap_subdir(GnomeIconEntry*, const gchar*),
+	      void set_pixmap_subdir(const Gtk::string &subdir));
+
+  WRAP_METHOD(void gnome_icon_entry_set_icon(GnomeIconEntry*, const gchar*),
+	      void set_icon(const Gtk::string &filename));
+
+  WRAP_METHOD(gchar* gnome_icon_entry_get_filename(GnomeIconEntry*),
+	      Gtk::string get_filename());
+
+  Gnome::Entry* gnome_entry();
+  Gtk::Entry* gtk_entry();
+  Gnome::FileEntry* gnome_file_entry();
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+#include <gnome--/private/icon-entry_p.h>
+
+namespace Gnome {
+
+Gnome::Entry*
+IconEntry::gnome_entry()
+{
+  return Gtk::wrap(GNOME_ENTRY(gnome_icon_entry_gnome_entry(gtkobj())));
+}
+
+Gnome::FileEntry*
+IconEntry::gnome_file_entry()
+{
+  return Gtk::wrap(GNOME_FILE_ENTRY(gnome_icon_entry_gnome_file_entry(gtkobj())));
+}
+
+Gtk::Entry*
+IconEntry::gtk_entry()
+{
+  return Gtk::wrap(GTK_ENTRY(gnome_icon_entry_gtk_entry(gtkobj())));
+}
+
+} /* namespace Gnome */
+
+DOCUMENTATION_START;
+

@@ -1,0 +1,25 @@
+SHELL = @SHELL@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ 
+CXXFLAGS = @CXXFLAGS@
+CXX = @CXX@
+CXXLD = @CXX@
+GTKMM_CFLAGS = @GTKMM_CFLAGS@
+GTKMM_LIBS = @GTKMM_LIBS@
+GNOME_CFLAGS = @GNOME_INCLUDEDIR@
+GNOME_LIBS = @GNOMEUI_LIBS@ @GNOME_LIBDIR@
+LIBTOOL = @LIBTOOL@
+GNOMEMM_LIB = ../../src/gnome--/libgnomemm.la
+top_builddir = ../..
+
+LIBS = $(GNOMEMM_LIB) $(GTKMM_LIBS) $(GNOME_LIBS) 
+INCLUDES = -I ../.. -I . -I ../../gdk-- -I ../../src $(CXX_FLAGS) $(GTKMM_CFLAGS) $(GNOME_CFLAGS)
+
+CXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(INCLUDES) -c $<
+CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(CXXFLAGS) $(LDFLAGS) -o $@ 
+
+# compile and link for simple files
+CXXBUILD =  \
+        $(CXXCOMPILE) ; \
+        $(CXXLINK) $@.lo $(LIBS)
+

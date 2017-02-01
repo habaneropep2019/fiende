@@ -1,0 +1,264 @@
+Sun Aug 12 22:36:59 2001  George Lebl <jirka@5z.com>
+
+	* gdiskfree_options.c: minor cleanup
+
+Sun Aug 12 13:27:02 2001  George Lebl <jirka@5z.com>
+
+	* gdiskfree_options.c:  Fix initialization of the excludes list to
+	  NULL to avoid segv
+
+2001-08-12  Gregory McLean <gregm@gxsnmp.org>
+	* gdiskfree_options.c/h : Move the excluded filesystems list 
+	to the application's option structure for the upcomming user
+	configurable exclude fs stuff.
+	* gdiskfree.c : switch to use the app config structure for the 
+	excluded filesystems.
+        Need to figure out how to write a list using the gnome_config<blah>
+ 	stuff..
+
+2001-08-10  Matthias Warkus  <mawarkus@gnome.org>
+
+	* *.png: Icon and splash logo by Timothy Musson
+	<trmusson@ihug.co.nz> added, with permission of the maintainer.
+	
+	* Makefile.am: Install pixmaps.
+
+	* gdiskfree.desktop: Use new icon.
+	
+	* gdiskfree_menus.c: Use splash pixmap.
+	
+
+2001-08-08  Abel Cheung  <maddog@linux.org.hk>
+
+	* \*.desktop: Added zh_TW.Big5 (traditional Chinese) strings.
+
+Wed Jun 06 16:22:15 2001  George Lebl <jirka@5z.com>
+
+	* gdiskfree_app.c: When percentage is over 100% just trim to 100%.
+	  You can't show more then 100% with gtk-dial anyhow.  Use current
+	  options rather then always reading from config since that's the
+	  only way the defaults will work.  When the stored location is off
+	  screen make sure at least 50 pixels are showing on screen.  Also
+	  allow saving at 0,0 location, this should really be done by the
+	  session manager.
+
+	* gdiskfree.c: don't crash on VERY large disks (currently over
+	  1000Tb) and it fixes a warning as well.
+
+	* gdiskfree_options.c: make show_mount and show_size default to on,
+	  since most users will have NO clue about the mount point and size
+	  and that's the important information we care about.  Also sanitize
+	  things.  Make the lowest update time 300, since that's basically
+	  about the lowest useful time where the CPU isn't hogged.
+
+2001-06-06  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gdiskfree.c (main): Use "gdiskfree" instead of PACKAGE in
+	gnome_init_with_popt_table(). Also exclude "usbdevfs".
+	
+2001-06-05  Christian Rose  <menthos@menthos.com>
+
+	* gdiskfree.desktop: Modified sv translation.
+
+2001-06-03 Gregory McLean <gregm@gxsnmp.org>
+
+	* gdiskfree_app.c - gdiskfree_app_change_orient, added some code
+	to fix one of my personal annoyances, now when we change orientation
+	of the app we re-size the window like it should have all along.
+        Plus the user can still re-size the window as he/she sees fit. The
+	magical resize is only triggered on oreintation change (and probably
+	on drive add/remove but thats later)
+
+2001-06-01 John Fleck <jfleck@inkstain.net>
+
+	* gdiskfree_options.c - link help into help button on preferences
+	dialog - fixes bugzilla #16631 
+
+2001-03-04 John Fleck <jfleck@inkstain.net>
+
+	* gdiskfree/doc/es/gdiskfree-es.omf - omf file category needs to
+	be in Spanish.
+	
+
+2001-02-20 John Fleck <jfleck@inkstain.net>
+
+	* updating doc/C/gdiskfree.sgml, it/gdiskfree.sgml and
+	es/gdiskfree.sgml for 1.4 release
+	
+2001-02-02 John Fleck <jfleck@inkstain.net>
+
+	* updated doc/es/Makefile.am to fix build error
+
+2001-01-02 John Fleck <jfleck@inkstian.net>
+
+	* updated doc/it/Makefile.am and doc/es/Makefile.am so our
+	translators' fine work gets properly installed so the Nautilus
+	help browser can read it.
+	
+2000-11-19 John Fleck <jfleck@inkstain.net>
+	
+	* updated doc/C/Makefile.am, doc/es/Makefile.am to install sgml 
+	in help directory
+
+2000-11-12 John Fleck <jfleck@inkstain.net>
+	* doc/C/gdiskfree.sgml - further updates for Nautilus help browser
+
+2000-11-08  Gediminas Paulauskas  <menesis@delfi.lt>
+
+	* gdiskfree_menus.c: Change Preferences menu item to default.
+	
+2000-09-16 John Fleck <jfleck@inkstain.net>
+
+	* doc/C/gdiskfree.sgml: updated for new Nautilus browser
+
+2000-07-19  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gdiskfree.c: Added function-prototype to get rid of compiler
+	warning.
+	
+2000-07-06 John Fleck <jfleck@inkstain.net> 
+	* updating doc/es/Makefile.am, doc/es/gdiskfree.sgml and adding
+	png's so the Spanish docs will build
+
+2000-06-22 John Fleck <jfleck@inkstain.net>
+
+	* updating gdiskfree/doc/C/gdiskfree.sgml in response to Chema's
+	changes, also took png's out of images/ directory, as this was
+	fouling up consistency in the makefiles
+	* updating gdiskfree/doc/C/Makefile.am to fix typo, and to create
+	stylesheet-images directory in the make-install
+
+2000-06-10  Chema Celorio  <chema@celorio.com>
+
+	* gdiskfree_options.h: add show_size
+
+	* gdiskfree_options.c: add show_size
+
+	* gdiskfree.c (main): add a size to disks (i.e. "20.1 Gb")
+	(gdiskfree_convert_size): new fucntion, converts a size in
+	unsigned long type to a string like "10b","13 Mb", "20 Gb" ...
+
+	* gdiskfree_app.c (gdiskfree_app_add_disk): create size label
+	and add a parameter [ const gchar *disk_size ]
+
+	* gdiskfree_app.h (gdiskfree_update): rename label --> mount_label
+	and add size_label
+
+	* gdiskfree.c (save_session): Fix a bug in which the labels
+	of the disk will show upon startup regardless of the preference settings
+
+2000-05-13 John Fleck <jfleck@inkstain.net>
+
+	* fixed dtd <warning> problem
+
+2000-05-12  James M. Cape  <jcape@jcinteractive.com>
+
+	* gdiskfree_app.c: Changed spacings to be 6px around the v/hbox the
+	frames are in, 8px between the frames, and 6px around the frame
+	contents (the dial & label).
+
+2000-05-13  Andreas Hyden  <a.hyden@cyberpoint.se>
+
+	* gdiskfree.desktop: Added Swedish translation.
+
+2000-04-25 John Fleck <jfleck@inkstain.net>
+
+	* updated dtd and version in gdiskfree.sgml
+
+2000-04-22  Fatih Demir	<kabalak@gmx.net>
+
+	* gdiskfree.desktop : Added [tr] .
+
+2000-04-20 John Fleck <jfleck@inkstain.net>
+
+	* updated /doc/C/Makefile.am to correctly handle
+	stylesheet gifs
+
+2000-04-10  Valek Filippov <frob@df.ru>
+
+	* gdiskfree.c: Typo fixed.
+
+Sat Apr  8 11:47:20 EDT 2000 Gregory McLean <gregm@comstar.net>
+
+	* gdiskfree.c, gdiskfree_options.c, gdiskfree_app.c: warning
+	free compilation now.
+
+Sun Mar 12 09:01:15 EST 2000 Gregory McLean <gregm@comstar.net>
+
+	* doc/C/gdiskfree.sgml -- Updated docs from John Fleck.
+
+2000-03-08  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* gdiskfree.c, gdiskfree_options.c, gdiskfree_app.c: fixed
+	updating and config stuff. it was really ugly before.
+	* doc/C/Makefile.am: fixed to work. perhaps it didn't work
+	because of my db2html setup?
+
+Sun Mar 05 09:20:00 2000  Gregory McLean <gregm@comstar.net>
+
+  	* gdiskfree_options.c: stop the superious orientation changes.
+
+Fri Feb 25 15:40:37 2000  George Lebl <jirka@5z.com>
+
+	* gdiskfree_app.c: check for divide by zero
+
+Thu Feb 24 16:59:37 EST 2000 Gregory McLean <gregm@comstar.net>
+	
+	* Mount points can be shown below the dial. (user requested
+	feature)
+
+Wed Feb 23 23:48:06 EST 2000 Gregory McLean <gregm@comstar.net>
+
+	* Complete re-write of the app.. Much cleaner now.
+	Now to remove the old dead files.
+
+Wed Feb 16 21:37:22 EST 2000 Gregory McLean <gregm@comstar.net>
+
+	* doc/* : Documentation by John Flex <jfleck@inkstain.net> 
+	added in.
+
+1999-09-26  Martin Baulig  <martin@home-of-linux.org>
+
+	* df.c: Call update_stats () immediately after build_app_window ()
+	so it has the correct values on startup.
+
+1999-09-05  Matthias Warkus  <mawa@iname.com>
+
+	* gnome-diskfree.png: Removed and added to gnome-core in order to
+	have it handy for the diskusage applet.
+
+1999-08-14  Matthias Warkus  <mawa@iname.com>
+
+	* Makefile.am: Installs gnome-diskfree.png.
+	* gdiskfree.desktop: Uses gnome-diskfree.png.
+	* gnome-diskfree.png: Icon by Ben Frantzdale. Added.
+
+1999-01-11  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* df.c: Do not include error.h (include errno instead).  Do not
+	include getopt.h, as we dont even use it.
+
+Wed Jan 06 22:49:41 1999  George Lebl  <jirka@5z.com>
+
+	* df.c: standardized menus with the new app-helper macros
+
+1998-12-19  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
+
+	* xgetcwd.c: added #include <glib.h>
+
+Sun Oct 25 18:48:06 EST 1998 Gregory McLean <gregm@comstar.net>
+
+	* df.c: Cleaned out some dead code, also some minor restructuring
+	so that config options can be implemented.
+	* utils.[ch] : new file for them misc functions that don't fit 
+	elsewhere.
+
+Sun Oct 25 17:03:06 EST 1998 Gregory McLean <gregm@comstar.net>
+
+	* df.c: Fixed the help menu to stop that silly warning.
+
+1998-08-23  Martin Baulig  <martin@home-of-linux.org>
+
+	* fsusage.c, fsusage.h, mountlist.c, mountlist.h: Removed.
+	* df.c: We now use libgtop for the mountlist and fsusage stuff.
+

@@ -1,0 +1,305 @@
+<refentry id="bonobo-bonobo-canvas-component">
+<refmeta>
+<refentrytitle>BonoboCanvasComponent</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboCanvasComponent</refname><refpurpose>Class for exporting BonoboCanvasItems through BonoboEmbeddables to
+other applications.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link>;
+typedef     <link linkend="BonoboCanvasComponentClass">BonoboCanvasComponentClass</link>;
+<link linkend="GnomeCanvas">GnomeCanvas</link>* <link linkend="bonobo-canvas-new">bonobo_canvas_new</link>              (<link linkend="gboolean">gboolean</link> is_aa,
+                                             <link linkend="Bonobo-Canvas-ComponentProxy">Bonobo_Canvas_ComponentProxy</link> proxy);
+<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link>* <link linkend="bonobo-canvas-component-construct">bonobo_canvas_component_construct</link>
+                                            (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp,
+                                             <link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);
+<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link>* <link linkend="bonobo-canvas-component-new">bonobo_canvas_component_new</link>
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);
+<link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* <link linkend="bonobo-canvas-component-get-item">bonobo_canvas_component_get_item</link>
+                                            (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp);
+<link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> <link linkend="bonobo-canvas-component-get-ui-container">bonobo_canvas_component_get_ui_container</link>
+                                            (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp);
+void        <link linkend="bonobo-canvas-component-grab">bonobo_canvas_component_grab</link>    (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp,
+                                             <link linkend="guint">guint</link> mask,
+                                             <link linkend="GdkCursor">GdkCursor</link> *cursor,
+                                             <link linkend="guint32">guint32</link> time);
+void        <link linkend="bonobo-canvas-component-ungrab">bonobo_canvas_component_ungrab</link>  (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp,
+                                             <link linkend="guint32">guint32</link> time);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  The BonoboCanvasComponent objects are used to wrap GnomeCanvasItems
+  and export them to container applications.  Typically the
+  <link linkend="bonobo-component-canvas-new">bonobo_component_canvas_new</link>() function will be invoked in a callback
+  from a BonoboEmbeddable object.
+</para>
+
+<para>
+  Here is an example of how to export Gnome Canvas Items in a simple
+  way.  
+  <example>
+    <title>Wrapping a Gnome Canvas Item</title>
+    <programlisting>
+
+/*
+ * Here is where the GnomeCanvasItem (in this case an ellipse)
+ * is created and wrapped in a BonoboCanvasComponent.
+ *
+ * This function is invoked on demand on the embeddable
+ * argument.  Embeddables are the document model, and the
+ * items returned are the views.  
+ */
+BonoboCanvasComponent *
+my_item_creator (BonoboEmbeddable *embeddable,
+                 GnomeCanvas      *canvas,
+                 void             *data)
+{
+        GnomeCanvasItem *item = gnome_canvas_item_new (
+		gnome_canvas_root (canvas),
+                <link linkend="gnome-canvas-ellipse-get-type">gnome_canvas_ellipse_get_type</link>(),
+                "x1", 5.0,  "y1", 5.0,
+                "x2", 95.0, "y2", 95.0,
+                "fill_color", "white",
+                "outline_color", "black",
+                NULL);
+
+        return bonobo_canvas_component_new (item);
+}
+
+/*
+ * This is a routine that creates a BonoboEmbeddable that
+ * uses CanvasItems.
+ */
+BonoboEmbeddable *make_embeddable (void)
+{
+       return bonobo_embeddable_new_canvas_item (my_item_creator, NULL);
+}
+    </programlisting>
+  </example>
+</para>
+
+<para>
+  Applications that do not use the base <link linkend="BonoboEmbeddable">BonoboEmbeddable</link> class, but
+  use their own types derived from the <link linkend="BonoboEmbeddable">BonoboEmbeddable</link> can use the
+  <link linkend="bonobo-embeddable-construct">bonobo_embeddable_construct</link>() during their construction phase. 
+</para>
+
+<para>
+  On the client side (the application that will embed this component)
+  an object of the type <link linkend="BonoboCanvasItem">BonoboCanvasItem</link> is used.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboCanvasComponent">BonoboCanvasComponent</title>
+<programlisting>typedef struct {
+	BonoboXObject base;
+	BonoboCanvasComponentPrivate *priv;
+} BonoboCanvasComponent;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboCanvasComponentClass">BonoboCanvasComponentClass</title>
+<programlisting>typedef struct {
+	BonoboXObjectClass parent_class;
+	
+	POA_Bonobo_Canvas_Component__epv epv;
+
+	/* Signals */
+	void (*set_bounds) (BonoboCanvasComponent *component,
+			    Bonobo_Canvas_DRect   *bbox,
+			    CORBA_Environment     *ev);
+	
+	gboolean (*event)  (BonoboCanvasComponent *component,
+			    GdkEvent              *event);
+} BonoboCanvasComponentClass;
+</programlisting>
+<para>
+  
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-canvas-new">bonobo_canvas_new ()</title>
+<programlisting><link linkend="GnomeCanvas">GnomeCanvas</link>* bonobo_canvas_new              (<link linkend="gboolean">gboolean</link> is_aa,
+                                             <link linkend="Bonobo-Canvas-ComponentProxy">Bonobo_Canvas_ComponentProxy</link> proxy);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>is_aa</parameter>&nbsp;:</entry>
+<entry> Flag indicating is antialiased canvas is desired
+</entry></row>
+<row><entry align="right"><parameter>proxy</parameter>&nbsp;:</entry>
+<entry> Remote proxy for the component this canvas will support
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A <link linkend="GnomeCanvas">GnomeCanvas</link> with the root replaced by a forwarding item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-canvas-component-construct">bonobo_canvas_component_construct ()</title>
+<programlisting><link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link>* bonobo_canvas_component_construct
+                                            (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp,
+                                             <link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);</programlisting>
+<para>
+Creates a CORBA server for the interface Bonobo::Canvas::Item
+wrapping <parameter>item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>comp</parameter>&nbsp;:</entry>
+<entry> a <link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> to initialize
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeCanvasItem">GnomeCanvasItem</link> that is being exported
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboCanvasComponent.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-canvas-component-new">bonobo_canvas_component_new ()</title>
+<programlisting><link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link>* bonobo_canvas_component_new
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);</programlisting>
+<para>
+Creates a CORBA server for the interface Bonobo::Canvas::Item
+wrapping <parameter>item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A GnomeCanvasItem that is being exported
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboCanvasComponent.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-canvas-component-get-item">bonobo_canvas_component_get_item ()</title>
+<programlisting><link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* bonobo_canvas_component_get_item
+                                            (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>comp</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> object
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The GnomeCanvasItem that this BonoboCanvasComponent proxies
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-canvas-component-get-ui-container">bonobo_canvas_component_get_ui_container ()</title>
+<programlisting><link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> bonobo_canvas_component_get_ui_container
+                                            (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>comp</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> object
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The UI container for the component's remote proxy.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-canvas-component-grab">bonobo_canvas_component_grab ()</title>
+<programlisting>void        bonobo_canvas_component_grab    (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp,
+                                             <link linkend="guint">guint</link> mask,
+                                             <link linkend="GdkCursor">GdkCursor</link> *cursor,
+                                             <link linkend="guint32">guint32</link> time);</programlisting>
+<para>
+Grabs the mouse focus via a call to the remote proxy.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>comp</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> object
+</entry></row>
+<row><entry align="right"><parameter>mask</parameter>&nbsp;:</entry>
+<entry> Mask of events to grab
+</entry></row>
+<row><entry align="right"><parameter>cursor</parameter>&nbsp;:</entry>
+<entry> <link linkend="GdkCursor">GdkCursor</link> to display during grab
+</entry></row>
+<row><entry align="right"><parameter>time</parameter>&nbsp;:</entry>
+<entry> Time of last event before grab
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-canvas-component-ungrab">bonobo_canvas_component_ungrab ()</title>
+<programlisting>void        bonobo_canvas_component_ungrab  (<link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> *comp,
+                                             <link linkend="guint32">guint32</link> time);</programlisting>
+<para>
+Grabs the mouse focus via a call to the remote proxy.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>comp</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboCanvasComponent">BonoboCanvasComponent</link> object
+</entry></row>
+<row><entry align="right"><parameter>time</parameter>&nbsp;:</entry>
+<entry> Time of last event before grab
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="BonoboEmbeddable">BonoboEmbeddable</link>, <link linkend="BonoboCanvasItem">BonoboCanvasItem</link>
+</para>
+</refsect1>
+
+</refentry>

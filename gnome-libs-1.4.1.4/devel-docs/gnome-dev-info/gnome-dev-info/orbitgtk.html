@@ -1,0 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>ORBit-Gtk</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="LibGnorba Documentation"
+HREF="libgnorba-docs.html"><LINK
+REL="PREVIOUS"
+TITLE="LibGnorba Documentation"
+HREF="libgnorba-docs.html"><LINK
+REL="NEXT"
+TITLE="gnome-plugins"
+HREF="gnome-plugins.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="libgnorba-docs.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>LibGnorba Documentation</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="gnome-plugins.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ORBITGTK"
+>ORBit-Gtk</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2589"
+>Author(s)</A
+></H2
+><P
+>Elliot Lee &#60;sopwith@redhat.com&#62;</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2592"
+>Description</A
+></H2
+><P
+>Routines for making ORBit work nicely with gtk, and
+starting/retrieving the name service object for a GNOME session.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CORBA-INIT"
+>gnome_CORBA_init initialize ORBit and GNOME for use in a program.</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2597"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>CORBA_ORB <TT
+CLASS="FUNCTION"
+>gnome_CORBA_init</TT
+></CODE
+>(char *<TT
+CLASS="PARAMETER"
+><I
+>app_id</I
+></TT
+>, struct argp *<TT
+CLASS="PARAMETER"
+><I
+>app_parser</I
+></TT
+>, int *<TT
+CLASS="PARAMETER"
+><I
+>argc</I
+></TT
+>, char **<TT
+CLASS="PARAMETER"
+><I
+>argv</I
+></TT
+>, unsigned int <TT
+CLASS="PARAMETER"
+><I
+>flags </I
+></TT
+>, int *<TT
+CLASS="PARAMETER"
+><I
+>arg_index</I
+></TT
+>, CORBA_Environment *<TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN2614"
+>Description</A
+></H3
+><P
+>This routine initializes gnome (by calling
+<TT
+CLASS="FUNCTION"
+>gnome_init</TT
+>).  A few items are set up to allow
+ORBit and gtk to interact well, and finally it initializes ORBit and
+returns the CORBA_ORB reference to the new ORB.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN2618"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>int main(int argc, char *argv)
+{
+	CORBA_ORB my_orb;
+	CORBA_Environment ev;
+
+	CORBA_exception_init(&#38;ev);
+	my_orb = gnome_CORBA_init("myapp", NULL, &#38;argc, &#38;argv, 0, NULL, &#38;ev);
+	if(ev._major != CORBA_NO_EXCEPTION)
+	    exit(1); /* error initializing ORB */
+
+	/* insert killer app code here */
+}</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN2621"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>char *<TT
+CLASS="PARAMETER"
+><I
+>app_id</I
+></TT
+></P
+><P
+>An alphanumeric application ID string (the application's name is a good choice).</P
+></LI
+><LI
+><P
+>struct argp *<TT
+CLASS="PARAMETER"
+><I
+>app_parser</I
+></TT
+></P
+><P
+>See the (non-existent) argp docs for help.</P
+></LI
+><LI
+><P
+>int *<TT
+CLASS="PARAMETER"
+><I
+>argc</I
+></TT
+></P
+><P
+>A pointer to the number of arguments.</P
+></LI
+><LI
+><P
+>char **<TT
+CLASS="PARAMETER"
+><I
+>argv</I
+></TT
+></P
+><P
+>The array of argument strings.</P
+></LI
+><LI
+><P
+>unsigned int <TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+></P
+><P
+>See the (non-existent) argp docs for help.</P
+></LI
+><LI
+><P
+>int *<TT
+CLASS="PARAMETER"
+><I
+>arg_index</I
+></TT
+></P
+><P
+>See the (non-existent) argp docs for help.</P
+></LI
+><LI
+><P
+>CORBA_Environment *<TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+></P
+><P
+>Pointer to a CORBA exception information structure,
+to allow the ORB initialization functions to signal any errors that occur.</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-NAME-SERVICE-GET"
+>gnome_name_service_get - retrieves an object reference to the root name service context for the current GNOME session</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN2654"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>CORBA_Object
+<TT
+CLASS="FUNCTION"
+>gnome_name_service_get</TT
+></CODE
+>(void);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN2658"
+>Description</A
+></H3
+><P
+>This routine is used to get access to the top naming context for
+the current GNOME session. If a naming server is not running, one will be started.</P
+><P
+>This function assumes that both gtk and ORBit have been initialized.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN2662"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>CORBA_Object ns;
+
+ns = gnome_name_service_get();</PRE
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libgnorba-docs.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gnome-plugins.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>LibGnorba Documentation</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libgnorba-docs.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>gnome-plugins</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

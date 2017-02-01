@@ -1,0 +1,55 @@
+If you want to hack on the GNOME project, it will make your life easier
+to have the following packages installed:
+
+	- GNU m4 1.4
+	- GNU texinfo 3.12 (for makeinfo 1.68)
+	- GNU autoconf 2.13
+	- GNU libtool 1.2d
+	- GNU gettext 0.10.35
+	- GNU automake 1.4
+	- GNU guile 1.3a
+	- GNU indent 1.91 (ORBit wants it)
+	- GNU flex 2.5.4 (ORBit wants it)
+	- GNU bison 1.27 (ORBit wants it)
+	- SLIB 2c3 (See http://www-swiss.ai.mit.edu/~jaffer/SLIB.html)
+
+These should be available by ftp from prep.ai.mit.edu or any of the
+fine GNU mirrors.  Prerelease software can be found at alpha.gnu.org.
+
+If you are accessing gnome via CVS, then you will have to run the
+autogen.sh script with any possible arguments that you might want to
+pass to configure.
+
+    cvsroot/gnome# ./autogen.sh --prefix=/opt/gnome
+
+If you like to build in a directory different from the source, you can
+run `<path-to-src-dir>/autogen.sh' in the build directory.
+
+Please submit patches to the gnome-list@gnome.org mailing list.  All
+kinds of contributions are accepted. If at all possible, please use
+CVS to get the latest development version of gnome; the README file
+has the CVSROOT information.
+
+===========================================================================
+				 FAQ
+
+Q1. `aclocal' complains that there is no AM_ACLOCAL_INCLUDE?
+
+A1. You invoked `aclocal' without `-I macros'.  The `macros' subdir
+contains other macros that are used for `gnome' configure.in files.
+By omitting the `-I macros' you will not pick up those definitions.
+
+The definition of AM_ACLOCAL_INCLUDE is also in the `macros' subdir,
+and this macro is named such that `aclocal' will complain if its
+definition is not found.
+
+If you use the `autogen.sh' script, all this is taken care of for you.
+
+Q2. What is AM_ACLOCAL_INCLUDE
+
+A2. This macro ensures that aclocal is invoked with `-I macros'.
+
+    - One way it does that is it sets the $(ACLOCAL) Makefile variable
+    to included `-I macros'.
+
+    - The other way is to cause Q1 ;-).

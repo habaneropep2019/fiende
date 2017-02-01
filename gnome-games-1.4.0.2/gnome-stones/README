@@ -1,0 +1,133 @@
+This is a quick and dirty README file.
+
+
+Gnome-Stones keys:
+==================
+
+In the title-screen:
+* [UP] and [DOWN] key to select the starting cave.
+* [RETURN] or Game/New to start game.
+
+While playing:
+* Cursor keys to move the game figure.
+* [Shift]+Cursor key, to dig the sand near the game figure, but don't move it.
+* [p] key to pause the game.
+* [ESC] key to kill the figure.
+* [Shift]+[ESC] to abort game.
+
+
+Gnome-Stone caves:
+==================
+
+The default caves are intended for debugging, but not for real playing. The
+general structure of a caves file is the following:
+
+[General] section:
+------------------
+* Title: (translated string, mandatory)
+	Is the name of this game.
+
+* Object size: (integer, mandatory, has to be 1 right now)
+	How many characters does an object take in the cave description
+	
+* New life score: (integer, optional, default 500)
+
+* Lives: (integer, optional, default 3)
+	The number of lives, that you start with 
+	
+* Frame rate: (float, optional, default 0.2)
+	The game is updated every "Frame rate" second
+
+* Plugins: (string, mandatory)
+	This is a colon sperated list of object plugins, that this cave file
+	needs.  There must be one plugin named "default". Other object plugins 
+	are "gnome-stones" and "gnomekoban".  Most likely this entry will look
+	like default:gnome-stones, because gnomekoban isn't working right know.
+
+[Objects] section:
+------------------
+
+The [Objects] section consists of lines of the form:
+
+<character>=<plugin>:<object>[,<start value>
+
+For example, if you have the following line
+
+O=gnome-stones:boulder
+
+than every 'O' in a Line## line in a cave section will be replaces with a boulder
+object from the gnome-stones plugin in that cave.  There is one exception: if 
+you use a underscore character here, you have to use a space character in the
+Line## lines.
+
+[Caves] section:
+----------------
+* Number: (integer, mandatory)
+	Number of caves in this caves section.
+
+* Cave###: (string, mandatory)
+	Name of the ###th cave. Every cave in this cave file must
+	be listed here.
+	
+
+[Start caves] section:
+----------------------
+* Number: (integer, mandatory)
+	Number of start caves in this Start caves section. 
+    
+* Cave###: (string, mandatory)
+	Name of the ###th start cave. A start cave is a cave, that you can start
+	the game with.
+
+
+Cave sections:
+--------------
+
+* Diamonds needed: (integer, mandatory)
+	The number of diamonds, that are needed to open the exit.
+
+* Diamond score: (integer, optional, default ?)
+	The score you gain for the first 'Diamonds needed' diamonds.
+
+* Extra: diamond score (integer, option, default 'Diamond score')
+	The score you gain for every diamond, if the door has opened.
+
+* Time: (integer, mandatory)
+	The time you have to exit this cave.
+
+* Message: (translated string, optional)
+	This message is shown in the status-bar while playing this cave.
+
+* Next cave: (string, optional)
+	The name of the cave, that will be started after finishing this one.
+	If no 'Next	cave' is given, this cave will be the last in the game.
+
+* Height: (integer, mandatory)
+* Width: (integer, mandatory)
+	Size of this cave. The maximum size of cave is: 40 rows and 80 columns.
+
+* Line##: (string, mandatory)
+	For every row there must be a Line## line, which describes the content
+	of this cave row. Every Line## line must have at least 'Width'
+	characters. Every character symbolizes one object.
+
+There may have additional options in the Cave sections, that depend one the
+plugins loaded.  When using the gnome-stones object plugin, you can use the 
+following options:
+	
+* gnome-stones:magic wall:millingTime: (integer, optional, default 0)
+	The time, that the magic wall mills.
+
+* gnome-stones:amoeba:slowTime: (integer, optional, default 0)
+	The time, that the amoeba grows slowly. After this time, the
+	amoeba will speed up growing
+
+* gnome-stones:amoeba:maxSize: (integer, optional, default 200)
+	If the amoeba grow larger than this size, it will transform to
+	boulders.
+
+
+For a better understanding of the game file format, you should have a close
+look on the cave file that come with gnome-stones.  If you have created some
+nice gnome-stones caves, just go ahead and send them to me.  I'll propably
+create a web page, where I collect all the caves.

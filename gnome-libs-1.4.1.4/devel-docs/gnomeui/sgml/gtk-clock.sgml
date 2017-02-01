@@ -1,0 +1,198 @@
+<refentry id="GtkClock">
+<refmeta>
+<refentrytitle>GtkClock</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GtkClock</refname><refpurpose>A small text clock widget, capable of realtime, count-up and count-down modes</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GtkClock-struct">GtkClock</link>;
+enum        <link linkend="GtkClockType">GtkClockType</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gtk-clock-new">gtk_clock_new</link>                   (<link linkend="GtkClockType">GtkClockType</link> type);
+void        <link linkend="gtk-clock-set-format">gtk_clock_set_format</link>            (<link linkend="GtkClock">GtkClock</link> *gclock,
+                                             <link linkend="gchar">gchar</link> *fmt);
+void        <link linkend="gtk-clock-set-seconds">gtk_clock_set_seconds</link>           (<link linkend="GtkClock">GtkClock</link> *gclock,
+                                             <link linkend="time-t">time_t</link> seconds);
+void        <link linkend="gtk-clock-set-update-interval">gtk_clock_set_update_interval</link>   (<link linkend="GtkClock">GtkClock</link> *gclock,
+                                             <link linkend="gint">gint</link> seconds);
+void        <link linkend="gtk-clock-start">gtk_clock_start</link>                 (<link linkend="GtkClock">GtkClock</link> *gclock);
+void        <link linkend="gtk-clock-stop">gtk_clock_stop</link>                  (<link linkend="GtkClock">GtkClock</link> *gclock);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkMisc">GtkMisc</link>
+               +----<link linkend="GtkLabel">GtkLabel</link>
+                     +----GtkClock
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The <type>GtkClock</type> widget provides an easy way of providing a textual clock in your application. It supports realtime display, as well as count up and count down modes. The clock widget could conceivably be used in such applications as an application's status bar, or as the basis for a panel applet, etc.
+</para>
+<para>
+Three modes of operation are supported. These are realtime - which displays the current time, count-up/increasing - which counts up from an initial value (like a stopwatch), and count-down/decreasing - which counts down from an initial value.
+</para>
+<para>
+Note, however, that the accuracy of the gtkclock widget is limited to 1 second.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GtkClock-struct">struct GtkClock</title>
+<programlisting>struct GtkClock;</programlisting>
+<para>
+You should not access the members of the GtkClock struct directly, instead,
+access them through the gtk_clock_* functions.
+</para></refsect2>
+<refsect2>
+<title><anchor id="GtkClockType">enum GtkClockType</title>
+<programlisting>typedef enum
+{
+	GTK_CLOCK_INCREASING,
+	GTK_CLOCK_DECREASING,
+	GTK_CLOCK_REALTIME
+} GtkClockType;
+</programlisting>
+<para>
+Three modes are supported - realtime (GTK_CLOCK_REALTIME), count-up (GTK_CLOCK_INCREASING) and count-down (GTK_CLOCK_DECREASING). In realtime mode, the widget displays the current local machine time. In count-up mode, the widget counts up either from an initial value (as specified with gtk_clock_set_seconds) or from the default of 0 seconds. In count-down mode, the widget counts down from a specified value or 0 seconds. Note that negative times are possible, and that the clock does not stop at 0 seconds in count down mode.
+</para></refsect2>
+<refsect2>
+<title><anchor id="gtk-clock-new">gtk_clock_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gtk_clock_new                   (<link linkend="GtkClockType">GtkClockType</link> type);</programlisting>
+<para>
+Creates a new <type>GtkClock</type> widget.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry>A GtkClockType value, specifying what mode this widget is to display in. There are three options: GTK_CLOCK_INCREASING, GTK_CLOCK_DECREASING, GTK_CLOCK_REALTIME. These options are described above.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>GtkWidget * on success, NULL on failure.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gtk-clock-set-format">gtk_clock_set_format ()</title>
+<programlisting>void        gtk_clock_set_format            (<link linkend="GtkClock">GtkClock</link> *gclock,
+                                             <link linkend="gchar">gchar</link> *fmt);</programlisting>
+<para>
+Set the format of a <type>GtkClock</type> widget. The syntax of the format string is identical to that of the function strftime(3). Further information about time format strings can be found on this man page. The widget defaults to a format string of "%<literal>H</literal>:%<literal>M</literal>" in realtime mode, or "%<literal>H</literal>:%<literal>M</literal>:%<literal>S</literal>" in count-up or count-down modes.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gclock</parameter>&nbsp;:</entry>
+<entry>A pointer to a GtkClock widget.
+</entry></row>
+<row><entry align="right"><parameter>fmt</parameter>&nbsp;:</entry>
+<entry>A time format string, as described by the man page strftime(3).
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gtk-clock-set-seconds">gtk_clock_set_seconds ()</title>
+<programlisting>void        gtk_clock_set_seconds           (<link linkend="GtkClock">GtkClock</link> *gclock,
+                                             <link linkend="time-t">time_t</link> seconds);</programlisting>
+<para>
+Set the current time as displayed by the clock in count-up and count-down modes. This function has no effect in realtime mode, as the clock time is determined by the system clock in realtime mode.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gclock</parameter>&nbsp;:</entry>
+<entry>A pointer to a GtkClock widget.
+</entry></row>
+<row><entry align="right"><parameter>seconds</parameter>&nbsp;:</entry>
+<entry>The time to display on the clock, measured in seconds.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gtk-clock-set-update-interval">gtk_clock_set_update_interval ()</title>
+<programlisting>void        gtk_clock_set_update_interval   (<link linkend="GtkClock">GtkClock</link> *gclock,
+                                             <link linkend="gint">gint</link> seconds);</programlisting>
+<para>
+Set the interval at which the <type>GtkClock</type> widget is updated. The seconds parameter is used to determine how often the time shown on the widget is updated. The default value is to update every second, but you may wish to increase this value. If you set the update interval to 0, the clock is never updated.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gclock</parameter>&nbsp;:</entry>
+<entry>A pointer to a GtkClock widget.
+</entry></row>
+<row><entry align="right"><parameter>seconds</parameter>&nbsp;:</entry>
+<entry>The interval at which to update the clock widget, measured in seconds.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gtk-clock-start">gtk_clock_start ()</title>
+<programlisting>void        gtk_clock_start                 (<link linkend="GtkClock">GtkClock</link> *gclock);</programlisting>
+<para>
+Start the clock counting in count-up or count-down modes. The clock will begin counting up or down from the time when this function is called, until gtk_clock_stop is called. This function has no effect in the realtime mode (you can't start and stop real time! :-).
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gclock</parameter>&nbsp;:</entry>
+<entry>A pointer to a GtkClock widget.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gtk-clock-stop">gtk_clock_stop ()</title>
+<programlisting>void        gtk_clock_stop                  (<link linkend="GtkClock">GtkClock</link> *gclock);</programlisting>
+<para>
+Stop the clock counting in count-up or count-down modes. The clock ceases counting up or down, and the last time reached remains on the display. This function has no effect in the realtime mode (you can't start and stop real time! :-).
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gclock</parameter>&nbsp;:</entry>
+<entry>A pointer to a GtkClock widget.
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

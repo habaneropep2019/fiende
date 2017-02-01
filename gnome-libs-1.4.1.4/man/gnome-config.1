@@ -1,0 +1,226 @@
+.\" 
+.\" gnome-config manual page.
+.\" (C) Miguel de Icaza (miguel@gnu.org)
+.\"
+.TH GNOME 1 "GNOME 1.0"
+.SH NAME
+gnome-config \- GNOME libraries and component information retrieval.
+.SH SYNOPSIS
+.PP
+.B gnome-config
+[\-\-version] [\-\-help] [\-\-cflags] [\-\-libs] [\-\-libs-only-L]
+[\-\-libs-only-l] [\-\-prefix] [\-\-exec-prefix] [\-\-bindir]
+[\-\-sbindir] [\-\-libexecdir] [\-\-datadir] [\-\-sysconfdir]
+[\-\-sharedstatedir] [\-\-localstatedir] [\-\-libdir] [\-\-infodir]
+[\-\-mandir] [\-\-includedir] [\-\-modversion] [LIBRARIES...]
+.SH DESCRIPTION
+The \fIgnome-config\fP program is used to retrieve information from installed libraries in
+the system.  It is typically used to compile and link against one or
+more GNOME libraries.  Here is a typical usage scenario in a Makefile:
+.PP
+.nf
+program: program.c
+	cc program.c `gnome-config --cflags --libs gnomeui`
+.fi
+.PP
+Usually, a combination of flags is used like --cflags and --libs in
+conjunction with the list of libraries that your program uses.  These
+libraries are specified as part of the command line.
+.PP
+\fIgnome-config\fP includes hard-coded information for a number of
+libraries: the ones used to build gnome-libs, and the ones provided by
+gnome-libs (which \fIgnome-config\fP is part of).  Other
+libraries are integrated by providing gnome-config modules.  
+.SH OPTIONS
+The following Generic options are supported:
+.TP
+.I "--version"
+Requests that the gnome-libs version information be displayed.
+.TP
+.I "--modversion"
+Requests that the version information of the libraries specified on
+the command line be displayed.  This information is either the
+gnome-libs version for libraries that are part of gnome-libs, or the
+version specified in 
+.B MODULE_VERSION
+variable in the module configuration file.
+.TP
+.I "--help"
+Displays a help message and terminates.
+.PP
+The following options are used to compile and link programs with GNOME
+libraries and components:
+.TP
+.I "--cflags"
+This prints pre-processor and compiler flags required to compile the
+module with the libraries specified on the command line.
+.TP 
+.I "--libs"
+This prints the library linking information.  These flags can be
+passed to the compiler driver to link an object file with the
+libraries specified on the command line.
+.TP
+.I "--libs-only-L"
+This only prints the -L/-R part of --libs for the libraries specified
+on the command line.
+.TP
+.I "--libs-only-l"
+This only prints the -l part of --libs for the libraries specified on
+the command line.
+.PP
+The following options are used to find out the directories that were
+used to install the various files that are part of the GNOME
+distribution, they correspond to the variable names used by the
+Makefiles (Makefiles in GNOME are compliant with the GNU standard for
+makefiles, and they typically use GNU autoconf and GNU automake to get
+these right and uniform):
+.TP
+.I "--prefix"
+Outputs the prefix that was used to configure the GNOME libraries.
+.TP
+.I "--exec-prefix"
+Outputs the exec-prefix used to install the GNOME libraries.
+.TP
+.I "--bindir"
+Outputs the bindir used to install the GNOME libraries.
+.TP
+.I "--sbindir"
+Outputs the sbindir used to install the GNOME libraries.
+.TP
+.I "--libexecdir"
+Outputs the libexecdir used to install the GNOME libraries.
+.TP
+.I "--datadir"
+Outputs the datadir used to install the GNOME libraries.
+.TP
+.I "--sysconfdir"
+Outputs the sysconfdir used to install the GNOME libraries.
+.TP
+.I "--sharedstatedir"
+Outputs the sharedstatedir used to install the GNOME libraries.
+.TP
+.I "--localstatedir"
+Outputs the localstatedir used to install the GNOME libraries.
+.TP
+.I "--libdir"
+Outputs the libdir used to install the GNOME libraries.
+.TP
+.I "--infodir"
+Outputs the infodir used to install the GNOME libraries.
+.TP
+.I "--mandir"
+Outputs the mandir used to install the GNOME libraries.
+.TP
+.I "--includedir"
+Outputs the includedir used to install the GNOME libraries.
+.PP
+The basic set of libraries you can link with are:
+.nf
+    glib        (calls glib-config)
+    idl         (to be used with orbit-idl)
+    gnome
+    gnomeui
+    gnorba
+    gtk         (calls gtk-config)
+    gtkxmhtml   (only --libs)
+    zvt         (only --libs)
+.fi
+.SH MODULE INTEGRATION
+\fIgnome-config\fP can incorporate more GNOME libraries, to do so the
+library author needs to install an xxxxConf.sh file in the directory
+returned by "gnome-config --libdir" or in any directory listed in the 
+.B GNOME_LIBCONFIG_PATH
+environment variable or in the directory pointed by
+.B GNOME_PATH/lib
+.PP
+The prefix "xxxx" should be substituted with the module name, for
+example, the applets library installs the appletConf.sh file.
+.PP
+The configuration file is a shell script evaluated by
+\fIgnome-config\fP and it should define four shell variable settings:
+.TP
+.I "xxx_LIBDIR"
+This specifies any directory paths required to find the libraries
+defined by this module.
+.TP 
+.I "XXX_LIBS"
+A list of compiler options to link the code with this module.
+.TP
+.I "XXX_INCLUDEDIR"
+This specifies the flags that should be passed to the compiler for the
+program to be able to locate the header files provided by the module.
+.TP
+.I "MODULE_VERSION"
+This should be the module version number.  It should be in the format
+"module-version", for example "bonobo-0.1" is a valid 
+.B MODULE_VERSION
+setting.
+.PP
+This is an example file for an imaginary library called "foo":
+.PP
+.nf
+#
+# Configuration file for using library foo.
+# 
+FOO_LIBDIR="-L/opt/foo/lib"
+FOO_LIBS="-lfoo"
+FOO_INCLUDEDIR="-I/opt/foo/include"
+MODULE_VERSION=foo-2.3
+.fi
+.PP
+Typically these files are generated at configuration or compilation
+time, authors usually use a template file, this is an example template
+file for fooConf.sh, it is called fooConf.sh.in:
+.PP
+.nf
+#
+# Configuration file for using library foo.
+# 
+FOO_LIBDIR="@FOO_LIBDIR@"
+FOO_LIBS="@FOO_LIBS@"
+FOO_INCLUDEDIR="@FOO_INCLUDEDIR@"
+MODULE_VERSION=foo-@VERSION@
+.fi
+.PP
+The above template file is typically processed by the Makefile to
+produce the actual configuration file.  This is a sample piece of
+code that shows how to get this right:
+.PP
+.nf
+## We create fooConf.sh here and not from configure because we want
+## to get the paths expanded correctly.  Macros like srcdir are given
+## the value NONE in configure if the user doesn't specify them (this
+## is an autoconf feature, not a bug).
+
+fooConf.sh: fooConf.sh.in Makefile
+## Use sed and then mv to avoid problems if the user interrupts.
+	sed -e 's?\@FOO_LIBDIR\@?$(FOO_LIBDIR)?g' \\
+	    -e 's?\@FOO_INCLUDEDIR\@?$(FOO_INCLUDEDIR)?g' \\
+	    -e 's?\@FOO_LIBS\@?$(FOO_LIBS)?g' \\
+	    -e 's?\@VERSION@\@?$(VERSION)?g' \\
+	      < $(srcdir)/fooConf.sh.in > fooConf.tmp \\
+	  && mv fooConf.tmp fooConf.sh
+.fi
+.PP
+This file is then copied into a system accessible location.
+.SH ENVIRONMENT
+The \fIgnome-config\fP program uses the directories listed in the
+.B GNOME_LIBCONFIG_PATH
+to locate library definition files (Conf.sh) installed on the system.
+The variable
+.B GNOME_PATH 
+is used as a list of directories where GNOME applications and
+libraries have been installed.  \fIgnome-config\fP looks in the
+\fIlib\fP subdirectory of each directory listed here for library
+definition files (Conf.sh) installed.
+.SH AUTHOR
+gnome-config was written by Miguel de Icaza, Raja Harinath and various
+hackers in the GNOME team.  It was inspired by Owen Taylor's
+\fIgtk-config\fP program.
+.SH SEE ALSO
+.BR gnome(1), 
+.BR gtk-config(1), 
+.SH BUGS
+If you find bugs in the \fIgnome-config\fP program, please report
+these using the \fIgnome-bug\fP script included with the GNOME
+libraries distribution.

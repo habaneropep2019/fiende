@@ -1,0 +1,140 @@
+use strict;
+sub plugin {
+  my $global=shift;
+  print "Generation namespace documentation\n";
+  print_namespaces($global);
+  print_name_index($global);
+  print "Done with namespaces\n";
+}
+
+sub print_namespaces {
+  my $space=shift;
+  print_namespace($space);
+  foreach ($space->all()) {
+    print_namespace($_) if ($_->is_namespace());
+  }
+}
+
+sub print_name_index {
+  my $space=shift;
+  my @namespaces;
+  my @base;
+
+  # gather up all classes
+  foreach ($space->all()) {
+    push(@namespaces,$_) if $_->is_namespace();
+  }
+
+  open(FILE,">name_index.html");
+
+  print FILE '
+<html>
+<head><title>Gtk-- Reference: Namespace Index</title></head>
+<body bgcolor="#F0F0F0" text="#000000" link="#0000FF"
+vlink="#000077" alink="#FF0000">
+<table align=center border=0 cellspacing=10> <tr>
+<td><a href="class_index.html">Class Index</a></td>
+<td><a href="cross_index.html">Cross Index</a></td>
+<td>Namespace Index</td>
+</table>
+<h1 align=center>Namespaces</h1>
+<ul type=disc>';
+
+  print FILE "<li><b><a href=\"global.html\">::</a></b>\n";
+  foreach (sort byfullname @namespaces) {
+    print FILE "<li><b>",$_->href($$_{fullname}),"</b>\n";
+  }
+
+  print FILE "</ul></body></html>";
+  close(FILE);
+}
+
+sub print_namespace {
+  $_=shift;
+
+  print "Generating $$_{fullname}\n";
+  open(FILE,">$$_{fullname}.html");
+
+  print FILE "<html>\n";
+  print FILE "<head><title>Gtk-- Reference: $$_{fullname}</title></head>\n";
+  print FILE '
+<body bgcolor="#F0F0F0" text="#000000" link="#0000FF"
+vlink="#000077" alink="#FF0000">
+<table align=center border=0 cellspacing=10> <tr>
+<td><a href="class_index.html">Class Index</a></td>
+<td><a href="cross_index.html">Cross Index</a></td>
+<td><a href="name_index.html">Namespace Index</a></td>
+</table>
+';
+   
+   print FILE "<h1 align=center>Namespace $$_{fullname}</h1><p>\n";
+
+
+   my $items = $_->{items};
+   my @array = sort byname @$items;
+   my $child;
+   my $type;
+   my $col;
+
+   $col = 0;
+
+   print FILE "<hr noshade>\n";
+   print FILE "<h1>Index:</h1>\n";
+   foreach $type ( $Enum::CLASS, $Enum::TYPEDEF )
+   {
+      print FILE "<dt><h3>Members of type <em>$Enum::TYPE_NAMES[$type]</em></h3>\n";
+      print FILE "<table>\n";
+      foreach $child (@array)
+      {
+         if ($child->{ntype} == $type)
+         {
+            print FILE "<tr>" if $col == 0;
+            $col++;
+            print FILE "<td width=20%>";
+            print FILE $child->href();
+            print FILE "</td>";
+            if ($col == 5)
+            {
+               $col = 0;
+               print FILE "</tr>";
+            }
+            print FILE "\n";
+         }
+      }
+      if ($col != 0)
+      {
+         print FILE "</tr>";
+      }
+      print FILE "</table>\n";
+   }
+
+
+   print FILE "<hr noshade>\n";
+   print FILE "<h1>Member Descriptions:</h1>\n";
+   print FILE "<dl>\n";
+   foreach $type ( $Enum::TYPEDEF, $Enum::FUNCTION )
+   {
+      print FILE "<dt><h3>Members of type <em>$Enum::TYPE_NAMES[$type]</em></h3>\n";
+      foreach $child (@array)
+      {
+         if ($child->{ntype} == $type)
+         {
+            print FILE "<dd>";
+            print FILE $child->href($child->{fullname});
+            if ($child->{short})
+            {
+                print FILE " - $child->{short}";
+            }
+            if ($child->{longcomment})
+            {
+                print FILE "<br>$child->{long}";
+            }
+            print FILE "\n";
+         }
+      }
+   }
+   print FILE "</dl>\n";
+
+   print FILE "</html>\n";
+   close(FILE);
+}

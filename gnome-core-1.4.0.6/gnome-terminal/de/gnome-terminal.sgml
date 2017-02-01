@@ -1,0 +1,1026 @@
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V3.1//EN" [
+<!ENTITY GNOME-APPS SYSTEM "gnome-terminal.sgml">
+<!ENTITY term "<application>GNOME-Terminal</application>">
+<!ENTITY xterm-prog "<application>xterm</application>-Programm">
+<!ENTITY prefs-dlg "<application>Eigenschaften</application>-Dialog">
+ ]>
+
+<!-- Deutsche Übersetzung 3. April 2000 von Martin Baulig gegenüber
+   - Version 1.0 des Originals (29. März 2000 - CVS Revision 1.20) -->
+
+
+<article id="index">
+  
+  <artheader> 
+    <title>GNOME-Terminal Anwenderhandbuch</title>
+    <authorgroup>
+      <author>
+	<firstname>Miguel</firstname>
+	<surname>de Icaza</surname>
+      </author>
+      <author>
+	<firstname>Michael</firstname>
+	<surname>Zucchi</surname>
+      </author>
+    </authorgroup>
+    <legalnotice id="legalnotice">
+      <para>
+        Permission is granted to make and distribute verbatim copies of this
+        manual provided the copyright notice and this permission notice are
+        preserved on all copies.
+      </para>
+      <para>
+        Permission is granted to copy and distribute modified versions of
+        this manual under the conditions for verbatim copying, provided that
+        the entire resulting derived work is distributed under the terms of a
+        permission notice identical to this one.
+      </para>
+      <para>
+        Permission is granted to copy and distribute translations of this
+        manual into another language, under the above conditions for modified
+        versions, except that this permission notice may be stated in a
+        translation approved by the Free Software Foundation.
+      </para>
+
+
+
+      <!-- let us comment this out for now, as suggested by RMS... 
+    <para> UNIX is a trademark of X/Open Group.</para>
+    <para> Linux is a trademark of Linus Torvalds.</para>
+    <para> X Window System is a trademark of X Consortium,
+      Inc.</para>
+    <para> DEC is a trademark of Digital Equipment
+      Corporation.</para>
+      -->
+    </legalnotice>
+
+  </artheader>
+
+  
+  
+  <sect1 id="Description">
+    <title>Beschreibung</title>
+    <para>
+      Das &term; ist ein Terminalemulationsprogram, das Teil des GNOME-Projekts
+      ist. Es bietet Zugang zur Unix-Shell auf dem GNOME-Desktop.
+    </para>
+
+    <para>
+      Das &term; unterstützt eine Anzeige in Farbe (siehe <xref
+	linkend="config-colour"> für nähere Informationen) und bietet
+      Maus-Unterstützung für Applikationen, die Maus-Ereignise von
+      <application>xterm</application>-artigen Terminalen empfangen
+      können.
+    </para>
+  </sect1>
+  
+  <sect1 id="usage">
+    <title>Grundlegende Benutzung</title>
+    <sect2 id="shells">
+      <title>Shells</title>
+      <para>
+	Das &term; startet die Standard-Shell (Kommandozeileninterpreter) für
+	den Benutzer. Fortschrittliche UNIX Shells können die Fähigkeiten der
+	normalen Eingabeaufforderung signifikant erweitern. Zum Beispiel
+	bietet die <application>bash</application> Shell (welche in den
+	meisten Linux-Distributionen die Standard-Shell ist)
+	Befehlsvervollständigung (versuchen Sie einmal, den Anfang eines
+	Befehls einzugeben und drücken Sie dann die <keycap>Tab</keycap>-Taste),
+	Chronikfenster (Sie können zuvor eingegebene Befehle mit der
+	<keycap>Up</keycap>-Taste wieder abrufen) und vieles mehr. Weitere
+	Informationen finden Sie in der Dokumentation der jeweiligen Shell.
+      </para>
+    </sect2>
+
+    <sect2 id="scrolling"> 
+      <title>Rollbalken</title> 
+      <para>
+	Das &term; hat Rollbalken, so daß Sie zurückrollen können, und zuvor
+	eingegebene Befehle und Befehlsausgaben zu sehen; dies ist besonders
+	dann nützlich, wenn die Ausgabe eines Befehls nicht auf eine
+	Bildschirmseite paßt. Standardmäßig ist der Rollbalken auf der rechten
+	Seite des Terminalfensters. Sie können seine Position jedoch ändern
+	oder ihn ganz entfernen, indem Sie den
+	<link linkend="config">&prefs-dlg;</link>
+	verwenden.
+      </para>
+      <para> 
+	Sie können auch die Tastatur zum Rollen benutzen:
+	<keysym>Shift-PgUp</keysym> rollt nach oben bzw.
+	<keysym>Shift-PgDown</keysym> nach unten.
+      </para>
+    </sect2>
+
+    <sect2 id="emulation">
+      <title>Emulation</title>
+
+      <para>
+	Das Terminal wurde so konzipiert, daß es das &xterm-prog; emuliert,
+	welches vom X-Consortium zur Verfügung gestellt wird. Dieses
+	&xterm-prog; selbst ist wiederum eine nahezu vollständige Emulation
+	des DEC VT102-Terminals.
+      </para>
+      
+      <para>
+	Das &term; unterstützt dieselben Erweiterungen des VT102, die auch
+	das &xterm-prog; unterstützt &mdash; durch spezielle Escape-Sequenzen.
+	Das &xterm-prog; ist ein sich entwickelndes Produkt. Neuere Änderungen
+	in xterm wurden auch ins &term; übernommon. Dies beinhaltet die
+	Emulation der neueren DEC VT220 Escape-Sequenzen.
+      </para>
+
+      <para>
+	Vereinfacht gesagt, bedeutet dies daß das &term; alle Befehle
+	(Escape-Sequenzen) versteht, die von VT102/VT220-Terminalen für
+	Dinge wie die Positionierung des Cursors auf dem Bildschirm etc.
+	verwendet werden. Daher können Sie im &term; alle Applikationen
+	ablaufen lassen, die dafür gedacht waren, in VT102/VT220 oder
+	xterm-Terminalen abzulaufen und alle Steuerungen (wie etwa
+	Pfeiltasten, <keycap>BildAuf/BildAb</keycap>-Tasten,
+	<keycap>Tab</keycap>-Taste etc.) funktionieren wie Sie es
+	erwarten.
+      </para>
+
+    </sect2>
+
+  </sect1>
+
+  <sect1 id="menus">
+    <title>Menüs</title>
+    <para>
+      Das &term; bietet eine Reihe von Kontrollmöglichkeiten, die Sie
+      über die Menüs erreichen, die sich ganz oben im Terminal-Fenster
+      befinden sowie über ein Kontext-Menü, das Sie erhalten, indem Sie
+      die rechte Maustaste drücken und gleichzeitig die
+      <keycap>Strg</keycap>-Taste gedrückt halten.
+    </para>
+    <sect2 id="menu-file">
+      <title>Datei-Menü</title>
+      <variablelist>
+	<varlistentry>
+	  <term><guimenuitem>Neues Terminal</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Erzeugt ein neues Terminal-Fenster. Dies ist eine effiziente
+	      Methode, mehrere Terminals zu erzeugen, da es weniger
+	      Systemressourcen verbraucht als wenn Sie jedesmal eine
+	      separate &term;-Kopie starten.
+	      (Für fortgeschrittene Benutzer: das so erzeugte neue
+	      Terminal-Fenster gehört zum selben Prozess mit derselben
+	      PID wie das Original. Jedes Fenster startet allerdings
+	      seinen eigenen Shell-Prozess.)
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Menübalken verbergen</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Verbirgt den Hauptmenübalken des Terminals und erzeugt
+	      somit ein ordentlicheres, kleineres Terminal. Der
+	      Menübalken kann über das
+	      <link linkend="menu-popup"><guimenu>Kontext-Menü</guimenu></link>
+	      zurückgewonnen werden.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Terminal schließen</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Schließt das aktuelle Terminal. Es schließt ebenfalls
+	      alle anderen Terminals, die über die Kommandozeile innerhalb
+	      dieses Terminals gestartet werden. Falls das zu schließende
+	      Terminal das letzte ist, beendet sich das &term;-Programm.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="menu-edit">
+      <title>Bearbeiten-Menü</title>
+      <variablelist>
+	<varlistentry>
+	  <term><guimenuitem>Einfügen</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Fügt die aktuelle Markierung bzw. Zwischenablage in das
+	      Terminal ein. Dies kann auch mit der mittleren Maustaste
+	      erreicht werden.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="menu-settings">
+      <title>Einstellungen-Menü</title>
+      <variablelist>
+	<varlistentry>
+	  <term><guimenuitem>Einsteillungen ...</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Zeigt den in <xref linkend="config"> beschriebenen
+	      <interface>Einstellungen</interface>-Dialog an.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Terminal zurücksetzen</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Setzt die Terminal-Parameter zurück. Dies löst weder den
+	      Bildschirm noch bewegt es den Cursor, aber alle nachfolgende
+	      Terminal-Ausgabe erscheint mit Standard-Schriftart und
+	      Farbe.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Zurücksetzen und löschen</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Setzt die Terminal-Parameter zurück und löscht außerdem den
+	      Bildschirm. Alle Schriftarten und Farben sind auf die
+	      Standardwerte zurückgesetzt.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Farbwähler ...</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Kann dazu verwendet werden, Farben aufs Terminal zu ziehen und
+	      dort fallenzulassen. Siehe <xref linkend="config-colour"> für
+	      weitere Informationen.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="menu-help">
+      <title>Hilfe-Menü</title>
+      <variablelist>
+	<varlistentry>
+	  <term><guimenuitem>GNOME-Terminal Anwenderhandbuch</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      So bekommt man dieses Dokument aus dem &term; heraus.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Info ...</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Ein klein wenig Ruhm für all diejenigen, die sehr hart daran
+	      gearbeitet haben, all dies möglich zu machen.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="menu-popup">
+      <title>Kontext-Menü</title>
+      <para>
+	Das <guimenu>Kontext-Menü</guimenu> erhalten Sie, indem Sie mit
+	der rechten Maustaste irgendwo in das Terminal-Fenster klicken,
+	während Sie die <keycap>Strg</keycap>-Taste gedrückt halten.
+	(Es ist manchmal nicht notwendig, die <keycap>Strg</keycap>-Taste
+	gedrückt zu halten, aber gehen Sie bitte nicht davon aus, daß dies
+	immer so ist.) Es bietet einen schnelleren Zugang zu einigen Befehlen
+	aus dem Hauptmenü; dies ist besonders nützlich, wenn das Hauptmenü
+	verborgen ist. Folgende Einträge sind vorhanden:
+      </para>
+      <variablelist>
+	<varlistentry>
+	  <term><guimenuitem>Neues Terminal ...</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Erzeugt ein neues Terminal-Fenster.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Einstellungen ...</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Bringt den in <xref linkend="config"> beschriebenen
+	      &prefs-dlg; zum Vorschein.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Menübalken zeigen</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Ein-/Ausschalten dieser Option zeigt bzw. verbirgt den
+	      Menübalken an der Oberkante des Terminal-Fensters.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Tastatur sichern</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Diese Option stellt sicher, daß alle Tastatur-Eingaben
+	      direkt an das Terminal geschickt werden und alles andere
+	      ignorieren. Dies ist in der (seltenen) Situation hilfreich,
+	      in der derselbe X-Server von mehreren Benutzern verwendet
+	      wird und der X-Server keine ausreichende Authentifizierung
+	      bietet &mdash; so daß es anderen Benutzern möglich ist, alles
+	      was Sie tippen auszuspionieren. In dieser Situation wird
+	      dazu geraten, zum "Tastatur sichern"-Modus zu schalten,
+	      bevor Sie irgendwelche vertrauliche Informationen wie etwa
+	      Paßwörter eingeben.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Terminal zurücksetzen</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Setzt die Terminal-Parameter (Schriftart und Hintergrund)
+	      auf die Standardwerte zurück, ohne den Bildschirm zu löschen.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>Reset and Clear</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Setzt die Terminal-Parameter auf die Standardwerte zurück
+	      und löscht den Bildschirm.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guimenuitem>In Browser öffnen</guimenuitem></term>
+	  <listitem>
+	    <para>
+	      Wenn sich der Mauszeiger über einer URL (zum Beispiel
+	      eine Internet-Adresse) befinet, wenn dieses Kontextmenü
+	      aufgerufen wird, ist diese Befehl verfügbar, um einen
+	      Browser zu starten, der diese URL anzeigt.
+	      Als Abkürzung dient <keycap>Strg</keycap>-linke Maustaste.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+  </sect1>
+
+
+
+  <sect1 id="config">
+    <title>Konfigurierbare Optionen</title>
+    <para>
+      Konfigurierbare Optionen können Sie im &prefs-dlg; ändern, den
+      Sie über <link linkend="menu-settings"><guimenuitem>Einstellungen ...</guimenuitem></link> im <guimenu>Einstellungen</guimenu>-Menü erreichen.
+    </para>
+
+    <sect2 id="config-general">
+      <title>Allgemeine Optionen</title>
+      <para>
+	Während die meisten der Optionen selbsterklärend sind, werden einige
+	davon nachfolgend etwas detailierter beschrieben.
+      </para>
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Terminalklasse</guilabel></term>
+	  <listitem>
+	    <para>
+	      Setzt die Terminalklasse für die aktuelle Konfiguration oder
+	      das aktuelle Terminal. Einzelheiten dazu finden Sie unter
+	      <link linkend="classes">Klassen</link>.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guilabel>Zeichenmenge für Wortmarkierung</guilabel></term>
+	  <listitem>
+	    <para>
+	      Definiert eine Menge von Zeichen (oder 
+	      <emphasis>Zeichenklassen</emphasis>), die als
+	      'Wortzeichen' betrachtet werden sollen. Sie wird benutzt,
+	      wenn Sie Text wortweise
+	      <link linkend="pointer-select">markieren</link>.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+    <sect2 id="config-image">
+      <title>Hintergrundtyp</title>
+      <para>
+	Im <guilabel>Grafik</guilabel>-Reiter können Sie den Hintergrund
+	für das Terminal bestimmen. Mögliche Hintergrundtypen sind:
+      </para>
+      <itemizedlist>
+	<listitem> 
+	  <para><guilabel>Keiner</guilabel> &mdash; in diesem Fall
+	    benutzt das &term; die Hintergrundfarbe aus dem
+	    <guilabel>Farben</guilabel>-Reiter.
+	  </para>
+	</listitem>
+	<listitem> 
+	  <para><guilabel>Hintergrundpixmap</guilabel> &mdash; diese
+	    Option ermöglicht Ihnen die Wahl eines Hintergrundbildes.
+	    Sie können den <guibutton>Suchen ...</guibutton>-Knopf dazu
+	    verwenden, das Bild auszuwählen.
+	  </para>
+	</listitem>
+	<listitem> 
+	  <para> 
+	    <guilabel>Transparent</guilabel> &mdash; diese Option macht
+	    das &term; "transparent". Es ist nicht wirklich transparent,
+	    es simuliert nur den Hintergrund Ihres Desktops wie ein
+	    Chamäleon. Erwarten Sie jedoch nicht, andere Fenster durch
+	    das &term; hindurch zu sehen.
+	  </para>
+	</listitem>
+      </itemizedlist>
+      <para> 
+	Falls Sie <guilabel>Pixmap</guilabel> oder
+	<guilabel>Transparent</guilabel> als Hintergrund wählen, können Sie
+	auch die Option <guibutton>Hintergrund sollte schattiert sein</guibutton>
+	wählen, welches das Hintergrundbild "abschirmt" oder "verdunkelt".
+      </para> 
+    </sect2>
+
+    
+    
+    
+
+
+
+    <sect2 id="config-colour">
+      <title>Farbkonfiguration</title>
+      <para>
+	Das &term; unterstützt alle Farberweiterungen, die das &xterm-prog;
+	verwendet. Der <guilabel>Farben</guilabel>-Reiter ermöglicht Ihnen,
+	diese Farben anzupassen.
+      </para>
+
+      <variablelist>
+	<varlistentry>
+	  <term><guilabel>Farbschema</guilabel></term>
+	  <listitem>
+	    <para>
+	      Einige Applikationen sind in der Lage, die Farbfähigkeit
+	      des Terminals zu verwenden. Die Interaktion zwischen der
+	      Applikation und dem Terminal erfolgt auf eine Art und Weise,
+	      in der die Applikation eine von sechzehn bekannten Farben
+	      (ANSI-Farben), wie etwa "blau" oder "leuchtend rot", anfordern
+	      kann: das Mail-Programm <application>mutt</application> kann
+	      zum Beispiel wichtige Nachrichten in rot darstellen. Es ist
+	      jedoch Aufgabe des Terminals, zu bestimmen, welche Farbe denn
+	      nun genau für "leuchtend rot" oder "blau" verwendet wird.
+	      Die Zusammenstellung dieser sechzehn Farben nennt man eine
+	      Palette oder ein Farbschema.
+	    </para>
+	    <para>
+	      Das &term; unterstützt vier Farbschemata: das
+	      <guilabel>Linux-Konsole</guilabel>-Schema, das
+	      <guilabel>Farbiges XTerm</guilabel>-Schema, das
+	      <guilabel>rxvt</guilabel>-Schema und ein frei
+	      zusammenstellbares Schema. Diese Schemata sind alle
+	      etwas verschieden voneinander: zum Beispiel benutzt
+	      die Linux-Konsole hellgrau statt "weiß", während
+	      rxvt wirklich weiß benutzt.
+	    </para>
+	    <para>
+	      Wenn Sie das <guilabel>Eigene</guilabel>-Schema gewählt haben,
+	      können Sie alle 16 Farben (genaugenommen 8 Farben und 8
+	      leuchtende Farben) anpassen, indem Sie auf die Farbwähler-Knöpfe
+	      klicken.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><guilabel>Vorder-/Hintergrundfarbe</guilabel></term>
+	  <listitem>
+	    <para>
+	      Hier können Sie die Standard Vorder- und Hintergrundfarbe
+	      festlegen, die vom Terminal benutzt wird, wenn keine Farben
+	      von der im Terminal ablaufenden Applikation angefordert wurden.
+	    </para>
+	    
+	    <para>
+	      Folgende Optionen stehen zur Verfügung:
+	      <guilabel>Weiß auf schwarz</guilabel>,
+	      <guilabel>Schwarz auf Weiß</guilabel>,
+	      <guilabel>Grün auf Schward</guilabel>,
+	      <guilabel>Schwarz auf Hellgelb</guilabel> und
+	      <guilabel>Eigene Farben</guilabel>.
+	      Wie diese wirklich erscheinen, hängt jedoch von der gewählten
+	      Palette ab (für die Optionen
+	      <guilabel>Weiß auf schwarz</guilabel> und
+	      <guilabel>Schwarz auf weiß</guilabel>).
+	      <guilabel>Eigene Farben</guilabel> ermöglicht Ihnen, die
+	      standardmäßig benutzte Vorder- und Hintergrundfarbe
+	      individuell und unabhängig von der Palette festzulegen.
+	    </para>
+
+	    <para>
+	      Zusätzlich können Sie eine Farbe aus der rechteckigen Box
+	      nahe des Farbrades aus jedem GNOME-Farbwähler wählen und
+	      sie auf Terminal fallenlassen. Wenn Sie die Farbe auf einer
+	      leeren Fläche fallenlassen, wird sie als Hintergrundfarbe
+	      benutzt, andernfalls als Vordergrundfarbe. Dies ändert
+	      außerdem automatisch den Vorder-/Hintergrundtyp auf
+	      <guilabel>Eigene Farben</guilabel> und setzt die gewählte
+	      Vorder- bzw. Hintergrundfarbe.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="config-scrolling">  
+      <title>Rollen</title>
+      <para>
+	In diesem Reiter können Sie die Position der Rollbalken und die
+	Anzahl der Zeilen festlegen, die zum Rollen im Speicher behalten
+	werden sollen.
+      </para>
+    </sect2>
+
+  </sect1>
+
+
+
+
+
+
+  
+  <sect1 id="pointerusage">
+    <title>Mausbenutzung</title>
+    <para>
+      Die Maus kann verwendet werden, zu markieren (kopieren), die Markierung
+      zu vergrößern, Text von anderen Terminals und Applikationen einzufügen
+      und um ein Menü zum Vorschein zu bringen.
+    </para>
+
+    <sect2 id="pointer-select">
+      <title>Markierung</title>
+      <para>
+	Die nachfolgende Beschreibung geht davon aus, daß Sie eine
+	Standard-Maus mit drei Tasten haben, die nicht im Kontrollzentrum
+	auf Linkshänder-Modus gesetzt wurde. Selbstverständlich funktioniert
+	die Maus auch für Linkshänder, nur sind dann eben linke und rechte
+	Taste vertauscht.
+      </para>
+      <para>
+	Die linke Maustaste dient dazu, eine Markierung zu starten. Wenn die
+	Taste einmal gedrückt und dann die Maus bewegt wird, während die
+	Taste weiterhin gedrückt ist, werden Zeichen einzeln markiert.
+	Sobald Sie den Mauszeiger über die vertikallen Fensterbegrenzungen
+	hinausziehen, wird der Fensterinhalt automatisch entsprechend gerollt.
+      </para>
+      <para>
+	Wenn Sie die linke Maustaste doppelklicken, geschiet die Markierung
+	wortweise. Halten Sie die Maustaste nach dem zweiten Klick gedrückt
+	und ziehen Sie die Maus um die Markierung zu vergrößern. Die
+	Wortzeichen werden im <guilabel>Allgemein</guilabel>-Reiter im
+	&prefs-dlg; geändert.
+      </para>
+      <para>
+	Dreifachklicken Sie hingegen die linke Maustaste und halten Sie dann
+	gedrückt, werden ganze Zeilen markiert wenn Sie mit der Maus nach
+	oben und unten fahren.
+      </para>
+      <para>
+	Die rechte Maustaste kann dazu verwendet werden, die Markierung
+	auszuweiten. Rollen Sie einfach an die Stelle, bis zu der Sie die
+	Markierung ausgedehnt haben wollen und klicken Sie an der gewünschten
+	Stelle die rechte Maustaste. Wiederum resultiert Einfach-, Doppel-
+	und Dreifachklick in zeichen-, wort- bzw. zeilenweiser Markierung.
+      </para>
+      <para>
+	In jedem Fall wird der markierte Text automatisch in die
+	Zwischenablage kopiert, so daß er in anderen Applikationen eingefügt
+	werden kann, sobald Sie die Maustaste loslassen.
+      </para>
+    </sect2>
+
+    <sect2 id="pointer-paste">
+      <title>Text einfügen</title>
+      <para>
+	Wenn die mittlere Maustaste gedrückt wird, wird die aktuelle
+	Markierung im Fenster eingefügt. Dies kann dazu benutzt werden,
+	Text aus anderen Applikationen zu transferieren.
+      </para>
+      <para>
+	Wenn Sie nur eine Zweitastenmaus haben, bietet Ihr X-Server unter
+	Umständen eine Möglichkeit, die mittlere Taste zu simulieren. Die
+	häufigste Methode dazu ist, die linke und rechte Maustaste
+	gleichzeitig zu drücken. Sehen Sie bitte in der Dokumentation Ihres
+	X-Servers nach für weitere Informationen.
+      </para>
+    </sect2>
+
+    <sect2 id="pointer-wheel">
+      <title>Radmaus</title>
+      <para>
+	Wenn Sie eine Radmaus (welche die Taste-4 und Taste-5-Ereignisse
+	generiert), können Sie das Rad dazu verwenden, im Textfenster auf-
+	und abzurollen.
+      </para>
+    </sect2>
+
+    <sect2 id="pointer-menu">
+      <title>Kontext-Menü</title>
+      <para>
+	Die Maus kann ebenfalls benutzt werden, um das
+	<link linkend="menu-popup">Kontext-Menü</link> zum Vorschein zu
+	bringen, welches zum Beispiel das Terminal zurücksetzen oder eine
+	verborgene Hauptmenüleise wieder zum Vorschein bringen kann. Um
+	in dieses Menü zu gelangen, klicken Sie einfach irgendwo in das
+	Terminal-Fenster und halten Sie gleichzeitig die
+	<keycap>Strg</keycap>-Taste auf der Tastatur gedrückt.
+      </para>
+    </sect2>
+    
+    <sect2 id="url-highlight">
+      <title>URLs starten</title>
+      <para>
+	Das &term; kann dazu verwendet werden, URLs (Uniform Resource
+	Locators; meistens Internetadressen, wie zum Beispiel
+	<literal>http://www.gnome.org</literal>) aus der Textanzeige
+	zu starten &mdash; einfach, indem Sie die Maus über den URL-Text
+	bewegen. Die URL wird dadurch hervorgehoben, indem Sie unterstrichen
+	wird und der Mauszeiger verwandelt sich in eine zeigende Hand.
+      </para> 
+      <para>
+	Wenn Sie das <link linkend="menu-popup">Kontext-Menü</link> aufrufen,
+	während sich die Maus über einer solchen hervorgehobenen URL befindet,
+	enthält dieses Menü einen neuen Menüpunkt um die URL in einem Browser
+	zu öffnen.
+      </para>
+      <para>
+	Als Abkürzung können Sie auch die linke Maustaste drücken, während
+	Sie die <keycap>Strg</keycap>-Taste auf der Tastatur gedrückt haben,
+	um die URL direkt im Browser zu öffnen.
+      </para>
+    </sect2>
+
+    <sect2 id="pointer-dnd">
+      <title>Ziehen und Fallenlassen</title>
+      <para>
+	Eine Vielzahl von Operationen im Terminal kann durch Ziehen und
+	Fallenlassen erledigt werden.
+      </para>
+      <variablelist>
+	<varlistentry>
+	  <term>Dateien ziehen</term>
+	  <listitem>
+	    <para>
+	      Wenn Dateien ins Terminal gezogen werden, wird ihr vollständiger
+	      Name in das Fenster eingefügt. URLs können auf dieselbe Art und
+	      Weise eingefügt werden.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>Farben ziehen</term>
+	  <listitem>
+	    <para>
+	      Eine Farbe kann aus einer anderen GNOME-Applikation oder aus
+	      dem <link linkend="menu-settings">Farbwähler</link> in das
+	      Terminal gezogen werden. Falls sie auf einem Zeichen landet,
+	      setzt dies die Vordergrundfarbe, andernfalls die
+	      Hintergrundfarbe. Sehen Sie auch unter
+	      <link linkend="config-colour">Farbkonfiguration</link> nach. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+  </sect1>
+  
+
+
+
+  
+  <sect1 id="classes">
+    <title>Terminalklassen</title> 
+
+    <para>
+      Das &term; unterstützt verschiedene Konfigurationprofile, so daß
+      es sich für verschiedene Zwecke einsetzen läßt (verschiedene
+      Hintergrundfarben, Vorhandensein und Position von Rollbalken usw.).
+      Um diese einzurichten, starten Sie den &prefs-dlg; aus dem
+      <guimenu>Einstellungen</guimenu>-Menü. Machen Sie dann alle
+      gewünschten Änderungen (sie wirken sich auf Ihr gegenwärtiges
+      Terminal aus, so daß Sie sehen können, wie es aussehen wird)
+      und geben einen neuen Namen in das Feld
+      <guilabel>Terminalklasse</guilabel> ein, bevor Sie das Dialogfeld
+      schließen.
+    </para>
+    
+    <para>
+      Um beim Programmstart eine bestimmte Terminalklasse zu aktivieren,
+      können Sie den Kommandozeilenparameter <option>--tclass</option>
+      benutzen.
+    </para>
+  </sect1>
+  
+  <sect1 id="options">
+    <title>Kommandozeilenparameter</title>
+    <para>
+      <itemizedlist>
+	<listitem>
+	  <para><option>--background <replaceable>COLOUR</replaceable>
+	    </option>
+	  </para>
+	  
+	  <para>
+	    Bestimmt die Hintergrundfarbe des Terminals beim Programmstart.
+	    Dabei kann <replaceable>COLOUR</replaceable> jede von Ihrem
+	    Fenstersystem akzeptierte Farbe sein.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--tclass <replaceable>CLASSNAME</replaceable>
+	    </option></para>
+	  <para>
+	    Bestimmt die beim Programmstart benutzte Terminalklasse.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--command <replaceable>CMD</replaceable>,
+	      -e <replaceable>CMD</replaceable>
+	    </option></para>
+	  <para>
+	    Führt den Befehl <replaceable>CMD</replaceable> aus.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para><option>--execute <replaceable>CMD ARGS</replaceable>, 
+	      -x <replaceable>CMD ARGS</replaceable>
+	    </option></para>
+	  <para>
+	    Führt den Befehl <replaceable>CMD</replaceable> mit den
+	    Argumenten  <replaceable>ARGS</replaceable> aus. Hinter
+	    diesem Argument werden keine weiteren Argumente vom Terminal
+	    interpretiert. Dies klont das Verhalten von
+	    <command>xterm -e</command>.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--font <replaceable>FONT</replaceable></option></para>
+	  <para>
+	    Setzt die im Terminal verwendete Schriftart auf
+	    <replaceable>FONT</replaceable>.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--foreground <replaceable>COLOUR</replaceable>
+	    </option></para>
+	  <para>
+	    Setzt die Vordergrundfarbe des Terminals auf
+	    <replaceable>COLOUR</replaceable>.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--geometry <replaceable>GEOMETRY</replaceable>
+	    </option></para>
+	  <para>
+	    Bestimmt die Geometrie dieses Terminals. Die Geometrie bestimmt
+	    die gewünschte Breite und Höhe in Terminal-Zeichen. Zum Beispiel
+	    erzeugt <option>--geometry=80x40</option> ein Terminal mit
+	    80 Spalten und 40 Zeilen.
+	  </para>
+	  <!--
+	<para>FIXME: LInk to gnome-libs document on GEOMETRY
+	  specifications when it is written
+	</para> -->
+	</listitem>
+	
+	<listitem>
+	  <para><option>--login</option></para>
+	  <para>
+	    Läßt &term; die Shell als Login-Shell starten (dies läßt alle
+	    beim Login üblichen Initialisierungsskripts ablaufen).
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--nologin</option>
+	  </para>
+	  <para>
+	    Läßt &term; lediglich eine Shell starten, ohne die beim Login
+	    üblichen Initialisationsskripte ablaufen zu lassen.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--noutmp</option></para>
+	  <para>
+	    Bestimmt, das dieses Terminal und die zugehörige Shell sich
+	    nicht in der Systemdatenbank eintragen, in der alle zur Zeit
+	    eingeloggten Benutzer registriert sind.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--utmp</option></para>
+	  <para>
+	    Sort dafür, daß sie zum Terminal gehörende Shell sich in die
+	    Systemdatenbank einträgt, in der alle zur Zeit eingeloggten
+	    Benutzer registriert sind (die sogenannte utmp-Datenbank).
+	    Dies ist die Standardeinstellung.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para><option>--lastlog</option></para>
+	  <para>
+	    Immer einen lastlog-Eintrag für jedes Terminal-Login erzeugen.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--nolastlog</option></para>
+	  <para>
+	    Keinen lastlog-Eintrag für jedes Terminal-Login erzeugen.
+	  </para>
+	</listitem>
+	
+	<listitem>
+	  <para><option>--title <replaceable>TITLE</replaceable>,
+	      -t <replaceable>TITLE</replaceable>
+            </option></para>
+	  <para>
+	    Läßt &term; <replaceable>TITLE</replaceable> als Fenstertitel
+	    verwenden.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para><option>--termname <replaceable>TERMNAME</replaceable>
+	    </option></para>
+	  <para>
+	    Läßt &term; <replaceable>TERMNAME</replaceable> als Wert für
+	    die Umgebungsvariable <envar>TERM</envar> verwenden.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para><option>--start-factory-server</option></para>
+	  <para>
+	    Versucht, den TerminalFactory-Service für dieses Terminal
+	    zu starten (siehe unten).
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para><option>--use-factory</option></para>
+	  <para>
+	    Wenn bereits ein Terminal-Prozess läuft, der mit der
+	    <option>--start-factory-server</option>-Option gestartet
+	    wurde, startet der Befehl
+	    <command>gnome-terminal --use-factory</command> ein neues
+	    Terminal, das zu dem existierenden Terminal-Prozess gehört.
+	    Das heißt, es hat denselben Effekt als wenn Sie
+	    <link linkend="menu-file">
+              <menuchoice><guimenu>Datei</guimenu>
+		<guimenuitem>Neues Terminal</guimenuitem>
+	      </menuchoice>
+	    </link> im existierenden Terminal wählen würden.
+	  </para>
+	  <para>
+	    Wenn keine TerminalFactory aktiv ist, hat diese Option keine
+	    Auswirkungen.
+	  </para>
+	</listitem>
+      </itemizedlist>		
+    </para>
+    <para>
+      Sie können selbstverständig mehr als eine diese Optionen gleichzeitig
+      verwenden, wenn Sie zum Beispiel den textbasierten Web-Browser
+      <application>Lynx</application> installiert haben, starte
+      <command>gnome-terminal --title Web --command lynx</command> ein
+      &term;, in dem <application>Lynx</application> abläuft und dessen
+      Titel "Web" ist.
+    </para>
+
+  </sect1>
+  
+  <sect1 id="environment">
+    <title>Umgebung</title>
+    <para>
+      Folgende Variablen werden vom &term; gesetzt:
+      <itemizedlist>
+	<listitem>
+	  <para><envar>TERM</envar></para>
+
+	  <para>
+	    Diese Variable wird standardmäßig auf "xterm" gesetzt.
+	    Einige curses-Implementationen und curses-basierende
+	    Applikationen benötigen eventuell "xterm-color" oder
+	    "xterm-debian", um Farben zu unterstützen. Sie müssen diese
+	    Variable daher unter Umständen ändern, falls Ihre Applikation
+	    sonst keine Farben darstellt.
+	    Dies kann mittlerweile über den
+	    <option>--termname </option>
+	    <link linkend="options">Kommandozeilenparameter</link>
+	    geschehen.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para><envar>COLORTERM</envar></para>
+
+	  <para>
+	    Diese Variable wird auf "gnome-terminal" gesetzt. Zahlreiche
+	    Applikationen (insbesondere die Slang-basierten Applikationen)
+	    benutzen diesen Wert um festzustellen, ob das Terminal Farben
+	    unterstützt.
+	  </para>
+	</listitem>
+
+	<listitem>
+	  <para><envar>WINDOWID</envar></para>
+
+	  <para>
+	    Diese Variable enthält die X11-Fenster-ID. Sie wird manchmal
+	    von Applikationen dazu benutzt, die Inhalt dieses Fenster zu
+	    änden oder spezielle Effekte zu bieten.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </para>
+  </sect1>
+  
+  <sect1 id="Authors">
+    <title>Autoren</title>
+
+    <para>
+      Eine große Anzahl von Personen hat mitgeholfen, Ihnen das &term;
+      zu schaffen.
+    </para>
+
+    <para>
+      Michael Zucchi schrieb die Zvt-Widget-Engine; Miguel de Icaza und
+      Jay Painter haben sie weiterentwickelt, verbessert und verwaltet.
+      George Lebl fügte dem Widget die Unterstützung von Transparenz und
+      Pixmap-Hintergründen hinzu; dies wurde später von Michael Zucchi
+      signifikant weiterentwickelt, er implementierte ebenfalls eine
+      glattere/schellere Anzeige und einen optionalen Roll-Mode.
+    </para>
+
+    <para>
+      Miguel schrieb das Haupt-&term;-Programm, und Erik Troan fügte
+      Terminalklassen und zahlreiche andere Features hinzu.
+      Jeff Garzik, Jay, Christopher Blizzard, Michael, Jens Lautenbacher,
+      Tom Tromey, Tristan Tarrant, Jonathan Blandford und Michael Zucchi
+      haben zahlreiche Fehler verbessert und kleinere Verbesserungen
+      vorgenommen. Nat Friedman stelle sicher, daß das Benutzerinterface
+      mit den GNOME-Richtlinen übereinstimmt. Felix Bellaby, Tom Tromey
+      und Manish Vachharajani haben das Sitzungsmanagement implementiert
+      und weiterentwickelt.
+    </para>
+
+    <para> 
+      Bitte senden Sie alle Kommentare, Anregungen und Fehlerberichte an
+      die <ulink url="http://bugs.gnome.org/" type="http">GNOME-Problemdatenbank</ulink>. Eine Anleitung zum Berichten von Fehlern findet sich online unter
+      <ulink url="http://bugs.gnome.org/Reporting.html" type="http">http://bugs.gnome.org/Reporting.html</ulink>. Falls Sie GNOME 1.1 oder neuer verwenden,
+      können Sie auch den Befehl <command>bug-buddy</command> verwenden,
+      um Fehler zu berichten.
+    </para>
+
+    <para>
+      Die deutsche Übersetzung dieses Handbuchs stammt von
+      Martin Baulig (<email>baulig@suse.de</email>).
+    </para>
+  </sect1>
+  
+  
+</article>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

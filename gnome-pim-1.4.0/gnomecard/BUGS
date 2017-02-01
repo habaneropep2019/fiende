@@ -1,0 +1,27 @@
+BUG #1260
+
+ Bug #1260 seems to be a problem with libversit's parser and gnomecard
+ ignoring any extended properties. It is good to check the value type, but
+ the error is still there.
+ 
+ Arturo
+ 
+ OK, this one is gone too.
+
+Erase last bug (fixed).
+
+ There is a nasty bug that happens when erasing the last card on the list.
+ It seems like the clist row is erased, but the actual data erased is the
+ card selected before the last one. I have observed this when modifying
+ cards with an arbitrary location in the list too, but unable to reproduce
+ the bug.
+ 
+ Arturo
+ 
+ Hah! This was fixed right away. The thing was that, as the card's row in the
+ clist was being erased first, gnomecard_curr_crd was changed as a side
+ effect, and then the card it pointed to was erased. This is why people 
+ shouldn't ever use globals... and this program is full of them.
+ 
+ Arturo
+

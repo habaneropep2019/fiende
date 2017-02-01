@@ -1,0 +1,72 @@
+
+GDK--
+
+The is a wrapper for the Gimp Drawing Kit, to provide
+its functionality with C++ bindings.  
+
+Objects have no dependencies on Gtk or Gtk--.  The classic X hiarchy
+of Drawables is provided.  Objects will contain no extra data above 
+the class they wrap.
+
+Some enhanced objects are provided to ease use.
+
+-------------------------------------------------------------------
+
+Handles
+
+Some objects are handles.  A handle is reference to a remote
+object that can not be access except through the handle.  Because
+the object that handle refers to is remote there is no concept 
+of providing values directly without the handle.  There is
+no operator -> or operator * possible as the object is remote.
+
+There are certain things that one should know before programming
+with handles.
+
+ -  Objects on the remote side a scarce.  
+    They should only be allocated when needed.
+    Excessive allocation can cause failure.
+
+ -  There can be many handles to the same object.
+    So altering the object through one handle makes
+    its presence felt on all handles to that object.
+
+ -  A handle can point to no object at all at least until
+    enough information is availalbe to construct the handle.
+    You can always check to see a handle is initialize when
+    in doubt.   
+
+ -  using operator = with a handle give you a another handle
+    to the same object not a new object.
+
+ -  Some handles provide methods of copying memberwise on
+    the other end.
+
+ -  When a handle is destructed, it will free the resource
+    if there are no other handles to that object. 
+
+ -  Handles never need to be dynamic as you can always
+    pass a handle to and from a function.
+
+When in doubt about what a handle might do, think of them
+as being similar to pointers.
+
+
+Provided handles
+
+  Gdk_Bitmap 
+  Gdk_Colormap 
+  Gdk_Drawable
+  Gdk_Font 
+  Gdk_GC 
+  Gdk_Pixmap
+  Gdk_Window
+
+
+Classes
+ 
+  Gdk_Color
+  Gdk_Rectangle
+ 
+
+     

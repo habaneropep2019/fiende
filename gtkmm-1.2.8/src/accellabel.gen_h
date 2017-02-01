@@ -1,0 +1,109 @@
+/* $Id: accellabel.gen_h,v 1.33 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* accellabel.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/label.h>
+#include <gtk/gtkaccellabel.h>
+
+CLASS_START(Gtk);
+//: A label which displays an accelerator key to the right of the text.
+//- The {Gtk::AccelLabel} widget is a subclass of {Gtk::Label} that also displays an accelerator key to
+//- the right of the label text, e.g. 'Ctl+S'. It is commonly used in menus to show the keyboard
+//- short-cuts for commands.
+//-
+//- The accelerator key to display is not set explicitly. Instead, the {Gtk::AccelLabel} displays the
+//- accelerators which have been added to a particular widget. This widget is set by calling
+//- {set_accel_widget()}.
+
+//- For example, a {Gtk::MenuItem} widget may have an accelerator added to emit the "activate" signal
+//- when the 'Ctl+S' key combination is pressed. A {Gtk::AccelLabel} is created and added to the
+//- {Gtk::MenuItem}, and {set_accel_widget()} is called with the {Gtk::MenuItem} as the argument. The
+//- {Gtk::AccelLabel} will now display 'Ctl+S' after its label.
+class AccelLabel : public Label {
+  WRAP_CLASS(AccelLabel,GtkAccelLabel,GTK_ACCEL_LABEL,GTK_IS_ACCEL_LABEL,accel_label,Gtk::Label,GtkLabel,GTK_LABEL);
+public:
+
+  //: Creates a new {Gtk::AccelLabel}.
+  //- string: The label string.
+  explicit AccelLabel(const string &label);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(guint gtk_accel_label_get_accel_width(GtkAccelLabel*),
+	      guint get_accel_width () const);
+  //: Sets the widget whose accelerators are to be shown.
+  WRAP_METHOD(void gtk_accel_label_set_accel_widget(GtkAccelLabel*,GtkWidget*),
+	      void  set_accel_widget(Gtk::Widget &accel_widget));
+  //: Recreates the string representing the accelerator keys.
+  //- This should not be needed since the string is automatically updated whenever accelerators
+  //- are added or removed from the associated widget.
+  WRAP_METHOD(gboolean gtk_accel_label_refetch(GtkAccelLabel *accel_label),
+	      bool refetch());
+};
+
+PRIVATE_START;
+#include <gtk--/private/label_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+
+AccelLabel::AccelLabel(const string &label)
+  : Label((GtkLabel*)(gtk_object_new(get_type(),0)))
+  {
+    initialize_class();
+    set_text(label);
+  }
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_AccelLabel)
+//. name: queue_id
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: accel_padding
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: accel_widget
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: accel_string
+//. type: string
+//. get:
+//. set:
+//. desc:
+
+//. name: accel_string_width
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+

@@ -1,0 +1,773 @@
+<HTML
+><HEAD
+><TITLE
+>MsOleStream</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.54"><LINK
+REL="HOME"
+TITLE="libole2 Library Reference Manual"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="API Reference"
+HREF="r19.html"><LINK
+REL="PREVIOUS"
+TITLE="MsOle"
+HREF="libole2-msole.html"><LINK
+REL="NEXT"
+TITLE="MsOleSummary"
+HREF="libole2-msolesummary.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>libole2 Library Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="libole2-msole.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="r19.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="libole2-msolesummary.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="LIBOLE2-MSOLESTREAM"
+>MsOleStream</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN379"
+></A
+><H2
+>Name</H2
+>MsOleStream&nbsp;--&nbsp;</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN382"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;libole2/libole2.h&gt;
+
+
+struct      <A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+>;
+<A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    <A
+HREF="libole2-msolestream.html#MS-OLE-STREAM-OPEN"
+>ms_ole_stream_open</A
+>              (<A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+> **const stream,
+                                             <A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             const char *dirpath,
+                                             const char *name,
+                                             char mode);
+<A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    <A
+HREF="libole2-msolestream.html#MS-OLE-STREAM-CLOSE"
+>ms_ole_stream_close</A
+>             (<A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+> **const stream);
+<A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    <A
+HREF="libole2-msolestream.html#MS-OLE-STREAM-DUPLICATE"
+>ms_ole_stream_duplicate</A
+>         (<A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+> **const stream_copy,
+                                             const <A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+> *const stream);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN397"
+></A
+><H2
+>Description</H2
+><P
+></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN400"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN402"
+></A
+><H3
+><A
+NAME="MSOLESTREAM"
+></A
+>struct MsOleStream</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>struct MsOleStream
+{
+	MsOlePos size;
+
+	gint		(*read_copy)	(MsOleStream *stream,
+					 guint8 *ptr,
+					 MsOlePos length);
+
+	guint8 *	(*read_ptr)	(MsOleStream *stream,
+					 MsOlePos length);
+
+	MsOleSPos	(*lseek)	(MsOleStream *stream,
+					 MsOleSPos bytes,
+					 MsOleSeek type);
+
+	MsOlePos	(*tell)		(MsOleStream *stream);
+
+	MsOlePos	(*write)	(MsOleStream *stream,
+					 guint8 *ptr,
+					 MsOlePos length);
+
+
+	/**
+	 * PRIVATE (do not use)
+	 **/
+	enum {
+		MsOleSmallBlock,
+		MsOleLargeBlock
+	} type;
+	MsOle		*file;
+	void		*pps;		/* Straight PPS */
+	GArray		*blocks;	/* A list of the blocks in the file
+					   if NULL: no file */
+	MsOlePos	 position;	/* Current offset into file.
+					   Points to the next byte to read */
+};</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN407"
+></A
+><H3
+><A
+NAME="MS-OLE-STREAM-OPEN"
+></A
+>ms_ole_stream_open ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    ms_ole_stream_open              (<A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+> **const stream,
+                                             <A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             const char *dirpath,
+                                             const char *name,
+                                             char mode);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Opens the stream in <TT
+CLASS="PARAMETER"
+><I
+>dirpath</I
+></TT
+> with the name <TT
+CLASS="PARAMETER"
+><I
+>name</I
+></TT
+> and creates the stream
+object <TT
+CLASS="PARAMETER"
+><I
+>stream</I
+></TT
+>. If <TT
+CLASS="PARAMETER"
+><I
+>mode</I
+></TT
+> is '<TT
+CLASS="LITERAL"
+>r</TT
+>' it opens read only, and if it is '<TT
+CLASS="LITERAL"
+>w</TT
+>'
+it opens for write only.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>stream</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> stream object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dirpath</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> directory of the stream.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>name</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> stream name.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>mode</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> mode of opening stream.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN452"
+></A
+><H3
+><A
+NAME="MS-OLE-STREAM-CLOSE"
+></A
+>ms_ole_stream_close ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    ms_ole_stream_close             (<A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+> **const stream);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Closes the <TT
+CLASS="PARAMETER"
+><I
+>stream</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>stream</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> stream object to be closed.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN475"
+></A
+><H3
+><A
+NAME="MS-OLE-STREAM-DUPLICATE"
+></A
+>ms_ole_stream_duplicate ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    ms_ole_stream_duplicate         (<A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+> **const stream_copy,
+                                             const <A
+HREF="libole2-msolestream.html#MSOLESTREAM"
+>MsOleStream</A
+> *const stream);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Duplicates the stream object <TT
+CLASS="PARAMETER"
+><I
+>stream</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>stream_copy</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> stream object copy.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>stream</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> stream object to be duplicated.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="libole2-msole.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="r19.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="libole2-msolesummary.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>MsOle</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>MsOleSummary</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

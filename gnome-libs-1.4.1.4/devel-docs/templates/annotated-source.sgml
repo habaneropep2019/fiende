@@ -1,0 +1,148 @@
+<!doctype programlistingco PUBLIC "-//Davenport//DTD DocBook V3.0//EN">
+
+<!-- You can use this template as a basis for including annotated -->
+<!-- source code in GNOME documentation.  In this example, we point -->
+<!-- out several important parts in a small snippet of source. -->
+
+<!-- We are using the Role attribute to indicate the source language, -->
+<!-- in this case C. -->
+
+<programlistingco role="C">
+
+  <!-- For this example, the area specifications are given as a
+  line-column string of the form "line column".  Each area
+  specification also has an identifier that we will use to reference
+  it in the program listing and in the annotations (callout list). -->
+
+  <areaspec units="linecolumn">
+    <area coords="4 1" id="clicked-signal-prototype">
+    <area coords="7 25" id="user-data">
+    <area coords="10 1" id="delete-event-signal-prototype">
+    <area coords="13 1" id="destroy-widgets">
+    <area coords="14 1" id="quit-main-loop">
+    <area coords="15 1" id="return-value">
+    <area coords="27 1" id="title">
+    <area coords="38 1" id="gtk-widget-show-all">
+    <area coords="40 1" id="return">
+  </areaspec>
+
+  <!-- Remember that you must replace the "<" and ">" characters with
+  "&lt;" and "&gt;", as well as replacing "&" with "&amp;". -->
+
+  <programlisting>
+#include &lt;stdio.h&gt;
+#include &lt;gtk/gtk.h&gt;
+
+static void
+button_clicked (GtkWidget *widget, gpointer data)
+{
+	printf ("%s\n", (char *) data);
+}
+
+static gint
+window_delete_event (GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+	gtk_widget_destroy (widget);
+	gtk_main_quit ();
+	return TRUE;
+}
+
+int
+main (int argc, char **argv)
+{
+	GtkWidget *window;
+	GtkWidget *button;
+
+	gtk_init (&amp;argc, &amp;argv);
+
+	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title (GTK_WINDOW (window), "Example");
+	gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+			    (GtkSignalFunc) window_delete_event,
+			    NULL);
+
+	button = gtk_button_new_with_label ("Say hello");
+	gtk_signal_connect (GTK_OBJECT (button), "clicked",
+			    (GtkSignalFunc) button_clicked,
+			    "Hello world!");
+	gtk_container_add (GTK_CONTAINER (window), button);
+
+	gtk_widget_show_all (window);
+	gtk_main ();
+	return 0;
+}
+  </programlisting>
+
+  <!-- Here are the annotations, included as a callout list.  For each
+  callout, we include the list of area IDs it references.  The title
+  in the callout list is optional, but it is nice to have it. -->
+
+  <calloutlist>
+
+    <title>Interesting areas of the code</title>
+
+    <callout arearefs="clicked-signal-prototype">
+      <para>
+	Please note the correct signal prototype for the "clicked"
+	signal of buttons.
+      </para>
+    </callout>
+
+    <callout arearefs="user-data">
+      <para>
+	We are passing the string to print in the user data of the
+	signal.  We cast it to (char *) for safety.
+      </para>
+    </callout>
+
+    <callout arearefs="delete-event-signal-prototype">
+      <para>
+	Please note the correct signal prototype for the
+	"delete_event" signal of windows.  People often forget that it
+	returns a gint and takes a GdkEvent * as a parameter.
+      </para>
+    </callout>
+
+    <callout arearefs="destroy-widgets">
+      <para>
+	Good programmers destroy their toplevel widgets when they are
+	done.
+      </para>
+    </callout>
+
+    <callout arearefs="quit-main-loop">
+      <para>
+	We quit the main loop to tell Gtk that we are done and the
+	program can terminate.
+      </para>
+    </callout>
+
+    <callout arearefs="return-value">
+      <para>
+	Since we <emphasis>did</emphasis> handle the delete_event, we
+	must return TRUE to tell Gtk not to do any further
+	processing of the signal by itself.
+      </para>
+    </callout>
+
+    <callout arearefs="title">
+      <para>
+	Every window should have a meaningful title.
+      </para>
+    </callout>
+
+    <callout arearefs="gtk-widget-show-all">
+      <para>
+	We are lazy, so instead of showing every child widget by hand,
+	we show them all in one shot with gtk_widget_show_all().
+      </para>
+    </callout>
+
+    <callout arearefs="return">
+      <para>
+	Remember that successful program termination must end with a
+	return value of 0.
+      </para>
+    </callout>
+  </calloutlist>
+</programlistingco>

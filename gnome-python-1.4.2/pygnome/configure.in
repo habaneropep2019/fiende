@@ -1,0 +1,36 @@
+AC_INIT(_gnomeuimodule.c)
+AC_ARG_WITH(gnome-conf,
+[  --with-gnome-config=CFG  the path of the gnome-config script],,
+[with_gnome_conf=no])
+
+dnl get information for generating Makefile.
+PY_INIT(Makefile, Setup)
+
+PY_CHECK_MOD(Gtkinter, GtkObject,,[AC_MSG_ERROR([can't find pygtk files])])
+
+AC_MSG_CHECKING(for gnome-config)
+if test -f "$with_gnome_config"; then
+  GNOMECONF="$with_gnome_config"
+else
+  GNOMECONF=no
+  for gnome_prefix in /usr /usr/local /opt /opt/gnome; do
+    if test -f "$gnome_prefix/bin/gnome-config"; then
+      GNOMECONF="$gnome_prefix/bin/gnome-config"
+      break
+    fi
+  done
+  if ! test -f "$GNOMECONF"; then
+    AC_MSG_ERROR([can't find gnome-config])
+  fi
+fi
+AC_MSG_RESULT($GNOMECONF)
+GNOME_FLAGS=`gnome-config --cflags --libs gnome         | sed 's/-rdynamic//g'`
+GNOMEUI_FLAGS=`gnome-config --cflags --libs gnomeui     | sed 's/-rdynamic//g'`
+GTKXMHTML_FLAGS=`gnome-config --cflags --libs gtkxmhtml gtk|sed 's/-rdynamic//g'`
+ZVT_FLAGS=`gnome-config --cflags --libs zvt gtk          | sed 's/-rdynamic//g'`
+AC_SUBST(GNOME_FLAGS)
+AC_SUBST(GNOMEUI_FLAGS)
+AC_SUBST(GTKXMHTML_FLAGS)
+AC_SUBST(ZVT_FLAGS)
+
+AC_OUTPUT(Setup Makefile.pre)

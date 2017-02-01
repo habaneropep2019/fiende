@@ -1,0 +1,358 @@
+<refentry id="gnome-gnome-i18n">
+<refmeta>
+<refentrytitle>gnome-i18n</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-i18n</refname><refpurpose>Support for localization and internationalization.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+#define     <link linkend="gettext-macro">_</link>                               (String)
+#define     <link linkend="N--CAPS">N_</link>                              (String)
+#define     <link linkend="textdomain">textdomain</link>                      (String)
+#define     <link linkend="gettext">gettext</link>                         (String)
+#define     <link linkend="dgettext">dgettext</link>                        (Domain,Message)
+#define     <link linkend="dcgettext">dcgettext</link>                       (Domain,Message,Type)
+#define     <link linkend="bindtextdomain">bindtextdomain</link>                  (Domain,Directory)
+const char* <link linkend="gnome-i18n-get-language">gnome_i18n_get_language</link>         (void);
+<link linkend="GList">GList</link>*      <link linkend="gnome-i18n-get-language-list">gnome_i18n_get_language_list</link>    (const <link linkend="gchar">gchar</link> *category_name);
+void        <link linkend="gnome-i18n-set-preferred-language">gnome_i18n_set_preferred_language</link>
+                                            (const char *val);
+const char* <link linkend="gnome-i18n-get-preferred-language">gnome_i18n_get_preferred_language</link>
+                                            (void);
+void        <link linkend="gnome-i18n-init">gnome_i18n_init</link>                 (void);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  This module allows the programmer to internationalize his
+  application by providing a number of macros that can be used to tag his
+  texts, and some functions that control the internationalization of
+  the application or library.
+</para>
+
+<para>
+  Typically the programmer would enclose text strings that are
+  displayed to the user in a <link linkend="gettext-macro">_</link>() macro call.  This macro serves two
+  purposes: it is used to tag the string for translation (it is a
+  special sequence recognized by the GNU gettext framework) and it is
+  used at run-time to invoke the translation process on the current
+  string.
+
+  <example>
+    <title>Typical usage of the _ macro</title>
+    <programlisting>
+void print_hello (void)
+{
+        printf (_("Hello World"));
+}
+    </programlisting>
+  </example>
+</para>
+
+<para>
+  The macro <link linkend="gettext-macro">_</link>() can map to either an invocation to gettext (which
+  means that the string argument is translated in the default
+  application translation domain) or to dgettext (which means that the
+  string is translated into the
+  <emphasis>GNOME_EXPLICIT_TRANSLATION_DOMAIN</emphasis>.
+</para>
+
+<para>
+  Typically applications will just include the
+  <filename>gnome.h</filename> header file, the
+  <filename>libgnome.h</filename> or the
+  <filename>gnome-i18n.h</filename> header file and this will define
+  the <link linkend="gettext-macro">_</link>() macro as an invocation to <link linkend="gettext">gettext</link>().  In the case of
+  libraries, shared object modules (dynamically linked libraries) or
+  shared object CORBA servers (CORBA servers implemented as shared
+  libraries), you should define the
+  <emphasis>GNOME_EXPLICIT_TRANSLATION_DOMAIN</emphasis> macro to your
+  package name (usually a define in the compilation Makefile or in the
+  config.h file will do it).  By doing this your library, shared
+  library or CORBA server will explicitly translate its string
+  messages in its own translation domain (rather than using the
+  application domain, which will not have a translation table for your
+  messages). 
+</para>
+
+<para>
+  All of the functions in this module do either map to an empty action
+  if the <emphasis>ENABLE_NLS</emphasis> macro is not defined or to
+  actual functions if it is defined.
+</para>
+
+<para>
+  See the Info page for GNU gettext to learn more on the
+  internationalization process for an application. 
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gettext-macro">_()</title>
+<programlisting>#define     _(String)</programlisting>
+<para>
+  Use this to tag strings in an executable path, this macro expands to
+  <link linkend="gettext">gettext</link>() or <link linkend="dgettext">dgettext</link>() if the application supports
+  internationalization.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>String</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="N--CAPS">N_()</title>
+<programlisting>#define     N_(String)</programlisting>
+<para>
+  This macro is just an identity macro, the only purpose of this macro
+  is to allow <filename>gettext</filename> to identify the string as a
+  translatable message.  This macro can be used in static
+  initializers, where the <link linkend="gettext-macro">_</link>() macros can not be used.
+
+  <example>
+    <title>Typical usage of the N_ macro</title>
+    <programlisting>
+char *days [5] = {
+    	N_("monday"), 
+    	N_("tuesday"), 
+    	N_("wednesday"), 
+    	N_("thursday"), 
+    	N_("friday")
+};
+
+void print_days (void)
+{
+        int i;
+
+        for (i = 0; i < 5; i++)
+             printf (_("The day of the week <literal>s</literal> is"), _(days [i]));
+}
+    </programlisting>
+  </example>
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>String</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="textdomain">textdomain()</title>
+<programlisting>#    define textdomain(String) (String)
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>String</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gettext">gettext()</title>
+<programlisting>#    define gettext(String) (String)
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>String</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="dgettext">dgettext()</title>
+<programlisting>#    define dgettext(Domain,Message) (Message)
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Domain</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Message</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="dcgettext">dcgettext()</title>
+<programlisting>#    define dcgettext(Domain,Message,Type) (Message)
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Domain</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Message</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Type</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bindtextdomain">bindtextdomain()</title>
+<programlisting>#    define bindtextdomain(Domain,Directory) (Domain)
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Domain</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Directory</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-i18n-get-language">gnome_i18n_get_language ()</title>
+<programlisting>const char* gnome_i18n_get_language         (void);</programlisting>
+<para>
+Returns current language (contents of "LANG" environment variable).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-i18n-get-language-list">gnome_i18n_get_language_list ()</title>
+<programlisting><link linkend="GList">GList</link>*      gnome_i18n_get_language_list    (const <link linkend="gchar">gchar</link> *category_name);</programlisting>
+<para>
+This computes a list of language strings.  It searches in the
+standard environment variables to find the list, which is sorted
+in order from most desirable to least desirable.  The `C' locale
+is appended to the list if it does not already appear.
+If <parameter>category_name</parameter> is <literal>NULL</literal>, then LC_ALL is assumed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>category_name</parameter>&nbsp;:</entry>
+<entry> Name of category to look up, e.g. "LC_MESSAGES".
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the list of languages
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-i18n-set-preferred-language">gnome_i18n_set_preferred_language ()</title>
+<programlisting>void        gnome_i18n_set_preferred_language
+                                            (const char *val);</programlisting>
+<para>
+This sets the user's preferred language in the Gnome config
+database.  This value can always be overridden by the standard
+environment variables.  It exists so that a config applet which
+chooses the preferred language has a standard place to put the
+resulting information.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>val</parameter>&nbsp;:</entry>
+<entry> Preferred language
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-i18n-get-preferred-language">gnome_i18n_get_preferred_language ()</title>
+<programlisting>const char* gnome_i18n_get_preferred_language
+                                            (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the preferred language as set in the Gnome config database.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-i18n-init">gnome_i18n_init ()</title>
+<programlisting>void        gnome_i18n_init                 (void);</programlisting>
+<para>
+Initialize the i18n environment variables (if not already set) from
+the Gnome config database.  Ordinarily this should not be called by
+user code.</para>
+<para>
+
+</para></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  GNU gettext info page
+</para>
+</refsect1>
+
+</refentry>

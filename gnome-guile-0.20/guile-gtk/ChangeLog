@@ -1,0 +1,2818 @@
+2001-02-25  Ariel Rios  <ariel@arcavia.com>
+
+	* Makefile.am (EXTRA_DIST): Include the .defs translation
+	in the distribution.
+
+2001-02-04  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gdk-1.2.defs, gdk-1.3.defs, gtk-support.c
+	(gdk_window_get_origin_scm): Added, to go with
+	gdk_window_get_size.
+
+2001-01-29  Ariel Rios  <ariel@arcavia.com>
+
+	* Makefile.am (install-data-local): Uncomment rep.scm installation
+
+2001-01-30  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-1.2.defs, gtk-1.3.defs (GtkWidget): Added subfields of
+	`allocation' and `requisition' using the new `cname' option.
+
+	* build-guile-gtk (emit-field-accessors): Handle `cname' option in
+	field specifier.  See NEWS.
+
+2001-01-28  Ariel Rios  <ariel@arcavia.com>
+
+	* Makefile.am: Install rep.scm
+
+	* build-guile-gtk (emit-funcs): Added cstring type that will be used
+	in constant char * types.
+
+2001-01-21  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* configure.in: Check for pkg-config, and do not use the new
+	Gnome-2 autoconf stuff when it is not found.  Instead, use the old
+	way of checking for Gtk+ then.
+
+	* gtk/repl.scm (gtk-repl): Pass gdk-flush itself to add-hook, not
+	the result of calling gdk-flush.  Strange, how got this in there?
+	Do only start the threaded repl when we have the `threads'
+	feature.  Start the old event repl else.
+	
+2001-01-20  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sym_repl): New.
+	(hack_compiled_switches): Add a `(use-modules (gtk repl))' form to
+	the compiled actions.
+
+	* gtk-1.2/gtk.scm: Do not use `(gtk event-repl)' module.  Removed
+	all repl code.
+
+	* gtk/repl.scm: New file, contains the repl code from
+	gtk/event-repl.scm, gtk-1.2/gtk.scm and gtk-1.3/gtk.scm.  Also
+	contains new code for a threaded repl, which is now the default.
+
+	* Makefile.am (install-data-local): Do not install event-repl.scm.
+	Install repl.scm in gtk directory instead.
+
+2000-12-11  Ariel Rios  <ariel@arcavia.com>
+
+	* guile-gtk.c (sgtk_init_substrate): Removed unused stuff
+
+2000-12-02  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gdk-1.3.defs (gdk_event_button_state, gdk_event_key_state):
+	Removed commented definition.
+	(gdk_event_state): New, and return GdkModifierType instead of uint
+	like gdk_event_button_state etc did.
+
+2000-11-30  Martin Baulig  <baulig@suse.de>
+
+	* configure.in: Make the check for thread_create actually work.
+	* gtk-threads.c: #include <config.h>.
+
+	* gtk/config.scm.in (gtkconf-gtk-2-0): Added.
+	* configure.in (GTKCONFIG_GTK_2_0): Added, either `#t' or `#f'.
+
+	* build-guile-gtk (emit-object-info): Use G_TYPE_OBJECT for
+	GTK+ 2.x and GTK_TYPE_OBJECT for GTK+ 1.x.
+
+2000-11-30  Martin Baulig  <baulig@suse.de>
+
+	* guile-gtk.c (sgtk_signal_emit): Make this work with GTK+ 1.3.
+
+2000-11-29  Martin Baulig  <baulig@suse.de>
+
+	* Makefile.am (INCLUDES): Put $(GTK_CFLAGS) first, before
+	$(GUILE_INCS).
+
+2000-11-29  Martin Baulig  <baulig@suse.de>
+
+	* examples/autogen.sh: New file.
+	* examples/NO-AUTO-GEN: Removed.
+	* examples/configure.in: Use gnome-common here as well.
+
+2000-11-29  Martin Baulig  <baulig@suse.de>
+
+	* autogen.sh: Use gnome-common with the GNOME 2 macros.
+
+	* configure.in: Make conditional GNOME 1.x / 2.x support work,
+	use pkg-config to check for GTK+.
+
+	* NO-AUTO-GEN: Removed.
+
+2000-11-19  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gdk-1.2.defs (GdkPoint): Completely removed commented out
+	definition.
+
+	* gtk-support.c, guile-gtk.h (gdk_draw_text_scm): New.
+
+	* gdk-1.2.defs (gdk_draw_text, gdk_draw_text_scm): Use
+	gdk_draw_text_scm instead of gdk_draw_text.  Keep Scheme name.
+	Add text parameter.
+	(gdk_draw_points): Use `(cvecr point)' as type of points
+	parameters.  Remove npoints parameter.
+
+	* build-guile-gtk (->string, string-append*): New.
+	(canonicalize): Use "->string".  Everywhere: use string-append*
+	instead of string-append.
+
+	* configure.in: Use AC_CHECK_PROG instead of AC_PATH_PROG.
+	AC_PROG_PATH was used incorrectly, anyway.  Set GTK_CONFIG_2_0
+	when checking for gtk-config-2.0, not GTK_VERSION.  GTK_VERSION
+	already has a meaning, which is not whether gtk-config-2.0 has
+	been found.  Add "$" in test whether GTK_CONFIG_2_0 is yes or no.
+
+2000-11-08  Ariel Rios <ariel@arcavia.com>
+
+	* NEWS: Updated for version 0.20
+
+2000-10-31  Ariel Rios <ariel@arcavia.com>
+
+	* guile-gtk.c (enter_type_info): We now use G_TYPE_BRANCH_SEQNO in
+	the Gtk2.0 port.
+	(sgtk_maybe_find_type_info): Ditto.
+	(sgtk_boxed2scm): Ditto
+	(sgtk_find_object_info_from_type): Ditto.
+	(sgtk_find_object_info): Ditto.
+
+2000-10-29  Ariel Rios  <ariel@arcavia.com>
+
+	* gtk-1.3.defs (GtkColorSelectionDialog): Removed changed fields.
+	(GtkFundamentalType): Comment GTK_TYPE_OBJECT.
+
+2000-10-29  Ariel Rios  <ariel@arcavia.com>
+
+	* gdk-1.3.defs (gdk_pixmap_create_from_xpm): Change definition d'accord to gdk function.
+	(GTimer): Comment definition.
+
+2000-10-26  Ariel Rios  <ariel@arcavia.com>
+
+	* gdk-1.2.defs: gdk_draw_point, gdk_draw_line, gdk_draw_text: NEW 
+
+2000-10-20  Ariel Rios  <ariel@arcavia.com>
+
+	* gtk-1.3.defs (GtkFundamentalType): Comment out foreign, callback, args and c-callbacks types.
+
+	* gdk-1.3.defs (GdkWindowType): Removed pixmap enum and added a foreign. Please notice that from now
+	on 1.3 and 1.2 files are different!
+
+2000-10-20  Ariel Rios  <ariel@arcavia.com>
+
+	* gtk-1.3.defs (includes): Include the gtk 2.0 headers. 
+	gdk-1.3.defs: Ditto.
+
+2000-10-19  Ariel Rios  <ariel@arcavia.com>
+
+	* gtk-support.c: Include config.h
+
+2000-10-04 Ariel Rios   <ariel@arcavia.com>
+
+	* guile-gtk.h: Include headers correctly.
+
+	* gtk-compat.c: Ditto.
+
+2000-10-04    Ariel Rios  <ariel@arcavia.com>
+
+	* gtk-support.c (gdk_event_pressure): Put function inside and #ifndef clause.
+	(gdk_event_xtilt): Ditto
+	(gdk_event_button): Ditto
+	(gdk_event_source): Ditto
+	(gdk_event_deviceid): Ditto.
+	(gdk_get_leader_window_id): Ditto. 
+	(gdk_window_get_id): Ditto.
+
+2000-10-03  Ariel Rios  <ariel@arcavia.com>
+
+	* guile-gtk.c: Correct included headers.
+
+2000-09-30  Ariel Rios  <ariel@arcavia.com>
+
+	* guile-gtk.c (sgtk_scm2ret):Conditionally set GTK_TYPE_OBJECT since in
+	GTK 2.0 they are not fundamental types anymore. 
+	(sgtk_valid_arg): Conditionally set GTK_TYPE_OBJECT and  GTK_TYPE_CALLBACK.
+	Conditionally include the correct headers according to lib version.
+
+2000-09-30  Ariel Rios  <ariel@arcavia.com> 
+	
+	* configure.in: Uncomment AC_DEFINE(GTK_2_0)
+	* acconfig.h: Undef GTK_2_0
+
+	
+2000-09-30  Ariel Rios  <ariel@arcavia.com>
+
+	* configure.in: Added commented stuff for defining GTK_2_0.  
+	
+2000-09-30  Ariel Rios  <ariel@arcavia.com>
+	
+	* guile-gtk.c:  _sgtk_object_proxy: Add a FIXME reference to remember that the proxy
+	may need a GObject instead of a GtkObject.
+	(gtkobj_marker_hook): Conditionally correctly use the ref_count according to the 
+	Gtk version.
+	(sgtk_scm2arg): Conditionally set the GTK_TYPE_CALLBACK and GTK_TYPE_OBJECT since in
+	GTK 2.0 they are not fundamental types anymore.
+	This Changes should not break compilation in 1.2 systems!
+	
+
+2000-09-29  Ariel Rios  <ariel@arcavia.com>
+
+	* configure.in: Conditionally check whether if we have gtk-config-2.0. If so we built
+	for the gtk-1.3 unstable series.
+
+2000-09-21  Ariel Rios <ariel@arcavia.com>
+	
+	* configure.in: Bump version to 0.20.
+        Let the games begin!
+
+2000-09-05  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_event_area): Uncomment.  *
+	gtk-support.c, guile-gtk.h (gdk_event_area): Return A
+	GdkRectangle, not a pointer to it.  Thanks to Mark Seaborn!
+
+	* guile-gtk.h (gtk_style_fg_gc, gtk_style_bg_gc,
+	gtk_style_light_gc, gtk_style_dark_gc, gtk_style_mid_gc,
+	gtk_style_text_gc, gtk_style_base_gc): New prototypes to fight
+	compiler warnings.
+	
+2000-08-30  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_init_substrate): Call sgtk_init_threads.
+
+	* gtk-support.c: Include "gtk-threads.h".
+	(sgtk_threads_update): Added SCM_PROC for it.
+
+	* configure.in: Pass `gthread' module flag to AM_PATH_GTK.  Added
+	check for thread_create struct member.
+
+	* acconfig.h: Added HAVE_THREAD_CREATE
+
+	* Makefile.am: Added gtk-threads.c, gtk-threads.h, gtk/threads.scm
+	in all the right places.
+
+2000-08-25  Marius Vollmer  <mvo@dt.e-technik.uni-dortmund.de>
+
+	* configure.in: Do not check for scm_the_root_module, check
+	whether scm_eval_x takes two arguments instead.
+	* guile-gtk.c (sgtk_shell): Use the result.
+
+	* guile-gtk.c (sgtk_valid_complen): Correctly use actual_len
+	instead of len.
+	(sgtk_composite_inconversion): Copy vector completely on first
+	changed element, not just up to this element.
+
+2000-08-25  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gdk-1.2.defs, gtk-support.c, guile-gtk.h
+	(gdk_event_button_state, gdk_event_key_state): Removed.
+	(gdk_event_state): New, and return GdkModifierType instead of uint
+	like gdk_event_button_state etc did.
+	
+	* configure.in: Chek for scm_the_root_module.
+	* guile-gtk.c (sgtk_shell): Use it as the second arg to scm_eval_x
+	if its there.
+
+2000-08-24  Marius Vollmer  <mvo@dt.e-technik.uni-dortmund.de>
+
+	* gdk-1.2.defs (gdk-event-button-state, gdk-event-key-state),
+	gtk-support.c guile-gtk.h (gdk_event_button_state,
+	gdk_event_key_state): Return uint instead of bool.
+
+2000-08-07  Marius Vollmer  <mvo@dt.e-technik.uni-dortmund.de>
+
+	* guile-gtk.spec: Updated from the spec file used by Jason Cao to
+	build the guile-gtk-0.19-1 RPM.
+
+2000-07-05  Ariel Rios  <ariel@arcavia.com>
+
+	* README: Updated for 0.19
+	
+	* NEWS: Ditto.
+	
+	* configure.in: Ditto.
+
+2000-06-19  Ariel Rios  <ariel@arcavia.com>
+        Thanks to Greg Badros!!!
+	* guile-gtk.c (sgtk_init_substrate): Updated for upcoming new guile 1.4.
+	The old stuff is commented until a correct hack in Makefile.am is included
+	to handle old and newer guile versions.	
+
+2000-05-23  Marius Vollmer  <mvo@dt.e-technik.uni-dortmund.de>
+
+	* gtk-1.2.defs, gtk-1.3.defs (GtkAnchorType, gtk_window_set_modal,
+	gtk_window_add_embedded_xid, gtk_window_remove_embedded_xid,
+	gtk_window_set_default_size, gtk_window_set_position,
+	gtk_window_set_transient_for): New.
+
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_string_width): New.
+
+2000-05-16  Marius Vollmer  <mvo@dt.e-technik.uni-dortmund.de>
+
+	* gtk-support.c (gtk_no_copy, gtk_no_free): New functions.
+	* guile-gtk.h: Provide prototypes for them.
+
+	* gtk-1.2.defs (GtkNotebookPage): Defined as (useless) boxed
+	object by using the new gtk_no_copy/gtk_no_free functions.
+
+	* guile-gtk.c: Include <string.h>.
+	(tc16, illobj, ILLOBJP, ILLOBJ_TYPE, illobj_print, illobj_smob,
+	sgtk_make_illegal_type_object): New stuff for representing objects
+	of on illegal type.
+	(sgtk_arg2scm): Use it instead of printing a message.
+	(sgtk_init_substrate): Initialize illobj_smob.
+
+2000-05-21  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-1.2.defs, gtk-1.3.defs (GtkStyle): Added white_gc and
+	black_gc fields.
+	(gtk_style_light_gc, gtk_style_dark_gc, gtk_style_mid_gc,
+	gtk_style_text_gc, gtk_style_base_gc): Added.
+	* gtk-support.c (gtk_style_light_gc, gtk_style_dark_gc,
+	gtk_style_mid_gc, gtk_style_text_gc, gtk_style_base_gc): Added.
+	
+2000-05-12  Ariel Rios <ariel@arcavia.com>
+
+	* toolkits/translate.scm: Updated newer version of the
+        translator.
+
+2000-05-12  Ariel Rios <ariel@arcavia.com>
+
+	* toolkits/translate.scm: Set of functions to help
+	translating gtk C header files unto defs files.
+	
+	* toolkits/case.scm: Added macro needed by the translator
+
+2000-04-16  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_atom2scm): Bugfix: use the CAR of the returned
+	cell as the symbol, not the cell itself.
+	(make_gtkobj, sgtk_boxed2scm): Cast value to SCM in call to SCM_SETCDR.
+
+	* guile-gtk.c: Include <string.h>.
+
+2000-04-14  Marius Vollmer  <mvo@dt.e-technik.uni-dortmund.de>
+
+	* configure.in (scm_simple_format): Check for it in libguile.
+	* guile-gtk.c (throughout): Conditionally use ~A and ~S instead of
+	%s and %S in error messages.
+
+2000-04-12  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.h, guile-gtk.c  (sgtk_scm2atom, sgtk_atom2scm): New.
+        * build-guile-gtk: Use it for now `atom' type.
+	
+	* gtk-1.2.defs, gtk-1.3.defs (gtk_selection_convert): New.
+
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_string_extents): New.
+
+2000-04-09  Mikael Djurfeldt  <mdj@mdj.nada.kth.se>
+
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_threads_enter,
+	gdk_threads_leave): New.
+
+2000-04-08  Mikael Djurfeldt  <mdj@mdj.nada.kth.se>
+
+	* gtk-1.2.defs, gtk-1.3.defs (gtk_pixmap_get): New.
+
+2000-04-08  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-support.c (gdk_event_x, gdk_event_y): Handle
+	GDK_ENTER_NOTIFY and GDK_LEAVE_NOTIFY.
+
+	* guile-gtk.c, guile-gtk.h (sgtk_port2fileno): New.  This works
+	with newer Guiles.
+	* build-guile-gtk (file-descriptor): Use it.
+
+2000-04-01  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-support.c (gdk_event_x, gdk_event_y): handle
+	GDK_ENTER_NOTIFY and GDK_LEAVE_NOTIFY.
+
+2000-03-27 Alexandre Muniz <munizao@xprt.net>
+
+	* gtk-1.2.defs: GtkCTreeLineStyle: fixed typo.
+
+2000-03-27  Ariel Rios  <ariel@arcavia.com>
+
+	* gtk-1.2.defs: GtkCTreePos, GtkCTreeLineStyle: New enums. 
+
+2000-03-15  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	gdk_color_copy was making problems, but everybody should have it
+	by now.
+	
+	* configure.in (gdk_color_copy): No longer check for it.
+	* guile-gtk.h (gdk_color_copy, gdk_color_free): Removed prototypes.
+	* gtk-compat.c (gdk_color_copy, gdk_color_free): Removed functions.
+
+2000-02-27  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.h (gdk_color_copy, gdk_color_free): Only declare
+	prototypes when Gtk+ does not have these functions.  Remove
+	`const' from gdk_color_copy argument.
+
+	* guile-gtk.c (sgtk_init_with_args): Call gtk_set_locale.
+
+2000-02-26  Ariel Rios  <ariel@arcavia.com>
+
+	* configure.in: Bumped version number to 0.18
+
+2000-02-26  Ariel Rios  <ariel@arcavia.com>
+	
+	* guile-gtk.h (gdk_color_copy): Do the parameter const 
+ 	Required for compilation in Gtk+1.2.7
+
+2000-02-26  Ariel Rios  <ariel@arcavia.com>
+
+	* Makefile.am: Added dynlink-old.scm to EXTRA_DIST.
+
+2000-02-22  Ariel Rios  <ariel@arcavia.com>
+
+	* README: Updated for version 0.18
+
+2000-02-13  Martin Baulig  <martin@home-of-linux.org>
+
+	* guile-gtk.h (gdk_color_copy): Don't make the parameter `const'.
+
+2000-01-31  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* Makefile.am (libguiledlopenhelper_la_LDFLAGS): Add -rpath
+	option.  This is needed because libguiledlopenhelper is now a
+	`EXTRA' library.  Thanks to Jacob Berkman!
+
+	* gtk/dynlink-old.scm (merge-compiled-code-old): Renamed from
+	merge-compiled-code, silly me.
+
+2000-01-30  Ariel Rios <ariel@arcavia.com>
+
+	* guile-gtk.h (gdk_color_copy): Typo.
+
+2000-01-29  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gdk-1.2.defs (gdk_pixmap_create_from_xpm): Add `null-ok' option
+	to `mask' parameter.
+
+	* guile-gtk.c (scm_done_malloc, scm_internal_cwdr, scm_puts):
+	Declare prototypes only when configure didn't find the functions
+	in libguile.
+	(sgtk_composite_inconversion, sgtk_composite_outconversion):
+	Return argument unchanged when it is not a list or vector.
+	(sgtk_scm2slist, sgtk_scm2list, sgtk_scm2cvec): Handle SCM_BOOL_F
+	by returning a NULL pointer.
+	(sgtk_slist_finish, sgtk_list_finish, sgtk_cvec_finish): Do
+	nothing when getting a NULL pointer.
+	
+2000-01-23  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Using libltdl support from libguile.
+
+	Makefile.am (lib_LTLIBRARIES): Replaced libguiledlopenhelper.la
+	with $(LIBGUILEDLOPENHELPER).
+	(EXTRA_LTLIBRARIES): Added libguiledlopenhelper.la.
+	(install-data-local): Install gtk/dynlink-old.scm.
+	gtk/dynlink-old.scm: Old contents of gtk/dynlink.scm.
+	gtk/dynlink.scm: Use dynamic-link and dynamic-call directly when
+	we are using ltdl, defer to gtk/dynlink-old.scm when not.
+	(configure.in): Check for "lt_dlopen" in libguile.  Set
+	USING_LTLDL, USING_LTDL_SCM and LIBGUILEDLOPENHELPER accordingly.
+	Check only whether libtool wins when not using ltdl.
+	gtk/config.scm.in (gtkconf-using-ltdl): New variable.
+	
+	Supporting type conversions with composites.
+
+	* guile-gtk.c, guile-gtk.h (sgtk_composite_inconversion,
+	sgtk_composite_outconversion): New.
+
+	* build-guile-gtk: Updated error handling machinery to work with
+	recent Guile versions.
+	(type-conversion): Take a type object, not a symbol.  Get the
+	conversion function from the `conversion' property of the type
+	object.  Changed callers.
+	(type-cname, type-isa, type-prop, type-name,
+	type-scm2c-does-type-checking, type-scm2c, type-c2scm,
+	type-c2args, type-c2refs, type-finish, type-can-be-passed,
+	type-can-be-returned): Moved to the top-level.
+	(type-set-prop): New.
+	(emit-composite-helpers): emit conversion functions when element
+	type has a conversion function.
+	(composite-conversion): New.
+	(realize-slist-type, realize-list-type, realize-cvec-type,
+	realize-cvecp-type, realize-cvecr-type, realize-fvec-type): Use
+	it.
+	(register-boxed-converter, register-ptype-converter): Take form
+	options as parameter.  Use them to get the conversion function.
+	Changed callers.
+	(register-object-type): Take form options as parameter.
+	(string type): Specify conversion as type property, not as global
+	option.
+
+2000-01-20  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* build-guile-gtk (emit-funcs): The `string' type now only accepts
+	non-substrings.
+	
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_pixmap_create_from_xpm): New.
+
+	* configure.in (mylibdir): Removed.
+	* gtk/config.scm.in (gtkconf-libdir): Construct from
+	$myexecprefix.
+
+	* gtk/config.scm.in (gtkconf-default-version): New variable, takes
+	old role of gtkconf-version.
+	(gtkconf-version): Initialize to `#f', will bet set to the right
+	value once the glue code has been loaded.
+	(gtkconf-guile-gtk-version): New variable, reflects version of
+	guile-gtk package itself.
+	* gtk/dynlink.scm (gtk-version-set): Take version number as string
+	and construct prefix from it.  Set gtkconf-version.  Changed all
+	callers.
+	
+2000-01-13  Ariel Rios  <ariel@arcavia.com>
+        
+	Corrections by Vladimir V. Tsychevski:THANKS!!! 
+	* gtk-1.2.defs, gtk-1.3.defs, gtk.defs: 
+	gtk_aspect_frame_new, gtk_progress_set_show_text, 
+	gtk_progress_set_activity_mode, GtkPlug,
+	gtk_aspect_frame_set: Corretly set bool type.
+
+2000-01-10 Ariel Rios   <ariel@arcavia.com>
+
+	* gtk-1.2.defs, gtk-1.3.defs: New Objects: GtkItemFactory(NEW)
+	gtk_item_factory_from_widget, gtk_item_factory_path_from_widget: NEW 
+
+1999-12-29  Ariel Rios  <jarios@usa.net>
+
+	* gdk-1.2.defs, gdk-1.3.defs, gdk.defs: 
+	  gdk_rgb_get_visual, gdk_rgb_init, gdk_rgb_get_visual: NEW
+
+1999-12-19  Martin Baulig  <martin@home-of-linux.org>
+
+	* gtk/dynlink.scm ((search-path-extended)): Use `(-[0-9]+)*' instead of `*' as
+	pattern to get libraries with trailing version numbers.
+
+1999-12-18  Martin Baulig  <martin@home-of-linux.org>
+
+	* guile-gtk.c (sgtk_scm2enum, sgtk_valid_enum): Protect 'SCM_SYMBOLP'
+	with `SCM_NIMP'.
+
+1999-12-12 Ariel Rios <jarios@usa.net>
+
+	* build-guile-gtk: Bad define error placement error corrected. We no longer
+	  have the problem when using 'link' option.
+
+1999-12-12  Martin Baulig  <martin@home-of-linux.org>
+
+	* guiledlopenhelper.c (sgtk_dlopen): Use the `fullname' and RTLD_GLOBAL on NetBSD.
+	(sgtk_dlsym): We need to prepend the symbol with a leading underscore on NetBSD.
+
+	* configure.in: Don't consider libtool as winning when "deplibs_check_method" is
+	"unknown".
+
+1999-12-11  Ariel Rios <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs: GtkLayout (NEW)
+	  gtk_layout_new, gtk_layout_put, gtk_layout_move, gtk_layout_set_size,
+	  gtk_layout_get_hadjustment, gtk_layout_get_vadjustment, gtk_layout_set_hadjustment,
+	  gtk_layout_set_vadjustment, gtk_layout_freeze, gtk_layout_thaw. (NEW)
+	
+1999-12-10  Ariel Rios <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs: gtk_spin_button_configure, gtk_spin_button_spin,
+	  gtk_spin_button_set_numeric, gtk_spin_button_set_wrap, gtk_spin_button_set_shadow_type,
+	  gtk_spin_button_set_snap_to_ticks, gtk_spin_button_update.
+	  GtkSpinType enum. (NEW).
+
+1999-11-18  Ariel Rios  <jarios@usa.net>
+
+	* test-gtk.scm: Corrected bad define placement error.
+	
+1999-11-07  Ariel Rios  <jarios@usa.net>
+
+	* Makefile.am: Remove references to enum-test.* and fake.h
+
+1999-11-07  Ariel Rios  <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs:
+	  Corrected gtk_widget_add_events.
+
+1999-10-24  Ariel Rios  <jarios@usa.net>
+	
+	* Makefile.am: Included references to enum-test.defs,
+          examples/calendar.scm, and enum-test.defs
+
+1999-10-24  Ariel Rios  <jarios@usa.net>
+
+	From Daniel Skarda THANKS!!!
+	
+	* gdk-1.2.defs, gdk-1.3.defs: (GTimer)
+	  Later on I will create the proper glib.defs =)
+	  g-timer-new, g-timer-start, g-timer-stop,
+	  g-timer-reset: NEW
+        * gtk-1.2.defs (gtk_accelerator_parse): Changed (ret ..) to
+	 values .... 
+
+	* gtk-1.2.defs (gtk_widget_add_events): NEW
+
+	* configure.in: mylibdir - new variable (for gtkconf-libdir)
+	
+	* gtk/config.scm.in: gtkconf-libdir: NEW
+
+	* gtk/dynlink.scm (default-lib-path): Now searchs also in libdir
+
+	* build-guile-gtk (emit-funfs): 'c-definition - new type
+	property. 
+
+	* build-guile-gtk (load-scheme): Loads scheme code - suitable for
+	example for loading definitions of "non-gtk" types (needed by
+	guileGL bindings)
+
+	* build-guile-gtk: types, register-type and make-type was moved
+	out from emit-funcs - so now it is possible to register new types
+	from "outside" (using load-scheme). You can also register realizer
+	for your own composite types. For now only "simple" types can be 
+	registered.
+
+	* build-guile-gtk (define-type-alias): allow to define alias for
+	type
+
+	* build-guile-gtk (emit-struct-info): if "size" was specified in
+	"(define-struct..." than sizeof() is not used for 
+	GtkTypeInfo.object_size
+	
+	* guile-gtk.c (sgtk_valid_(flags|enum), sgtk_scm2(flags|enum)):
+	Now these functions accepts also numbers instead symbols (or list
+	of symbols). So now it is possible to write
+
+		(gl-begin 'points)
+		(gl-begin GL-POINTS)
+
+	- these variants have same meaning - but the second one is faster
+	(presumed that GL-POINTS is defined as appropriate integer constant) 
+	
+	* gtk-support.c (gtk_widget_allocation_*_scm): New functions - so
+	you can get widget's width, height, x and y.
+
+	* guile-gtk.c (enum/flags functions): Speed inmprovements in
+	scm2enum and scm2flags.
+
+	Instead of O(n) search and strcmp, scm2(enum|flags) functions
+ 	store and protect symbol so it compares only SCMs (no strings).
+ 	Symbols are sorted so we can perform binary search - O(log n).
+
+	Flags and enums are now converted and validated at once so 
+	scm_validate_(enum|flags) was retained only for compatibility and
+	for (ret ...) expressions...
+
+	These changes makes library binary backward incompatible (any
+	other application which utilizes build-guile-gtk should be
+	recompiled) .
+	
+	* build-guile-gtk (emit-enum/flags-info): emit function now
+	reflects changes in enum/flags conversion
+          
+	  
+1999-10-20  Ariel Rios  <jarios@usa.net>
+	
+	* gtk-1.2.defs, gtk-1.3.defs:
+	  gtk_handle_box_set_shadow_type, gtk_handle_set_handle_position,
+	  gtk_hanlde_box_set_snap_edge.
+	  gtkhandlebox is completely wrapped.
+
+1999-10-18  Ariel Rios  <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs:
+	  gtk_paned_pack1, gtk_paned_pack2, gtk_paned_set_position,
+          gtk_paned_compute_position: NEW
+          gtkpaned.h is completely wrapped.
+
+1999-10-17  Ariel Rios  <jarios@usa.net>
+ 	Released 0.17
+
+1999-10-15  Ariel Rios  <jarios@usa.net>
+	
+	* NEWS: Updates for 0.17 release
+	* configure.in: Bump to version 0.17
+	
+1999-10-10  Ariel Rios   <jarios@usa.net>
+
+	* README: Minor typo corrections.
+
+1999-10-05  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-1.3.defs: Include gdk-1.3.defs and not gdk-1.2.defs.
+
+1999-10-05  Ariel Rios  <jarios@usa.net>
+
+ 	* NEWS: Updates for 0.17 release.
+
+1999-10-05  Ariel Rios  <jarios@usa.net>
+
+	* examples/calendar.scm: A new program demonstrating GtkCalendar 
+	was created: NEW.
+
+1999-10-05  Ariel Rios  <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs: 
+          gtk-main-iteration now returns an int according to gtkmain.h
+          gtk-main-iteration-do, gtk-true, gtk-false, gtk-grab-get-current: NEW
+  
+1999-10-04  Ariel Rios  <jarios@usa.net>
+
+	* Makefile.am: guile-gtk.spec was added to EXTRA_DIST
+
+          From Greg Badros: THANKS!
+      	* guile-gtk.spec: The rpm spec file was included: NEW
+
+1999-10-03  Ariel Rios  <jarios@usa.net>
+	
+	* gtk-1.2.defs, gtk-1.3.defs: gtk-calendar-new, gtk-calendar-select-month,
+	gtk-calendar-select-day, gtk-calendar-mark-day, gtk-calendar-umark-day,
+	gtk-calendar-clear-marks, gtk-calendar-display-options, gtk-calendar-freeze,
+	gtk-calendar-thaw, gtk-plug-new, gtk-tooltips-force-window: NEW
+	GtkPlug, GtkCalendar: NEW Objects
+	  
+1999-10-03  Ariel Rios     <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs: gtk-progress-bar-set-discrete-blocks,
+	gtk-progress-bar-set-activity-step, gtk-progress-bar-set-activity-blocks: NEW 
+        GtkProgress: NEW Object
+        gtk-progress-set-text-alignment, gtk-progress-set-show-text, 
+        gtk-progress-set-format-string, gtk-progress-set-adjustment,
+        gtk-progress-configure, gtk-progress-set-percentage, 
+        gtk-progress-set-value, gtk-progress-get-value,
+        gtk-progress-set-activity-mode, gtk-progress-get-current-text,
+        gtk-progress-get-text-from-value: NEW        
+
+1999-10-03  Ariel Rios     <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs: gtk-notebook-get-current-page,
+        gtk-notebook-get-nth-page, gtk-notebook-page-num,
+ 	gtk-notebook-get-tab-label, gtk-notebook-set-tab-label-text,
+        gtk-notebook-get-menu-label, gtk-notebook-set-menu-label,
+        gtk-notebook-label-text, gtk-notebook-reorder-child: NEW
+
+1999-10-03  Ariel Rios     <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs: gtk_adjustment_changed,
+        gtk_adjustment_value_changed, gtk_adjustment_value_changed: NEW
+
+1999-10-02  Martin Baulig  <martin@home-of-linux.org>
+
+	* build-guile-gtk: Added `long' type.
+
+	* build-guile-gtk: Added `define-ptype' to .defs files for
+	generic pointer types (like CORBA_Object for instance).
+
+1999-10-01  Ariel Rios     <jarios@usa.net>
+
+	* gtk-1.2.defs, gtk-1.3.defs: gtk_clist_set_reorderable,
+        gtk_clist_set_use_drag_icons, gtk_clist_set_button_actions,
+        gtk_clist_get_column_widget, gtk_clist_set_columns_autosize: NEW
+
+1999-10-01  Martin Baulig  <martin@home-of-linux.org>
+
+	* Makefile.am (libguiledlopenhelper_la_LIBADD): We need to add
+ 	$(GUILE_LIBS) here because the guile header files may access
+	things in -lqthreads.
+
+1999-09-30  Ariel Rios  <jarios@usa.net>
+
+	From Daniel Skarda  THANKS!!
+	* gtk-1.2.defs: New objects, flags etc: GtkTearoffMenuItem,
+	GtkAccelFlags, GtkAccelGroup, GtkAccelLabel
+
+	New functions: gtk_tearoff_menu_item_new, gtk_signal_emit_stop*,
+	gtk_accel_group*, gtk_*uline*, gtk_accel_label*, ...
+
+	* gdk-1.2.defs: New function: gdk_beep :)
+
+	
+1999-09-29  Ariel Rios  <jarios@usa.net>
+
+        * README : Updates. New references to the new homepage and 
+          mailing list were added.
+
+1999-09-28  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_move_prots_to_global): New function.
+	(gtkobj_free): Use it so that we do not forget about a freed
+	proxy's protects.
+
+1999-09-23  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Bug fix of protection code.  It failed when one object was
+	protected multiple times, and was not safe to be run during GC.
+	Thanks to Greg Badros for providing the test case.
+	
+	* guile-gtk.h (sgtk_protect): Return a sgtk_protshell token
+	instead of the protected object.
+	(sgtk_unprotect): Expect a protshell token previously returned
+	from sgtk_protect.
+	
+	* build-guile-gtk (callback, full-callback): Updated for new
+	sgtk_protect interface.
+
+	* guile-gtk.c (sgtk_protshell, sgtk_protshell_chunk): New.
+	(sgtk_object_proxy::protects, global_protects): Now of type
+	sgtk_protshell*.
+	(sgtk_mark_protects): New static function.  Use this instead of
+	scm_gc_mark where appropriate.
+	(sgtk_protect, sgtk_unprotect): Maintain lists of sgtk_protshells
+	instead of SCM lists.
+	(sgtk_callback_marshall, sgtk_callback_destroy): Use
+	sgtk_protshells as DATA tokens.
+	(sgtk_init_substrate): Initialize sgtk_protshell_chunk.
+	
+1999-08-15  Miroslav Silovic  <silovic@zesoi.fer.hr>
+
+	* build-guile-gtk ((emit-funcs defs)): typo fix in rect type
+
+	* configure.in (LIBS): autoconf checks for scm_fdes_to_port
+	* guile-gtk.c (sgtk_fileno2port): 
+
+1999-08-14  Martin Baulig  <martin@home-of-linux.org>
+
+	* build-guile-gtk ((emit-func)): Truncate iptypes to the length
+	of input-params; recent versions of guile raise an out-of-range
+	exception in constructs like (for-each (lambda (p t)) x y) if
+	x and y don't have the same length. This fixes bug #1860.
+
+1999-08-14  Martin Baulig  <martin@home-of-linux.org>
+
+	* guile-gtk.c (sgtk_fileno2port): Use scm_fdes_to_port and
+	scm_setvbuf instead of scm_stdio_to_port and scm_setbuf0
+	which has been removed recently.
+
+1999-08-12  Miroslav Silovic  <silovic@zesoi.fer.hr>
+
+	* guile-gtk.c (sgtk_fileno2port): added
+	also added SCM_SYSCALL (copied from _scm.h, without vms support)
+
+	* build-guile-gtk ((emit-funcs defs)): file-descriptor can be
+ 	returned now
+
+	* guile-gtk.h: added prototypes
+
+	* guile-gtk.c (sgtk_valid_rect sgtk_scm2rect sgtk_rect2scm): added
+
+	* gdk-1.3.defs: 
+	* gdk-1.2.defs: replaced GdkRectangle with rect. The function is
+ 	still commented out because gdk_event_area isn't defined anywhere
+
+	* build-guile-gtk ((emit-funcs defs)): added rect type
+
+1999-07-20  Martin Baulig  <martin@home-of-linux.org>
+
+	* build-guile-gtk ((emit-funcs defs)): Added `(finish func)'
+	option for the parameters; see guile-gnome/gnorba.defs for an
+	example.
+
+1999-07-19  Martin Baulig  <martin@home-of-linux.org>
+
+	* build-guile-gtk ((emit-struct-info defs)): New. Implement new
+	`(define-struct name (copy ...) (free ...))' for arbitrary non-Gtk
+	structs. This does basically the same than `(define-boxed)', but
+	registers a new Gtk type.
+	((emit-funcs defs)): Added `(realize-cvecp-type t mode)' which is
+	the same as cvec but with &len/ptr.
+
+	* guile-gtk.c (sgtk_register_type_infos_gtk): New function which
+	will be called from the glue code to register the new Gtk types
+	for the `(define-struct)'s.
+	
+1999-07-08  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	More stuff from Ariel Rios.  Thanks!
+	* gtk-1.2.defs, gtk-1.3.defs (gtk_ruler_draw_ticks,
+	gtk_ruler_draw_pos): New.
+
+1999-07-07  Miroslav Silovic  <silovic@zesoi.fer.hr>
+
+	* build-guile-gtk ((emit-funcs defs)): converted ptypes to iptypes
+ 	where it only refers to input parameters.
+
+1999-07-06  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* build-guile-gtk (emit-funcs): Changed `let' to `letrec' so that
+	`process-forms' can actually call itself recursively.  Boy, I feel
+	ashamed.
+
+	More stuff from Ariel Rios.  Thanks!
+	* gtk-1.2.defs, gtk-1.3.defs (gtk_notebook_set_scrollable):
+	Changed flag to type `bool'.
+	(gtk_notebook_set_homogeneous_tabs, gtk_notebook_set_tab_hborder,
+	gtk_notebook_set_tab_vborder, gtk_notebook_set_tab_label): New.
+
+1999-07-06  Mikael Djurfeldt  <mdj@thalamus.nada.kth.se>
+
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_window_get_size_scm): New.
+	* gtk-support.c (gdk_window_get_size_scm): New.
+
+1999-06-30  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* build-guile-gtk (emit-funcs): Fix silly typo and don't use
+	improper internal define.  Should work now.
+
+1999-06-29  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* build-guile-gtk (emit-funcs): Do not call emit-funcs recursively
+	when handling the sub-statement lists in `if' forms.  Calling it
+	recursively would evaluate the sub-statements in a isolated
+	environment.  Instead, define new local function process-forms and
+	call that recursively.
+
+1999-06-29  Miroslav Silovic  <silovic@zesoi.fer.hr>
+
+	* gtk/config.scm.in: defines gtkconf-autobuild-flags (from
+ 	AUTOBUILD_FLAGS)
+
+	* build-guile-gtk ((emit-funcs defs)): rudimentary conditional
+ 	compile, the syntax is (if flag (declarations) (declarations)),
+ 	where flag simply checks for a symbol in gtkconf-autobuild-flags
+	list	
+
+	* configure.in (AUTOBUILD_FLAGS): check for buggy gnome-config.h;
+	substitutes AUTOBUILD_FLAGS, check for cpp
+
+1999-06-28  Miroslav Silovic  <silovic@zesoi.fer.hr>
+
+	* guile-gtk.c (sgtk_cvec2scm): added return obj; D'OH!
+
+1999-06-27  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* build-guile-gtk (realize-fvec-type): Include length in name of
+	type.
+
+1999-06-27  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-1.2.defs, gtk-1.3.defs (GtkArgFlags, GTK_OBJECT_TYPE,
+	gtk_object_query_args_scm): New.
+	* gtk-support.c (gtk_object_query_args_scm): New.
+	
+	From Ariel Rios.  Thanks!
+	* gtk-1.2.defs, gtk-1.3.defs (gtk_editable_select_region,
+	gtk_editable_insert_text_scm, gtk_editable_delete_text,
+	gtk_editable_cut_clipboard, gtk_editable_copy_clipboard,
+	gtk_editable_paste_clipboard, gtk_editable_delete_selection,
+	gtk_editable_set_position, gtk_editable_get_position,
+	gtk_editable_set_editable): New definitions.
+	* gtk-support.c (gtk_editable_insert_text_scm): New.
+
+	From Chris Ebenezer.  Thanks!
+	* gtk-1.2.defs, gtk-1.2.defs
+	(gtk_label_set, gtk_label_set_text): Use new name.
+	(gtk_label_set_justify, gtk_label_set_line_wrap,
+	gtk_label_set_pattern): New definitions.
+	(gtk_preview_set_install_colormap): Changed argument type of
+	`install_cmap' to `int'.
+	
+1999-06-22  Mikael Djurfeldt  <mdj@crunchy.nada.kth.se>
+
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_window_clear,
+	gdk_colormap_alloc_color): New.
+
+	* gtk-1.2.defs (gtk_curve_set_vector, gtk_curve_get_vector): New.
+
+1999-06-22  Miroslav Silovic  <silovic@zesoi.fer.hr>
+
+	* build-guile-gtk: 
+	(emit-funcs): multiple return values support (see *_with_default
+	in gnome-config parts of gnome-defs for examples)
+	
+	(realize-cvecr-type):
+	(realize-cvec-type): support for pass-by-reference
+
+	* guile-gtk.c (sgtk_cvec2scm): added
+
+1999-06-21  Miroslav Silovic  <silovic@zesoi.fer.hr>
+
+	* build-guile-gtk ((emit-funcs defs)): removed extra argument to @@
+
+1999-05-27  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	More bug fixes prompted by Markus Linnala.  More Thanks!
+	
+	* build-guile-gtk (emit-accessor): Always canonicalize return type
+	to have explicitely no options to avoid confusion with composite
+	types.  Previously, a composite type has been mistaken for a
+	non-composite type with options.
+	
+	* guile-gtk.c (sgtk_scm2slist, sgtk_scm2list, sgtk_scm2cvec):
+	Initialize elemets to NULL when FROMSCM is not given.  This gives
+	semi-reasonable behaviour in case the called function does not
+	initialize the composite itself.
+
+	* gtk-1.2.defs, gtk-1.3.defs (GtkCList): Added "selection" field.
+	
+1999-05-26  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Bug fixes prompted by Markus Linnala.  Thanks!
+
+	* build-guile-gtk (make-type): Added "name" argument.  Changed all
+	callers to supply a useful name.
+	(type-name): New function.
+	(type-can-be-passed, type-can-be-returned): New functions.
+	(emit-composite-helpers): Only emit helpers that the element type
+	can support.
+	(realize-slist-type, realize-list-type, realize-cvec-type,
+	realize-cvecr-type, realize-fvec-type): Use type-name to form the
+	names of generated functions, not type-cname.
+	(register-type 'static-string): Flag as not can-be-passed.
+	(register-type 'callback): Flag as not can-be-returned.
+	(register-type 'full-callback): Likewise.
+	(register-type 'file-descriptor): Likewise.
+	
+	* gtk-1.2.defs, gtk-1.3.defs (gtk_clist_get_text): Correctly
+	declare it to return a static_string in the "text" argument.
+
+1999-05-13  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_window_get_parent): New, thanks
+	to Jeffrey Nichols.
+
+1999-05-06  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gdk-1.2.defs (gdk_window_get_id): New.
+	* gdk-1.3.defs (gdk_window_get_id): New.
+	* gtk-support.c (gdk_window_get_id): New.
+
+1999-04-09  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.16.
+
+1999-04-07  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* configure.in: Bumped version number to 0.16.
+
+	* gtk-support.c: Include <gdkprivate.h> to get at
+	gdk_leader_window.
+	(gdk_get_leader_window_id): New.
+	* guile-gtk.h (gdk_get_leader_window_id): New prototype. 
+	* gdk-1.2.defs, gdk-1.3.defs (gdk_get_leader_window_id): New.
+	
+1999-04-02  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* build-guile-gtk (mode-helper-valid): New.  Use it in the
+	composite type realization routines to allow non-`in' values to
+	have arbitrary elements.
+
+	* gtk-1.3.defs (gtk_curve_set_vector, gtk_curve_get_vector): New.
+
+	* guile-gtk.c (sgtk_valid_complen): Don't check element validity
+	when the predicate is NULL.
+	(sgtk_scm2slist, sgtk_scm2list, sgtk_scm2cvec): Don't convert
+	element when FROMSCM is NULL.
+	
+1999-03-23  Mikael Djurfeldt  <mdj@mdj.nada.kth.se>
+
+	* configure.in: Use quotes in libtool winning regexp.  (sh on
+	solaris can't handle it without quotes.)
+
+1999-03-02  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.15.
+	
+	* configure.in: Changed version number to 0.15.
+
+	* Makefile.am (all): Depend on libguilegtk.la.
+	(libguilegtk.la): New target.
+
+1999-03-01  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-1.3/gdk.scm: Copied from gtk-1.2/gdk.scm and adapted version
+	numbers.
+	* gtk-1.3/gtk.scm: Copied from gtk-1.2/gtk.scm and adapted version
+	numbers.
+
+	* gtk-1.2/gtk.scm: Correctly load libguilegtk-1.2.
+	* gtk-1.2/gdk.scm: Define module (gtk-1.2 gdk), not (gtk-1.1 gdk).
+
+	* gtk-1.3.defs: Copied from gtk-1.2.defs and adapted version
+	numbers.
+	* gdk-1.3.defs: Copied from gdk-1.2.defs.
+	* gtk-1.0.defs, gtk-1.1.defs, gdk-1.0.defs, gdk-1.1.defs: Removed.
+
+	* configure.in: Only accept Gtk versions 1.2 and 1.3.
+
+	* Makefile.am: Tossed out support for gtk-1.0 and added support
+	for gtk-1.3.
+	(install-data-local): Removed debris removal commands
+
+	* examples/foo.defs: Use (gtk-1.2 gtk) module.
+
+	* gdk-1.2.defs (gdk_font_load): Flag return value as `not copied'.
+
+	* examples/calc.scm, examples/test-gtk.scm: Correct showstopping
+	typo "view-port" -> "viewport".
+
+	* build-guile-gtk (emit-boxed-info): Put conversion functions into
+	generated sgtk_boxed_info structures.
+
+	* guile-gtk.c (sgtk_maybe_find_type_info): New function.
+	(sgtk_build_args): Look up conversion in type_info and apply it.
+	(sym_gtk_version): Support 1.3 instead of 1.0.
+	
+	* guile-gtk.h (sgtk_type_info): Added "conversion" field.
+
+1999-02-27  Gregory McLean <gregm@comstar.net>
+
+	* s/gtk-1.1/gtk-1.2/g
+        * s/gdk-1.1/gdk-1.2/g
+ 	* Whee it compiles against gtk+ 1.2 ;)
+
+1999-02-17  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* build-guile-gtk (gtkconf-cflags): Define.  It was used already,
+	but not defined.
+
+1999-02-16  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk/dynlink.scm (merge-compiled-code): Correctly call
+	%sgtk-dlinit only when the library was actually loaded via
+	%sgtk-dlopen.  Thanks to Mark Gritter.
+
+1999-02-15  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* Makefile.am (gtk-glue.c, gdk-glue.c): Use explicit variables
+	instead of `$<'.
+
+1999-02-14  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (acinclude.m4): Get rid of ugly circular dependency
+	caused by `aclocal -I .'.  
+
+1999-02-14  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk/config.scm.in: New file.
+
+	* configure.in: Do not output gtk/dynlink.scm and build-guile-gtk,
+	do output gtk/config.scm.  Bump version number to 0.15a.
+	Substitute myprefix and myexec_prefix.  Check wether the generated
+	libtool contains "deplibs_check_method", and consider it winning
+	when it does.
+	
+	* gtk/dynlink.scm.in: Removed.
+	* gtk/dynlink.scm: No longer generated by configure, uses (gtk
+	config) instead.
+	(dlopen-libtool-library): Do not bother to track inter-library
+	dependencies when gtkconf-libtool-is-winning is true.
+	(init-dlopen-func): Always load the helper library from its known
+	place, $(libdir)/lib/.
+	
+	* build-guile-gtk.in: Removed.
+	* build-guile-gtk: No longer generated by configure, use (gtk
+	config) instead.
+
+	* Makefile.am (gtk-glue.c, gdk-glue.c, main.c): Take care to use
+	the local version of gtk/config.scm when generating glue code.
+	(install-data-local): Install gtk/config.scm.  Install
+	gtk/dynlink.scm from the srcdir.
+	(EXTRA_DIST): Distribute gtk/dynlink.scm instead of
+	gtk/dynlink.scm.  Distribute gtk/config.scm.in and build-guile-gtk.
+	
+	* examples/test-gtk.scm: Provide ersatz definition for
+	gtk-scrolled-window-add-with-viewport if it isn't defined.
+	* examples/calc.scm: Provide ersatz definition for
+	gtk-scrolled-window-add-with-viewport if it isn't defined.
+
+	* gdk-1.0.defs: (gdk_draw_lines, gdk_draw_polygon): Copied from
+	gdk-1.1.defs.
+	
+	* gtk-1.0.defs (gtk_text_set_word_wrap): New.
+	* gtk-1.1.defs (gtk_text_set_word_wrap, gtk_text_set_line_wrap):
+	New (thanks to Chris Bitmead).
+
+1999-01-24  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.14.
+	
+	* guile-gtk.c (gtk_class_new): Initialize
+	info.base_class_init_func only for Gtk versions greater than 1.0.
+	(Setting it to NULL explicitely is redundant, but I want to have
+	the clue in there that base_class_init_func isn't in 1.0 if I ever
+	want to set it to something different than NULL).
+	
+1999-01-20  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (gtkobj_free): Do the right thing when removing
+	proxy from all_proxies list.  There was one `=' too many in the
+	condition of the `if'.  Apparently this bug crept in when someone
+	(who doesn't provide ChangeLog entries) did some cleanup.  This
+	bug was not in 0.12.
+
+	* gtk-1.1.defs (gtk_container_block_resize,
+	gtk_container_unblock_resize, gtk_container_need_resize): Removed.
+
+1999-01-17  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.13.
+
+	* Makefile.am: Install gtk/event-repl.scm in gtkmoduledir and not
+	in sitedir.  Delete old installed copy in sitedir.
+	* gtk/event-repl.scm: Moved from toplevel dir.  Changed module
+	name to (gtk event-repl).
+	* gtk-1.0/gtk.scm. gtk-1.1/gtk.scm: Use (gtk event-repl) instead of
+	(event-repl).
+
+	* configure.in (GUILEGTK_LIB): Added equivalent of -L$libdir in
+	front of library.
+
+1998-12-20  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* examples/Makefile.am: Removed all traces of foo.defs.guile.
+	* examples/foo.defs: Merged contents foo.defs.guile.
+
+	* gtk-1.1.defs: Removed `(installed by guile-gtk)' marker.
+	Merged contents of gtk-1.0.defs.guile file.
+	* gdk-1.1.defs: Removed `(installed by guile-gtk)' marker.
+	Merged contents of gdk-1.0.defs.guile file.
+	(gdk_draw_lines): New.
+	
+	* gdk-1.0.defs: Removed `(installed by guile-gtk)' marker.
+	Appended contents of gdk-1.0.defs.guile file at end.
+	* gtk-1.0.defs: Removed `(installed by guile-gtk)' marker.
+	Appended contents of gtk-1.0.defs.guile file at end.
+
+	* build-guile-gtk.in (read-file): Do not read a *.defs.guile file
+	after reading the regular *.defs file.
+	(defsdir): Changed to $(datadir)/guile-gtk.
+
+	* Makefile.am: Remove all traces of *.defs.guile files.  Install
+	*.defs files in $(datadir)/guile-gtk/.  Remove old files in
+	$(datadir)/gtk/ during install.
+
+	* gtk-1.1/gtk.scm (gtk-idle-add): New.
+
+	New cool stuff from Matthias Clasen:
+	
+	* gtk-1.1.defs (gtk_menu_popup_interp): Allow #f for
+	parent_menu_shell and parent_menu_item.  Use "uint" for
+	activate_time.
+	(gtk_editable_get_chars): New.
+	
+	* examples/test-gtk.scm: New stuff.
+
+1998-12-12  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Bug reports from <nick@unclebob.ml.org>.
+	
+	* examples/configure.in (GUILEGTK_LIBLIBS): New subst.
+	* examples/Makefile.am: Use it for libguilefoo_la_LIBADD.
+
+	* build-guile-gtk.in (lib-link-flags): New function.
+	(toplevel): Use it to implement the new "liblibs" command.
+	
+	* gtk-1.1.defs (gtk_timeout_add_interp, gtk_timeout_add_full): Use
+	_full instead of _interp version.  No user visible changes.
+	(gtk_idle_add_interp): Removed.
+	(gtk_idle_add_full): New.  The _full suffix is also used for the
+	Scheme name, since this is a different function from gtk_idle_add.
+	(gtk_container_children_foreach_interp,
+	gtk_container_children_foreach_full): Use _full instead of _interp
+	version.  No user visible changes.
+	
+	* examples/hello-world.scm: Correctly use (gtk gtk) module.  Use
+	gtk-standalone-main so that it works standalone.
+
+	* examples/test-gtk.scm (create-progress-bar): Rewritten to not
+	use gtk-progress-bar-percentage, which is gone.
+
+	* configure.in (GUILEGTK_LIB): New subst.
+	* build-guile-gtk.in (link-flags): Use it to get the right
+	library.
+
+	* gtk-1.1.defs (gtk_signal_connect_interp,
+	gtk_signal_connect_full): Use gtk_signal_connect_full since
+	gtk_signal_connect_interp is deprecated.  Unfortunately, this
+	moves the AFTER argument.  Hopefully no existing code uses it.
+	(gtk_signal_set_class_function_full): Add protection option.
+
+	More stuff from Matthias Clasen.  Thanks!
+
+	* gtk-compat.c (gtk_color_selection_set_color_interp,
+	gtk_color_selection_get_color_interp): New.
+	* guile-gtk.h (gtk_color_selection_set_color_interp,
+	gtk_color_selection_get_color_interp): New prototypes.
+
+	* gtk-1.1.defs (GtkFontSelectionDialog,
+	gtk_font_selection_dialog_new,
+	gtk_font_selection_dialog_get_font_name,
+	gtk_font_selection_dialog_get_font,
+	gtk_font_selection_dialog_set_font_name,
+	gtk_font_selection_dialog_get_preview_text,
+	gtk_font_selection_dialog_set_preview_text): New definitions.
+	
+	* examples/test-gtk.scm (gtk): Refined color selection dialog and
+	added font selector.
+
+	* guile-gtk.c (sgtk_scm2list): Keep a pointer to the tail node so
+	that building the list has linear time complexity (thanks to
+	Matthias Clasen).
+
+1998-12-06  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (tc16_gtktype, gtktype_print, gtktype_equalp,
+	gtktype_smob, sgtk_type_from_name, sgtk_valid_type, sgtk_scm2type,
+	sgtk_type2scm): New.
+	(sgtk_valid_arg): New.
+	(sgtk_scm2arg): Don't check for valid types.  Instead, assume that
+	sgtk_valid_arg has been called beforehand.
+	(sgtk_find_object_info_from_type): Return NULL for
+	GTK_TYPE_INVALID.  Construct a fresh sgtk_object_info for types
+	that are known to Gtk+ but not included in the pre-compiled list
+	of types.
+	(sgtk_build_args): New argument SUBR, used for error messages.
+	Removed unused "skip" label.  Use sgtk_valid_arg before calling
+	sgtk_scm2arg.  Changed all callers.
+	(sgtk_gtk_object_new): Use the builtin type "type" for the first
+	argument.
+	(gtk_class_new, gtk_signal_new_generic, sgtk_signal_emit): New.
+	(sgtk_init_substrate): Register gtktype_smob.
+	
+	* guile-gtk.h (sgtk_valid_type, sgtk_scm2type, sgtk_type2scm,
+	sgtk_valid_arg, gtk_type_get_info,
+	gtk_signal_set_class_function_full): New prototypes.
+	(sgtk_build_args): Update prototype.
+	
+        * gtk-1.1.defs (GtkSignalRunType): Removed GTK_RUN_MASK.  Added
+	GTK_RUN_ACTION and GTK_RUN_NO_HOOKS.
+	(gtk_type_name, gtk_type_from_name, gtk_class_new,
+	gtk_signal_new_generic, gtk_signal_emit,
+	gtk_signal_set_class_function_full): New.
+
+	* configure.in: Check for gtk_type_get_info and
+	gtk_signal_set_class_function_full.
+
+	* gtk-compat.c (gtk_type_get_info,
+	gtk_signal_set_class_function_full): New dummy definitions.
+
+	* build-guile-gtk.in (realize-slist-type, realize-list-type): Use
+	mode out for returned values.
+	(emit-func): Deal with rest-arg option.
+	(register-type 'type): New builtin type.
+
+	* guiledlopenhelper.c (sgtk_dlinit): Produce message when function
+	can't be found.
+	
+	Due to Matthias Clasen:
+
+	* gtk-1.1.defs (gtk_clist_remove): Correctly use define-func.
+	(gtk_scrolled_window_add_with_viewport): New.
+	(GtkFileSelection): Added action_area field.
+
+	* guile-gtk.c (sgtk_scm2list): Use g_list_concat to build up the
+	list, not g_list_append.  g_list_append adds values not nodes.
+	Work remains to be done here.
+
+	* test-gtk.scm: Much new stuff.
+
+1998-11-28  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-1.1.defs (gtk_widget_is_child): Removed.
+
+	* build-guile-gtk.in (realize-type): Correctly use
+	register-list-type for the list type, not register-slist-type.
+	Bugger.  One more of these and I loose my hackers certificate.
+
+	More work on composites.
+	
+	* build-guile-gtk.in (type-free): Replaced by type-finish
+	throughout.
+	(emit-composite-helpers): Correctly register emitted types.
+	(mode-in?, mode-out?, mode-def, mode-helper-from, mode-helper-to):
+	New.
+	(realize-slist-type, realize-cvec-type, realize): Take mode
+	argument.  Use mode-helper-from and mode-helper-to.
+	(realize-list-type, realize-cvecr-type, realize-fvec-type): New.
+	(realize-type): Handle new composite types list, cvecr and fvec.
+	Pass mode argument to realizers.
+	(register-type 'point): New.
+
+	* gdk-1.1.defs (gdk-draw-polygon): New.
+	* gtk-1.1.defs (GtkVisibility, GtkSortType,
+	gtk_container_children, gtk_combo_set_popdown_strings): New.
+	(GtkClist): General overhaul.  Should be useable now.
+	* gtk-1.0.defs (gtk_container_children,
+	gtk_combo_set_popdown_strings): New.
+
+	* guile-gtk.c (sgtk_valid_point, sgtk_scm2point, sgtk_point2scm):
+	New.
+	(sgtk_valid_composite): Call sgtk_valid_complen to do the real
+	work.
+	(sgtk_valid_complen): Do the checks previously done by
+	sgtk_valid_composite and optionally also check for a valid length.
+	(sgtk_scm2slist): Correctly terminate the GSList.  (Thanks to
+	Matthias Clasen)
+	(sgtk_slist_finish): New.
+	(sgtk_list2scm, sgtk_scm2list, sgtk_list_finish): New.  (Thanks to
+	Matthias Clasen, but the bugs are mine)
+	(sgtk_cvec_free): Removed.
+	(sgtk_cvec_finish): New.
+
+	* guile-gtk.h (sgtk_valid_point, sgtk_scm2point, sgtk_point2scm,
+	sgtk_valid_complen, sgtk_slist_finish, sgtk_list2scm,
+	sgtk_scm2list, sgtk_list_finish, sgtk_cvec_finish): New.
+
+	* examples/test-gdk.scm: Much cooler now.
+
+1998-11-27  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* gtk-1.1.defs (GtkWidgetFlags): Update from gtk+/gtk/gtk.defs.
+	(gtk_widget_basic): Comment out (xref gtk+/ChangeLog: 
+	Wed Nov 18 22:54:36 1998  Tim Janik  <timj@gtk.org>).
+	(gtk_clist_set_policy): Comment out (xref gtk+/ChangeLog:
+	Wed Nov 19 01:22:42 1998  Tim Janik  <timj@gtk.org>).
+	(gtk_container_disable_resize): Likewise.
+	(gtk_container_enable_resize): Likewise.
+
+1998-11-17  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gnome-guile-checks.m4: Copied new version from ../macros.  This
+	was already in 0.12.
+
+1998-11-15  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.12.
+	
+	Being good friend with both gtk-1.0 and gtk-1.1.
+
+	* configure.in (INSTALLED_DEFS_FILES): No longer used, removed all
+	code to figure it out.
+	(GTK_VERSION, GUILE_GTK_VERSION, LIBGUILEGTK_VERSION): New substs.
+	(AC_OUTPUT): Added gtk/dynlink.scm.
+	
+	* Makefile.am (bin_PROGRAMS): Use GUILE_GTK_VERSION to set program
+	name at configure time.
+	(lib_LTLIBRARIES): Use LIBGUILEGTK_VERSION.
+	(EXTRA_PROGRAMS, EXTRA_LTLIBRARIES): New.
+	(guile_gtk_SOURCES, guile_gtk_LDFLAGS, guile_gtk_LDADD): Copied to
+	both guile_gtk_1_0_* and guile_gtk_1_1_*.  Removed original.
+	(libguilegtk_la_SOURCES, libguilegtk_la_LDFLAGS,
+	libguilegtk_LIBADD): Copied to both libguilegtk_1_0_la_* and
+	libguilegtk_1_1_la_*.  Removed original.
+	(libguilegtk_la_1_0_LDFLAGS, libguilegtk_la_1_1_LDFLAGS): Added
+	explicit -rpath.
+	(toolkitsdir): Removed.
+	(install-exec-local): New, make versioning symlink for guile-gtk.
+	(vgtkmoduledir, vscmsrcdir): New, point to right module directory.
+	(install-data-local): Use vgtkmoduledir and vscmsrcdir to install
+	versioned Scheme files.  Don't install toolkits/ stuff.
+	(gtkdefs, gdkdefs): New.
+	(EXTRA_DATA): Removed.
+	(defs_DATA): Use gtkdefs and gdkdefs to pick up the right
+	versions.
+	(CLEAN_FILES): Added gdk-glue.c, gtk-glue.c and main.c.
+	(gtk-glue.c, gdk-glue.c, main.c): Use gtkdefs and gdkdefs to pick
+	up the right versions.
+	(EXTRA_DIST): Distribute new files.  Don't distribute
+	toolkits/gtk.scm.
+	(dist-hook): New.
+	
+	* build-guile-gtk.in (emit-glue): Emit code to register
+	`other-inits' modules at initialization time.
+
+	* gtk-1.0.defs: Copied from gtk.defs.  Import gdk-1.0.defs instead
+	of gdk.defs.
+	(GtkProgressBar): New field `percentage'.
+	* gtk-1.0.defs.guile: Copied from gtk.defs.guile.  Added other-inits
+	option.
+	* gdk-1.0.defs: Copied from gdk.defs.
+	* gdk-1.0.defs.guile: Copied from gdk.defs.guile.  Added other-inits
+	option.
+	
+	* gtk-1.1.defs: Copied from gtk.defs.  Import gdk-1.1.defs instead
+	of gdk.defs.
+	* gtk-1.1.defs.guile: Copied from gtk.defs.guile.  Added other-inits
+	option.
+	* gdk-1.1.defs: Copied from gdk.defs.
+	(GdkEventType): Reactivate GTK_DRAG_* and GTK_DROP_* members.
+	* gdk-1.1.defs.guile: Copied from gdk.defs.guile.  Added other-inits
+	option.
+
+	* gtk/dynlink.scm.in: Copied from gtk/dynlink.scm.
+	(sgtk-dlopen): New.
+	(dlopen-libtool-library): Use sgtk-dlopen instead of %sgtk-dlopen.
+	
+	(default-module-prefix, module-prefix, gtk-version-set,
+	gtk-version-alias): New.
+
+	* gtk-1.0/gtk.scm: Copied from gtk/gtk.scm.  Call gtk-version set
+	before merging the compiled code.
+	(gtk_major_version, gtk_minor_version): New.
+	* gtk-1.0/gdk.scm: Copied from gtk/gdk.scm.  Call gtk-version set
+	before merging the compiled code.
+	(gdk_major_version, gdk_minor_version): New.
+
+	* gtk-1.1/gtk.scm: Copied from gtk/gtk.scm.  Call gtk-version set
+	before merging the compiled code.
+	(gtk_major_version, gtk_minor_version): New.
+	* gtk-1.1/gdk.scm: Copied from gtk/gdk.scm.  Call gtk-version set
+	before merging the compiled code.
+	(gdk_major_version, gdk_minor_version): New.
+
+	* gtk/gtk.scm, gtk/gdk.scm: Reduced to a single call to
+	gtk-version-alias.
+
+	* guile-gtk.c (sym_gtk_version): New.
+	(sgtk_init_substrate): Use sym_gtk_version as the module prefix.
+
+	* guile-gtk.h (GtkWidgetFlags): Only define for GTK_MAJOR_VERSION
+	== 1 and GTK_MINOR_VERSION == 0.
+	
+1998-10-25  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gnome-guile-checks.m4: Copied new version from ../macros.
+	
+	* test-gdk.scm (arc-drawer-new): Corrected non-RnRS use of
+	internal defines.
+
+	* dynlink.scm: Added some comments and move others around to
+	hopefully improve legibility.
+	(find-soname): Removed unused definition of string-string.
+
+	* gtk.scm (gtk-repl): Corrected non-RnRS use of internal defines.
+
+	* gdk.defs (GdkEventType): Comment out GDK_DRAG_* and GDK_DROP_*
+	members because they are not in Gtk 1.0.6.  See general comment
+	about "Gtk versions" in README.
+
+	* ChangeLog: fixed typo in the entry from 1998-10-12 that might
+	have confused mechanical greps.
+
+	* README: Tell them to run test-gtk.scm while the examples
+	directory is current.  This enables it to find the test pixmap.
+
+	* configure.in: Bumped version number to 0.12a.
+
+	* guile-gtk.c (sgtk_find_missing_types, sgtk_try_missing_type):
+	New.
+	(sgtk_fillin_type_info): Call sgtk_try_missing_type when Gtk can't
+	find it.  This allows us to patch minor discrepancies between our
+	defs files and the Gtk run-time system.
+
+1998-10-24  Martin Baulig  <martin@home-of-linux.org>
+
+	We cannot rely upon the fact that dlopen () is doing the
+	LD_LIBRARY_PATH search for us, this is not the fact on BSD-like
+	systems.
+
+	* guiledlopenhelper.c (sgtk_dlopen): This function now takes an
+	additional parameter which is the full pathname of the library,
+	it is only used	on systems where dlopen () requires a full path
+	name. Otherwise we let dlopen () do the LD_LIBRARY_PATH search.
+
+	* gtk/dynlink.scm (search-path-extended): New function.
+	(search-path): First try to find the library without a version
+	suffix, if this	fails we call `search-path-extended' to find things
+	like /usr/lib/libm.so.2.0 when there's no /usr/lib/libm.so.
+	(dlopen-libtool-library): Don't call %sgtk-dlopen () if the library
+ 	cannot be found.
+	(init-dlopen-funcs): Call `find-soname' for "libguiledlopenhelper"
+	and use the full pathname in the call to `dynamic-link'.
+
+	* NEWS: Added note that dynamic linking is working on FreeBSD.
+
+1998-10-24  Martin Baulig  <martin@home-of-linux.org>
+
+	* gdk.defs (GdkEventType): Keep this in sync with gdktypes.h.
+	
+1998-10-12  Martin Baulig  <martin@home-of-linux.org>
+
+	* Makefile.am: Let the `Makefile' depend upon $(BUILT_SOURCES).
+	This is required to get dependencies correctly.
+
+1998-10-11  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gnome-guile-checks.m4: Copied new version from
+	gnome-guile/macros/
+
+1998-10-03  Marius Vollmer  <mvo@zagadka.ping.de>
+
+        Released 0.11.
+
+	* guiledlopenhelper.c (sgtk_dlopen): Do not include name of
+	library in error message, it is already included in the string
+	from dlerror().
+
+	* calc.scm: Invoke guile-gtk with "$0" "$@" for extra correctness.
+
+
+1998-09-25  Christopher Blizzard  <blizzard@appliedtheory.com>
+
+	* autogen.sh: use $ACLOCAL_FLAGS when running aclocal so that the
+ 	gnome .m4 files don't have to be installed in the normal path.
+
+1998-08-21  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_fillin_type_info): Fix wrong logic in
+	condition.  We need to fill when info->type is a fundamental type,
+	but not GTK_TYPE_OBJECT or GTK_TYPE_INVALID.
+
+	* build-guile-gtk.in (emit-defined-func): Use the scm-name option
+	for the Scheme name of a function, if it exists.
+	(emit-funcs): Register new type `full-callback' for the full
+	variant of callbacks.
+
+	* gtk.defs (gtk_input_add_full): New definition.
+	* gtk.defs.guile: Use scm-name option to give gtk_input_add_full
+	the Scheme name "gtk-input-add".
+	
+1998-08-20  Raja R Harinath  <harinath@cs.umn.edu>
+
+	`gtk_input_add_interp' was removed in `gtk+' recently.
+	* gtk-compat.h: Comment out gtk_input_add_interp.
+	* gtk.defs: Likewise.
+	* gtk.defs.guile: Likewise.
+
+1998-07-25  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Prevent guile-gtk from registering missing types with Gtk+.
+	
+	* guile-gtk.c (gtk_type_register_builtin): Removed.
+	(sgtk_register_type_infos): Do nothing with the sgtk_type_infos
+	except putting them on the ALL_TYPE_INFOS list.  Do not try to
+	find them and do not create them when they are missing from Gtk+'s
+	run-time type system.  Do not enter them into our type info table.
+	(sgtk_fillin_type_info): New function to perform the things on
+	demand that sgtk_register_type_infos used to do.
+	(sgtk_find_type_info): Try to find the sgtk_type_info in
+	ALL_TYPE_INFOS when it is not found in the table.
+	(sgtk_boxed2scm): Call sgtk_fillin_type_info.
+	(sgtk_find_object_info): Return NULL when the found type_info is
+	not for an GTK_TYPE_OBJECT.
+	
+	* Makefile.am (EXTRA_DIST): Distribute "continuations.scm", not
+	"continuations.h", silly me.  Distribute "gnome-guile-checks.m4".
+
+Wed Jul 22 00:01:07 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* gnome-guile-checks.m4: If no build-guile, link against readline
+	before termcap.
+
+1998-07-21  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk.defs (GtkProgressBar): Removed "percentage" field so that it
+	compiles again.
+
+1998-07-12  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_valid_double, sgtk_double2scm,
+	sgtk_scm2double): New functions.
+	(sgtk_arg2scm, sgtk_scm2arg, sgtk_scm2ret): Use them for
+	GTK_TYPE_DOUBLE.
+	(sgtk_find_object_info_from_type, sgtk_find_object_info,
+	sgtk_build_args): Made non-static.
+
+	* guile-gtk.h (sgtk_valid_double, sgtk_double2scm,
+	sgtk_scm2double, sgtk_find_object_info_from_type,
+	sgtk_find_object_info, sgtk_build_args, gdk_event_button): New
+	prototypes.
+
+	* gtk-support.c (gdk_event_button): New function.
+	* gdk.defs.guile (gdk_event_button): New definition.
+
+	* build-guile-gtk.in (emit-funcs): Register "double" type.
+
+1998-07-11  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_find_arg_info): Do not use
+	gtk_object_get_arg_type for long names.  Instead, search the
+	object_info of the class part of the name, and start the search
+	for the short name there.
+
+1998-07-03  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* guile-gtk.c (gtk_type_register_builtin): Improve fix.  Use
+	`memset' to initialize all fields, known or unknown, named or
+	renamed, to 0.
+
+1998-07-01  Jens Lautenbacher  <jens@tellux.de>
+
+	* gtk.defs: (GtkSpinButtonUpdatePolicy) Grr. Is a enum in gtk, not
+ 	a flag.
+
+1998-06-30  Jens Lautenbacher  <jens@tellux.de>
+
+	* guile-gtk.c (gtk_type_register_builtin): removed arg_set_func
+ 	and arg_get_func to make it compile against new gtk versions.
+
+1998-06-24  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (gtk-glue.c): Tell build-guile-gtk.in to look in
+	$(srcdir) for files to (import ...).
+	(gdk-glue.c): Likewise.
+	(main.c): Likewise.
+
+1998-06-24  Jens Lautenbacher  <jens@tellux.de>
+
+	* gtk.defs: (GtkSpinButtonUpdatePolicy) Removed obsolete
+ 	GTK_UPDATE_SNAP_TO_TICKS flag.
+
+1998-06-20  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* README: Added pointers to simple-gtk and wickel.
+
+	From lutterdc@cs.purdue.edu (David Lutterkort):
+	* gtk.defs (GtkButton): Add `child' to field option.
+	(gtk_file_selection_show_fileop_buttons,
+	gtk_file_selection_hide_fileop_buttons): New definitions.
+
+1998-06-16  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* examples/continuations.scm: New file.
+	* Makefile.am (EXTRA_DIST): Distribute it.
+
+1998-06-14  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk/dynlink.scm (do-libtool-link): Beautify warning message when
+	a library could not be loaded.
+
+	* gtk.defs: Corrected first line to use the string expected by
+	configure to decide whether to install gtk.defs or not.
+	Inactivated all stuff that refers to accelerators.
+	
+	* guiledlopenhelper.c (sgtk_dlopen): Print dlerror message to
+	stderr when dlopen returned NULL.
+
+	* guile-gtk.c (enter_proxy): Cast arguments to g_hash_table_new to
+	GHashFunc and GCompareFunc, respectively.
+	(sgtk_valid_composite): Use scm_ilength to test whether OBJ is a
+	list.  Simplify loop over all list elements accordingly.
+	(sgtk_slist2scm): Changed "gpointer" to "void".
+	(sgtk_scm2slist): Changed "gpointer" to "void".  Allow SCM_EOL to
+	be a list, too.
+	(sgtk_scm2cvec, sgtk_cvec_free): New.
+	* guile-gtk.h (sgtk_slist2scm, sgtk_scm2slist): Changed "gpointer"
+	to "void".
+	(sgtk_cvec, sgtk_scm2cvec, sgtk_cvec_free): New.
+	(GtkWidgetFlags): Only define if G_ENUM isn't defined.
+
+	* build-guile-gtk.in (emit-composite-helpers): Changed "gpointer"
+	to "void".
+	(realize-slist-type): Only types that don't have the fit-for-list
+	property can't be used in lists, not those where
+	scm2c-does-type-checking.
+	(realize-cvec-type): New.
+	(realize-type): Added case for `cvec' types.
+	(register-boxed-converter, register-object-type): Set fit-for-list
+	property.
+	(emit-funcs): Set fit-for-list property for string, static_string,
+	int, uint types.
+	
+	* gnome-guile-checks.m4: Copied from "../macros/".
+	* autogen.sh: Changed -I location from "../macros" to "."
+	* Makefile.am: Added ACLOCAL_AMFLAGS variable to pass "-I ." to
+	aclocal when run by make.
+	(EXTRA_DIST): Distribute README.gnome-guile.
+
+	* examples/calc.scm: Read and push all values that are in the
+	entry, not just the first.
+
+1998-06-11  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk.defs: Correctly specify GtkBin as the base of GtkEventBox.
+	Thanks to Jeff Dike.
+
+1998-06-07  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* configure.in: Bump version number to `0.11a'.
+
+1998-06-04  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (EXTRA_DIST): Removed README.libtool rule, as there
+	is no such file.
+
+1998-06-03  Martin Baulig  <baulig@merkur.uni-trier.de>
+
+	* configure.in: Using GNOME_CHECK_GUILE again; I improved this macro
+	a little bit, it makes sure guile really works and has a failflag
+	like GNOME_INIT. In general, I think it is better to use a macro
+	from the `macros' directory since this can more easily be changed.
+
+	* acconfig.h (HAVE_GUILE): New tag.
+
+	* Makefile.am (INCLUDES): Added $(GUILE_INCS).
+
+	* autogen.sh: Added `-I ../macros' to invocation of `aclocal'.
+
+1998-06-02  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk-compat.c: Include <gdk/gdkx.h> for GDK_ROOT_PARENT.
+	(gtk_pixmap_new_interp): Call gdk_pixmap_create_from_xpm with
+	GDK_ROOT_PARENT as window.  This is probably not correct, is it?
+	
+1998-05-31  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	First traces of composite types (lists and arrays).
+	
+	* build-guile-gtk.in (printable): New function.
+	(make-type): Replace optional c2args parameter with more general
+	`props' mechanism.  Changed callers.
+	(type-prop): New function.
+	(type-scm2c-does-type-checking): New function to remove
+	overloading of type-isa.  See comment.
+	(type-c2args): Use type-prop.
+	(type-free): New function.
+	(emitted-helpers, emit-composite-helpers, realize-slist-type,
+	realize-type): New
+	(lookup-type): Use assoc instead of assq to make it work with
+	types that have lists as names.
+	(emit-func): Call realize-type for every parameter type and the
+	return type.  Use type-scm2c-does-type-checking instead of
+	type-isa to figure out whether scm2c does type checking. Emit code
+	to cleanup the converted parameters after the C function has been
+	called.
+	(register-type 'int, register-type 'uint): Always emit a useable
+	type checker. Use scm2c-does-type-checking to signal that, well,
+	scm2c does type checking.
+
+	* gtk.defs (gtk_radio_button_group): New function.
+
+	* guile-gtk.h (sgtk_valid_composite, sgtk_slist2scm,
+	sgtk_scm2slist): New prototypes.
+	* guile-gtk.c (sgtk_valid_composite, sgtk_slist2scm,
+	sgtk_scm2slist): New functions.
+	
+
+1998-05-30  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* autogen.sh, cleanit.sh: New.
+
+1998-05-24  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.10
+	
+	* guiledlopenhelper.c: New.
+
+	* Makefile.am (lib_LTLIBRARIES): Add libguiledlopenhelper.la
+	(libguiledlopenhelper_la_SOURCES,
+	libguiledlopenhelper_la_LDFLAGS): New.
+	(EXTRA_DIST): List new files from the examples/ directory.
+
+	* build-guile-gtk.in (read-link-info): Convert init-func to a
+	symbol before using it as a key.
+
+	* example/Makefile.am, example/configure.in, example/foo.c,
+	example/foo.h, example/foo.defs, example/foo.defs.guile,
+	example/foo.scm, example/test-foo.scm: New.
+
+	* gtk/dynlink.scm (pk, this-module, init-dlopen-funcs): New.
+	(search-path): New function.
+	(find-libtool-library): Use it.
+	(default-lib-path): Search LD_LIBRARY_PATH before
+	"/usr/local/lib".
+	(find-soname): New.
+	(dlopen-libtool-library): Use "libdir" from .la file for locating
+	the real shared object.  Call init-dlopen-funcs.  Use %sgtk-dlopen
+	instead of dynamic-link.  Use find-soname for the fallback case.
+	Do not print warning here when fallback fails, too.
+	(do-libtool-link): Print warning here, instead.
+	(merge-compiled-code): Throw error when dlopen-libtool-library
+	returns #f.  Use %sgtk-dlinit for dynamically linked functions.
+	Still use dynamic-call for functions found in registered-modules.
+	
+1998-05-23  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* Makefile.am (libguilegtk_la_LIBADD): Removed GUILE_LIBS.  The
+	GUILE_LIBS are already provided by the guile executable and are
+	likely to contain static libraries, which complicate dynamic
+	linking.
+
+	* gtk/dynlink.scm (find-libtool-library): Take path to search as
+	parameter.  Return `#f' on failure instead of throwing.
+	(default-lib-path): New function.
+	(libtool-library-dlname): Removed (superseded by the following).
+	(libtool-library-info): New function.
+	(dlopen-libtool-library): Take optional path parameter.  Link all
+	dependency_libs before linking this one.  Try ".so" lib when no
+	".la" file could be found or it contains no dlname.  Merely print
+	warning and return #f when library could not be linked.
+	(make-word-scanner): New function.
+	(do-libtool-link): New function.
+
+	* gtk.defs (gtk_entry_new_with_max_length): Declare return type as
+	GtkWidget, not none.
+
+	* ltconfig: Remove inter-library dependency hack.  We are now back
+	to using the official libtool.
+	
+1998-05-16  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.9
+
+	* ltconfig, ltmain.sh, README.libtool: Upgraded to libtool 1.2a.
+	ltconfig is patched to make inter-library dependencies appear to
+	work on GNU/Linux.
+
+	* Makefile.in: Upgraded to automake 1.3.
+	
+	* Makefile.am (main.c): Generate from gtk.defs and gdk.defs
+	instead of from the *.defs.guile files.  Include gtk.defs and
+	gdk.defs in dependencies.
+
+	* build-guile-gtk.in (form-options): Handle `define-object' and
+	`define-boxed'.
+	(emit-boxed-info): Get copy, free and size from the form options.
+	(emit-field-accessors): Emit setter function when requested.
+	(emit-funcs): Emit field accessors of boxed types.
+	(emit-main): Use SGTK_REGISTER_GLUE instead of explicit module
+	magic.
+
+	* configure.in: Signal error when the right version of Gtk+ could
+	not be found.  Check for qt_abort, not qtabort.
+
+	* gdk.defs: Changed all `define-boxed' statements to new syntax,
+	so that they can have options.
+	(GdkVisibilityState, GdkInputSource): New enum definitions.
+
+	* gdk.defs.guile: Added large number of GdkEvent accessor
+	functions.
+
+	* gtk/gtk.scm (gtk-standalone-main): New function.
+
+	* gtk-support.c: Added large number of GdkEvent accessor
+	functions.
+
+	* gtk.defs: Changed all `define-boxed' statements to new syntax,
+	so that they can have options.
+
+	* guile-gtk.c (sgtk_init_noargs, sgtk_init, sgtk_init_with_gtk,
+	sgtk_init_argv, sgtk_init_with_args): Renamed sgtk_init_noargs to
+	sgtk_init.  Renamed sgtk_init_with_gtk to sgtk_init_with_args.
+	Removed sgtk_init_argv.  Changed all callers.
+	(sgtk_register_glue): New function.
+
+	* guile-gtk.h: Updated to reflect guile-gtk.c and gtk-support.c
+	
+Mon May 11 00:33:27 1998  Marius Vollmer  <mvo@diaspora>
+
+        * Makefile.am (gtkmoduledir): New installation directory.
+	(install-data-local): Make $(gtkmoduledir) and populate it.
+	(BUILT_SOURCES): Removed "gtk-glue.x", "gdk-glue.x" and "main.x".
+  	Added "gtk-support.x".
+	(CLEANFILES): Removed "gtk-glue.x", "gdk-glue.x".  Added
+ 	"gtk-support.x".
+	(EXTRA_DIST): Added "README.libtool", "gtk/gdk.scm" and
+ 	"gtk/dynlink.scm".
+	(main.c): New target.  "main.c" is now generated by
+ 	build-guile-gtk, too.
+
+	* build-guile-gtk.in (*imported-initfuncs*): New variable.
+	(read-file): New argument BACKEND.  Code for processing all
+ 	statements except `import' and `include' removed, call BACKEND
+ 	instead to do the processing.
+	(glue-backend): New function to perform the processing formerly
+ 	done by read-file.
+	(*inits*, add-init): New toplevel definitions.
+	(emit-func): Do not emit "SCM_PROC" directives.  Directly generate
+ 	its definition instead and remember an appropriate
+ 	"scm_make_gsubr" with add-init.  Renamed "c_ret" to "cr_ret"
+ 	throughout.
+	(->c-identifier, module->cfunc, module->cname): New unused
+ 	functions.
+	(emit-glue): New function.
+	(read-link-info, init-func->module-name, emit-main, run-system,
+ 	link-flags, do-link): New functions.
+	(maybe-next-arg, rest-args): New functions.
+	(defs-file): Removed.
+	(at toplevel): Do not read "defs-file".  Moved most of the code
+ 	for the "glue" command into emit-glue.  New commands "main",
+ 	"libs", "cflags" and "link".
+
+	* gdk.defs.guile: Removed snarf-file option.  Changed
+ 	init-func option to "sgtk_init_gtk_gdk_glue".
+	
+	* gtk.defs.guile: Removed snarf-file option.  Changed init-func
+ 	option to "sgtk_init_gtk_gtk_glue".  Added extra-init-code option
+ 	for calling sgtk_init_gtk_support.
+
+	* gtk-support.c: Moved SCM_PROCs from guile-gtk.c to here.
+	(sgtk_init_gtk_support): New function.
+
+	* guile-gtk.c: Move Guile compatabilityy stuff from guile-gtk.h to
+	here. Moved all SCM_PROCs to gtk-support.c
+	(get_type_info, sgtk_get_type_info): Renamed.  Changed all
+	callers.
+	(sgtk_register_type_infos): Call sgtk_init_noargs.
+	(sgtk_string_conversion): Only call SCM_COERCE_SUBSTRING on proper
+	strings.
+	(sgtk_init, sgtk_init_substrate): Renamed sgtk_init to
+	sgtk_init_substrate and made static. Do not call
+	sgtk_init_gdk_defs and sgtk_init_gtk_defs.
+	(sgtk_inited): New variable.
+	(sgtk_init_with_gtk): Return immediatly when we have already been
+	inited.  Set sgtk_inited to 1 after initiliazing.
+	(sgtk_init_noargs): Made non-static.
+	(hack_compiled_switches): Moved from "main.c".
+	(sgtk_shell): Moved from "main.c".  Call sgtk_init_with_gtk.
+
+	* guile-gtk.h: Moved Guile compatability stuff to "guile-gtk.c".
+  	(sgtk_get_type_info, sgtk_callback_trampoline, sgtk_shell): New
+ 	prototypes.
+
+	* libtool: Updated to version 1.2.  Read README.libtool.
+
+	* toolkits/gtk.scm: Contents moved to "gtk/gtk.scm".  Throw error
+ 	when loaded.
+
+	* gtk/gtk.scm: Moved contents of "toolkits/gtk.scm" here.  Renamed
+ 	to be the (gtk gtk) module.  Don't use (gtk gtkstubs) module.  Use
+ 	(gtk dynlink) module.  Call merge-compiled-code instead of
+ 	merge-exports.
+	(merge-exports): Removed.
+	(gtk-update): Made public.
+	(gtk-show-error): Set text to `#f' when the window is destroyed.
+	(gtk-standalone-main): New function.
+	
+	* gtk/gdk.scm: New file.
+	* gtk/dynlink.scm: New file.
+	
+Wed May  6 01:01:16 1998  Marius Vollmer  <mvo@diaspora>
+
+	* toolkits/gtk.scm (gtk-destroyed?): Removed.
+
+Sat May  2 19:46:53 1998  Marius Vollmer  <mvo@diaspora>
+
+	* build-guile-gtk.in (emit-object-info): Fixed typo in emitted
+ 	code.
+	(register-enum-converter): Added optional argument to specify C
+ 	name of type.
+	(emit-funcs): Use it to make string-enums use "gchar*".
+
+	* configure.in: Use "test -f" instead of "test -e".
+	Do not call AC_PROG_LN_S.
+
+	* gtk.defs (gtk_events_pending): New definition.
+	* toolkits/gtk.scm (gtk-update): New function.
+	
+Mon Apr 27 00:14:02 1998  Marius Vollmer  <mvo@diaspora>
+
+	* build-guile-gtk.in (import-path, add-import-dir,
+ 	search-in-path): New variable/functions.
+	(with-input-from-defs-file): Use search-in-path.  Do not change
+ 	current working directory while reading.  Call PROC with the full
+ 	name of the file, not just the basename.
+	(read-file-2): Changed accordingly.
+	(register-type 'string): Implement c2sm converter with
+ 	scm_take0str.
+	(usage): put "[OPTIONS]" after "OP".
+	(next-arg, peek-arg): New functions.
+	(opsym, defs-file): Use next-arg to get the values.  Additionally,
+ 	handle "-I" options.
+
+	* gtk.defs (GtkAdjustment): List all accessible fields.
+	(GtkText): Added `hadj', `vadj' fields.
+
+	* guile-gtk.c (sgtk_arg2scm): New argument `free_mem'.  When
+ 	free_mem is true, free memory of GtkArg value for GTK_TYPE_STRING.
+	(callback_trampoline, sgtk_callback_trampoline): New
+ 	variabale/function.
+	(inner_callback_marshal): Use callback_trampoline.
+	(sgtk_find_arg_info): Do not return pointer to static GtkArg info
+ 	structure, instead fill in new `GtkArg *arg' parameter.  Changed
+ 	callers.  Use `gtk_object_get_arg_type' for long names.
+	(sgtk_gtk_widget_new, sgtk_gtk_widget_set): Removed.  Use
+ 	sgtk_gtk_object_new/sgtk_gtk_object_set instead in the SCM_PROC
+ 	lines.
+	(sgtk_gtk_object_get): New function.
+	(sgtk_init): Initialize callback_trampoline.
+
+	* guile-gtk.h (sgtk_arg2scm): Update prototype for new free_mem
+ 	argument.
+
+	* gtk.scm (gtk-show-error): New function.
+ 	(call-with-error-catching): Removed label argument. Call
+ 	gtk-show-error instead of printing to current-error-port.
+	(gtk-signal-connect*): Removed.
+	(at toplevel): Set callback-trampoline to wrap callbacks with
+ 	`with-error-catching'.
+	
+Sat Apr 25 22:19:24 1998  Marius Vollmer  <mvo@diaspora>
+
+	* Makefile.am (gdk-glue.c, gtk-glue.c): Depend on
+ 	build-guile-gtk.in.  Use build-guile-gtk.in instead of
+ 	build-guile-gtk.  The substitutions are not needed for this
+ 	package and depending on configure generated files causes the glue
+ 	code to be regenerated during make by mere users.
+	(EXTRA_DIST): Do not list build-guile-gtk.  Include
+ 	examples/test-gdk.scm.
+
+	* build-guile-gtk.in: Renamed main module to build-guile-gtk.
+	(emit-object-info): New function.
+	(emit-type-info): Call it and include object info in type_infos.
+  	This object info is needed to make gtk-object-new work with named
+ 	types.
+	(type-isa, type-scm2c): New rule: when type-isa return `#f' for a
+ 	type, expect type-scm2c to do type checking and pass it more args
+ 	to do this job.
+	(emit-func): Perform scm->c conversion during type checking when
+ 	type-isa returns #f for a argument type.
+	(register-type 'int): Use "gint" for C type, return #f for
+ 	type-isa, use scm_num2long, scm_long2num for conversion.
+  	scm_num2long does type checking.
+	(register-type 'uint): Likewise, for unsiggned ints.
+	(register-object-type 'GtkObject): Removed.
+	(emit-funcs): Correctly get object options from the cdddr.
+
+	* configure.in (AM_PATH_GTK): Request version 1.0.0.
+
+	* gtk-support (gdk_event_x, gdk_event_y): Support
+ 	GDK_BUTTON_RELEASE.
+
+	* gtk.defs: Add definition of GtkObject.
+
+	* guile-gtk.c (DEBUG_GC, DEBUG_PRINT): Renamed DEBUG_GC to
+ 	DEUG_PRINT thru out.
+	(sgtk_register_type_infos): Ignore sgtk_object_infos while
+ 	preparing builtin types.
+	(sgtk_arg2scm, sgtk_scm2arg, sgtk_scm2ret): Renamed old
+ 	sgtk_scm2arg to sgtk_scm2ret.  Changed all callers.  New function
+ 	sgtk_scm2arg that uses the GTK_VALUE_* macros.  Added support for
+ 	all useful fundamental types.
+	(sgtk_find_object_info, sgtk_find_object_info_from_type, xstrndup,
+ 	sgtk_find_arg_info, sgtk_build_args, sgtk_gtk_oject_new,
+ 	sgtk_gtk_widget_new, sgtk_gtk_objectc_set, sgtk_gtk_widget_set):
+ 	New functions.
+
+	* guile-gtk.h (sgtk_object_info): New structure type.
+	(sgtk_scm2arg, sgtk_scm2ret): Updated prototypes.
+
+	* toolkits/gtk.scm (call-with-error-catching, with-error-catching,
+ 	gtk-signal-connect*): New functions/macro.
+	
+Thu Apr 23 23:37:57 1998  Marius Vollmer  <mvo@diaspora>
+
+	Almost complete rewrite of the inner workings and the code
+ 	generation process.
+
+	* Makefile.am
+	(schemedir): Removed.
+	(sitedir): Use $prefix instead of GUILE_SCMDIR.
+	(bin_SCRIPTS): Added build-guile-gtk.
+	(guile_gtk_LDFLAGS): Removed $GTK_LDFLAGS.
+	(libguilegtk_la_SOURCES): Removed guile-compat.h, gtk-compat.h,
+ 	gtk-funcs.c, gtk-types.c, gtk-types.h.  Added gtk-support.c
+ 	gdk-glue.c, gtk-glue.c instead.
+	(install-data-local): New target to install toolkits/gtk.scm by
+ 	hand.
+	(defsdir, defs_DATA): New install variable for installing the
+ 	`*.defs' files.
+	(BUILT_SOURCES): Removed gtk-types.h,, gtk-types.c, gtk-funcs.c
+ 	and gtk-funcs.x.  Added gdk-glue.c, gdk-glue.x, gtk-glue.c and
+ 	gtk-glue.x.
+	(CLEAN_FILES): Removed gtk-funcs.x.  Added gdk-glue.x, gtk-glue.x.
+	(guile-gtk.x, gtk-funcs.x, main.x, gtk-funcs.c, gtk-types.c,
+ 	gtk-types.h, install-exec-hook): Removed these targets.
+	(gdk-glue.c, gtk-glue.c): New targets.
+	(EXTRA_DIST): Removed PROPOSAL, guile.details, gen-typeinfo,
+ 	gtk-interp.patch.  Added gdk.defs, gdk.defs.details,
+ 	gtk.defs.details, build-guile-gtk.  Correctly reflect new location
+ 	of calc.scm, test-gtk.scm, hellow-world.scm.  Added
+ 	examples/test-gdk.scm.
+
+	* build-guile-gtk.in: Renamed from gen-typeinfo.  Include
+ 	mini-format module inline and avoid dependency on SLIB/format.
+  	Put main code into `build-guile-gtk' module.
+	(defsdir): New variable.
+	(*extra-options*, register-extra-options, extra-options,
+ 	*global-options*): New definitions to deal with options.
+	(dirname, basename): New functions.
+	(read-file): Incorporated `read-import-file' functionality. Search
+ 	also in defsdir.  Change cwd to the directory of the defs file
+ 	that is being read.  Handle new `import', `include', `add-options'
+ 	and `options' statements.  Read *.defs.guile file if it exists.
+	(@, @@): Use mini-format instead of format.
+	(string-map): Removed.
+	(string-upcase, string-downcase): Use string-copy and
+ 	string-upcase!/string-downcase! instead of string-map.
+	(canonicalize): Do not convert syllables to lowercase.
+	(funcname): Convert syllables to lowercase.
+	(typename): Do not captialize syllables.
+	(scmname): Convert syllables to lowercase.
+	(short-name): Removed.
+	(form-options): New function.
+	(undeferred-functions, type-conversions, overridden-funcs,
+ 	read-detail-file, undeferred, overridden-func): Removed.
+	(type-conversion): Use get-opt-val.
+	(get-opt): Made global.  New argument to return as default value
+ 	when option is not found.  Do return cdr of option, not the
+ 	complete option.  Changed all users.
+	(get-opt-val): Made global.
+	(emit-enum/flags-info, emit-boxed-info): Generate individual
+ 	struct object for each type.  Generate "extern" declaration for
+ 	imported types.
+	(emit-infomac, emit-idmacs, emit-ids, emit-idfuncproto,
+ 	emit-idfunc): Removed.
+	(emit-type-info): New function.
+	(type-c2scm): Take additional `copy' argument.  Changed all
+ 	callers and specialized definitions.
+	(emit-func): Use options instead of `defer?` argument.  Changed
+ 	all callers.  Deal with `ret' having options.  Generated code: do
+ 	not copy return value when `ret' has (copy #f) option.  Do not use
+ 	`short-name'.
+	(emit-defined-func): Set `cur-protection' according to options of
+ 	function.
+	(emit-funcs): Do not emit static set of include directives and
+ 	initialization function.
+	(cur-protection): New local variable of `emit-funcs'.
+	(register-type 'bool): Accept every SCM value as a boolean.
+	(register-type 'callback): Use `sgtk_protect' with
+ 	`cur-protection'.
+	(register-type 'gpointer): Renamed to `dont-use-gpointer'.
+	(usage): Output new usage information.
+	(import-file, detail-file): Removed.
+	(main actions at toplevel): Do not test for "-import" option.
+  	Move reading of definition files into error catching section.
+  	Handle only "glue" operation.  Emit include directives and and
+ 	initialization function here, using stuff from *global-options*.
+
+	* configure.in: (INSTALLED_DEFS_FILES): New substitution.  Checkk
+ 	whether gtk.defs, gdk.defs should be installed by us and add them
+ 	to INSTALLED_DEFS_FILES if yes.
+	(AC_ACLOCAL_INCLUDE): Removed reference to "../macros".
+	(GNOME_INIT): Removed.
+	(libqt): Use "qtabort" to check for libqt and not "main".
+	(AC_FIND_GUILE_H, AC_FIND_GUILE_LIB, --with-guile-incs,
+ 	--with-guile-libs): Removed.  Making the compiler search the right
+ 	places should be handled external to configure, IMO.  And we have
+ 	build-guile.
+	(AC_PATH_X, AC_PATH_XTRA, GTK_LDFLAGS, GTK_LIBS): Removed.  This
+ 	is handled by gtk-config now.
+	(AC_CHECK_FUNCS for Gtk+): Check only for gdk_color_copy and
+ 	gtk_widget_peek_colormap.
+	(GUILE_SCMDIR): Removed.
+	(AC_OUTPUT): Generate build-guile-gtk form build-guile-gtk.in and
+ 	make it executable.
+
+	* examples/calc.scm: Do not handle the "delete_event" on toplevel
+ 	window.  Only call gtk_exit and gtk_main when we are standalone.
+
+	* examples/test-gtk.scm (create-tooltips): Install tooltips object
+ 	into global variable to protect it from being collected.  Only
+ 	call gtk_exit and gtk_main when we are standalone.
+
+	* gtk-compat.c (gtk_radio_menu_item_new_with_label_interp):
+ 	Renamed to gtk_radio_menu_item_new_with_label_from_widget.
+	(gtk_radio_menu_item_new_interp): Renamed to
+ 	gtk_radio_menu_item_new_from_widget.
+	(gdk_colormap_ref, gdk_colormap_unref, gdk_visual_ref,
+ 	gdk_visual_unref, gdk_window_ref, gdk_window_unref,
+ 	gdk_event_copy, gdk_event_free, gtk_tooltips_ref,
+ 	gtk_tooltips_unref, callback_data, unmarshal_callback,
+ 	gtk_timeout_add_interp, gtk_idle_add_interp, interp_data,
+ 	remarshal, renotify, gtk_signal_connect_interp,
+ 	gtk_radio_button_new_interp,
+ 	gtk_radio_button_new_with_label_interp, gtk_invoke_input_function,
+ 	gtk_input_add_interp): Removed, phew.
+
+	* guile-gtk.h: Removed prototypes of removed function. Merged
+ 	remaining contents into guile-gtk.h. Removed file "guile-gtk.h".
+
+	* gtk-support.c: New file for additional hand-written glue code.
+	(gdk_color_intern, gdk_font_intern, gtk_style_fg_gc,
+ 	gtk_style_bg_gc, gdk_event_type, gdk_event_window, gdk_event_x,
+ 	gdk_event_y): New functions.
+
+	* gtk.defs: Mark as being `installed by guile-gtk'.  Moved all Gdk
+ 	related definitions to gdk.defs.  Import gdk.defs.
+	(GtkWidgetFlags): Added `destroyed' member.
+	(gtk_main_level, GTK_OBJECT_DESTROYED): New defintions.
+	(GtkWidget): Added `window' field.
+	(gtk_clist_clist_set_row_data, gtk_clist_get_row_data,
+ 	gtk_clist_get_row_data): Commented out. Type gpointer is a no-no.
+	(gtk_radio_button_new_interp): Renamed to
+ 	gtk_radio_button_new_from_widget.
+	(gtk_radio_button_new_with_label_interp): Renamed to
+ 	gtk_radio_button_new_with_label_from_widget.
+	(gtk_radio_menu_item_new_with_label_from_widget): Renamed to
+	gtk_radio_menu_item_new_from_widget.
+	(gtk_radio_menu_item_new_with_label_interp): Renamed to
+	gtk_radio_menu_item_new_with_label_from_widget.
+
+	* guile-compat.c: Don't include guile-compat.h, include
+ 	guile-gtk.h instead.
+
+	* guile-gtk.c: Include guile-gtk.h as <guile-gtk.h> and not
+ 	"guile-gtk.h" for consistency.  Do not include guile-compat.h,
+ 	gtk-types.h, gtk-compat.h.
+	(DEBUG_GC): New macro to control debugging output during GC.
+	(proxy_tab, gpointer_hash, gpointer_compare, enter_proxy,
+ 	get_proxy, forget_proxy): New variable/functions for associating
+ 	proxies with gpointers.
+	(type_info_tab, n_type_info_tab, enter_type_info, get_type_info,
+ 	must_get_type_info, all_type_infos, gtk_type_register_builtin,,
+ 	sgtk_register_type_infos, sgtk_finnd_type_info): New
+ 	variables/functions for connecting sgtk_type_info structures to
+ 	GtkType values.
+	(sgtk_object_proxy, all_proxies): New type/variables for wrapping
+ 	GtkObjects with a SCM value.
+	(global_protects, mark_traced_ref, tc16_gtkobj_marker_hook,
+ 	count_traced_ref, gtkobj_marker_hook, gtkobj_marker_hook_print,
+ 	install_marker_hook): New variables/functions for merging the
+ 	tracing collector of Guile with thhe ref_counting of GtkObjects.
+	(handle_key): Removed.
+	(gtkobj_mark): Also mark children of GtkContainers.
+	(gtkobj_print): Do not handle proxies whos GtkObject has
+ 	disappeared.  It wont happen anymore.
+	(gtkobj_free): Call gtk_object_unref on the GtkObject and get rid
+ 	of the proxy structure.
+	(sgtk_protect, sgtk_unprotect, sgtk_unprotect_1): Semi-new
+ 	functions; extensions of the old and removed sgtk_protect_scm and
+ 	sgtk_unprotect_scm.
+	(make_gtkobj): Properly ref/sink the GtkObject but do not connect
+ 	to the "destroy" signal and do not attach the SCM smob with
+ 	gtk_object_data.
+	(sgtk_wrap_gtkobj): Get the smob with get_proxy and not with
+ 	gtk_object_get_data.
+	(sgtk_destroyed_p, protects, sgtk_protect_scm,
+ 	sgtk_unprotect_scm): Removed.
+	(sgtk_valid_flags): Do not require all bits to have a literal.
+	(boxed, boxed_pool, new_boxed, free_boxed): Removed.
+	(BOXED_SEQNO): New macro.
+	(boxed_equal): Removed.
+	(sgtk_boxed2scm): Store the gpointer directly in the cdr and the
+ 	seqno of the type in the free bits of the car.
+	(sgtk_find_boxed_info, sgtk_find_enum_info, sgtk_find_flags_info):
+ 	Removed.  Changed all callers to use sgtk_find_type_info and casts
+ 	instead.
+	(inner_callback_marshall): Removed jmpbuf argument. This gives
+ 	warnings for older Guile versions, but they are harmless.
+	(sgtk_callback_marshal): Do not invoke callback when the GC is
+ 	active.
+	(sgtk_callback_destroy): Use sgtk_unprotect.
+	(standalone_p, sgtk_set_standalone, sgtk_is_standalone,
+ 	sgtk_standalone_p): New variable/functions.  No idea why I did
+ 	them in C.
+	(sgtk_init): Initialize gtkobj_marker_hook smob and
+ 	global_protects.  Call install_marker_hook.
+	(dgtk_init_with_gtk): Call sgtk_init after gtk_init.
+
+	* guile-gtk.h: Merged in gtk-compat.h and guile-compat.h.
+ 	(sgtk_type_info): New structure.
+	(sgtk_enum_info, sgtk_senum_info, sgtk_boxed_info): Use
+ 	sgtk_type_info as header.
+	(sgtk_enum_infos, sgtk_flags_infos, sgtk_boxed_infos,
+ 	sgtk_senum_infos): Removed `external' declaration because these
+ 	arrays are no longer generated.
+	(sgtk_register_type_infos): New prototype.
+	(sgtk_protect, sgtk_unprotect): New prototypes.
+	(sgtk_protect_scm, sgtk_uprotect_scm): Removed.
+	(sgtk_callback_marshall): Changed n_args argument to guint.
+	(sgtk_set_standalone, sgtk_is_standalone, sgtk_standalone_p): New
+ 	prototypes.
+
+	* main.c: Do not include guile-compat.h.
+	(hack_compiled_switches): Call sgtk_set_standalone(0) when going
+ 	to start our own event loop.
+
+	* toolkits/gtk.scm: Added some aliases:
+	(gtk-radio-menu-item-new -> 
+	   gtk-radio-menu-item-new-from-widget)
+	(gtk-radio-menu-item-new-with-label ->
+   	   gtk-radio-menu-item-new-with-label-from-widget)
+	(gtk-radio-button-new ->
+           gtk-radio-button-new-from-widget)
+	(gtk-radio-button-new-with-label ->
+           gtk-radio-button-new-with-label-from-widget)
+	(gtk-destroyed? -> gtk-object-destroyed)
+	
+Sun Mar 29 15:55:55 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* gtk.defs (gtk_combo_disable_activate): New function.  From
+ 	Daniel Skarda <0rfelyus@atrey.karlin.mff.cuni.cz>.
+
+1998-03-17  Marc Ewing  <marc@redhat.com>
+
+	* removed ltmain.sh and ltconfig
+
+1998-03-16  Marc Ewing  <marc@redhat.com>
+
+	* Makefile.am: replace X_CFLAGS with GTK_CFLAGS
+	* configure.in: added:
+	  AM_ACLOCAL_INCLUDE(../macros)
+	  AM_PATH_GTK
+	  GNOME_INIT
+
+Sun Mar 15 16:51:24 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* gen-typeinfo (emit-infomac): n-senums argument to loop comes
+	after n-flags, not before.
+
+	* gen-typeinfo (emit-lits): Handle define-string-enum.
+	(emit-enum/flags-info): Emit string enum info.
+	(emit-infomac): Handle define-string-enum.
+	(emit-idmacs): Likewise.
+	(emit-funcs): Likewise.
+	(register-senum-converter): New function.
+
+	* guile-gtk.h (sgtk_senum_literal, sgtk_senum_info): New types.
+	* guile-gtk.c (sgtk_valid_senum): New function.
+	(sgtk_senum2scm): Likewise.
+	(sgtk_scm2senum): Likewise.
+
+1998-03-15  Sascha Ziemann  <szi@aibon.ping.de>
+
+	* configure.in: added --enable-debug
+
+Sat Mar 14 01:48:24 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (install-exec-hook): Make symlink, not hard link.
+
+	* toolkits/gtk.scm (let-multi): Comment out.
+	Don't require module (ice-9 syncase).
+
+	* guile-gtk.h (sgtk_init_with_gtk): Declare.
+	* gtk-guile.c (inner_main): Use sgtk_init_with_gtk.
+	* guile-gtk.c (sgtk_init_with_gtk): New function.
+	(sgtk_init): Changed interface.  Don't call gtk_init().
+	(sgtk_init_noargs): Use sgtk_init_with_gtk.
+
+1998-03-13   Marc Ewing <marc@redhat.com>
+
+	* gtk-compat.h: update to reflect GTK.
+
+Fri Mar 13 23:47:04 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am: Use ROOT to allow libgtkstubs to be relocated.  Use
+	`rm -f', not $(RM).  Prefer a hard link over a soft link.
+
+1998-03-11  Sascha Ziemann  <szi@aibon.ping.de>
+
+	* guile-gtk.c (sgtk_init):
+	* gen-typeinfo ((emit-funcs defs)):
+	* Makefile.am (MKDEP): during MKDEP the .c file must not include the
+	.x files either.
+
+Tue Mar  3 10:08:33 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (BUILT_SOURCES): Include main.x.
+
+Mon Mar  2 00:00:24 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* gtk.defs (gtk_statusbar_push): Added context_id argument
+	(gtk_statusbar_pop): Likewise.
+	(gtk_statusbar_steal): Removed.
+	(gtk_statusbar_get_context_id): New function.
+	(gtk_statusbar_remove): Likewise.
+
+	* gen-typeinfo (usage): New function.
+	(imported-types): New define.
+	(defs): Scan import file if required.
+	(read-import-file): New function.
+	(import-file): New define.
+	(*imported-types*): New define.
+	(imported-type?): New function.
+	(emit-object-predicate): [emit-funcs] Only emit if not imported
+	type.
+	(emit-accessor): [emit-funcs] Likewise.
+
+	* Makefile.am (gtk-funcs.c, gtk-types.c, gtk-types.h): Renamed tmp
+	files to avoid problems with parallel builds.
+
+1998-03-01  Sascha Ziemann  <szi@aibon.ping.de>
+
+	* toolkits/gtk.scm (let-multi): Added a macro for multiple return
+	values. Perhaps a call-with-values would be also usefull.
+
+	* guile-gtk.c (sgtk_init):
+	* gen-typeinfo ((emit-funcs defs)):
+	* main.c (sgtk_init_main): Added a ifndef for guile-snarf to
+	prevent including .x during creating the same
+
+	* Makefile.am (EXTRA_DIST): Removed *.x files created by
+	guile-snarf from dist. They depend on the local guile-snarf.
+
+	* run-scheme: New shell script. This is a wrapper for different
+	Scheme implementations. Probably usefull, if someone wants to port
+	Guile-Gtk to another Scheme implementation.
+
+Fri Feb 27 09:57:45 1998  Maciej Stachowiak  <mstachow@mit.edu>
+
+	* gtk.defs: Update gtk.defs to the latest CVS gtk+ - all widgets
+ 	and almost all functions should be available. Some that could not
+ 	yet be added for various reasons are commented out.
+
+1998-02-26  Lauri Alanko  <la@iki.fi>
+
+	* gtk.defs: Added a couple of missing fields
+
+Sat Feb 21 11:50:47 1998  Maciej Stachowiak  <mstachow@mit.edu>
+
+	* gtk.defs: Replaced entry for gtk_tooltips_set_tips with one for
+ 	gtk_tooltips_set_tip, correcting the number of arguments.	
+
+1998-02-03  Raja R Harinath  <harinath@cs.umn.edu>
+
+	Update to latest CVS `gtk+' changes, enough to get it compiled.
+	* gtk.defs (GtkTooltips): `define-object' instead of
+	`define-boxed'.
+	(GtkWidgetFlags): Comment out GTK_UNMAPPED, GTK_PROPAGATE_STATE,
+	GTK_ANCHORED, and GTK_USER_STYLE.  `unmapped', and `anchored' were
+	removed from gtk+, others became private.  New GTK_TOPLEVEL
+	instead of GTK_ANCHORED.  New GTK_HAS_GRAB.
+
+	* guile-gtk.h (GTK_WIDGET_FLAGS): Delete.  Now in `gtk+'.
+
+1998-01-28  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (INCLUDES): Add $(includedir).
+
+1997-12-14  Tom Tromey  <tromey@cygnus.com>
+
+	* gtk-compat.h (gtk_text_forward_delete): Define if
+	gtk_text_forward_delete not found.
+	* gtk.defs (gtk_text_forward_delete): Renamed from
+	gtk_text_foreward_delete.
+	* configure.in (LDFLAGS): Check for gtk_text_forward_delete.
+
+1997-12-05  Tom Tromey  <tromey@cygnus.com>
+
+	* guile-gtk.c (sgtk_font_conversion): Only run SCM_COERCE_SUBSTR
+	once we know the font argument is a string.
+	(sgtk_color_conversion): Likewise.
+	
+	* Makefile.am (SUFFIXES): New macro.
+	(.c.x): Include DEFS, INCLUDES, CPPFLAGS on command line.
+
+	* gtk.defs (GtkFileSelection, gtk_file_selection_new,
+	gtk_file_selection_get_filename, gtk_file_selection_set_filename):
+	New definitions.
+
+1997-11-01  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* configure.in: Don't touch LIBS while gathering GUILE_LIBS.
+	(GTK_LIBS, GTK_LDFLAGS): New variables that contain all Gtk
+	libraries and linker flags, including X.
+	Use them while checking for Gtk features.
+	* Makefile.am (all_xlibs, all_gtklibs): Removed.
+	(guile_gtk_LDFLAGS, guile_gtk_LDADD): Use GTK_LDFLAGS and
+	GTK_LIBS, respectively, instead of all_gtklibs and all_xlibs.
+	(libguilegtk_la_LDFLAGS, libguilegtk_la_LDADD): Likewise.
+
+1997-10-31  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* gtk.defs (gtk_signal_disconnect): New definition.
+
+1997-10-30  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-compat.c (scm_puts): New compatability function.
+	* configure.in: Check whether it is needed.
+	
+	* configure.in: Don't check for -lX11, -lXext, -lgtk, -lgdk and
+	-lgdk.  They simply are supposed to be there.  Set LIBS
+	appropriately while checking for Gtk functions.
+	* Makefile.am (all_xlibs, all_gtklibs): New variables to aid in
+	constructing linker commands.
+	(guile_gtk_LDFLAGS): Only include X_LIBS, which contains necessary
+	linker flags (despite its name)
+	(guile_LDADD): Use all_xlibs and all_gtklibs.
+	(libguilegtk_la_LDFLAGS, libguilegtk_la_LIBADD): Likewise.
+
+	* Makefile.am (toolkitdir, toolkit_DATA, schemedir, scheme_DATA):
+	Include "toolkits" dir in installed file name, not in location.
+	Rename variables accordingly.
+	
+1997-10-27  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c: Replace scm_gen_puts with scm_puts throughout.
+	
+	* gtk.defs (gtk_input_add_interp): Change `source' parameter to
+	type `file-descriptor', because that is what it is.
+
+	* guile.details: Type conversion for `string' removed.  Overriding
+	function definition for gtk_input_add_interp removed.
+
+	* gen-typeinfo (emit-funcs): hard-wire conversion for `string'
+	type here.  Renamed `portfd' type to `file-descriptor'.
+	
+Sun Oct 26 10:49:33 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* configure.in (LDFLAGS): Don't set CFLAGS or LDFLAGS.
+	* Makefile.am (INCLUDES): New macro.
+	(guile_gtk_LDFLAGS): Added X_LIBS.
+
+	* Makefile.am (sitedir): New macro.
+	(toolkitdir): Likewise.
+	(site_DATA): Likewise.
+	(toolkit_DATA): Likewise.
+	(.c.x): Changed from GNU make rule to traditional rule.
+	(install-data-local): Removed.
+
+1997-10-25  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_color_conversion, sgtk_font_conversion):
+	Coerce argument to a regular string before using it.
+	(sgtk_string_conversion): New function used to coerce every string
+	argument to a regular string.
+	* guile-gtk.h (sgtk_string_conversion): New prototype.
+
+	* guile.details: Use sgtk_string_conversion for all `string'
+	arguments.
+
+1997-10-23  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (gtkobj_free): Don't forcibly destroy GtkObjects
+	with ref_count of zero.  It is wrong for GtkWindows.  Print a
+	warning instead.  The real fix is to correct the ref_counting of
+	Gtk.
+
+	* configure.in: Check for AC_PROG_LN_S.  Pass `--version' option
+	while checking whether build-guile works.  Set GUILE_LIBS when
+	manually checking for Guile libs, not LIBS.  Use AC_MSG_CHECKING
+	and AC_MSG_RESULT instead of echo.
+
+1997-10-13  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.7
+
+	* gtk.defs (GtkJustification, GtkCurveType, GtkFundamentalType):
+	new enums from Tim Janik.  Thanks!
+
+1997-10-12  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_init_argv): New function.
+	guile-gtk.h (sgtk_init_argv): New prototype.
+
+	* gtk.defs (gtk_frame_new): Accept `#f' as the label.
+
+1997-10-11  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c: Include <gdk/gdkprivate.h> to get at gdk_display.
+	(sgtk_init): Call gtk_init only when gdk_display is still NULL.
+
+	* gen-typeinfo (emit-funcs): New type `gpointer', but only for
+	quick hacks.
+
+	* main.c: Include <config.h> before every other header file.
+	* guile-compat.h: Don't include <config.h>.
+
+	* guile-gtk.c: Replace `//' comments with `/* */`
+
+	* gtk.defs, guile.details: Converted to new define-func syntax
+	that allows for better extensibility.
+	* gen-typeinfo (emit-func): Handle new define-func syntax.
+
+1997-10-10  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-compat.h: Include "config.h" to get the HAVE_SCM_REVERSE_X
+	definition.
+
+	* gtk.defs: Added GtkPaned, GtkHPaned, GtkVPaned widgets.
+
+	We no longer link libguilegtk against the guile libs, on the
+	assumption that they are already included in the base guile
+	application.  In particular, the static libqt.a was causing
+	problems on Solaris.
+	
+	* configure.in: Do not include GUILE_LIBS in LIBS.  Substitute
+	GUILE_LIBS into Makefile.  Temporarily add GUILE_LIBS to LIBS
+	while checking for libguile functions.
+
+	* Makefile.am (guile_gtk_LDADD): Link against @GUILE_LIBS@.
+	(EXTRA_DIST): Distribute hello.scm.
+
+1997-10-09  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.6
+	
+	* main.c (sgtk_init_main): Include "main.x" instead of
+	"gtk-guile.x", silly me.
+
+Wed Oct  8 13:53:39 1997  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* configure.in: Changed "test ==" to "test =".
+
+1997-10-08  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* configure.in: Check for scm_reverse_x.
+	* guile-compat.h (scm_reverse_x): Define as alias for
+	scm_list_reverse_x when not found during configure.
+
+1997-10-07  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (xstrdup): New function.
+	(make-argv): Use it for duplicating the strings.
+
+	* guile-compat.h: Define SCM_LIST1 and SCM_LIST2 macros when they
+	are not defined already.
+
+	* configure.in: Check whether build-guile works before using it.
+
+	* Makefile.am: Renamed gtk-guile.* to main.* in all places.
+
+	Released 0.5
+	
+	* guile.details (gtk_input_add_interp): Override definition to use
+	a port instead of the integer fd.
+
+	* guile-gtk.c (sgtk_find_enum_info, sgtk_find_flags_info): New
+	functions.
+	(sgtk_arg2scm): Handle GTK_TYPE_FLAGS.
+	(make_argv): New function.
+	(sgtk_init_noargs): Use it to get argv back from Guile.
+	
+	* gtk.defs (gtk_input_add_interp, gtk_input_remove): New
+	definitions.
+
+	* gtk-interp.patch: Updated for gtk+970925.
+
+	* gtk-guile.c (hack_compiled_switches, sgtk_shell,
+	sgtk_init_main): New functions to start our own repl.
+	(inner_main): Call sgtk_init_main.  Call sgtk_shell instead of
+	scm_shell.
+	
+	* gtk-compat.c (gtk_input_add_interp, gtk_input_remove): New
+	compatability functions.
+	
+	* gen-typeinfo: Add support for overriding function definitions in
+	the detail file.  New type `portfd'.
+
+	* event-repl.scm: New file.
+	* toolkits/gtk.scm: New file.
+
+	* configure.in: Use build-guile and guile to find out certain
+	things about the guile installation.  Check for
+	gtk_input_add_interp.
+
+	* calc.scm: Use (toolkits gtk) module.
+
+	* Makefile.am (guile_gtk_LDFLAGS): Changed -rdynamic to
+	-export-dynamic.
+	(libguilegtk_la_LDFLAGS): Removed -rpath, added -export-dynamic
+	(gtk-guile.x): New dependency rule.
+	(install-data-local): Install event-repl.scm into
+	share/guile/site/ and toolkits/gtk.scm into share/guile/
+	(install-exec-hook): Make symlink from libguilegtk.so into
+	share/guile/toolkits/ so that it can be found for dynamic module
+	linking.
+	(EXTRA_DIST): Distribute toolkits/gtk.scm, event-repl and
+	gtk-guile.x
+
+1997-10-06  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* guile-gtk.c (sgtk_init_noargs,
+	scm_init_toolkits_gtkstubs_module): New functions.
+	guile-gtk.h (scm_init_toolkits_gtkstubs_module): New prototype.
+	
+	* gtk-guile.c (inner_main): Register module instead of
+	initializing.
+	
+1997-09-25  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.4
+	
+	* gtk.defs: Some additions and rearrangements.
+
+	* guile-compat.c: Include <config.h>
+	* gtk-compat.c: Include <config.h>
+	(gtk_list_append_item, gtk_list_prepend_item): New interp helper
+	functions.
+
+	* gen-typeinfo (emit-funcs): Allow `#f' and NULL as strings.
+
+	* configure.in:  Use AM_CONFIG_HEADER.
+
+	* Makefile.am: Add calc.scm and calcrc to EXTRA_DIST.
+
+1997-09-21  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	Released 0.3
+
+	* guile-gtk.c: Include "gtk-types.h" and "gtk-compat.h".
+	(sgtk_wrap_gtkobj): Return SCM_BOOL_F when wrapping a NULL
+	pointer.
+	(sgtk_main): Removed.
+	(sgtk_color_conversion, sgtk_font_conversion): New functions.
+	* guile-gtk.h: Add prototypes for them.
+	
+	* gtk-compat.c (gdk_color_parse_interp): Return NULL when the
+	parsing failed.
+	(gtk_style_get_white_interp): New function.
+	(gtk_widget_peek_colormap): New function, approximation to the
+	real gtk_widget_peek_colormap.
+	* gtk-compat.h: Add prototypes for above two functions.
+
+	* Makefile.am (EXTRA_DIST): Added guile.details.
+	(gtk-funcs.c, gtk-types.c gtk-types.h): Use guile.details for
+	generating them.
+
+	* gen-typeinfo: Added support for detail file.  Moved
+	SCM_DEFER_INTS before scm->c conversions.  Added support for type
+	conversions and function invokation without deferred ints.
+
+	* guile.details: New file to capture all Guile specific interface
+	details.
+
+	* configure.in: Check for gtk_widget_peek_colormap.
+
+	* gtk.defs: Minor additions.
+
+	* gtk-interp.patch: Updated for gtk+970916 and my current
+	gtk+-interp source tree.
+	
+1997-09-20  Marius Vollmer  <mvo@zagadka.ping.de>
+
+	* test-gtk.scm (yes-or-no?): New function.
+	(create-main-window): Use it for a modal annoyance.
+

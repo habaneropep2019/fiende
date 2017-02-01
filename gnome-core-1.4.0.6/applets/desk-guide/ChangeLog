@@ -1,0 +1,773 @@
+2002-01-21  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* deskguide-applet.c: Apply patch from Russel Steinthal to fix
+	the limit on MAX_DESKTOPS and make it dynamically allocated.
+	Fixes #3456.
+	
+2002-01-09  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* help/it/desk-guide.sgml: Fix typo. From Shingo Akagaki
+	<dora@kondara.org>.
+	
+2001-10-17  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* deskguide_applet.c: Default to no thumbnails. If only to save some
+	power for our poor laptop users :)
+	
+2001-06-20  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gwmthumbnail.c: Fix code to be triggered by failure to
+	allocate X shared memory. From Doug Larrick <doug@ties.org>.
+	* deskguide_applet.c: Make all uses of the gettext macros
+	look like _() and N_(), not _ () and N_ ().
+	
+2001-04-27  Leandro su Nerone  <leandro@firenze.linux.it>
+
+	* help/it/desk-guide.sgml: Little adjustment
+
+Thu Mar  1 05:21:04 2001  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.c (thumb_queue_step): don't do thumbnail shooting on
+	iconified or shaded windows.
+
+	* gwmh.h (struct _GwmhTask): made width/height/x/y 32bit ints,
+	to avoid crashes with excessive window sizes.
+
+	* gwmdesktop.c (task_remove_thumb): fixed thumb_queue cleanup
+	code (a bug that could cause segfaults after thumbnailing was
+	turned back on).
+
+	* gwmthumbnail.c (gwm_thumb_nail_destroy): pass the thumbnail in the
+	destroy function.
+
+2001-01-31  Jason Leach  <jasonleach@usa.net>
+
+	* deskguide_applet.c: Added a boolean config option for "Show
+	tasklist arrow", default to true.  Also renamed the "Switch
+	tasklist arrow" to a more descriptive "Switch horizontal/vertical
+	position of tasklist arrow".
+
+Tue Dec 05 20:08:49 2000  George Lebl <jirka@5z.com>
+
+	* deskguide_applet.c: bind signals on applet-widget BEFORE
+	  we call applet_widget_add, as otherwise there is a race where
+	  we may not get them.
+
+Wed Nov 29 13:01:34 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.c (gwm_desktop_button_press): take deco window movement
+	setting into account for double clicks.
+
+	* deskguide_applet.c: sawfish doesn't move decoration window anymore.
+
+2000-11-28 John Fleck <jfleck@inkstain.net>
+
+	* update help/C/desk-guide.sgml based on user feedback
+
+Fri Nov 17 08:20:11 2000  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.[hc]: update all relevant places where a VERSION
+	number is required, introduced DESKGUIDE_VERSION define.
+
+2000-11-15  Jacob "Ulysses" Berkman  <jacob@helixcode.com>
+
+	* gwmthumbnail.c (gdk_image_get): gdk_window_get_visual() always
+	returns NULL for pixmaps, so only require a visual when the window
+	is not a pixmap
+
+Tue Nov 14 21:01:39 2000  George Lebl <jirka@5z.com>
+
+	* gwmthumbnail.c: #endif should have no arguments, fixes warning
+
+Tue Nov 14 09:03:46 2000  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_about): up version number to 0.4 to distinguish
+	new bug reports.
+
+	* gwmh.[hc]: added gwmh_task_steal_qdata().
+
+	* gwmthumbnail.c:
+	* gwmdesktop.c: fix thumbnail destruction.
+
+Tue Nov 14 05:20:38 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmthumbnail.c (gwm_thumb_nail_update_drawable): assure that the
+	window we're thumbnailing has reasonable width and height.
+
+Tue Nov 14 04:23:58 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c (get_task_root_and_frame): shut up for a creation/destruction
+	race that we already handle gracefully.
+
+	* gwmdesktop.c (thumb_queue_remove): put in a paranoia check.
+	i want backtraces if this is triggered.
+
+	* deskguide_applet.c: reenable thumbnail shooting.
+
+	* gwmthumbnail.c (pixbuf_from_drawable): account for failing gc
+	creation. gdk_window_get_visual() may return NULL, so get the
+	depth from the colormap.
+
+2000-11-02  Jacob "Ulysses" Berkman  <jacob@helixcode.com>
+
+	* deskguide_applet.c: disable thumbnails by default since this
+	eats CPU on slow machines and seems to crash for quite a few
+	people
+
+2000-10-25  Karl Eichwalder  <ke@suse.de>
+
+	* deskguide_applet.c: s/Sawmill/Sawfish/.
+
+Sat Oct 14 15:27:47 2000  George Lebl <jirka@5z.com>
+
+	* gstc.c (gstc_parent_add_watch)
+	  gwmh.c (gwmh_init) (get_typed_property_data)
+	  (get_task_root_and_frame) (gwmh_desk_update) (gwmh_task_update)
+	  (gwmh_task_get_mini_icon):  Correct sigedness problems
+	  (gint vs. guint) when passing pointers.
+
+Mon Oct 9 John Fleck <jfleck@inkstain.net> 
+
+	* updating desk-guide.sgml desk-guide-applet.sgml for Nautilus 
+	compatibility
+
+Mon Aug 14 17:38:07 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmthumbnail.c (gdk_image_new_shared_with_pixmap): check whether we
+	actually got the window's visual, we'd crash occasionally otherwise.
+
+Wed Aug  9 02:25:08 2000  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_widget_button_toggle_task_list): grab keyboard
+	as well to cacth ESC for popdown.
+
+Wed Aug  9 02:04:05 2000  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_widget_button_toggle_task_list): popdown
+	taskview automatically if this option is enabled at pointer clicks
+	outside of the task view dialog.
+
+Wed Aug  9 01:39:07 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.c (thumb_queue_step): disable incremental thumb updates
+	during gtk grabs.
+
+Sat Aug  5 22:55:49 2000  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: scratched the double_buffering option.
+	added options to enable/disable thumb nail shooting and to
+	configure incremental update delays.
+	the default setting doesn't even consume more CPU usage than
+	the cpu load applet on my machine, let's see how that works
+	out for other people.
+
+Sat Aug  5 19:59:53 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.[hc]: always keep double buffering pixmap, support
+	incremental updates (major speedup) and window thumbnail fillings
+	from GwmThumbNail pixbufs.
+
+	* gwmthumbnail.[hc]: thumb nail from live drawable implementation.
+	contains lots of Gdk wrapper functions (fixups to avoid premature
+	aborts) and GdkPixbuf extensions to create/update RGB buffer
+	contents from screenshots.
+	
+	* applied patch for icon names from andersca:
+
+2000-06-21  Anders Carlsson  <andersca@gnu.org>
+
+        * gwmh.c (gwmh_property_atom2info): Declare WM_ICON_NAME atom.
+        (gwmh_task_update): Change the icon_name if the atom has changed.
+        (task_new): Set icon_name to NULL on creation.
+        (task_delete): Set icon_name to "DELETED" when deleted.
+
+        * gwmh.h (struct _GwmhTask): Add icon_name field.
+
+2000-05-21  Karl Eichwalder  <ke@suse.de>
+
+	* help/de/desk-guide.sgml: SGML fixes.
+	* help/de/desk-guide-applet.sgml: Ditto.
+	
+Fri May 19 02:08:22 2000  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.desktop (Name[de]): changed german translation
+	of deskguide from "Desktop-Überblick" to "Desktop-Übersicht".
+	i'm not sure translating proram *names* is a good idea at all.
+
+Fri May 19 01:48:47 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c (get_task_root_and_frame): take into account that
+	gdk_window_ref_from_xid() may return NULL if the XWindow id
+	isn't valid anymore.
+	TASK_XROOT(): same here.
+
+Fri May 19 01:20:43 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmh.[hc]: cleanup of the prematurely committed
+	GWMH_TASK_INFO_WM_HINTS path from andersca.
+	this is the deal: most GWMH_TASK_INFO_* flags are used to
+	1) flag internally that the task structure needs updating
+	2) detailedly report to notifiers that something has changed
+	with GWMH_TASK_INFO_WM_HINTS, 1) doesn't really apply, because
+	we don't want to duplicate all WM_HINT info in the task structure.
+	so there's a new flag group now: GWMH_TASK_INFO_UNOTIFY, which
+	covers all notify flags purely needed for notification reports.
+	(GWMH_TASK_INFO_UNOTIFY also needed to be incorporated into
+	GWMH_TASK_INFO_ALL, so notifiers get initial reports).
+
+	* gwmh.c (gwmh_property_atom2info): fix coding style.
+	(task_event_monitor): remove atom special casing, we already
+	have a generic mechanism to handle various atom changes and
+	necessary notification.
+	(gwmh_task_update): handle GWMH_TASK_INFO_UNOTIFY in the task
+	info mask, i.e. leave the task structure alone here and simply
+	pass the mask on for notification.
+
+	* deskguide_applet.c (main): indentation fixes.
+
+2000-05-13 John Fleck <jfleck@inkstain.net>
+
+	* fixed dtd <note> problem in desk-guide.sgml
+
+2000-05-09  Jacob Berkman  <jacob@helixcode.com>
+
+	* gwmh.c (task_event_monitor): check for WM_HINT changing
+	(gwmh_property_atom2info): add WM_HINT stuff
+
+	* gwmh.h (GwmhTaskInfoMask): add the WM_HINTS flag
+
+2000-05-04  Jacob Berkman  <jacob@helixcode.com>
+
+	* gwmdesktop.c (gwm_desktop_draw): revert something I
+	accidentally committed
+
+	* deskguide_applet.c (main): set the default icon
+
+2000-05-02 John Fleck <jfleck@inkstain.net>
+
+	* updated desk-guide.sgml, deskguide-properties.png and 
+	deskguid-properties-advanced.png to update docs to reflect
+	timj's changes
+
+Mon May  1 03:42:04 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c (task_event_monitor_frame_wrapper): provide a wrapper
+	function for the event monitor used on the frame window, as
+	Gdk's event filters are buggy for installing the same callback
+	multiple times on a window. this fixes a nasty race, where
+	events on newly mapped tasks were simply lost.
+
+	* deskguide_applet.c: nuked the "?" show-properties button,
+	and always show the pager. added a behaviour configuration
+	option to automatically popdown the task view.
+	minor cleanups.
+	
+	* gwmtaskview.[hc]: added ::popdown_request signal.
+
+	* gwmdesktop.c (gwm_desktop_button_press): bail out prematurely
+	if the button press changed desktops. this way, tasks can only
+	be activated on the current viewport.
+
+	* gwmh.c (task_event_monitor): auto-unfocus unmapped and
+	destroyed windows (spotted by andersca).
+	(task_event_monitor): ignore NotifyPointer and
+	NotifyInferior FocusOut events.
+	(get_task_root_and_frame): always set the new xframe, even if
+	==None.
+
+2000-04-23 John Fleck <jfleck@inkstain.net>
+
+	* changed desk-guide.sgml in response to genuine reader
+	feedback
+
+2000-04-22 John Fleck <jfleck@inkstain.net>
+
+	* changed help/C/desk-guide.sgml to reflect sawmills impending name change
+
+
+2000-04-14  Eric Baudais  <baudais@okstate.edu>
+
+	* help/C/desk-guide-applet.sgml: Added a bit about trademarks.
+2000-04-14  Eric Baudais  <baudais@okstate.edu>
+
+	* help/C/*.sgml: Updated the docs to the 1.x template.
+
+2000-03-30  Jacob Berkman  <jacob@helixcode.com>
+
+	* deskguide_applet.c (gp_phelp): sync with docs
+
+2000-03-25  Jacob Berkman  <jacob@helixcode.com>
+
+	* deskguide_applet.c (gp_config_popup):
+	(main): add help callbacks
+
+Fri Mar  3 20:16:44 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.c (gwm_desktop_draw): minor appearance fix.
+
+Wed Feb 23 08:10:52 2000  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: show the task list upon arrow clicks.
+
+	* gwmtaskview.c: the list doesn't do much yet, basically it
+	only shows tasks that are clicked (upon button_releases
+	<shudder>). discovered more clist problems and a bunch of
+	sawmill bugs on the way, this is really getting frustrating.
+
+Wed Feb 23 03:24:53 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmh.[hc]: added gwmh_window_send_client_message() to send
+	arbitrary client messages for a GdkWindow to the root window.
+
+	* gwmtaskview.[hc]: new widget displaying a task list, heck if
+	clist wouldn't be so badly designed this list could actually
+	make some sense.
+
+Sat Feb 12 14:50:52 2000  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_save_session): plugged a leak, based
+	on a patch by Peter Hawkins <peterhawkins@ozemail.com.au>.
+
+Wed Feb  9 03:27:40 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c (get_typed_property_data): removed noisy warning
+	("Property has wrong type, probably on crack") about
+	mismatching property types, since for e.g. COMPOUND_STRING,
+	we just try to get a STRING property first.
+
+2000-02-06  Anders Carlsson  <andersca@gnu.org>
+
+	* gwmh.c (gwmh_task_get_mini_icon): Fix the XCopyArea so that
+	it can handle icons that aren't 16x16 without displaying
+	garbage on the edges.
+
+Sun Feb  6 06:19:31 2000  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c:
+	applied changes to support COMPOUND_TEXT window names which is
+	often used for internationalized window names, based on a patch
+	by TANIGUCHI Toru <g97p0639@mn.waseda.ac.jp>.
+	(get_typed_property_data): for COMPOUND_TEXT list returns, return
+	the first text string.
+	(gwmh_task_update): feature XA_COMPOUND_TEXT return types besides
+	XA_STRING for XA_WM_NAME.
+	(gwmh_task_get_mini_icon): cosmetic fixups.
+	
+	* deskguide_applet.c: adapt config options to newer sawmill
+	versions.
+
+2000-01-29  Anders Carlsson  <andersca@gnu.org>
+
+	* gwmh.c (gwmh_task_get_mini_icon): Added a check for NULL
+	so that it wouldn't try to get pixmap when the KWM_WIN_ICON
+	hint was set to 0x0, 0x0.
+
+Tue Jan 04 00:19:21 2000  George Lebl <jirka@5z.com>
+
+	* deskguide_applet.desktop: use the PanelApplet dentry type
+
+Fri Dec 24 12:27:06 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c: made desk-guide work on 64bit platforms (with lots of help
+	from george lebl ;).
+	scratched send_client_message_32(,...) in favour of the two new variants
+	send_client_message_2L() and send_client_message_3L() to send client
+	messages with 2 or 3 longs respectively.
+	changed a couple of functions to use send_client_message_2L() or
+	send_client_message_3L() instead of send_client_message_32().
+	(client_list_sync): operate on guint32 ids.
+	(hack_a_client_list): return a guint32* array.
+	(get_typed_property_data): for format=32 returns from
+	XGetWindowProperty(), assume the values are actually sizeof(long)
+	(i.e. *64* bit on some platforms) and convert the data accordingly if
+	sizeof (gulong) == 8, so we always return guint32* arrays for format=32.
+	(wm_protocol_check_support): don't assume Atom and guint32 have the same
+	size, i.e. walk the Atom* array independantly from the guint32* array.
+	(gwmh_desk_update): interpret the values returned from
+	get_typed_property_data() for the GWMH_DESK_INFO_CLIENT_LIST case as
+	guint32* array, not as Window* array.
+
+Thu Dec 16 09:13:53 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_create_desk_widgets): 
+	(gp_config_find_value): 
+	(gp_config_popup): bunch of bugs fixed (sanity check config values,
+	offer saved config values in GUI).
+
+Sat Nov  6 01:00:21 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.c (gwm_desktop_button_press): added new feature, top-left
+	center window within area on button2-double-click.
+
+Thu Nov  4 01:08:46 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_init_gui): check the retrived pixel_size value,
+	the panel sometimes (initially) returns 0, and we don't accept values
+	smaller than 12.
+
+Thu Nov  4 00:45:40 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_create_desk_widgets): folded in patch from
+	george so we use the new applet_widget_get_panel_pixel_size()
+	function. fixed 4 pixel bloat offset when laying out desktops acording
+	to panel size (subtracted 2 * x/y-thickness).
+	removed orientation reentrancy workaround, as george claims it's no
+	longer needed.
+
+Wed Nov  3 13:33:10 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_init_gui): hide `?' properties button by default
+	to improve appearance with tiny panels.
+
+	* deskguide_applet.c (gp_widget_ignore_button): button press/click
+	cleanups.
+
+Sat Oct 30 13:10:16 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c:
+	guarded a bunch of API calls against invalid tasks.
+	(task_new): delete task immediatedly if we couldn't fetch the task's
+	root or frame, return NULL for that case.
+	(client_list_sync): skip NULL tasks from client list.
+	(gwmh_task_update): don't immediatedly delete tasks, but return FALSE
+	to indicate that the task isn't especially valid anymore and queue
+	a client list update so we get rid of this task as soon as possible.
+	(task_delete): added two task list checks (expensive).
+	(client_list_sync): added an expensive assertment on the rebuit
+	client_list.
+	the latter three paranoia checks, can be removed if desk-guide
+	doesn't crash for 42 days ;)
+
+Mon Oct 25 01:37:41 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: added gp_config_check() which can change config
+	widget sensitivity due to specific config values. made Height and
+	Width spinners insensitive when "override with panel size" is set.
+
+Mon Oct 25 00:57:42 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_init_gui): translate the result from
+	applet_widget_get_panel_size() into *hardcoded* pixel sizes:
+	static guint panel_sizes[] = { 24, 48, 64, 80 };
+	gp_panel_size = panel_sizes[applet_widget_get_panel_size (applet_widget)];
+	i can smell this blowing up some day, definitely ;(
+
+	* deskguide_applet.c: added configuration options to specify that
+	the pixels sizes should actually be fetched from the panel.
+	added divide-by-# of rows/columns feature for george and boc.
+
+Sun Oct 24 21:55:06 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: exposed violate_client_msg in configuration
+	options.
+
+	* gwmh.c (gwmh_desk_set_hack_values): added violate_client_msg flag
+	to identify window managers that expect us to modify current desktop
+	and current task properties on the client windows directly, instead
+	of sending a client message (this is in violation with the GNOME WM
+	Spec).
+
+	*gwmh.c (gwmh_task_set_desktop): 
+	(gwmh_task_set_area): modify properties directly is
+	gwmh_hack_violate_client_msg is set.
+
+Sun Oct 24 10:32:28 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: prefixed all config sections with `sect_',
+	so our settings don't get confused with those of other applets
+	(why the heck isn't `privcfgpath' passed as application-*specific*
+	prefix???). either the panel or the config system screw here majorly ;(
+
+	* deskguide_applet.c (gp_config_add_range): shrink spin buttons.
+
+	* deskguide_applet.c (gp_config_items): majorly reordered and reworded
+	configuration settings according to the GNOME UI Hit Squad page, at
+	least in the areas where the proposed changes actually made sense.
+
+	* deskguide_applet.c (gp_config_add_section): 
+	(gp_config_create_page): changed spacings/borders to what is recommended
+	by the GNOME UI Hit Squad:
+	http://www.jcinteractive.com/gnome-ui/hitsquad/deskguide_applet.html
+
+Wed Oct 13 02:02:26 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: fixed configuration options. updates to reflect
+	last SawMill version (moves decoration window instead).
+
+1999-10-08  Matthias Warkus  <mawa@iname.com>
+
+	* gnome-deskguide.png: Slightly polished pixmap. Stefan's a
+	perfectionist.
+
+Fri Oct  8 00:56:10 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_desk_notifier): uh oh, fixed a bad bad bug that
+	caused all desktop widgets to be destroyed and recreated upon area
+	changes. caused bad bad flickering, in the end that's not what we wrote
+	double buffering for.
+
+Thu Oct  7 14:04:01 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: added bug-fixing option to configure unified_area
+	support for different window managers (FVWM2 and SawMill need this).
+
+	* gwmh.[hc]: added support for wms with unified areas, i.e. where
+	the current area always changes on all desktops. we should evaluate
+	a _WIN_UNIFIED_AREA property at some point to figure this, but
+	until then i simply added gwmh_desk_set_hack_values() to hard configure
+	certain bug workarounds.
+	John Harper <john@dcs.warwick.ac.uk> provided significant code
+	portions for the unified_area support.
+
+	* gwmdesktop.c (gwm_desktop_desk_notifier): always update our idea
+	of the current area if GWMH_DESK_INFO_CURRENT_AREA changed, no
+	matter whether we are the current desktop.
+
+	* gwmh.c (hack_a_client_list): grab the server while doing excessive
+	tree queries.
+
+Thu Oct  7 02:46:20 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_create_desk_widgets): feature stacking of
+	desktops into a specified number of columns (rows) and wrap them
+	around upon packing. this allowes for the much requested "grid"
+	layout of desktops (as opposed to the normal grid layout of areas
+	which works fine out of the box already).
+	the number of rows/columns can be configured through the geometry
+	page in the properties dialog.
+
+	i'm wondering what else people will request from deskguide to fit
+	their needs, someone's probably still hiding, wanting to request
+	INBOX folder browsing support ;)
+
+Thu Sep 23 22:27:34 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c (gwmh_task_set_area): 
+	* gwmh.c (gwmh_task_set_desktop): since most window managers didn't
+	actually follow the spec to honour a client message for desktop and
+	area changes, we have to violate the spec here as well, and modify the
+	properties directly (besides sending the client message) ;(
+
+Thu Sep 23 21:06:50 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.[hc]: 
+	* gwmh.[hc]:
+	* gstc.[hc]: foooof. after 14h of hacking and debuging,
+	desk-guide is actually able to deal with non-gnome compliant
+	window managers. it performs all neccessary tasks, such as fetching
+	client list etc... itself. deep magic ;)
+	as a neat side effect, desk-guide can actually manage the desk solely
+	now, if no window manager is at all present.
+	probably the first and only pager that capable ;)
+	window manager switching works fine in general, i.e. between compliant
+	window managers as well as non-compliant ones, back and forth. there
+	are just a few very old twm-based cripples that cause gdk to crash by
+	destroying windows immediatedly after a ConfigureEvent arrived (fixed
+	in Gtk+-1.2.5).
+	i changed the intial error dialog to an alert dialog that strongly
+	recommends compliant wms, but we may actually remove this dialog now.
+
+Thu Sep 23 20:24:42 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.[hc]: added detected_gnome_wm field to the desk structure,
+	so users can figure if we have a compliant window manager. this
+	value may now change during a programs lifetime, i added appropriate
+	"reboot" hooks to the gwmh code to be triggered upon window manager
+	changes. detected_gnome_wm should always be checked by interested
+	applications if the notification mask contains GWMH_DESK_INFO_BOOTUP.
+
+	* gwmh.c (task_delete):
+	* gstc.c (gstc_parent_delete_watch): 
+	carefully reset event masks on foreign windows.
+
+Thu Sep 23 19:12:45 1999  Tim Janik  <timj@gtk.org>
+
+	* ok, got the last bits worked out for non gnome compliant window
+	managers, basically, we have to do everything ourselves, i.e.
+	guess what the actuall client list is. this would be easy if there
+	were no window manager at all, but with all the decorations floating
+	around, it's hard to tell what an actuall task is.
+	hopefully the current heuristics proove to be usefull in the common
+	case.
+
+Thu Sep 23 17:25:39 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c: reset GWMHA atoms if no GNOME comlainant window manager
+	is present, that way we don't get bogus proprtty values.
+
+Thu Sep 23 14:06:17 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.[hc]: added GWMH_DESK_INFO_FORCE_EVERYTHING value, so the
+	user can forcefully update everything (happens upon gwmh_init()
+	as well).
+
+	* deskguide_applet.c (main): queue a GWMH_DESK_INFO_FORCE_EVERYTHING
+	update if we don't know the window manager, so the newly setup
+	notifiers get called.
+
+Thu Sep 23 13:46:28 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: added bug-fix configure option to workaround
+	window managers that move their decoration windows instead of the
+	application window upon XMoveWindow(), occurs with at least
+	AfterStep, Enlightenment, FVWM and IceWM.
+
+Thu Sep 23 10:43:43 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c (gwmh_task_update): translate frame and window coordinates to
+	current desk when updating geometries.
+
+Thu Sep 23 09:50:42 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.c (gwmh_desktop_motion): constrain movement area to our
+	window plus a threshold border of 5 pixels.
+	(gwm_desktop_button_release): abort task moves.
+
+	* gwmdesktop.c (gwm_desktop_button_press): only show tasks and change
+	desktop+area on button1. tasks can be moved now with button2.
+	(policy suggested by owen).
+	
+	* gwmdesktop.c (gwm_desktop_draw): fixed a minor offset problem with
+	setting x/y_origin.
+
+Thu Sep 23 08:33:58 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c (gp_create_desk_widgets): don't poke around
+	indelicately in foreign class structures, use gwm_desktop_class_config()
+	now. set desired area size from newly added configuration options.
+
+	* gwmdesktop.[hc] (gwm_desktop_class_config): new function to set global
+	class configuration, will automatically update all existing widgets.
+
+	* deskguide_applet.c (gp_init_gui): changed packaging so we don't expand
+	the desktop widgets by default and with that destroy the constrained
+	aspect ratios.
+
+Thu Sep 23 05:35:41 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: internationalized the configuration option
+	array (Andreas Persenius <ndap@swipnet.se>).
+
+1999-09-18  Matthias Warkus  <mawa@iname.com>
+
+	* *.png: Transparency added to pixmaps.
+
+1999-09-17  Richard Hult  <rhult@hem2.passagen.se>
+
+	* deskguide_applet.desktop: Added Swedish desktop entry.
+
+Fri Sep 17 13:55:27 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: show hidden tasks by default.
+
+	* gwmh.[hc]: added GwmhHints, GwmhState and GwmhLayer enums, adapted
+	code to not use the namespace polluting WIN_* cruft from gnome
+	anymore.
+
+Fri Sep 17 13:17:31 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.c: feature ->raised_grid in property dialog.
+
+	* gwmdesktop.[hc]: added ->raised_grid class field so people that want
+	it can have the grid drawn on top of the tasks.
+
+	* gwmdesktop.c (gwm_desktop_map): make sure we are queued for a redraw
+	if we draw double buffered, since our expose handler relies on ::draw
+	being already called.
+
+	* gwmdesktop.c (gwm_desktop_draw): always draw border on top of the
+	tasks.
+
+1999-09-15  Kjartan Maraas  <kmaraas@online.no>
+
+	* deskguide_applet.c: Replaced TRANSL with _() to get the
+	strings to show up in gnome-core.pot.
+	* deskguide_applet.h: Commented out #define TRANSL......
+		
+1999-09-12  Matthias Warkus  <mawa@iname.com>
+
+	* *.png: Pixmaps added; used in about dialog and desktop entry.
+
+Sat Sep 11 17:59:16 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.c (gwm_desktop_button_press): supplement the x_comp and
+	y_comp values by the (frame - win) position distance.
+
+	* gwmdesktop.c (gwmh_desktop_motion): don't recalculate (win.{x,y} -
+	frame.{x,y}) upon every single move, simply rely on x_comp and y_comp.
+
+Sat Sep 11 17:27:35 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.c (gwmh_property_atom2info): translate property atoms to
+	info flags, according to desk-relative or task-relative properties.
+
+1999-08-21 Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* gwmh.c: Fixed error with the KWM_WIN_ICON hint.
+
+Fri Aug 20 12:36:57 1999  Tim Janik  <timj@gtk.org>
+
+	* stripe.xbm: removed
+
+	* gwmdesktop.c: use a checker board to indicate active area.
+
+Fri Aug 20 11:09:48 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.[hc]: added a ::check-task signal to determine
+	visibility of individual tasks.
+
+	* deskguide_applet.c: connect to GmwDesktop's ::check-task signal
+	for all desktops to hide tasks according to the new config flags
+	show_hidden_tasks, show_shaded_tasks, show_skip_winlist and
+	show_skip_taskbar.
+	don't show iconified tasks at all.
+
+Fri Aug 20 10:28:55 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.[hc]: split up gwmh_task_show() into gwmh_task_deiconify(),
+	gwmh_task_focus(), gwmh_task_raise() since some code needs only
+	part of the show() functionality.
+	gwmh_task_show() still incorporates the functionality of the above
+	fucntions and is more efficient since it coalescs the task updates
+	and will only sync once. though, it will not try to assign focus to
+	SKIP_FOCUS tasks anymore. it'll also unshade shaded tasks now.
+
+	* gwmh.c (gwmh_task_get_mini_icon): fixed this function up a bit
+	(codingstyle), added assertments, get_typed_property_data() returns
+	memory allocated through glib, so use g_free not XFree.
+
+1999-08-04 Anders Carlsson <anders.carlsson@tordata.se>
+
+	* gwmh.[hc]: Added gwmh_task_get_mini_icon
+
+Tue Jul  6 12:47:37 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmdesktop.c (gwm_desktop_button_press): don't change desktops
+	(pages) on button press if Control is being held, so windows can
+	be dragged around in this case.
+
+1999-07-05  Ettore Perazzoli  <ettore@comm2000.it>
+
+	* deskguide_applet.c (main): Create applet "deskguide_applet", not
+	"gnomepager_applet".
+
+Sat Jun 26 01:57:11 1999  Tim Janik  <timj@gtk.org>
+
+	* gwmh.h: 
+	* gstc.h: provide workaround for G_GNUC_PRETTY_FUNCTION definition
+	from old (pre 1.2.2) glib versions.
+
+Sat Jun 26 01:08:53 1999  Tim Janik  <timj@gtk.org>
+
+	* deskguide_applet.[hc]: desk guide pagin applet.
+
+	* gwmdesktop.[hc]: widget derived from GtkDrawinArea to display
+	a desktop and its pages.
+
+	* gwmh.[hc]: GNOME window manager helper code to keep track of
+	the different clients (tasks) on the screen.
+
+	* gstc.[hc]: helper code for gwmh.[hc] to monitor stacking order
+	of windows.
+
+	* initial import (26/6/1999).

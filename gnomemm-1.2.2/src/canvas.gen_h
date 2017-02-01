@@ -1,0 +1,223 @@
+// -*- C++ -*-
+/* $Id: canvas.gen_h,v 1.35 2001/06/22 17:58:30 murrayc Exp $ */
+
+/* canvas.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <libgnomeui/gnome-canvas.h>
+#include <gtk--/layout.h>
+
+#m4 GTKMM_CONVERSION(`double*',`double&',`&$3',`*$3')
+
+
+CLASS_START(Gnome);
+class CanvasItem;
+class CanvasGroup;
+
+//: Gnome Canvas 
+//- Canvas functions usually operate in either World coordinates
+//- (units for the entire canvas), or Canvas coordinates (pixels starting 
+//- at 0,0 in the top left).  There are functions to transform from 
+//- one to the other.
+//-
+//- If you want to put Imlib image objects on the Canvas,
+//- you need to push the Imlib colormap/visual before creating
+//- the canvas, and pop it afterward.
+class Canvas : public Gtk::Layout
+{
+  WRAP_CLASS(Canvas, GnomeCanvas,
+             GNOME_CANVAS, GNOME_IS_CANVAS,
+             canvas,
+             Gtk::Layout, GtkLayout, GTK_LAYOUT);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+
+  //: Get the root canvas item
+  WRAP_METHOD(
+    GnomeCanvasGroup* gnome_canvas_root(GnomeCanvas*),
+    Gnome::CanvasGroup* root());
+
+  //: Limits of scroll region
+  WRAP_METHOD(
+    void gnome_canvas_set_scroll_region (GnomeCanvas*,
+                                         double, double,
+                                         double, double),
+    void set_scroll_region (double x1, double y1,
+                            double x2, double y2));
+
+  //: Get limits of scroll region
+  WRAP_METHOD(
+    void gnome_canvas_get_scroll_region (GnomeCanvas*,
+                                         double*, double*,
+                                         double*, double*),
+    void get_scroll_region (double &x1, double &y1,
+                            double &x2, double &y2));
+    
+  //: Set the pixels/world coordinates ratio
+  //- With no arguments sets to default of 1.0.
+  WRAP_METHOD(
+    void gnome_canvas_set_pixels_per_unit(GnomeCanvas*, double),
+    void set_pixels_per_unit(double n=1.0));
+
+  //: Shift window.
+  //- Makes a canvas scroll to the specified offsets, given in canvas pixel 
+  //- units.
+  //- The canvas will adjust the view so that it is not outside the scrolling
+  //- region.  This function is typically not used, as it is better to hook
+  //- scrollbars to the canvas layout's scrolling adjusments.
+  WRAP_METHOD(
+    void gnome_canvas_scroll_to(GnomeCanvas*,int,int),
+    void scroll_to(int x, int y));
+
+  //: Scroll offsets in canvas pixel coordinates.
+  WRAP_METHOD(
+    void gnome_canvas_get_scroll_offsets (GnomeCanvas*,int*,int*),
+    void get_scroll_offsets (int &cx, int &cy) const);
+
+  //: Repaint immediately, don't wait for idle loop
+  //- normally the canvas queues repainting and does it in an 
+  //- idle loop
+  WRAP_METHOD(void gnome_canvas_update_now(GnomeCanvas*),
+             void update_now());
+
+  //: Find an item at a location.
+  //- Looks for the item that is under the specified position, which must be
+  //- specified in world coordinates.  Arguments are in world coordinates.
+  //- Returns 0 if no item is at that 
+  //- location.
+  WRAP_METHOD(
+    GnomeCanvasItem* gnome_canvas_get_item_at(GnomeCanvas*,double x,double y),
+    Gnome::CanvasItem* get_item_at(double x, double y));
+
+  //: Repaint small area (internal)
+  //- Used only by item implementations. Request an eventual redraw
+  //- of the region, which includes x1,y1 but not x2,y2
+  WRAP_METHOD(
+    void gnome_canvas_request_redraw(GnomeCanvas*, int, int, int, int),
+    void request_redraw(int x1, int y1, int x2, int y2));
+  
+  //: Convert from World to canvas coordinates (units for the entire canvas)
+  //: to Canvas coordinates (pixels starting at 0,0 in the top left
+  //: of the visible area). The relationship depends on the current
+  //: scroll position and the pixels_per_unit ratio (zoom factor)
+  WRAP_METHOD(
+    void gnome_canvas_w2c(GnomeCanvas*, double, double, int*, int*),
+    void w2c(double wx, double wy, int& cx, int& cy) const);
+  
+  //: From Canvas to World
+  WRAP_METHOD(
+    void gnome_canvas_c2w(GnomeCanvas*, int, int, double*, double*),
+    void c2w(int cx, int cy, double &wx, double &wy) const);
+
+  //: Convert from Window coordinates to world coordinates.
+  //- Window coordinates are based of the widget's GdkWindow.
+  //- This is fairly low-level and not generally useful.
+  WRAP_METHOD(
+    void gnome_canvas_window_to_world (GnomeCanvas*,double,double,
+                                       double*,double*),
+    void window_to_world (double winx,double winy,
+                          double &worldx,double &worldy) const);
+
+  WRAP_METHOD(
+    void gnome_canvas_world_to_window (GnomeCanvas*, double, double,
+                                       double*, double*),
+    void world_to_window (double worldx, double wolrdy,
+                          double &winx, double &winy) const);
+
+  //: Parse color spec string and allocate it into the GdkColor.
+  bool get_color(const Gtk::string &spec, GdkColor* color);
+  bool get_color(const Gtk::string &spec, Gdk_Color& color);
+
+  // The following are simply accessed via the struct in C,
+  //  but Federico reports that they are meant to be used.
+  //: Get the pixels per unit.
+  double get_pixels_per_unit() const { return gtkobj()->pixels_per_unit; }
+
+  // No signals
+
+};
+
+//: Antialiased Canvas
+//- This is very experimental and most likely buggy.
+//- To use you must first push GtkRGB colormap and visual, then
+//- pop after creation.
+class CanvasAA : public Canvas
+{
+  public:
+    CanvasAA();
+    virtual ~CanvasAA();
+};
+
+PRIVATE_START;
+#include <gtk--/private/layout_p.h>
+IMPL_START;
+#include <gnome--/private/canvas_p.h>
+
+/* canvas.cc
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+#include <gnome--/canvas-group.h>
+
+namespace Gnome {
+
+
+bool 
+Canvas::get_color(const Gtk::string &spec, Gdk_Color& color)
+{
+  return gnome_canvas_get_color(gtkobj(),
+                            const_cast<gchar*>(spec.c_str()), color.gdkobj());
+}
+bool 
+Canvas::get_color(const Gtk::string &spec, GdkColor * color)
+{
+  return gnome_canvas_get_color(gtkobj(),
+                            const_cast<gchar*>(spec.c_str()), color);
+}
+
+CanvasAA::CanvasAA()
+  {
+  }
+
+CanvasAA::~CanvasAA()
+  {
+  }
+
+} /* namespace Gnome */

@@ -1,0 +1,320 @@
+<refentry id="gnome-gnome-dentry">
+<refmeta>
+<refentrytitle>gnome-dentry</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-dentry</refname><refpurpose>Manipulation of .desktop files.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>;
+<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* <link linkend="gnome-desktop-entry-load">gnome_desktop_entry_load</link> (const char *file);
+<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* <link linkend="gnome-desktop-entry-load-flags">gnome_desktop_entry_load_flags</link>
+                                            (const char *file,
+                                             int clean_from_memory_after_load);
+<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* <link linkend="gnome-desktop-entry-load-flags-conditional">gnome_desktop_entry_load_flags_conditional</link>
+                                            (const char *file,
+                                             int clean_from_memory_after_load,
+                                             int unconditional);
+<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* <link linkend="gnome-desktop-entry-load-unconditional">gnome_desktop_entry_load_unconditional</link>
+                                            (const char *file);
+void        <link linkend="gnome-desktop-entry-save">gnome_desktop_entry_save</link>        (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *dentry);
+void        <link linkend="gnome-desktop-entry-free">gnome_desktop_entry_free</link>        (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *item);
+void        <link linkend="gnome-desktop-entry-destroy">gnome_desktop_entry_destroy</link>     (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *item);
+void        <link linkend="gnome-desktop-entry-launch">gnome_desktop_entry_launch</link>      (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *item);
+void        <link linkend="gnome-desktop-entry-launch-with-args">gnome_desktop_entry_launch_with_args</link>
+                                            (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *item,
+                                             int the_argc,
+                                             char *the_argv[]);
+<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* <link linkend="gnome-desktop-entry-copy">gnome_desktop_entry_copy</link> (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *source);
+<link linkend="gchar">gchar</link>*      <link linkend="gnome-is-program-in-path">gnome_is_program_in_path</link>        (const <link linkend="gchar">gchar</link> *program);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The routines in this module provide a way to load and save files in
+the format expected by the panel to create the menus and applet
+definitions.
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeDesktopEntry">struct GnomeDesktopEntry</title>
+<programlisting>typedef struct {
+	char *name;		/* These contain the translated name/comment */
+	char *comment;
+	int exec_length;	/* Length of `exec' vector.  Does not
+				   include the NULL terminator.  */
+	char **exec;		/* Command to execute.  Must be NULL
+				   terminated.  */
+	char *tryexec;		/* Test program to execute */
+	char *icon;		/* Icon name */
+	char *docpath;		/* Path to the documentation */
+	int   terminal;		/* flag: requires a terminal to run */
+	char *type;		/* type of this dentry */
+	char *location;		/* path of this dentry */
+	char *geometry;		/* geometry for this icon */
+	
+	unsigned int multiple_args:1;
+	unsigned int is_kde:1;  /* If this is a .kdelink file */
+} GnomeDesktopEntry;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-load">gnome_desktop_entry_load ()</title>
+<programlisting><link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* gnome_desktop_entry_load (const char *file);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> a file name that contains a desktop entry.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a newly created desktop entry loaded from <parameter>file</parameter> or NULL
+if the file does not exist or contains stale data.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-load-flags">gnome_desktop_entry_load_flags ()</title>
+<programlisting><link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* gnome_desktop_entry_load_flags
+                                            (const char *file,
+                                             int clean_from_memory_after_load);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> a file name that contains a desktop entry.
+</entry></row>
+<row><entry align="right"><parameter>clean_from_memory_after_load</parameter>&nbsp;:</entry>
+<entry> flag
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a newly created desktop entry loaded from <parameter>file</parameter> or NULL
+if the file does not exist or contains stale data.
+
+if <parameter>clean_from_memory_after_load</parameter> is TRUE, then any data cached used by loading
+process is discarded after loading the desktop entry.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-load-flags-conditional">gnome_desktop_entry_load_flags_conditional ()</title>
+<programlisting><link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* gnome_desktop_entry_load_flags_conditional
+                                            (const char *file,
+                                             int clean_from_memory_after_load,
+                                             int unconditional);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> a file name that contains a desktop entry.
+</entry></row>
+<row><entry align="right"><parameter>clean_from_memory_after_load</parameter>&nbsp;:</entry>
+<entry> flag
+</entry></row>
+<row><entry align="right"><parameter>unconditional</parameter>&nbsp;:</entry>
+<entry> flag
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a newly created desktop entry loaded from <parameter>file</parameter> or NULL
+if the file does not exist.
+
+if <parameter>unconditional</parameter> is TRUE then the desktop entry is loaded even if
+it contains stale data, otherwise, NULL is returned if stale data
+is found (like, the program referenced not existing).
+
+if <parameter>clean_from_memory_after_load</parameter> is TRUE, then any data cached used by loading
+process is discarded after loading the desktop entry.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-load-unconditional">gnome_desktop_entry_load_unconditional ()</title>
+<programlisting><link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* gnome_desktop_entry_load_unconditional
+                                            (const char *file);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> file name where the desktop entry resides
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a newly created GnomeDesktopEntry loaded from
+<parameter>file</parameter> even if the file does not contain a valid desktop entry or NULL
+if the file does not exist.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-save">gnome_desktop_entry_save ()</title>
+<programlisting>void        gnome_desktop_entry_save        (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *dentry);</programlisting>
+<para>
+Saves the desktop entry to disk</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dentry</parameter>&nbsp;:</entry>
+<entry> A gnome desktop entry.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-free">gnome_desktop_entry_free ()</title>
+<programlisting>void        gnome_desktop_entry_free        (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *item);</programlisting>
+<para>
+Releases the information used by <parameter>item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> a gnome desktop entry.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-destroy">gnome_desktop_entry_destroy ()</title>
+<programlisting>void        gnome_desktop_entry_destroy     (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *item);</programlisting>
+<para>
+Erases the file that represents <parameter>item</parameter> and releases the 
+memory used by <parameter>item</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> a gnome deskop entry.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-launch">gnome_desktop_entry_launch ()</title>
+<programlisting>void        gnome_desktop_entry_launch      (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *item);</programlisting>
+<para>
+Launchs the program associated to the <parameter>item</parameter> desktop entry.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> a gnome desktop entry.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-launch-with-args">gnome_desktop_entry_launch_with_args ()</title>
+<programlisting>void        gnome_desktop_entry_launch_with_args
+                                            (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *item,
+                                             int the_argc,
+                                             char *the_argv[]);</programlisting>
+<para>
+Launches the program associated with <parameter>item</parameter> with <parameter>the_argv</parameter> as its
+arguments.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> a gnome desktop entry.
+</entry></row>
+<row><entry align="right"><parameter>the_argc</parameter>&nbsp;:</entry>
+<entry> the number of arguments to invoke the desktop entry with.
+</entry></row>
+<row><entry align="right"><parameter>the_argv</parameter>&nbsp;:</entry>
+<entry> a vector of arguments for calling the program in <parameter>item</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-desktop-entry-copy">gnome_desktop_entry_copy ()</title>
+<programlisting><link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link>* gnome_desktop_entry_copy (<link linkend="GnomeDesktopEntry">GnomeDesktopEntry</link> *source);</programlisting>
+<para>
+Makes a copy of a <parameter>source</parameter> GnomeDesktopEntry</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>source</parameter>&nbsp;:</entry>
+<entry> a GnomeDesktop entry.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A copy of the <parameter>source</parameter> GnomeDesktopEntry
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-is-program-in-path">gnome_is_program_in_path ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      gnome_is_program_in_path        (const <link linkend="gchar">gchar</link> *program);</programlisting>
+<para>
+Looks for program in the PATH, if it is found, a g_strduped
+string with the full path name is returned.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>program</parameter>&nbsp;:</entry>
+<entry> a program name.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>NULL if program is not on the path or a string 
+allocated with g_malloc with the full path name of the program
+found
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

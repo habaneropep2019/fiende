@@ -1,0 +1,415 @@
+<refentry id="bonobo-bonobo-client-site">
+<refmeta>
+<refentrytitle>BonoboClientSite</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboClientSite</refname><refpurpose>Container side object embedding server.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboClientSite-struct">BonoboClientSite</link>;
+typedef     <link linkend="BonoboClientSiteClass">BonoboClientSiteClass</link>;
+<link linkend="BonoboClientSite">BonoboClientSite</link>* <link linkend="bonobo-client-site-new">bonobo_client_site_new</link>    (<link linkend="BonoboItemContainer">BonoboItemContainer</link> *container);
+<link linkend="BonoboClientSite">BonoboClientSite</link>* <link linkend="bonobo-client-site-construct">bonobo_client_site_construct</link>
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="BonoboItemContainer">BonoboItemContainer</link> *container);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-client-site-bind-embeddable">bonobo_client_site_bind_embeddable</link>
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="BonoboObjectClient">BonoboObjectClient</link> *object);
+<link linkend="BonoboObjectClient">BonoboObjectClient</link>* <link linkend="bonobo-client-site-get-embeddable">bonobo_client_site_get_embeddable</link>
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site);
+<link linkend="BonoboItemContainer">BonoboItemContainer</link>* <link linkend="bonobo-client-site-get-container">bonobo_client_site_get_container</link>
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site);
+<link linkend="BonoboViewFrame">BonoboViewFrame</link>* <link linkend="bonobo-client-site-new-view-full">bonobo_client_site_new_view_full</link>
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic,
+                                             <link linkend="gboolean">gboolean</link> visible_cover,
+                                             <link linkend="gboolean">gboolean</link> active_view);
+<link linkend="BonoboViewFrame">BonoboViewFrame</link>* <link linkend="bonobo-client-site-new-view">bonobo_client_site_new_view</link>
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);
+<link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* <link linkend="bonobo-client-site-new-item">bonobo_client_site_new_item</link>
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic,
+                                             <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *group);
+<link linkend="GList">GList</link>*      <link linkend="bonobo-client-site-get-verbs">bonobo_client_site_get_verbs</link>    (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site);
+void        <link linkend="bonobo-client-site-free-verbs">bonobo_client_site_free_verbs</link>   (<link linkend="GList">GList</link> *verb_list);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+   The <classname>BonoboClientSite</classname> implements the
+   <classname>Bonobo::ClientSite</classname> CORBA interface.  It acts
+   as the container-side contact for
+   <classname>BonoboEmbeddable</classname> objects.
+</para>
+
+<para>
+   For each object embedded in your application, you should create a
+   <classname>BonoboClientSite</classname> object.  
+</para>
+
+<para>
+   Once you have a handle on a remote object that implements the
+   <classname>Bonobo::Embeddable</classname> interface (typically
+   returned by <link linkend="bonobo-object-activate">bonobo_object_activate</link>() or
+   <link linkend="bonobo-get-object">bonobo_get_object</link>() or wrapper with
+   <link linkend="bonobo-object-client-from-corba">bonobo_object_client_from_corba</link>()) of type
+   <classname>BonoboObjectClient</classname>), you will have to bind
+   this object to the <classname>BonoboClientSite</classname> using the
+   <link linkend="bonobo-client-site-bind-embeddable">bonobo_client_site_bind_embeddable</link>().  Once this is done, you will
+   be able to request a <link linkend="BonoboView">BonoboView</link> on the <link linkend="BonoboClientSite">BonoboClientSite</link>.  
+</para>
+
+<para>
+   The <link linkend="BonoboClientSite">BonoboClientSite</link> object also provides access to the remote
+   BonoboEmbeddable object's verb list.  
+</para>
+
+<example>
+   <title>Sample usage</title>
+
+   <para>
+      This demostrates the use of the <link linkend="BonoboClientSite">BonoboClientSite</link> object.  This
+      launches the object specified, creates a <link linkend="BonoboClientSite">BonoboClientSite</link>,
+      then requests a new <link linkend="BonoboViewFrame">BonoboViewFrame</link> and finally it returns the
+      widget that represents that component.
+   </para>
+      
+   <programlisting>
+GtkWidget *
+create_widget_from_component (BonoboContainer *container, const char *id)
+{
+	BonoboObjectClient *server;
+	BonoboClientSite   *client_site;
+	BonoboViewFrame    *view_frame;
+
+	/*
+	 * Launch the requested component
+	 */
+	server = bonobo_object_activate (id, 0);
+	if (!server){
+		printf ("Could not activate the server");
+		return NULL;
+	}
+
+	client_site = bonobo_client_site_new (app->container);
+
+	/*
+	 * Add this client site to the container
+	 */
+	bonobo_container_add (container, BONOBO_OBJECT (client_site));
+
+	/*
+	 * Bind the component to the client site
+	 */
+	bonobo_client_site_bind_embeddable (client_site, server);
+
+	/*
+	 * Create a new BonoboView, and then get a GtkWidget
+	 */
+	view_frame = bonobo_client_site_embeddable_new_view (client_site);
+
+	/*
+	 * Get the widget for this view.
+	 */
+
+	 return bonobo_view_frame_get_wrapper (view_frame);
+}
+
+   </programlisting>
+</example>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboClientSite-struct">struct BonoboClientSite</title>
+<programlisting>struct BonoboClientSite;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboClientSiteClass">BonoboClientSiteClass</title>
+<programlisting>typedef struct {
+	BonoboXObjectClass parent_class;
+
+	POA_Bonobo_ClientSite__epv epv;
+
+	void (*show_window)  (BonoboClientSite *, CORBA_boolean shown);
+	void (*queue_resize) (BonoboClientSite *);
+	void (*save_object)  (BonoboClientSite *, Bonobo_Persist_Status *status);
+} BonoboClientSiteClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-new">bonobo_client_site_new ()</title>
+<programlisting><link linkend="BonoboClientSite">BonoboClientSite</link>* bonobo_client_site_new    (<link linkend="BonoboItemContainer">BonoboItemContainer</link> *container);</programlisting>
+<para>
+Container programs should provide a BonoboClientSite GTK object (ie,
+a Bonobo::ClientSite CORBA server) for each Embeddable which they
+embed.  This is the contact end point for the remote
+Bonobo::Embeddable object.
+</para>
+<para>
+This routine creates a new BonoboClientSite.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>container</parameter>&nbsp;:</entry>
+<entry> The container to which this client_site belongs.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The activated BonoboClientSite object bound to the <parameter>container</parameter>
+container.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-construct">bonobo_client_site_construct ()</title>
+<programlisting><link linkend="BonoboClientSite">BonoboClientSite</link>* bonobo_client_site_construct
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="BonoboItemContainer">BonoboItemContainer</link> *container);</programlisting>
+<para>
+This initializes an object of type BonoboClientSite.  See the description
+for <link linkend="bonobo-client-site-new">bonobo_client_site_new</link>() for more details.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> The BonoboClientSite object to initialize
+</entry></row>
+<row><entry align="right"><parameter>container</parameter>&nbsp;:</entry>
+<entry> a BonoboContainer to bind to.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the constructed BonoboClientSite <parameter>client_site</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-bind-embeddable">bonobo_client_site_bind_embeddable ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_client_site_bind_embeddable
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="BonoboObjectClient">BonoboObjectClient</link> *object);</programlisting>
+<para>
+This routine binds a remote Embeddable object to a local
+BonoboClientSite object.  The idea is that there is always a
+one-to-one mapping between BonoboClientSites and BonoboEmbeddables.
+The Embeddable uses its BonoboClientSite to communicate with the
+container in which it is embedded.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> the client site to which the remote Embeddable object will be bound.
+</entry></row>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> The remote object which supports the Bonobo::Embeddable interface.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if <parameter>object</parameter> was successfully bound to <parameter>client_site</parameter>
+<parameter>client_site</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-get-embeddable">bonobo_client_site_get_embeddable ()</title>
+<programlisting><link linkend="BonoboObjectClient">BonoboObjectClient</link>* bonobo_client_site_get_embeddable
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> A BonoboClientSite object which is bound to a remote
+BonoboObject server.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboObjectClient object which corresponds to the
+remote BonoboObject to which <parameter>client_site</parameter> is bound.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-get-container">bonobo_client_site_get_container ()</title>
+<programlisting><link linkend="BonoboItemContainer">BonoboItemContainer</link>* bonobo_client_site_get_container
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> A BonoboClientSite object which is bound to a remote
+BonoboObject server.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboObjectClient object which corresponds to the
+remote BonoboObject to which <parameter>client_site</parameter> is bound.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-new-view-full">bonobo_client_site_new_view_full ()</title>
+<programlisting><link linkend="BonoboViewFrame">BonoboViewFrame</link>* bonobo_client_site_new_view_full
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic,
+                                             <link linkend="gboolean">gboolean</link> visible_cover,
+                                             <link linkend="gboolean">gboolean</link> active_view);</programlisting>
+<para>
+Creates a ViewFrame and asks the remote <parameter>server_object</parameter> (which must
+support the Bonobo::Embeddable interface) to provide a new view of
+its data.  The remote <parameter>server_object</parameter> will construct a BonoboView
+object which corresponds to the new BonoboViewFrame returned by this
+function.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> the client site that contains a remote Embeddable object.
+</entry></row>
+<row><entry align="right"><parameter>uic</parameter>&nbsp;:</entry>
+<entry> The CORBA object for the container's UIContainer server.
+</entry></row>
+<row><entry align="right"><parameter>visible_cover</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if the cover should draw a border when it is active.
+</entry></row>
+<row><entry align="right"><parameter>active_view</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if the view should be uncovered when it is created.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A BonoboViewFrame object that contains the view frame for
+the new view of <parameter>server_object</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-new-view">bonobo_client_site_new_view ()</title>
+<programlisting><link linkend="BonoboViewFrame">BonoboViewFrame</link>* bonobo_client_site_new_view
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);</programlisting>
+<para>
+The same as <link linkend="bonobo-client-site-new-view-full">bonobo_client_site_new_view_full</link>() with an inactive,
+visible cover.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> the client site that contains a remote Embeddable
+object.
+</entry></row>
+<row><entry align="right"><parameter>uic</parameter>&nbsp;:</entry>
+<entry> The UIContainer object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A BonoboViewFrame object that contains the view frame for
+the new view of <parameter>server_object</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-new-item">bonobo_client_site_new_item ()</title>
+<programlisting><link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* bonobo_client_site_new_item
+                                            (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic,
+                                             <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *group);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> The client site that contains a remote Embeddable object
+</entry></row>
+<row><entry align="right"><parameter>uic</parameter>&nbsp;:</entry>
+<entry> The UI container for the item.
+</entry></row>
+<row><entry align="right"><parameter>group</parameter>&nbsp;:</entry>
+<entry> The Canvas group that will be the parent for the new item.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A GnomeCanvasItem that wraps the remote Canvas Item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-get-verbs">bonobo_client_site_get_verbs ()</title>
+<programlisting><link linkend="GList">GList</link>*      bonobo_client_site_get_verbs    (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-client-site-free-verbs">bonobo_client_site_free_verbs ()</title>
+<programlisting>void        bonobo_client_site_free_verbs   (<link linkend="GList">GList</link> *verb_list);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>verb_list</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="BonoboEmbeddable">BonoboEmbeddable</link>, <link linkend="BonoboContainer">BonoboContainer</link>, <link linkend="BonoboObjectClient">BonoboObjectClient</link>, <link linkend="BonoboViewFrame">BonoboViewFrame</link>
+</para>
+</refsect1>
+
+</refentry>

@@ -1,0 +1,172 @@
+/* $Id: adjustment.gen_h,v 1.43 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* adjustment.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/data.h>
+#include <gtk/gtkadjustment.h>
+
+CLASS_START(Gtk);
+/* gtkadjustment.h */
+//: A GtkObject representing an adjustable bounded value.
+//- The adjustment is used for holding numerical values and controlling the range
+//- of values a widget can take on. It can be used with the {\class Gtk::SpinButton::},
+//- {\class Gtk::ScrollBar::}, and {\class Gtk::Scale::} widgets.
+class Adjustment : public Data {
+  WRAP_CLASS(Adjustment,GtkAdjustment,GTK_ADJUSTMENT,GTK_IS_ADJUSTMENT,adjustment,Gtk::Data,GtkData,GTK_DATA);
+public:
+
+  friend class Range;
+  friend class HScrollbar;
+  friend class VScrollbar;
+
+  //: Constructor.
+  //- value: The initial value of the adjustment, and consequently, the widget that uses this adjustment.
+  //-        This value must be between lower and upper.
+  //-
+  //- lower: The lowest value this adjustment can take.
+  //-
+  //- upper: An upper value for the adjustment, but see below to determine what this value should be set to.
+  //-
+  //- step_increment: The amount the adjustment changes when incremented by one. For example, clicking on
+  //-                 a scrollbar's left or right arrows will change the value by this amount.
+  //-
+  //- page_increment: The amount an adjustment changes when "paged". Clicking in the trough of a scrollbar
+  //-                 or using the page up and page down keys will change the value by this amount.
+  //-
+  //- page_size: The relative size of a scrollbar's (or another widget's equivalent) handle. For example, if
+  //-            upper-lower equals 100, and page_size equals 25, then the bar will fill 1/4th of the
+  //-            width or height of the widget, leaving 3/4ths left as trough.
+  //-
+  //- The upper value is not the maximum value that the adjustment can achieve. To calculate the upper value,
+  //- determine what you want the maximum value for the adjustment to be, and add the page_size amount to that.
+  Adjustment(gfloat value,
+	     gfloat lower,
+	     gfloat upper,
+	     gfloat step_increment=1,
+	     gfloat page_increment=10,
+	     gfloat page_size=0);
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //:
+  SIGNAL_SPEC("changed",both,void changed(),gtk_adjustment_changed);
+
+  //: This signal is emmited when the adjustment's value has changed.
+  SIGNAL_SPEC("value_changed",both,void value_changed(),gtk_adjustment_value_changed);
+
+  //:
+  WRAP_METHOD(void gtk_adjustment_clamp_page(GtkAdjustment*,gfloat,gfloat), 
+	      void clamp_page(gfloat lower, gfloat upper));
+
+  //: Set the adjustment to a specific value. Will by default emit the value_changed signal.
+  WRAP_METHOD(void gtk_adjustment_set_value(GtkAdjustment*,gfloat),
+	      void set_value(gfloat value));
+
+  //: Returns the current value.
+  gfloat get_value()          const {return gtkobj()->value;}
+
+  //: Returns the current lower value.
+  gfloat get_lower()          const {return gtkobj()->lower;}
+  //: Returns the current upper value.
+  gfloat get_upper()          const {return gtkobj()->upper;}
+  //: Returns the current step_increment value.
+  gfloat get_step_increment() const {return gtkobj()->step_increment;}
+  //: Returns the current page_increment value.
+  gfloat get_page_increment() const {return gtkobj()->page_increment;}
+  //: Returns the current page_size value.
+  gfloat get_page_size()      const {return gtkobj()->page_size;}
+
+  //: Sets the lower value.
+  void set_lower(gfloat lower)           {gtkobj()->lower = lower; changed();}
+  //: Sets the upper value.
+  void set_upper(gfloat upper)           {gtkobj()->upper = upper; changed();}
+  //: Sets the step_increment value.
+  void set_step_increment(gfloat incr)   {gtkobj()->step_increment = incr; changed();}
+  //: Sets the page_increment value.
+  void set_page_increment(gfloat incr)   {gtkobj()->page_increment = incr; changed();}
+  //: Sets the page_size value.
+  void set_page_size(gfloat size)        {gtkobj()->page_size = size; changed();}
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/data_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+  Adjustment::Adjustment(gfloat value, gfloat lower, gfloat upper,
+			 gfloat step_increment, gfloat page_increment,
+			 gfloat page_size)
+    : Data((GtkData*)(gtk_object_new(get_type(),0)))
+  {
+    initialize_class();
+    GtkAdjustment *adjustment=(GtkAdjustment*)gtkobject;
+    adjustment->value = value;
+    adjustment->lower = lower;
+    adjustment->upper = upper;
+    adjustment->step_increment = step_increment;
+    adjustment->page_increment = page_increment;
+    adjustment->page_size = page_size;
+
+  }
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Adjustment)
+//. name: lower
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: upper
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: value
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: step_increment
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: page_increment
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: page_size
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+

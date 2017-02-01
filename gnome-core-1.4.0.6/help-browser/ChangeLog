@@ -1,0 +1,1036 @@
+2002-01-09  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gnome-info2html/main.c: Use <HTML><BODY> instead of the other way around.
+	Fixes #66332. From Shingo Akagaki <dora@kondara.org>
+	* mime.c, toc2info.c: Support for bz2 compressed man/info files.
+	Fixes bug #66335. From Shingo Akagaki <dora@kondara.org>.
+	* gnome-info2html/Makefile.am: Added man pages.
+	* gnome-man2html/Makefile.am: Same.
+		
+2001-09-08  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* transport.c, docobj.c: Apply patch from Red Hat to disable
+	http protocol. No more remote browsing - it was never designed
+	to handle it anyway.
+	
+2001-09-03  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* misc.c, toc2-man.c, window.c: Fix some warnings.
+	
+2001-08-03  Abel Cheung  <maddog@linux.org.hk>
+
+	* *.desktop : Reviewed/Modified/Added traditional Chinese strings.
+
+2001-08-03  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* help-browser.desktop: Added nynorsk.
+	
+2001-06-20  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* transport.c: Fix compilation on AIX by moving #include <math.h>
+	above #include <glib.h>. From Dan McNichol <mcnichol@austin.ibm.com>.
+	
+Mon Jun 11 21:59:25 2001  George Lebl <jirka@5z.com>
+
+	* *.[ch]: fix uses of strncpy, set some buffer sizes correctly,
+	  get rid of some useless buffer copying allocation, fix all
+	  warnings, teeeny bit of constcorrectness, fix strftime usage,
+	  mark strftime strings for translation, apply fix from Kjartan
+	  Maraas, use g_new0 instead of g_new, and generally deal with buffer
+	  issues where it could cause trouble.  Still some places are just
+	  evil and bad, and there are still possible overruns.
+
+2001-06-11  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* misc.c: Apply patch from markd@Kermodei.com> to close
+	http://bugzilla.gnome.org/show_bug.cgi?id=52628
+	
+2001-05-31  Marius Andreiana  <mandreiana@yahoo.com>
+
+	* gnome-info2html/html.c: added stdlib.h to get rid of compile warning
+	about exit()
+	
+2001-02-26  jacob berkman  <jacob@ximian.com>
+
+	* reverting previous patch
+
+x2001-02-25  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* htmlurl.h: removed an enum which is in gtkhtml/htmlenums.h. include
+	that.
+	* window.c: gtkhtml include fixes, shut a couple of warnings.
+
+Sun Feb 04 20:35:16 2001  George Lebl <jirka@5z.com>
+
+	* Makefile.am: Apply patch from "Adam J. Richter" <adam@yggdrasil.com>
+	  to fix some automake foo
+
+2001-01-29  jacob berkman  <jacob@ximian.com>
+
+	* transport.c (transport): seg fault fix for solaris from Laszlo
+	PETER <Laszlo.Peter@ireland.sun.com>
+
+2000-09-18  Jacob "Ulysses" Berkman  <jacob@helixcode.com>
+
+	* gnome-help-browser.c (main): 
+	* window.c (load_image): 
+	* gnome-helpwin.c (gtk_html_source): updated to work with modern gtkhtml
+
+2000-09-03  Matt Wilson  <msw@redhat.com>
+
+	* misc.c: add compatibility macros for building against bzip2-1.0
+
+2000-07-11  David A. Wheeler  <dwheeler@dwheeler.com>
+	* gnome-man2html/man2html.c: Silenced spurious compiler warnings.
+
+2000-07-05  David A. Wheeler  <dwheeler@dwheeler.com>
+
+	* gnome-man2html/man2html.c: Several changes to improve
+	hypertext linking.  These include:
+
+	 - Added support for new hypertext link macros. The macro
+	 ".UR url" starts a hypertext link, generating <A HREF="url">.
+	 The macro ".UE" ends it, generating </A>.  The macro ".UN name"
+	 inserts a named anchor, generating
+	 <A NAME="name" id="name">&nbsp;</A>.  The code is smart enough
+	 to know that hypertext anchors can't be nested; indeed, by using
+	 .UR ":" you can disable hypertext links until the matching ".UE".
+	 These macros are documented in man(7)
+	 as distributed by the Linux Documentation Project (LDP).
+
+	 - Automatically insert hypertext links to filenames.
+	 To prevent bogus filename linking, filename links
+	 must be absolute (begin with "/") and must be one of the handful of
+	 standard filenames from the Filesystem Hierarchy
+	 (e.g., /usr/doc, etc.).  Also, filenames must be at the beginning
+	 of a line, preceded by a space, or preceded in the HTML by a tag
+	 (e.g., begin/end of italics or bold).  Some filenames are
+	 directories, which gnome-help-browser doesn't support yet;
+	 I intend to add that support in a separate patch.
+	 Do a man:at(1) for an example.
+
+	 - Partial web addresses (www.whatever and ftp.whatever) can now
+	 include '/', so addresses like www.w3.org/CGI work correctly.
+
+	 - Inserts hyperlink names for sections & subsections that are equal
+	 to the section name (with spaces->underscores).  This lets you refer
+	 to sections by name, e.g., <man:ftp(1)#ENVIRONMENT> is now legal.
+	 The old link namess (e.g., lbAA) have been kept so you can use
+	 either name format, your choice.
+
+Mon Jun 12 16:17:18 2000  George Lebl <jirka@5z.com>
+
+	* docobj.c (docObjFree): free stuff allocated with glib with g_free
+	  and other stuff with free
+
+	* gnome-info2html/main.c (main): more free/g_free confusion
+	  untangling
+
+	* gnome-man2html/gnome-man2html.c: apply patch from bug #3925
+
+	* mime.c (convertINFO): init pointers to NULL to be more paranoid
+
+	* misc.c (getOutputFrom): make out stuff NULL on error, don't
+	  free random memory.  fix up the pipe stuff a little bit so that
+	  it no longer SIGPIPES or hangs or other fun stuff
+
+	* parseUrl.c (DecomposedUrl): decomposing urls make a copy with
+	  g_strdup as we're really then freeing it with g_free
+
+2000-05-24  Dan Mueth <d-mueth@uchicago.edu>
+
+	* help/C/default-page.html: Removed line:
+	"The user's guide isn't available yet".
+
+Sat May 13 10:13:06 2000  George Lebl <jirka@5z.com>
+
+	* gnome-help-browser.c: apply patch from
+	  marillat.christian@wanadoo.fr, fixing bug 10969.  The path
+	  for info pages pointed to one man directory by mistake
+
+2000-05-09  Andreas Hyden  <a.hyden@cyberpoint.se>
+
+	* gnome-help.desktop: Added Swedish translation.
+
+2000-05-07  Radek Doulik  <rodo@helixcode.com>
+
+	* mime.c (convertMIME): use strncmp for text/html - this catch
+	things like html/text;...
+
+2000-05-06  Jacob Berkman  <jacob@helixcode.com>
+
+	* window.c (helpWindowShowURL): use a stock button
+
+2000-05-06  Radek Doulik  <rodo@helixcode.com>
+
+	* mime.c (convertImage): new function to convert images
+	(convertMIME): use convertImage
+
+	* transport.c (getDocBegin): new function, splits buf into header
+	and doc data parts, sets doc begin to *s parameter
+	(loadSock): use getDocBegin, this fixes case when server ends
+	header with \r\n\r\n and document contains \n\n, before this fix
+	it eats document top part (upto \n\n), now it may correctly
+	identify doc begin (try http://freshmeat.net now :) margins are
+	right now)
+
+2000-05-04  Jacob Berkman  <jacob@helixcode.com>
+
+	* history.c (createHistoryWindow): 
+	* bookmarks.c (createBookmarksWindow): pass a pointer, not a pointer to
+	a pointer (duh)
+
+	* gnome-help-browser.c (main): set the default icon
+
+	* history.c (createHistoryWindow): 
+	* toc.c (createToc): 
+	* bookmarks.c (createBookmarksWindow): use the default icon
+
+2000-05-03  Michael Meeks  <michael@helixcode.com>
+
+	* gnome-info2html/html.c (write_node_link_html): s/strcasecmp/g_strcasecmp/
+
+	* window.c (gtkhtml_formActivate): ditto.
+
+2000-05-01  Jacob Berkman  <jacob@helixcode.com>
+
+	* gnome-man2html/gnome-man2html.c: 
+	* toc2.c: prettification patches from Iain
+
+	* gnome-help-browser.c (DEFAULT_*PATH): add /usr/share/(info|man) for
+	debian
+
+2000-04-05  Iain Holmes  <ih@csd.abdn.ac.uk>
+
+	* misc.c (loadFileToBuf): Check the extension of the file, and if
+	use libbz2 to open it if it is .bz2.
+	: Include <config.h> and conditionally include <libbz2.h>
+
+2000-04-08  Larry Ewing  <lewing@helixcode.com>
+
+	* window.c (on_set_base): make sure we strip references from
+	baseURL so that we don't carry them into the next load.  Should
+	fix the problem with image url's having references appended to them.
+	
+2000-04-04  Jacob Berkman  <jacob@helixcode.com>
+
+	* gnome-help-browser.c: look in $(prefix) for man and info pages
+
+	* toc2-info.c (expandInfoTable): instead of crashing, report an
+	error when there was no data loaded.  People probably have run into
+	bug-buddy enough times.
+
+2000-04-03  Jacob Berkman  <jacob@helixcode.com>
+
+	* add gtkhtml support
+
+2000-04-03  Alastair McKinstry <alastair@ilo.dec.com>
+
+        * help-browser.desktop:	Added Irish (gaelic) translation.
+2000-03-14  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* help/Makefile.am, help/lt/*: added Lithuanian default page
+          from Gediminas Paulauskas <menesis@delfi.lt>
+
+2000-03-19  Jacob Berkman  <jacob@helixcode.com>
+
+	* gnome-help-browser.c (main): show the window before loading
+	th URL so that when we pass an anchor in the initial URL it
+	all works right
+
+2000-02-23  Peter Hawkins  <peterhawkins@ozemail.com.au>
+
+	* gnome-help-browser.c: stopped the about box from being shown twice at once.
+
+2000-02-11  Jason Leach  <leach@wam.umd.edu>
+
+	* gnome-convert (plain): important bug fix, closes #6003
+
+	* mime.c: Make sure to include <alloca.h> when required (added an
+	#ifdef HAVE_ALLOCA_H), fixes bug #2275
+	* gnome-help-browser.c: same
+	* gnome-helpwin.c: same
+
+2000-02-09  Matt Wilson  <msw@redhat.com>
+
+	* toc2-ghelp.c (newGhelpTable): fix for segfaults on various
+	non-intel platforms, you need to strdup this stuff before poking
+	around with it.
+
+2000-01-24  Jacob Berkman  <jacob@helixcode.com>
+
+	* Makefile.am (EXTRA_DIST): dist sample.c
+
+2000-01-22  Jacob Berkman  <jacob@helixcode.com>
+
+	* Makefile.am (install-exec-local): copy the binaries from
+	$(top_srcdir)
+
+Sat Jan 15 00:23:22 2000  George Lebl <jirka@5z.com>
+
+	* *.[ch]: while looking for bugs I fixed a bunch of warnings,
+	  but no bugs.
+
+1999-12-17  Pavel Machek  <pavel@artax.karlin.mff.cuni.cz>
+
+	* gnome-convert: add better handling for unknown data types, start
+	gv for postscript and pdf
+
+1999-12-11  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* toc2-*.c (new*Table): don't go and sort if there aren't
+	any elements.  Insure complained about this.  There is a
+	0.000000001% chance that this fixes people's crashes.
+
+	* toc2.c (gen*TocHTML): don't make a table if there aren't
+	any elements.  This fixes a crash I had.
+
+1999-12-06  Pavel Machek  <pavel@ucw.cz>
+
+	* gnome-convert, gnome-download: better handling of unknown types
+
+	* fixed cache to include MIME types (that was design bug!)
+
+	* added possibilty to force mime type using
+	(text/html)http://localhost/ syntax
+
+1999-12-03  Pavel Machek <pavel@ucw.cz>
+
+	* Makefile.am (install-exec-local): add gnome-download
+	gnome-convert so that they are correctly installed
+
+1999-03-23  Pavel Machek  <pavel@bug.ucw.cz>
+
+	* gnome-man2html/gnome-man2html.c (main): Bugfix: code used to
+	crash on empty input '\0' is really == NULL and you wanted "".
+
+	* gnome-man2html: FIXME: this really should not be linked against gtk.
+	
+1999-03-22  Pavel Machek  <pavel@bug.ucw.cz>
+
+	* transport.c (loadSock): Cleaned code a bit, fixed potential
+	segfaults if other side missbehaves and added possibility to call
+	gnome-download external script
+
+1999-11-18  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* help/el/*: added a the Greek default page from gnome-core 1.0.*
+
+1999-11-05  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* help/Makefile.am: revert commit adding uk dir,
+	as it doesn't exist.
+
+1999-09-22  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* gnome-man2html/.cvsignore: 
+	* gnome-info2html/.cvsignore: 
+	* .cvsignore: updated
+
+1999-09-18  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* window.c: Changed some of the pixmaps on the tool bar to look better
+
+1999-08-05  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* window.c: Changed the GtkHandleBox in the Location bar to a
+	GnomeDockItem instead.
+
+1999-06-25  Pablo Saratxaga <srtxg@chanae.alphanet.ch>
+
+	* help/wa/gnome-help-browser-topic.dat: updated walloon language index
+
+1999-05-15  Jacob Berkman  <jberk+@cmu.edu>
+
+	* help/wa/.cvsignore: added file
+
+	* help/eu/.cvsignore: added file
+
+1999-03-17  Ettore Perazzoli  <ettore@comm2000.it>
+
+	* gnome-help.desktop: Added Italian translations.
+
+1999-04-10  Jacob Berkman  <jberk+@cmu.edu>
+
+	* help-browser-impl.c (destroy_server): fixes gnome bug #116,
+	crashing when file->new then file->close by checking for NULL
+	pointer returned from hash lookup
+
+1999-04-05  Michael Fulbright  <msf@avatar.labs.redhat.com>
+
+	* gnome-help-browser.c: fixed it so we save state but do not die,
+	we want to wait for session manager to tell us to. This should
+	fix session management for the help browser.
+
+1999-01-06  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* check-running.c (send_command_to_running): BSDI portability
+	patch. 
+
+1999-03-19  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* docobj.c (docObjResolveURL): Use strdup instead of g_strdup to
+	allocate absoluteRef.
+
+1999-03-23  Sung-Hyun Nam  <namsh@lgic.co.kr>
+
+	* gnome-man2html/Makefile.am: do not link to gnome lib.
+	* help/Makefile.am: added 'ko' subdir.
+	* help/ko/*: korean help files
+
+1999-01-22  Richard Hult <rhult@hem2.passagen.se>
+
+	* window.c (makeEntryArea): Use "Location:" instead of URL:
+
+1999-01-20  Jim Pick  <jim@jimpick.com>
+
+	* Makefile.am: patched to install help-browser.gnorba into
+	$(sysconfdir)/CORBA/servers - not /usr/etc/CORBA/servers
+
+1999-01-12  Michael Fulbright <drmike@redhat.com>
+
+	* help/C/default-page.html: updated to use new GNOME logo, nicer look
+
+1999-01-09  Nat Friedman  <nat@nat.org>
+
+	* window.c (helpWindowNew): The help-browser doesn't use the
+ 	appbar progress meter.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* window.c (helpWindowNew): Changed the status bar to a
+ 	GnomeAppBar.  Installed the menu hints.
+
+	Changed gtk_statusbar_push/pop calls to gnome_appbar_push/pop
+ 	calls throughout.
+
+1999-01-07  Nat Friedman  <nat@nat.org>
+
+	* window.c: Added settingsmenu, moved preferences there.  Updated
+ 	all menu items to use the GNOMEUIINFO standard macros.
+
+1999-01-06  Nat Friedman  <nat@nat.org>
+
+	* window.c: Use Ctrl-Q as the exit-app accelerator.
+
+1999-01-01  Tuomas Kuosmanen  <tigert@gimp.org>
+
+	* contents.xpm: Changed the pixmap so it is the same as 
+	gnome-stock 'index' icon.
+
+1998-12-17  Christopher Blizzard  <blizzard@appliedtheory.com>
+
+	* window.c (init_accel): Don't set up a new "grab_focus" signal
+ 	since it already exists in the entry box class heirarchy.
+	(init_accel): Don't attach the grab focus signal to the entry box,
+ 	it already does this.  This causes an endless loop in the signal
+ 	handlers.
+
+1998-12-17  Sebastian Wilhelmi  <wilhelmi@ira.uka.de>
+
+	* docobj.c (docObjFree): Use free for obj->absoluteRef, not g_free
+	as it comes from malloc.
+
+1998-12-15  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (EXTRA_DIST): Added help-browser.gnorba.
+
+1998-12-08  Matt Wilson  <msw@redhat.com>
+
+	* window.c: no c++ comments.
+
+1998-12-08  Michael Lausch  <mla@gams.at>
+
+	* help-caller.c (main): changed the
+	goad_server_activate_with_repo_id call to comply with new
+	version. 
+
+1998-12-01  Jeff Garzik  <jgarzik@pobox.com>
+
+	* gnome-info2html/html.c:
+	Silenced gcc prototype and ambiguity warnings.
+
+1998-11-29  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
+
+	* help-caller.c (main): seems as there is no return -> void main(...)
+	(INCLUDES): added #include "help-browser.h"
+
+	* bookmarks.c (appendEntry): fixed pointer-typo (IMHO)
+
+	* window.c (init_accel): declared static gint explicitly
+
+1998-11-26  Herbert Valerio Riedel  <hvr@hvrlab.ml.org>
+
+	* check-running.c (do_cb): added an int-argument to declaration 
+	(for it is a sighandler)
+
+	* help-browser-impl.c (idhash): inserted GPOINTER_TO_UINT
+
+	* bookmarks.c: inserted GPOINTER_TO_INT
+
+1998-11-23  Martin Baulig  <martin@home-of-linux.org>
+
+	* history.c (createHistoryWindow): Put the GtkCList into a
+	GtkScrolledWindow and use gtk_scrolled_window_set_policy ()
+	if using Gtk 1.1.4.
+	* bookmargs.c (createBookmarksWindow): Likewise.
+
+1998-11-23  Christopher Blizzard  <blizzard@appliedtheory.com>
+
+	* bookmarks.c (createBookmarksWindow): Comment out
+ 	gtk_clist_set_policy().  This should compile.
+ 
+	* history.c (createHistoryWindow): Comment out
+ 	gtk_clist_set_policy().  This should compile.
+
+1998-11-19  Havoc Pennington <hp@pobox.com>
+
+	* gnome-help-browser.c (main): Reflect renaming of gnorba calls
+	(server_register and server_unregister).
+
+Thu Nov 12 Felix Bellaby <felix@pooh.u-net.com>
+	* gnome-help-browser.c: tidy up warnings and mapping.
+	* window.c (init_accel): fix accelerators. 
+	* help-browser-impl.c: tidy up warnings and mapping.
+
+1998-11-04  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* transport.c: Include <sys/types.h> and reorder other includes.
+	(transport): Use `g_snprintf' instead of `snprintf'.
+	(transportHTTP): Likewise.
+
+Wed Oct 28 Felix Bellaby <felix@pooh.u-net.com>
+
+	* help-caller.c (main): use proper repo_id.
+	* toc2-ghelp.c (newGhelpTable): do not drop first item.
+	* toc2-info.c (newInfoTable): do not drop first item.
+	* toc2-man.c (newManTable): do not drop first item.
+	
+1998-10-20  Andrew Veliath  <andrewtv@usa.net>
+
+	* Makefile.am (ORBIT_GENERATED_SOURCES): Update IDL compiler rule
+	to depend on ORBIT_IDL.
+
+Sun Oct 18 19:19:04 1998  Owen Taylor  <otaylor@gtk.org>
+
+	* window.c: Use the new DND API.
+
+1998-10-15  Michael Lausch  <mla@gams.at>
+
+	* gnome-help-browser.c (main): Revert to the old behaviour to
+	display the toc: URL if called without cmd line argument.
+	(main): Don't crash if ther's no orbit-naming-server available.
+	
+
+1998-10-11  Michael Lausch  <mla@gams.at>
+
+	* idl/help-browser.idl: Changed interface. fetch_url displays the
+	URL in the window of the object passed as the first
+	parameter. show_url creates a new server and uses its window, a
+	new one to display the URL. It returns the new browser server.
+
+	* help-caller.c (main): You can now type in a URL which is
+	displayed in the help browser. If the URL starts with a '#', the
+	same window is used, otherwise a new window is opened. This is
+	just a demo program, showing how to use the CORBA interface to the 
+	help-browser.
+
+	* help-browser-impl.c: new variable win_servant_hash which holds
+ 	the relation between window and CORBA server. This is a hack. See
+ 	the TODO file.
+	(idhash): new function. used for hashing a window pointer.
+	(idcompare): new function. used for comparing two window pointers.
+	both functions are used by the win_servant_hash.
+	(impl_help_browser_simple_browser__create): Accepts an additional
+	parameter which is the window for this server. This parameter may
+	be 0 if there's no window yet. This is true for the first server
+	if no command line argument was passed.
+	If ther's a window, add the window and the servant to the hash table.
+	(impl_help_browser_simple_browser_fetch_url): If the servant
+	doesn't have a window, create one and it to the hash table.
+	(impl_help_browser_simple_browser_show_url): create a new window,
+	and add it to the hash table.
+	(destroy_server): new function. Find the server for this window
+	and destroy it.
+
+	* gnome-help-browser.c: remove the UGLY_LE_HACK define. It's not
+	nedded any more.
+	Export the makeHelpWindow function. It's needed in the CORBA
+	files. 
+	(main): remove #if 0 from the session management code.
+	Only create a window if a command line parameter was there.
+	Redirect stderr and stdout to a file. This is hardcoded right now, 
+	but should be changed ASAP.
+	Use the functions in libgnorva to register and de-register from
+	the naming server.
+	(closeWindowCallback): Close the window and destroy the CORBA
+	server associated with the window.
+	
+
+	* Makefile.am: Reorgnaize the ORBit generated files. All files
+	which can be generated from the IDL source are put in the
+	BUILT_SOURCES macro. Remove source naming server sources, as they
+	are not needed any more. 
+
+1998-10-09  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (BUILT_SOURCES): Add all ORBit generated files.
+
+1998-10-09  Michael Lausch  <mla@gams.at>
+
+	* Made ghnome-help-browser CORBA aware and added a small test
+	application gnome-help-caller, which resets the help browser to
+	the "toc:" entry.
+
+Sun Sep 20 15:20:10 1998  Ettore Perazzoli  <ettore@comm2000.it>
+
+	* toc2-ghelp.c (compareItems): Made `qsort()'-compatible (type of
+ 	`a' and `b' changed to `const void *').
+	(newGhelpTable): Quick fix to make it faster: put elements in a
+ 	temporary array, sort it via `qsort()' and build a list out of it
+ 	afterwards.
+
+	* toc2-info.c (compareItems): Made `qsort()'-compatible (type of
+ 	`a' and `b' changed to `const void *').
+	(newInfoTable): Quick fix to make it faster: put elements in a
+ 	temporary array, sort it via `qsort()' and build a list out of it
+ 	afterwards.
+
+	* toc2-man.c (compareItems): Made `qsort()'-compatible (type of
+ 	`a' and `b' changed to `const void *').
+	(newManTable): Quick fix to make it faster: put elements in a
+ 	temporary array, sort it via `qsort()' and build a list out of it
+ 	afterwards.
+
+Thu Sep 17 12:42:06 1998  John Ellis  <johne@bellatlantic.net>
+
+	* window.c(windowmenu): Now the window menu displays it's contents.
+
+Thu Sep 17 02:08:10 1998  John Ellis  <johne@bellatlantic.net>
+
+	* bg.xpm, gnome-logo2.xpm: Convert to png.
+	* default-page.html: Use said png's.
+	* Makefile.am: Change references of xpm to png.
+
+1998-27-07  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+ 	
+	* window.c: conditional compilation now checks for #defined symbol
+	GTK_HAVE_FEATURES_1_1_0 instead of GTK_HAVE_ACCEL_GROUP
+	
+Sun Jul 19 18:53:48 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* toc2-info.c: Include <stdlib.h>.
+
+Wed Jul 15 01:39:26 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* bookmarks.c: Include <stdlib.h>.
+
+Tue Jul  7 00:17:49 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* parseUrl.c: Don't include <malloc.h>.
+	* HTParse.c: Don't include <malloc.h>.
+
+1998-07-01  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* gnome-help.desktop: Added Portuguese translation.
+
+Fri Jun 12 12:28:17 1998  Robert Wilhelm  <robert@physiol.med.tu-muenchen.de>
+
+        * transport.c (transportHTTP): 
+        add CRs as required by HTTP spec.
+        add "Host:" to work better with virtual httpd.
+        check for buffer overflow.
+
+Wed Jun 10 17:22:59 EDT 1998 Gregory McLean <gregm@comstar.net>
+
+	* window.c : updated window.c to work with both gtk versions.
+
+1998-06-10  Carsten Schaar  <nhadcasc@fs-maphy.uni-hannover.de>
+
+	* gnome-help-browser.c (main): Call 'newGnomeClient' after
+ 	'gnome_init' now.
+	(newGnomeClient): Use 'gnome_master_client' instead of
+ 	'gnome_client_new_default'.
+
+1998-05-27  Carsten Schaar  <nhadcasc@fs-maphy.uni-hannover.de>
+
+	* toc2-ghelp.c: Included <gnome.h>.
+ 	(newGhelpTable): Changed to use gnome_i18n_get_language_list. This
+ 	way, only manual pages are shown, that are in the users language
+ 	search path. This includes alwas the "C" language. This way,
+ 	users, that have some of there LANG-variables set, can read gnome
+ 	help pages.
+	
+
+1998-05-25  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* check-running.c: fix up
+
+	* Made some changes to the config dir handling code.
+	Now the dir is fixed at .gnome-help-browser.
+
+1998-05-22  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* can accept drops.  does no MIME type checking.
+
+	* parseUrl.c (decomposeUrlRelative): handle NULL ref
+
+	* window.c: added accelerators for ' ', 'b', 'g'
+	A total hack, but works.
+
+	* window.c (makeEntryArea): disconnect the combobox
+	activate signal so it doesn't pop down on Enter.
+
+1998-05-15  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* check-running.c (send_command_to_running): Use SA_NODEFER
+	instead of SA_NOMASK.
+
+Fri May 15 11:59:00 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* mime.c: Just use <sys/wait.h>.
+
+Wed May 13 22:33:56 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* gnome-help-browser.c (save_state): If shutdown requested, then
+	exit.
+
+1998-05-05  Marc Ewing  <marc@redhat.com>
+
+	* clean up cache - do not have multiple cache entries
+	  for one key
+
+1998-05-05  Michael Fulbright  <msf@redhat.com>
+
+	* window.c: help_onhelp() - use "ghelp:help-browser" magic URL
+
+1998-05-04  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-help-browser.c (configApply): Only load the configuration
+	once. 
+
+1998-05-01  Marc Ewing  <marc@redhat.com>
+
+	* Changed g_error()'s to g_warnings()'s
+
+1998-05-01  Michael Fulbright  <msf@redhat.com>
+
+	* Makefile.am: removed references to sample-help*
+	* sample-help*: removed these useless files
+	* gnome-help-browser-help.html: added command line options
+	* gnome-help-browser-topic.dat: added command line options
+
+1998-04-29  Michael Fulbright  <msf@redhat.com>
+
+	* toc2.c: fixed man/info/ghelp toc HTML generation to use 3 col table
+	* visit.c: fixed 'toc:' magic URL to jump to anchor if present
+
+1998-04-27  Michael Fulbright  <msf@redhat.com>
+
+	* gnome-helpwin.c: remove unused functions
+	  visit.c: cleanly handle case where default_page.html isnt found
+
+1998-04-24  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-help-browser.c (generateConfigWidgets): Fix the right
+	alignment of the labels.
+	(generateConfigWidgets): Simplified the code by using
+	GnomePropertyBox. 
+
+1998-04-22  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* Make hiding/showing of bookmarks/history work properly
+
+1998-04-20  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* window.c: Make the browser use gnome-stock pixmaps.
+
+1998-04-15  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* history.c: i18n support.
+	* gnome-helpwin.c: i18n support.
+	* gnome-help-browser.c (configCallback): i18n support.
+	* bookmarks.c (createBookmarksWindow): Add support for i18n
+
+1998-04-06  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* Added -d debug option, cleaned a printf
+
+1998-04-06  Michael Fulbright  <msf@redhat.com>
+
+	* intl'n of menu and toolbar strings
+	* added button to toolbar to callup 'toc:' magic URL
+
+1998-04-02  Michael Fulbright  <msf@redhat.com>
+
+	* Tweaked 'Reload' a little, might work a little better now
+
+	* Added some stock icons to menus
+
+	* Fixed it so we dont segv when user give URL starting with a '/'
+
+1998-03-27  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* window.c (helpWindowShowURL): Don't pass NULL pointers to printf.
+
+1998-03-26  Michael Fulbright  <msf@redhat.com>
+
+	* Added 'whatis:' magic URL. You just type something like
+	  'whatis:ls', and it does a case-insensitive search of all
+	  document titles of matching "^ls.*"
+
+	* Added callback for forms from html widget, doesn't seem to
+	  quite be fully implemented yet.
+	
+1998-03-25  Michael Fulbright  <msf@redhat.com>
+
+	* Added support in bookmarks for document titles
+
+	* Updated help document to describe magic URLs
+
+	* Fixed bug which caused entry box to show currentRef
+	  instead of humanRef if a bad URL was given.
+
+Sat Mar 21 15:27:37 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* window.c: Use gnome_message_box_*, not gnome_messagebox_*.
+
+1998-03-18  Michael Fulbright  <msf@redhat.com>
+
+	* 'Fixed' reloading of default page - html widget was scrolling
+	   image off top and showing first line of text instead.
+
+	* Implemented 'toc:', 'toc:man', 'toc:info', and 'toc:ghelp'
+	  These load browser with table of contents of respective doc types.
+
+	* Found bug in info code which caused segfault when loading last
+	  section in an info file.
+
+	* Removed visitURL_nohistory - use visitURL() with several booleans
+	  to control if link is read from cache, stored in back/forward queue,
+	  and if it goes in the global history list
+
+1998-03-18  Marc Ewing  <marc@redhat.com>
+
+	* Removed the TOC window
+
+1998-03-16  Michael Fulbright  <msf@redhat.com>
+
+	* Added default page, made appropriate Makefile.am changes
+
+	* Started work on a 'Reload' button
+
+	* Session management works, but disabled by default. Just
+	  uncommnet the line invoking newGnomeClient() in gnome-help-browser.c
+
+Sun Mar 15 15:38:24 1998  Owen Taylor  <owt1@cornell.edu>
+
+	* gnome-info2html/Makefile.am: added GNOME_INCLUDEDIR to
+	  INCLUDES so glib.h will be found.
+
+1998-03-13  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (gnome_help_browser_LDADD): Use $(RES_LIBS) found in
+	configure.in. 
+
+1998-03-12  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* Clean up toolbar a bit.
+
+	* In entry box, map "/..." to "file:/..."
+
+1998-03-11  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* Made history, cache, bookmarks reconfigurable.
+
+	* Config panel.
+
+	* More humanRef bits (history, bookmarks, etc).
+
+1998-03-10  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* Cache tweak.
+
+Tue Mar 10 22:39:15 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* gnome-help-browser.c (program_invocation_name): Declare.
+	(save_state): Use program_invocation_name as argv[0] for restart
+	command.  Don't strip path information.
+	(newGnomeClient): Don't try to print NULL value.
+	(options): New structure.
+	(parser): Refer to options.
+	(parseAnArg): Recognize -x, -y, -w, -h.
+	(session_die): New function.
+	(newGnomeClient): Wire "session_die" to "die" signal.
+
+	* gnome-help-browser.c (newGnomeClient): Enable session support.
+
+Tue Mar 10 16:21:33 1998  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	(helpWindowNew): Focus the entry at startup
+
+1998-03-10  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* Use "humanRef" when rewriting the entry box.
+
+1998-03-09  Marc Ewing  <marc@redhat.com>
+
+	* Add ghelp: magic URL.
+	
+	* Change TOC to send "ghelp:<>".
+
+1998-03-08  Marc Ewing  <marc@tasmanian.redhat.com>
+
+	* Fix bug in relative URL parsing.
+
+	* Image callbacks now use docObj and transport().
+	
+Sun Mar  8 18:44:55 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* sample.c (main): Use new gnome_init.
+
+	* gnome-help-browser.c (HELP_VERSION): Renamed from VERSION to
+	avoid clash with config.h.
+
+	* Makefile.am (INCLUDES): Added GNOME_INCLUDEDIR.  Define
+	GNOMELOCALEDIR.
+
+Sat Mar  7 12:08:37 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* gnome-help-browser.c: Include <config.h>.
+	(helpURL): New global.
+	(parser): New structure.
+	(parseAnArg): New function.
+	(main): Changed to use new argument parsing.
+
+1998-03-08  Marc Ewing  <marc@redhat.com>
+
+	* Misc cleanups of gnome-helpwin, gnome-info2html,
+	  gnome-man2html, my bogus function casts.
+
+	* Rework some of docobj to handle binary data.
+	  Now the raw/conv data is *not* NULL terminated!
+
+	* Added simple (stupid) http transport.
+
+1998-03-06  Marc Ewing  <marc@redhat.com>
+
+	* fix horrible toc/info bug
+
+	* added bookmarks
+
+1998-03-05  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* history saving code
+
+	* preliminary gnome_config stuff
+
+1998-03-03  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* magic man: url
+
+	* .so magic (only for file:)
+
+	* new toc code.  uses html widget
+	
+	* moved info magic stuff to toc
+
+1998-03-02  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* fixed delete event handling
+
+1998-03-01  Marc Ewing  <marc@tasmanian.redhat.com>
+
+	* multiple windows now close correctly and track current window
+
+	* misc fixes and cleanups
+
+1998-02-26  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* toc-man.c (expandManPagesIndex): Don't `closedir(NULL)'.
+	(expandManPagesRoot): Likewise.
+	* magic.c (resolveMagicURL): Likewise.
+	* toc-ghelp.c (expandGHelpRoot): Likewise.
+	* toc-info.c (expandInfoRoot): Likewise.
+	
+1998-02-26  Marc Ewing  <marc@redhat.com>
+
+	* multiple windows!
+	* closing windows is *not* handled properly.  Have to
+	  figure out what the deal is with GnomeApp.
+
+	* need some way to update the "current" window based
+	  on focus or last activity or something.
+
+	* fix history a bit
+
+1998-02-26  Michael Fulbright  <msf@redhat.com>
+
+	* fixed info handling to work with the 'dir' file
+
+	* added some very simple error handling
+
+1998-02-26  Marc Ewing  <marc@redhat.com>
+
+	* add line position to queue info for forw/back
+
+	* changed history/toc window management a bit
+
+1998-02-25  Marc Ewing  <marc@redhat.com>
+
+	* cleaned up some messages
+
+	* ripped out some code that duplicates functionality
+
+1998-02-25  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (LDADD): Remove $(ZLIB).
+	(ZLIB): Remove.
+
+1998-02-25  Michael Fulbright  <msf@redhat.com>
+
+	* added better support for 'info:'
+
+1998-02-25  Marc Ewing  <marc@redhat.com>
+
+	* added caching code
+
+	* added entry box
+
+	* use g_message() and g_error() instead of printf()
+
+	* fixed a few places that used docObjGetRef()
+	  instead of docObjGetAbsoluteRef() as they should
+
+1998-02-24  Marc Ewing  <marc@germ.labs.redhat.com>
+
+	* Put virtually all the globals in a per-window structure.
+
+	* Rearranged *heavily* the docObj and url stuff.  Slightly
+	more sane arrangement of data structure and .h files now.
+
+	* Put everything back together again.  Seems to work :-).
+
+1998-02-23  Michael Fulbright  <msf@redhat.com>
+
+	* Added GNU info support, cleaned up code somewhat (unused vars, etc)
+
+Fri Feb 20 18:36:29 1998  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-man2html/gnome-man2html.c: Sync default manpath with those
+	places searched by toc.c
+
+1998-02-19  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* sample.c (main): Added ap_id "gnome_help_sample".
+
+	* gnome-help-browser.c: Added app_id "gnome_help_browser".
+
+Sat Feb 14 01:54:28 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (LDADD): Don't include LEXLIB, XF86MISC_LIBS.  Do
+	include INTLLIBS.
+	(install-data-local): Removed.
+	(help_DATA): New macro.
+	(INCLUDES): Removed `../..' and `$(srcdir)/../..'.
+

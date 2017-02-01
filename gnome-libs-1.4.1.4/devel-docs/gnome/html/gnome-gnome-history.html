@@ -1,0 +1,707 @@
+<HTML
+><HEAD
+><TITLE
+>gnome-history</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Library Reference Manual"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Gnome Library"
+HREF="libgnome.html"><LINK
+REL="PREVIOUS"
+TITLE="gnome-help"
+HREF="gnome-gnome-help.html"><LINK
+REL="NEXT"
+TITLE="gnome-i18n"
+HREF="gnome-gnome-i18n.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>Gnome Library Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnome-gnome-help.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnome.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnome-gnome-i18n.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="GNOME-GNOME-HISTORY"
+>gnome-history</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN2095"
+></A
+><H2
+>Name</H2
+>gnome-history&nbsp;--&nbsp;Keeping track of recently used documents.</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN2098"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;gnome.h&gt;
+
+
+struct      <A
+HREF="gnome-gnome-history.html#GNOMEHISTORYENTRY"
+>GnomeHistoryEntry</A
+>;
+void        <A
+HREF="gnome-gnome-history.html#GNOME-HISTORY-RECENTLY-USED"
+>gnome_history_recently_used</A
+>     (char *filename,
+                                             char *filetype,
+                                             char *creator,
+                                             char *desc);
+<GTKDOCLINK
+HREF="GLIST"
+>GList</GTKDOCLINK
+>*      <A
+HREF="gnome-gnome-history.html#GNOME-HISTORY-GET-RECENTLY-USED"
+>gnome_history_get_recently_used</A
+> (void);
+void        <A
+HREF="gnome-gnome-history.html#GNOME-HISTORY-FREE-RECENTLY-USED-LIST"
+>gnome_history_free_recently_used_list</A
+>
+                                            (<GTKDOCLINK
+HREF="GLIST"
+>GList</GTKDOCLINK
+> *alist);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2107"
+></A
+><H2
+>Description</H2
+><P
+>These functions provide ways to store and retrieve a list of
+recently used documents.  Applications need to call the
+<A
+HREF="gnome-gnome-history.html#GNOME-HISTORY-RECENTLY-USED"
+>gnome_history_recently_used</A
+>() routine with the proper arguments to
+register a file as having been recently used.  The creator field
+should be an action in the format supported by the "open" MIME type
+action (for example "program <TT
+CLASS="LITERAL"
+>f</TT
+>", or "program") to re-open the
+document.</P
+><P
+>In the following example, the file
+<TT
+CLASS="FILENAME"
+>sales.gnumeric</TT
+> will be added to the history
+of visited documents, the MIME type of the file is
+"application/x-gnumeric" and the program that will open this file is
+"gnumeric".  Finally, note that the descriptive information is
+surrounded by the <A
+HREF="gnome-gnome-i18n.html#GETTEXT-MACRO"
+>_</A
+>() macro to have this item translated to the user's
+language at runtime.</P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN2115"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>gnome_history_recently_used ("sales.gnumeric", 
+                             "application/x-gnumeric",
+                             "gnumeric",
+                             _("Load spreadsheet"));
+  </PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><P
+>The following example would keep track of recent talks with a
+user:</P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN2118"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void record_talk (char *user)
+{
+    char *message = g_strdup_printf (_("Talk to <TT
+CLASS="LITERAL"
+>s</TT
+>", user);
+
+    gnome_history_recently_used (user, "x-protocol/x-talk",
+                                 "gtalk", message);
+    g_free (message);
+}
+  </PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><P
+>To retrieve items from the history, you use the
+<A
+HREF="gnome-gnome-history.html#GNOME-HISTORY-GET-RECENTLY-USED"
+>gnome_history_get_recently_used</A
+>() function which returns a GList that
+contains <SPAN
+CLASS="STRUCTNAME"
+>GnomeHistoryEntry</SPAN
+> structures.  To
+release this list, call the
+<A
+HREF="gnome-gnome-history.html#GNOME-HISTORY-FREE-RECENTLY-USED-LIST"
+>gnome_history_free_recently_used_list</A
+>().</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2125"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2127"
+></A
+><H3
+><A
+NAME="GNOMEHISTORYENTRY"
+></A
+>struct GnomeHistoryEntry</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>struct GnomeHistoryEntry
+{
+	char *filename;		/* Name of the visited file. */
+	char *filetype;		/* MIME type of the visited file.  */
+	char *creator;		/* What program created the file.  */
+	char *desc;		/* Description of what choosing this
+				   item would do.  This is some
+				   explanatory text that might be
+				   presented to the user.  */
+};</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2132"
+></A
+><H3
+><A
+NAME="GNOME-HISTORY-RECENTLY-USED"
+></A
+>gnome_history_recently_used ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        gnome_history_recently_used     (char *filename,
+                                             char *filetype,
+                                             char *creator,
+                                             char *desc);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This routine is used to keep track of recently used file within the
+GNOME desktop.  <TT
+CLASS="PARAMETER"
+><I
+>filename</I
+></TT
+> is the file that was recently used or
+just created.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2139"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>filename</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the file name that was recently used.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>filetype</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the mime-type of the file used.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>creator</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> application that created this.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>desc</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> textual description of the application creator</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2160"
+></A
+><H3
+><A
+NAME="GNOME-HISTORY-GET-RECENTLY-USED"
+></A
+>gnome_history_get_recently_used ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="GLIST"
+>GList</GTKDOCLINK
+>*      gnome_history_get_recently_used (void);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2167"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>a GList with GnomeHistoryEntry structures with
+all of the recently used documents.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2176"
+></A
+><H3
+><A
+NAME="GNOME-HISTORY-FREE-RECENTLY-USED-LIST"
+></A
+>gnome_history_free_recently_used_list ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        gnome_history_free_recently_used_list
+                                            (<GTKDOCLINK
+HREF="GLIST"
+>GList</GTKDOCLINK
+> *alist);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Releases the list of recently used documents</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2183"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>alist</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a list with the recently used documents</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnome-gnome-help.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnome.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnome-gnome-i18n.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-help</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-i18n</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

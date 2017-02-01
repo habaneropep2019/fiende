@@ -1,0 +1,255 @@
+AC_INIT(guile-gtk)
+AM_CONFIG_HEADER(config.h)
+
+AM_INIT_AUTOMAKE(gnome-guile, 0.20)
+
+AM_MAINTAINER_MODE
+
+GNOME_COMMON_INIT
+
+AC_ISC_POSIX
+AC_PROG_CC
+AC_HEADER_STDC
+AC_ARG_PROGRAM
+AM_PROG_LIBTOOL
+
+GNOME_INIT
+
+AC_CHECK_LIB(intl, gettext)
+
+GNOME_CHECK_GUILE(fail)
+
+saved_LIBS="$LIBS"
+
+LIBS="$GNOME_LIBDIR $GNOMEUI_LIBS"
+AC_CHECK_FUNCS(gnome_canvas_points_ref)
+
+LIBS="$saved_LIBS"
+
+saved_CPPFLAGS="$CPPFLAGS"
+
+CPPFLAGS="$GNOME_INCLUDEDIR"
+AC_MSG_CHECKING(whether GtkCauldron accepts parent widget)
+AC_TRY_COMPILE(
+[
+#include "libgnomeui/gtkcauldron.h"
+],
+[
+  gtk_dialog_cauldron_parse (NULL, 0, NULL, NULL, NULL, NULL);
+],
+  AC_DEFINE(CAULDRON_TAKES_PARENT)
+  AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl ******************************
+dnl Check for Bonobo
+dnl ******************************
+try_bonobo=true
+bonobo_msg="no"
+uses_oaf=no
+build_bonobo=false
+AC_ARG_WITH(bonobo,
+	[--{with,without}-bonobo   Compile with Bonobo support or without it],
+	if test x$withval = xno; then
+		try_bonobo=false
+	fi
+)
+
+if $try_bonobo; then
+	AC_MSG_CHECKING(for Bonobo >= 0.28)
+	vers=`gnome-config --modversion bonobo | sed -e "s/bonobo-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 1000 + $2;}'`
+	if test "$vers" -ge 28; then
+		AC_MSG_RESULT(found)
+
+		dnl Check if Bonobo is OAFized
+		AC_MSG_CHECKING(if Bonobo uses OAF)
+		if ( gnome-config --libs bonobo | grep oaf ) > /dev/null 2>&1 ; then
+			using_oaf="yes"
+			bonobo_msg="yes"
+			build_bonobo=true
+		fi
+
+		AC_MSG_RESULT("$using_oaf")
+
+	else
+		AC_MSG_RESULT(not found)
+	fi
+fi
+AM_CONDITIONAL(WITH_BONOBO, $build_bonobo)
+
+dnl ******************************
+dnl Check for Gtkhtml
+dnl ******************************
+try_gtkhtml=true
+gtkhtml_msg="no"
+build_gtkhtml=false
+AC_ARG_WITH(gtkhtml,
+	[--{with,without}-gtkhtml   Compile with Gtkhtml support or without it],
+	if test x$withval = xno; then
+		try_gtkhtml=false
+	fi
+)
+
+if $try_gtkhtml; then
+	AC_MSG_CHECKING(for Gtkhtml >= 0.20)
+	vers=`gnome-config --modversion gtkhtml | sed -e "s/gtkhtml-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 1000 + $2;}'`
+	if test "$vers" -ge 2; then
+		AC_MSG_RESULT(found)
+		gtkhtml_msg="yes"
+		build_gtkhtml=true
+	else
+		AC_MSG_RESULT(not found)
+	fi
+fi
+AM_CONDITIONAL(WITH_GTKHTML, $build_gtkhtml)
+
+dnl ******************************
+dnl Check for Libglade
+dnl ******************************
+try_libglade=true
+libglade_msg="no"
+build_libglade=false
+AC_ARG_WITH(libglade,
+	[--{with,without}-libglade   Compile with Libglade support or without it],
+	if test x$withval = xno; then
+		try_libglade=false
+	fi
+)
+
+if $try_libglade; then
+	AC_MSG_CHECKING(for Libglade >= 0.14)
+	vers=`gnome-config --modversion libglade | sed -e "s/libglade-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 1000 + $2;}'`
+	if test "$vers" -ge 14; then
+		AC_MSG_RESULT(found)
+		libglade_msg="yes"
+		build_libglade=true
+	else
+		AC_MSG_RESULT(not found)
+	fi
+fi
+AM_CONDITIONAL(WITH_LIBGLADE, $build_libglade)
+
+dnl ******************************
+dnl Check for gdkpixbuf
+dnl ******************************
+try_gdkpixbuf=true
+gdkpixbuf_msg="no"
+build_gdkpixbuf=false
+AC_ARG_WITH(gdkpixbuf,
+	[--{with,without}-gdkpixbuf   Compile with gdk-pixbuf support or without it],
+	if test x$withval = xno; then
+		try_gdkpixbuf= false
+	fi
+)
+
+if $try_gdkpixbuf; then
+	AC_MSG_CHECKING(for gdk-pixbuf >= 0.9)
+	vers=`gnome-config --modversion gdk_pixbuf | sed -e "s/gdk-pixbuf-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 1000 + $2;}'`
+	if test "$vers" -ge 9; then
+		AC_MSG_RESULT(found)
+		gdkpixbuf_msg="yes"
+		build_gdkpixbuf=true
+	else
+		AC_MSG_RESULT(not found)
+	fi
+fi
+AM_CONDITIONAL(HAVE_GDK_PIXBUF, $build_gdkpixbuf)
+
+dnl ******************************
+dnl Check for ghttp
+dnl ******************************
+try_ghttp=true
+ghttp_msg="no"
+build_ghttp=false
+AC_ARG_WITH(ghttp,
+	[--{with,without}-ghttp   Compile with ghttp support or without it],
+	if test x$withval = xno; then
+		try_ghttp= false
+	fi
+)
+
+if $try_ghttp; then
+	AC_MSG_CHECKING(for ghttp >= 1.0)
+	vers=`gnome-config --modversion gdk_pixbuf | sed -e "s/ghttp-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 1000 + $2;}'`
+	if test "$vers" -ge 0; then
+		AC_MSG_RESULT(found)
+		ghttp_msg="yes"
+		build_ghttp=true
+	else
+		AC_MSG_RESULT(not found)
+	fi
+fi
+AM_CONDITIONAL(HAVE_GHTTP, $build_ghttp)
+
+
+dnl ******************************
+dnl Check for gal
+dnl ******************************
+try_gal=false
+gal_msg="no"
+build_gal=false
+AC_ARG_WITH(gal,
+	[--{with,without}-gal   Compile with gal support or without it],
+	if test x$withval = yes; then
+		try_gal= true
+	fi
+)
+
+if $try_gal; then
+	AC_MSG_CHECKING(for gal >= 0.2.1.1)
+	vers=`gnome-config --modversion gal | sed -e "s/gal-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 1000 + $2;}'`
+	if test "$vers" -ge 2; then
+		AC_MSG_RESULT(found)
+		gal_msg="yes"
+		build_gal=true
+	else
+		AC_MSG_RESULT(not found)
+	fi
+fi
+AM_CONDITIONAL(HAVE_GAL, $build_gal)
+
+CPPFLAGS="$saved_CPPFLAGS"
+
+AC_CONFIG_SUBDIRS(guile-gtk)
+
+AC_OUTPUT([
+gnome-guile.spec
+Makefile
+guile-gnome/Makefile
+guile-gnome/bonobo/Makefile
+guile-gnome/gal/Makefile
+guile-gnome/gdk-pixbuf/Makefile
+guile-gnome/ghttp/Makefile
+guile-gnome/gtkhtml/Makefile
+guile-gnome/libglade/Makefile
+guile-gnome/zvt/Makefile
+])
+
+echo "
+
+Configuration:
+
+	Source code location:	${srcdir}
+	
+	Bonobo Support:		${bonobo_msg}
+	Ghttp Support:          ${ghttp_msg}
+	Gtkhtml Support:	${gtkhtml_msg}
+	Gdk-Pixbuf Support:     ${gdkpixbuf_msg}
+	Gal Support:            ${gal_msg}
+	Libglade Support:	${libglade_msg}
+"
+if $build_bonobo; then
+	echo "
+	The Bonobo version of gnome-guile is not supported,
+	this code is changing extremely rapidly. For any given
+	release it may not compile or depend on unreleased packages.
+
+	Please do not file bonobo related bug reports.
+"
+fi

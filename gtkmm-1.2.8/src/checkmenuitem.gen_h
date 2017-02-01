@@ -1,0 +1,109 @@
+/* $Id: checkmenuitem.gen_h,v 1.51 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* checkmenuitem.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/menuitem.h>
+#include <gtk/gtkcheckmenuitem.h>
+
+CLASS_START(Gtk);
+//: A menu item with a check box.
+//- A {\class Gtk::CheckMenuItem} is a menu item that maintains the state of a boolean value in
+//- addition to a {\class Gtk::MenuItem}'s usual role in activating application code.
+//-
+//- A check box indicating the state of the boolean value is displayed at the left
+//- side of the GtkMenuItem. Activating the GtkMenuItem toggles the value.
+class CheckMenuItem : public MenuItem {
+  WRAP_CLASS(CheckMenuItem,GtkCheckMenuItem,GTK_CHECK_MENU_ITEM,GTK_IS_CHECK_MENU_ITEM,check_menu_item,Gtk::MenuItem,GtkMenuItem,GTK_MENU_ITEM);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Creates a new GtkCheckMenuItem with a label.
+  //- label: The string to use for the label.
+  explicit CheckMenuItem(const string &label,gfloat x=0.0,gfloat y=0.5);
+
+  WRAP_MEMBER(value,active,active,guint,guint);
+
+  //: Sets the active state of the menu item's check box.
+  //- state: Boolean value indicating whether the check box is active.
+  WRAP_METHOD(void gtk_check_menu_item_set_active(GtkCheckMenuItem *,gboolean),
+	      void set_active      (bool state=true));
+
+  //: Get's the active state of the widget.
+  bool is_active()          const { return gtkobj()->active; }
+  bool always_show_toggle() const { return gtkobj()->always_show_toggle; }
+
+  //: Controls whether the check box is shown at all times.
+  //- Normally the check box is shown only when it is active or while the menu item is selected.
+  //-
+  //- always: Boolean value indicating whether to always show the check box.
+  WRAP_METHOD(void gtk_check_menu_item_set_show_toggle(GtkCheckMenuItem *,gboolean),
+	      void set_show_toggle (bool always));
+
+  //- Triggered when the item changes state
+  //- (Note : changing the item's state with {set_active()}
+  //- will also trigger this signal).
+  SIGNAL_SPEC("toggled",both,void toggled(),gtk_check_menu_item_toggled);
+
+  //- Triggered when the item is redrawn (e.g.after being toggled)
+  //- Overload this signal if you want to implement your own check item
+  //- look. Otherwise, you most likely don't care about it.
+  //- The GdkRectangle specifies the area of the widget which will get
+  //- redrawn.
+  SIGNAL_SPEC("draw_indicator",impl,void draw_indicator(GdkRectangle*));
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/menuitem_p.h>
+IMPL_START;
+#include <gtk--/misc.h>
+#include <gtk--/label.h>
+
+namespace Gtk
+{
+
+  CheckMenuItem::CheckMenuItem(const string &label,gfloat x,gfloat y)
+    : MenuItem((GtkMenuItem*)(gtk_object_new(get_type(),0)))
+  {
+    initialize_class();
+    add_label(label,x,y);
+  }
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_CheckMenuItem)
+//. name: active
+//. type: bool
+//. get: none
+//. set: {set_active()}
+//. desc: Whether the item is checked or not
+
+//. name: always_show_toggle
+//. type: bool
+//. get: none
+//. set: {set_show_toggle()}
+//. desc: Whether the toggle indicator is always drawn or only when the
+//. item is highlighted
+

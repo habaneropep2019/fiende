@@ -1,0 +1,340 @@
+// -*- C++ -*-
+/* $Id: canvas-item.gen_h,v 1.48 2001/06/06 19:16:26 murrayc Exp $ */
+
+/* canvas-item.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/object.h>
+#include <libgnomeui/gnome-canvas.h>
+
+//Art:
+#include <gnome--/point.h>
+#include <gnome--/affinetrans.h>
+#include <gnome--/canvas-property.h>
+
+CLASS_START(Gnome);
+class Canvas;
+class CanvasGroup;
+struct CanvasItem_private;
+
+class CanvasItem : public Gtk::Object
+{
+  WRAP_CLASS(CanvasItem, GnomeCanvasItem,
+             GNOME_CANVAS_ITEM, GNOME_IS_CANVAS_ITEM,
+             canvas_item,
+             Gtk::Object, GtkObject, GTK_OBJECT);
+
+  friend class Gnome::CanvasHelpers::Properties;
+public:
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //:  Move an item by the specified amount
+  WRAP_METHOD(void gnome_canvas_item_move (GnomeCanvasItem*, double, double),
+	      void move (double dx, double dy));
+
+  //: Raise an item in the z-order of its parent group by the specified
+  //: number of positions.  If the number is zero, then the item will
+  //: be made the topmost of its parent group.
+  WRAP_METHOD(void gnome_canvas_item_raise (GnomeCanvasItem*, int),
+	      void raise (int positions));
+
+  //: Lower an item in the z-order of its parent group by the specified
+  //: number of positions.  If the number is zero, then the item will be
+  //: made the bottommost of its parent group.  */
+  WRAP_METHOD(void gnome_canvas_item_lower (GnomeCanvasItem*, int),
+	      void lower (int positions));
+
+  //: Raise an item to the top of its parent group's z-order.
+  WRAP_METHOD(void gnome_canvas_item_raise_to_top (GnomeCanvasItem*),
+	      void raise_to_top ());
+
+  //: Lower an item to the bottom of its parent group's z-order
+  WRAP_METHOD(void gnome_canvas_item_lower_to_bottom (GnomeCanvasItem*),
+	      void lower_to_bottom ());
+
+  //: Grab the mouse for the specified item.  Only the events in
+  //: event_mask will be reported.  If cursor is non-NULL, it will be
+  //: used during the duration of the grab.  Time is a proper X event
+  //: time parameter.  Returns the same values as XGrabPointer().
+  int grab (unsigned int event_mask, const Gdk_Cursor &cursor, guint32 etime);
+
+  //: deprecated
+  int grab (unsigned int event_mask, GdkCursor *cursor, guint32 etime);
+
+  //: Ungrabs the mouse -- the specified item must be the same that was
+  //: passed to gnome_canvas_item_grab().  Time is a proper X event
+  //: time parameter. 
+  WRAP_METHOD(void gnome_canvas_item_ungrab (GnomeCanvasItem*, guint32),
+	      void ungrab (guint32 etime));
+
+  //: These functions convert from a coordinate system to another.  "w"
+  //: is world coordinates and "i" is item coordinates. 
+  WRAP_METHOD(void gnome_canvas_item_w2i (GnomeCanvasItem*, double*, double*),
+	      void w2i (double& x, double& y));
+  WRAP_METHOD(void gnome_canvas_item_i2w (GnomeCanvasItem*, double*, double*),
+	      void i2w (double& x, double& y));
+
+  //: Used to send all of the keystroke events to a specific item as well 
+  //: as GDK_FOCUS_CHANGE events.
+  WRAP_METHOD(void gnome_canvas_item_grab_focus (GnomeCanvasItem*),
+	      void grab_focus ());
+
+  //: Fetch the bounding box of the item.  The bounding box may not be 
+  //: exactly tight, but the canvas items will do the best they can.
+  WRAP_METHOD(void gnome_canvas_item_get_bounds (GnomeCanvasItem *,
+						 double*, double*,
+						 double*, double*),
+	      void get_bounds (double& x1, double& y1,
+			       double& x2, double& y2));
+
+  //: Make the item visible
+  WRAP_METHOD(void gnome_canvas_item_show (GnomeCanvasItem*),
+	      void show());
+  
+  //: Hide the item
+  WRAP_METHOD(void gnome_canvas_item_hide (GnomeCanvasItem*),
+	      void hide());
+
+  //: Apply a relative affine transformation to the item 
+  void affine_relative (const Art::AffineTrans &affine);
+
+  //: Apply an absolute affine transformation to the item
+  void affine_absolute (const Art::AffineTrans &affine);
+
+
+  //  // Those are present in the header file but not in the libgnomeui library !
+  //  //: Scale an item about a point by the specified factors
+  //  WRAP_METHOD(void gnome_canvas_item_scale (GnomeCanvasItem *, double,
+  //                                         double, double, double),
+  //           void scale(double x, double y, double scale_x, double scale_y));
+  //
+  //  //: Rotate an item about a point by the specified number of degrees
+  //  WRAP_METHOD(void gnome_canvas_item_rotate (GnomeCanvasItem *, double,
+  //                                          double, double),
+  //           void rotate(double x, double y, double angle));
+
+  //: Gets the affine transform that converts from item-relative
+  //: coordinates to world coordinates
+  Art::AffineTrans get_i2w_affine() const;
+
+  //: Gets the affine transform that converts from item-relative
+  //: coordinates to canvas pixel coordinates
+  Art::AffineTrans get_i2c_affine() const;
+            
+
+
+  //: Returns the canvas we're on.
+  WRAP_MEMBER(value,canvas, canvas, Gnome::Canvas*, GnomeCanvas*);
+
+  //: Returns the parent canvas item - could be 0 for root item
+
+  // Commented out for now, because there an interdependency with
+  // Gnome::CanvasGroup which I don't know how to solve yet. - GL
+
+  WRAP_MEMBER(value, parent, parent, Gnome::CanvasGroup*, GnomeCanvasItem*);
+
+  
+  //: Tell the item to update itself.  The flags are from the update flags
+  //: defined above.  The item should update its internal state from its
+  //: queued state, recompute and request its repaint area, etc.  The
+  //: affine, if used, is a pointer to a 6-element array of doubles.
+  SIGNAL_SPEC("update", both, void update(double*,ArtSVP*,int));
+
+//   //: Realize an item -- create GCs, etc. 
+  SIGNAL_SPEC("realize", both, void realize());
+  
+//   //: Unrealize an item 
+  SIGNAL_SPEC("unrealize", both, void unrealize());
+  
+//   //: Map an item - normally only need by items with their own GdkWindows 
+  SIGNAL_SPEC("map", both, void map());
+  
+//   //: Unmap an item 
+  SIGNAL_SPEC("unmap", both, void unmap());
+
+//   //: Return the microtile coverage of the item
+  SIGNAL_SPEC("coverage", both, ArtUta* coverage());
+  
+//   //: Draw an item of this type.  (x, y) are the upper-left canvas
+//   //: pixel coordinates of the drawable, a temporary pixmap,
+//   //: where things get drawn.  (width, height) are the dimensions
+//   //: of the drawable.  
+
+  SIGNAL_SPEC("draw", both, void draw(GdkDrawable*,int,int,int,int));
+
+//   //: Calculate the distance from an item to the specified point.  It
+//   //: also returns a canvas item which is the item itself in the case
+//   //: of the object being an actual leaf item, or a child in case of
+//   //: the object being a canvas group.  (cx, cy) are the canvas pixel
+//   //: coordinates that correspond to the item-relative coordinates (x,
+//   //: y). 
+
+//   SIGNAL_SPEC("point", vfunc,
+// 	      double point(double,double,int,int,Gnome::CanvasItem**),
+// 	      double point(GnomeCanvasItem*, double,double,int,int,GnomeCanvasItem**));
+  
+//   //: Move an item by the specified amount 
+  SIGNAL_SPEC("translate", both, void translate(double,double));
+
+//   //: Fetch the bounding box of the item
+  SIGNAL_SPEC("bounds", both, void bounds(double*,double*,double*,double*));
+  
+  //: Signal: an event ocurred for an item of this type.  The (x, y)
+  //: coordinates are in the canvas world coordinate system.  
+  SIGNAL_SPEC("event", both|marsh, gint event(GdkEvent*));
+
+protected:
+  
+  //- For class children use only
+  void item_construct(const CanvasGroup &parent);
+
+  //- Unsafe version - can't use a _gtk_string here, C++ doesn't like
+  //- classes being passed before ellipses ('...') args
+  void item_construct(const CanvasGroup &parent,
+                      const gchar* first_arg_name,
+                      va_list ap);
+
+  //- Set arguments - For class children use only
+  void set(const gchar *first_arg_name, ...);
+  
+};
+
+PRIVATE_START;
+#include <gtk--/private/object_p.h>
+IMPL_START;
+#include <gnome--/private/canvas-item_p.h>
+
+/* canvas-item.cc
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+extern "C" 
+{
+#include <stdarg.h>
+}
+#include <gnome--/canvas.h>
+#include <gnome--/canvas-group.h>
+
+namespace Gnome
+{
+
+void
+CanvasItem::item_construct(const CanvasGroup &parentx)
+{
+  gnome_canvas_item_constructv(GNOME_CANVAS_ITEM(gtkobj()),
+                              GNOME_CANVAS_GROUP(parentx.gtkobj()),
+                              0, NULL);
+}
+
+void
+CanvasItem::item_construct(const CanvasGroup &parentx,
+                                 const gchar* first_arg_name,
+                                 va_list ap)
+{
+  gnome_canvas_item_construct(GNOME_CANVAS_ITEM(gtkobj()),
+                              GNOME_CANVAS_GROUP(parentx.gtkobj()),
+                              first_arg_name,
+                              ap);
+}
+
+void 
+CanvasItem::set(const gchar *first_arg_name, ...)
+{
+  va_list args;
+  va_start(args,first_arg_name);
+  gnome_canvas_item_set_valist(gtkobj(), first_arg_name, args);
+  va_end(args);
+}
+
+//:  Move an item by the specified amount
+
+//: Grab the mouse for the specified item.  Only the events in
+//: event_mask will be reported.  If cursor is non-NULL, it will be
+//: used during the duration of the grab.  Time is a proper X event
+//: time parameter.  Returns the same values as XGrabPointer().
+int
+CanvasItem::grab (unsigned int event_mask, const Gdk_Cursor &cursor,
+			guint32 etime)
+{
+  return gnome_canvas_item_grab(gtkobj(),event_mask,cursor.gdkobj(),etime);
+}
+
+//:  Move an item by the specified amount
+
+//: deprecated
+int 
+CanvasItem::grab (unsigned int event_mask, GdkCursor *cursor, 
+			guint32 etime)
+{
+  return gnome_canvas_item_grab(gtkobj(),event_mask,cursor,etime);
+}
+
+void
+CanvasItem::affine_relative (const Art::AffineTrans &affine)
+{
+  gnome_canvas_item_affine_relative (gtkobj(), affine.obj());
+}
+
+void
+CanvasItem::affine_absolute (const Art::AffineTrans &affine)
+{
+  gnome_canvas_item_affine_absolute (gtkobj(), affine.obj());
+}
+
+Art::AffineTrans
+CanvasItem::get_i2w_affine() const
+{
+  double tmp[6] = {0};
+  
+  gnome_canvas_item_i2w_affine(const_cast<GnomeCanvasItem*>(gtkobj()), tmp);
+  return Art::AffineTrans(tmp);
+}
+
+Art::AffineTrans
+CanvasItem::get_i2c_affine() const
+{
+  double tmp[6] = {0};
+  
+  gnome_canvas_item_i2c_affine(const_cast<GnomeCanvasItem*>(gtkobj()), tmp);
+  return Art::AffineTrans(tmp);
+}
+
+
+
+} /* namespace Gnome */

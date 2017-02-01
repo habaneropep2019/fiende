@@ -1,0 +1,690 @@
+2002-01-06  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_menu.c (create_task_item): Left-justify the menu items;
+	this is much more readable. Fixes #68104.
+
+Mon May 28 23:37:46 2001  George Lebl <jirka@5z.com>
+
+         * Applying patch:
+
+Sun May 27 16:14:44 2001  Michal Palczewski <mpalczew@u.washington.edu>
+
+        * tasklist_icon.c: fix memory leak in  
+
+Tue May 08 12:35:47 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch], tasklist_config.c, tasklist_properties.c:
+	  Apply patch from Cory Lueninghoener <cluening@cse.unl.edu> to fix
+	  bug #28149 which adds the option of the sunken border which a bunch
+	  of people preferred over the flat look.
+
+2001-04-26  Anders Carlsson  <andersca@codefactory.se>
+
+	* tasklist_applet.c (cb_motion_timeout): Don't try to show
+	tasks that are actually task groups in the timeout.
+	This fixes #53647.
+
+Sun Apr 22 16:42:52 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch], tasklist_menu.c, tasklist_config.c,
+	  tasklist_properties.c:  Add tooltips to tasks.  The code
+	  does some pretty evil things with GtkTooltips, take a look
+	  if you enjoy this kind of stuff.
+
+	* tasklist_menu.c:  The maximum length of labels on group menus
+	  is third of screen width.  The problem was that if you had
+	  many things on your tasklist the menu became useless (or on
+	  a vertical panel).
+
+Sun Apr 22 00:25:04 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c, tasklist_icon.c:  Avoid races by properly
+	  pushing the error trap and add a gdk_flush before a pop in the
+	  icon code.  This fixes issues with XView windows.
+
+Tue Apr 17 13:59:01 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c: fix a crash that could possibly happen when
+	  the get_label is called on an empty group or a task with no
+	  class.  Plus fixup some whacky mem management by "oh horrors" doing
+	  one g_strdup/g_free extra.  Also when the name is NULL, use "???"
+	  and always do the full deal on the label rather then returning
+	  before we set the iconified [] things or whatnot.
+
+Mon Mar 12 15:07:40 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.gnorba: make it exe not shlib, so that it loads
+	  now again.
+
+Mon Mar 12 14:52:32 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c: when sorting tasks and the groups are the same
+	  sort by the x window id to make sure tasks don't jump around.
+
+2001-03-12  Anders Carlsson  <andersca@codefactory.se>
+
+	* tasklist_applet.gnorba: change location_info to point to
+	  the process instead of the shlib.
+
+	* tasklist_applet.c: define APPLET_COMPILE_AS_PROCESS and make
+	  it actually compile.
+	  (tasklist_destroy): "Fix" a warning.
+
+	* Makefile.am: Make the tasklist a process again, since the
+	  shlib version currently leaks and is weird.
+
+Mon Mar 12 01:27:24 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch], tasklist_properties.c, tasklist_icon.c:
+	  Don't crash on remove from panel, don't redraw tasks when just
+	  geometry changed, redraw only when needed, change size when it has
+	  actually changed, not depending on random stack data, fix some
+	  leaks when removing tasklist but it still leaks quite horribly.
+	  Null things when freed to avoid crashes.  Notice icon changes
+	  again.  Add sarcastic #warning.
+
+2001-03-09  Jaka Mocnik  <jaka@gnu.org>
+
+	* tasklist/tasklist_applet.c (tasklist_task_get_label): return
+	empty string if task name is NULL. this prevents occasional
+	segfaults.
+
+2001-03-04 John Fleck <jfleck@inkstain.net>
+
+	* help/C/tasklist.sgml, help/C/tasklist_applet.sgml, plus
+	screenshots - add discussion of task grouping to docs, update
+	screenshots 
+
+2001-03-02  Anders Carlsson  <andersca@codefactory.se>
+
+	* tasklist_applet.h: Add about box to Tasklist struct.
+
+	* tasklist_applet.c (cb_about): Use tasklist->about_dialog here.
+	(tasklist_destroy): Destroy the property and about dialogs.
+
+Sun Feb 25 21:27:25 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c: Use destroy not unref for menu, since it needs
+	  to be actually destroyed in case there was another refcount.  When
+	  a task is destroyed, set the "task" data on the menuitem to NULL,
+	  and hide it.  (destroying makes thing go nuts a bit)
+
+	* tasklist_menu.c: handle cases where "task" is NULL, and make sure
+	  to update ->menuitem on task after the item is destroyed.  Also
+	  don't leak the pixmaps
+
+2001-02-14  Anders Carlsson  <andersca@codefactory.se>
+
+	* tasklist_menu.c (do_action): Don't segfault when trying to
+	kill programs that have already been killed once. 
+	This fixes bugzilla bug #10874.
+
+Tue Feb 13 05:00:44 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_menu.c: make sure menu doesn't go off screen.
+
+Mon Feb 12 21:25:33 2001  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch], tasklist_menu.c, pixmaps.h: Remove some
+	  unused code, fix warnings, remove function casts (they are evil)
+	  and add wrappers instead.  Compiles without warning now.
+
+	* tasklist_applet.c: In a fit of vanity, added self to the about box,
+	  though at the bottom, so I don't feel like a total asshole.  While
+	  I was looking through the function added my own touch of anality
+	  and some null checking.
+
+2001-02-04  Anders Carlsson  <andersca@codefactory.se>
+
+	* tasklist_menu.c (cb_activate_task): Add function.
+	(create_task_item): Make it possible to click-drag in a menu
+	to activate a task.
+
+	* tasklist_applet.c (real_layout_tasklist): If width > specified,
+	set width = specified.
+
+2001-01-30  jacob berkman  <jacob@ximian.com>
+
+	* tasklist_menu.c (tasklist_group_popup):
+	(create_task_item): add a seperator to the menu; tasks on the
+	current desktop are before, tasks not on after (like that foobar
+	task list)
+
+2001-01-24  jacob berkman  <jacob@ximian.com>
+
+	* tasklist*.[ch]: add shlibification and grouping by wmclass
+
+2000-12-21  Richard Hult  <rhult@codefactory.se>
+
+	* tasklist_applet.c (lexographic_compare_func): Sort correctly
+	even if one of the tasks has no name (instead of just crashing).
+
+Wed Dec 20 15:25:02 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch], tasklist_config.c, tasklist_properties.c:
+	  Add an option so that the re-size never pushes other applets if
+	  dynamic mode is on.
+
+Wed Dec 20 14:27:54 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch], tasklist_config.c, tasklist_properties.c:
+	  Fixups, optimizations of X traffic (this still needs work).  Add
+	  BeOS like deskbar (I think) sort of mode.  In vertical mode you can
+	  have the width be that of the longest window title.  So all you
+	  have to do to achieve this is to smack an aligned vertical
+	  panel there, make height dynamic and use this setting and voila!
+
+Wed Dec 13 19:17:27 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c, tasklist_applet.h, tasklist_config.c,
+	  tasklist_properties.c:  Apply a very slightly modified patch
+	  from John Heidemann <johnh@isi.edu> to keep tasks sorted
+	  optionally, and turn it on by default since it's pretty cool
+	  to do so actually.
+
+Tue Dec 05 20:09:51 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c: bind signals on applet-widget before we call
+	  applet_widget_add to avoid a race.
+
+Wed Nov 15 00:14:47 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_icon.c:  Fixed possible crash and a leak and push/pop trap
+	  which fixes crashes with non-gnome-wm
+
+2000-10-22  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c: Add patch from Eric Brayeur that gives
+	 tasks focus on drag-and-drop.
+
+Wed Sep 27 21:10:23 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c: fix leaks from the get_visible_tasks.  Fix
+	  weird loops.  The horiz_rows is now returning > 0 value always,
+	  just to make sure that we don't crash on an ultratiny panel.
+
+2000-09-24  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (layout_tasklist): Prevent segfaulting
+	when using ultra tiny panels.
+
+2000-05-21  Jacob Berkman  <jacob@helixcode.com>
+
+	* tasklist_icon.c (tasklist_icon_create_minimized_icon): don't
+	make minimized icons so faint
+
+2000-05-09  Jacob Berkman  <jacob@helixcode.com>
+
+	* tasklist_icon.c (tasklist_icon_get_pixmap): gets the WM_HINT
+	(tasklist_icon_check_x): don't leak memory
+	(tasklist_icon_set): check the WMHint icon before KDE
+
+	* tasklist_applet.h (TasklistTask): add a Pixmap field
+
+	* tasklist_applet.c (task_notifier): change the icon when it gets changed
+	(task_notifier): initialize the icon
+
+Sat May 06 00:14:01 2000  George Lebl <jirka@5z.com>
+
+	* unknown.xpm: add const so that we don't have to cast inside source
+
+	* tasklist_applet.c: put in gtk_paint_flat_box with no shadow so that
+	  we actually clear old tasks.  minimize flicker by only drawing
+	  what's being exposed, including only drawing tasks that are being
+	  exposed.
+
+2000-05-04  Jacob Berkman  <jacob@helixcode.com>
+
+	* tasklist_icon.c: 
+	* tasklist_applet.c: show icons as 20x20, and get rid of the extra
+	in shadow.  Also set the default window icon
+
+2000-04-24  Fatih Demir	<kabalak@gmx.net>
+	
+	* tasklist_applet.desktop : Added [tr] section
+
+2000-04-23  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_icon.c (tasklist_icon_check_x): Prevent up2date from
+	crashing the tasklist. The _real_ bug has to be fixed somewhere else
+	though.
+
+2000-04-22 John Fleck <jfleck@inkstain.net>
+
+	* updated tasklist-fig.png to reflect wmhint icon support
+
+2000-04-16  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_properties.c (cb_spin_button): connect to "changed" on the
+	spin button instead of the adjustment. This fixes bug #9053.
+
+2000-04-15  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.h: Remove mask from TasklistIcon since we now use
+	gdk_pixbuf_render_to_drawable_alpha.
+
+	* tasklist_properties.c: Add <config.h> for correct i18n stuff.
+
+	* tasklist_applet.c: Use the new code.
+
+	* tasklist_icon.c: New file with icon getting routines. 
+
+2000-04-15  Eric Baudais  <baudais@okstate.edu>
+
+	* help/C/tasklist-applet.sgml: Added a bit about trademarks.
+
+2000-04-13  Eric Baudais  <baudais@okstate.edu>
+
+	*help/C/*.sgml: Updated the docs to the 1.x template.
+
+2000-04-12  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c: Update for new GdkPixbuf.
+
+2000-04-04  Jacob Berkman  <jacob@helixcode.com>
+
+	* tasklist_properties.c (phelp_cb): use correct anchor
+
+2000-04-03  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.[ch],tasklist_config.c, tasklist_properties.c:
+	Add an option to move to switch workspace when restoring a task
+	that is on another workspace.
+
+Fri Mar 03 00:03:58 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch],tasklist_menu.c: add a menu field to the
+	  task structure and destroy the menu when the task dies.  Fixes
+	  bug #6780
+
+2000-02-28  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (draw_task): Get the drawing done right this time.
+
+2000-02-25  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (draw_task): Draw text with fg_gc[0] instead of
+	black_gc.
+
+2000-02-23  Peter Hawkins  <peterhawkins@ozemail.com.au>
+
+	* tasklist_applet.c: stopped about box being opened many times at once.
+
+2000-02-22  Andreas Hyden  <andreas.hyden@telia.com>
+
+	* tasklist_menu.c: Marked string for translation.
+
+2000-02-21  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (change_size): Fix a bug with
+	dynamic resizing. I'm not sure if this is the correct way
+	but it seems to work :)
+
+Sun Feb 20 01:27:12 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c: ok, the previous commit was bogus.  After
+	  some investigation I found out the initial sizing was very
+	  confused.  Some reordering made the area correctly size before
+	  being exposed and thus killing the initial redraw bug
+
+Sun Feb 20 00:33:49 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c: draw ourselves on "realize" to avoid the bug
+	  where we don't get drawn on startup
+
+Thu Feb 17 21:20:16 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.c: don't leak the minicons pixbufs.  Also don't
+	  crash when a window is destroyed too quickly in which we will
+	  only get a DESTROY from gwmh and never a NEW
+
+
+2000-02-17 TANIGUCHI Toru <g97p0639@mn.waseda.ac.jp>
+
+        * tasklist_applet.c (fixup_task_label): fix i18n problem by
+          using GdkWchar.
+
+2000-02-13  Peter Hawkins <peterhawkins@ozemail.com.au>
+	* Fixed a couple of minor memory leaks, stopped Preferences dialog from
+	  being opened multiple times.
+
+2000-02-06  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (draw_task): Change the icon handling
+	routines to actually handle the icon's width and height
+	so that it'll display small icons correctly.
+
+Thu Jan 27 17:14:57 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch],tasklist_config.c,tasklist_properties.c: Add
+	  a new configuration field, follow_panel_size which is on by
+	  default.  If so then the horizontal rows and vertical width are
+	  autocalculated and the tasklist follows the size hints.  On the
+	  properties page kill the binding of "changed" on the spin button
+	  as that was not working right (it was casting spinbutton to
+	  adjustment).  Also for many of the signals follow the correct
+	  prototype.
+
+2000-01-27  Ettore Perazzoli  <ettore@helixcode.com>
+
+	* Makefile.am: Oops, the previous change was wrong.  Fixed.
+
+2000-01-26  Ettore Perazzoli  <ettore@helixcode.com>
+
+	* Makefile.am (gstc.c): Fix compilation with build directory !=
+	source directory by copying the file into the build directory,
+	instead of the source directory.
+	(gwmh.c): Likewise.
+
+2000-01-25  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (cb_button_press_event): Fix focus problem
+
+2000-01-07  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (task_notifier): Use gdk-pixbuf to get mini icons
+	  from programs that support it
+
+Wed Jan 05 16:09:39 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.[ch],tasklist_menu.c: fix minor warnings, make
+	  some functions static, and comment out unused variables
+
+	* tasklist_applet.c: don't include gwhm.c and gstc.c but just include
+	  their headers
+
+	* Makefile.am,.cvsignore: add exlicit rules for gwmh.c and gstc.c so
+	  they get copied out of ../desk-guide when needed and compile them as
+	  separate files. Also add them to .cvsignore
+
+Tue Jan 04 00:21:16 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_applet.desktop: use the PanelApplet dentry type
+
+Tue Jan 04 00:07:56 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_config.c: if the desktop is 800 exactly still start
+	  at 300 wide, not 450
+
+Sun Jan 02 02:07:23 2000  George Lebl <jirka@5z.com>
+
+	* tasklist_config.c: made the horizontal size default to 300 if the
+	  screen width is less then 800 otherwise to 450 as usual, makes the
+	  default panel config look nice on a 640x480 screen
+
+1999-12-10  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* tasklist_applet.c (task_notifier): #if 0 the KWM mini icons
+	for now, so it can compile
+
+1999-12-04  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (cb_button_press_event): Show the task twice
+	if it's iconified.
+
+1999-11-15  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c: Make KWM mini icons work again.
+
+1999-11-15  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c
+	  tasklist_applet.h: Finally, different icon for minimized windows.
+
+1999-11-14  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c: Use GdkPixbuf for drawing mini icons.
+
+1999-11-13  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (cb_button_press_event): Don't switch desktops
+	if "Show minimized windows on all desktops" is enabled
+
+1999-10-30  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_properties.c (create_size_page): Increase the tasklist
+	width to 8192 for people that use xinerama.
+
+1999-10-30  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c: Make "switch desktop" flicker less when
+	"Show all tasks on all desktops" is set.
+
+1999-10-24  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (fixup_task_label): Display iconified windows
+	differently
+
+1999-10-20  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_properties.c: Change property dialog to be more 
+	user friendly
+
+1999-10-19  Ian Peters  <itp@gnu.org>
+
+	* TODO: added feature request
+
+1999-10-18  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* TODO: new file
+
+1999-10-02  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_properties.c: Make spin buttons have the same size
+
+1999-09-30  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c: Fixed sizing bug by always resizing on full
+	layout.
+
+1999-09-27  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (is_task_visible): check for harea and varea
+	as well as current desktop
+
+1999-09-23  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_menu.c: #if 0 out the send to desktop feature since it 
+	  gives strange results with some window managers :-/
+
+Wed Sep 22 01:08:36 1999  Tim Janik  <timj@gtk.org>
+
+	* tasklist_applet.c (cb_button_press_event): unconditionally change
+	the current area to the one the activated task is on. we don't need
+	any special casing for inconified tasks btw.
+
+Wed Sep 22 00:40:41 1999  Tim Janik  <timj@gtk.org>
+
+	* tasklist_menu.c (cb_menu): make it compile (s/task/current_task/).
+	* tasklist_applet.c (cb_button_press_event): 
+	eliminated bogus gwmh_task_show() call.
+
+	* tasklist_menu.c (cb_to_desktop): cure compiler (we don't
+	return a value).
+
+1999-09-21  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c
+	  tasklist_menu.c: Added patch from Tim Janik
+
+1999-09-21 Elliot Lee <sopwith@redhat.com>
+
+	* Makefile.am: Include gnome-tasklist.png in EXTRA_DIST
+
+1999-09-21  Anders Carlsson  <andersca@gnu.org>
+
+	* tasklist_applet.c (cb_about): Changed my e-mail
+
+1999-09-19  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* pixmaps.h
+	  tasklist_menu.c: Added spooky skull for "kill"
+
+1999-09-18  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* gnome-tasklist.png
+	  tasklist_applet.desktop: Added applet icon
+
+1999-09-18  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c: Fixed a small bug with the handle
+
+1999-09-18  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* pixmaps.h
+	  tasklist_menu.c: Added nifty and good looking menu icons by tigert
+
+1999-09-18  Richard Hult  <rhult@hem2.passagen.se>
+
+	* tasklist_properties.c (create_spin_button): Make OK sensitive
+	when the value is changed.
+
+1999-09-17  Richard Hult  <rhult@hem2.passagen.se>
+
+	* tasklist_applet.desktop: Added Swedish desktop entry. 
+
+1999-09-17  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_menu.c
+	  tasklist_properties.c Replaced "Minimized" with "Iconified"
+	  
+
+Fri Sep 17 13:44:22 1999  Tim Janik  <timj@gtk.org>
+
+	* tasklist_menu.c (cb_menu): use the GWMH_STATE_* flags instead
+	of the namespace polluting WIN_* cruft from gnome.
+
+1999-09-17  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* tasklist_applet.h:
+	* tasklist_config.c (write_config): correctly
+	return FALSE
+
+1999-09-16  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c: Fixed a couple of memory leaks
+
+1999-09-16  Jacob Berkman  <jberkman@andrew.cmu.edu>
+
+	* tasklist_config.c (write_config): now the cb func
+
+	* tasklist_applet.c (create_applet): change the cb func
+
+	* tasklist_properties.c (cb_apply): don't save config here
+
+1999-09-16  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_menu.c: Added "Send to desktop" feature
+
+1999-09-16  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.h
+	  tasklist_applet.c
+	  tasklist_config.c
+	  tasklist_properties.c: Changed option buttons to check 
+	  buttons for "Show mininized/normal tasks"
+
+1999-09-16  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c
+	  tasklist_menu.c: Fixed minimize/iconify bug with E and sawmill
+
+1999-09-14  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c
+	  tasklist_applet.h
+	  tasklist_config.c
+	  tasklist_properties.c: Adding dynamic sizing
+
+1999-09-14  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c
+	  tasklist_applet.h
+	  tasklist_config.c
+	  tasklist_properties: Adding Normal/Minimized tasks appear on all desktops
+
+1999-09-14  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c
+	  tasklist_applet.h
+	  tasklist_config.c
+	  tasklist_properties.c: Adding "which tasks to show"
+
+1999-09-13  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c: Adding save session handler
+
+1999-09-11  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c
+	  tasklist_applet.h
+	  tasklist_config.c
+	  tasklist_properties.c: We can now change the width when 
+	  a vertical panel is used
+
+1999-09-11  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_properties.c: We now set a window title
+
+1999-09-11  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* unknown.xpm: Adding new icon from tigert
+
+1999-09-11  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c: Fixed a bug with move to desktop
+
+1999-09-11  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	*   tasklist_config.c
+	    tasklist_properties.c: Even more config stuff
+
+1999-09-11  Anders carlsson  <anders.carlsson@tordata.se>
+
+	* Makefile.am
+	  tasklist_applet.c
+	  tasklist_applet.h
+	  tasklist_config.c
+	  tasklist_properties.c: Added basic properties
+
+1999-09-09  Anders Carlsson   <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c
+	  tasklist_menu.c: Added orient support
+
+1999-08-30  Anders Carlsson   <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c
+	  tasklist_config.c
+	  tasklist_menu.c: Started implementing basic config stuff
+
+Fri Aug 20 19:10:42 1999  George Lebl  <jirka@5z.com>
+
+	* tasklist_applet.c: comment out registering Properties... with
+	  a NULL callback as that's not really nice
+
+	
+1999-08-18  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c: Removed black rectangle around text.
+	  unknown.xpm: Changed unknown icon to a better(?) one.
+
+	
+1999-08-14  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* tasklist_applet.c: Added about box.
+
+	
+1999-08-05  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* menu.c
+	  tasklist_applet.c
+	  tasklist_applet.h: Fix menus (not complete yet though).
+	  
+
+1999-08-04  Anders Carlsson  <anders.carlsson@tordata.se>
+
+	* menu.c
+	  tasklist_applet.c
+	  tasklist_applet.h: Redo the applet from scratch (almost).
+

@@ -1,0 +1,105 @@
+
+module gnome_PIM {
+  
+  /* Exceptions */
+  exception PIM_busy{
+  };
+
+
+  struct vCard_X {
+    string name;
+    string val;
+  };
+
+  typedef sequence<vCard_X> vCard_X_seq;
+
+  /* We export the vCard information in unpacked form.  This means
+   * that fields with multiple items (ie. N) are unpacked into a
+   * structure.  In addition, escaped items are unescaped directly
+   * into a string */
+
+  /* First, we define the unpacked fields in a structure */
+  struct vCard_N {
+    string family;        /* Public */
+    string given;         /* John */
+    string additional;    /* Quinlan */
+    string prefix;        /* Mr. */
+    string suffix;        /* Esq. */
+  };
+  struct vCard_BDAY {
+    /* hmmm -- is the time range needed here?
+     * I guess we should have a more universal time field. */
+    short year;
+    short month;
+    short day;
+  };
+  struct vCard_ADR {
+    string type; /* really needs to be better, i guess */
+    string pobox;
+    string extended_address;
+    string street_address;
+    string locality;
+    string region;
+    string postal_code;
+    string country_name;
+  };
+  struct vCard_TZ {
+    short offset; /* from UTC */
+    string name; /* ie. EST */
+    string locale; /* Raleigh/North America */
+  };  
+  struct vCard_GEO {
+    float LAT;
+    float LON;
+  };
+
+  struct vCard_ORG {
+    string name;
+    string unit1;
+    string unit2;
+    string unit3;
+    string unit4;
+  };
+  /* Types -- see RFC 2426 for more details. */
+  struct vCard {
+    string FN;
+    vCard_N N;
+    string NICKNAME;
+    string PHOTO; /* how do we deal with binary data? */
+    vCard_BDAY BDAY;
+    vCard_ADR ADR;
+    vCard_ADR LABEL;
+    string TEL;
+    string EMAIL; /* only one email, I guess */
+    string MAILER;
+    vCard_TZ TZ;
+    vCard_GEO GEO;
+    string TITLE;
+    string ROLE;
+    string LOGO; /* more binary data */
+    string AGENT; /* uri or normal string */
+    vCard_ORG ORG;
+    string CATEGORIES;
+    string NOTE;
+    string PRODID; /* unimplemented, i guess... */
+    string REV;
+    string SORT_STRING; /* also unimplemented */
+    string SOUND; /* even more binary data */
+    string URL;
+    string UID;
+    string VVERSION;
+    string CLASS;
+    string KEY; /* more binary data */
+
+    vCard_X_seq X;
+  };
+  typedef sequence<vCard> vCard_seq;
+  
+  interface vCard_server {
+    vCard_seq get_records ();
+    
+    vCard get_record (in string UID);
+    void set_record (in string UID, in vCard record);
+  };
+};
+  

@@ -1,0 +1,1219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>GNOME library.</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Architecture notes."
+HREF="arch.html"><LINK
+REL="NEXT"
+TITLE="gnome-defs"
+HREF="gnome-defs.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="arch.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="gnome-defs.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="LIBGNOME"
+>GNOME library.</A
+></H1
+><P
+>        This chapter is intended to be a reference to the libgnome.
+        </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GNOME-CONFIG"
+>gnome-config</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN367"
+>Author(s)</A
+></H2
+><P
+>  Miguel de Icaza &#60;miguel@nuclecu.unam.mx&#62;
+  </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN370"
+>Description</A
+></H2
+><P
+>A set of routines for manipulating the database of configuration
+information.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN373"
+>Glossary</A
+></H2
+><P
+><P
+></P
+><UL
+><LI
+><P
+>"config path" - a string that specifies which item to
+retrieve from the configuration database. For example, a config path
+of "/myapp/display_toolbox" could be used to retrieve the setting for
+whether 'myapp' should display its toolbox.</P
+></LI
+><LI
+><P
+>"default" - when retrieving a config item, specifies
+the value to be used if the item is not found.</P
+></LI
+><LI
+><P
+>"private configuration data" - Normally, config item
+data is located in files under the ~user/.gnome directory in a .ini-like
+format. These files are world-readable. Items that have security or
+privacy implications are stored and retrieved using the "private"
+versions of the gnome-config routines, and the data for these items is
+stored in files under the ~user/.gnome_private directory, which is not
+accessable by anyone except that user and the system administrator.</P
+></LI
+><LI
+><P
+>"translated" strings - GNOME's multilingual support
+means that multiple languages must be supported for configuration items.
+The gnome_config_*get_translated_string() and
+gnome_config_*set_translated_string() routines allow you to specify
+which language a string item should be accessed for.</P
+></LI
+><LI
+><P
+>"section" - a group of config items and other config
+sections</P
+></LI
+></UL
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-GET"
+>gnome_config_*get_* - routines to retrieve information for a
+specified config path.</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN389"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>type
+<TT
+CLASS="FUNCTION"
+>gnome_config_get_typename</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN394"
+>Description</A
+></H3
+><P
+>Routine to retrieve a config item. 'typename' would be one of
+string, translated_string, int, bool, float, or vector. In the case of
+the gnome_config_get_string(), gnome_config_get_translated_string(),
+and gnome_config_get_vector(), ownership of the memory used by the
+returned value is given over to the application.
+When the application is done with it, it should be freed using g_free() or
+g_string_array_free() as appropriate.</P
+><P
+>Combinations of "private" and "with_default" versions of these
+routines exist. For example, there are gnome_config_get_string(),
+gnome_config_get_string_with_default()
+gnome_config_private_get_string(), and
+gnome_config_private_get_string_with_default() routines.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN398"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char *myitem;
+gboolean is_default;
+
+myitem =
+gnome_config_get_string_with_default("/foo/blah=DefaultValue", &#38;is_default);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN401"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+></P
+><P
+>The config path to the config item being accessed.</P
+></LI
+><LI
+><P
+>gboolean *<TT
+CLASS="PARAMETER"
+><I
+>def</I
+></TT
+>
+(gnome_config_get_*_with_default() routines only)</P
+><P
+>Address of a gboolean variable. Used to return an indication to
+the caller as to whether the return value is a default value or was
+retrieved from the config database for the specified 'path'.</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-SET"
+>gnome_config_set_* - routines to store information for a
+specified config path.</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN414"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void
+<TT
+CLASS="FUNCTION"
+>gnome_config_set_typename</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>, type <TT
+CLASS="PARAMETER"
+><I
+>value</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN421"
+>Description&#62;</A
+></H3
+><P
+>Stores the specified value into the configuration database at the
+specified config path.</P
+><P
+>Note that there are "private" variations on all the regular
+routines, e.g. gnome_config_set_string() and
+gnome_config_private_set_string().</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN425"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char *values[] = {"A one", "a two", "a three"};
+
+gnome_config_set_vector("/foo/bar/baz", 3, values);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-HAS-SECTION"
+>gnome_config_has_section - Checks whether a config section
+exists</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN430"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>gboolean
+<TT
+CLASS="FUNCTION"
+>gnome_config_has_section</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN435"
+>Description</A
+></H3
+><P
+>This routine returns TRUE if the specified section/item exists, xor
+FALSE if it does not.</P
+><P
+>A parallel gnome_config_private_has_section() routine also
+is available.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN439"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>if(gnome_config_has_section("/foo/bar/baz")) {
+        g_print("You have saved preferences.\n");
+} else {
+        g_print("You haven't saved preferences yet.\n");
+}</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN442"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+></P
+><P
+>Config path of the item/section of interest</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-INIT-ITERATOR"
+>gnome_config_init_iterator - Setup an iterator to get a listing
+of items in a specified config section.</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN451"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+> void
+*<TT
+CLASS="FUNCTION"
+>gnome_config_init_iterator</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN456"
+>Description</A
+></H3
+><P
+>This routine is used to begin a loop over all the items in a
+config section. gnome_config_iterator_next() is used to advance to the
+next item.</P
+><P
+>Note that a gnome_config_private_init_iterator() variant
+exists.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN460"
+>Usage</A
+></H3
+><P
+>See the gnome_config_iterator_next() usage example</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN463"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>const char
+*<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+></P
+><P
+>Config section to list the items in.</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-INIT-ITERATOR-SECTIONS"
+>gnome_config_init_iterator - Setup an iterator to get a listing
+of sections in a specified config section.</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN472"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+> void
+*<TT
+CLASS="FUNCTION"
+>gnome_config_init_iterator_sections</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN477"
+>Description</A
+></H3
+><P
+>This routine is used to begin a loop over all the items in a
+config section. gnome_config_iterator_next() is used to advance to the
+next item.</P
+><P
+>Note that a gnome_config_private_init_iterator_sections() variant
+exists.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN481"
+>Usage</A
+></H3
+><P
+>See the gnome_config_iterator_next() usage example</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN484"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>const char
+*<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+></P
+><P
+>Config section to list the sub-sections of.</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-ITERATOR-NEXT"
+>gnome_config_iterator_next - get the next item from an
+iterator</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN493"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void
+*<TT
+CLASS="FUNCTION"
+>gnome_config_iterator_next</TT
+></CODE
+>(void *<TT
+CLASS="PARAMETER"
+><I
+>s</I
+></TT
+>, char **<TT
+CLASS="PARAMETER"
+><I
+>key</I
+></TT
+>, char **<TT
+CLASS="PARAMETER"
+><I
+>value</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN502"
+>Description</A
+></H3
+><P
+>This function normally serves as the loop update for a config item or
+section iterator. The return value is an opaque pointer needed by
+gnome_config_iterator_next, or NULL if there are no more available
+data in the iterator.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN505"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char *section_name, *key, *value;
+void *section_iter, *item_iter;
+GString *tmpstr;
+tmpstr = g_string_new(NULL);
+for(section_iter = gnome_config_init_iterator_sections("/foo");
+    section_iter != NULL;
+    section_iter = gnome_config_iterator_next(section_iter, NULL, &#38;section_name)) {
+    
+    g_string_sprintf(tmpstr, "/foo/%s", section_name);
+    
+    for(item_iter = gnome_config_init_iterator(tmpstr-&#62;str);
+        item_iter;
+        item_iter = gnome_config_iterator_next(item_iter, &#38;key, &#38;value)) {
+        g_print("Got key %s -&#62; value %s in section %s of /foo\n",
+                key, value, section_name);
+
+        g_free(key); g_free(value);
+    }
+
+    g_free(section_name);
+}
+g_string_free(tmpstr);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN508"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>void *<TT
+CLASS="PARAMETER"
+><I
+>s</I
+></TT
+></P
+><P
+>A value returned by either gnome_config_*_init_iterator_*() or
+gnome_config_iterator_next().</P
+></LI
+><LI
+><P
+>char **<TT
+CLASS="PARAMETER"
+><I
+>key</I
+></TT
+></P
+><P
+>The address of a char * variable. Used to return a pointer to
+the key for item iterators. For section iterators, this should be
+NULL.</P
+></LI
+><LI
+><P
+>char **<TT
+CLASS="PARAMETER"
+><I
+>value</I
+></TT
+></P
+><P
+>The address of a char * variable. Used to return a pointer to
+the value for item iterators, or to the section name for section
+iterators.</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-DROP-ALL"
+>gnome_config_drop_all - drops all the cached config data from the in-memory cache</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN525"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_config_drop_all</TT
+></CODE
+>(void);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN529"
+>Description</A
+></H3
+><P
+>The gnome_config routines cache the configuration entries in memory to
+increase speed. Calling gnome_config_drop_all() causes the cache to be
+cleared. </P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-SYNC"
+>gnome_config_sync - writes all
+unwritten config entries to the config database</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN534"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_config_sync</TT
+></CODE
+>(void);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN538"
+>Description</A
+></H3
+><P
+>As previously stated, the gnome_config routines cache configuration
+entries in memory to increase speed. This routine flushes the cache to
+disk - you would ordinarily use it after a number of
+gnome_config_set_* operations.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-CLEAN"
+>gnome_config_*clean_* - routines for removing a configuration database entry or subtree altogether</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN543"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_config_clean_file</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN548"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_config_private_clean_file</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN553"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_config_clean_section</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN558"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_config_private_clean_section</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN563"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_config_clean_key</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN568"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>gnome_config_private_clean_key</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN573"
+>Description</A
+></H3
+><P
+>These routines delete all the configuration entries associated with the specified entity (either a file, section, or key).</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN576"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char *val1, *val2;
+
+gnome_config_set_string("/foo/bar", "baz");
+val1 = gnome_config_get_string("/foo/bar");
+gnome_config_clean_section("/foo");
+val2 = gnome_config_get_string("/foo/bar");
+if(val1 &#38;&#38; val2 &#38;&#38; !strcmp(val1, val2)) {
+    g_error("The values match! gnome_config_clean_section is broken!");
+} else {
+    g_message("gnome_config_clean_section worked.");
+}</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN579"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+></P
+><P
+>The config path to the config item which is to be removed.</P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GNOME-CONFIG-GET-REAL-PATH"
+>gnome_config_*get_real_path</A
+></H2
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN588"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>char *<TT
+CLASS="FUNCTION"
+>gnome_config_get_real_path</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN593"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>char *<TT
+CLASS="FUNCTION"
+>gnome_config_private_get_real_path</TT
+></CODE
+>(const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>);<P
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN598"
+>Description</A
+></H3
+><P
+>Occasionally an application writer may want to get the local filename
+where a config item is stored. When passed a config path, these
+routines (currently implemented as macros) return that filename.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN601"
+>Usage</A
+></H3
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char *filename = gnome_config_get_real_path("/foo/bar");
+FILE *filehandle = fopen(filename, "w");
+/* do devious things with the file */</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN604"
+>Parameters</A
+></H3
+><P
+></P
+><UL
+><LI
+><P
+>const char *<TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+></P
+><P
+>The config path to the config item being accessed.</P
+></LI
+></UL
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="arch.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gnome-defs.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Architecture notes.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>gnome-defs</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,78 @@
+/* $Id: checkbutton.gen_h,v 1.37 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* checkbutton.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/togglebutton.h>
+#include <gtk/gtkcheckbutton.h>
+CLASS_START(Gtk);
+//: Button with indicator
+//- The checkbutton is a small button with a lable next to it. It can
+//- be toggled on or off.
+class CheckButton : public ToggleButton {
+  WRAP_CLASS(CheckButton,GtkCheckButton,GTK_CHECK_BUTTON,GTK_IS_CHECK_BUTTON,check_button,Gtk::ToggleButton,GtkToggleButton,GTK_TOGGLE_BUTTON);
+public:
+
+  //: Create an empty check button. 
+  //- With an empty button, you can {Gtk::Button::add()} a widget
+  //- such as a {Gtk::Pixmap::} or {Gtk::Box::}. 
+  //-
+  //- If you just wish to add a {Gtk::Label::},
+  //- you may want to
+  //- use the {Gtk::CheckButton(const string &label)} ctor 
+  //- directly instead.
+  WRAP_CTOR_DEFAULT;
+
+  //: Create a check button with a label. 
+  //- You won't be able
+  //- to add a widget in this button since it already has a {Gtk::Label::}
+  //- in it.
+  CheckButton(const string &label,gfloat x=0.5,gfloat y=0.5);
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Emited on button redraw to update indicator.
+  //- Triggered when the button is redrawn (e.g.after being toggled)
+  //- Overload this signal if you want to implement your own check button
+  //- look. Otherwise, you most likely don't care about it.
+  //- The GdkRectangle specifies the area of the widget which will get
+  //- redrawn.
+  SIGNAL_SPEC("draw_indicator",impl,void draw_indicator(GdkRectangle*));
+  
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/togglebutton_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+CheckButton::CheckButton(const string &label,gfloat x,gfloat y)
+  :     ToggleButton((GtkToggleButton*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  add_label(label,x,y);
+}
+
+}
+
+DOCUMENTATION_START;
+

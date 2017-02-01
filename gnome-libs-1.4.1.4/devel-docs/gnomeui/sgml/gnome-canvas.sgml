@@ -1,0 +1,1026 @@
+<refentry id="GnomeCanvas">
+<refmeta>
+<refentrytitle>GnomeCanvas</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeCanvas</refname><refpurpose>  A generic engine for structured graphics.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeCanvas-struct">GnomeCanvas</link>;
+#define     <link linkend="GNOME-CANVAS-EPSILON-CAPS">GNOME_CANVAS_EPSILON</link>
+#define     <link linkend="GNOME-CANVAS-COLOR-CAPS">GNOME_CANVAS_COLOR</link>              (r, g, b)
+#define     <link linkend="GNOME-CANVAS-COLOR-A-CAPS">GNOME_CANVAS_COLOR_A</link>            (r, g, b, a)
+struct      <link linkend="GnomeCanvasBuf">GnomeCanvasBuf</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-canvas-new">gnome_canvas_new</link>                (void);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-canvas-new-aa">gnome_canvas_new_aa</link>             (void);
+<link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link>* <link linkend="gnome-canvas-root">gnome_canvas_root</link>         (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas);
+void        <link linkend="gnome-canvas-set-scroll-region">gnome_canvas_set_scroll_region</link>  (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> x1,
+                                             <link linkend="double">double</link> y1,
+                                             <link linkend="double">double</link> x2,
+                                             <link linkend="double">double</link> y2);
+void        <link linkend="gnome-canvas-get-scroll-region">gnome_canvas_get_scroll_region</link>  (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> *x1,
+                                             <link linkend="double">double</link> *y1,
+                                             <link linkend="double">double</link> *x2,
+                                             <link linkend="double">double</link> *y2);
+void        <link linkend="gnome-canvas-set-pixels-per-unit">gnome_canvas_set_pixels_per_unit</link>
+                                            (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> n);
+void        <link linkend="gnome-canvas-scroll-to">gnome_canvas_scroll_to</link>          (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             int cx,
+                                             int cy);
+void        <link linkend="gnome-canvas-get-scroll-offsets">gnome_canvas_get_scroll_offsets</link> (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             int *cx,
+                                             int *cy);
+void        <link linkend="gnome-canvas-update-now">gnome_canvas_update_now</link>         (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas);
+<link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* <link linkend="gnome-canvas-get-item-at">gnome_canvas_get_item_at</link>   (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y);
+void        <link linkend="gnome-canvas-request-redraw-uta">gnome_canvas_request_redraw_uta</link> (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="ArtUta">ArtUta</link> *uta);
+void        <link linkend="gnome-canvas-request-redraw">gnome_canvas_request_redraw</link>     (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             int x1,
+                                             int y1,
+                                             int x2,
+                                             int y2);
+void        <link linkend="gnome-canvas-w2c-affine">gnome_canvas_w2c_affine</link>         (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> affine[6]);
+void        <link linkend="gnome-canvas-w2c">gnome_canvas_w2c</link>                (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> wx,
+                                             <link linkend="double">double</link> wy,
+                                             int *cx,
+                                             int *cy);
+void        <link linkend="gnome-canvas-w2c-d">gnome_canvas_w2c_d</link>              (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> wx,
+                                             <link linkend="double">double</link> wy,
+                                             <link linkend="double">double</link> *cx,
+                                             <link linkend="double">double</link> *cy);
+void        <link linkend="gnome-canvas-c2w">gnome_canvas_c2w</link>                (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             int cx,
+                                             int cy,
+                                             <link linkend="double">double</link> *wx,
+                                             <link linkend="double">double</link> *wy);
+void        <link linkend="gnome-canvas-window-to-world">gnome_canvas_window_to_world</link>    (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> winx,
+                                             <link linkend="double">double</link> winy,
+                                             <link linkend="double">double</link> *worldx,
+                                             <link linkend="double">double</link> *worldy);
+void        <link linkend="gnome-canvas-world-to-window">gnome_canvas_world_to_window</link>    (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> worldx,
+                                             <link linkend="double">double</link> worldy,
+                                             <link linkend="double">double</link> *winx,
+                                             <link linkend="double">double</link> *winy);
+int         <link linkend="gnome-canvas-get-color">gnome_canvas_get_color</link>          (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             char *spec,
+                                             <link linkend="GdkColor">GdkColor</link> *color);
+void        <link linkend="gnome-canvas-set-stipple-origin">gnome_canvas_set_stipple_origin</link> (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="GdkGC">GdkGC</link> *gc);
+void        <link linkend="gnome-canvas-set-dither">gnome_canvas_set_dither</link>         (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="GdkRgbDither">GdkRgbDither</link> dither);
+<link linkend="GdkRgbDither">GdkRgbDither</link> <link linkend="gnome-canvas-get-dither">gnome_canvas_get_dither</link>        (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkLayout">GtkLayout</link>
+                     +----GnomeCanvas
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    The GNOME canvas is an engine for displaying structured graphics
+    and simplifying the development of complex graphic-based
+    applications.  
+  </para>
+  
+  <refsect2>
+    <title>Canvas Items</title>
+    <para>
+      The GNOME Canvas basic building blocks are the GNOME Canvas
+      Items (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link>): lines, rectangles, text, ellipses,
+      polylines, images and embedded widgets.  You can use any of
+      those directly in your application.
+    </para>
+    
+    <para>
+      The CanvasItem system is designed to be extensible.
+      Applications can define their own <link linkend="GnomeCanvasItem">GnomeCanvasItem</link> objects for
+      special purpose tasks.  For example, the GNOME Gnumeric
+      spreadsheet defines a number of special Canvas Items that are
+      specialized for the task of spreadsheets.
+    </para>
+    
+    <para>
+      Specialized canvas items allow the developer to write
+      custom items that can adapt to their needs for speed,
+      scalability and gives the user the power to extend the
+      canvas. 
+    </para>
+    
+    <para>
+      Items on the canvas can be reconfigured by using the Gtk
+      argument system.  Users can reconfigure the parameters of
+      the canvas items and the changes on the parameters will be
+      reflected immediately on the screen.
+    </para>
+  </refsect2>
+  
+  <refsect2>
+    <title>Flicker free display</title>
+    <para>
+      The GNOME Canvas uses off-screen buffers to render the images
+      before transferring them to the screen.  Transfers can take
+      place at the command of the programmer (by explicitly
+      requesting a repaint update) or done automatically by the
+      engine (during the idle look handler).
+    </para>
+  </refsect2>
+  
+  <refsect2>
+    <title>Event dispatching</title> 
+    <para>Each 
+      GnomeCanvasItem can receive mouse events, keyboard events,
+      mouse-enter and mouse leave events.  In addition a canvas
+      item can grab the mouse (for example to implement reliable
+      dragging of objects).
+    </para>
+  </refsect2>
+  
+  <refsect2>
+    <title>Canvas types</title>
+    <para>
+      The Canvas can be run in two different modes: X11 mode and Art
+      mode.  The mode is chosen at the creation time of the widget
+      by either calling <link linkend="gnome-canvas-new">gnome_canvas_new</link>() or <link linkend="gnome-canvas-new-aa">gnome_canvas_new_aa</link>(),
+      the former creates an X11 canvas, while the latter creates an
+      Art-based canvas.
+    </para>
+    
+    <para>
+      The X11 mode uses the X server to draw the items and it takes
+      advantage of the X server acceleration features for drawing on
+      the screen.  The only drawback is that the output quality and
+      the imaging model are restricted to the X11 quality and
+      imaging model.
+    </para>
+    
+    <para>
+      The Art mode of the canvas has an advanced imaging model based
+      on LibArt and it allows any GnomeCanvasItem (with the
+      exception of the embedded widget item) to be rotated, scaled
+      and translated (this is done by means of applying an affine
+      transformation on the object).
+    </para>
+  </refsect2>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeCanvas-struct">struct GnomeCanvas</title>
+<programlisting>struct GnomeCanvas;</programlisting>
+  <para>
+    Most of the fields in this structure are for private use only.
+    However, canvas item implementations may make use of some of them.
+  </para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-CANVAS-EPSILON-CAPS">GNOME_CANVAS_EPSILON</title>
+<programlisting>#define GNOME_CANVAS_EPSILON 1e-10
+</programlisting>
+  <para>
+    This macro defines a &lsquo;small&rsquo; floating-point value for
+    the internal computations that the canvas performs.  It can be
+    used by item implementations as a test to see whether a number is
+    &ldquo;almost zero&rdquo;.
+  </para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-CANVAS-COLOR-CAPS">GNOME_CANVAS_COLOR()</title>
+<programlisting>#define     GNOME_CANVAS_COLOR(r, g, b)</programlisting>
+  <para>
+    This macro is used to build a 32-bit integer with an RGB color
+    specification.  The specified values must be integers in the range
+    [0, 255].
+  </para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry>Red component of the color.
+</entry></row>
+<row><entry align="right"><parameter>g</parameter>&nbsp;:</entry>
+<entry>Green component of the color.
+</entry></row>
+<row><entry align="right"><parameter>b</parameter>&nbsp;:</entry>
+<entry>Blue component of the color.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOME-CANVAS-COLOR-A-CAPS">GNOME_CANVAS_COLOR_A()</title>
+<programlisting>#define     GNOME_CANVAS_COLOR_A(r, g, b, a)</programlisting>
+  <para>
+    This macro is used to build a 32-bit integer with an RGBA color
+    specification.  This is the same as an RGB color specification,
+    but with an added alpha or opacity value.  The specified values
+    must be integers in the range [0, 255].
+  </para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry>Red component of the color.
+</entry></row>
+<row><entry align="right"><parameter>g</parameter>&nbsp;:</entry>
+<entry>Green component of the color.
+</entry></row>
+<row><entry align="right"><parameter>b</parameter>&nbsp;:</entry>
+<entry>Blue component of the color.
+</entry></row>
+<row><entry align="right"><parameter>a</parameter>&nbsp;:</entry>
+<entry>Opacity component of the color.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeCanvasBuf">struct GnomeCanvasBuf</title>
+<programlisting>typedef struct {
+	/* 24-bit RGB buffer for rendering */
+	guchar *buf;
+
+	/* Rowstride for the buffer */
+	int buf_rowstride;
+
+	/* Rectangle describing the rendering area */
+	ArtIRect rect;
+
+	/* Background color, given as 0xrrggbb */
+	guint32 bg_color;
+
+	/* Invariant: at least one of the following flags is true. */
+
+	/* Set when the render rectangle area is the solid color bg_color */
+	unsigned int is_bg : 1;
+
+	/* Set when the render rectangle area is represented by the buf */
+	unsigned int is_buf : 1;
+} GnomeCanvasBuf;
+</programlisting>
+  <para>
+    This structure is passed to the <function>render</function> method
+    of canvas items when they need to paint themselves on an
+    antialiased canvas.  The <structfield>buf</structfield> field
+    points to a 24-bit RGB buffer for rendering.  The
+    <structfield>buf_rowstride</structfield> field specifies the
+    number of bytes in each row in the buffer, which should be used to
+    calculate byte offsets inside it.  The buffer's pixel offsets in
+    canvas pixel coordinates are given by the
+    <structfield>rect</structfield> rectangle.  The
+    <structfield>is_bg</structfield> and
+    <structfield>is_buf</structfield> fields are flags that items can
+    use to implement rendering optimizations, and they are used in
+    conjunction with the <structfield>bg_color</structfield> field.
+  </para>
+
+  <para>
+    The <structfield>is_buf</structfield> flag specifies whether the
+    contents of the buffer are an accurate representation of the state
+    of the canvas.  If this flag is true, then the RGB data in the
+    <structfield>buf</structfield> is valid, that is, it contains
+    meaningful data.
+  </para>
+
+  <para>
+    The <structfield>is_bg</structfield> flag specifies whether the
+    buffer has all its pixels set to the same color.  This allows
+    canvas items to optimize for this case by doing alpha compositing
+    for a smaller set of values than if the buffer had pixels of
+    different colors.
+  </para>
+
+  <para>
+    At least one of these flags is on at any one time.  The meaning of
+    their combinations is as follows:
+
+    <table>
+      <title>
+	Values for <structfield>is_bg</structfield> and
+	<structfield>is_buf</structfield>
+      </title>
+      <tgroup cols="3">
+	<thead>
+	  <row>
+	    <entry><structfield>is_buf</structfield></entry>
+	    <entry><structfield>is_bg</structfield></entry>
+	    <entry>Meaning</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry><symbol>FALSE</symbol></entry>
+	    <entry><symbol>TRUE</symbol></entry>
+	    <entry>
+	      The buffer does not contain meaningful data.  However,
+	      it should be considered as if it were filled with the
+	      solid color specified in the
+	      <structfield>bg_color</structfield> field.  Item
+	      implementations may want to call
+	      <function><link linkend="gnome-canvas-buf-ensure-buf">gnome_canvas_buf_ensure_buf</link>()</function> to
+	      fill the buffer automatically.
+	    </entry>
+	  </row>
+	  <row>
+	    <entry><symbol>TRUE</symbol></entry>
+	    <entry><symbol>FALSE</symbol></entry>
+	    <entry>
+	      The buffer contains meaningful data and not all of its
+	      pixels may be the same color.  Item implementations can
+	      use the buffer data as-is for alpha compositing.
+	    </entry>
+	  </row>
+	  <row>
+	    <entry><symbol>TRUE</symbol></entry>
+	    <entry><symbol>TRUE</symbol></entry>
+	    <entry>
+	      The buffer contains meaningful data, and all the pixels
+	      are of the same color.  Item implementations can use the
+	      buffer data as-is for alpha compositing, or be smarter
+	      and do less operations since they can just composite
+	      over a single color.
+	    </entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+  </para>
+
+  <para>
+    Whenever an item paints to an RGB buffer in which the
+    <structfield>is_bg</structfield> field was true, the item is then
+    responsible for turning off this flag if it knows that the result
+    will not be pixels all of the same color.  If a large item, like a
+    solid rectangle, knows that it will be filling the buffer with a
+    solid color, then it take any one of the following actions:
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  Fill the actual pixels in the buffer with the solid color
+	  and turn off the <structfield>is_bg</structfield> flag.  It
+	  should then turn on the <structfield>is_buf</structfield>
+	  flag.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Fill the actual pixels in the buffer with the solid color,
+	  set the <structfield>bg_color</structfield> field to that
+	  same color, and turn on both the
+	  <structfield>is_bg</structfield> and
+	  <structfield>is_buf</structfield> flags.  This is correct,
+	  but is wasteful, since it could have done just the following
+	  instead.
+	</para>
+      </listitem>
+      <listitem>
+	<para>
+	  Just set the <structfield>bg_color</structfield> to the
+	  solid color, turn on the <structfield>is_bg</structfield>
+	  flag, and turn off the <structfield>is_buf</structfield>
+	  flag.  This means that the buffer does not contain the
+	  actual meaningful data, and the next item to be repainted
+	  should look at the solid color instead.  This is the most
+	  efficient version.
+	</para>
+      </listitem>
+    </itemizedlist>
+  </para>
+
+  <para>
+    Most item implementations may only need to perform the actions for
+    the first case described above.  The other two are simply
+    optimizations they can perform.
+  </para></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-new">gnome_canvas_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_canvas_new                (void);</programlisting>
+<para>
+Creates a new empty canvas in non-antialiased mode.  If you wish to use the
+&amp;GnomeCanvasImage item inside this canvas, then you must push the gdk_imlib
+visual and colormap before calling this function, and they can be popped
+afterwards.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A newly-created canvas.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-new-aa">gnome_canvas_new_aa ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_canvas_new_aa             (void);</programlisting>
+<para>
+Creates a new empty canvas in antialiased mode.  You should push the GdkRGB
+visual and colormap before calling this functions, and they can be popped
+afterwards.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A newly-created antialiased canvas.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-root">gnome_canvas_root ()</title>
+<programlisting><link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link>* gnome_canvas_root         (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas);</programlisting>
+<para>
+Queries the root group of a canvas.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The root group of the specified canvas.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-set-scroll-region">gnome_canvas_set_scroll_region ()</title>
+<programlisting>void        gnome_canvas_set_scroll_region  (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> x1,
+                                             <link linkend="double">double</link> y1,
+                                             <link linkend="double">double</link> x2,
+                                             <link linkend="double">double</link> y2);</programlisting>
+<para>
+Sets the scrolling region of a canvas to the specified rectangle.  The canvas
+will then be able to scroll only within this region.  The view of the canvas
+is adjusted as appropriate to display as much of the new region as possible.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Leftmost limit of the scrolling region.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Upper limit of the scrolling region.
+</entry></row>
+<row><entry align="right"><parameter>x2</parameter>&nbsp;:</entry>
+<entry> Rightmost limit of the scrolling region.
+</entry></row>
+<row><entry align="right"><parameter>y2</parameter>&nbsp;:</entry>
+<entry> Lower limit of the scrolling region.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-get-scroll-region">gnome_canvas_get_scroll_region ()</title>
+<programlisting>void        gnome_canvas_get_scroll_region  (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> *x1,
+                                             <link linkend="double">double</link> *y1,
+                                             <link linkend="double">double</link> *x2,
+                                             <link linkend="double">double</link> *y2);</programlisting>
+<para>
+Queries the scrolling region of a canvas.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Leftmost limit of the scrolling region (return value).
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Upper limit of the scrolling region (return value).
+</entry></row>
+<row><entry align="right"><parameter>x2</parameter>&nbsp;:</entry>
+<entry> Rightmost limit of the scrolling region (return value).
+</entry></row>
+<row><entry align="right"><parameter>y2</parameter>&nbsp;:</entry>
+<entry> Lower limit of the scrolling region (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-set-pixels-per-unit">gnome_canvas_set_pixels_per_unit ()</title>
+<programlisting>void        gnome_canvas_set_pixels_per_unit
+                                            (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> n);</programlisting>
+<para>
+Sets the zooming factor of a canvas by specifying the number of pixels that
+correspond to one canvas unit.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>n</parameter>&nbsp;:</entry>
+<entry> The number of pixels that correspond to one canvas unit.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-scroll-to">gnome_canvas_scroll_to ()</title>
+<programlisting>void        gnome_canvas_scroll_to          (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             int cx,
+                                             int cy);</programlisting>
+<para>
+Makes a canvas scroll to the specified offsets, given in canvas pixel units.
+The canvas will adjust the view so that it is not outside the scrolling
+region.  This function is typically not used, as it is better to hook
+scrollbars to the canvas layout's scrolling adjusments.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>cx</parameter>&nbsp;:</entry>
+<entry> Horizontal scrolling offset in canvas pixel units.
+</entry></row>
+<row><entry align="right"><parameter>cy</parameter>&nbsp;:</entry>
+<entry> Vertical scrolling offset in canvas pixel units.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-get-scroll-offsets">gnome_canvas_get_scroll_offsets ()</title>
+<programlisting>void        gnome_canvas_get_scroll_offsets (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             int *cx,
+                                             int *cy);</programlisting>
+<para>
+Queries the scrolling offsets of a canvas.  The values are returned in canvas
+pixel units.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>cx</parameter>&nbsp;:</entry>
+<entry> Horizontal scrolling offset (return value).
+</entry></row>
+<row><entry align="right"><parameter>cy</parameter>&nbsp;:</entry>
+<entry> Vertical scrolling offset (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-update-now">gnome_canvas_update_now ()</title>
+<programlisting>void        gnome_canvas_update_now         (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas);</programlisting>
+<para>
+Forces an immediate update and redraw of a canvas.  If the canvas does not
+have any pending update or redraw requests, then no action is taken.  This is
+typically only used by applications that need explicit control of when the
+display is updated, like games.  It is not needed by normal applications.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-get-item-at">gnome_canvas_get_item_at ()</title>
+<programlisting><link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* gnome_canvas_get_item_at   (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y);</programlisting>
+<para>
+Looks for the item that is under the specified position, which must be
+specified in world coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry> X position in world coordinates.
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry> Y position in world coordinates.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The sought item, or NULL if no item is at the specified
+coordinates.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-request-redraw-uta">gnome_canvas_request_redraw_uta ()</title>
+<programlisting>void        gnome_canvas_request_redraw_uta (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="ArtUta">ArtUta</link> *uta);</programlisting>
+<para>
+Informs a canvas that the specified area, given as a microtile array, needs
+to be repainted.  To be used only by item implementations.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>uta</parameter>&nbsp;:</entry>
+<entry> Microtile array that specifies the area to be redrawn.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-request-redraw">gnome_canvas_request_redraw ()</title>
+<programlisting>void        gnome_canvas_request_redraw     (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             int x1,
+                                             int y1,
+                                             int x2,
+                                             int y2);</programlisting>
+<para>
+Convenience function that informs a canvas that the specified rectangle needs
+to be repainted.  This function converts the rectangle to a microtile array
+and feeds it to <link linkend="gnome-canvas-request-redraw-uta">gnome_canvas_request_redraw_uta</link>().  The rectangle includes
+<parameter>x1</parameter> and <parameter>y1</parameter>, but not <parameter>x2</parameter> and <parameter>y2</parameter>.  To be used only by item implementations.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Leftmost coordinate of the rectangle to be redrawn.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Upper coordinate of the rectangle to be redrawn.
+</entry></row>
+<row><entry align="right"><parameter>x2</parameter>&nbsp;:</entry>
+<entry> Rightmost coordinate of the rectangle to be redrawn, plus 1.
+</entry></row>
+<row><entry align="right"><parameter>y2</parameter>&nbsp;:</entry>
+<entry> Lower coordinate of the rectangle to be redrawn, plus 1.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-w2c-affine">gnome_canvas_w2c_affine ()</title>
+<programlisting>void        gnome_canvas_w2c_affine         (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> affine[6]);</programlisting>
+<para>
+Gets the affine transform that converts from world coordinates to canvas
+pixel coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> An affine transformation matrix (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-w2c">gnome_canvas_w2c ()</title>
+<programlisting>void        gnome_canvas_w2c                (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> wx,
+                                             <link linkend="double">double</link> wy,
+                                             int *cx,
+                                             int *cy);</programlisting>
+<para>
+Converts world coordinates into canvas pixel coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>wx</parameter>&nbsp;:</entry>
+<entry> World X coordinate.
+</entry></row>
+<row><entry align="right"><parameter>wy</parameter>&nbsp;:</entry>
+<entry> World Y coordinate.
+</entry></row>
+<row><entry align="right"><parameter>cx</parameter>&nbsp;:</entry>
+<entry> X pixel coordinate (return value).
+</entry></row>
+<row><entry align="right"><parameter>cy</parameter>&nbsp;:</entry>
+<entry> Y pixel coordinate (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-w2c-d">gnome_canvas_w2c_d ()</title>
+<programlisting>void        gnome_canvas_w2c_d              (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> wx,
+                                             <link linkend="double">double</link> wy,
+                                             <link linkend="double">double</link> *cx,
+                                             <link linkend="double">double</link> *cy);</programlisting>
+<para>
+Converts world coordinates into canvas pixel coordinates.  This version</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>wx</parameter>&nbsp;:</entry>
+<entry> World X coordinate.
+</entry></row>
+<row><entry align="right"><parameter>wy</parameter>&nbsp;:</entry>
+<entry> World Y coordinate.
+</entry></row>
+<row><entry align="right"><parameter>cx</parameter>&nbsp;:</entry>
+<entry> X pixel coordinate (return value).
+</entry></row>
+<row><entry align="right"><parameter>cy</parameter>&nbsp;:</entry>
+<entry> Y pixel coordinate (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-c2w">gnome_canvas_c2w ()</title>
+<programlisting>void        gnome_canvas_c2w                (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             int cx,
+                                             int cy,
+                                             <link linkend="double">double</link> *wx,
+                                             <link linkend="double">double</link> *wy);</programlisting>
+<para>
+Converts canvas pixel coordinates to world coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>cx</parameter>&nbsp;:</entry>
+<entry> Canvas pixel X coordinate.
+</entry></row>
+<row><entry align="right"><parameter>cy</parameter>&nbsp;:</entry>
+<entry> Canvas pixel Y coordinate.
+</entry></row>
+<row><entry align="right"><parameter>wx</parameter>&nbsp;:</entry>
+<entry> X world coordinate (return value).
+</entry></row>
+<row><entry align="right"><parameter>wy</parameter>&nbsp;:</entry>
+<entry> Y world coordinate (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-window-to-world">gnome_canvas_window_to_world ()</title>
+<programlisting>void        gnome_canvas_window_to_world    (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> winx,
+                                             <link linkend="double">double</link> winy,
+                                             <link linkend="double">double</link> *worldx,
+                                             <link linkend="double">double</link> *worldy);</programlisting>
+<para>
+Converts window-relative coordinates into world coordinates.  You can use
+this when you need to convert mouse coordinates into world coordinates, for
+example.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>winx</parameter>&nbsp;:</entry>
+<entry> Window-relative X coordinate.
+</entry></row>
+<row><entry align="right"><parameter>winy</parameter>&nbsp;:</entry>
+<entry> Window-relative Y coordinate.
+</entry></row>
+<row><entry align="right"><parameter>worldx</parameter>&nbsp;:</entry>
+<entry> X world coordinate (return value).
+</entry></row>
+<row><entry align="right"><parameter>worldy</parameter>&nbsp;:</entry>
+<entry> Y world coordinate (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-world-to-window">gnome_canvas_world_to_window ()</title>
+<programlisting>void        gnome_canvas_world_to_window    (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="double">double</link> worldx,
+                                             <link linkend="double">double</link> worldy,
+                                             <link linkend="double">double</link> *winx,
+                                             <link linkend="double">double</link> *winy);</programlisting>
+<para>
+Converts world coordinates into window-relative coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>worldx</parameter>&nbsp;:</entry>
+<entry> World X coordinate.
+</entry></row>
+<row><entry align="right"><parameter>worldy</parameter>&nbsp;:</entry>
+<entry> World Y coordinate.
+</entry></row>
+<row><entry align="right"><parameter>winx</parameter>&nbsp;:</entry>
+<entry> X window-relative coordinate.
+</entry></row>
+<row><entry align="right"><parameter>winy</parameter>&nbsp;:</entry>
+<entry> Y window-relative coordinate.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-get-color">gnome_canvas_get_color ()</title>
+<programlisting>int         gnome_canvas_get_color          (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             char *spec,
+                                             <link linkend="GdkColor">GdkColor</link> *color);</programlisting>
+<para>
+Allocates a color based on the specified X color specification.  As a
+convenience to item implementations, it returns TRUE if the color was
+allocated, or FALSE if the specification was NULL.  A NULL color
+specification is considered as "transparent" by the canvas.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>spec</parameter>&nbsp;:</entry>
+<entry> X color specification, or NULL for "transparent".
+</entry></row>
+<row><entry align="right"><parameter>color</parameter>&nbsp;:</entry>
+<entry> Returns the allocated color.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if <parameter>spec</parameter> is non-NULL and the color is allocated.  If <parameter>spec</parameter>
+is NULL, then returns FALSE.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-set-stipple-origin">gnome_canvas_set_stipple_origin ()</title>
+<programlisting>void        gnome_canvas_set_stipple_origin (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="GdkGC">GdkGC</link> *gc);</programlisting>
+<para>
+Sets the stipple origin of the specified GC as is appropriate for the canvas,
+so that it will be aligned with other stipple patterns used by canvas items.
+This is typically only needed by item implementations.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>gc</parameter>&nbsp;:</entry>
+<entry> GC on which to set the stipple origin.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-set-dither">gnome_canvas_set_dither ()</title>
+<programlisting>void        gnome_canvas_set_dither         (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas,
+                                             <link linkend="GdkRgbDither">GdkRgbDither</link> dither);</programlisting>
+<para>
+Controls dithered rendering for antialiased canvases. The value of dither
+should be; <link linkend="GDK-RGB-DITHER-NONE-CAPS">GDK_RGB_DITHER_NONE</link>, <link linkend="GDK-RGB-DITHER-NORMAL-CAPS">GDK_RGB_DITHER_NORMAL</link>, or
+<link linkend="GDK-RGB-DITHER-MAX-CAPS">GDK_RGB_DITHER_MAX</link>. The default canvas setting is <link linkend="GDK-RGB-DITHER-NORMAL-CAPS">GDK_RGB_DITHER_NORMAL</link>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><parameter>dither</parameter>&nbsp;:</entry>
+<entry> Type of dither used to render an antialiased canvas.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+<!--
+Local variables:
+mode: sgml
+sgml-parent-document: ("../gnomeui-docs.sgml" "book" "sect1" "")
+End:
+-->
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-get-dither">gnome_canvas_get_dither ()</title>
+<programlisting><link linkend="GdkRgbDither">GdkRgbDither</link> gnome_canvas_get_dither        (<link linkend="GnomeCanvas">GnomeCanvas</link> *canvas);</programlisting>
+<para>
+Returns the type of dithering used to render an antialiased canvas.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>canvas</parameter>&nbsp;:</entry>
+<entry> A canvas.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The dither setting.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+  <para>
+    <link linkend="GnomeCanvasItem">GnomeCanvasItem</link>, <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link>, GnomeCanvasRE,
+    <link linkend="GnomeCanvasRectEllipse">GnomeCanvasRectEllipse</link>, <link linkend="GnomeCanvasImage">GnomeCanvasImage</link>, <link linkend="GnomeCanvasLine">GnomeCanvasLine</link>,
+    <link linkend="GnomeCanvasPolygon">GnomeCanvasPolygon</link>, <link linkend="GnomeCanvasText">GnomeCanvasText</link>, <link linkend="GnomeCanvasWidget">GnomeCanvasWidget</link>
+  </para>
+</refsect1>
+
+</refentry>

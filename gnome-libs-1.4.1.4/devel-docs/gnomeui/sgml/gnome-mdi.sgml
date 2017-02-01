@@ -1,0 +1,798 @@
+<refentry id="GnomeMDI">
+<refmeta>
+<refentrytitle>GnomeMDI</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeMDI</refname><refpurpose>GNOME Multiple Document Interface</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeMDI-struct">GnomeMDI</link>;
+enum        <link linkend="GnomeMDIMode">GnomeMDIMode</link>;
+<link linkend="GtkObject">GtkObject</link>*  <link linkend="gnome-mdi-new">gnome_mdi_new</link>                   (<link linkend="gchar">gchar</link> *appname,
+                                             <link linkend="gchar">gchar</link> *title);
+void        <link linkend="gnome-mdi-set-mode">gnome_mdi_set_mode</link>              (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIMode">GnomeMDIMode</link> mode);
+void        <link linkend="gnome-mdi-set-menubar-template">gnome_mdi_set_menubar_template</link>  (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menu_tmpl);
+void        <link linkend="gnome-mdi-set-toolbar-template">gnome_mdi_set_toolbar_template</link>  (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *tbar_tmpl);
+void        <link linkend="gnome-mdi-set-child-menu-path">gnome_mdi_set_child_menu_path</link>   (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             const <link linkend="gchar">gchar</link> *path);
+void        <link linkend="gnome-mdi-set-child-list-path">gnome_mdi_set_child_list_path</link>   (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             const <link linkend="gchar">gchar</link> *path);
+<link linkend="gint">gint</link>        <link linkend="gnome-mdi-add-view">gnome_mdi_add_view</link>              (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child);
+<link linkend="gint">gint</link>        <link linkend="gnome-mdi-add-toplevel-view">gnome_mdi_add_toplevel_view</link>     (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child);
+<link linkend="gint">gint</link>        <link linkend="gnome-mdi-remove-view">gnome_mdi_remove_view</link>           (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GtkWidget">GtkWidget</link> *view,
+                                             <link linkend="gint">gint</link> force);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-mdi-get-active-view">gnome_mdi_get_active_view</link>       (<link linkend="GnomeMDI">GnomeMDI</link> *mdi);
+void        <link linkend="gnome-mdi-set-active-view">gnome_mdi_set_active_view</link>       (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GtkWidget">GtkWidget</link> *view);
+<link linkend="gint">gint</link>        <link linkend="gnome-mdi-add-child">gnome_mdi_add_child</link>             (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child);
+<link linkend="gint">gint</link>        <link linkend="gnome-mdi-remove-child">gnome_mdi_remove_child</link>          (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child,
+                                             <link linkend="gint">gint</link> force);
+<link linkend="gint">gint</link>        <link linkend="gnome-mdi-remove-all">gnome_mdi_remove_all</link>            (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="gint">gint</link> force);
+void        <link linkend="gnome-mdi-open-toplevel">gnome_mdi_open_toplevel</link>         (<link linkend="GnomeMDI">GnomeMDI</link> *mdi);
+void        <link linkend="gnome-mdi-update-child">gnome_mdi_update_child</link>          (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child);
+<link linkend="GnomeMDIChild">GnomeMDIChild</link>* <link linkend="gnome-mdi-get-active-child">gnome_mdi_get_active_child</link>   (<link linkend="GnomeMDI">GnomeMDI</link> *mdi);
+<link linkend="GnomeMDIChild">GnomeMDIChild</link>* <link linkend="gnome-mdi-find-child">gnome_mdi_find_child</link>         (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="gchar">gchar</link> *name);
+<link linkend="GnomeApp">GnomeApp</link>*   <link linkend="gnome-mdi-get-active-window">gnome_mdi_get_active_window</link>     (<link linkend="GnomeMDI">GnomeMDI</link> *mdi);
+void        <link linkend="gnome-mdi-register">gnome_mdi_register</link>              (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GtkObject">GtkObject</link> *object);
+void        <link linkend="gnome-mdi-unregister">gnome_mdi_unregister</link>            (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GtkObject">GtkObject</link> *object);
+<link linkend="GnomeApp">GnomeApp</link>*   <link linkend="gnome-mdi-get-app-from-view">gnome_mdi_get_app_from_view</link>     (<link linkend="GtkWidget">GtkWidget</link> *view);
+<link linkend="GnomeMDIChild">GnomeMDIChild</link>* <link linkend="gnome-mdi-get-child-from-view">gnome_mdi_get_child_from_view</link>
+                                            (<link linkend="GtkWidget">GtkWidget</link> *view);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-mdi-get-view-from-window">gnome_mdi_get_view_from_window</link>  (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeApp">GnomeApp</link> *app);
+<link linkend="GnomeUIInfo">GnomeUIInfo</link>* <link linkend="gnome-mdi-get-menubar-info">gnome_mdi_get_menubar_info</link>     (<link linkend="GnomeApp">GnomeApp</link> *app);
+<link linkend="GnomeUIInfo">GnomeUIInfo</link>* <link linkend="gnome-mdi-get-toolbar-info">gnome_mdi_get_toolbar_info</link>     (<link linkend="GnomeApp">GnomeApp</link> *app);
+<link linkend="GnomeUIInfo">GnomeUIInfo</link>* <link linkend="gnome-mdi-get-child-menu-info">gnome_mdi_get_child_menu_info</link>  (<link linkend="GnomeApp">GnomeApp</link> *app);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----GnomeMDI
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    The <type>GnomeMDI</type> object lets the application manage a
+    number of documents and displays their views in a configurable
+    fashion.
+  </para>
+  
+  <para>
+    Once an instance of <type>GnomeMDI</type> has been created, you
+    can add documents to it using <link linkend="gnome-mdi-add-child">gnome_mdi_add_child</link>() and add views
+    of these documents with <link linkend="gnome-mdi-add-view">gnome_mdi_add_view</link>() routine. GnomeMDI
+    also provides means to create global menus and toolbar that apply
+    for each document and for merging document-specific menus with the
+    global ones. MDI automatically creates a menu containing a list of
+    all open documents. The global menus and toolbar can be created
+    using a template GnomeUIInfo structure or with a handler for
+    app_created signal which allows for customization of all
+    <type>GnomeApp</type> widgets that <type>GnomeMDI</type> creates.
+  </para>
+
+  <para>
+    The views are displayed in one of three modes that can be set using
+    <link linkend="gnome-mdi-set-mode">gnome_mdi_set_mode</link>() function:
+    <itemizedlist> 
+      <listitem><para>
+	  <literal>GNOME_MDI_NOTEBOOK</literal> mode displays each view in a notebook page. The user can create
+	  any number of notebooks, each within its toplevel <type>GnomeApp</type> and drag
+	  pages from one to another, thus distributing the views between them in any
+	  desired manner.
+	</para></listitem>
+      <listitem><para>
+	  <literal>GNOME_MDI_TOPLEVEL</literal> mode displays each view in its own toplevel window.
+	</para></listitem>
+      <listitem><para>
+	  <literal>GNOME_MDI_MODAL</literal> mode displays only a single view of a document.
+	</para></listitem>
+      <listitem><para>
+	  <literal>GNOME_MDI_DEFAULT</literal> uses the mode that can be configured on a per-user
+	  basis via the GNOME control center.
+	</para></listitem>
+    </itemizedlist>
+  </para>
+  
+  <para>
+    <type>GnomeMDI</type> can automatically save and restore its state and the state
+    of its children and layout, which is particularly useful to simplify implementation
+    of session managment.
+  </para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeMDI-struct">struct GnomeMDI</title>
+<programlisting>struct GnomeMDI;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeMDIMode">enum GnomeMDIMode</title>
+<programlisting>typedef enum {
+	GNOME_MDI_NOTEBOOK,
+	GNOME_MDI_TOPLEVEL,
+	GNOME_MDI_MODAL,
+	GNOME_MDI_DEFAULT_MODE = 42
+} GnomeMDIMode;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-new">gnome_mdi_new ()</title>
+<programlisting><link linkend="GtkObject">GtkObject</link>*  gnome_mdi_new                   (<link linkend="gchar">gchar</link> *appname,
+                                             <link linkend="gchar">gchar</link> *title);</programlisting>
+<para>
+Creates a new MDI object. <parameter>appname</parameter> and <parameter>title</parameter> are used for
+MDI's calling <link linkend="gnome-app-new">gnome_app_new</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appname</parameter>&nbsp;:</entry>
+<entry> Application name as used in filenames and paths.
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> Title of the application windows.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+A pointer to a new GnomeMDI object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-set-mode">gnome_mdi_set_mode ()</title>
+<programlisting>void        gnome_mdi_set_mode              (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIMode">GnomeMDIMode</link> mode);</programlisting>
+<para>
+Sets the MDI mode to mode. Possible values are <literal>GNOME_MDI_TOPLEVEL</literal>,
+<literal>GNOME_MDI_NOTEBOOK</literal>, <literal>GNOME_MDI_MODAL</literal> and <literal>GNOME_MDI_DEFAULT</literal>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>mode</parameter>&nbsp;:</entry>
+<entry> New mode.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-set-menubar-template">gnome_mdi_set_menubar_template ()</title>
+<programlisting>void        gnome_mdi_set_menubar_template  (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menu_tmpl);</programlisting>
+<para>
+This function sets the template for menus that appear in each toplevel
+window to menu_template. For each new toplevel window created by the MDI,
+this structure is copied, the menus are created with
+<link linkend="gnome-app-create-menus-with-data">gnome_app_create_menus_with_data</link>() function with mdi as the callback
+user data. Finally, the pointer to the copy is assigned to the new
+toplevel window (a GnomeApp widget) and can be obtained by calling
+&amp;gnome_mdi_get_menubar_info.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>menu_tmpl</parameter>&nbsp;:</entry>
+<entry> A GnomeUIInfo array describing the menu.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-set-toolbar-template">gnome_mdi_set_toolbar_template ()</title>
+<programlisting>void        gnome_mdi_set_toolbar_template  (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *tbar_tmpl);</programlisting>
+<para>
+This function sets the template for toolbar that appears in each toplevel
+window to toolbar_template. For each new toplevel window created by the MDI,
+this structure is copied, the toolbar is created with
+<link linkend="gnome-app-create-toolbar-with-data">gnome_app_create_toolbar_with_data</link>() function with mdi as the callback
+user data. Finally, the pointer to the copy is assigned to the new toplevel
+window (a GnomeApp widget) and can be retrieved with a call to
+&amp;gnome_mdi_get_toolbar_info.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>tbar_tmpl</parameter>&nbsp;:</entry>
+<entry> A GnomeUIInfo array describing the toolbar.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-set-child-menu-path">gnome_mdi_set_child_menu_path ()</title>
+<programlisting>void        gnome_mdi_set_child_menu_path   (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             const <link linkend="gchar">gchar</link> *path);</programlisting>
+<para>
+Sets the desired position of child-specific menus (which are added to and
+removed from the main menus as views of different children are activated).
+See gnome_app_find_menu_pos for details on menu paths.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object. 
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> A menu path where the child menus should be inserted.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-set-child-list-path">gnome_mdi_set_child_list_path ()</title>
+<programlisting>void        gnome_mdi_set_child_list_path   (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             const <link linkend="gchar">gchar</link> *path);</programlisting>
+<para>
+Sets the position for insertion of menu items used to activate the MDI
+children that were added to the MDI. See gnome_app_find_menu_pos for
+details on menu paths. If the path is not set or set to <literal>NULL</literal>, these menu
+items aren't going to be inserted in the MDI menu structure. Note that if
+you want all menu items to be inserted in their own submenu, you have to
+create that submenu (and leave it empty, of course).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> A menu path where the child list menu should be inserted
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-add-view">gnome_mdi_add_view ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_mdi_add_view              (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child);</programlisting>
+<para>
+Creates a new view of the child and adds it to the MDI. GnomeMDIChild
+<parameter>child</parameter> has to be added to the MDI with a call to gnome_mdi_add_child
+before its views are added to the MDI. 
+An "add_view" signal is emitted to the MDI after the view has been
+created, but before it is shown and added to the MDI, with a pointer to
+the created view as its parameter. The view is added to the MDI only if
+the signal handler (if it exists) returns <literal>TRUE</literal>. If the handler returns
+<literal>FALSE</literal>, the created view is destroyed and not added to the MDI.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> A pointer to a child.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+<literal>TRUE</literal> if adding the view succeeded and <literal>FALSE</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-add-toplevel-view">gnome_mdi_add_toplevel_view ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_mdi_add_toplevel_view     (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child);</programlisting>
+<para>
+Creates a new view of the child and adds it to the MDI; it behaves the
+same way as gnome_mdi_add_view in <literal>GNOME_MDI_MODAL</literal> and <literal>GNOME_MDI_TOPLEVEL</literal>
+modes, but in <literal>GNOME_MDI_NOTEBOOK</literal> mode, the view is added in a new
+toplevel window unless the active one has no views in it.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDIChild object to be added to the MDI.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+<literal>TRUE</literal> if adding the view succeeded and <literal>FALSE</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-remove-view">gnome_mdi_remove_view ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_mdi_remove_view           (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GtkWidget">GtkWidget</link> *view,
+                                             <link linkend="gint">gint</link> force);</programlisting>
+<para>
+Removes a view from an MDI. 
+A "remove_view" signal is emitted to the MDI before actually removing
+view. The view is removed only if the signal handler (if it exists and
+the <parameter>force</parameter> is set to <literal>FALSE</literal>) returns <literal>TRUE</literal>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> View to remove.
+</entry></row>
+<row><entry align="right"><parameter>force</parameter>&nbsp;:</entry>
+<entry> If TRUE, the "remove_view" signal is not emitted.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+<literal>TRUE</literal> if the view was removed and <literal>FALSE</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-active-view">gnome_mdi_get_active_view ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_mdi_get_active_view       (<link linkend="GnomeMDI">GnomeMDI</link> *mdi);</programlisting>
+<para>
+Returns a pointer to the active view (the one with the focus).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+A pointer to a GtkWidget *.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-set-active-view">gnome_mdi_set_active_view ()</title>
+<programlisting>void        gnome_mdi_set_active_view       (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GtkWidget">GtkWidget</link> *view);</programlisting>
+<para>
+Sets the active view to <parameter>view</parameter>. It also raises the window containing it
+and gives it focus.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to an MDI object.
+</entry></row>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A pointer to the view that is to become the active one.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-add-child">gnome_mdi_add_child ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_mdi_add_child             (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child);</programlisting>
+<para>
+Adds a new child to the MDI. No views are added: this has to be done with
+a call to gnome_mdi_add_view. 
+First an "add_child" signal is emitted to the MDI with a pointer to the
+child as its parameter. The child is added to the MDI only if the signal
+handler (if it exists) returns <literal>TRUE</literal>. If the handler returns <literal>FALSE</literal>, the
+child is not added to the MDI.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDIChild to add to the MDI.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+<literal>TRUE</literal> if the child was added successfully and <literal>FALSE</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-remove-child">gnome_mdi_remove_child ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_mdi_remove_child          (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child,
+                                             <link linkend="gint">gint</link> force);</programlisting>
+<para>
+Removes a child and all of its views from the MDI. 
+A "remove_child" signal is emitted to the MDI with <parameter>child</parameter> as its parameter
+before actually removing the child. The child is removed only if the signal
+handler (if it exists and the <parameter>force</parameter> is set to <literal>FALSE</literal>) returns <literal>TRUE</literal>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> Child to remove.
+</entry></row>
+<row><entry align="right"><parameter>force</parameter>&nbsp;:</entry>
+<entry> If TRUE, the "remove_child" signal is not emitted
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+<literal>TRUE</literal> if the removal was successful and <literal>FALSE</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-remove-all">gnome_mdi_remove_all ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_mdi_remove_all            (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="gint">gint</link> force);</programlisting>
+<para>
+Removes all children and all views from the MDI. 
+A "remove_child" signal is emitted to the MDI for each child before
+actually trying to remove any. If signal handlers for all children (if
+they exist and the <parameter>force</parameter> is set to <literal>FALSE</literal>) return <literal>TRUE</literal>, all children
+and their views are removed and none otherwise.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>force</parameter>&nbsp;:</entry>
+<entry> If TRUE, the "remove_child" signal is not emitted
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+<literal>TRUE</literal> if the removal was successful and <literal>FALSE</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-open-toplevel">gnome_mdi_open_toplevel ()</title>
+<programlisting>void        gnome_mdi_open_toplevel         (<link linkend="GnomeMDI">GnomeMDI</link> *mdi);</programlisting>
+<para>
+Opens a new toplevel window (unless in <literal>GNOME_MDI_MODAL</literal> mode and a
+toplevel window is already open). This is usually used only for opening
+the initial window on startup (just before calling <link linkend="gtkmain">gtkmain</link>()) if no
+windows were open because a session was restored or children were added
+because of command line args).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-update-child">gnome_mdi_update_child ()</title>
+<programlisting>void        gnome_mdi_update_child          (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeMDIChild">GnomeMDIChild</link> *child);</programlisting>
+<para>
+Updates all notebook labels of <parameter>child</parameter>'s views and their window titles
+after its name changes. It is not required if <link linkend="gnome-mdi-child-set-name">gnome_mdi_child_set_name</link>()
+is used for setting the child's name.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> Child to update.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-active-child">gnome_mdi_get_active_child ()</title>
+<programlisting><link linkend="GnomeMDIChild">GnomeMDIChild</link>* gnome_mdi_get_active_child   (<link linkend="GnomeMDI">GnomeMDI</link> *mdi);</programlisting>
+<para>
+Returns a pointer to the active GnomeMDIChild object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+A pointer to the active GnomeMDIChild object. <literal>NULL</literal>, if there is none.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-find-child">gnome_mdi_find_child ()</title>
+<programlisting><link linkend="GnomeMDIChild">GnomeMDIChild</link>* gnome_mdi_find_child         (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="gchar">gchar</link> *name);</programlisting>
+<para>
+Finds a child named <parameter>name</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> A string with a name of the child to find.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+A pointer to the GnomeMDIChild object if the child was found and NULL
+otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-active-window">gnome_mdi_get_active_window ()</title>
+<programlisting><link linkend="GnomeApp">GnomeApp</link>*   gnome_mdi_get_active_window     (<link linkend="GnomeMDI">GnomeMDI</link> *mdi);</programlisting>
+<para>
+Returns a pointer to the toplevel window containing the active view.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+A pointer to a GnomeApp that has the focus.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-register">gnome_mdi_register ()</title>
+<programlisting>void        gnome_mdi_register              (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GtkObject">GtkObject</link> *object);</programlisting>
+<para>
+Registers GtkObject <parameter>object</parameter> with MDI. 
+This is mostly intended for applications that open other windows besides
+those opened by the MDI and want to continue to run even when no MDI
+windows exist (an example of this would be GIMP's window with tools, if
+the pictures were MDI children). As long as there is an object registered
+with the MDI, the MDI will not destroy itself when the last of its windows
+is closed. If no objects are registered, closing the last MDI window
+results in MDI being destroyed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> Object to register.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-unregister">gnome_mdi_unregister ()</title>
+<programlisting>void        gnome_mdi_unregister            (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GtkObject">GtkObject</link> *object);</programlisting>
+<para>
+Removes GtkObject <parameter>object</parameter> from the list of registered objects.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> Object to unregister.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-app-from-view">gnome_mdi_get_app_from_view ()</title>
+<programlisting><link linkend="GnomeApp">GnomeApp</link>*   gnome_mdi_get_app_from_view     (<link linkend="GtkWidget">GtkWidget</link> *view);</programlisting>
+<para>
+Returns the toplevel window for this view.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A pointer to a GtkWidget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+A pointer to the GnomeApp containg the specified view.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-child-from-view">gnome_mdi_get_child_from_view ()</title>
+<programlisting><link linkend="GnomeMDIChild">GnomeMDIChild</link>* gnome_mdi_get_child_from_view
+                                            (<link linkend="GtkWidget">GtkWidget</link> *view);</programlisting>
+<para>
+Returns a child that <parameter>view</parameter> is a view of.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> A pointer to a GtkWidget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+A pointer to the GnomeMDIChild the view belongs to.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-view-from-window">gnome_mdi_get_view_from_window ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_mdi_get_view_from_window  (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             <link linkend="GnomeApp">GnomeApp</link> *app);</programlisting>
+<para>
+Returns the pointer to the view in the MDI toplevel window <parameter>app</parameter>.
+If the mode is set to <literal>GNOME_MDI_NOTEBOOK</literal>, the view in the current
+page is returned.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeApp widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+A pointer to a view.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-menubar-info">gnome_mdi_get_menubar_info ()</title>
+<programlisting><link linkend="GnomeUIInfo">GnomeUIInfo</link>* gnome_mdi_get_menubar_info     (<link linkend="GnomeApp">GnomeApp</link> *app);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeApp widget created by the MDI.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+A GnomeUIInfo array used for menubar in <parameter>app</parameter> if the menubar has been created with a template.
+<literal>NULL</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-toolbar-info">gnome_mdi_get_toolbar_info ()</title>
+<programlisting><link linkend="GnomeUIInfo">GnomeUIInfo</link>* gnome_mdi_get_toolbar_info     (<link linkend="GnomeApp">GnomeApp</link> *app);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeApp widget created by the MDI.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+A GnomeUIInfo array used for toolbar in <parameter>app</parameter> if the toolbar has been created with a template.
+<literal>NULL</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-get-child-menu-info">gnome_mdi_get_child_menu_info ()</title>
+<programlisting><link linkend="GnomeUIInfo">GnomeUIInfo</link>* gnome_mdi_get_child_menu_info  (<link linkend="GnomeApp">GnomeApp</link> *app);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeApp widget created by the MDI.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 
+A GnomeUIInfo array used for child's menus in <parameter>app</parameter> if they have been created with a template.
+<literal>NULL</literal> otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="GnomeApp">GnomeApp</link>, <link linkend="GnomeMDIChild">GnomeMDIChild</link>, <link linkend="GnomeMDIGenericChild">GnomeMDIGenericChild</link>, <link linkend="GnomeMDISession">GnomeMDISession</link>
+</para>
+</refsect1>
+
+</refentry>

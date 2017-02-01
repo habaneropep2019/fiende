@@ -1,0 +1,110 @@
+/* $Id: togglebutton.gen_h,v 1.48 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* togglebutton.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/button.h>
+#include <gtk/gtktogglebutton.h>
+CLASS_START(Gtk);
+//: Button with two states
+//- The togglebutton has the look of a regular button, but
+//- the action of a checkbutton. It can be switched between
+//- two states by clicking on it. Like the button, it can
+//- hold another widget inside it.
+class ToggleButton : public Button {
+  WRAP_CLASS(ToggleButton,GtkToggleButton,GTK_TOGGLE_BUTTON,GTK_IS_TOGGLE_BUTTON,toggle_button,Gtk::Button,GtkButton,GTK_BUTTON);
+public:
+
+  //: Create an empty toggle button.
+  //- With an empty button, you can {Gtk::Button::add()} a widget
+  //- such as a {Gtk::Pixmap::} or {Gtk::Box::}.
+  //-
+  //- If you just wish to add a {Gtk::Label::},
+  //- you may want to
+  //- use the {ToggleButton(const string &label)} ctor 
+  //- directly instead.
+  WRAP_CTOR_DEFAULT;
+
+  //: Create a check button with a label.
+  //- You won't be able
+  //- to add a widget in this button since it already has a {\class Gtk_Label}
+  //- in it.
+  explicit ToggleButton(const string &label,gfloat x=0.5,gfloat y=0.5);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Set whether the indicator will be drawn.
+  //- See {draw_indicator}.
+  WRAP_METHOD(
+    void gtk_toggle_button_set_mode(GtkToggleButton *,gboolean),
+    void set_mode (bool draw_indicator));
+
+  //: Returns whether the indicator will be drawn.
+  //- See {draw_indicator}.
+  WRAP_MEMBER(value,mode,draw_indicator,bool,bool);
+
+  //: Set the state of the indicator.
+  WRAP_METHOD(
+    void gtk_toggle_button_set_active(GtkToggleButton *,gboolean),
+    void set_active(bool is_active));
+
+  //- See {active}.
+  //: Return the state of the indicator.
+  //- See {active}.
+  WRAP_MEMBER(value,active,active,bool,bool);
+
+  //: Emitted on a change of button state.
+  //- Triggered when the button changes state
+  //- (Note : changing the button's state with {set_active()}
+  //- will also trigger this signal).
+  SIGNAL_SPEC("toggled",both,void toggled(),gtk_toggle_button_toggled);
+};
+
+PRIVATE_START;
+#include <gtk--/private/button_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+ToggleButton::ToggleButton(const string &label,gfloat x,gfloat y)
+  :     Button((GtkButton*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  add_label(label,x,y);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_ToggleButton)
+//. name: active
+//. type: guint:1
+//. get: {get_active()}
+//. set: {set_active()}
+//. desc: Whether the button is toggled on (e.g. active) or off
+
+//. name: draw_indicator
+//. type: guint:1
+//. get: {get_mode()}
+//. set: {set_mode()}
+//. desc: Whether the button or only its parent itself will be redrawn
+//. when toggled. If set to true, the button will be redrawn, otherwise
+//. only the parent will be.
+

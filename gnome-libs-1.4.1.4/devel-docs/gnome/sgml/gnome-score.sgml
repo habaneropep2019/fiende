@@ -1,0 +1,99 @@
+<refentry id="gnome-gnome-score">
+<refmeta>
+<refentrytitle>gnome-score</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-score</refname><refpurpose>Tracking score for games</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+<link linkend="gint">gint</link>        <link linkend="gnome-score-init">gnome_score_init</link>                (const <link linkend="gchar">gchar</link> *gamename);
+<link linkend="gint">gint</link>        <link linkend="gnome-score-log">gnome_score_log</link>                 (<link linkend="gfloat">gfloat</link> score,
+                                             <link linkend="gchar">gchar</link> *level,
+                                             <link linkend="gboolean">gboolean</link> higher_to_lower_score_order);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The routines in this module provide a simple way for games to
+keep track of the user's score in a game.</para>
+
+<para>The programmer needs to call <link linkend="gnome-score-init">gnome_score_init</link>() with the name of
+the game prior to accessing any of the other gnome_score functions.
+<link linkend="gnome-score-log">gnome_score_log</link>() should then be called every time the user ends a
+round.  To get a list of the most notable scores, you call the
+<link linkend="gnome-score-get-notable">gnome_score_get_notable</link>() routine.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-score-init">gnome_score_init ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_score_init                (const <link linkend="gchar">gchar</link> *gamename);</programlisting>
+<para>
+GNOME Games should call this routine as the first statement
+in <link linkend="main">main</link>() if they have been installed setgid to the <link linkend="games">games</link>() group.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gamename</parameter>&nbsp;:</entry>
+<entry> Identifies the game name.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> 0 on success, returns -1 on failure.
+
+group privileges are dropped regardless of the status returned.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-score-log">gnome_score_log ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_score_log                 (<link linkend="gfloat">gfloat</link> score,
+                                             <link linkend="gchar">gchar</link> *level,
+                                             <link linkend="gboolean">gboolean</link> higher_to_lower_score_order);</programlisting>
+<para>
+Logs a score entry for the user.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>score</parameter>&nbsp;:</entry>
+<entry> the score achieved by the user in this game
+</entry></row>
+<row><entry align="right"><parameter>level</parameter>&nbsp;:</entry>
+<entry> level on which the score was obtained
+</entry></row>
+<row><entry align="right"><parameter>higher_to_lower_score_order</parameter>&nbsp;:</entry>
+<entry> biggers is better or not
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>0 on failure or the status from the gnome-score helper
+program.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

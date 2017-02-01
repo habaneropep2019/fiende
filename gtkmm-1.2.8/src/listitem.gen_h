@@ -1,0 +1,80 @@
+/* $Id: listitem.gen_h,v 1.35 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* listitem.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/item.h>
+#include <gtk/gtklistitem.h>
+CLASS_START(Gtk);
+//: An item in a {\class Gtk::List}.
+//- The {\class Gtk::ListItem} widget is used for each item in a {\class Gtk::List}.
+class ListItem : public Item {
+  WRAP_CLASS(ListItem,GtkListItem,GTK_LIST_ITEM,GTK_IS_LIST_ITEM,list_item,Gtk::Item,GtkItem,GTK_ITEM);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  //: Creates a new {\class Gtk::ListItem} with a child label containing the given string.
+  //- label: The string to use for the child label.
+  explicit ListItem(const string &label,gfloat x=0.0,gfloat y=0.5);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  // gtk_list_item_(de)select are just a wrapper for gtk_item_(de)select
+  // and defined in Gtk_Item, so they do not be redefined here
+  // void select();
+  // void deselect();
+
+  SIGNAL_SPEC("toggle_focus_row",both,void toggle_focus_row());
+  SIGNAL_SPEC("select_all",both, void select_all());
+  SIGNAL_SPEC("unselect_all",both, void unselect_all());
+  SIGNAL_SPEC("undo_selection",both, void undo_selection());
+  SIGNAL_SPEC("start_selection",both, void start_selection());
+  SIGNAL_SPEC("end_selection",both, void end_selection());
+  SIGNAL_SPEC("extend_selection",both,
+    void extend_selection  ( GtkScrollType  scroll_type,
+                             gfloat         position,
+                             gboolean       auto_start_selection));
+  SIGNAL_SPEC("scroll_horizontal",both,
+    void scroll_horizontal ( GtkScrollType  scroll_type,
+                             gfloat         position));
+  SIGNAL_SPEC("scroll_vertical",both,
+    void scroll_vertical   ( GtkScrollType  scroll_type,
+                             gfloat         position));
+  SIGNAL_SPEC("toggle_add_mode",both,void toggle_add_mode());
+};
+
+PRIVATE_START;
+#include <gtk--/private/item_p.h>
+IMPL_START;
+#include <gtk--/misc.h>
+#include <gtk--/label.h>
+namespace Gtk
+{
+
+ListItem::ListItem(const string &label,gfloat x,gfloat y)
+  :     Item((GtkItem*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  add_label(label,x,y);
+}
+
+}
+
+DOCUMENTATION_START;
+

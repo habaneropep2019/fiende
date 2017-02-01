@@ -1,0 +1,84 @@
+/* $Id: href.gen_h,v 1.2 2000/08/31 15:46:25 kenelson Exp $ */
+
+
+/* href.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/button.h>
+#include <libgnomeui/gnome-href.h>
+
+CLASS_START(Gnome);
+class HRef : public Gtk::Button
+{
+  WRAP_CLASS(HRef, GnomeHRef,
+             GNOME_HREF, GNOME_IS_HREF,
+             href,
+             Gtk::Button, GtkButton, GTK_BUTTON);
+public:
+  HRef(const Gtk::string &url, const Gtk::string &label);
+  HRef(const Gtk::string &url);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(void gnome_href_set_url (GnomeHRef *href, const gchar *url),
+	      void set_url (const Gtk::string &url));
+
+  WRAP_METHOD(gchar* gnome_href_get_url (GnomeHRef *href),
+	      Gtk::string get_url ());
+
+  WRAP_METHOD(void gnome_href_set_label (GnomeHRef *href, const gchar *label),
+	      void set_label (const Gtk::string &label));
+
+  WRAP_METHOD(gchar* gnome_href_get_label (GnomeHRef *href),
+	      Gtk::string get_label ());
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/button_p.h>
+IMPL_START;
+#include <gnome--/private/href_p.h>
+
+namespace Gnome
+{
+
+HRef::HRef(const Gtk::string &url, const Gtk::string &label)
+  : Gtk::Button(GTK_BUTTON(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  
+  set_url(url);
+  set_label(label);
+}
+
+HRef::HRef(const Gtk::string &url)
+  : Gtk::Button(GTK_BUTTON(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  
+  set_url(url);
+  set_label(url);
+}
+
+} //namespace Gnome
+
+DOCUMENTATION_START;
+

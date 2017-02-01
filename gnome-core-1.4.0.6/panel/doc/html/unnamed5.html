@@ -1,0 +1,327 @@
+<HTML
+><HEAD
+><TITLE
+>The Applet's Context Menu</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The GNOME Panel Libraries"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="The Art of Applet Writing"
+HREF="unnamed1.html"><LINK
+REL="PREVIOUS"
+TITLE="The .gnorba and .desktop Files"
+HREF="unnamed4.html"><LINK
+REL="NEXT"
+TITLE="Advanced Menu Stuff"
+HREF="unnamed6.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The GNOME Panel Libraries</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed4.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed6.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="UNNAMED5"
+>The Applet's Context Menu</A
+></H1
+><P
+>	  When the user right clicks on the applet, a menu appears, this is all
+	  handeled by the panel, so in order to add items to it you use a
+	  special interface to &quot;add callbacks&quot; to the menu. A very
+	  simple example would be (making our hello applet even more feature
+	  full):
+
+	  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN52"
+></A
+><P
+><B
+>Example 4. hello_applet with menu items</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;config.h&gt;
+#include &lt;applet-widget.h&gt;
+
+static void
+hello_there (AppletWidget *applet, gpointer data)
+{
+        g_print(_("Hello There"));
+}
+
+int
+main (int argc, char **argv)
+{
+        GtkWidget *applet;
+        GtkWidget *label;
+
+        /* Initialize the i18n stuff */
+        bindtextdomain (PACKAGE, GNOMELOCALEDIR);
+        textdomain (PACKAGE);
+
+        /* intialize, this will basically set up the applet, corba and
+           call gnome_init */
+        applet_widget_init("hello_applet", NULL, argc, argv, NULL, 0, NULL);
+
+        /* create a new applet_widget */
+        applet = applet_widget_new("hello_applet");
+        /* in the rare case that the communication with the panel
+           failed, error out */
+        if (!applet)
+                g_error("Can't create applet!\n");
+
+        /* create the widget we are going to put on the applet */
+        label = gtk_label_new(_("Hello There!"));
+        gtk_widget_show(label);
+
+        /* add the widget to the applet-widget, and thereby actually
+           putting it "onto" the panel */
+        applet_widget_add (APPLET_WIDGET (applet), label);
+        gtk_widget_show (applet);
+
+        /* add an item to the applet menu */
+        applet_widget_register_callback(APPLET_WIDGET(applet),
+                                        "hello",
+                                        _("Hello There"),
+                                        hello_there,
+                                        NULL);
+
+        /* special corba main loop */
+        applet_widget_gtk_main ();
+
+        return 0;
+}
+            </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+	</P
+><P
+>	  Now the user will see a &quot;Hello There&quot; menu item on the
+	  applet menu, and when selected, the applet will print &quot;Hello
+	  There&quot;. Useful huh?
+	</P
+><P
+>	  Note that the second argument to the register_callback is just a
+	  string identifier of this callback, and can really be whatever you
+	  want. But it should NOT be translated as the label (the 3rd 
+	  argument) should be.
+	</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed4.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed6.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>The .gnorba and .desktop Files</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Advanced Menu Stuff</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

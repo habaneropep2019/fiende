@@ -1,0 +1,226 @@
+/* $Id: table.gen_h,v 1.66 2001/07/15 13:33:38 murrayc Exp $ */
+
+
+/* table.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gtk/gtktable.h>
+
+CLASS_START(Gtk);
+class Table;
+
+namespace Table_Helpers
+{
+#m4 include(list.m4)
+  GP_LIST(TableList,Table,Widget)
+  GP_LIST_NOINSERT()
+  GP_LIST_CONTAINER_REMOVE()
+  GP_LIST_END()
+};
+
+//: Table Packing Widget
+//- {\class Gtk::Table} is one of the primary methods for construction of
+//- grouped widgets.  It consists of a set of lattice points to
+//- to which widgets can be attached.  There are {\i (rows+1)} lattice
+//- points vertically and {\i (columns+1)} lattice points horizontally.
+//- Lattice points start counting from 0.
+//- Lattice points can either be specified to be {homogeneous}  meaning
+//- equally spaced or not {homogeneous} meaning each cell should
+//- be calculated based on the widgets contained in the row and column.
+//- Homogeneous defaults to FALSE.
+//-
+//- Widgets can be attached to the table at by specifying the top, bottom,
+//- left and right points corresponding to upper, lefthand
+//- lattice point and the lower, righthand lattice point with the
+//- widget should span.  Widgets can
+//- either be contained in a cell or may span cells.  A number of options
+//- control the resizing behavior of widgets contained in the table.
+//-
+//- {\b Packing options:}  
+//-
+//- There are a number of packing objections that can be specified 
+//- when adding a widget.  With {\enum GTK_EXPAND}, the lattice is 
+//- allowed to grow to fill space.  With {\enum GTK_SHRINK}, the lattice 
+//- is allowed to shrink when resized.  It is also possible to specify
+//- the behaviour of the widgets allocation within the table.  The 
+//- flag {\enum GTK_FILL} declares the widget should grow to fill lattice.
+//- If this is not set any extra space is used as padding.
+//- The default is {\enum GTK_FILL} and {\enum GTK_EXPAND}.  
+//-
+//- The table size is calculated
+//- based on the size of the widgets contained within and the restrictions
+//- imposed by specified options.
+//-
+//- Padding and spacing can be use
+//- in the table.  Padding is added on either side of a widget, while spacing
+//- is placed between widgets.
+//-
+//- The other generic packing widgets are:
+//- {Gtk::Box::}, {Gtk::HBox::}, {Gtk::VBox::}
+class Table : public Container {
+  WRAP_CLASS(Table,GtkTable,GTK_TABLE,GTK_IS_TABLE,table,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+
+  explicit Table(gint rows=1, gint columns=1, gint homogeneous=FALSE);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Binds a widget to a set of lattice points.  
+  //- At minumum 
+  //- specification of the lattice points is required.  
+  //- Additionally, the cell options as described above and paddings 
+  //- may be specified.  Default paddings are 0 pixels in both dimensions.
+  WRAP_METHOD(
+    void gtk_table_attach (GtkTable*, GtkWidget*,
+                           guint, guint, guint, guint,
+                           GtkAttachOptions, GtkAttachOptions,
+                           guint, guint),
+    void attach(Gtk::Widget &child,
+	      guint left_attach,
+	      guint right_attach,
+              guint top_attach,
+              guint bottom_attach,
+	      gint xoptions=(GTK_FILL|GTK_EXPAND), 
+	      gint yoptions=(GTK_FILL|GTK_EXPAND),
+	      guint xpadding=0, guint ypadding=0));
+
+
+  //: (Gtk 1.1) This function allows for dynamic resizing of 
+  //: a Table.
+  WRAP_METHOD(void gtk_table_resize(GtkTable*,guint,guint),
+  void resize(guint rows, guint columns));
+
+  WRAP_METHOD(void gtk_table_set_homogeneous(GtkTable*,gint),
+  void set_homogeneous(bool homogeneous));
+  
+  //: This function sets the number of pixels to appear between one row of cells and the next.
+  //- {\var row} is the 
+  //- lattice row counted without the edges starting from 0.  Therefore, row
+  //- 0 would denote between the first and second
+  //- row of cells.  {\i row} has a range from  0 and {\i (rows-2)}
+  //- Default spacing is 0 pixels.
+  WRAP_METHOD(void gtk_table_set_row_spacing(GtkTable*,gint,gint),
+  void set_row_spacing(gint row, gint spacing));
+
+  //- This function sets the number of pixels to appear between one column of cells and the next.
+  //- {\var column} is the 
+  //- lattice column counted without the edges starting from 0.  Therefore, 
+  //- column 0 would denote between the first and second
+  //- row of cells.  {\var column} has a range from  0 and {\i (columns-2)}.
+  //- Default spacing is 0 pixels.
+  WRAP_METHOD(void gtk_table_set_col_spacing(GtkTable*,gint,gint),
+  void set_col_spacing(gint column, gint spacing));
+
+  //: This function sets the number of pixels to a appear between every
+  //: row of cells.  Default is 0 pixels.
+  WRAP_METHOD(void gtk_table_set_row_spacings(GtkTable*,gint),
+  void set_row_spacings(gint spacing));
+
+  //: This function sets the number of pixels to a appear between every
+  //: column of cells.  Default is 0 pixels.
+  WRAP_METHOD(void gtk_table_set_col_spacings(GtkTable*,gint),
+  void set_col_spacings(gint spacing));
+
+  void set_spacings(gint spacing);
+
+  typedef Table_Helpers::TableList TableList;
+
+  // *****WARNING - THESE METHODS DO NOT WORK IN STABLE 
+  //   CAN NOT BE FIXED BECAUSE OF BINARY COMPATIBLITY.  WILL
+  //   FIX IN 1.4
+  TableList& children() 
+    {return reinterpret_cast<TableList&>(container_self);}
+  const TableList& children() const
+    {return reinterpret_cast<const TableList&>(container_self);}
+};
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+Table::Table(gint rows, gint columns, gint homogeneous)
+  : Container((GtkContainer*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gtkobj()->homogeneous = (homogeneous ? TRUE : FALSE);
+  gtk_table_resize (gtkobj(), rows, columns);
+}
+
+void Table::set_spacings(int spacing)
+{
+  set_row_spacings(spacing);
+  set_col_spacings(spacing);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Table)
+//. name: children
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: rows
+//. type: GtkTableRowCol*
+//. get:
+//. set:
+//. desc:
+
+//. name: cols
+//. type: GtkTableRowCol*
+//. get:
+//. set:
+//. desc:
+
+//. name: nrows
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: ncols
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: column_spacing
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: row_spacing
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: homogeneous
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

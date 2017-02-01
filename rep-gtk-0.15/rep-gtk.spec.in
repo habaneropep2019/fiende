@@ -1,0 +1,97 @@
+
+Name: rep-gtk
+Version: @version@
+Release: 1
+Summary: GTK+ binding for librep Lisp environment
+Requires: librep >= 0.13, gtk+ >= 1.2
+Copyright: GPL
+Group: Development/Languages
+Source: http://download.sourceforge.net/rep-gtk/rep-gtk-%{version}.tar.gz
+URL: http://rep-gtk.sourceforge.net/
+Packager: John Harper <john@dcs.warwick.ac.uk>
+Buildroot: /var/tmp/%{name}-root
+BuildPrereq: librep-devel libglade-devel gnome-libs-devel gdk-pixbuf-devel
+
+%description
+This is a binding of GTK+ for the librep Lisp interpreter. It is based
+on Marius Vollmer's guile-gtk package (initially version 0.15, updated
+to 0.17), with a new glue-code generator.
+
+%package libglade
+Summary: librep binding for the libglade library for loading user interfaces.
+Group: Development/Languages
+Requires: %{name} = @version@, libglade
+
+%description libglade
+This is a binding of libglade for the librep Lisp interpreter. libglade
+allows applications to dynamically load XML descriptions of GTK+ widget
+hierarchies. These hierarchies may be created by the GLADE GUI builder.
+
+%package gnome
+Summary: GNOME binding for librep
+Group: Development/Languages
+Requires: %{name} = @version@, gnome-libs, libglade
+
+%description gnome
+This is a binding of the various GNOME libraries for the librep Lisp
+interpreter. It include support for the basic GNOME functions, the
+GNOME user interface widgets, the GNOME Canvas architecture, and the
+GNOME version of libglade.
+
+%prep
+%setup
+
+%build
+%configure
+make host_type=%{_target_platform}
+
+%install
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+make install \
+    host_type=%{_target_platform} \
+    installdir=$RPM_BUILD_ROOT%{_libexecdir}/rep/%{_target_platform}
+
+%clean
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+%doc README README.guile-gtk BUGS ChangeLog gtk.defs gdk.defs
+%{_libexecdir}/rep/%{_target_platform}/gui/gtk
+%{_libexecdir}/rep/%{_target_platform}/gui/gtk.so
+%{_libexecdir}/rep/%{_target_platform}/gui/gtk.la
+%{_libexecdir}/rep/%{_target_platform}/sgtk-types.so
+%{_libexecdir}/rep/%{_target_platform}/sgtk-types.la
+%{_libexecdir}/rep/%{_target_platform}/gtk.so
+%{_libexecdir}/rep/%{_target_platform}/gtk.la
+
+%files libglade
+%defattr(-,root,root)
+%doc libglade.defs examples/test-libglade examples/simple.glade
+%doc examples/rep-ui examples/rep-ui.glade
+%{_libexecdir}/rep/%{_target_platform}/libglade.so*
+%{_libexecdir}/rep/%{_target_platform}/libglade.la
+
+%files gnome
+%defattr(-,root,root)
+%doc gnome*.defs gdk-pixbuf.defs libglade.defs
+%doc examples/gnome-test examples/canvas-test
+%{_libexecdir}/rep/%{_target_platform}/gui/gnome
+%{_libexecdir}/rep/%{_target_platform}/gui/gnome.so
+%{_libexecdir}/rep/%{_target_platform}/gui/gnome.la
+%{_libexecdir}/rep/%{_target_platform}/gnome*.so
+%{_libexecdir}/rep/%{_target_platform}/gnome*.la
+%{_libexecdir}/rep/%{_target_platform}/libglade-gnome.so
+%{_libexecdir}/rep/%{_target_platform}/libglade-gnome.la
+%{_libexecdir}/rep/%{_target_platform}/gdk-pixbuf.so
+%{_libexecdir}/rep/%{_target_platform}/gdk-pixbuf.la
+
+%changelog
+* Tue Jun 13 2000 John Harper <john@dcs.warwick.ac.uk>
+- use better macros
+
+* Fri Sep 17 1999 John Harper <john@dcs.warwick.ac.uk>
+- specify installdir when installing
+
+* Tue Sep 14 1999 Aron Griffis <agriffis@bigfoot.com>
+- 0.4 spec file update: added buildroot

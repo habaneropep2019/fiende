@@ -1,0 +1,212 @@
+/* $Id: layout.gen_h,v 1.28 2000/02/13 02:22:09 kenelson Exp $ */
+
+/* layout.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gtk--/adjustment.h>
+#include <gtk/gtklayout.h>
+
+CLASS_START(Gtk);
+
+class Layout : public Container
+{
+  WRAP_CLASS(Layout,GtkLayout,GTK_LAYOUT,GTK_IS_LAYOUT,layout,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+
+  // Gtk_Widget::set_scroll_adjustments
+  SIGNAL_SPEC("set_scroll_adjustments",both|fake,
+    void set_scroll_adjustments(Gtk::Adjustment*,Gtk::Adjustment*),
+    void gtk_layout_set_scroll_adjustments(GtkLayout*,GtkAdjustment*,GtkAdjustment*));
+
+  Layout();
+  Layout (Gtk::Adjustment &hadjustment,
+	  Gtk::Adjustment &vadjustment);
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD( 
+    void gtk_layout_put(GtkLayout*,GtkWidget*,gint,gint),
+    void put                           (Gtk::Widget &widget,
+					gint x,
+					gint y));
+
+  WRAP_METHOD(
+    void gtk_layout_move(GtkLayout*, GtkWidget*, gint, gint),
+    void move                          (Gtk::Widget &widget,
+					gint x,
+					gint y));
+  
+  WRAP_METHOD(void gtk_layout_set_size(GtkLayout*,
+				       guint width,
+				       guint height),
+	      void set_size (guint width,
+			     guint height));
+  
+  //: These disable and enable moving and repainting the scrolling
+  //: window of the GtkLayout, respectively.  If you want to update the
+  //: layout's offsets but do not want it to repaint itself, you should
+  //: use these functions.
+  WRAP_METHOD(void gtk_layout_freeze(GtkLayout*),
+	      void freeze());
+  WRAP_METHOD(void gtk_layout_thaw(GtkLayout*),
+	      void thaw());
+
+  WRAP_MEMBER(value,hadjustment,hadjustment,Gtk::Adjustment*,GtkAdjustment*);
+  WRAP_MEMBER(value,vadjustment,vadjustment,Gtk::Adjustment*,GtkAdjustment*);
+
+  WRAP_METHOD(void gtk_layout_set_hadjustment(GtkLayout*,GtkAdjustment*),
+    void set_hadjustment                 (Gtk::Adjustment *hadj=0));
+  WRAP_METHOD(void gtk_layout_set_vadjustment(GtkLayout*,GtkAdjustment*),
+    void set_vadjustment                 (Gtk::Adjustment *vadj=0));
+  WRAP_METHOD(void gtk_layout_set_hadjustment(GtkLayout*,GtkAdjustment*),
+    void set_hadjustment                 (Gtk::Adjustment &hadj));
+  WRAP_METHOD(void gtk_layout_set_vadjustment(GtkLayout*,GtkAdjustment*),
+    void set_vadjustment                 (Gtk::Adjustment &vadj));
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+/* layout.cc
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+Layout::Layout()
+  : Container((GtkContainer*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_hadjustment();
+  set_vadjustment();
+}
+
+Layout::Layout(Adjustment &hadjustment,
+		       Adjustment &vadjustment)
+  : Container((GtkContainer*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_hadjustment(hadjustment);
+  set_vadjustment(vadjustment);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Layout)
+//. name: children
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: width
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: height
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: xoffset
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: yoffset
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: hadjustment
+//. type: GtkAdjustment*
+//. get:
+//. set:
+//. desc:
+
+//. name: vadjustment
+//. type: GtkAdjustment*
+//. get:
+//. set:
+//. desc:
+
+//. name: bin_window
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: visibility
+//. type: GdkVisibilityState
+//. get:
+//. set:
+//. desc:
+
+//. name: configure_serial
+//. type: gulong
+//. get:
+//. set:
+//. desc:
+
+//. name: scroll_x
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: scroll_y
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: freeze_count
+//. type: guint
+//. get:
+//. set:
+//. desc:
+

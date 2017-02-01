@@ -1,0 +1,1533 @@
+/* $Id: ctree.gen_h,v 1.90 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* ctree.h
+ *
+ * Copyright (C) 2000 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+/**********************************************************************
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+***********************************************************************
+  This wrapper is new to the kit.  The old one was so out of date
+  as to not be useful.  This wrapper has not been time tested
+  like the others, please be sure to report unexpected crashes, strange
+  behavior and unusable methods.  A number of the available methods
+  may not have been defined correctly yet.
+***********************************************************************
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+**********************************************************************/
+
+#m4 GTKMM_CONVERSION(`GtkCTreeNode*',`Gtk::CTree::Row',`$3.node_',`Gtk::CTree::Row($3?CT_PARENT($3):0,$3)')
+
+#include <gtk--/clist.h>
+#include <gtk/gtkctree.h>
+
+CLASS_START(Gtk);
+class CTree;
+class CTree_Class;
+
+namespace CTree_Helpers {
+
+class RowList;
+class TreeList;
+class Element
+  {
+      friend class RowList;
+      friend class TreeList;
+
+      Gtk::SArray  text_;
+      guint8        spacing_;
+      Gdk_Pixmap    pixmap_closed_;
+      Gdk_Bitmap    mask_closed_;
+      Gdk_Pixmap    pixmap_opened_;
+      Gdk_Bitmap    mask_opened_;
+      bool          is_leaf_;
+      bool          expanded_;
+    public: 
+      Element(const Gtk::SArray& text,
+              bool is_leaf=false, 
+              bool expanded=false);
+      Element(const Gtk::SArray& text,
+              Gdk_Pixmap pixmap_closed,
+              Gdk_Bitmap mask_closed,
+              Gdk_Pixmap pixmap_opened,
+              Gdk_Bitmap mask_opened, 
+              bool is_leaf=false, 
+              bool expanded=false);
+  };
+
+typedef Element LeafElem;
+
+class BranchElem : public Element
+  {
+    public:
+      BranchElem(const Gtk::SArray& text,
+              bool expanded=false);
+      BranchElem(const Gtk::SArray& text,
+              Gdk_Pixmap pixmap_closed,
+              Gdk_Bitmap mask_closed,
+              Gdk_Pixmap pixmap_opened,
+              Gdk_Bitmap mask_opened,
+              bool expanded=false);
+  };
+
+/****************************************************************/
+class Row;
+class Cell
+  {
+    protected:
+      friend class Row;
+      GtkCTree     *tree_;
+      GtkCTreeNode *node_;
+      gint          column_;
+   
+      Cell(GtkCTree* parent, GtkCTreeNode* row, gint column);
+      Cell();
+
+    public:
+      GtkCellType get_type() const;
+ 
+      Gtk::Style* get_style() const;
+      nstring get_text() const;
+      Gdk_Pixmap get_pixmap() const;
+      Gdk_Bitmap get_mask() const;
+
+      void set_style(Gtk::Style* style=0);
+      void set_style(Gtk::Style& style);
+      void set_text(const nstring&);
+      void set_pixmap(const Gdk_Pixmap& pixmap,const Gdk_Bitmap& mask=0);
+      void set_shift(gint vertical,gint horizontal);
+
+      void clear();
+ 
+      void moveto(gfloat row_align=0.5,gfloat col_align=0.5);
+  };
+
+
+class CellIterator: private Cell
+  {
+    private:
+      friend class Row;
+      CellIterator(GtkCTree* parent, GtkCTreeNode* row, gint column)
+        : Cell(parent,row,column)
+        {}
+
+    public:
+      CellIterator()
+        : Cell()
+        {}
+
+      typedef bidirectional_iterator_tag iterator_category;
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
+
+      typedef Cell  value_type;
+      typedef Cell* pointer;
+      typedef Cell& reference;
+      typedef CellIterator Self;
+
+      Self&  operator++();
+      Self&  operator--();
+      Self   operator++(int) {Self t=*this; Self::operator++(); return t;}
+      Self   operator--(int) {Self t=*this; Self::operator--(); return t;}
+
+      reference operator*()  const;
+      pointer operator -> () const;
+
+      bool operator ==(const Self& cell) const {return column_==cell.column_;}
+      bool operator !=(const Self& cell) const {return column_!=cell.column_;}
+  };
+
+/****************************************************************/
+class RowList;
+class SelectionList;
+class Row
+  {
+      friend class RowList;
+    public:
+      typedef Row                                Self;
+      typedef Cell                               value_type;
+      typedef value_type &                       reference;
+      typedef const value_type &                 const_reference;
+
+      typedef CellIterator                       iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t                             difference_type;
+      typedef size_t                             size_type;
+     
+    protected:
+      friend class ::Gtk::CTree;
+      friend class CTree_Class;
+      friend class SelectionIterator;
+      GtkCTree* tree_;
+      GtkCTreeNode* node_;
+      
+
+      iterator begin_() const
+        { return iterator(tree_,node_,0); }
+      iterator end_() const
+        { return iterator(tree_,node_,size()); }
+
+    public:
+      Row(GtkCTree* tree,GtkCTreeNode* node)
+        : tree_(tree), node_(node) {}
+      Row() : tree_(0), node_(0) {}
+
+      void set_style(Gtk::Style* style=0);
+      void set_style(Gtk::Style& style);
+      Gtk::Style* get_style();
+
+      void set_selectable(bool);
+      bool get_selectable();
+
+      void set_background(const Gdk_Color&);
+      void set_foreground(const Gdk_Color&);
+
+      gpointer get_data();
+      void set_data(gpointer);
+      void set_data(gpointer,GtkDestroyNotify);
+
+      guint8 get_spacing();         //gtk_ctree_get_node_info
+      GtkVisibility is_visible();
+      bool          is_viewable();
+      bool          is_leaf();      //gtk_ctree_get_node_info
+      bool          is_expanded();  //gtk_ctree_get_node_info
+			
+      void expand();
+      void expand_recursive();
+      void expand_to_depth(int depth);
+      void collapse();
+      void collapse_recursive();
+      void collapse_to_depth(int depth);
+      void toggle_expansion();
+      void toggle_expansion_recursive();
+
+      void set_spacing(guint8);//gtk_ctree_get_node_info
+      void set_leaf(bool);     //gtk_ctree_get_node_info
+      void set_opened (const Gdk_Pixmap&,const Gdk_Bitmap&); 
+      void set_closed (const Gdk_Pixmap&,const Gdk_Bitmap&);
+
+      void select();
+      void select_recursive();
+      void unselect();
+      void unselect_recursive();
+      void sort();
+      void sort_recursive();
+
+      RowList subtree();
+      Row     get_parent();
+
+      /*** Cell Vector operations ***/
+
+      iterator begin()
+        {return begin_();}
+      iterator end()
+        {return end_();}
+
+      const_iterator begin() const
+        { return const_iterator(begin_()); }
+      const_iterator end() const
+        { return const_iterator(end_()); }
+
+      reverse_iterator rbegin()
+        { return reverse_iterator(end_()); }
+      reverse_iterator rend()
+        { return reverse_iterator(begin_()); }
+
+      const_reverse_iterator rbegin() const
+        { return const_reverse_iterator(reverse_iterator(end_())); }
+      const_reverse_iterator rend() const
+        { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      size_type size() const
+        { return size_type(((GtkCList*)tree_)->columns); }
+      size_type max_size()
+        { return size_type(((GtkCList*)tree_)->columns); }
+      bool empty()
+        { return false; }
+
+      value_type operator[](size_type l) const
+        { return Cell(tree_, node_, l); }
+
+// - check if get_parent was successful.
+// - check in tree_select_row(Row) function if Row is the same than 
+//   previously selected/clicked Row
+// - gpointer Version to check e.g. for NULL
+      bool operator == (const Self     tRow)  const 
+        { return (tRow.node_ == node_); }
+      bool operator == (const gpointer tNull) const 
+        { return (node_ == tNull); }
+      bool operator != (const Self     tRow)  const 
+        { return (tRow.node_ != node_); }
+      bool operator != (const gpointer tNull) const 
+        { return (node_ != tNull); }
+  };
+
+/****************************************************************/
+class RowIterator : protected Row
+  {
+    protected:
+      friend class RowList;
+      friend class Gtk::CTree;
+      GtkCTreeNode* pnode_;
+      RowIterator(GtkCTree* parent,GtkCTreeNode* pnode, GtkCTreeNode* node)
+        : Row(parent,node), pnode_(pnode) {}
+
+    public:
+      typedef bidirectional_iterator_tag iterator_category;
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
+
+      typedef Row  value_type;
+      typedef Row* pointer;
+      typedef Row& reference;
+      typedef RowIterator Self;
+ 
+      RowIterator(): Row() {}
+   
+      bool operator == (const Self& i) const {return node_==i.node_;}
+      bool operator != (const Self& i) const {return node_!=i.node_;}
+
+      Self&  operator++();
+      Self&  operator--();
+      Self   operator++(int) {Self t=*this; Self::operator++(); return t;}
+      Self   operator--(int) {Self t=*this; Self::operator--(); return t;}
+
+      reference operator*() const;
+      pointer operator -> () const;
+
+  };
+
+// this one goes through every element in depth first pattern. 
+class TreeIterator : protected Row
+  {
+    private:
+      friend class TreeList;
+
+      TreeIterator(GtkCTree* parent,GtkCTreeNode* node)
+        : Row(parent,node) {}
+
+    public:
+      typedef bidirectional_iterator_tag iterator_category;
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
+
+      typedef Row  value_type;
+      typedef Row* pointer;
+      typedef Row& reference;
+      typedef TreeIterator Self;
+
+      TreeIterator() {}
+
+      bool operator == (const Self& i) const {return node_==i.node_;}
+      bool operator != (const Self& i) const {return node_!=i.node_;}
+
+      Self&  operator++();
+      Self&  operator--();
+      Self   operator++(int) {Self t=*this; Self::operator++(); return t;}
+      Self   operator--(int) {Self t=*this; Self::operator--(); return t;}
+
+      reference operator*() const;
+      pointer operator -> () const;
+  };
+
+/****************************************************************/
+class RowList
+  {
+    public:
+      typedef Row                                value_type;
+      typedef value_type &                       reference;
+      typedef const value_type &                 const_reference;
+
+      typedef RowIterator                        iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t                             difference_type;
+      typedef size_t                             size_type;
+
+    private:
+      friend class Row;
+      friend class ::Gtk::CTree;
+
+      GtkCTree* parent_;
+      GtkCTreeNode* node_;
+
+      RowList(GtkCTree* parent, GtkCTreeNode* node)
+        : parent_(parent), node_(node) {};
+
+      iterator begin_() const;
+      iterator end_() const;
+
+    public:
+
+      iterator begin()
+        {return begin_();}
+      iterator end()
+        {return end_();}
+
+      const_iterator begin() const
+        { return const_iterator(begin_()); }
+      const_iterator end() const
+        { return const_iterator(end_()); }
+
+      reverse_iterator rbegin()
+        { return reverse_iterator(end_()); }
+      reverse_iterator rend()
+        { return reverse_iterator(begin_()); }
+
+      const_reverse_iterator rbegin() const
+        { return const_reverse_iterator(reverse_iterator(end_())); }
+      const_reverse_iterator rend() const
+        { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      value_type front() const     { return *begin(); }
+      value_type back() const      { return *(--end()); }
+
+      // This is order n. (use at own risk)
+      value_type operator[](size_type l) const;
+
+      size_type size() const;
+      size_type max_size() const { return size_type(-1); }
+      bool empty() const;
+
+      iterator insert(iterator position, const Element& e);
+
+      void push_front(const Element& e) { insert(begin(),e); }
+      void push_back(const Element& e)  { insert(end(),e); }
+      void pop_front()                  { erase(begin()); }
+      void pop_back()                   { erase(--end()); }
+
+      void clear();
+
+      iterator erase(iterator);
+      void erase(iterator start, iterator stop);
+      void remove(const_reference);
+
+      void swap(iterator, iterator);
+      void move(iterator, iterator);
+      iterator find_data(gpointer) const;
+  };
+
+class TreeList
+  {
+    public:
+      typedef Row                                value_type;
+      typedef value_type &                       reference;
+      typedef const value_type &                 const_reference;
+
+      typedef TreeIterator                       iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+//      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+//      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t                             difference_type;
+      typedef size_t                             size_type;
+
+    private:
+      friend class Gtk::CTree;
+      GtkCTree* tree_;
+      TreeList(GtkCTree* tree) :tree_(tree) {}
+
+      iterator begin_() const;
+      iterator end_() const;
+
+    public:
+      TreeList() {}
+      ~TreeList() {}
+
+      iterator begin()
+        {return begin_();}
+      iterator end()
+        {return end_();}
+
+      const_iterator begin() const
+        { return const_iterator(begin_()); }
+      const_iterator end() const
+        { return const_iterator(end_()); }
+
+ //     reverse_iterator rbegin()
+ //       { return reverse_iterator(end_()); }
+ //     reverse_iterator rend()
+ //       { return reverse_iterator(begin_()); }
+
+ //     const_reverse_iterator rbegin() const
+ //       { return const_reverse_iterator(reverse_iterator(end_())); }
+ //     const_reverse_iterator rend() const
+ //       { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      //value_type front() const     { return *begin(); }
+      //value_type back() const      { return *(--end()); }
+
+      // This is order n. (use at own risk)
+      value_type operator[](size_type l) const;
+
+      // size_type size() const;  (not computable)
+      size_type max_size() const { return size_type(-1); }
+      bool empty() const;  
+  };
+
+  class SelectionList;
+  
+  class SelectionIterator: protected Row
+  {
+    private:
+      friend class SelectionList;
+      GList* glist_node_;
+
+      SelectionIterator(GtkCTree* parent, GList* node)
+        : Row(parent,0), glist_node_(node)
+        {}
+
+    public:
+      typedef bidirectional_iterator_tag iterator_category;
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
+
+      typedef Row  value_type;
+      typedef Row* pointer;
+      typedef Row& reference;
+
+      typedef SelectionIterator Self;
+
+      SelectionIterator()
+        {}
+
+      SelectionIterator(const Self& s)
+        : Row(s), glist_node_(s.glist_node_) {}
+
+      Self& operator= (const Self& s)
+        { Row::operator=(s); glist_node_=s.glist_node_; return *this; }
+
+      reference operator*()  const;
+      pointer operator -> () const;
+
+      Self&  operator++();
+      Self&  operator--();
+      Self   operator++(int) {Self t=*this; Self::operator++(); return t;}
+      Self   operator--(int) {Self t=*this; Self::operator--(); return t;}
+
+      bool operator ==(const Self& row) const {return glist_node_==row.glist_node_;}
+      bool operator !=(const Self& row) const {return glist_node_!=row.glist_node_;}
+  };
+  
+  class SelectionList
+  {
+    public:
+      typedef Row                                value_type;
+      typedef value_type &                       reference;
+      typedef const value_type &                 const_reference;
+
+      typedef SelectionIterator                  iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t                             difference_type;
+      typedef size_t                             size_type;
+
+    private:
+      friend class Gtk::CTree;
+      Gtk::CTree *parent_; // this will be shared with the other lists.
+
+      iterator begin_() const;
+      iterator end_() const;
+
+      GList*& glist() const;
+
+    public:
+      iterator begin()
+        {return begin_();}
+      iterator end()
+        {return end_();}
+
+      const_iterator begin() const
+        { return const_iterator(begin_()); }
+      const_iterator end() const
+        { return const_iterator(end_()); }
+
+      reverse_iterator rbegin()
+        { return reverse_iterator(end_()); }
+      reverse_iterator rend()
+        { return reverse_iterator(begin_()); }
+
+      const_reverse_iterator rbegin() const
+        { return const_reverse_iterator(reverse_iterator(end_())); }
+      const_reverse_iterator rend() const
+        { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      value_type front() const     { return *begin(); }
+      value_type back() const      { return *(--end()); }
+
+      // This is order n. (use at own risk)
+      value_type operator[](size_type l) const;
+
+      size_type size(void) const;
+      size_type max_size(void) const { return size_type(-1); }
+      bool empty(void) { return glist() == 0; }
+
+      void all();
+      void clear();
+      void undo();
+
+      // this has no insert method, items can only be removed
+  };
+
+  
+
+
+} /* namespace CTree_Helpers */
+
+
+
+//: A widget displaying a hierarchical tree.
+//- The {\class Gtk::CTree} widget is used for showing a hierarchical tree to the user, for example a directory tree.
+//-
+//- The tree is internally represented as a set of {GtkCTreeNode} structures.
+//-
+//- The interface has much in common with the {\class Gtk::CList} widget: rows (nodes) can be selected by
+//- the user etc.
+//-
+//- Positions in the tree are often indicated by two arguments, a parent and a sibling, both
+//- {GtkCTreeNode} pointers. If the parent is NULL, the position is at the root of the tree and if
+//- the sibling is NULL, it will be the last child of parent, otherwise it will be inserted just before the
+//- sibling.
+class CTree : public CList
+{
+  WRAP_CLASS(CTree,GtkCTree,GTK_CTREE,GTK_IS_CTREE,ctree,Gtk::CList,GtkCList,GTK_CLIST);
+
+public:
+
+  typedef Gtk::CTree_Helpers::Element       Element;
+  typedef Gtk::CTree_Helpers::Cell          Cell;
+
+  typedef Gtk::CTree_Helpers::Row           Row;
+  typedef Gtk::CTree_Helpers::RowList       RowList;
+
+  typedef Gtk::CTree_Helpers::TreeList      TreeList;
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Create tree with titles.
+  CTree(const Gtk::SArray& titles, gint tree_column=0);
+
+  //: Create tree without titles.
+  CTree(gint columns, gint tree_column=0);
+
+  //: Used to determine if a particular coordinat lies on an expander button.
+  //- x, y: The coordinates to check.
+  //- Returns: True if the given coordinates lie on an expander button.
+  WRAP_METHOD(
+    gboolean gtk_ctree_is_hot_spot(GtkCTree*,gint,gint),
+    bool is_hot_spot(gint x,gint y));
+
+  //: Set the amount of indentation between levels in the tree.
+  //- indent: The number of pixels to shift the levels of the tree.
+  WRAP_METHOD(
+    void gtk_ctree_set_indent(GtkCTree*,gint),
+    void set_indent(gint indent));
+
+  //: Set the spacing between the tree graphic and the actual node content.
+  //- spacing: The number of pixels between the tree and the node's content.
+  WRAP_METHOD(
+    void gtk_ctree_set_spacing(GtkCTree*,gint),
+    void set_spacing(gint spacing));
+
+  WRAP_METHOD(
+    void gtk_ctree_set_show_stub(GtkCTree*,gboolean),
+    void set_show_stub(bool show_stub)); 
+
+  typedef GtkCTreeLineStyle LineStyle;
+  typedef GtkCTreeExpanderStyle ExpanderStyle;
+  typedef GtkCTreeCompareDragFunc CompareDragFunc;
+
+  WRAP_METHOD(
+    void gtk_ctree_set_line_style(GtkCTree*,LineStyle),
+    void set_line_style(LineStyle style));
+
+  WRAP_METHOD(
+    void gtk_ctree_set_expander_style(GtkCTree*,ExpanderStyle),
+    void set_expander_style(ExpanderStyle style));
+
+  WRAP_METHOD(
+    void gtk_ctree_set_drag_compare_func(GtkCTree*,CompareDragFunc),
+    void set_drag_compare_func(CompareDragFunc));
+
+  // signals  (these are totally unwrappable!)
+#m4start
+GTKMM_PROXY_NAME(tree_select_row)
+GTKMM_PROXY_CALLBACK(tree_select_row,tree_select_row,void,void,`GtkCTree* p0,GtkCTreeNode* p1,gint p2',`p0,p1,p2',`Gtk::CTree::Row(p0,p1),p2',p0)
+GTKMM_PROXY_IMPL(tree_select_row,tree_select_row,void,void,`Gtk::CTree::Row row,gint column',`,__FWD_CONVERT(`GtkCTreeNode*',`Gtk::CTree::Row',`row'),column')
+GTKMM_PROXY_SIGNAL(tree_select_row,tree_select_row)
+GTKMM_PROXY_SIGNAL_TRANSLATE_NOEMIT_DECL(tree_select_row,gtkmm_ctree_tree_select_row,void,void,`Gtk::CTree::Row,gint',`GtkCTreeNode*,gint',0)
+dnl GTKMM_PROXY_SIGNAL_TRANSLATE_IMPL(tree_select_row,gtkmm_ctree_tree_select_row,void,void,`Gtk::CTree::Row,gint',`GtkCTreeNode* p1,gint p2',`__REV_CONVERT(GtkCTreeNode*,Gtk::CTree::Row,p1),p2')
+
+GTKMM_PROXY_NAME(tree_unselect_row)
+GTKMM_PROXY_CALLBACK(tree_unselect_row,tree_unselect_row,void,void,`GtkCTree* p0,GtkCTreeNode* p1,gint p2',`p0,p1,p2',`Gtk::CTree::Row(p0,p1),p2',p0)
+GTKMM_PROXY_IMPL(tree_unselect_row,tree_unselect_row,void,void,`Gtk::CTree::Row row,gint column',`,__FWD_CONVERT(`GtkCTreeNode*',`Gtk::CTree::Row',`row'),column')
+GTKMM_PROXY_SIGNAL(tree_unselect_row,tree_unselect_row)
+GTKMM_PROXY_SIGNAL_TRANSLATE_NOEMIT_DECL(tree_unselect_row,gtkmm_ctree_tree_unselect_row,void,void,`Gtk::CTree::Row,gint',`GtkCTreeNode*,gint',1)
+dnl GTKMM_PROXY_SIGNAL_TRANSLATE_IMPL(tree_unselect_row,gtkmm_ctree_tree_unselect_row,void,void,`Gtk::CTree::Row,gint',`GtkCTreeNode* p1,gint p2',`__REV_CONVERT(GtkCTreeNode*,Gtk::CTree::Row,p1),p2')
+
+GTKMM_PROXY_NAME(tree_expand)
+GTKMM_PROXY_CALLBACK(tree_expand,tree_expand,void,void,`GtkCTree* p0,GtkCTreeNode* p1',`p0,p1',`Gtk::CTree::Row(p0,p1)',p0)
+GTKMM_PROXY_IMPL(tree_expand,tree_expand,void,void,`Gtk::CTree::Row row',`,__FWD_CONVERT(`GtkCTreeNode*',`Gtk::CTree::Row',`row')')
+GTKMM_PROXY_SIGNAL(tree_expand,tree_expand)
+GTKMM_PROXY_SIGNAL_TRANSLATE_NOEMIT_DECL(tree_expand,gtkmm_ctree_tree_expand,void,void,`Gtk::CTree::Row',`GtkCTreeNode*',2)
+dnl GTKMM_PROXY_SIGNAL_TRANSLATE_IMPL(tree_expand,gtkmm_ctree_tree_expand,void,void,`Gtk::CTree::Row',`GtkCTreeNode* p1',`__REV_CONVERT(GtkCTreeNode*,Gtk::CTree::Row,p1)')
+
+GTKMM_PROXY_NAME(tree_collapse)
+GTKMM_PROXY_CALLBACK(tree_collapse,tree_collapse,void,void,`GtkCTree* p0,GtkCTreeNode* p1',`p0,p1',`Gtk::CTree::Row(p0,p1)',p0)
+GTKMM_PROXY_IMPL(tree_collapse,tree_collapse,void,void,`Gtk::CTree::Row row',`,__FWD_CONVERT(`GtkCTreeNode*',`Gtk::CTree::Row',`row')')
+GTKMM_PROXY_SIGNAL(tree_collapse,tree_collapse)
+GTKMM_PROXY_SIGNAL_TRANSLATE_NOEMIT_DECL(tree_collapse,gtkmm_ctree_collapse,void,void,`Gtk::CTree::Row',`GtkCTreeNode*',3)
+dnl GTKMM_PROXY_SIGNAL_TRANSLATE_IMPL(tree_collapse,gtkmm_ctree_collapse,void,void,`Gtk::CTree::Row',`GtkCTreeNode* p1',`__REV_CONVERT(GtkCTreeNode*,Gtk::CTree::Row,p1)')
+
+#m4end
+
+  TreeList tree()  
+    { return TreeList(gtkobj());}
+  const TreeList tree() const
+    { return TreeList(const_cast<GtkCTree*>(gtkobj()));}
+
+  RowList rows()  
+    { return RowList(gtkobj(),0);}
+  const RowList rows() const
+    { return RowList(const_cast<GtkCTree*>(gtkobj()),0);}
+
+  // convenience functions (order N)
+  Row row(int i)             {return rows()[i]; }
+  const Row row(int i) const {return rows()[i]; }
+
+  CTree_Helpers::SelectionList& selection()       
+    {
+      return reinterpret_cast<CTree_Helpers::SelectionList&>(ctree_self);
+      //pointer to ref cast works because 
+      //Gtk::CTree* parent_ is only member data of SelectionList.
+      //TODO: Add a SelectionList constructor instead. 
+    }
+  const CTree_Helpers::SelectionList& selection() const 
+    {
+      return reinterpret_cast<const CTree_Helpers::SelectionList&>(ctree_self);
+      //pointer to ref cast works because 
+      //Gtk::Tree* parent_ is only member data of SelectionList.
+      //TODO: Add a SelectionList constructor instead.
+    }
+};
+
+PRIVATE_START;
+#include <gtk--/private/clist_p.h>
+IMPL_START;
+#include <gtk--/style.h>
+#include <gtk--/adjustment.h>
+
+namespace Gtk {
+
+CTree::CTree(const Gtk::SArray& titles, gint tree_column)
+  : CList((GtkCList*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GTK_OBJECT_UNSET_FLAGS(gtkobj(), GTK_CONSTRUCTED);
+  gtk_ctree_construct(GTK_CTREE(gtkobject),titles.size(),tree_column,
+     const_cast<gchar**>((const gchar**)titles));
+}
+
+CTree::CTree(gint columns, gint tree_column)
+  : CList((GtkCList*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GTK_OBJECT_UNSET_FLAGS(gtkobj(), GTK_CONSTRUCTED);
+  gtk_ctree_construct(GTK_CTREE(gtkobject),columns,tree_column,(gchar**)0);
+}
+
+
+const int default_spacing = 4;
+
+namespace CTree_Helpers {
+
+Element::Element(const Gtk::SArray& text, bool is_leaf, bool expanded)
+   : text_(text), spacing_(default_spacing), is_leaf_(is_leaf), expanded_(expanded)
+  {}
+
+Element::Element(const Gtk::SArray& text,
+              Gdk_Pixmap pixmap_closed,
+              Gdk_Bitmap mask_closed,
+              Gdk_Pixmap pixmap_opened,
+              Gdk_Bitmap mask_opened,
+              bool is_leaf,
+              bool expanded)
+    : text_(text),
+      spacing_(default_spacing),
+      pixmap_closed_(pixmap_closed), mask_closed_(mask_closed),
+      pixmap_opened_(pixmap_opened), mask_opened_(mask_opened),
+      is_leaf_(is_leaf), expanded_(expanded)
+  {}
+
+BranchElem::BranchElem(const Gtk::SArray& text,
+              bool expanded)
+    : Element(text,0,expanded)
+  {}
+
+BranchElem::BranchElem(const Gtk::SArray& text,
+              Gdk_Pixmap pixmap_closed,
+              Gdk_Bitmap mask_closed,
+              Gdk_Pixmap pixmap_opened,
+              Gdk_Bitmap mask_opened,
+              bool expanded)
+    : Element(text,pixmap_closed,mask_closed,
+              pixmap_opened,mask_opened,0,expanded)
+  {}
+
+/******************************************************************/
+
+Cell::Cell(GtkCTree* tree, GtkCTreeNode* node, gint column) 
+  : tree_(tree), node_(node), column_(column)
+  {}
+
+Cell::Cell()
+  : tree_(0), node_(0), column_(0)
+  {}
+
+GtkCellType Cell::get_type() const
+  {
+    return gtk_ctree_node_get_cell_type(tree_,node_,column_);
+  }
+
+Gtk::Style* Cell::get_style() const
+  {
+    return wrap(gtk_ctree_node_get_cell_style(tree_,node_,column_));
+  }
+
+nstring Cell::get_text() const
+  {
+    gchar* text=0;
+    switch (get_type())
+      {
+        case GTK_CELL_TEXT:
+          gtk_ctree_node_get_text(tree_,node_,column_,&text);
+          break;
+        case GTK_CELL_PIXTEXT:
+          gtk_ctree_node_get_pixtext(tree_,node_,column_,
+                                     &text,0,0,0);
+          break;
+        default:
+          break;
+      }
+    return text;
+  }
+
+Gdk_Pixmap Cell::get_pixmap() const
+  {
+    GdkPixmap* pixmap=0;
+    switch (get_type())
+      {
+        case GTK_CELL_PIXMAP:
+          gtk_ctree_node_get_pixmap(tree_,node_,column_,&pixmap,0);
+          break;
+        case GTK_CELL_PIXTEXT:
+          gtk_ctree_node_get_pixtext(tree_,node_,column_,
+                                     0,0,&pixmap,0);
+          break;
+        default:
+          break;
+      }
+    return pixmap;
+  }
+
+Gdk_Bitmap Cell::get_mask() const
+  {
+    GdkBitmap* bitmap=0;
+    switch (get_type())
+      {
+        case GTK_CELL_PIXMAP:
+          gtk_ctree_node_get_pixmap(tree_,node_,column_,0,&bitmap);
+          break;
+        case GTK_CELL_PIXTEXT:
+          gtk_ctree_node_get_pixtext(tree_,node_,column_,
+                                     0,0,0,&bitmap);
+          break;
+        default:
+          break;
+      }
+    return bitmap;
+  }
+
+void Cell::set_style(Gtk::Style* s)
+  {
+    gtk_ctree_node_set_cell_style(tree_,node_,column_,s?s->gtkobj():0);
+  }
+
+void Cell::set_style(Gtk::Style& s)
+  {
+    gtk_ctree_node_set_cell_style(tree_,node_,column_,s.gtkobj());
+  }
+
+void Cell::set_text(const nstring& text)
+  {
+    guint8 spacing=default_spacing;
+    GdkPixmap* pixmap;
+    GdkBitmap* mask;
+    switch (get_type())
+      {
+        case GTK_CELL_EMPTY:
+        case GTK_CELL_TEXT:
+          gtk_ctree_node_set_text(tree_,node_,column_,text.gc_str());
+          break;
+        case GTK_CELL_PIXMAP:
+          gtk_ctree_node_get_pixmap(tree_,node_,column_,&pixmap,&mask);
+          gtk_ctree_node_set_pixtext(tree_,node_,column_,text.gc_str(),
+               default_spacing,pixmap,mask);
+          break;
+        case GTK_CELL_PIXTEXT:
+          gtk_ctree_node_get_pixtext(tree_,node_,column_,
+                                     0,&spacing,&pixmap,&mask);
+          gtk_ctree_node_set_pixtext(tree_,node_,column_,text.gc_str(),
+               spacing,pixmap,mask);
+          break;
+        default:
+          break;
+      }
+  }
+
+void Cell::set_pixmap(const Gdk_Pixmap& pixmap,const Gdk_Bitmap& mask)
+  {
+    guint8 spacing=default_spacing;
+    gchar *text;
+    switch (get_type())
+      {
+        case GTK_CELL_EMPTY:
+        case GTK_CELL_PIXMAP:
+          gtk_ctree_node_set_pixmap(tree_,node_,column_,pixmap,mask);
+          break;
+        case GTK_CELL_TEXT:
+          gtk_ctree_node_get_text(tree_,node_,column_,&text);
+          gtk_ctree_node_set_pixtext(tree_,node_,column_,text,
+               default_spacing,pixmap,mask);
+          break;
+        case GTK_CELL_PIXTEXT:
+          gtk_ctree_node_get_pixtext(tree_,node_,column_,
+                                     &text,0,0,0);
+          gtk_ctree_node_set_pixtext(tree_,node_,column_,text,
+               spacing,pixmap,mask);
+          break;
+        default:
+          break;
+      }
+  }
+
+void Cell::set_shift(gint vertical,gint horizontal)
+  {
+    gtk_ctree_node_set_shift(tree_,node_,column_,vertical,horizontal);
+  }
+
+void Cell::moveto(gfloat row_align, gfloat col_align)
+  {
+    gtk_ctree_node_moveto(tree_,node_,column_,row_align,col_align);
+  }
+
+/******************************************************************/
+
+void Row::set_style(Gtk::Style* s)
+  {
+    gtk_ctree_node_set_row_style(tree_,node_,s?s->gtkobj():0); 
+  }
+
+void Row::set_style(Gtk::Style& s)
+  {
+    gtk_ctree_node_set_row_style(tree_,node_,s.gtkobj()); 
+  }
+
+Gtk::Style* Row::get_style()
+  {
+    return wrap(gtk_ctree_node_get_row_style(tree_,node_)); 
+  }
+ 
+void Row::set_selectable(bool s)
+  {
+    gtk_ctree_node_set_selectable(tree_,node_,s);
+  }
+
+bool Row::get_selectable()
+  {
+    return gtk_ctree_node_get_selectable(tree_,node_);
+  }
+
+void Row::set_background(const Gdk_Color& c)
+  {
+    gtk_ctree_node_set_background(tree_,node_,const_cast<GdkColor*>(c.gdkobj()));
+  }
+
+void Row::set_foreground(const Gdk_Color& c)
+  {
+    gtk_ctree_node_set_foreground(tree_,node_,const_cast<GdkColor*>(c.gdkobj()));
+  }
+
+gpointer Row::get_data()
+  {
+    return gtk_ctree_node_get_row_data(tree_,node_);
+  }
+
+void Row::set_data(gpointer d)
+  {
+    gtk_ctree_node_set_row_data(tree_,node_,d);
+  }
+
+void Row::set_data(gpointer d,GtkDestroyNotify n)
+  {
+    gtk_ctree_node_set_row_data_full(tree_,node_,d,n);
+  }
+
+GtkVisibility Row::is_visible()
+  {
+    return gtk_ctree_node_is_visible(tree_,node_);
+  }
+
+bool Row::is_viewable()
+  {
+    return gtk_ctree_is_viewable(tree_,node_);
+  }
+
+void Row::expand()
+  {
+    gtk_ctree_expand(tree_,node_);
+  }
+
+void Row::expand_recursive()
+  {
+    gtk_ctree_expand_recursive(tree_,node_);
+  }
+
+void Row::expand_to_depth(int depth)
+  {
+    gtk_ctree_expand_to_depth(tree_,node_,depth);
+  }
+
+void Row::collapse()
+  {
+    gtk_ctree_collapse(tree_,node_);
+  }
+
+void Row::collapse_recursive()
+  {
+    gtk_ctree_collapse_recursive(tree_,node_);
+  }
+
+void Row::collapse_to_depth(int depth)
+  {
+    gtk_ctree_collapse_to_depth(tree_,node_,depth);
+  }
+
+void Row::toggle_expansion()
+  {
+    gtk_ctree_toggle_expansion(tree_,node_);
+  }
+
+void Row::toggle_expansion_recursive()
+  {
+    gtk_ctree_toggle_expansion_recursive(tree_,node_);
+  }
+
+void Row::select()
+  {
+    gtk_ctree_select(tree_,node_);
+  }
+
+void Row::select_recursive()
+  {
+    gtk_ctree_select_recursive(tree_,node_);
+  }
+
+void Row::unselect()
+  {
+    gtk_ctree_unselect(tree_,node_);
+  }
+
+void Row::unselect_recursive()
+  {
+    gtk_ctree_unselect_recursive(tree_,node_);
+  }
+
+void Row::sort()
+  {
+    gtk_ctree_sort_node(tree_,node_);
+  }
+
+void Row::sort_recursive()
+  {
+    gtk_ctree_sort_recursive(tree_,node_);
+  }
+
+#define CT_ROW(x) ((GtkCTreeRow*)(((GList*)x)->data))
+#define CT_CHILD(x) (CT_ROW(x)->children)
+#define CT_NEXT(x) ((GtkCTreeNode*)g_list_next(x))
+#define CT_PREV(x) ((GtkCTreeNode*)g_list_previous(x))
+#define CT_PARENT(x) (CT_ROW(x)->parent)
+#define CT_PARENT_NEXT(x) ((GtkCTreeNode*)(((GList*)CT_PARENT(x))->next))
+#define CT_PARENT_PREV(x) ((GtkCTreeNode*)(((GList*)CT_PARENT(x))->prev))
+
+RowIterator&  RowIterator::operator++()
+  {
+    if (!pnode_&&!node_)
+      node_= (GtkCTreeNode*)(GTK_CLIST(tree_)->row_list);
+    else if (!node_)
+      node_=CT_CHILD(pnode_);
+    else
+      node_ = CT_NEXT(node_);
+    return *this;
+  }
+
+RowIterator&  RowIterator::operator--()
+  {
+    if (!pnode_&&!node_)
+      node_= (GtkCTreeNode*)(GTK_CLIST(tree_)->row_list_end);
+    else if (!node_)
+      node_=(GtkCTreeNode*)(g_list_last((GList*)CT_CHILD(pnode_)));
+    else
+      node_ = CT_PREV(node_);
+    return *this;
+  }
+
+RowIterator::reference RowIterator::operator*() const
+  {
+    Self& r=const_cast<Self&>(*this);
+    return r;
+  }
+
+RowIterator::pointer RowIterator::operator -> () const
+  {
+    return &operator*();
+  }
+
+Row& SelectionIterator::operator*() const
+  { 
+    SelectionIterator& unconst_self = const_cast<SelectionIterator&>(*this);
+    
+    Row& r = unconst_self;
+    r.node_ = (GtkCTreeNode*)(glist_node_->data);
+    return r;
+  }
+
+Row* SelectionIterator::operator -> () const
+  {
+    return &operator*();
+  }
+
+SelectionIterator&  SelectionIterator::operator++()
+  {
+    if (!glist_node_)
+      glist_node_ = GTK_CLIST(tree_)->selection;
+    else
+      glist_node_ = g_list_next(glist_node_);
+    return *this;
+  }
+
+SelectionIterator&  SelectionIterator::operator--()
+  {
+    if (!glist_node_)
+      glist_node_ = GTK_CLIST(tree_)->selection_end;
+    else
+      glist_node_ = g_list_previous(glist_node_);
+    return *this;
+  }
+
+TreeIterator::reference TreeIterator::operator*() const
+  {
+    Self& r=const_cast<Self&>(*this);
+    return r;
+  }
+
+TreeIterator::pointer TreeIterator::operator -> () const
+  {
+    return &operator*();
+  }
+
+
+TreeIterator&  TreeIterator::operator++()
+  {
+    if (!node_)
+      node_=(GtkCTreeNode*)(GTK_CLIST(tree_)->row_list);
+    else
+      {
+        if (CT_CHILD(node_)) node_=CT_CHILD(node_);
+        else if (CT_NEXT(node_)) node_=CT_NEXT(node_);
+        else if (CT_PARENT(node_)) node_=CT_PARENT_NEXT(node_);
+        else node_=0;
+      }
+    return *this;
+  }
+
+TreeIterator&  TreeIterator::operator--()
+  {
+    if (!node_)
+      node_=(GtkCTreeNode*)(GTK_CLIST(tree_)->row_list_end);
+    else
+      {
+        if (CT_CHILD(node_))
+	  node_=(GtkCTreeNode *)g_list_last((GList*)CT_CHILD(node_));
+	else if(CT_PREV(node_)) node_=CT_PREV(node_);
+	else if(CT_PARENT(node_)) node_=CT_PARENT_PREV(node_);
+	else node_=0;
+      }
+    return *this;
+  }
+
+/**************************************************************
+*** SelectionList
+**************************************************************/
+SelectionList::iterator SelectionList::begin_() const 
+  { return iterator(parent_->gtkobj(),GTK_CLIST(parent_->gtkobj())->selection); }
+SelectionList::iterator SelectionList::end_() const
+  { return iterator(parent_->gtkobj(),(GList*)0); }
+
+GList*& SelectionList::glist() const 
+  { return GTK_CLIST(parent_->gtkobj())->selection; }
+
+SelectionList::value_type SelectionList::operator[](size_type l) const
+  {
+    return Row(parent_->gtkobj(),
+                gtk_ctree_node_nth(parent_->gtkobj(), l) );
+       //GPOINTER_TO_INT(g_list_nth(GTK_CLIST(parent_->gtkobj())->selection,l)->data));
+  }
+
+void SelectionList::all()
+  {
+    gtk_clist_select_all(GTK_CLIST(parent_->gtkobj()));
+  }
+
+void SelectionList::clear()
+  {
+    gtk_clist_unselect_all(GTK_CLIST(parent_->gtkobj()));
+  }
+
+void SelectionList::undo()
+  {
+    gtk_clist_undo_selection(GTK_CLIST(parent_->gtkobj()));
+  }
+
+SelectionList::size_type SelectionList::size() const
+  {
+    return g_list_length(GTK_CLIST(parent_->gtkobj())->selection);
+  }
+
+
+RowList::iterator RowList::begin_() const
+  {
+    if (!node_)
+      return iterator(parent_,0, 
+         (GtkCTreeNode*) GTK_CLIST(parent_)->row_list);
+    return iterator(parent_,node_,
+         CT_CHILD(node_));
+  }
+
+/**************************************************************
+*** RowList
+**************************************************************/
+RowList::size_type RowList::size() const
+  {
+    if (!node_)
+       return GTK_CLIST(parent_)->rows;
+    return g_list_length((GList*)CT_CHILD(node_));
+  }
+
+
+RowList::iterator RowList::end_() const
+  {
+    return iterator(parent_, node_, 0);
+  }
+
+Row RowList::operator [](size_type i) const
+  {
+    if (!node_)
+      return *iterator(parent_, 0,
+                    (GtkCTreeNode*) g_list_nth(GTK_CLIST(parent_)->row_list,i));
+    return *iterator(parent_, node_,
+                    (GtkCTreeNode*) g_list_nth((GList*)CT_CHILD(node_),i));
+  }
+
+RowList::iterator RowList::insert(iterator i,const Element &e)
+  {
+    GtkCTreeNode* node= gtk_ctree_insert_node(parent_,
+                          i.pnode_,
+                          i.node_,
+                          const_cast<gchar**>((const char **)(e.text_)),
+                          e.spacing_,
+                          e.pixmap_closed_,
+                          e.mask_closed_,
+                          e.pixmap_opened_,
+                          e.mask_opened_,
+                          e.is_leaf_,
+                          e.expanded_);
+
+    return iterator(parent_,i.pnode_,node);
+  }
+
+RowList::iterator RowList::find_data(gpointer data) const
+  {
+    GtkCTreeNode* node=gtk_ctree_find_by_row_data(parent_,node_,data);
+    GtkCTreeNode* pnode=node_;
+    if (node) pnode=CT_PARENT(node); // we need to adjust the parent
+    return iterator(parent_,pnode,node);
+  }
+
+RowList Row::subtree()
+  {
+    return RowList(tree_,node_);
+  }
+
+Row Row::get_parent()
+  {
+    return Row(tree_,CT_PARENT(node_));
+  }
+
+guint8 Row::get_spacing()
+  {
+    gchar     *text;
+    guint8     spacing;
+    GdkPixmap *pixmap_closed,*pixmap_opened;
+    GdkBitmap *mask_closed,*mask_opened;
+    gboolean   is_leaf,expanded;
+    gtk_ctree_get_node_info (tree_,node_,&text,&spacing,&pixmap_closed,&mask_closed,&pixmap_opened,&mask_opened,&is_leaf,&expanded);
+    return spacing;
+  }
+
+bool Row::is_leaf() 
+  {
+    gchar     *text;
+    guint8     spacing;
+    GdkPixmap *pixmap_closed,*pixmap_opened;
+    GdkBitmap *mask_closed,*mask_opened;
+    gboolean   is_leaf,expanded;
+    gtk_ctree_get_node_info (tree_,node_,&text,&spacing,&pixmap_closed,&mask_closed,&pixmap_opened,&mask_opened,&is_leaf,&expanded);
+    return is_leaf;
+  }
+
+bool Row::is_expanded()
+  {
+    gchar     *text;
+    guint8     spacing;
+    GdkPixmap *pixmap_closed,*pixmap_opened;
+    GdkBitmap *mask_closed,*mask_opened;
+    gboolean   is_leaf,expanded;
+    gtk_ctree_get_node_info (tree_,node_,&text,&spacing,&pixmap_closed,&mask_closed,&pixmap_opened,&mask_opened,&is_leaf,&expanded);
+    return expanded;
+  }
+
+void Row::set_spacing(guint8 tSpacing)
+  {
+    gchar     *text;
+    guint8     spacing;
+    GdkPixmap *pixmap_closed,*pixmap_opened;
+    GdkBitmap *mask_closed,*mask_opened;
+    gboolean   is_leaf,expanded;
+    gtk_ctree_get_node_info (tree_,node_,&text,&spacing,&pixmap_closed,&mask_closed,&pixmap_opened,&mask_opened,&is_leaf,&expanded);
+    gtk_ctree_set_node_info (tree_,node_,g_strdup(text),tSpacing,pixmap_closed,mask_closed,pixmap_opened,mask_opened,is_leaf,expanded);    
+  }
+
+void Row::set_leaf(bool tLeaf)
+  {
+    gchar     *text;
+    guint8     spacing;
+    GdkPixmap *pixmap_closed,*pixmap_opened;
+    GdkBitmap *mask_closed,*mask_opened;
+    gboolean   is_leaf,expanded;
+    gtk_ctree_get_node_info (tree_,node_,&text,&spacing,&pixmap_closed,&mask_closed,&pixmap_opened,&mask_opened,&is_leaf,&expanded);
+    gtk_ctree_set_node_info (tree_,node_,g_strdup(text),spacing,pixmap_closed,mask_closed,pixmap_opened,mask_opened,tLeaf,expanded);
+  }
+
+void Row::set_opened (const Gdk_Pixmap& tPix,const Gdk_Bitmap& tBit) 
+  {
+    gchar     *text;
+    guint8     spacing;
+    GdkPixmap *pixmap_closed,*pixmap_opened;
+    GdkBitmap *mask_closed,*mask_opened;
+    gboolean   is_leaf,expanded;
+    gtk_ctree_get_node_info (tree_,node_,&text,&spacing,&pixmap_closed,&mask_closed,&pixmap_opened,&mask_opened,&is_leaf,&expanded);
+    gdk_pixmap_ref (tPix);
+    if (tBit) gdk_pixmap_ref (tBit);
+    gtk_ctree_set_node_info (tree_,node_,g_strdup(text),spacing,pixmap_closed,mask_closed,tPix,tBit,is_leaf,expanded);  
+  }
+
+void Row::set_closed (const Gdk_Pixmap& tPix,const Gdk_Bitmap& tBit)
+  {
+    gchar     *text;
+    guint8     spacing;
+    GdkPixmap *pixmap_closed,*pixmap_opened;
+    GdkBitmap *mask_closed,*mask_opened;
+    gboolean   is_leaf,expanded;
+    gtk_ctree_get_node_info (tree_,node_,&text,&spacing,&pixmap_closed,&mask_closed,&pixmap_opened,&mask_opened,&is_leaf,&expanded);
+    gdk_pixmap_ref (tPix);
+    if (tBit) gdk_pixmap_ref (tBit);
+    gtk_ctree_set_node_info (tree_,node_,g_strdup(text),spacing,tPix,tBit,pixmap_opened,mask_opened,is_leaf,expanded);
+  }
+
+RowList::iterator RowList::erase(iterator i)
+  {
+    iterator ri = i;
+    ++ri;
+
+    gtk_ctree_remove_node(parent_, i.node_);
+
+    return ri;
+  }
+
+void RowList::remove(const_reference i)
+  {
+    gtk_ctree_remove_node(parent_, i.node_);
+  }
+
+
+/**************************************************************
+*** CellIterator
+**************************************************************/
+CellIterator&  CellIterator::operator++()
+  {
+    if (column_<((GtkCList*)tree_)->columns) column_++;
+    return *this;
+  }
+
+CellIterator&  CellIterator::operator--()
+  {
+    if (column_>0) column_--;
+    return *this;
+  }
+
+Cell& CellIterator::operator*() const
+  {
+    return const_cast<CellIterator&>(*this);
+  }
+
+Cell* CellIterator::operator -> () const
+  {
+    return &operator*();
+  };
+
+bool RowList::empty() const
+  {
+    return ((GtkCList*)parent_)->row_list==0;
+  }
+
+bool TreeList::empty() const
+  {
+    return ((GtkCList*)tree_)->row_list==0;
+  }
+
+TreeList::iterator TreeList::begin_() const
+  {
+    return TreeIterator(tree_,(GtkCTreeNode*)(((GtkCList*)tree_)->row_list));
+  }
+
+TreeList::iterator TreeList::end_() const
+  {
+    return TreeIterator(tree_,0);
+  }
+
+
+} /* namespace CTree_Helpers */
+
+/**************************************************************
+*** SIGNALS
+**************************************************************/
+
+//this is insanely hard to do
+namespace {
+static void tree_select_row_convert_func(
+            SigC::Callback3<void,Gtk::CTree::Row,gint,GtkCTree*> *s, 
+            GtkCTreeNode* p1, 
+            gint p2, 
+            GtkCTree* obj)
+  {
+    SigC::Callback2<void,Gtk::CTree::Row,gint> *s2= 
+      (SigC::Callback2<void,Gtk::CTree::Row,gint>*)s;
+    s2->call(Gtk::CTree::Row(obj,p1),p2);
+  }
+}
+
+SigC::Connection
+CTree::Proxy_tree_select_row::connect(
+            const SigC::Slot2<void,Gtk::CTree::Row,gint> &s)
+   {
+    return BaseType::connect(
+        SigC::bind( 
+          SigC::convert(
+            (SigC::Slot3<void,Gtk::CTree::Row,gint,GtkCTree*>&)s, 
+            &tree_select_row_convert_func),
+          obj->gtkobj()
+      ));
+   }
+
+SigC::Connection
+CTree::Proxy_tree_unselect_row::connect(
+            const SigC::Slot2<void,Gtk::CTree::Row,gint> &s)
+   {
+    return BaseType::connect(
+        SigC::bind(
+          SigC::convert(
+            (SigC::Slot3<void,Gtk::CTree::Row,gint,GtkCTree*>&)s,
+            &tree_select_row_convert_func),
+          obj->gtkobj()
+      ));
+   }
+
+
+namespace {
+static void tree_expand_convert_func(
+            SigC::Callback2<void,Gtk::CTree::Row,GtkCTree*> *s,
+            GtkCTreeNode* p1,
+            GtkCTree* obj)
+  {
+    SigC::Callback1<void,Gtk::CTree::Row> *s2=
+      (SigC::Callback1<void,Gtk::CTree::Row>*)s;
+    s2->call(Gtk::CTree::Row(obj,p1));
+  }
+}
+
+SigC::Connection
+CTree::Proxy_tree_expand::connect(
+            const SigC::Slot1<void,Gtk::CTree::Row> &s)
+   {
+    return BaseType::connect(
+        SigC::bind(
+          SigC::convert(
+            (SigC::Slot2<void,Gtk::CTree::Row,GtkCTree*>&)s,
+            &tree_expand_convert_func),
+          obj->gtkobj()
+      ));
+   }
+
+SigC::Connection
+CTree::Proxy_tree_collapse::connect(
+            const SigC::Slot1<void,Gtk::CTree::Row> &s)
+   {
+    return BaseType::connect(
+        SigC::bind(
+          SigC::convert(
+            (SigC::Slot2<void,Gtk::CTree::Row,GtkCTree*>&)s,
+            &tree_expand_convert_func),
+          obj->gtkobj()
+      ));
+   }
+
+
+
+
+
+} /* namespace Gtk */

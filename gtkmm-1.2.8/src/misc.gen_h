@@ -1,0 +1,103 @@
+/* $Id: misc.gen_h,v 1.31 2000/04/14 22:34:04 kenelson Exp $ */
+
+/* misc.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <gtk/gtkmisc.h>
+CLASS_START(Gtk);
+
+//: Misc Widget Abstract.
+//- This is an abstract for a set of utility widgets
+//- that lack a physical window.  They do have
+//- alignment and padding within their defined space.
+//-
+//- Without a window, widgets of this type cannot capture events.
+//- To capture events place in {Gtk::EventBox::}.
+class Misc : public Widget {
+  WRAP_CLASS(Misc,GtkMisc,GTK_MISC,GTK_IS_MISC,misc,Gtk::Widget,GtkWidget,GTK_WIDGET);
+public:
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Set the {xalign} and {yalign} of this widget.
+  WRAP_METHOD(
+    void gtk_misc_set_alignment(GtkMisc*,gfloat,gfloat),
+    void set_alignment(gfloat xalign,
+		     gfloat yalign));
+
+  //: Set the {xpad} and {ypad} of this widget.
+  WRAP_METHOD(
+    void gtk_misc_set_padding(GtkMisc*,gint,gint),
+    void set_padding  (gint xpad,
+		     gint ypad));
+
+  WRAP_MEMBER(value,xpad,xpad,gint,gint);
+  WRAP_MEMBER(value,ypad,ypad,gint,gint);
+  WRAP_MEMBER(value,xalign,xalign,gfloat,gfloat);
+  WRAP_MEMBER(value,yalign,yalign,gfloat,gfloat);
+
+protected:
+  WRAP_CTOR_DEFAULT;
+};
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Misc)
+//. name: xalign
+//. type: gfloat
+//. get: {get_xalign()}
+//. set: {set_alignment()}
+//. desc:    Specify how to position the child
+//.     widget when it is not allocated all the space available to it.
+//.     A value of 0.0 positions the widget to the left or
+//.     top of its allocated space. A value of 1.0 positions
+//.     the widget to the right or bottom of its allocated space. Specifying
+//.     0.5 will center the widget in its allocated space.
+//.
+//.     Range: 0.0 to 1.0
+
+//. name: yalign
+//. type: gfloat
+//. get: {get_yalign()}
+//. set: {set_alignment()}
+//. desc: see {xalign}
+
+//. name: xpad
+//. type: guint16
+//. get: {get_xpad()}
+//. set: {set_padding()}
+//. desc: Padding is space placed to either side of a widget to
+//.  seperate it from its neighbors.
+
+//. name: ypad
+//. type: guint16
+//. get: {get_ypad()}
+//. set: {set_padding()}
+//. desc: see {xpad}
+

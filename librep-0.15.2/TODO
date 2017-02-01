@@ -1,0 +1,247 @@
+[ This is -*-Indented-Text-*- ]
+
+TODO list for librep
+********************
+
+Bugs are marked !, things that should be done soon are marked +,
+and more long-term ideas are marked -
+
+
+Outstanding bugs
+================
+
+ ! uses setlocale("LC_NUMERIC", "C") to make floating point I/O work,
+   need to reimplement this locally
+
+   [ this is only done temporarily now, but rep-gtk still has some
+     instances that can't be removed until librep 0.14 I guess.. ]
+
+ ! modules with `(set-binds)' config shouldn't inline constants?
+
+ ! #!key params can't be inlined by the compiler
+
+ ! non-top-level compiled defvar's aren't quite right
+
+ ! scheme define/lambda doesn't splice begin forms
+
+ ! the scheme module fails some of the guile test.scm cases
+
+ ! can't do numerator/denominator of flonums
+
+ ! the first level lookup of foo#bar isn't cached
+
+ ! interfaces aren't re-parsed when modules are reloaded
+
+ ! environment of macro expanders is not consistent
+
+   interpreted code closes macros in the usual lexical environment,
+   the compiler closes them in the *root-strcucture* since the
+   lexical environment of the compiled file doesn't exist
+
+   Xerox scheme closes all macros in the `initial environment', this
+   would provide consistency, but would break existing code
+
+ ! macro memoization loses
+
+   e.g. if same (eq) expression is expanded in different structures
+
+   OTOH, there is little or no chance of this ever happening
+
+ ! doesn't handle NaN or Inf in floats properly (at all)
+
+ ! Putting a breakpoint in a .jaderc file doesn't work correctly; the
+   debugger is entered, but the commands don't work
+
+ ! if load can't find the file, its error message is confusing
+   (especially if the named file does exist, but no suffixed file
+   exists)
+
+ ! non-fixnum numbers can't be dumped / dump totally broken re: modules
+
+ ! it's legal to do (set foo 42) where the contents of foo has a
+   lexical binding
+
+   this breaks: (let ((var 'loop))
+		  (let loop ((foo t))
+		    (set var print)
+		    (loop foo)))
+
+ + document in manual: current-utime, new read syntaxes
+
+ + deprecated:
+
+   * 0xNN and 0NN integer syntaxes [0.13+]
+   * &optional and &rest (replaced by #!optional and #!rest) [0.13+]
+
+
+General programming tasks:
+==========================
+
+ + comparison of datums currently compares type id and contents
+
+   should be defined by programmer, e.g.:
+
+	(define-datum-comparer ID FUN)
+
+   by analogy with define-datum-discloser
+
+   (but do callers of rep_value_cmp () assume that it may GC?)
+
+ + avoid spurious init-bind and unbind instructions
+
+   (generated when lexical bindings aren't heap allocated)
+
+ + rename backquote* as quasiquote* -- helps scheme, doesn't affect rep
+
+ + add restricted load to gaol? (same directory only?)
+
+ + %make-structure shouldn't map names to structures itself
+
+   it's done this way to allow mutually recursive structures (debatable
+   itself) but really %make-structure should just create the thing
+   (with an optional name for printing)
+
+ - allow ML-like functors (parameterized modules)
+
+   the basic support is there. Can do:
+
+   (define (my-functor x)
+     (structure (export foo) (open rep)
+       (define (foo y) (+ x y))))
+
+   but there's currently no clean way to import the first-class
+   structure (without resorting to open-structures)
+
+   I think the way is to require the functor to implement a named
+   interface which is specified in the module signature:
+
+   (define-structure foo
+       (open rep
+	     (functor (my-functor x) some-interface))
+       ...
+
+   `(my-functor x) would get evaluated in the environment containing
+   the define-structure form? Or in the environment created up to that
+   point?
+
+   The named-interface trick could also be useful for importing normal
+   modules (to avoid having to load them at compile time)
+
+   [ I have a first-stab at this, needs compiler support.. ]
+
+ - add a facility for dumping a set of structures, for later reloading
+
+ - move the gtk-independent parts of the rep-gtk glue generator and
+   support code to librep
+
+   [ I've rewritten the glue-code generator in an oo style so that it
+   can be easily extended. Need to rewrite the runtime support. Will do
+   this in time for GTK 2.0 ]
+
+ - add defadvice (port from elisp? other implementations?)
+
+ - Compiler could annotate output files with their dependences
+
+ - I/O shouldn't block all threads
+
+   wait_for_input () already groks threads, so I think the only problem
+   is the use of stdio/fd functions. How does stdio handle streams that
+   have been set non-blocking? Maybe reimplement basic stdio?
+
+   (there is now support for waking threads via polling)
+
+   [ I have a patch that adds support for threads to be woken when
+   one of a set of fds is available for writing and reading. It
+   also has a blocking I/O function that suspends the thread while
+   it blocks.. ]
+
+ - add regression tests
+
+   [ partially done, there is a test framework now, but only a couple
+   of modules define tests ]
+
+ - scheme compilation is worse than rep compilation
+
+   should be able to make this a lot better, maybe not as good as rep
+   code (since the vm primitives are designed for that), but still a
+   lot better..
+
+   [ it's better now, but still room for improvement ]
+
+ - the gc sucks
+
+   is it possible to add a good (generational?) gc?
+
+   could sweeping be sped up by prefetching cache lines?
+
+   do lazy sweeping of block-allocated objects? (problem with cons mark bit?)
+
+   do mostly non-recursive marking? (mark stack)
+
+   [ tried this -- marginally slower than current method ]
+
+ - remove special forms (replacing them with macros) where both
+   possible and desirable
+
+   The current (July 2000) list of special forms is:
+
+   cond %define defvar lambda progn quote setq
+
+ - most subrs can't be called tail recursively (apply is special-cased)
+
+ - add a hygienic macro facility
+
+   this may be overkill? capture of introduced bindings can be avoided
+   using gensyms, capture of introduced free variables could be avoided
+   by introducing a way of tagging variable references with the
+   structure they need to be dereferenced in.
+
+   [ I have an experimental low-level hygienic macro implementation,
+     but it's a long way from being useful ]
+
+ - do JIT compilation of bytecode where profitable
+
+   there's now GNU lightning, a VCODE-like system, using C macros to do
+   portable runtime code generation
+
+   Only do this for _heavily_ used bytecode subrs. Measure this by
+   adding an extra vector slot, and counting the number of vm
+   instructions executed (and dividing by the length of the
+   code-string?)
+
+   Another option is to generate direct-threaded code from the bytecode
+   (and cache it). I have an attempt at this but it needs either (1) an
+   extra pass to detect labels, or (2) to maintain a strict mapping
+   between bytecode addresses and direct-code addresses
+
+   There's an interesting paper about automatically generating meta
+   instructions to suit individual instruction sequences, PLDI 98 or
+   something (check citeseer for it). Applied with reasonable success
+   to Caml interpreter
+
+ - Optimize compilation of case statements
+
+   1. handle constant keys
+
+   2. optimize the search (binary search if all clauses have same type
+      and are orderable?)
+
+ - Use two passes for `concat'; the first pass calculates the new
+   string's length, the second builds it
+
+ - Add more backends for accessing remote files
+
+   Make remote-rcp work properly, and add others (ssh, http, ..?)
+
+ - Make the compiler optimise its output
+
+   now the lisp is mostly lexically scoped, there should be much
+   more potential for aggressive optimisation
+
+
+Manual tasks:
+=============
+
+ + Document the error-mode and interrupt-mode variables
+
+ + Document the internals (i.e. the C interface)

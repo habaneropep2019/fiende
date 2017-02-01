@@ -1,0 +1,856 @@
+<!doctype book PUBLIC "-//Davenport//DTD DocBook V3.0//EN" [
+<!entity FDL SYSTEM "fdl.sgml">
+<!entity art-construction-core SYSTEM "sgml/art_construction_core.sgml">
+<!entity art-construction-extended SYSTEM "sgml/art_construction_extended.sgml">
+<!entity art-construction-trans SYSTEM "sgml/art_construction_trans.sgml">
+<!entity art-gamma SYSTEM "sgml/art_gamma.sgml">
+<!entity art-affine SYSTEM "sgml/art_affine.sgml">
+<!entity art-memory SYSTEM "sgml/art_memory.sgml">
+<!entity art-svp SYSTEM "sgml/art_svp.sgml">
+<!entity art-render SYSTEM "sgml/art_render.sgml">
+<!entity art-pixbuf SYSTEM "sgml/art_pixbuf.sgml">
+<!entity art-buffer-affine SYSTEM "sgml/art_buffer_affine.sgml">
+<!entity art-uta SYSTEM "sgml/art_uta.sgml">
+]>
+
+
+<book id="libart">
+  <bookinfo>
+    <title>The libart library</title>
+
+    <authorgroup>
+      <author>
+        <firstname>Mathieu</firstname>
+        <surname>Lacage</surname>
+        <affiliation>
+          <address>
+            <email>mathieu@gnu.org</email>
+          </address>
+        </affiliation>
+      </author>
+    </authorgroup>
+
+
+    <legalnotice>
+      <para>
+	Permission is granted to copy, distribute and/or modify this document
+	under the terms of the GNU Free Documentation License, Version 1.1
+	or any later version published by the Free Software Foundation;
+	with the Invariant Sections being  with no
+	Front-Cover Texts, and with no Back-Cover Texts.
+	A copy of the license is included in the section entitled "GNU
+	Free Documentation License".
+      </para>
+    </legalnotice>
+
+    <copyright>
+      <year>2001</year>
+      <holder>Mathieu Lacage and Raph Levien</holder>
+    </copyright>
+  </bookinfo>
+
+  <chapter id="intro">
+    <title>What is Libart ?</title>
+
+    <sect1 id="intro-intro">
+      <title>Introduction</title>
+      <para>
+	Libart is a 2D drawing library: its goal is to be a high-quality vector-based
+	2D library with antialiasing and alpha composition. Libart was developed by
+	Raph Levien in an attempt to provide a powerful yet easy-to-use foundation
+	layer for the development of Gui-based applications in Gnome. Libart is thus
+	distributed as a part of Gnome under the LGPL. Libart can also be licensed 
+	under other licenses from ArtofCode<footnoteref linkend="artofcode">.
+	<footnote id="artofcode">
+	  <para><ulink url="http://www.artofcode.com">www.artofcode.com</ulink></para>
+	</footnote>
+      </para>
+
+      <para>
+	This documentation is itself licenced under the GNU FDL and the copyright is owned by
+	Raph Levien and Mathieu Lacage.
+      </para>
+
+    </sect1>
+
+    <sect1 id="intro-file-names">
+      <title>File names</title>
+      
+      <para>
+	Whether or not you are a Core HaXXor, you may be used to reading
+	the source code for the libraries you are using, perhaps
+	to understand how those libraries work in more detail.
+      </para>
+      
+      <para>
+	The first step is to find the file containing the code that
+	deals with a particular data structure.
+	libart tries to make this process easy for you.
+	File names are structured as follows:
+	<computeroutput>art_sourcestructure_deststructure_details.{h|c}</computeroutput>.
+	For example, the source file <computeroutput>art_svp_vpath.h</computeroutput>
+	contains the source code which manipulates svp data structures and generates vpath 
+	data structures. Most notably, the following function can be found in there:
+	<function>art_svp_from_vpath</function>.
+      </para>
+
+	<para>
+	  I hope you will get used to the marvelous world of <emphasis>documentation by code</emphasis>
+	  since everyone knows that the code is the ultimate source of rightness.
+	</para>
+
+      </sect1>
+
+
+    <sect1>
+      <title>LibArt's overall architecture</title>
+
+      <sect2>
+	<title>Using libart</title>
+
+	<para>
+	  Using libart to display vector graphics on screen can be a pretty difficult task
+	  for beginers: libart was not designed to draw vector graphics on screen. It was 
+	  designed to draw graphics in pixel buffers. It is up to the reader to draw those
+	  pixel buffers on screen after rendering.
+	</para>
+
+	<figure>
+	  <title>LibArt's Use scenarios</title>
+	  <graphic fileref="art-overall-arch.png" scale="50"></graphic>
+	</figure>
+
+	<para>
+	  The diagram above shows how you could use libart: the pixel buffers can be stored
+	  -they could be also manipulated before doing so- but they can also be rendered on screen
+	  using GTK+' Gdkrgb code.
+	</para>
+
+	<para>
+	  Some sample code shows how to achieve both of those scenarios by hand, but application 
+	  developers should remember that it is pretty unlikely that they will have to do this. Higher-level
+	  APIs which deal with structured vector graphics are available and they take care of
+	  all the rendering of the vector data you feed them. The <function>GnomeCanvas</function>
+	  can be used for this: its antialiased version uses libart to render vector data in pixel
+	  buffers and Gdkrgb to render those pixel buffers in X windows.
+	</para>
+
+      </sect2>
+
+      <sect2>
+	<title>From vector data to pixel buffers</title>
+
+	<para>
+	  Libart's vector input is described using 2 data structures: <function>ArtBpath</function> (short 
+	  for Bezier Paths)
+	  and <function>ArtVPath</function> (short for Vector Paths). libart provides a number of 
+	  helper functions to manipulate these data structures and instantiate specific geometric 
+	  shapes easily.
+	</para>
+
+	<para>
+	  To render these data vectors to a pixel buffer, libart wants you to transform them in 
+	  <function>ArtSVP</function>s (short for Sorted Vector Paths). Svps are a rendering-friendly
+	  version of the original vectors. I would strongly suggest against constructing your own
+	  svps by hand without using the libart's construction APIs: these SVPs need to verify a number
+	  of properties which are not trivial and I have no idea what would happen if you passed
+	  a corrupted svp to the rendering code (probably bad things)...
+	  For example, <function>art_svp_from_vpath</function> will generate the svp corresponding
+	  to your vpaths.
+	</para>
+
+	<para>
+	  Once you have constructed your svps, you can manipulate those svps before rendering them.
+	  It is thus possible to apply arbitrary affine transformations to those svps. It is also possible
+	  to intersect 2 svps and generate the svp representing the union of these svps...
+	</para>
+
+	<para>
+	  Finally, it is time for you to render your svps in a pixel buffer. This can be done 
+	  pretty easily using <function>art_rgb_svp_aa</function> and/or 
+	  <function>art_rgb_svp_alpha</function>.
+	</para>
+
+	<para>
+	  All the above steps are summarized in the following diagram:
+	</para>
+
+	<figure>
+	  <title>LibArt's data flow</title>
+	  <graphic fileref="art-data-flow.png" scale="50"></graphic>
+	</figure>
+
+      </sect2>
+
+    </sect1>
+
+  </chapter>
+
+  <chapter id="sample">
+    <title>Sample code</title>
+
+    <sect1 id="sample-non-display">
+      <title>A non-displaying application</title>
+
+      <para>
+	To get a good idea on how to use libart 
+	in your own application, here is a simple example which does
+	nothing but render in a pixel buffer a small square. The full 
+	source for this example is available for download:
+	<ulink url="./art-non-diplay.tar.gz">art-non-diplay.tar.gz</ulink>
+	(includes a simple Makefile to build it).
+      </para>
+
+      <programlisting>
+int main (int argc, char *argv[])
+{
+  ArtSVP *path;
+  char *buffer;
+
+  path = make_path ();
+
+  buffer = render_path (path);
+
+  save_buffer (buffer, "foo.png");
+
+  return 0;
+}
+      </programlisting>
+
+      <para>
+	As shown above, we begin by creating an SVP, then we render it in a pixel buffer and
+	last we save it to a file.
+	Creating the SVP is very easy:
+      </para>
+<programlisting>
+static ArtSVP *
+make_path (void)
+{
+  ArtVpath *vec = NULL;
+  ArtSVP *svp = NULL;
+  
+  vec = art_new (ArtVpath, 10);
+  vec[0].code = ART_MOVETO;
+  vec[0].x = 0;
+  vec[0].y = 0;
+  vec[1].code = ART_LINETO;
+  vec[1].x = 0;
+  vec[1].y = 10;
+  vec[2].code = ART_LINETO;
+  vec[2].x = 10;
+  vec[2].y = 10;
+  vec[3].code = ART_LINETO;
+  vec[3].x = 10;
+  vec[3].y = 0;
+  vec[4].code = ART_END;
+
+  svp = art_svp_from_vpath (vec);
+
+  return svp;
+}
+</programlisting>
+      <para>
+	The above VPath is a list of drawing commands. There are 5 different drawing commands:
+	<function>ART_MOVETO</function>, <function>ART_MOVETO_OPEN</function>,
+	<function>ART_LINETO</function>, <function>ART_CURVETO</function> an <function>ART_END</function>.
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      <function>ART_MOVETO</function> and <function>ART_MOVETO_OPEN</function> describe where the
+	      pen of the painter starts to draw the vectors. <function>ART_MOVETO</function> starts
+	      a closed vector path (the last point of the vector path will be connected to the first one).
+	    </para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      <function>ART_END</function> ends a vector path.
+	    </para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      <function>ART_LINETO</function> and <function>ART_CURVETO</function> describe
+	      the following point in the vector path.
+	      <function>ART_CURVETO</function> is reserved for use with <function>BPath</function>s and
+	      cannot be used with a <function>Vpath</function>.
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+      
+      <para>
+	The following figure summarizes the behaviour of these drawing commands:
+	<figure>
+	  <title>Drawing commands</title>
+	  <graphic fileref="art-drawing-commands.png" scale="50"></graphic>
+	</figure>
+	Once the SVP is built, we render it and save it to a file:
+      </para>
+
+<programlisting>
+static unsigned char *
+render_path (const ArtSVP *path)
+{
+  art_u8 *buffer = NULL;
+  art_u32 color = (0xFF << 24) | (0x00 <<16) | (0x00<<8) | (0xFF) ; /* RRGGBBAA */
+    
+
+  buffer = art_new (art_u8, WIDTH*HEIGHT*BYTES_PER_PIXEL);
+  art_rgb_run_alpha (buffer, 0xFF, 0xFF, 0xFF, 0xFF, WIDTH*HEIGHT);
+  art_rgb_svp_alpha (path, 0, 0, WIDTH, HEIGHT, 
+		     color, buffer, ROWSTRIDE, NULL);
+
+  return (unsigned char *) buffer;
+}
+
+static void
+save_buffer (const unsigned char *buffer, const char *filename)
+{
+  GdkPixbuf *pixbuf;
+
+  pixbuf = gdk_pixbuf_new_from_data (buffer,
+				     GDK_COLORSPACE_RGB, 
+				     FALSE, 8,
+				     WIDTH, HEIGHT,
+				     ROWSTRIDE,
+				     NULL, NULL);
+
+  pixbuf_save_to_file (pixbuf, filename);
+ 
+  gdk_pixbuf_unref (pixbuf);
+}
+</programlisting>
+
+      <para>
+	The rendering is itself pretty simple: we first fill the buffer with the 0xFFFFFFFF rgba color
+	(that is, 0xFFFFFF rgb color with a transparency of 0xFF which means no transparency at all. It
+	should be called opacity actually ;) with the <function>art_rgb_run_alpha</function> function.
+	Then, we fill the svp in the buffer with the 0xFF0000FF rgba color with the 
+	<function>art_rgb_svp_alpha</function> function.
+      </para>
+
+      <para>
+	Last, to save the pixel buffer, we just instantiate a <function>GdkPixbuf</function>
+	and save it with the <function>pixbuf_save_to_file</function> function we stole 
+	from random pieces of code (namely, nautilus and gnome-iconedit).
+      </para>
+
+      <para>
+	Easy, was it not ?
+      </para>
+
+    </sect1>
+
+    <sect1 id="sample-display">
+      <title>A displaying application</title>
+      
+      <para>
+	Once more, the code for this example can be found 
+	<ulink url="./art-display.tar.gz">there</ulink>.
+      </para>
+
+      <para>
+	Now that we know how to render our data in a pixel buffer, we want to display it 
+	on screen in a window. To do this, we use the gdkrgb library which transfers
+	pixel buffers to the X server in Drawables.
+	The code below is very similar to our previous example: we just initialize GTK+ and
+	gdkrgb and instead of saving the pixel buffer to a file, we create a widget to display 
+	it and run the GTK+ main loop:
+      </para>
+
+      <programlisting>
+int main (int argc, char *argv[])
+{
+  ArtSVP *path;
+  char *buffer;
+
+  /* gtk/gdkrgb initialization */
+  gtk_init (&amp;argc, &amp;argv);
+  gdk_rgb_init ();
+  gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
+  gtk_widget_set_default_visual(gdk_rgb_get_visual());
+
+  path = make_path ();
+
+  buffer = render_path (path);
+
+  build_widget (buffer);
+
+  /* gtk main loop */
+  gtk_main ();
+
+  return 0;
+}
+      </programlisting>
+
+      <para>
+	The only new function is <function>build_widget</function> which is shown
+	below. This function just creates a drawing area and connects a drawing
+	callback to the expose signal.
+      </para>
+
+      <programlisting>
+static void 
+build_widget (unsigned char *buffer)
+{
+  GtkWidget *window = NULL, *drawing_area = NULL;
+
+  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size (GTK_WINDOW(window), WIDTH, HEIGHT);
+  gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+		      GTK_SIGNAL_FUNC (destroy_cb), NULL);
+  gtk_signal_connect (GTK_OBJECT (window), "destroy",
+		      GTK_SIGNAL_FUNC (destroy_cb), NULL);
+  drawing_area = gtk_drawing_area_new ();
+  gtk_container_add (GTK_CONTAINER (window),
+		     GTK_WIDGET (drawing_area));
+
+  gtk_signal_connect (GTK_OBJECT (drawing_area), "expose_event",
+		      GTK_SIGNAL_FUNC (expose_cb), buffer);
+  gtk_signal_connect (GTK_OBJECT (drawing_area), "configure_event",
+		      GTK_SIGNAL_FUNC (expose_cb), buffer);
+
+  gtk_widget_show_all (window);
+}
+      </programlisting>
+
+      <para>
+	The expose callback is very simple: it just calls gdkrgb's entry point
+	to render the pixel buffer onto the drawing area we instantiated a little
+	before.
+      </para>
+      
+      <programlisting>
+static int 
+expose_cb (GtkWidget *widget, GdkEventExpose *evt, gpointer data)
+{
+  art_u8 *buf = (art_u8 *)data;
+
+  gdk_draw_rgb_image (widget->window, widget->style->black_gc, 
+		      0, 0, WIDTH, HEIGHT, 
+		      GDK_RGB_DITHER_NONE,
+		      buf,
+		      ROWSTRIDE);
+  return FALSE;
+}
+      </programlisting>
+    </sect1>
+
+  </chapter>
+
+
+  <chapter id="basic">
+    <title>Basic APIs</title>
+
+    <sect1 id="basic-misc">
+      <title>Miscealeanous useful APIs</title>
+
+      &art-memory;
+      &art-affine;
+      &art-gamma;
+      
+    </sect1>
+
+
+    <sect1 id="basic-foo">
+      <title>Construction APIs</title>
+
+      <para>
+	As we have already seen it previously in our sample
+	application and in the introduction, rendering vector graphics
+	in pixel buffers is first a matter of constructing the correct 
+	data structures representing these vectors.
+      </para>
+
+      <para>
+	Libart provides a number of API functions to create and manipulate
+	the <link linkend="ArtVpath">ArtVpath</link> and <link linkend="ArtBpath">ArtBpath</link>
+	data structures which are detailed in the folowing three sections.
+      </para>
+
+      &art-construction-core;
+      &art-construction-extended;
+      &art-construction-trans;
+
+    </sect1>
+
+    <sect1 id="basic-rendering">
+      <title>Rendering APIs</title>
+
+      &art-svp;
+      &art-render;
+      
+    </sect1>
+    
+  </chapter>
+
+
+<!--
+  <chapter id="advanced">
+    <title>Advanced APIs</title>
+
+    <sect1 id="basic-buffer">
+      <title>Pixel buffer manipulation APIs</title>
+
+      &art-pixbuf;
+      &art-buffer-affine;
+      
+    </sect1>
+
+    <sect1 id="advanced-uta">
+      <title>MicroTile Arrays</title>
+
+      &art-uta;
+
+    </sect1>
+
+  </chapter>
+-->
+
+  <chapter id="problems">
+    <title>Known problems</title>
+
+    <sect1 id="problems-numerical">
+      <title>Numerical Stability</title>
+
+      <para>
+	Libart is known to have a lot of problems concerning numerical
+	stability. These problems can come from two separate issues:
+	<itemizedlist>
+	  <listitem><para>
+	      Libart uses floats to represent an manipulate user-data. 
+	      Floating-point arithmetics are known to lack numerical
+	      stability sometimes. Some problems are thus to be expected.
+	  </para></listitem>
+	  <listitem><para>
+	      The libart intersector (the code used to transform vpaths into
+	      svps) is known to have some bugs. Fixing those requires a lot of
+	      work and a careful re-design/re-write of the intersector. Till then,
+	      Raph has not had time to fix them. Also, no one volunteered to fix 
+	      them. If you have some time left on weekends and are interested in this
+	      task, please contact Raph (raph at acm dot org).
+	  </para>
+	    <para>
+	      The libart intersector is used by <link linkend="art-svp-union">art_svp_union</link>,
+	      <link linkend="art-svp-intersect">art_svp_intersect</link> and
+	      <link linkend="art-svp-diff">art_svp_diff</link>. These functions are used heavily
+	      by the Gnome Antialiased Canvas (the intersector code can be found in 
+	      <filename>art_svp_wind.c</filename>).
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	Despite these problems, libart can still be used for production use: these bugs
+	manifest themselves in small drawing glitches which can be avoided by sparsely using
+	<link linkend="art-vpath-perturb">art_vpath_perturb</link>.
+      </para>
+    </sect1>
+
+    <sect1 id="problems-memory">
+      <title>Memory Footprint</title>
+
+      <para>
+	Libart memory use can be pretty large if you use complex drawing primitives such
+	as circles (through the use of <link linkend="art-vpath-new-circle">art_vpath_new_circle</link>)
+	or bézier paths (through the use of <link linkend="art-bez-path-to-vec">art_bez_path_to_vec</link>).
+      </para>
+      <para>
+	The reason for the high memory use is that these drawing primitives are converted to VPaths before
+	being rendered and the VPath representing these primitives use a lot of memory space.
+	If you want to fix this, feel free to fix both the renderer and the intersector to handle
+	these complex primitives directly (freetype2 antialised renderer does this: you might want to have a
+	look at its code in <filename>src/smooth/ftgrays.c</filename>).
+      </para>
+    </sect1>
+
+  </chapter>
+
+  <chapter id="internals">
+    <title>Libart Internals</title>
+
+    <sect1 id="internals-scanline">
+      <title>Rasterizer</title>
+
+      <para>
+	The rasterizer code we will refer to is the function named <function>art_svp_render_aa</function>
+	located in the file <filename>art_svp_render_aa.c</filename>.
+      </para>
+
+      <sect2>
+	<title>Winding Number Calculation.</title>
+
+	<para>
+	  The goal of the libart rasterizer is to calculate a property for each of the pixels to render: this is
+	  the <emphasis>winding number</emphasis>. This property reflects the position of a given pixel relative to
+	  all the vector paths to render. It says whether or not the pixel is located <emphasis>inside</emphasis>
+	  or <emphasis>outside</emphasis> a vector path. As can be seen on the folowing diagram, a point is inside
+	  a given closed polygon if and only if the infinite horizontal half-line starting on the pixel and going
+	  to the left intersects the enclosing polygon an odd number of times.
+	</para>
+
+	<figure>
+	  <title>Inside or Outside of a polygon</title>
+	  <graphic fileref="art-winding-number.png" scale="50"></graphic>
+	</figure>
+
+	<para>
+	  The winding number of a pixel is defined as the number of times the horizontal line intersects an up
+	  segment minus the number of times the horizontal line intersects down segments (a segment being defined
+	  by a pair of points A=(Ax, Ay) and B=(Bx, By), an up segment is a segment such that By > Ay). 
+	  A non-zero winding number thus means the pixel is located within a polygon and must be painted.
+	</para>
+
+	<para>
+	  Classicaly, the winding number property is calculated on each pixel and this information is used to paint
+	  a pixel in either black or white (this is what the standard freetype renderer used to do to render
+	  each character on screen). The problem here is that the output medium used by computers does not have
+	  an infinite spatial resolution. Computer screens (CRTs or LCDs or even printers) draw dots with a non-zero
+	  area. Each of the displayed pixel is not a point in the mathematical sense. Traditionaly, to render the
+	  vector paths, we would test whether or not the center of each pixel lies within the vector path: this rendering
+	  method introduces a number of well known artificial artefacts which are usually refered to as <emphasis>
+	    aliasing</emphasis> artefacts.
+	</para>
+
+	<para>
+	  Hopefully, there exist antialiasing techniques to minimize these aliasing artifacts. The idea behind
+	  all these techniques is to fake higher resolution on the output medium by trading-off color depth for
+	  spatial resolution: certain pixels are not completely turned black (they are turned grey)
+	  to give viewers the feeling of smooth outines rather than jagged outlines.
+	</para>
+
+	  <figure>
+	    <title>Oversampling versus Exact Coverage Calculus</title>
+	    <graphic fileref="art-oversampling.png" scale="50"></graphic>
+	  </figure>
+
+	<para>
+	  Traditional antialiasing algorithms use Oversampling: they render the outlines on a high-resolution
+	  grid and then calculate the grey output by averaging over the high-resolution B&amp;W grid.
+	  Libart instead tries to calculate the real coverage of each pixel by the outline to get better precision
+	  than with oversampling.
+	</para>
+
+	<para>
+	  To express this new concept (that is, partial coverage of a pixel rather than Black or White), libart
+	  redefines winding numbers and uses a special data structure which is of importance to describe them:
+	  <link linkend="ArtSVPRenderAAStep">ArtSVPRenderAAStep</link>.
+	</para>
+
+	<para>
+	  To understand how they are used, we'll use the example shown in the figure below.
+	  On the bottom row of pixels, pixel 3 would be represented by the step (x=1, delta=+0.3), 
+	  pixel 4 by the step (x=2, delta=+0.67) and pixels 5 and 6 by the step (x=3, delta=+0.03).
+	</para>
+
+	<para>
+	  The bottom row of pixels is rendered as folows: we begin by rendering the first step which says that 
+	  pixel 1 on this row is 30% covered by the outline (delta=0.3 -> 30%). The second step tells us that the 
+	  second pixel on this row is (30+67)=97% covered by the outline (the difference -the delta- is of +0.67). 
+	  Finally, the third step tells us that pixels 3 and folowing on this row are (97+3)=100% covered by the 
+	  outline. The fourth step would tell us where the pixels are not 100% covered anymore.
+	  To summarize, on a given row of pixels, each step gives us the delta (that is, the difference in coverage)
+	  relative to the previous step of the current pixel.
+	</para>
+
+	<para>
+	  The raster version of an outline can thus be represented relative to an output buffer by an array of arrays
+	  of <link linkend="ArtSVPRenderAAStep">ArtSVPRenderAAStep</link>s. Each array of
+	  <link linkend="ArtSVPRenderAAStep">ArtSVPRenderAAStep</link>s represents a row of pixels of the output buffer
+	  and each step of the array of <link linkend="ArtSVPRenderAAStep">ArtSVPRenderAAStep</link>s represents
+	  a <emphasis>run</emphasis> (that is, adjacent pixels with same color characteristics).
+	</para>
+
+	<para>
+	  People who want to render the real pixels in the output buffer just need to calculate running sums over the 
+	  steps for each line of the output buffer. The running sum represents the degree of presence of the outline
+	  over the background: the outline is easy to composite over the backgound.
+	</para>
+
+      </sect2>
+
+      <sect2>
+	<title>How libart does this for true.</title>
+
+	<para>
+	  <link linkend="art-svp-render-aa">art_svp_render_aa</link> exports the API which offers the interface
+	  described in the previous section: a callback is called on each of the output buffer's line with an array
+	  of <link linkend="ArtSVPRenderAAStep">ArtSVPRenderAAStep</link>s as parameter. This callback
+	  just needs to calculate the running sum for this line and render the real pixels in a pixel buffer.
+	</para>
+
+	<para>
+	  <link linkend="art-rgb-svp-aa">art_rgb_svp_aa</link> and 
+	  <link linkend="art-rgb-svp-alpha">art_rgb_svp_alpha</link>
+	  both use internally <link linkend="art-svp-render-aa">art_svp_render_aa</link> by providing different
+	  callbacks. Their code is pretty simple and can be found in <filename>art_rgb_svp.c</filename> (the code
+	  for their associated callbacks can be found in the same file).
+	</para>
+
+	<para>
+	  The interesting piece of code is indeed <link linkend="art-rgb-svp-aa">art_rgb_svp_aa</link>.
+	  This code implements a pretty classic Plane Sweep algorithm: it loops over the output buffer's
+	  lines and calculates for each line the steps for the callback. To calculate the steps,
+	  it maintains over the lines the list of segments crossing the current line.
+	</para>
+
+	<sect3>
+	  <title>A Plane Sweep Algorithm</title>
+
+	  <para>
+	    To maintain the list of <emphasis>active</emphasis> segments (that is, segments 
+	    crossing the current
+	    line), the algorithm adds the segments starting on the current line and 
+	    removes the segments ending on the current line. The folowing pseudo-code
+	    summarizes this process for libart's (x,y) space.
+	  </para>
+
+	  <programlisting>
+for (y = 0; y < height; y++) {
+	add_new_active_segments (active_segments, svp);
+	
+	process_line (active_segments, y);
+
+	remove_old_active_segments (active_segmnts);
+}
+	  </programlisting>
+
+	  <para>
+	    Surprisingly enough, the svp data-structure was designed so that the two important operations
+	    of this algorithm (namely, adding new active segments and removing old active segments to/from 
+	    the list of active segments) are easy to implement and fast.
+	  </para>
+
+	  <para>
+	    Let's first have a look at what the SVP data structure looks like.
+	  </para>
+
+	  <programlisting>
+typedef struct _ArtSVP ArtSVP;
+typedef struct _ArtSVPSeg ArtSVPSeg;
+
+struct _ArtSVPSeg {
+  int n_points;
+  int dir; /* == 0 for "up", 1 for "down" */
+  ArtDRect bbox;
+  ArtPoint *points;
+};
+
+struct _ArtSVP {
+  int n_segs;
+  ArtSVPSeg segs[1];
+};
+	  </programlisting>
+
+	  <para>
+	    Each of an SVP's segment represent a monotonous vector shape as shown on the 
+	    figure below. The word <emphasis>Monotonous</emphasis> used here is to be understood
+	    as <emphasis>not changing vertical direction</emphasis>: segments either go up or down.
+	    A given Vector path changing his vertical direction is split in two vector paths
+	    when represented by an SVP: one going up and one going down. Each segment is 
+	    contained within its own bounding box stored in the <emphasis>bbox</emphasis> field.
+	  </para>
+
+	  <figure>
+	    <title>VPath to SVP</title>
+	    <graphic fileref="art-svp-vpath.png" scale="50"></graphic>
+	  </figure>
+
+
+	  <para>
+	    The segments listed in an SVP are ordered using their starting points as shown
+	    in <emphasis>art_svp_seg_compare</emphasis> (from <filename>art_svp.c</filename>)
+	    from top to bottom, left to right.
+	    The ordering of the segments and their bounding boxes allows one to easily parse 
+	    the list of segments of an svp to update the list of active segments:
+	  </para>
+
+	  <programlisting>
+  for (y = y0; y < y1; y++)
+    {
+      /* insert new active segments */
+      for (; i < svp->n_segs && svp->segs[i].bbox.y0 < y + 1; i++)
+	{
+	  if (svp->segs[i].bbox.y1 > y &&
+	      svp->segs[i].bbox.x0 < x1)
+	    {
+	      seg = &amp;svp->segs[i];
+	      /* move cursor to topmost vector which overlaps [y,y+1) */
+	      for (curs = 0; seg->points[curs + 1].y < y; curs++);
+	      cursor[i] = curs;
+	      dy = seg->points[curs + 1].y - seg->points[curs].y;
+	      if (fabs (dy) >= EPSILON)
+		seg_dx[i] = (seg->points[curs + 1].x - seg->points[curs].x) /
+		  dy;
+	      else
+		seg_dx[i] = 1e12;
+	      seg_x[i] = seg->points[curs].x +
+		(y - seg->points[curs].y) * seg_dx[i];
+	      art_svp_render_insert_active (i, active_segs, n_active_segs++,
+					    seg_x, seg_dx);
+	    }
+	}
+
+
+	  /* here, process the current list of active segments.*/
+
+
+	/* remove old segments from active list */
+	if (seg->points[curs].y >= y + 1)
+	  {
+	    curs--;
+	    cursor[seg_index] = curs;
+	    seg_x[seg_index] += seg_dx[seg_index];
+	  }
+	else
+	  {
+	    art_svp_render_delete_active (active_segs, j--,
+					    --n_active_segs);
+	  }
+    }
+	  </programlisting>
+
+	</sect3>
+
+	<sect3>
+	  <title>A note on coverage calculus in <link linkend="art-svp-render-aa">art_svp_render_aa</link></title>
+
+	  <para>
+	    Because the code which calculates the different steps for each line of the output buffer
+	    is not that easy to get right quickly, here is included a simple diagram which outlines 
+	    the meaning of the variables of the code:
+	  </para>
+
+	  <figure>
+	    <title>Coverage Calculus</title>
+	    <graphic fileref="art-coverage-calculus.png" scale="50"></graphic>
+	  </figure>
+
+
+	</sect3>
+
+      </sect2>
+
+
+    </sect1>
+
+    <sect1 id="internals-intersector">
+      <title>Intersector</title>
+
+      <para>
+	Someone will have to write this section.
+      </para>
+    </sect1>
+
+
+  </chapter>
+
+
+  &FDL;
+
+
+</book>
+
+

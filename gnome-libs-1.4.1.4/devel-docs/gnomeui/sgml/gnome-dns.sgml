@@ -1,0 +1,135 @@
+<refentry id="gnomeui-gnome-dns">
+<refmeta>
+<refentrytitle>gnome-dns</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-dns</refname><refpurpose>Non-blocking name resolver interface.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+void        <link linkend="gnome-dns-init">gnome_dns_init</link>                  (<link linkend="gint">gint</link> server_count);
+<link linkend="guint32">guint32</link>     <link linkend="gnome-dns-lookup">gnome_dns_lookup</link>                (const char *hostname,
+                                             void (*callback) (guint32 ip_addr, void *callback_data),
+                                             void *callback_data);
+void        <link linkend="gnome-dns-abort">gnome_dns_abort</link>                 (<link linkend="guint32">guint32</link> tag);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+You can use this module to do name server lookups in a non-blocking
+fashion.  You need to provide a callback function to be invoked when
+the name has been resolved.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-dns-init">gnome_dns_init ()</title>
+<programlisting>void        gnome_dns_init                  (<link linkend="gint">gint</link> server_count);</programlisting>
+<para>
+Initialize the dns functions for use.
+</para>
+<para>
+server_count specifies the number of servers to <link linkend="fork">fork</link>() at
+init, or &lt;= 0 to do dynamic server forking.  If you are
+concerned about virtual mem usage, fork your servers as one of the
+first things in your program.
+</para>
+<para>
+Note that it will still do dynamic forking if you specify &gt; 0. 
+when it runs out of servers.. a good init value may be 1 or 2.
+</para>
+<para>
+Results:
+<link linkend="gnome-dns-lookup">gnome_dns_lookup</link>() will be ready for use.
+</para>
+<para>
+Side effects:
+The library is initialized.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>server_count</parameter>&nbsp;:</entry>
+<entry> server count to <link linkend="fork">fork</link>() at init.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dns-lookup">gnome_dns_lookup ()</title>
+<programlisting><link linkend="guint32">guint32</link>     gnome_dns_lookup                (const char *hostname,
+                                             void (*callback) (guint32 ip_addr, void *callback_data),
+                                             void *callback_data);</programlisting>
+<para>
+Looks up an address and returns a tag for use with
+<link linkend="gnome-dns-abort">gnome_dns_abort</link>() if desired.  May not return -1 if
+hostname was in cache.
+</para>
+<para>
+Callback function is called when dns_lookup is complete.
+</para>
+<para>
+Side effects:
+A new dns server may be spawned if all the current servers
+are in use.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>hostname</parameter>&nbsp;:</entry>
+<entry> hostname to lookup
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry> function to call when dns lookup is complete.
+</entry></row>
+<row><entry align="right"><parameter>callback_data</parameter>&nbsp;:</entry>
+<entry> data to pass to the callback function
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A tag identifying this lookup or 0 if lookup was
+in cache.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dns-abort">gnome_dns_abort ()</title>
+<programlisting>void        gnome_dns_abort                 (<link linkend="guint32">guint32</link> tag);</programlisting>
+<para>
+Aborts a previous call to <link linkend="gnome-dns-lookup">gnome_dns_lookup</link>().
+DNS callback function is not called.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tag</parameter>&nbsp;:</entry>
+<entry> the tag returned from previous call to <link linkend="gnome-dns-lookup">gnome_dns_lookup</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

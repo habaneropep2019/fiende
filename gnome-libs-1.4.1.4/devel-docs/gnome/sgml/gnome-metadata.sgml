@@ -1,0 +1,457 @@
+<refentry id="gnome-gnome-metadata">
+<refmeta>
+<refentrytitle>gnome-metadata</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-metadata</refname><refpurpose>File metadata information storage.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+enum        <link linkend="GnomeMetadataError-t">GnomeMetadataError_t</link>;
+int         <link linkend="gnome-metadata-set">gnome_metadata_set</link>              (const char *file,
+                                             const char *name,
+                                             int size,
+                                             const char *data);
+int         <link linkend="gnome-metadata-remove">gnome_metadata_remove</link>           (const char *file,
+                                             const char *name);
+char**      <link linkend="gnome-metadata-list">gnome_metadata_list</link>             (const char *file);
+int         <link linkend="gnome-metadata-get">gnome_metadata_get</link>              (const char *file,
+                                             const char *name,
+                                             int *size,
+                                             char **buffer);
+int         <link linkend="gnome-metadata-get-fast">gnome_metadata_get_fast</link>         (const char *file,
+                                             const char *name,
+                                             int *size,
+                                             char **buffer);
+int         <link linkend="gnome-metadata-rename">gnome_metadata_rename</link>           (const char *from,
+                                             const char *to);
+int         <link linkend="gnome-metadata-copy">gnome_metadata_copy</link>             (const char *from,
+                                             const char *to);
+int         <link linkend="gnome-metadata-delete">gnome_metadata_delete</link>           (const char *file);
+void        <link linkend="gnome-metadata-regex-add">gnome_metadata_regex_add</link>        (const char *regex,
+                                             const char *key,
+                                             int size,
+                                             const char *data);
+void        <link linkend="gnome-metadata-regex-remove">gnome_metadata_regex_remove</link>     (const char *regex,
+                                             const char *key);
+void        <link linkend="gnome-metadata-type-add">gnome_metadata_type_add</link>         (const char *type,
+                                             const char *key,
+                                             int size,
+                                             const char *data);
+void        <link linkend="gnome-metadata-type-remove">gnome_metadata_type_remove</link>      (const char *type,
+                                             const char *key);
+void        <link linkend="gnome-metadata-lock">gnome_metadata_lock</link>             (void);
+void        <link linkend="gnome-metadata-unlock">gnome_metadata_unlock</link>           (void);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+   One of the problems that a desktop environment faces is the fact
+that it is usually necessary to have a mechanism for storing
+information about a file's properties.  For example, applications
+might want to bind an icon for a specific executable file or bind a
+small thumbnail image for a graphic produced by a graphics program.
+These icons should be semantically attached to the main file.
+</para>
+
+<para>
+   The GNOME metadata was implemented by Tom Tromey at Cygnus, given a
+number of design constraints and tradeoffs (described in detail in
+<ulink
+url="http://www.cygnus.com/~tromey/gnome/metadata.html" type="http">[TROMEY]</ulink>).
+</para>
+
+<para>
+Here is a list of the GNOME metadata features:
+</para>
+
+  <itemizedlist>
+    <listitem><para>Binding the information on a per-file basis: This
+      is a per-user setting and each user keeps track of his own
+      bindings.  System defaults apply on top of these.
+      </para></listitem>
+
+    <listitem><para> Binding information by file content: Given the
+      type of the file (using file signatures, similar to the
+      Unix-file(1) command).  </para></listitem>
+
+    <listitem><para>Binding information by a regular expression.  For
+      example, a default icon for gif files would be provided by a
+      regular expression "*.\.gif$".  </para></listitem>
+
+    <listitem><para>The metadata system is optimized to provide a
+      coherent GUI solution, rather than as a compromise to kludging
+      existing command line tools.
+    </para></listitem>
+    
+    <listitem><para>Most ordinary uses of files will continue to work
+      without metadata, just as they do now.
+    </para></listitem>
+
+  </itemizedlist>
+
+<para>
+   There are a number of standard properties for file metadata in
+GNOME, for example: "View" stores the action for viewing the file
+contents; "Open" stores analogous action for editing; "Icon" which
+contains the icon used for displaying the file on the desktop.  For a
+complete list of the existing keys see <emphasis>FIXME</emphasis>.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeMetadataError-t">enum GnomeMetadataError_t</title>
+<programlisting>typedef enum
+{
+	GNOME_METADATA_OK = 0,		   /* No error. */
+	GNOME_METADATA_IO_ERROR,	   /* IO or other low-level
+					      communications/storage
+					      error.  */
+	GNOME_METADATA_NOT_FOUND	   /* Information not found.  */
+} GnomeMetadataError_t;
+</programlisting>
+<para>
+This describes the errors that can be returned by some gnome-metadata
+functions.
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-set">gnome_metadata_set ()</title>
+<programlisting>int         gnome_metadata_set              (const char *file,
+                                             const char *name,
+                                             int size,
+                                             const char *data);</programlisting>
+<para>
+Sets metadata associated with <parameter>file</parameter> and <parameter>name</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> File with which metadata will be associated
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Metadata key.
+</entry></row>
+<row><entry align="right"><parameter>size</parameter>&nbsp;:</entry>
+<entry> Size in bytes of data
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> Data to be stored.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>0</literal> on success or an error code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-remove">gnome_metadata_remove ()</title>
+<programlisting>int         gnome_metadata_remove           (const char *file,
+                                             const char *name);</programlisting>
+<para>
+Remove a piece of metadata associated with <parameter>file</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> File name
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Metadata key.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>0</literal> on success, or an error code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-list">gnome_metadata_list ()</title>
+<programlisting>char**      gnome_metadata_list             (const char *file);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> File name.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>an array of all metadata keys associated with <parameter>file</parameter>.  The
+array is <literal>NULL</literal> terminated.  The result can be freed with
+<link linkend="g-strfreev">g_strfreev</link>().  This only returns keys for which there
+is a particular association with <parameter>file</parameter>.  It will not return keys
+for which a regex or other match succeeds.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-get">gnome_metadata_get ()</title>
+<programlisting>int         gnome_metadata_get              (const char *file,
+                                             const char *name,
+                                             int *size,
+                                             char **buffer);</programlisting>
+<para>
+Get a piece of metadata associated with <parameter>file</parameter>.  <parameter>size</parameter> and <parameter>buffer</parameter>
+are result parameters.  *<parameter>buffer</parameter> is <link linkend="g-malloc">g_malloc</link>()d.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> File name
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Metadata key
+</entry></row>
+<row><entry align="right"><parameter>size</parameter>&nbsp;:</entry>
+<entry> Return parameter for size of data
+</entry></row>
+<row><entry align="right"><parameter>buffer</parameter>&nbsp;:</entry>
+<entry> Return parameter for data
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>0</literal>, or an error code.  On error *<parameter>buffer</parameter> will be set to <literal>NULL</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-get-fast">gnome_metadata_get_fast ()</title>
+<programlisting>int         gnome_metadata_get_fast         (const char *file,
+                                             const char *name,
+                                             int *size,
+                                             char **buffer);</programlisting>
+<para>
+Like <link linkend="gnome-metadata-get">gnome_metadata_get</link>(), but won't run the `file' command to
+characterize the file type.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> File name
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Metadata key
+</entry></row>
+<row><entry align="right"><parameter>size</parameter>&nbsp;:</entry>
+<entry> Return parameter for size of data
+</entry></row>
+<row><entry align="right"><parameter>buffer</parameter>&nbsp;:</entry>
+<entry> Return parameter for data
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>0</literal>, or an error code.  On error *<parameter>buffer</parameter> will be set to
+<literal>NULL</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-rename">gnome_metadata_rename ()</title>
+<programlisting>int         gnome_metadata_rename           (const char *from,
+                                             const char *to);</programlisting>
+<para>
+This function moves metadata associated with file <parameter>from</parameter> to file
+<parameter>to</parameter>.  It should be called after a file is renamed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>from</parameter>&nbsp;:</entry>
+<entry> Source file name
+</entry></row>
+<row><entry align="right"><parameter>to</parameter>&nbsp;:</entry>
+<entry> Destination file name
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>0</literal> on success, or an error code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-copy">gnome_metadata_copy ()</title>
+<programlisting>int         gnome_metadata_copy             (const char *from,
+                                             const char *to);</programlisting>
+<para>
+This function copies metadata associated with file <parameter>from</parameter> to file
+<parameter>to</parameter>.  It should be called after a file is copied.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>from</parameter>&nbsp;:</entry>
+<entry> Source file name
+</entry></row>
+<row><entry align="right"><parameter>to</parameter>&nbsp;:</entry>
+<entry> Destination file name
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>0</literal> on success, or an error code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-delete">gnome_metadata_delete ()</title>
+<programlisting>int         gnome_metadata_delete           (const char *file);</programlisting>
+<para>
+This function deletes all metadata associated with <parameter>file</parameter>.
+It should be called after a file is deleted.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> File name
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>0</literal> on success, or an error code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-regex-add">gnome_metadata_regex_add ()</title>
+<programlisting>void        gnome_metadata_regex_add        (const char *regex,
+                                             const char *key,
+                                             int size,
+                                             const char *data);</programlisting>
+<para>
+Add a regular expression to the internal list.  This regex is used
+when matching requests for the metadata <parameter>key</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>regex</parameter>&nbsp;:</entry>
+<entry> The regular expression.
+</entry></row>
+<row><entry align="right"><parameter>key</parameter>&nbsp;:</entry>
+<entry> The metadata key.
+</entry></row>
+<row><entry align="right"><parameter>size</parameter>&nbsp;:</entry>
+<entry> Size of data in bytes.
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> The data.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-regex-remove">gnome_metadata_regex_remove ()</title>
+<programlisting>void        gnome_metadata_regex_remove     (const char *regex,
+                                             const char *key);</programlisting>
+<para>
+Remove the regular expression from the internal list.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>regex</parameter>&nbsp;:</entry>
+<entry> The regular expression.
+</entry></row>
+<row><entry align="right"><parameter>key</parameter>&nbsp;:</entry>
+<entry> The metadata key.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-type-add">gnome_metadata_type_add ()</title>
+<programlisting>void        gnome_metadata_type_add         (const char *type,
+                                             const char *key,
+                                             int size,
+                                             const char *data);</programlisting>
+<para>
+Add a file type to the internal list.  This pairing is used
+when matching requests for the metadata <parameter>key</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> File type
+</entry></row>
+<row><entry align="right"><parameter>key</parameter>&nbsp;:</entry>
+<entry> The metadata key.
+</entry></row>
+<row><entry align="right"><parameter>size</parameter>&nbsp;:</entry>
+<entry> Size of data in bytes.
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> The data.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-type-remove">gnome_metadata_type_remove ()</title>
+<programlisting>void        gnome_metadata_type_remove      (const char *type,
+                                             const char *key);</programlisting>
+<para>
+Remove a type/key pairing from the internal list.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> The file type.
+</entry></row>
+<row><entry align="right"><parameter>key</parameter>&nbsp;:</entry>
+<entry> The metadata key.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-lock">gnome_metadata_lock ()</title>
+<programlisting>void        gnome_metadata_lock             (void);</programlisting>
+<para>
+Locks the metadata system.  Used if you are going to invoke
+many metadata operations to speed up metadata access.</para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-metadata-unlock">gnome_metadata_unlock ()</title>
+<programlisting>void        gnome_metadata_unlock           (void);</programlisting>
+<para>
+Unlocks the metadata system.  Used if you are going to invoke
+many metadata operations to speed up metadata access.</para>
+<para>
+
+</para></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

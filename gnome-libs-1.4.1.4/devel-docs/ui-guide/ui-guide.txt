@@ -1,0 +1,208 @@
+		 GNU Network Object Model Environment
+
+		      User Interface Guidelines
+
+
+* About this document
+
+This document contains the user interface guidelines that developers
+should follow when writing applications for the GNU Network Object
+Model Environment (GNOME).
+
+One of the main goals of the GNOME project is to provide a consistent
+graphical user interface for applications.  Users can benefit greatly
+from a uniform and consistent look-and-feel among applications.  When
+a group of programs share the same philosophy about the user
+interface, users can just learn how to use the user interface for any
+one of those programs and apply their knowledge on the rest of them,
+without having to re-learn a different user interface.
+
+This document describes the philosophy of the GNOME user interface and
+contains ways in which developers may access the standard user
+interface elements of GNOME.  Wherever possible, it contains source
+code examples that can be used to implement this functionality.  It
+also provides examples of how not to design user interfaces for GNOME
+applications; these appear with an explanation regarding why these
+examples are "bad design" and how to correct them.
+
+
+* Fundamentals of the GNOME user interface
+
+[This is to be modeled after Part 1 "Fundamentals" of the Macintosh
+User Interface Guidelines.]
+
+** Compliancy levels
+
+This document will often speak of "GNOME compliancy levels".  Programs
+can be assigned ratings of conformance to the GNOME User Interface
+Guidelines based on these compliancy levels.
+
+The purpose of having compliancy levels is to let developers
+progressively implement features of the GNOME user interface into
+their programs, by being able to know which of those features are more
+important than others.
+
+When this document describes a particular user interface feature, it
+will be labeled with a specific compliancy level so that developers
+can implement those features in an orderly fashion.
+
+There are five compliancy levels for the GNOME user interface:
+
+*** GNOME compliancy level 1 (G1) - Mandatory
+
+All applications are expected to have G1 features.  These are meant to
+be the bare minimum user interface features that applications should
+have.
+
+*** GNOME compliancy level 2 (G2) - Highly recommended
+
+Features in the G2 level are to be expected in the final version
+of an application (i.e. one that is past the beta stage).  All GNOME
+applications of release-quality are expected to have G2 features.
+
+*** GNOME compliancy level 3 (G3) - Suggested
+
+Features in the G3 level are not to be expected in applications.
+These are features that may not be applicable in all situations, are
+hard to implement, or are beyond the call of duty.  It is suggested
+that very polished applications try to implement G3 features.
+
+*** GNOME compliancy level 4 (G4) - Nice to have
+
+Features in the C4 level are minor conveniences that developers may
+not decide to implement.  Users will experience C4 level features as
+ocassionaly useful, but definitely not needed for a functional user
+interface.
+
+*** GNOME compliancy level 5 (G5) - Experimental features
+
+Features in the G5 level are experimental user interface conventions
+that are in development.  As such, they may have not been formalized
+enough for developers to use consistently.  It is recommended that no
+release-quality application have G5 level features -- only development
+and proof-of-concept programs should use these when appropriate.
+
+When features in the G5 level are formalized enough to be included in
+the G1-G4 levels, they will be moved there and cease to be
+experimental features.  It is recommended that the original developers
+of G5 features help application developers integrate these new
+features in their applications.
+
+
+** User interface principles
+
+** Design considerations
+
+** Developing the user interface
+
+
+* User interface components
+
+** Windows
+
+*** Main application windows -- GnomeApp
+
+Many applications can use the standard application windows provided by
+the GnomeApp widget in the libgnomeui library.  A GnomeApp window
+provides a toplevel window with a title, an optional menu bar, an
+optional tool bar, a content area, and an optional status bar.
+
+[Screenshot/diagram of a skeleton GnomeApp window]
+
+*** Non-standard application windows
+
+[For example, the gtcd CD player uses a toplevel window with no menu
+bar or tool bar; explain why and when can non-standard application
+windows be used.]
+
+
+** Menus
+
+This chapter describes the kinds of menus you can implement in GNOME
+applications:  pull-down menus, hierarchical menus, pop-up menus, and
+tear-off menus.  This chapter defines the standard menu items that
+should be present in menus used by GNOME applications.
+
+It is highly recommended that applications create their menus using
+the gnome-app-helper module.  This allows the programmer to easily
+specify a definition for a hierarchical menu which can then be plugged
+into a GnomeApp application window.
+
+*** Application menu bar
+
+Application windows based on GnomeApp are expected to have a menu bar
+with at least the items described in this section.  For GnomeApp
+windows, this menu bar is defined to be in the G1 compliancy level.
+
+All the submenu labels in the menu bar are flushed to the left of the
+menu bar.  They are specified in order from left to right, as follows:
+
+1. File menu.  This should have at least one item called "Exit", using
+the GNOME_STOCK_MENU_EXIT icon.  If the application does not deal with
+documents or files, it can use a different name for the File menu.
+For example, it could be substituted with a Game menu.
+
+2. Help menu.  This should have at least the following items in this
+order:
+
+	- One item called "Help on GNOME", which should invoke the
+	  GNOME Help Browser in its default main page.  This can be
+	  done using the gnome_help_xxx() function [FIXME].
+
+	- A separator line.
+
+	- One item called "About <program name>", using the
+	  GNOME_STOCK_MENU_ABOUT icon.  This item should create and
+	  display an about box using the gnome_about_new() function.
+
+[Add stuff about optional edit/view/whatever menus, with descriptions
+of what items should be in each.]
+
+It is highly recommended that the application have complete online
+help; this should be considered as G2 level compliancy.  If the
+application provides online help, it should be accessible by a "Help
+on <program name>" menu item at the top of the Help submenu described
+above.
+
+[FIXME: add description of Help Index, Help Contents, etc. items]
+
+
+** Dialog boxes
+
+** Controls (widgets)
+
+** Icons
+
+** Behaviors
+
+** Language
+
+
+* General development information
+
+[This section is meant to provide useful information on tricky UI and
+X programming issues.  Relevant topics include how to write
+flicker-free widgets and widgets that resize correctly, how to make
+themable widgets by using the Gtk themes API, and how to extend the
+existing GNOME widgets.  It also has a checklist of things
+applications should have to conform with the GNOME User Interface
+Guidelines.]
+
+** Checklist
+
+
+* References
+
+[1] Apple Computer, Macintosh Human Interface Guidelines.
+Addison-Wesley, 1992.  (Also available as
+http://developer.apple.com/techpubs/mac/HIGuidelines/HIGuidelines-2.html).
+
+[2] GNU Network Object Model Environment, http://www.gnome.org
+
+[3] The GNOME Manifesto, http://www.gnome.org/about/manifesto.shtml
+
+[4] Interface Hall of Fame, http://www.iarchitect.com/mfame.htm
+
+[5] Interface Hall of Shame, http://www.iarchitect.com/mshame.htm
+
+[6] Tom Vogt, Rogue GNOME Style Guide, http://home.onestop.net/arena/rsg.txt

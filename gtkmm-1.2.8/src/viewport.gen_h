@@ -1,0 +1,124 @@
+/* $Id: viewport.gen_h,v 1.44 2000/02/13 02:22:09 kenelson Exp $ */
+
+/* viewport.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/bin.h>
+#include <gtk/gtkviewport.h>
+
+CLASS_START(Gtk);
+class Adjustment;
+
+class Viewport : public Bin {
+  
+  WRAP_CLASS(Viewport,GtkViewport,GTK_VIEWPORT,GTK_IS_VIEWPORT,viewport,Gtk::Bin,GtkBin,GTK_BIN);
+public:
+
+  SIGNAL_SPEC("set_scroll_adjustments",both|fake,
+    void set_scroll_adjustments(Gtk::Adjustment*,Gtk::Adjustment*),
+    void gtk_viewport_set_scroll_adjustments(GtkViewport*,GtkAdjustment*,GtkAdjustment*));
+
+  Viewport();
+  Viewport( Adjustment &hadjustment, 
+	        Adjustment &vadjustment);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_MEMBER(value,hadjustment,hadjustment,Gtk::Adjustment*,GtkAdjustment*);  
+  WRAP_MEMBER(value,vadjustment,vadjustment,Gtk::Adjustment*,GtkAdjustment*);  
+
+  WRAP_METHOD(
+    void gtk_viewport_set_hadjustment (GtkViewport*,GtkAdjustment *),
+    void set_hadjustment( Gtk::Adjustment *adjustment=0));
+  WRAP_METHOD(
+    void gtk_viewport_set_vadjustment (GtkViewport*,GtkAdjustment *),
+    void set_vadjustment( Gtk::Adjustment *adjustment=0));
+  WRAP_METHOD(
+    void gtk_viewport_set_hadjustment (GtkViewport*,GtkAdjustment *),
+    void set_hadjustment( Gtk::Adjustment &adjustment));
+  WRAP_METHOD(
+    void gtk_viewport_set_vadjustment (GtkViewport*,GtkAdjustment *),
+    void set_vadjustment( Gtk::Adjustment &adjustment));
+
+  WRAP_MEMBER(value,shadow_type,shadow_type,GtkShadowType,GtkShadowType);
+  WRAP_METHOD(
+    void gtk_viewport_set_shadow_type(GtkViewport*,GtkShadowType),
+    void set_shadow_type(GtkShadowType type));
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+#include <gtk--/adjustment.h>
+namespace Gtk
+{
+
+Viewport::Viewport()
+  : Bin((GtkBin*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_hadjustment();
+  set_vadjustment();
+}
+
+Viewport::Viewport( Adjustment &hadjustment,
+			    Adjustment &vadjustment)
+  :     Bin((GtkBin*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_hadjustment(hadjustment);
+  set_vadjustment(vadjustment);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_ViewPort)
+//. name: shadow_type
+//. type: GtkShadowType
+//. get:
+//. set:
+//. desc:
+
+//. name: view_window
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: bin_window
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: hadjustment
+//. type: GtkAdjustment*
+//. get:
+//. set:
+//. desc:
+
+//. name: vadjustment
+//. type: GtkAdjustment*
+//. get:
+//. set:
+//. desc:
+

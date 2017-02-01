@@ -1,0 +1,40 @@
+#! /bin/sh
+
+prefix=@prefix@
+BIN=${prefix}/bin
+localstatedir=@localstatedir@
+
+usage()
+{
+    cat <<EOF
+Usage: scrollkeeper-get-toc-from-docpath <DOCPATH> 
+EOF
+
+    exit $1
+}
+
+if test $# -eq 0; then
+    usage 1
+fi
+
+scrollkeeper_dir=`scrollkeeper-config --pkglocalstatedir`
+
+docids=`grep $1 ${scrollkeeper_dir}/scrollkeeper_docs | \
+          awk 'BEGIN { FS="	"} {print $2}'`
+	  
+for docid in $docids; do
+    break;
+done
+
+if test -z $docid; then
+    echo $1 is not installed
+    exit 1 
+fi
+
+if test -f ${scrollkeeper_dir}/TOC/$docid; then
+    echo ${scrollkeeper_dir}/TOC/$docid
+    exit 0
+else
+    echo No TOC available for this path!!!
+    exit 1
+fi

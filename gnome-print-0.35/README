@@ -1,0 +1,172 @@
+Gnome Printing Library
+
+This is an implementation of the Gnome Printing Architecture, as
+described in:
+
+   http://www.levien.com/gnome/print-arch.html
+
+
+An updated description of gnome-print and future plans can be
+found in :
+
+   http://www.levien.com/gnome/print-summit-2000.htm
+
+We have a mailing list setup:
+
+   gnome-print@ximian.com
+
+For information about the native drivers read NATIVE_DRIVERS
+
+Overview
+
+1. Imaging
+Gnome-print uses semi-standard PostScript imaging model. I.e. all
+shapes are described as sequences of path commands (moveto, lineto
+curveto, closepath) and images created through fill and stroke
+operators.
+
+2. Coordinates
+The initial coordinate system is identical to the PostScript one,
+i.e. unit is 1 typographic point and y grows upwards on the page.
+Coordinate system can be modified, using concat operator.
+
+3. Graphic state
+Graphic state is manipulated through usual operators, like
+setrgbcolor, setopacity, setlinewidth. There are gsave and grestore
+operators that manipulate graphic state stack.
+Currently the only supported colorspace is RGB, as we have yet to
+figure out the patent issues involved in CMYK and other colorspaces.
+
+4. Text
+There are 2 primary text operators. The simpler one (show) accepts
+UTF-8 encoded string, and outputs it as well as possible using
+current font from graphic state.
+The other one (glyphlist) accepts device idependently formatted
+sequence of glyphs - i.e. user program should do exact layout and
+languge analyzing itself. Glyphlist can include glyphs from different
+fonts, use different colors and position glyphs either in
+predetermined coordinates or use simple font-specific positioning
+rules (glyph advances for latin-like fonts).
+
+5. Fonts
+Gnome-print uses type1 fonts for all rendering, so printed output
+is always identical to onscreen preview.
+
+Features
+
+1. Client side page description API
+
+* Basic vector path mainipulation, using newpath, moveto, lineto,
+  curveto and closepath
+
+* stroking and filling - stroke, fill and eofill
+
+* generating outline of stroked line - strokepath
+
+* clipping to vector paths - clip, eoclip
+
+* rgb, rgba and grayscale bitmaps - rgbimage, rgbaimage, grayimage
+
+* graphic state manipulation - setrgbcolor, setopacity, setlinewidth,
+  setlinejoin, setlinecap, setfont
+
+* graphic state stack - gsave and grestore
+
+* coordinate system manipulation - concat
+
+* utf-8 encoded text display - show
+
+* prepositioned text display - glyphlist
+
+Several basic page description commands are also combined to easier
+frontend function - bpath, rotate, scale, translate
+
+2. Rendering context
+
+There exist several stock rendering contexts, and new ones can be
+easily derived from GnomePrintContext base class, using Gtk+
+object system.
+All rendering contexts use same fonts, so display is guaranteed
+to be identical.
+
+GnomePrintPreview
+Generates high-quality antialiased representation of page on
+gnome-canvas. Resulting image can be zoomed without re-rendering.
+
+GnomePrintPs and GnomePrintPs2
+Generate PostScript representation of page. Although PostScript
+itself cannot use transparency, stock PostScript rendering
+contexts are wrapped into GnomePrintFRGBA meta-context, so
+semiopaque shapes and images are rendered through temporary
+bitmaps.
+
+GnomePrintMeta
+Generates page description metafile, that can be replayed to
+any other rendering context.
+
+GnomePrintRBuf
+Generates high-quality antialiased bitmap from arbitrarily
+positioned part of the page.
+
+GnomePrintPDF (in development)
+Generates Portable Document Format file from page.
+
+GnomePrintMultipage
+Allows placing more than 1 page of input to single output
+page.
+
+3. Fonts
+
+Gnome-print encapsulates fonts in opaque Gtk+ objects, giving
+applications consistent API. This allows us to extend font
+system using Gtk+ object inheritance, so taking advance of
+OpenType, multiple-master and composite fonts. At current
+stage only type1 fonts are supported.
+There are three levels of font objects, representing different
+logical rendering frameworks.
+
+* GnomeFontFace - is unscaled unmodified typeface, using
+  1000x1000 unit em square.
+* GnomeFont - is typeface scaled and adjusted for certain output
+  device (certain priner, screen)
+* GnomeRFont - instance of font, adapted to certain raster
+  resolution. If raster resolution is the same, as one used by
+  GnomeFont, gnome rfont glyph shapes are identical to the
+  gnome font ones. Otherwise there can be slight differences.
+
+Thus structure allows us to keep single, high optimized layout
+for certain device and yet adapt it as well as possible to
+different actual output device (on screen preview, draft printer)
+At current stage gnome-print does not do grid-fitting, so
+actually GnomeFont and GnomeRFont are identical for all
+contexts.
+
+GnomeFont is explicitly glyph, not character based. For simple
+cases, when 1:1 mapping between unicode character and glyph is
+possible, there exists lookup function to find certain
+font glyph value, given unicode character. For more complicated
+cases user-side software has to do font and language analyzing
+and generate output consisting of glyph values.
+
+If glyph mapping rules are simple, one can use gnome-print
+show or show_sized operators to print UTF-8 encoded text
+directly.
+For complicated languages layout program can generate
+GnomeGlyphList object, encapsulating series of glyphs, fonts
+and positioning rules.
+
+At current stage GnomeFont glyph mapping covers latin, greek and
+cyrillic character, in case type1 font has these defined. More
+support will be added in future when GnomeFont will be ported to
+FreeType2 library.
+Font-specific glyphs are supported, using unicode private
+area 0xe000-0xf800
+
+Font information is currently read from xml fontmap files,
+describing pfb and afm file locations. Fonts are referenced
+internally by GnomeFont objects. Each print context decides
+itself, transparently from user, how to guarantee font presence
+in final rendering destination, i.e. nonstandard fonts are
+embedded in PostScript streams.
+
+

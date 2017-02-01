@@ -1,0 +1,583 @@
+/* $Id: main.gen_h,v 1.55 2001/01/05 19:59:48 kenelson Exp $ */
+
+/* main.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk/gtkmain.h>
+#include <gtk--/base.h>
+
+CLASS_START(Gtk);
+class Widget;
+
+//**********************************************************************
+
+//: Idle Signal Class (internal)
+class IdleSig
+{
+public:
+  typedef SigC::Callback0<gint> Callback;
+  typedef SigC::Slot0<gint> SlotType;
+
+protected:
+  static gint gtk_callback(gpointer d);
+
+public:
+  Connection connect(const SlotType &sd,gint priority = GTK_PRIORITY_DEFAULT);
+};
+
+//: Timeout Signal Class (internal)
+class TimeoutSig
+{
+public:
+  typedef SigC::Callback0<gint> Callback;
+  typedef SigC::Slot0<gint> SlotType;
+
+protected:
+  static gint gtk_callback(gpointer d);
+
+public:
+  Connection connect(const SlotType &sd,guint32 interval);
+};
+
+//: KeySnooper Signal Class (internal)
+class KeySnooperSig
+{
+public:
+  typedef SigC::Callback2<gint,Widget*,GdkEventKey*>         Callback;
+  typedef SigC::Slot2<gint,Widget*,GdkEventKey*>             SlotType;
+
+protected:
+  static gint gtk_callback(GtkWidget* w,GdkEventKey* k,gpointer d);
+
+public:
+  Connection connect(const SlotType &sd);
+};
+
+//: Input Signal Class (internal)
+class InputSig
+{
+public:
+// typedef void (*GdkInputFunction) (gpointer          data,
+//                                  gint              source,
+//                                  GdkInputCondition condition);
+// Source: File descriptor
+// Condition: GDK_INPUT_READ, GDK_INPUT_WRITE, GDK_INPUT_EXCEPTION
+
+  typedef SigC::Callback2<void,gint,GdkInputCondition>         Callback;
+  typedef SigC::Slot2<void,gint,GdkInputCondition>             SlotType;
+
+protected:
+  static void gtk_callback(gpointer          data,
+                           gint              source,
+                           GdkInputCondition condition);
+
+public:
+  Connection connect(const SlotType &sd,
+                     gint source,
+                     GdkInputCondition condition);
+};
+
+//: Quit Signal Class (internal)
+class QuitSig
+{
+public:
+  typedef SigC::Callback0<gint> Callback;
+  typedef void SType;
+  typedef gint RType;
+  typedef SigC::Slot0<SType> OutSlotType;
+  typedef SigC::Slot0<RType> InSlotType;
+  typedef SigC::CallDataObj2<OutSlotType::Func,gint> Data;
+
+protected:
+  static gint gtk_callback(gpointer          data);
+  static void callback(void* data);
+
+public:
+  Connection connect(const InSlotType &sd,guint main_level=0);
+  OutSlotType slot();
+  void emit()       { callback(0); }
+  void operator()() { callback(0); }
+};
+
+
+
+//**********************************************************************
+
+//: Main application class
+//- Every application must have one of these objects.  
+//- It may not be global and must be the first Gtk object created.
+//- {Gtk::Kit::} is an alias for {Gtk::Main::}.  It is a 
+//- singleton so declaring more than one will simply access the first
+//- created.
+//-
+//- Normal use of this class is in {main()} function to give {argc} and {argv}
+//- to the gtk initialization. Widgets can use {Gtk::Main::quit()}
+//- for example to exit from the application.
+//- 
+//- The internals of the widget have been disguised as signals
+//- so that the user can easily connect using the same methods
+//- used throughout the widget interface.
+//-
+//- Minimal gtk-- application is something like this:
+//- {\example
+//-   void main(int argc, char *argv[]) {
+//-     Gtk::Kit kit(argc, argv);
+//-     ... create some widgets ...
+//-     kit.run();
+//-   }
+//- }
+class Main : public SigC::Object {
+  friend class QuitSig;
+protected:
+  static Main *instance_;
+public:
+  //: Access to one global instance of Gtk::Main.
+  static Main *instance() { return instance_; }
+	
+  Main(int *argc, char ***argv, bool have_locale=false);
+  Main(int &argc, char **&argv, bool have_locale=false);
+  ~Main();
+
+  //: Start the widget loop.
+  //- This begins the event loop which handles events.  No
+  //- events propagate until this has been called.  It may be
+  //- called recursively to popup dialogs.
+  static void run()             {instance_->run_impl();}
+  static void iteration(bool blocking=TRUE)    
+                                {instance_->iteration_impl(blocking);}
+  static gint events_pending()  {return instance_->events_pending_impl();}
+
+  //: Grabs events to a widget modal
+  //- Prevents events to everything else than given widget and its
+  //- childs. This way you can create modal dialogs(not recommended).
+  static void grab_add(Widget &widget);
+
+  //: Removes event grab
+  static void grab_remove(Widget &widget);
+
+  //: Returns the widget which is grabbing events
+  static Widget* grab_get_current();
+  
+  static void gtk_true();
+  static void gtk_false();
+
+  //: Idle signal
+  //- idle provides a way to setup a callback that will be
+  //- called when gtk has nothing else to do, when the execution has
+  //- returned from all callbacks etc.
+  //-
+  //- Return value of the callback will determine if the callback is
+  //- removed. 0 means callback is removed, 1 means it'll be called again 
+  //- after gtk next time has nothing to do.
+  //- 
+  //- Example:
+  //- {\example
+  //-   gint thisclass::mymethod() { return 1; }
+  //-   Main::idle.connect(slot(this,&thisclass::mymethod));
+  //- }
+  //-
+  //- You can supply an integer priority to the {idle()} call; by default, it's 
+  //-  {\enum GTK_PRIORITY_DEFAULT}, lower numbers are higher priority.
+  static IdleSig idle;
+
+  //: Timeout signal
+  //- timeout provides a way to setup a callback that will be called when
+  //- certain time has elapsed. 
+  //- 
+  //- Return value of the callback will determine if the callback is
+  //- removed. 0 means callback is removed, 1 means it'll call it again after
+  //- the time has again elapsed.
+  //-
+  //- Example:
+  //- {\example
+  //-   gint thisclass::mymethod() { return 1; }
+  //-   Main::timeout.connect(slot(this,&thisclass::mymethod),100);
+  //- }
+  static TimeoutSig timeout;
+
+  //: KeySnooper signal
+  //- key_snooper provides a way to channel keypresses to a callback 
+  //- without registering with the widget.
+  //-
+  //- Callbacks will get the name of the widget and the keypress event.
+  //- It is the responsibility of the snooper to pass the keypress
+  //- to the widget, however, care must be given that the keypress is 
+  //- not passed twice.
+  static KeySnooperSig key_snooper;
+
+  //: Input signal
+  //- input provides a way to monitor a file descriptor for activity
+  //- for a number of conditions.
+  //- Conditions can be any combination of 
+  //- {\enum GDK_INPUT_READ, GDK_INPUT_WRITE, GDK_INPUT_EXCEPTION}.
+  //-
+  //- The first argument of the callback is the file descriptor with
+  //- activity, the second denotes the kind of activity.
+  //- 
+  //- See also {\func open}(2), {\func fileno}(3) and {\func socket}(2)
+  //- for ways of obtaining a file descriptor.
+  //-
+  //- This is largely a wrapper for gdk_input_add_full, which in turn
+  //- uses {\func select}(2).
+  //-
+  //- Example:
+  //- {\example
+  //-   void thisclass::mymethod(int fd, GdkInputCondition cond) { }
+  //-   int fd = open("bob", O_RDONLY);
+  //-   Main::input.connect(slot(this, &thisclass::mymethod), fd,
+  //-     GdkInputCondition(GDK_INPUT_READ | GDK_INPUT_EXCEPTION));
+  //- }
+  static InputSig input; 
+
+  //: Quit signal
+  //- quit is an emitable signal which terminates the application.
+  //- You can connect callbacks to it to invoke actions when the 
+  //- user has requested the application should terminate.
+  //-
+  //- Example:
+  //- {\example
+  //- Connecting to: 
+  //-   gint thisclass::mymethod() { return 1; }
+  //-   Main::quit.connect(slot(this,&thisclass::mymethod);
+  //-
+  //- Invoking when:
+  //-   Gtk_Button button;
+  //-
+  //-   button.clicked.connect(Main::quit.slot());
+  //-
+  //- Calling directly:
+  //-   Main::quit();
+  //- }
+  static QuitSig quit;
+
+protected:
+  Main();
+
+  void init(int *argc, char ***argv,
+	    bool have_locale);
+
+  void init_gtkmm_internals();
+
+  virtual void run_impl();
+  virtual void quit_impl();
+  virtual void iteration_impl(bool blocking);
+  virtual gint events_pending_impl(); 
+};
+
+typedef Main Kit;
+
+PRIVATE_START;
+IMPL_START;
+#include <gtk--/widget.h>
+extern void gtkmm_wrap_init();
+
+namespace Gtk
+{
+
+void Main::run_impl() { gtk_main(); }
+void Main::quit_impl() { gtk_main_quit(); }
+void Main::iteration_impl(bool blocking) { gtk_main_iteration_do(blocking); }
+gint Main::events_pending_impl() {return gtk_events_pending();}
+
+
+// initialize static objects
+Main*         Main::instance_=0;
+IdleSig       Main::idle;
+QuitSig       Main::quit;
+TimeoutSig    Main::timeout;
+InputSig      Main::input;
+KeySnooperSig Main::key_snooper;
+
+
+Main::Main(int &argc, char **&argv, bool have_locale) 
+{
+  init(&argc,&argv,have_locale);
+}
+
+Main::Main(int *argc, char ***argv, bool have_locale) 
+{ 
+   init(argc,argv,have_locale);
+}
+
+void Main::init(int *argc, char ***argv,
+		    bool have_locale) 
+{
+  if (instance_) { 
+    g_warning("Main::Main called twice!\n"); 
+  } else {
+    instance_=this;
+
+    if (have_locale == true)
+      gtk_set_locale();
+    gtk_init(argc, argv);
+
+    init_gtkmm_internals();
+  }
+}
+
+void
+Main::init_gtkmm_internals()
+{
+  gtkmm_wrap_init();
+  if (!quark_) 
+    quark_ = g_quark_from_static_string ("gtkmm");
+}
+
+
+Main::Main()
+{
+  // Only used by subclasses
+  init_gtkmm_internals();
+}
+
+Main::~Main() {
+  instance_=0;
+  //gtk_exit(0); 
+}
+
+// static_init_for_gtkmm::static_init_for_gtkmm() {}
+
+void
+Main::grab_add(Widget &widget)
+{
+  gtk_grab_add(widget.gtkobj());
+}
+
+void
+Main::grab_remove(Widget &widget)
+{
+  gtk_grab_remove(widget.gtkobj());
+}
+
+Widget*
+Main::grab_get_current()
+{
+  return wrap(gtk_grab_get_current());
+}
+
+void 
+Main::gtk_true()
+{
+  gtk_true();
+}
+
+void 
+Main::gtk_false()
+{
+  gtk_false();
+}
+
+//***********************************************************************
+using SigC::SlotData;
+using SigC::SlotNode;
+
+// structs to clean up gtk resources after connection is broken
+struct IdleNode : public SlotNode
+{
+  guint connid;
+  IdleNode(guint cid):connid(cid) {}
+  virtual ~IdleNode();
+};
+
+struct TimeoutNode : public SlotNode
+{
+  guint connid;
+  TimeoutNode(guint cid):connid(cid) {}
+  virtual ~TimeoutNode();
+};
+
+struct KeySnooperNode : public SlotNode
+{
+  guint connid;
+  KeySnooperNode(guint cid):connid(cid) {}
+  virtual ~KeySnooperNode();
+};
+
+struct InputNode : public SlotNode
+{
+  guint connid;
+  InputNode(guint cid):connid(cid) {}
+  virtual ~InputNode();
+};
+
+struct QuitNode : public SlotNode
+{
+  guint connid;
+  QuitNode(guint cid):connid(cid) {}
+  virtual ~QuitNode();
+};
+
+
+//***********************************************************************
+
+IdleNode::~IdleNode()
+{
+  gtk_idle_remove(connid);
+}
+
+TimeoutNode::~TimeoutNode()
+{
+  gtk_timeout_remove(connid);
+}
+
+KeySnooperNode::~KeySnooperNode()
+{
+  gtk_key_snooper_remove(connid);
+}
+
+InputNode::~InputNode()
+{
+  gtk_input_remove(connid);
+}
+
+QuitNode::~QuitNode()
+{
+  gtk_quit_remove(connid);
+}
+
+//***********************************************************************
+
+
+gint IdleSig::gtk_callback(gpointer d)
+{
+  Callback* data=(Callback*)d;
+  return data->call();
+}
+
+Connection IdleSig::connect(const SlotType &s,gint priority)
+{
+  // connect to gtk object
+  SigC::SlotData* sd=(SigC::SlotData*)(s.obj());
+  guint connid=gtk_idle_add_priority(priority,&gtk_callback,
+                                   (gpointer)&(sd->data_));
+  sd->connect();
+
+  // register disconnection data
+  sd->list_.insert_direct(sd->list_.begin(),
+                          new IdleNode(connid));
+  return sd;
+}
+
+gint TimeoutSig::gtk_callback(gpointer d)
+{
+  Callback* data=(Callback*)d;
+  return data->call();
+}
+
+Connection TimeoutSig::connect(const SlotType &s,guint32 interval)
+{
+  // connect to gtk object
+  SlotData* sd=(SlotData*)(s.obj());
+  guint connid=gtk_timeout_add(interval,&gtk_callback,
+                             (gpointer)&(sd->data_));
+  sd->connect();
+
+  // register disconnection data
+  sd->list_.insert_direct(sd->list_.begin(),
+                          new TimeoutNode(connid));
+  return sd;
+};
+
+gint KeySnooperSig::gtk_callback(GtkWidget* w,GdkEventKey* k,gpointer d)
+{
+  Callback* data=(Callback*)d;
+  return data->call(wrap(w),k);
+}
+
+Connection KeySnooperSig::connect(const SlotType &s)
+{
+  // connect to gtk object
+  SlotData* sd=(SlotData*)(s.obj());
+  guint connid=gtk_key_snooper_install(&gtk_callback,
+                                     (gpointer)&(sd->data_));
+  sd->connect();
+
+  // register disconnection data
+  sd->list_.insert_direct(sd->list_.begin(),
+                          new KeySnooperNode(connid));
+  return sd;
+};
+
+void InputSig::gtk_callback(gpointer d,
+                           gint              source,
+                           GdkInputCondition condition)
+{
+  Callback* data=(Callback*)d;
+  data->call(source,condition);
+}
+
+Connection InputSig::connect(const SlotType &s,
+                              gint source,
+                              GdkInputCondition condition)
+{
+  // connect to gtk object
+  SlotData* sd=(SlotData*)(s.obj());
+  guint connid=gtk_input_add_full(source,condition,&gtk_callback,0,
+                                     (gpointer)&(sd->data_),0);
+  sd->connect();
+
+  // register disconnection data
+  sd->list_.insert_direct(sd->list_.begin(),
+                          new InputNode(connid));
+  return sd;
+};
+
+gint QuitSig::gtk_callback(gpointer d)
+{
+  Callback* data=(Callback*)d;
+  return data->call();
+}
+
+void QuitSig::callback(void* data)
+{
+  Main::instance()->quit_impl();
+}
+
+Connection QuitSig::connect(const InSlotType &s,guint main_level)
+{
+  // connect to gtk object
+  SlotData* sd=(SlotData*)(s.obj());
+  guint connid=gtk_quit_add(main_level,&gtk_callback,(gpointer)&(sd->data_));
+  sd->connect();
+
+  // register disconnection data
+  sd->list_.insert_direct(sd->list_.begin(),
+                          new QuitNode(connid));  
+  return sd;
+};
+
+SigC::Slot0<void> QuitSig::slot()
+{
+  SlotData* tmp=manage(new SlotData());
+  Data& data=reinterpret_cast<Data&>(tmp->data_);
+
+#ifdef SIGC_CXX_PARTIAL_SPEC
+  data.callback=&callback;
+#else
+  data.callback=reinterpret_cast<SigC::Trait<void>::type (*) (void *)>
+     (&callback);
+#endif
+
+  return tmp;
+}
+
+}
+
+DOCUMENTATION_START;
+

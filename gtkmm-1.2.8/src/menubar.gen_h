@@ -1,0 +1,70 @@
+/* $Id: menubar.gen_h,v 1.36 2001/07/15 13:33:38 murrayc Exp $ */
+
+
+/* menubar.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/menushell.h>
+#include <gtk--/menuitem.h>
+#include <gtk/gtkmenubar.h>
+
+CLASS_START(Gtk);
+//: A subclass widget for {\class Gtk::MenuShell} which holds {\class Gtk::MenuItem} widgets
+//- The {\class Gtk::MenuBar} is a subclass of {\class Gtk::MenuShell} which contains one to
+//- many {\class Gtk::MenuItem}. The result is a standard menu bar which can hold many menu
+//- items. {\class Gtk::MenuBar} allows for a shadow type to be set for aesthetic purposes.
+//- The shadow types are defined in the {set_shadow_type} function.
+class MenuBar : public MenuShell {
+  WRAP_CLASS(MenuBar,GtkMenuBar,GTK_MENU_BAR,GTK_IS_MENU_BAR,menu_bar,Gtk::MenuShell,GtkMenuShell,GTK_MENU_SHELL);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+/*  append, prepend and insert are defined in menushell */
+
+  //: Sets the shadow type to use on the {\class Gtk::MenuBar}.
+  //- The shadow types to use are: {\enum GTK_SHADOW_NONE}, {\enum GTK_SHADOW_IN},
+  //- {\enum GTK_SHADOW_OUT}, {\enum GTK_SHADOW_ETCHED_IN}, and {\enum GTK_SHADOW_ETCHED_OUT}
+  //-
+  //- type: The {GtkShadowtype}.
+  WRAP_METHOD(void gtk_menu_bar_set_shadow_type(GtkMenuBar*,GtkShadowType),
+	      void set_shadow_type(GtkShadowType  type));
+
+  GtkShadowType get_shadow_type() const { return gtkobj()->shadow_type; }
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/menushell_p.h>
+IMPL_START;
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Menubar)
+//. name: shadow_type
+//. type: GtkShadowType
+//. get: none
+//. set: {set_shadow_type()}
+//. desc: Can be set to {\enum GTK_SHADOW_NONE,
+//.  GTK_SHADOW_IN,
+//.  GTK_SHADOW_OUT,
+//.  GTK_SHADOW_ETCHED_IN,
+//.  GTK_SHADOW_ETCHED_OUT }
+

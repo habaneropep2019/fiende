@@ -1,0 +1,244 @@
+/* $Id: animator.gen_h,v 1.1 2000/08/29 18:36:29 kenelson Exp $ */
+
+
+/* animator.gen_h
+ * 
+ * Copyright (C) 1998-1999 
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <gnome--/imlib.h>
+#include <libgnomeui/gnome-animator.h>
+
+CLASS_START(Gnome);
+class Pixmap;
+
+class Animator : public Gtk::Widget
+{
+  WRAP_CLASS(Animator, GnomeAnimator,
+             GNOME_ANIMATOR, GNOME_IS_ANIMATOR,
+             animator,
+             Gtk::Widget, GtkWidget, GTK_WIDGET);
+public:
+  Animator(guint width, guint height);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Set loop type (See `GnomeAnimatorLoopType'). 
+  WRAP_METHOD(
+    void gnome_animator_set_loop_type (GnomeAnimator *,GnomeAnimatorLoopType),
+    void set_loop_type(GnomeAnimatorLoopType loop_type));
+
+  //: Get loop type (See `GnomeAnimatorLoopType'). 
+  WRAP_METHOD(
+    GnomeAnimatorLoopType gnome_animator_get_loop_type (GnomeAnimator *),
+    GnomeAnimatorLoopType get_loop_type ());
+
+
+  //: Set playback direction.
+  //- A positive value means "forwards";
+  //- A negative one means "backwards". 
+  WRAP_METHOD(
+     void gnome_animator_set_playback_direction (GnomeAnimator *animator,
+          gint playback_direction),
+     void set_playback_direction (gint playback_direction=1));
+
+  //: Get playback direction.
+  //- A positive value means "forwards";
+  //- A negative one means "backwards". 
+  WRAP_METHOD(
+    gint gnome_animator_get_playback_direction (GnomeAnimator *animator),
+    gint get_playback_direction ());
+
+
+  //: Append a frame from image with crop.
+  WRAP_METHOD(
+    gboolean gnome_animator_append_frame_from_imlib_at_size (GnomeAnimator*,
+      GdkImlibImage*,gint,gint,guint32,guint,guint),
+    bool append_frame (const Gdk_Imlib::Image &image,
+                       gint x_offset,
+                       gint y_offset,
+                       guint32 interval,
+                       guint width,
+                       guint height));
+
+  //: Append a frame from image.
+  WRAP_METHOD(
+    gboolean gnome_animator_append_frame_from_imlib (GnomeAnimator*,
+      GdkImlibImage*,gint,gint,guint32),
+    bool append_frame (const Gdk_Imlib::Image &image,
+                       gint x_offset,
+                       gint y_offset,
+                       guint32 interval));
+
+  //: Append a frame from file with crop.
+  WRAP_METHOD(
+     gboolean gnome_animator_append_frame_from_file_at_size (GnomeAnimator *, 
+       const gchar *, gint, gint,guint32, guint, guint),
+     bool append_frame(const Gtk::string &name,
+                       gint x_offset,
+                       gint y_offset,
+                       guint32 interval,
+                       guint width,
+                       guint height));
+
+  //: Append a frame from file. 
+  WRAP_METHOD(
+    gboolean gnome_animator_append_frame_from_file (GnomeAnimator *animator,
+      const gchar *, gint , gint , guint32 ),
+    bool append_frame(const Gtk::string &name,
+                      gint x_offset,
+                      gint y_offset,
+                      guint32 interval));
+
+  //: Append pixmap to animator's list of frames.
+  WRAP_METHOD(
+    gboolean gnome_animator_append_frame_from_gnome_pixmap (GnomeAnimator *,
+      GnomePixmap *, gint, gint, guint32),
+    bool append_frame (Gnome::Pixmap &pixmap,
+                       gint x_offset,
+                       gint y_offset,
+                       guint32 interval));
+
+
+  //: Append frames from image with crop.
+  //- Crop `image' into frames `x_unit' pixels wide, and append them as
+  //- frames to the animator with the specified `interval' and offsets.
+  //- Each frame is rendered at the specified size. 
+  WRAP_METHOD(
+    gboolean gnome_animator_append_frames_from_imlib_at_size (GnomeAnimator *, 
+       GdkImlibImage *, gint, gint, guint32, gint, guint, guint),
+    bool append_frames (const Gdk_Imlib::Image &image,
+                        gint x_offset,
+                        gint y_offset,
+                        guint32 interval,
+                        gint x_unit,
+                        guint width,
+                        guint height));
+
+  //: Append frames from image.
+  //- Crop `image' into frames `x_unit' pixels wide, and append them as
+  //- frames to the animator with the specified `interval' and offsets.
+  //- Each frame is rendered at its natural size. 
+  WRAP_METHOD(
+    gboolean gnome_animator_append_frames_from_imlib (GnomeAnimator *, 
+      GdkImlibImage *, gint, gint, guint32, gint),
+    bool append_frames (const Gdk_Imlib::Image &image,
+                        gint x_offset,
+                        gint y_offset,
+                        guint32 interval,
+                        gint x_unit));
+
+  //: Load an image from `name', crop it into frames `x_unit' pixels
+  //: wide, and append them as frames to the animator.  Each frame is
+  //: rendered at the specified size. 
+  WRAP_METHOD(
+    gboolean gnome_animator_append_frames_from_file_at_size (GnomeAnimator *, 
+      const gchar *, gint, gint, guint32, gint, guint, guint),
+    bool append_frames(const Gtk::string &name,
+                       gint x_offset,
+                       gint y_offset,
+                       guint32 interval,
+                       gint x_unit,
+                       guint width,
+                       guint height));
+
+  //: Append frames from file.
+  //- Load an image from `name', crop it into frames `x_unit' pixels
+  //- wide, and append them as frames to the animator.  Each frame is
+  //- rendered at its natural size.
+  WRAP_METHOD(
+    gboolean gnome_animator_append_frames_from_file (GnomeAnimator *,
+      const gchar *, gint, gint, guint32, gint),
+    bool append_frames(const Gtk::string &name,
+                       gint x_offset,
+                       gint y_offset,
+                       guint32 interval,
+                       gint x_unit));
+            
+
+
+  //: Start playing the animation in the GTK loop. 
+  WRAP_METHOD(void gnome_animator_start (GnomeAnimator *),
+    void start ());
+
+  //: Stop playing the animation in the GTK loop.
+  WRAP_METHOD(void gnome_animator_stop (GnomeAnimator *),
+    void stop ());
+
+  //: Advance the animation by `num' frames.  
+  //- A positive value uses the
+  //- specified playback direction; a negative one goes in the opposite
+  //- direction.  If the loop type is `GNOME_ANIMATOR_LOOP_NONE' and the
+  //- value causes the frame counter to overflow, false is returned and
+  //- the animator is stopped; otherwise, true is returned.
+  WRAP_METHOD(gboolean gnome_animator_advance (GnomeAnimator *, gint),
+    bool advance (gint num));
+
+                                                       
+  //: Set the number of current frame.  The result is immediately visible. 
+  WRAP_METHOD(void gnome_animator_goto_frame (GnomeAnimator *, guint ),
+    void goto_frame (guint frame_number));               
+
+  //: Get the number of current frame. 
+  WRAP_METHOD(guint gnome_animator_get_current_frame_number (GnomeAnimator *),
+    guint get_current_frame_number ());
+
+  //: Get the animator status. 
+  WRAP_METHOD(GnomeAnimatorStatus gnome_animator_get_status (GnomeAnimator *),
+    GnomeAnimatorStatus get_status ());
+
+
+  //: Set speed factor
+  //- (the higher, the faster: the `interval' value is divided 
+  //- by this factor before being used).  Default is 1.0. 
+  WRAP_METHOD(void gnome_animator_set_playback_speed (GnomeAnimator *, gdouble),
+    void set_playback_speed (gdouble speed=1.0));
+                                                       
+  //: Get speed factor
+  //- (the higher, the faster: the `interval' value is divided by 
+  //- this factor before being used).  Default is 1.0. 
+  WRAP_METHOD(gdouble gnome_animator_get_playback_speed (GnomeAnimator *),
+    gdouble get_playback_speed ());
+              
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+
+IMPL_START;
+#include <gnome--/pixmap.h>
+
+namespace Gnome
+{
+
+Animator::Animator(guint width, guint height)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  Gtk::Widget::gtkobj()->requisition.width = width;
+  Gtk::Widget::gtkobj()->requisition.height = height;
+}
+
+} //namespace Gnome
+
+DOCUMENTATION_START;
+

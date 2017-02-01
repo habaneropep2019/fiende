@@ -1,0 +1,121 @@
+/* $Id: colorselection.gen_h,v 1.44 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* colorselection.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <gtk--/window.h>
+#include <gtk--/button.h>
+#include <gtk/gtkcolorsel.h>
+
+CLASS_START(Gtk);
+//: A widget used to select a color.
+//- The {\class Gtk::ColorSelection} is a widget that is used to select a color. It
+//- consists of a color wheel and number of sliders and entry boxes for
+//- color parameters such as hue, saturation, value, red, green, blue,
+//- and opacity. It is found on the standard color selection dialog box
+//- {Gtk::ColorSelectionDialog}.
+class ColorSelection : public VBox {
+  WRAP_CLASS(ColorSelection,GtkColorSelection,GTK_COLOR_SELECTION,GTK_IS_COLOR_SELECTION,color_selection,Gtk::VBox,GtkVBox,GTK_VBOX);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Sets the policy controlling when the color_changed signals are emitted.
+  //- The available policies are:
+  //-
+  //- {\enum GTK_UPDATE_CONTINUOUS} - signals are sent continuously as the color selection changes.
+  //-
+  //- {\enum GTK_UPDATE_DISCONTINUOUS} - signals are sent only when the mouse button is released.
+  //-
+  //- {\enum GTK_UPDATE_DELAYED} - signals are sent when the mouse button is released or when the
+  //- mouse has been motionless for a period of time.
+  WRAP_METHOD(void gtk_color_selection_set_update_policy(GtkColorSelection*,GtkUpdateType),
+  void set_update_policy (GtkUpdateType policy));
+
+  //: Controls whether opacity can be set with the {\class Gtk::ColorSelection}.
+  //- If this functionality is enabled, the necessary additional widgets are added
+  //- to the {\class Gtk::ColorSelection} and the opacity value can be retrieved
+  //- via the fourth value in the color array returned by the {get_color()} function.
+  WRAP_METHOD(void gtk_color_selection_set_opacity(GtkColorSelection*,gint),
+  void set_opacity       (gint use_opacity));
+
+  // NOTE: mail gtk+ that second argument should be const.
+  //: Sets the color in the {\class Gtk::ColorSelection}.
+  //- The widgets are updated to reflect the new color.
+  //-
+  //- color: A color array consisting of 4 gfloat values for red, green, blue, and opacity.
+  WRAP_METHOD(void gtk_color_selection_set_color(GtkColorSelection*,fixmegtkconst gdouble*),
+  void set_color         (const gdouble *color));
+
+  //: Retrieve the currently selected color value.
+  //- color: A color array consisting of 4 gfloat values for red, green, blue, and opacity.
+  WRAP_METHOD(void gtk_color_selection_get_color(GtkColorSelection*,gdouble*),
+  void get_color         (gdouble *color) const);
+
+  //: This signal is emitted when the color changes in the {\class Gtk::ColorSelection} according to its update policy.
+  SIGNAL_SPEC("color_changed",both,void color_changed());
+
+};
+
+//: A standard dialog box for selecting a color.
+//- The {\class Gtk::ColorSelectionDialog} provides a standard dialog which allows
+//- the user to select a color much like the {\class Gtk::FileSelection} provides
+//- a standard dialog for file selection.
+class ColorSelectionDialog : public Window {
+  WRAP_CLASS(ColorSelectionDialog,GtkColorSelectionDialog,GTK_COLOR_SELECTION_DIALOG,GTK_IS_COLOR_SELECTION_DIALOG,color_selection_dialog,Gtk::Window,GtkWindow,GTK_WINDOW);
+public:
+    
+  ColorSelectionDialog(const nstring &title);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_MEMBER(value,colorsel,colorsel,Gtk::ColorSelection*,GtkWidget*);
+  WRAP_MEMBER(value,vbox,main_vbox,Gtk::VBox*,GtkWidget*);
+  WRAP_MEMBER(value,ok_button,ok_button,Gtk::Button*,GtkWidget*);
+  WRAP_MEMBER(value,reset_button,reset_button,Gtk::Button*,GtkWidget*);
+  WRAP_MEMBER(value,cancel_button,cancel_button,Gtk::Button*,GtkWidget*);
+  WRAP_MEMBER(value,help_button,help_button,Gtk::Button*,GtkWidget*);
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+#include <gtk--/private/window_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+ColorSelectionDialog::ColorSelectionDialog(const nstring &title)
+  :     Window((GtkWindow*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GtkColorSelectionDialog *colorseldiag;
+
+  colorseldiag = (GtkColorSelectionDialog*)gtkobject;
+  gtk_window_set_title (GTK_WINDOW (colorseldiag), title.gc_str());
+
+}
+
+}
+
+DOCUMENTATION_START;
+

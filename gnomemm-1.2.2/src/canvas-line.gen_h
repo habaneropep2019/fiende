@@ -1,0 +1,204 @@
+/* $Id: canvas-line.gen_h,v 1.38 2001/06/23 15:26:09 murrayc Exp $ */
+
+/* canvas-line.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/canvas-item.h>
+#include <gnome--/canvas-property.h>
+#include <libgnomeui/gnome-canvas-line.h>
+#include <libgnomeui/gnome-canvas-util.h>
+#include <vector>
+
+#m4 include(property.m4)
+#m4 GTKMM_CONVERSION(void*,Gdk_Pixmap,`Gdk_Pixmap((GdkPixmap*)$3)')
+#m4 GTKMM_CONVERSION(void*,Gdk_Color,`Gdk_Color(*(GdkColor*)$3)')
+#m4 GTKMM_CONVERSION(int,GdkCapStyle,`$2($3)')
+#m4 GTKMM_CONVERSION(int,GdkJoinStyle,`$2($3)')
+#m4 GTKMM_CONVERSION(int,GdkLineStyle,`$2($3)')
+#m4 GTKMM_CONVERSION(char*,const Gtk::string&,,`$3.c_str()')
+#m4 GTKMM_EQUAL(gdouble,double)
+
+
+CLASS_START(Gnome);
+
+class GnomeGroup;
+
+// Sample use of Gnome_CanvasPoints :
+
+//   Gnome_CanvasPoints points;
+//  
+//   points.push_back(Art::Point(0, 0));
+//   points.push_back(Art::Point(100,0));
+//   points.push_back(Art::Point(0,100));
+//   points.push_back(Art::Point(100,100));
+//
+//   line = new Gnome_CanvasLine(&m_canvasgroup,points);
+
+using std::vector;
+
+class CanvasPoints : public vector<Art::Point>
+{
+ public:
+  CanvasPoints(size_type nbpoints = 0);
+  CanvasPoints(GnomeCanvasPoints *castitem);
+  ~CanvasPoints();
+  
+  const GnomeCanvasPoints* gtkobj() const { return _gtkobj(); }
+  GnomeCanvasPoints* gtkobj() { return _gtkobj(); }
+
+ protected:
+  GnomeCanvasPoints* _gtkobj() const;
+  mutable GnomeCanvasPoints *points_;
+  mutable bool owned_;
+};
+
+class CanvasLine : public CanvasItem
+{
+  WRAP_CLASS(CanvasLine, GnomeCanvasLine,
+             GNOME_CANVAS_LINE, GNOME_IS_CANVAS_LINE,
+             canvas_line,
+             CanvasItem, GnomeCanvasItem, GNOME_CANVAS_ITEM);
+public:
+  CanvasLine(const CanvasGroup &parent);
+  CanvasLine(const CanvasGroup &parent,const CanvasPoints&);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  CANVAS_PROPERTY(points,points,const CanvasPoints&,GnomeCanvasPoints*)
+
+  CANVAS_PROPERTY(fill_color,fill_color,const Gtk::string&,char*)
+  CANVAS_PROPERTY(fill_color,fill_color_gdk,const Gdk_Color&,GdkColor*,Gdk_Color,void*,pointer_data)
+  //FIXME: fill_color_rgba?
+  CANVAS_PROPERTY(fill_stipple,fill_stipple,const Gdk_Pixmap&,GdkWindow*,Gdk_Pixmap,void*,pointer_data)
+
+  CANVAS_PROPERTY(width_pixels,width_pixels,guint,guint)
+  CANVAS_PROPERTY(width_units,width_units,gdouble,gdouble)
+
+  CANVAS_PROPERTY(cap_style,cap_style,GdkCapStyle,GdkCapStyle,GdkCapStyle,int,int_data)
+  CANVAS_PROPERTY(join_style,join_style,GdkJoinStyle,GdkJoinStyle,GdkJoinStyle,int,int_data)
+  CANVAS_PROPERTY(line_style,line_style,GdkLineStyle,GdkLineStyle,GdkLineStyle,int,int_data)
+
+  CANVAS_PROPERTY(first_arrowhead,first_arrowhead,bool,gboolean,bool,int,int_data)
+  CANVAS_PROPERTY(last_arrowhead,last_arrowhead,bool,gboolean,bool,int,int_data)
+
+  CANVAS_PROPERTY(smooth,smooth,bool,gboolean,bool,int,int_data)
+  CANVAS_PROPERTY(spline_step,spline_step,guint,guint,guint,guint,uint_data)
+
+  CANVAS_PROPERTY(arrow_shape_a,arrow_shape_a,gdouble,gdouble,gdouble,double,double_data)
+  CANVAS_PROPERTY(arrow_shape_b,arrow_shape_b,gdouble,gdouble,gdouble,double,double_data)
+  CANVAS_PROPERTY(arrow_shape_c,arrow_shape_c,gdouble,gdouble,gdouble,double,double_data)
+};
+
+PRIVATE_START;
+#include <gnome--/private/canvas-item_p.h>
+IMPL_START;
+#include <gnome--/private/canvas-line_p.h>
+
+/* canvas-line.c
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/canvas-group.h>
+
+namespace Gnome {
+
+CanvasPoints::CanvasPoints(size_type nbpoints)
+  : vector<Art::Point>(nbpoints),
+    points_(0), owned_(false)
+{}
+
+CanvasPoints::CanvasPoints(GnomeCanvasPoints *castitem) :
+  points_(castitem),owned_(false)
+{
+  int i = 0;
+  
+  reserve(points_->num_points);
+  
+  for(iterator it = begin(); i < points_->num_points; i+=2, ++it)
+    {
+      (*it).set_x(points_->coords[i]);
+      (*it).set_y(points_->coords[i+1]);
+    }
+}
+
+CanvasPoints::~CanvasPoints()
+{
+  if (owned_ && points_) gnome_canvas_points_free(points_);
+}
+
+GnomeCanvasPoints*
+CanvasPoints::_gtkobj() const
+{
+  int i = 0;
+  
+  if(!points_)
+    {
+      points_ = gnome_canvas_points_new(size());
+      owned_ = true;
+    }
+  else if(size() != static_cast<unsigned int>(points_->num_points))
+    {
+      if (owned_) gnome_canvas_points_free(points_);
+      points_ = gnome_canvas_points_new(size());
+      owned_ = true;
+    }
+  
+  for(const_iterator it = begin(); it != end(); ++it, i+=2)
+    {
+      points_->coords[i] = (*it).get_x();
+      points_->coords[i+1] = (*it).get_y();
+    }
+  return points_;
+}
+
+CanvasLine::CanvasLine(const CanvasGroup &parentx)
+  : CanvasItem(GNOME_CANVAS_ITEM(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  item_construct(parentx);
+}
+
+CanvasLine::CanvasLine(const CanvasGroup &parentx, const CanvasPoints& points)
+  : CanvasItem(GNOME_CANVAS_ITEM(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  item_construct(parentx);
+  set_points(points);
+}
+
+} /* namespace Gnome */

@@ -1,0 +1,142 @@
+This is gnome-print fontmap generation tool
+
+
+1. Quick usage (user)
+
+Once your fontmaps are set up, you do not need to use much of the
+complex arguments below. Old fontmaps are always scanned initially,
+so if you want to add fonts, simply run:
+
+  gnome-font-install --debug --recursive --user DIRS...
+
+Where DIRS is list of directories with font files
+If you delete font files, rerun
+
+  gnome-font-install --debug --user
+
+So fontmaps will be updated
+
+Alternately, you can use even simpler --smart argument
+
+  gnome-font-install --debug --smart
+
+It creates appropriate fontmap depending on UID (root vs. user)
+and scans recursively standard set of font directories.
+It can be somewhat slow, as quite a lot of directories are scanned
+recursively.
+
+
+2. Quick usage (administrator)
+
+  gnome-font-install --debug --recursive --dynamic DIRS...
+
+If gnome-print 'make install' fontmap generation fails, and you
+are really desperate, why, you can do:
+
+  gnome-font-install --debug --recursive --dynamic /
+
+And make some coffee. If there are usable Type1 fonts on your
+system, chances are they will be found. If still nothing,
+there probably are no valid fonts.
+
+
+
+4. Font versioning
+
+Of all font files (afm and pfb), gnome-font-install tries to build
+fonts with highest version numbers, so that
+
+  AFM_VERSION <= PFB_VERSION
+
+SO if you are adding updated fonts (like cyrillic URW ones), make sure
+that you version numbers are actually higher - or alternatively
+delete original afm-s first.
+
+
+
+5. Aliasing
+
+.font files can specify font aliasing, mapping afm with different
+name to certain pfb file. This is quite inflexible, and is mostly
+meant for using URW fonts with standard PostScript name.
+
+
+
+6. Full usage
+
+Usage: gnome-font-install [OPTION...] [FILE/DIRECTORY...]
+  -d, --debug          Print out debugging information
+  -q, --smart          Tries to do everything automatically
+  -r, --recursive      Search directories recursively for font files
+  -c, --clean          Start from zero fontmap, instead of parsing old one
+  -u, --user           Create $HOME/.gnome/fonts/gnome-print.fontmap
+  -d, --dynamic        Create $SYSCONFDIR/gnome/fonts/gnome-print.fontmap
+  -s, --static         Create $DATADIR/gnome/fonts/gnome-print.fontmap
+  -t, --target=ARG     Write output fontmap to specified file (- for stdout)
+  -a, --aliases=PATH   File describing known aliases
+
+Help options
+  -?, --help           Show this help message
+  --usage              Display brief usage message
+
+
+Comments
+
+* Each file given in command line is tested, and if found to be valid
+  font file used later for fontmap generation
+
+* Directories are scanned for all files (regardless of name). If
+  --recursive option is used, then the scan is recursive
+
+* Usually previous fontmaps are read before scanning, so fonts
+  already installed on specified level are omitted. Use --clean
+  to ignore existing fontmap files
+
+* There are 3 levels of fontmaps, found in directories:
+
+  $HOME/.gnome/fonts      (user)
+  $SYSCONFDIR/gnome/fonts (dynamic)
+  $DATADIR/gnome/fonts    (static)
+
+  Directories are parsed in following order. All files matching
+  *.fontmap pattern are read in alphabetical order EXCEPT:
+
+  gnome-print.fontmap is first file to read from any directory
+
+  --user, --dynamic and --static flags may be used to specify
+  desired output fontmap level. If --target is omitted, output
+  will be gnome-print.fontmap in level directory. Default
+  level is user.
+
+  Rules for including fonts:
+  - For user fontmap, ignore all fonts found either in user,
+    dynamic or static fontmaps EXCEPT those in user-level
+    gnome-print.fontmap (which will be overwritten by default anyways)
+  - For dynamic fontmap, ignore fonts in dynamic and static
+    fontmaps, EXCEPT those in dynamic-level gnome-print.fontmap
+  - for static fontmap, ignore fonts in static maps, EXCEPT
+    again static gnome-print fontmap
+
+  The idea is, that static fontmaps should be installed by
+  binary packages, and thus seldom change. And if they go away,
+  chances are, that physical font files go with them.
+  Dynamic maps should be managed by system administrators
+  (make install generates dynamic map too), and also, if
+  fontmap is removed, there is little reason to keep these
+  fonts in user map.
+
+* Target allows you to specify output fontmap name explicitly.
+  If path to file does not exist, directories will be created
+  on-the-fly
+
+* Alias file allows to specify gnome-print <= 0.29 fontmap
+  files, containing type1 alias entries. These are for entries,
+  for which we have to use afm and pfb files from different
+  fonts. The only useful one, is adobe-urw.font - which is
+  initially in $srcdir/fonts, and after installation
+  $datadir/fonts
+
+
+Lauris Kaplinski <lauris@ximian.com>
+28.09.2001
+

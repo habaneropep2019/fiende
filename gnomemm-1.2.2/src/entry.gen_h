@@ -1,0 +1,75 @@
+/* $Id: entry.gen_h,v 1.4 2000/08/29 18:09:02 kenelson Exp $ */
+
+
+/* entry.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/combo.h>
+#include <libgnomeui/gnome-entry.h>
+
+CLASS_START(Gnome);
+class Entry : public Gtk::Combo
+{
+  WRAP_CLASS(Entry, GnomeEntry,
+             GNOME_ENTRY, GNOME_IS_ENTRY,
+             entry,
+             Gtk::Combo, GtkCombo, GTK_COMBO);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  Gtk::Widget* gtk_entry();
+
+  WRAP_METHOD(void gnome_entry_set_history_id (GnomeEntry*, const gchar*),
+	      void set_history_id (const Gtk::string &history_id));
+
+  WRAP_METHOD(void gnome_entry_set_max_saved (GnomeEntry*, guint),
+	      void set_max_saved (guint max_saved));
+
+  WRAP_METHOD(void gnome_entry_prepend_history (GnomeEntry*, gint , const gchar*),
+	      void prepend_history (gint save, const Gtk::string &text));
+
+  WRAP_METHOD(void gnome_entry_append_history (GnomeEntry*, gint , const gchar*),
+	      void append_history (gint save, const Gtk::string &text));
+
+  WRAP_METHOD(void gnome_entry_load_history (GnomeEntry*),
+	      void load_history ());
+
+  WRAP_METHOD(void gnome_entry_save_history (GnomeEntry*),
+	      void save_history ());
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/combo_p.h>
+IMPL_START;
+#include <gnome--/private/entry_p.h>
+
+Gtk::Widget*
+Gnome::Entry::gtk_entry()
+{
+  return Gtk::wrap(gnome_entry_gtk_entry(gtkobj()));
+}
+
+
+DOCUMENTATION_START;
+

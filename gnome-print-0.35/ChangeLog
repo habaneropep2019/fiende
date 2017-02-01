@@ -1,0 +1,1556 @@
+2002-01-23  Tim Mooney <mooney@dogbert.cc.ndsu.NoDak.edu>
+
+	* libgnomeprint/parseTT.c: use G_GNUC_FUNCTION convenience define from
+	glib instead of __FUNCTION__ gccism.
+
+2002-01-23  Lauris Kaplinski  <lauris@ximian.com>
+
+	* configure.in: Version 0.35
+
+2002-01-22  Lauris Kaplinski  <lauris@ximian.com>
+
+	* profiles/fax-g3.profile (driver): Use gnome-print-ps2 as driver
+
+	* profiles/Makefile.am (profilesdir): De-versioning of profiles,
+	thanks to Dobey
+
+2002-01-21  Alexander Shopov  <al_shopov@web.bg>
+
+	* configure.in (ALL_LINGUAS): Added "bg".
+
+2002-01-14  Lauris Kaplinski  <lauris@ximian.com>
+
+	* run-gnome-font-install: Added --aliases to all fontmap generations
+
+2002-01-04  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure,in (ALL_LINGUAS): Added "eu".
+
+2001-12-06  israel  <israel@ximian.com>
+
+	* fonts/Makefile.am (EXTRA_DIST): make distcheck fixes.
+
+2001-12-06  Israel Escalante  <israel@ximian.com>
+
+	* configure.in: Bump version to 0.34
+
+2001-11-28  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c (gfi_font_entry_get_by_psname): New helper
+	(gfi_process_alias): Scan all existing maps for aliases as well
+
+2001-11-27  Lauris Kaplinski  <lauris@ximian.com>
+
+	* configure.in (PRINT_LIBS): Use LIBGNOMEPRINT_LIBS here, so
+	printConf.sh gets full library list
+
+2001-11-25  Lauris Kaplinski  <lauris@ximian.com>
+
+	* fonts/Makefile.am (mapdir): Added defaults.fontmap
+
+	* fonts/defaults.fontmap: New file, we will define some locale-specific
+	defaults here
+
+2001-11-24  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c (gfi_write_font): Set psname to
+	afm one, if exists, set alias always to pfb name
+
+2001-11-23  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c (gfi_process_alias): Register notice
+	(gfi_build_font): Ditto
+	(gfi_build_ttf_font): Ditto
+	(gfi_write_font): Write notice
+
+	* installer/gf-fontmap.c (gf_fm_load_common_data): Helper, read
+	notice also, if present
+
+	* installer/gf-pfb.c (gf_pfb_search_def_string): Dig through nested
+	parentheses - needed for 'Notice' and 'Copyright' fields
+
+2001-11-22  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c: Added /usr/share/abisource/fonts
+	to default font search paths
+
+	* configure.in: Use version 0.33
+
+2000-11-14  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+        * configure.in (ALL_LINGUAS): added Walloon (wa) 
+
+2001-11-05  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gf-pfb.c (gf_pfb_open): Dont't check for SFNT, as we are not one
+
+	* run-gnome-font-install: Added '--smart' as last cycle
+
+	* installer/gnome-font-install.c (main): Added --smart argument
+
+2001-10-31  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gf-fontmap.c (gf_fm_load_fonts_2_0): Added truetype parsing
+	(gf_fm_load_font_2_0_type1): Correct appending
+	(gf_fm_load_font_2_0_truetype): New method
+
+	* installer/gf-ttf.c: New file
+
+	* installer/gf-ttf.h: New file
+
+	* installer/gnome-font-install.c (main): Verify all fonts from all
+	maps, vacuum master map later
+	(gfi_verify_fontmap): New method
+	(gfi_verify_font_entry): Verify TrueType as well
+	(gfi_verify_ttf_file): New method
+	(gfi_read_ttf_file_data): New method
+	(gfi_try_font_file): Check TrueType
+	(gfi_sort_fonts): Use gfi_sort_file_list
+	(gfi_sort_file_list): New method
+	(gfi_build_ttf_font): New method
+	(gfi_write_font): Write truetype entries
+
+	* tests/testprint4.c (print_paragraph): Expect sample to be utf8
+
+2001-10-30  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c: Removed #ifdef 0 code
+
+	* configure.in: Version 0.32, removed gnome-font checking
+	(FREETYPE_LIBS): Added test for freetype
+	(LIBGNOMEPRINT_LIBS): Meaningful macro here
+	(LIBGNOMEPRINT_LIBS): Meaningful macro here
+
+2001-10-12  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c (gfi_process_alias): Check NULL
+	strings before atof
+	(gfi_build_font): Ditto
+
+2001-10-11  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c (gfi_read_afm_file_data): Use
+	gf_afm_check for quick test before firing up parseAFM
+	--recursive is disabled by default
+	(gfi_scan_path): Test for circular links, refuse links to '/',
+	'/proc', '/dev'
+
+	* installer/gf-pfb.c (gf_pfb_open): Ignore small files and check
+	mmap for NULL result in addition to -1. Do not mmap more than
+	64K + 6 of file (max PS initial segment length).
+	(gf_afm_check): Quick test for "StartFontMetrics" string
+
+2001-10-09  Havoc Pennington  <hp@redhat.com>
+
+	* installer/gnome-font-install.c (main): improve error handling a
+	bit, don't use g_warning for user mistakes.
+
+	* configure.in (PRINT_INCLUDEDIR): fix for changed gdk-pixbuf
+	header location
+
+2001-10-07  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* configure.in (ALL_LINGUAS): added lv
+
+2001-10-07  Carlos Perelló Marín <carlos@gnome-db.org>
+
+	* configure.in: Added pt to ALL_LINGUAS.
+
+2001-10-02  Lauris Kaplinski  <lauris@ximian.com>
+
+	* configure.in: Use version 0.30
+
+2001-09-23  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/Makefile.am (gnome_font_install_SOURCES): Added copy of
+	fontmap and parseAFM.[c,h]
+
+2001-09-16  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* configure.in: Added "nn" to ALL_LINGUAS.
+	
+2001-09-15  Darin Adler  <darin@bentspoon.com>
+
+	* acconfig.h: Add LIBGPA.
+
+2001-09-13  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gf-pfb.c: Reordered #includes to make BSD happy
+
+	* tests/Makefile.am (CPPFLAGS): Pass environment
+
+	* Makefile.am (CPPFLAGS): Pass environment variable
+
+	* gnome-print.spec.in (CFLAGS): Applied patch #60325 (Gregory Leblanc)
+
+2001-08-31  Abel Cheung  <maddog@linux.org.hk>
+
+	* configure.in (ALL_LINGUAS): zh_TW.Big5 -> zh_TW
+
+2001-08-09  Abel Cheung  <maddog@linux.org.hk>
+
+	* configure.in: Add zh_TW.Big5 to ALL_LINGUAS.
+
+2001-07-18  Zbigniew Chyla  <cyba@gnome.pl>
+
+	* profiles/fax-g3.profile: Added Polish translation.
+
+2001-07-08  Lauris Kaplinski  <lauris@ximian.com>
+
+	* tests/testprint3.c (print_test_page): Added test for
+	symbol fonts
+
+2001-05-31  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c (main): Set umask to 022
+
+	* Makefile.am: Removed USE_GNOME_FONT
+
+	* configure.in: Version 0.29
+	Removed --with-gnome-font
+	More reasonable libxml version checking
+
+2001-05-29  Darin Adler  <darin@bentspoon.com>
+
+	* ABOUT-NLS: Remove generated file from repository.
+
+2001-05-24  Lauris Kaplinski  <lauris@ximian.com>
+
+	* configure.in: Version 0.29.test
+
+2001-05-22  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gf-pfb.c (gf_pfb_search_def_name): Allow '-' in name
+
+2001-05-21  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c: #include <stdio.h> for fprintf
+	Replace g_print (...) with fprintf (stderr, ...)
+	(main): Added warning about no fonts
+	(gfi_try_font_file): Make path absolute, if not already
+
+	* installer/Makefile.am: Added README.installer
+
+	* installer/README.installer: New file
+
+	* installer/gnome-font-install.c: Added POPT_AUTOHELP
+
+2001-05-11  Lauris Kaplinski  <lauris@ximian.com>
+
+	* configure.in: Version 0.29
+
+2001-03-20  Lauris Kaplinski  <lauris@ximian.com>
+
+	* configure.in: Version 0.28
+
+	* run-gnome-font-install: Added IRIX-specific font & exec paths
+
+	* installer/gnome-font-install.c: #include <popt-gnome.h> instead of <popt.h>
+
+2001-03-08  Chema Celorio  <chema@celorio.com>
+
+	* tests/testprint4.c (latin_to_utf8): was not being used, #ifdef
+	out
+
+2001-03-07  Lauris Kaplinski  <lauris@ximian.com>
+
+	* gnome-print.spec.in (Group): Changed fontmap to fontamp2 and added
+	fax profile
+
+2001-03-06  Lauris Kaplinski  <lauris@ximian.com>
+
+	* configure.in: Set version to final 0.26
+
+	* tests/testprint.c (test_dump_metafile): Close context after printing
+
+2001-03-02  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c (gfi_process_type1_alias): Read
+	afm file, so we get correct italic angle and weight in case entry
+	does not have them (as is the case with hand-made entries)
+
+	* run-gnome-font-install: Change fontmap file name to fontmap2
+
+2001-02-23  Lauris Kaplinski  <lauris@ximian.com>
+
+	* configure.in: Use version 0.26.pre
+
+2001-02-22  Lauris Kaplinski  <lauris@ximian.com>
+
+	* profiles/fax-g3.profile (driver): Added fax profile
+
+2001-02-21  Lauris Kaplinski  <lauris@ximian.com>
+
+	* tests/testtext.c (print_test_page): Added beginpage
+
+	* tests/testprint3.c (print_test_page): Added beginpage
+
+	* tests/testprint2.c (print_test_page): Added beginpage
+
+	* tests/testprint.c (print_test_page): Added beginpage
+
+2001-02-20  Lauris Kaplinski  <lauris@ximian.com>
+
+	* tests/testprint4.c: Rewrite page description part, now we have nice
+	glyphlist test/demo and will soon have linestyle test/demo too
+
+2001-02-18  Lauris Kaplinski  <lauris@ximian.com>
+
+	* HACKING: New file with some minuscule guidelines
+
+	* AUTHORS: Added Lauris, Chema, Chris
+
+	* MAINTAINERS (Email): Removed other names
+
+2001-02-12  Chema Celorio  <chema@celorio.com>
+
+	* configure.in (have_admin): if --with-admin is specified
+	build with admin support
+
+2001-02-12  Karl Eichwalder  <ke@suse.de>
+
+	* configure.in (AC_INIT): The new gnome-font-install.c now is
+	found in installer/ .
+
+2000-02-11  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c: Done .font parsing
+	* installer/Makefile.am: add install hook
+	* Makefile.am: Commented out old font installer
+	* run-gnome-font-install: Some argument changes for new installer
+
+2000-02-08  Lauris Kaplinski  <lauris@ximian.com>
+
+	* installer/gnome-font-install.c: Add some .font file
+	parsing skeleton
+
+2000-12-24  Miguel de Icaza  <miguel@helixcode.com>
+
+	* doc/gnome-print-sections.txt: Update.
+
+	* doc/gnome-print.types: Updated with all the new types.
+
+	* doc/Makefile.am (scan): Do not list individual files, pass the
+	directory with the source code.
+
+2000-12-18  Chema Celorio  <chema@celorio.com>
+
+	* gnome-font-install.c (main): cast args to remove compile warning
+
+	* tests/testprint4.c (do_rosette): remove unused variable
+
+2000-12-18  Chema Celorio  <chema@celorio.com>
+
+	* configure.in (GNOMEPRINT_CURRENT): bump GNOME_PRINT_CURRENT
+	since we added the "-lgpa" flag to the "gnome-config --libs print"
+	we want old programs to keep using the old gnome-print. 
+
+2000-12-17  Chema Celorio  <chema@celorio.com>
+
+	* configure.in (try_admin): compile --with-admin by default
+
+2000-12-11  Chema Celorio  <chema@celorio.com>
+
+       * Mon Dec 11 2000 Chema Celorio <chema@celorio.com>
+       - Added note about this file not beeing maintaned and updated
+         the old description.
+
+
+2000-12-11  Morten Welinder  <terra@diku.dk>
+
+	* gnome-print.spec.in: Update various stuff from requirements to
+ 	pre-requisites.
+
+2000-11-28  Chema Celorio  <chema@celorio.com>
+
+	* data/models/GNOME-TEST-WIDGETS-----.model: add file
+
+2000-11-26  Chema Celorio  <chema@celorio.com>
+
+	* configure.in: s/Gnumeric/gnome-print
+
+2000-11-26  Chema Celorio  <chema@celorio.com>
+
+	* configure.in : check that gnome-xml is version < 2.0.x
+	and warn if not
+
+2000-11-25  Chema Celorio  <chema@celorio.com>
+
+	* configure.in : Fix so that they
+	work with & without gnome-print-admin support
+	* tests/Makefile.am: ditto
+	* installer/Makefile.am :  ditto
+
+2000-11-25  Chema Celorio  <chema@celorio.com>
+
+	* configure.in : added data/ppds/Makefile to AC_OUTPUT
+
+2000-11-25  Chema Celorio  <chema@celorio.com>
+	
+	* Makefile.am (SUBDIRS): make the libgpa directory before
+	libgnomeprint since libgnomeprint depends on libgpa
+	* data/models & data/ppds : Removed Makefile & Makefile.in
+
+2000-11-25  Chema Celorio  <chema@celorio.com>
+
+	* configure.in (GNOMEPRINT_REVISION): remove doc/Makefile.
+	the doc directory is not included in the Subdirs. The doc
+	directory is not building.
+
+2000-11-25  Jaka Mocnik  <jaka@activetools.si>
+
+	* installer/Makefile.am: add $(GNOME_INCLUDEDIR) to INCLUDES as
+	including libart headers requires this.
+
+2000-11-22  Chema Celorio  <chema@celorio.com>
+
+	* configure.in (PRINT_TEST_LIBS): added data & data/models Makefile.am
+
+2000-11-22  Chema Celorio  <chema@celorio.com>
+
+	* data/Makefile.am (SUBDIRS): added
+
+	* Makefile.am (LIBGPA_DIR): added the data directory
+
+2000-11-21  Chema Celorio  <chema@celorio.com>
+
+	* acconfig.h: define ENABLE_LIBGPA
+
+	* Makefile.am (LIBGPA_DIR): added LIBGPA_DIR as an
+	optional directory to build
+
+	* configure.in (GPA_CURRENT): Add libgpa support.
+	And a new flag "with-admin" to configure with
+	libgpa & gnome-print-admin support
+
+	* autogen.sh (PKG_NAME): renamve PKG_NAME from
+	Gnome Printing to Gnome Print
+
+	* configure.in: remove libunicode check, we don't use it
+	anymore.
+	(have_gpa): check for gnome-print-admin support
+
+2000-11-20  John Gotts  <jgotts@linuxsavvy.com>
+
+	* gnome-print.spec.in: Fixed the run-gnome-font-install/no font found
+	problem.
+
+2000-11-19  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* configure.in: Added gnome-font test
+
+	* Makefile.am: Build font installer only if not using gnome-font
+
+	* acconfig.h: #undef USE_GNOME_FONT
+
+2000-11-16  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* installer/*: New experimental font installation tool
+
+	* configure.in: Added installer
+
+	* Makefile.am: Ditto
+
+2000-11-15  Chema Celorio  <chema@celorio.com>
+
+	* configure.in (PRINT_LIBS): remove duct tape
+	
+2000-11-14  jgotts  <jgotts@linuxsavvy.com>
+
+	* gnome-print.spec.in: Added several missing files, deleted an obsolete
+	file.  I don't agree with the run-font-install change, but I'll leave
+	it to a better authority to back it out.
+
+2000-11-13  Chema Celorio <chema@celorio.com>
+
+	* tests/testprint4.c (do_image): gsave the graphic state 300 times
+	and grestore it 300 times to stress test the gsave & grestore operators	
+
+2000-11-13  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* configure.in: Version 0.25
+
+2000-11-05  Yukihiro Nakai  <nakai@gnome.gr.jp>
+
+	* configure.in: Add sk(Slovak) to ALL_LINGUAS.
+
+2000-11-04  Zbigniew Chyla  <cyba@gnome.pl>
+
+	* profiles/*.profile: Added Polish translation.
+
+2000-10-26  Dan Damian  <dand@dnttm.ro>
+
+	* configure.in: Added "ro" to ALL_LINGUAS.
+
+2000-10-19  Joe Shaw  <joe@helixcode.com>
+
+	* tests/Makefile.am: Remove blank SUBDIRS line.
+
+2000-10-17  Yukihiro Nakai  <nakai@gnome.gr.jp>
+
+	* configure.in: Add zh_CN.GB2312 to ALL_LINGUAS
+
+2000-10-14  Chema Celorio  <chema@celorio.com>
+
+	* profiles/development/Postscript.profile: rename to
+	"Generic Postscript (Legacy)"
+
+2000-10-10  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* configure.in: Added Ben Taylor's Solaris patch
+	
+2000-10-06  Chema Celorio  <chema@celorio.com>
+
+	* NATIVE_DRIVERS : update
+
+2000-10-03  Tomasz K³oczko  <kloczek@pld.org.pl>
+
+	* configure.in: removed checking gdk-pixbuf (AM_PATH_GDK_PIXBUF()      
+	removed).
+
+2000-09-27  Chema Celorio  <chema@celorio.com>
+
+	* profiles/Makefile.am (profilesdir): use (datadir)/gnome-print
+	(VERSION)/profiles for the profiles
+
+2000-09-26  Chema Celorio  <chema@celorio.com>
+
+	* tests/testembed.c (decrypt_eexec): add this function back. Dunno why
+	it is not there anymore
+
+2000-09-29  Miguel de Icaza  <miguel@helixcode.com>
+
+	* profiles/pdf.profile: Rename to PDF writer
+	
+2000-06-22  Miguel de Icaza  <miguel@helixcode.com>
+
+	* configure.in (ALL_LINGUAS): Use gnome-config based testing.
+
+2000-09-26  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* configure.in: 0.24
+
+2000-09-24  Chema Celorio  <chema@celorio.com>
+
+	* profiles/pdf.profile (driver): rename to "Gnome Print PDF Writer"
+
+	* profiles/PostscriptOptimized.profile: enable ps2 as the default
+	postscript profile
+
+	* profiles: move profiles that should not get installed
+	by default to the development directory
+
+	* profiles/Postscript.profile: split into 3. Normal
+	Optimized and No-alpha
+
+2000-09-22  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* README: Write a short summary of features
+
+2000-09-21  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* configure.in: Remove libunicode dependency
+
+	* tests/testprint4.c (latin_to_utf8): Remove libunicode stuff
+	
+2000-09-20  Zach Frey <zfrey@bright.net>
+
+	* configure.in: Add an additional check for libunicode, to work
+	around libunicode-0.4 not working properly with gnome-config.
+	* doc/Makefile.am: Update the gtk-doc 'scan' target.
+	* doc/gnome-print.sgml: added
+	* libgnomeprint/*.[ch]: various small typo fixes and gtk-doc
+	cleanups in the comments.
+
+2000-09-19  Chema Celorio  <chema@celorio.com>
+
+	* configure.in: 0.23
+
+2000-09-18  JP Rosevear  <jpr@helixcode.com>
+
+	* tests/Makefile.am: Use new PRINT_TEST* variables when building the 
+	test programs
+
+	* configure.in: Add PRINT_TEST_* for building the test programs.  
+	This should fix unicode problems with non-gnome prefixes
+
+2000-09-17  Chema Celorio  <chema@celorio.com>
+
+	* configure.in (_ldflags): add zlib checks
+
+2000-09-16  Chema Celorio  <chema@celorio.com>
+
+	* tests/testmetrics.c (print_metrics): clean a bit
+
+2000-09-14  Michael Meeks  <michael@helixcode.com>
+
+	* configure.in: Add check for libunicode >= 0.4
+
+2000-08-28  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* configure.in: Use version number 0.22, to end all that version
+	incompatibility mesh.
+
+2000-08-18  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* tests/makefile.am: INCLUDE main sourcedir fro private headers
+	* tests/*.c: do not include <libgnomeprint/gnome-printer-profile.h>
+	
+2000-08-08  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* profiles/Postscript.profile: Added alpha emulation drivers
+	
+2000-08-06  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* configure.in: Use version number 0.21
+	
+2000-08-06  Chema Celorio  <chema@celorio.com>
+
+	* tests/fonts.gnumeric : added
+	* tests/chars_test_sheet.gnumeric : added
+
+2000-07-25  Chema Celorio  <chema@celorio.com>
+
+	* test*.c : move test* to tests, clean up this mess
+
+2000-07-27  Lauris Kaplinski  <lauris@helixcode.com>
+
+	* testtext.c (main): No more class in gnome_font_family_list ()
+
+2000-07-25  Chema Celorio  <chema@celorio.com>
+
+	* testprint5.c (do_print): added yet ANOTHER test program.
+	This testprint[%number].c is getting ugly. I will fix it soon
+	so that we have a better testing suite.
+
+2000-07-21  Lauris kaplinski  <lauris@helixcode.com>
+
+	* testprint4.c (do_rosette): Test font switching
+	(main): Show font selection dialog (does nothing)
+
+2000-07-18  Lauris Kaplinski <lauris@helixcode.com>
+
+	* testprint4.c (do_rosette): test fresh new glyphlists
+
+	* Makefile.am: added libunicode dependency
+	* configure.in: added libunicode dependency
+
+2000-07-17  Chema Celorio  <chema@celorio.com>
+
+	* Makefile.am : patch from 
+	Fabrice Bellet <Fabrice.Bellet@creatis.insa-lyon.fr>
+
+2000-07-15  Chema Celorio  <chema@celorio.com>
+
+	* profiles/pdf.profile: added
+	* profiles/pcl.profile: added
+
+	* testpdf.c: added. Needs cleaning ...
+	* NATIVE_DRIVERS: added. This file that explains the
+	status of the NATIVE drivers and how to try them out.
+	* Makefile.am: added testpdf.c compilation
+	* profiles/PCL.profile: Added PCL profile
+
+2000-07-12  Federico Mena Quintero  <federico@helixcode.com>
+
+	* configure.in: Use a "0.21pre" version number so that we can
+	guard other CVS modules against breakage.
+
+2000-07-03  Eskil Heyn Olsen  <eskil@eazel.com>
+	Some work on making the rpm'ing of gnome-print work.
+	
+	* Makefile.am:
+	Added run-gnome-font-install to EXTRA_DIST
+
+	* gnome-print.spec.in:
+	There are no files in %{prefix}/share/locale, so I removed that
+	from the %files directive
+	
+	* libgnomeprint/Makefile.am:
+	Added a missing .h file to SOURCES
+
+2000-06-24  Morten Welinder  <terra@diku.dk>
+
+	* run-gnome-font-install: New script.
+
+	* Makefile.am (install-data-local): use run-gnome-font-install.
+
+	* gnome-print.spec.in (%post): Attempt to mirror Makefile.am
+ 	changes.
+
+	* configure.in (PRINT_LIBS): Kill font searching here.
+
+2000-06-23  Morten Welinder  <terra@diku.dk>
+
+	* Makefile.am (install-data-local): chmod 0644 the resulting
+ 	fontmap file.
+
+	* gnome-font-install.c (warn_missing_font): Static.
+
+2000-06-07  Lauris Kaplinski  <lauris@kaplinski.com>
+
+	* testprint4.c: Added frgba context generation
+
+2000-05-30  Lauris Kaplinski  <lauris@ariman.ee>
+
+	* configure.in: Added gdk_pixbuf to PRINT_LIBS, also check its
+	  presence and version
+	* Makefile.am: Added -lgdk_pixbuf to test programs
+	* testprint2.c: Upgraded pixbuf context syntax
+	* testprint3.c: Upgraded pixbuf context syntax
+	* .cvsignore: ignore testprint4
+
+2000-05-26  Lauris Kaplinski  <lauris@ariman.ee>
+
+	* testprint4.c: added test program for new and updated contexts,
+	coming from rgba branch
+	* Makefile.am: added testprint4
+
+2000-05-09  Darin Adler  <darin@eazel.com>
+
+	* .cvsignore: Ignore testzip and testprint3.
+	* testprint3: Removed.
+	* testzip: Removed.
+	No need to check in binaries.
+
+2000-05-06  Chema Celorio  <chema@celorio.com>
+
+	* testzip.c (compress_rlc): Add file to test
+	compression methods.
+
+2000-05-06  Karl Eichwalder  <ke@suse.de>
+
+	* configure.in (ALL_LINGUAS): Add hr.
+
+2000-05-02  Chema Celorio  <chema@celorio.com>
+
+	* testprint3: added
+	* testprint3.c: added.
+
+2000-04-18  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+        * configure.in (ALL_LINGUAS): added Catalan
+
+2000-04-16  Fatih Demir	<kabalak@gmx.net>
+
+	* configure.in : Added tr to ALL_LINGUAS ..
+
+2000-04-14  Daniel Veillard <Daniel.Veillard@w3.org>
+
+	* gnome-font-install.c libgnomeprint/gnome-font.c: libxml2
+	  generate notes for formatting spaces, xmlKeepBlanksDefault(0);
+	  is needed to avoid breaking the lookup code
+
+2000-04-14  Daniel Veillard <Daniel.Veillard@w3.org>
+
+	* Makefile.am: use @PRINT_INCLUDEDIR@ for $INCLUDES
+	* libgnomeprint/Makefile.am: use @PRINT_INCLUDEDIR@ for $INCLUDES
+	* gnome-font-install.c libgnomeprint/gnome-font.c: little hack
+	  to get gnome-print to compile both with libxml-1.x and libxml-2.x
+	  Didn't touch code, just use include paths computed by configure
+	  and check for LIBXML_VERSION macro
+
+2000-04-10  Morten Welinder  <terra@diku.dk>
+
+	* configure.in (GNOMEPRINT_CURRENT): Update version and interface
+ 	ages.
+
+2000-04-02  Chema Celorio  <chema@celorio.com>
+
+	* MAINTAINERS (Email): Added myself to the list
+	so that I can get the bug reports.
+
+2000-03-20  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in,po/lt.po: added Lithuanian file
+
+2000-03-01  Chema Celorio  <chema_gnome@celorio.com>
+
+	* .cvsignore: Added *.diff, output.ps and testprint2
+
+2000-03-01  Michael Meeks  <michael@helixcode.com>
+
+	* configure.in: Bump REVISION, AGE and version.
+
+2000-02-11  Miguel de Icaza  <miguel@gnu.org>
+
+	* configure.in (GNOMEPRINT_AGE): Bump numbers.
+
+2000-01-11  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* configure.in (GNOMEPRINT_CURRENT): Update version.
+
+	* testprint.c (test_ps): New option --master, specifies the
+	gnome-print-master interface is used for printing/preview.
+	Its pretty messy, but what the hell ...
+
+1999-12-28  Jody Goldberg  <jgoldberg@home.com>
+
+	* libgnomeprint/gnome-font.h : Remove ugly '#pragma {' sillyness
+	  associated with extern "C".  It was generating warnings.
+	* libgnomeprint/gnome-print-meta.h : Ditto.
+	* libgnomeprint/gnome-print-ps.h : Ditto.
+	* libgnomeprint/gnome-print.h : Ditto.
+	* libgnomeprint/gnome-text.h : Ditto.
+
+Thu Dec 16 12:12:52 1999  Changwoo Ryu  <cwryu@adam.kaist.ac.k>
+
+	* configure.in (ALL_LINGUAS): Added Korean.
+
+1999-12-02  Morten Welinder  <terra@diku.dk>
+
+	* gnome-font-install.c (main): Handle write errors.  Change main's
+ 	type to match the C standard.
+
+1999-11-17  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): added some missing ones and sorted
+	it alphabetically (that helps to found out missing ones!)
+
+1999-10-30  Larry Ewing  <lewing@gimp.org>
+
+	* gnome-font-install.c: add missing include of
+	<gnome-xml/xmlmemory.h>.
+
+1999-10-30  Larry Ewing  <lewing@gimp.org>
+
+	* gnome-font-install.c (xmlGetValue): xmlFree the result of libxml
+	calls.
+	(xmlSetValue): same as above.
+
+1999-10-29  Morten Welinder  <terra@diku.dk>
+
+	* configure.in (PRINT_INCLUDEDIR): Get xml stuff from xml-config.
+  	(Bugs 2242 and 1654.)  Add AC_ISC_POSIX, whatever that is.
+
+1999-10-19  Yuri Syrota  <rasta@renome.rovno.ua>
+
+	* configure.in: Added "uk" to ALL_LINGUAS.
+
+1999-10-08  Morten Welinder  <terra@diku.dk>
+
+	* testprint.c: Fix includes.
+	(test_ps): Don't use "printer" uninitialised.
+
+	* testprint2.c: Fix includes.
+
+1999-10-08  Jesus Bravo Alvarez  <jba@pobox.com>
+
+	* configure.in (ALL_LINGUAS): Added Galician (gl)
+
+1999-09-26  Lauris Kaplinski <lauris@ariman.ee>
+
+	* configure.in: Added "et" to ALL_LINGUAS.
+	
+1999-09-07  Philippe.Defert@cern.ch
+
+	* gnome-font-install.c: Add support for the --fontmap-path to
+	enable administators to specify the location for the fontmap file.
+
+1999-09-08  James Henstridge  <james@daa.com.au>
+
+	* libgnomeprint/gnome-print-ps.c (gnome_print_ps_setdash): modified
+	so that it produces correct postscript.  Before it was trying to
+	fprintf a pointer with the %g code.
+
+1999-08-31  Kjartan Maraas  <kmaraas@online.no>
+
+	* configure.in: Added "da" to ALL_LINGUAS.
+	
+1999-08-27  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* configure.in (GNOMEPRINT_AGE): Updated versioning information. 
+
+1999-08-23  Elliot Lee  <sopwith@redhat.com>
+
+	* Makefile.am: No such thing as GNOME_XML_LIBDIR.
+	Also add printConf.sh to CLEANFILES.
+
+1999-08-23  Miguel de Icaza  <miguel@gnu.org>
+
+	* Makefile.am: Removed broken disthook.
+
+1999-08-16  Miguel de Icaza  <miguel@gnu.org>
+
+	* testprint.c (test_ps): Modified test program to test the preview
+	code.
+	(test_ps): Use the correct visual.
+
+	* testprint2.c: Another test program.
+	
+1999-08-04  Richard Hult <rhult@hem2.passagen.se>
+
+	* configure.in (ALL_LINGUAS): added 'sv'
+
+1999-07-25  Jody Goldberg  <jgoldberg@home.com>
+
+	* libgnomeprint/gnome-print{-meta.c,-ps.c,.[ch]} : improve const
+	  for gnome_print_show.
+
+1999-07-16  Herbert Valerio Riedel  <hvr@hvrlab.dhs.org>
+
+	* gnome-print.spec.in: fixed typo =)
+
+Wed Jul 14 20:31:32 EDT 1999 Gregory McLean <gregm@comstar.net>
+
+	* gnome-print.spec.in: This will now produce a working gnome-print
+	rpm, all font sillyness is handled.
+
+1999-07-09  Chris Lahey  <clahey@umich.edu>
+
+	* configure.in, Makefile.am, fonts/Makefile.am: Made it so that
+	fonts/*.font are placed into the tar.gz so that the system works.
+
+	* Makefile.am (install-data-local): I added back in the static
+	listing of possible files for ghostscript because the new version
+	doesn't seem to find the correct directory in some version of
+	ghostscript.  This way it can be successful either by looking in
+	the place ghostscript specifies or in one of the standard
+	locations if it doesn't understand ghostscript's output.
+
+1999-07-07  Jody Goldberg  <jgoldberg@home.com>
+
+	* doc/tmpl/gnome-font.sgml, libgnomeprint/gnome-font.[ch]
+	(gnome_font_get_width_string_n) : New function to mirror the
+	interface of gdk_text_width and avoid unnecessary copying of
+	substrings.
+
+Wed Jul  7 16:12:35 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-font-install.c (main): Added an informative error message
+	when the basic fonts (Times, Helvetica, and Courier) are not
+	found.
+
+Wed Jul  7 16:00:34 1999  Raph Levien  <raph@gimp.org>
+
+	* testprint.c (print_test_page): Added an informative error
+	message when the fonts are not found (it was segfaulting).
+
+Wed Jul  7 15:09:48 1999  Raph Levien  <raph@gimp.org>
+
+	* Makefile.am (testprint_LDADD): Moved LDADDS before the other
+	library dependencies, so it will build with static libraries.
+	Closes gnome bug 392.
+
+1999-07-06  Morten Welinder  <terra@diku.dk>
+
+	* configure.in (GHOSTSCRIPT_ASSIGN): Use perl, not sed which
+ 	turned out to have portability problems.  We were using perl
+ 	anyway.
+
+1999-06-29  Morten Welinder  <terra@diku.dk>
+
+	* configure.in (GHOSTSCRIPT_DIRS): Wring the font directories out
+ 	of gs.
+	(GHOSTSCRIPT_ASSIGN): Turn directories into suitable options.
+
+	* Makefile.am (install-data-local): Use GHOSTSCRIPT_ASSIGN.
+
+	* gnome-font-install.c (check_directory): Fix race condition.
+	(add_assignment): Fix leaks.
+	(main): Fix leaks.  (Not because the leaks were important, but
+ 	because leaks tend to shadow other problems.)
+
+1999-06-28  Morten Welinder  <terra@diku.dk>
+
+	* gnome-font-install.c (search_path_for_file): Constify.
+	(check_fontfile): Ditto.
+	(already_included): Ditto.
+	(scan_fonts): Ditto.
+	(read_fontmap): Ditto.
+	(write_fontmap): Ditto.
+	(check_directory): Fix prototype.
+	(g_format_name_equal): Static.
+	(g_format_name_hash): Ditto.
+	(already_included): Ditto.
+	(append_font): Ditto.
+	(check_font): Ditto.
+	(check_fontfile): Ditto.
+	(scan_fonts): Ditto.
+	(read_fontmap): Ditto.
+	(write_fontmap): Ditto.
+	(ctx): Ditto.
+	(xmlGetValue): Plug major leak.
+	(check_directory): Remove bogus errno local.
+
+1999-06-02  Havoc Pennington  <hp@pobox.com>
+
+	* configure.in (ALL_LINGUAS): added 'it'
+
+1999-05-26  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* testtext.c, testprint.c: Use the headers from the libgnomeprint
+	directory
+
+	* Makefile.am, printConf.sh.in (MODULE_VERSION): Include module
+	version here as well.
+
+	* configure.in (AC_INIT): Use gnome-font-install.c as the check.
+
+	* autogen.sh (PKG_NAME): Patch from raph to check the package
+	properly with the reorganization.
+
+1999-05-19  Havoc Pennington  <hp@pobox.com>
+
+	* gnome-font.c (gnome_font_refresh_fontmap): Also check the
+	gnome-print install prefix for fontmaps.
+
+1999-05-06  Havoc Pennington  <hp@pobox.com>
+
+	* gnome-font.c (gnome_font_load_fontmap): Don't assume the XML
+	file is valid - sometimes the xmlGetValue() calls were returning
+	NULL, and NULL for 'weight' crashes gnome_font_add_mapping(). We
+	now skip the entry if this happens and spew a big
+	warning. Probably steps should be taken to ensure it doesn't
+	happen, but even if the user replaces a .font with a binary file
+	we shouldn't segfault.
+
+1999-05-05  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* gnome-printer-profile.c (gnome_printer_profile_get_printer):
+	Return NULL on error (the return value was missing).
+
+1999-04-28  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* gnome-text.c (gnome_text_default_glyph_state): Fixed an
+	incorrect array intiailizer with more elements than necessary.
+
+	* gnome-printer-profile.c: Fixup includes, fixed a bunch of
+	missing return values in assertions.
+
+	* gnome-printer-dialog.c (gnome_printer_widget_init): Removed
+	unused variables.
+
+	* gnome-print-ps.c: Fixup includes.
+
+	* gnome-print.c (gnome_print_translate gnome_print_rotate
+	gnome_print_scale): Do not take the address of an array.
+
+	* gnome-font.h: Fixup includes.
+
+	* gnome-font-dialog.c: Fixup includes.
+
+1999-04-19  Chris Lahey  <clahey@umich.edu>
+
+	* configure.in: Removed the check for TeX since TeX is no longer
+	required.
+
+	* gnome-font.h, gnome-font.c: Removed the subst_glyph field from
+	the fontmap structure, and replaced it with a char *alias field
+	which gives the replacement font name directly.  This is pulled
+	from the alias field of the fontmap entries.
+
+	* fonts/adobe-urw.font: Added alias fields to all the fonts.
+
+Sun Apr 18 23:57:16 1999  Raph Levien  <raph@gimp.org>
+
+	* configure.in (PRINT_INCLUDEDIR): changed GNOMEPRINT_INCLUDEDIR
+	to PRINT_INCLUDEDIR and used -I${includedir} instead of -L
+
+	* Makefile.am (INCLUDES): added $(GTK_CFLAGS) . I'm not sure if
+	this is exactly right, but hey, it compiles.
+
+1999-04-17  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-font-dialog.h, gnome-font-dialog.c
+	(gnome_font_selection_set_font,
+	gnome_font_selection_dialog_set_font): Added these functions to
+	allow the application to set the font.
+
+1999-04-16  Chris Lahey  <clahey@umich.edu>
+
+	* Makefile.am (install-data-local): Added more possible locations
+	for font files.
+
+1999-04-16  Havoc Pennington  <hp@pobox.com>
+
+	* gnome-font-install.c (search_path_for_file): was returning
+	garbage instead of NULL in some cases, leading to a segv. Fixed.
+
+1999-04-16  Chris Lahey  <clahey@umich.edu>
+
+	* fonts/debian.font: Everything covered by adobe-urw.font or
+	urw-urw.font was removed.
+
+	* fonts/ghostscript.font: This was replaced by urw-urw.font.
+
+	* fonts/tex-urw.font: This has been replaced by adobe-urw.font.
+
+	* fonts/urw-urw.font: Uses command line assignments to match the
+	users urw afm metrics with the users urw pfb glyphs.
+
+	* fonts/adobe-urw.font: Uses command line assignments to match out
+	installed adobe afm metrics with the users urw pfb glyphs.
+
+	* configure.in: Added afms/Makfile and afms/adobe/Makefile.
+
+	* Makefile.am: Added a bunch of options to gnome-font-install in
+	install-data-local to look for installed fonts in different
+	places.  Added afms to SUBDIRS.
+
+	* gnome-font-install.c: Added popt usage.  Now recognizes relative
+	glpyhs/metrics paths of two different types (and two different
+	things to search for).  afm-path, pfb-path,
+	afm-assignment, and pfb-assignment.
+
+	* afms/adobe/*.afm: Added a bunch of afms to get installed in
+	$(datadir)/fonts/afms/adobe/.  These get used by adobe-urw.font.
+	
+	* afms/Makefile.am, afms/.cvsignore, afms/adobe/Makefile.am,
+	afm/adobe/.cvsignore: Simple support files.
+
+1999-04-15  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-font-install.c (check_font): Added a bit of debugging output.
+
+	* X.font, debian.font, ghostscript.font, groff.font, tex.font,
+	tex-urw.font: Moved the .font file to their own directory fonts/.
+
+	* gnome-font.h, gnome-font.c: Made these recognize the new xml
+	based fontmap.  Also got rid of glyph aliases since those can be
+	represented as changes to font files.
+
+	* gnome-font-install.c: This now installs to the correct
+	location.  It also scans the directory you give it on the command
+	line.  It now ignores the old data in the fontmap until we get
+	everything where we think it ought to go.
+
+	* configure.in: Set up to require xml.
+
+	* Makefile.am: Set up to compile gnome-font-install from a .c
+	instead of making it as a perl script from a .in.  Made
+	gnome-print dependent on xml.  Added an extra parameter to
+	gnome-font-install to tell it where to find the .font files.
+
+1999-04-09  Shooby Ban  <bansz@szif.hu>
+
+	* po/hu.po: Added hungarian translations
+	
+1999-03-26  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-font-install.c: Added this file to parse .font files and
+	build a fontmap.
+
+1999-02-26  Chris Lahey  <clahey@umich.edu>
+
+	* .cvsignore: Added intl.
+
+	* intl/: Removed from CVSROOT/modules.
+
+1999-02-25  Chris Lahey  <clahey@umich.edu>
+
+	* configure.in: Bumped the version number.  Fixed up some gettext
+	stuff.
+
+	* Makefile.am: Added gnome-print-i18n.h.
+
+1999-02-14  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-printer-dialog.h: Added a #include
+	"gnome-printer-profile.h" to get apps using this to compile
+	correctly.
+
+	* gnome-font-dialog.h, gnome-font-dialog.c: Rearranged this dialog
+	a bit and added a preview.
+
+	* gnome-font.h: Added #include <gnome.h> in case this is included
+	before gnome.h is.
+
+	* gnome-print.h, gnome-printer.h: Added #include <gtk/gtk.h> in
+	case this is included before gtk.h is.
+
+	* .cvsignore: Added gnome-print.spec.
+
+1999-02-14  Sergey Panov <sipan@mit.edu>
+
+        * configure.in, po/ru.po: Added Russian translations
+        done by Valek Filippov <val@comptek.ru>
+
+1999-02-14  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-printer-dialog.c: Documented all the API entry points. 
+
+	Add gnome-printer-profile support.
+
+	* gnome-printer.c: Add include config.h, use the
+	gnome-print-i18n.h file.
+	(gnome_printer_str_status): New function, returns a string
+	representation of a printer status.
+	(gnome_printer_get_status): New function.  Returns the status of a
+	printer. 
+
+	* gnome-print-i18n.h: Support for including the proper
+	internationalization files for the gnome-print messages.
+	
+	* gnome-printer-profile.c: New file.  Provides printer profiles
+	and creation of GnomePrinter contexts based on these.
+
+1999-02-13  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-printer.c (gnome_printer_get_status,
+	gnome_printer_str_status): New functions.
+
+	* gnome-printer-dialog.c (gnome_printer_widget_get_printer):
+	Implement a GnomePrinterWidget to use in embedding in more complex
+	dialog boxes. 
+
+1999-02-10  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-font.c: Made it so that the gnome font to x font
+	conversion just uses the font size as it's x pixel height instead
+	of finding a similarly sized font.  Replaced a bunch of erroneous
+	frees with g_frees.
+
+	* gnome-font-dialog.h, gnome-font-dialog.c: Added an italics
+	checkbox.
+
+	* gnome-print.spec.in: Added gnome-print.spec to CVS.
+
+	* Makefile.am: Added gnome-print.spec to EXTRA_DIST.  Made
+	gnome-font-install get installed to the bin directory.
+
+	* configure.in: Added gnome-print.spec.
+
+1999-02-09  Arturo Espinosa  <arturo@nuclecu.unam.mx>
+
+	* gnome-font.c: (create_display_font) check for the return value of
+	  gnome_font_new_closest to avoid sigsegv.
+
+1999-02-01  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-font.c: Added something to scan different weights in x fonts.
+
+	* configure.in: Bumped version number to 0.1.0.
+
+1999-01-31  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+        * gnome-print-meta.c: Do not close the printer context.  That is the
+        job of our parent
+	
+1999-01-26  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-font-dialog.c: Changed the layout of this dialog.
+
+	* gnome-font.c: Changed from "times new roman" to "times" so it
+	would work on machines with "times" but no "times new roman" x
+	screen font.  Added an #if 1 #else #endif to make it easy to
+	switch back.
+
+Sat Jan 23 23:11:36 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-text.c (gnome_text_hs_just): Changed it to make use of
+	total_space rather than n_spaces.
+
+	* testtext.c: use a max_neg_space of 128 (i.e. half).
+
+Sat Jan 23 22:22:31 1999  Peter Teichman  <pat4@acpub.duke.edu>
+
+	* gnome-font-dialog.h: can't #include libgnomeprint/gnome-font.h if
+	gnome-print hasn't been built. Unfortunately, this *is* gnome-print.
+
+1999-01-23  Chris Lahey  <clahey@umich.edu>
+
+        * gnome-font-dialog.h, gnome-font-dialog.c: Moved this from
+	go/font-dialog.[ch] to here.
+	
+1999-01-23  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* testprint.c (main): Added tests for metafile driver.
+
+	* gnome-print-meta.c: New file.  Implements the metafile printer
+	driver.
+
+Thu Jan 21 15:37:40 1999  Raph Levien  <raph@acm.org>
+
+	* gnome-print-ps.c: turned off VERBOSE
+
+	* gnome-text.h: Glyph default state, which makes it easier to
+	keep track of which attributes have changed. Also added alignment
+	options to the layout.
+
+	* gnome-text.c (gnome_text_lines_from_layout): Many enhancements
+	to this function, including alignment options and the fact that
+	it preserves attributes in the middle of the paragraph.
+
+	* testtext.c: exercises justification.
+
+Thu Jan 21 00:47:06 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-text.c (gnome_text_layout_new): fixed a problem that
+	it was incrementing char_idx twice.
+
+1999-01-19  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-font.h, gnome-font.c: Copied most of wp_font.[Ch] into
+	gnome-font.[ch] and got rid of a few small C++isms.
+
+Tue Jan 19 19:24:36 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-print-ps.c: selecting the font from gnome-text
+	now loads the .pfa file if necessary.
+
+Tue Jan 19 17:11:03 1999  Raph Levien  <raph@acm.org>
+
+	* testtext.c (print_test_page): test for the multiline paragraph
+	stuff
+
+	* gnome-text.h:
+	* gnome-text.c: added a simple justification function. added
+	functions to break a paragraph into multiple lines.
+
+	* gnome-font.h:
+	* gnome-font.c: added some more apis for unsized fonts, and
+	fixed a bug or two involving uninitialized memory
+
+Tue Jan 19 00:49:30 1999  Raph Levien  <raph@gimp.org>
+
+	It prints using gnome-text now!
+
+	* testtext.c (print_test_page): string now contains some fun utf-8
+	encoded unicode stuff
+
+	* gnome-text.h: added some apis for getting font info through
+	the font handle, for use by gnome-print-ps.c
+	* gnome-text.c (gnome_text_layout_new): fixed bug in unicode utf-8
+	decoder; added kerning, tracking, and ligatures
+
+	* gnome-font.h:
+	* gnome-font.c (gnome_font_unsized_kern): added this function.
+
+	* gnome-print-ps.h: changed current_font_size from int to double,
+	added a couple of elements for keeping track of current font when
+	printing gnome-text stuff.
+	* gnome-print-ps.c: added the gnome_print_ps_textline method.
+
+Mon Jan 18 16:05:01 1999  Raph Levien  <raph@acm.org>
+
+	* gnome-text.h:
+	* gnome-text.c: added the GnomeTextLine structure. Much new
+	code added to support this.
+
+	* gnome-font.h:
+	* gnome-font.c: a bunch of new stuff to support gnome-text.
+	Also, an interface for listing fonts and font families.
+
+	* gnome-print.h:
+	* gnome-print.c: added a ::textline(GnomeTextLine *) method,
+	which has much richer functionality than ::show (char *). Note:
+	this is not yet printing in the gnome-print-ps module.
+
+	* testtext.c: beginnings of a testbed for GnomeText.
+
+	* Makefile.am: added testtext
+
+1999-01-08  Tomasz K³oczko <kloczek@rudy.mif.pg.gda.pl>
+
+	* po/pl.po
+	added pl translation.
+
+Thu Jan  7 11:45:07 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-font.h:
+	* gnome-font.c (gnome_font_name_closest): Adding more support
+	for unsized fonts, in general, as that's going to be the main
+	interface for gnome-text.
+
+	* gnome-text.h:
+	* gnome-text.c: getting a good start on the implemementation
+	of font handles and font list handles. Still very much work in
+	progress, though.
+
+1999-01-07  Chris Lahey  <clahey@umich.edu>
+
+	* gnome_printer-dialog.h, gnome-printer-dialog.c
+	(gnome_printer_dialog_get_printer): Added this function to allow
+	the programmer to get the chosen printer information.
+
+Wed Jan  6 18:53:40 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-font.h:
+	* gnome-font.c (gnome_font_add_unimapping): It will now correctly
+	configure the mapping from Unicode to Adobe Type1 standard
+	encoding. (gnome_font_get_glyph) added a function that finds
+	the glyph number corresponding to a unicode code.
+
+	* configure.in: changed from kpsetool to kpsewhich, which
+	seems to work better on the RH 5.2 install (kpsetool was
+	inserting some exclamation points).
+
+Wed Jan  6 17:04:51 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-font.h:
+	* gnome-font.c (gnome_font_get_glyph): Added some code to map
+	unicodes to glyph numbers - still need to get the mappings
+	initialized when loading fonts. (gnome_font_find_glyphnum) fixed a
+	stupid segv.
+
+Wed Jan  6 00:09:40 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-font.h:
+	* gnome-font.c: a lot of code to parse .afm files and
+	suck out kerning and ligature data
+
+	* gnome-text.h:
+	* gnome-text.c: gnome_text_new now decodes the utf input,
+	although it currently doesn't do anything with it.
+
+	* gnome-print-ps.c: slightly more intelligent about escaping
+	strings to show.
+	
+Mon Jan  4 11:29:57 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-font-install.in: Simple bugfix to allow installing
+	individual font files, not just entire dirs.
+
+1999-01-05  Chris Lahey  <clahey@umich.edu>
+
+	* gnome-printer-dialog.c (gnome_printer_dialog_new): Added this
+	function to generate a non-modal font dialog.
+
+Sun Jan  3 23:10:28 1999  Raph Levien  <raph@gimp.org>
+
+	* gnome-font.h:
+	* gnome-font.c: Added code for font families and dealing
+	reasonably with font weights.
+	
+	* gnome-text.h: Expanded out the concepts somewhat.
+
+	* gnome-text.c: Added this file.
+
+	* testprint.c: Uses font families now.
+
+	* Makefile.am: added gnome-text.[ch] files.
+	
+Sun Jan  3 21:12:05 EST 1999  Jeff Garzik  <jgarzik@pobox.com>
+
+	* configure.in:
+	Correct TeX check.
+	
+	* gnome-print-ps:
+	Fixed two non-void funcs returning no value.
+	Added g_return_val_if_fail guard to check for null ptr derefs.
+
+	* po/Makefile.in.in:
+	Removed 'po/ChangeLog' from distfiles.  'make distcheck' works.
+
+	* po/fr.po:
+	Added dummy file so configure.in won't complain.
+
+Wed Dec 16 12:35:18 1998  Raph Levien  <raph@gimp.org>
+
+	* configure.in: Improved test for TEXMF (it now uses
+	kpsetool so it can be in arbitrary locations).
+
+Mon Dec 14 12:35:18 EST 1998	Michael K. Johnson <johnsonm@redhat.com>
+
+	* Makefile.am, gnome-print.c, gnome-print.h, gnome-print-ps.c:
+	Added rotate, scale, and translate wrappers and postscript
+	deconvolvers from concat back to rotate, scale, and translate.
+	All the guts come from libart_lgpl.
+
+1998-11-17  Havoc  <hp@pobox.com>
+
+	* gnome-printer-dialog.c (gnome_printer_dialog_class_init): 
+	Replace gtk_dialog_get_type() with gnome_dialog_get_type();
+	fixes a segfault when trying to print in gwp.
+
+1998-11-17  Seth Alves  <alves@hungry.com>
+
+	* gnome-print-ps.c (gnome_print_ps_setrgbcolor): don't set the
+	color if that color is already set
+	(gnome_print_ps_setfont): don't set the font if that font is
+	already set
+
+Wed Oct 21 20:43:41 1998  Raph Levien  <raph@gimp.org>
+
+	* gnome-font.h:
+	* gnome-font.c:
+	* gnome-print-ps.h:
+	* gnome-print-ps.c (gnome_print_ps_setfont): Support for glyph
+	aliasing.
+
+	* gnome-font-install: cleanups, and support for glyph-alias
+
+	* parseAFM.c (token, linetoken): stopped buffer overruns.
+	* parseAFM.h: added AFM_ prefix to error codes.
+
+	Our experience with the parseAFM module really points up the need
+	for coding standards, and the need to bring imported code up to
+	those standards.
+
+1998-10-07  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* parseAFM.c: #include <stdlib.h> and <string.h>
+	(parseCharWidths): Added missing return type int (ewww, K&R
+	function prototypes...).
+	(parseCharMetrics): Likewise.
+	(parseTrackKernData): Likewise.
+	(parsePairKernData): Likewise.
+	(parseCompCharData): Likewise.
+	(enum parseKey): Why make an enum declaration static?
+
+	* gnome-font.c (gnome_font_get_width_string): Added parens around
+	assignment used as truth value.
+
+	* gnome-print-ps.c (gnome_print_ps_setfont): Removed unused status
+	variable.
+
+Mon Oct  5 16:16:04 1998  Raph Levien  <raph@gimp.org>
+
+	* Makefile.am (install-data-local): Make it so that it
+	runs gnome-font-install to find GhostScript and TeX fonts
+	upon "make install".
+
+	* gnome-print-ps.c: expanded support for gnome-font, and
+	also minor change to image api (removed matrix).
+
+	* gnome-font.c: serious extensions to read the fontmap,
+	download fonts to the printer, and support querying of
+	widths.
+
+	* testprint.c (print_test_page): added test for
+	gnome_font_get_width_string.
+
+Sun Oct  4 22:18:45 1998  Raph Levien  <raph@gimp.org>
+
+	* gnome-font.c (gnome_font_add_mapping): The gnome-font
+	module now loads fontmaps, and gnome-font-install does a
+	credible job creating them.
+
+Sun Oct  4 09:45:43 1998  Raph Levien  <raph@gimp.org>
+
+	* fontinst.pl: A quick hack to find PostScript fonts and install
+	symlinks in ~/.gnome/fonts
+
+1998-10-01  Seth Alves  <alves@hungry.com>
+
+	* gnome-print-ps.c (gnome_print_ps_new): send postscript header and
+	trailer comments
+
+1998-09-30  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* Makefile.am: Use '?' to separate the sed
+	commands as ',' is used when people pass -Wl,something.
+
+1998-09-29  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* configure.in: Output our compilation flags.
+
+	* printConf.sh.in:  New file, used to plug gnome-print into the
+	gnome-config setup.
+
+	* Makefile.am: Create and install printConf.sh from
+	printConf.sh.in
+
+Thu Sep 24 12:42:53 1998  Raph Levien  <raph@gimp.org>
+
+	* The image operators are now supported.
+
+Wed Sep 23 17:50:43 1998  Raph Levien  <raph@gimp.org>
+
+	* Started gnomifying, adding a printer dialog.
+
+Wed Sep 23 15:28:58 1998  Raph Levien  <raph@gimp.org>
+
+	* Initial version. Based on
+	http://www.levien.com/gnome/print-arch.html

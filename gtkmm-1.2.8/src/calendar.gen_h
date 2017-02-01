@@ -1,0 +1,224 @@
+/* $Id: calendar.gen_h,v 1.27 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* calendar.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <gtk/gtkcalendar.h>
+
+CLASS_START(Gtk);
+//: Display a calendar and/or allow the user to select a date.
+//- {\class Gtk_Calendar} is a widget that displays a calendar, 
+//- one month at a time. 
+//-
+//- The month and year currently displayed can be altered with {select_month()}.
+//- The exact day can be selected from the displayed month using {select_day()}.
+//-
+//- The way in which the calendar itself is displayed can be altered 
+//- using {display_options()}.
+//-
+//- The selected date can be retrieved from a GtkCalendar using 
+//- {get_date()}.
+//-
+//- If performing many 'mark' operations, the calendar can be frozen 
+//- to prevent flicker, using {freeze()}, and 'thawed' again using {thaw()}.
+class Calendar : public Widget {
+  WRAP_CLASS(Calendar,GtkCalendar,GTK_CALENDAR,GTK_IS_CALENDAR,calendar,Gtk::Widget,GtkWidget,GTK_WIDGET);
+public:
+
+  //: Constructor.
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Shifts the calendar to a different month.
+  //- month: A month number.
+  //-
+  //- year: The year the month is in.
+  WRAP_METHOD(gint gtk_calendar_select_month(GtkCalendar*,guint,guint),
+	      gint	   select_month	(guint	      month,
+					 guint	      year));
+
+  //: Selects a day from the current month.
+  //- day : The day number to select.
+  WRAP_METHOD(void gtk_calendar_select_day(GtkCalendar*,guint),
+	      void	   select_day	(guint	      day));
+
+  WRAP_METHOD(gint gtk_calendar_mark_day(GtkCalendar*,guint),
+	      gint	   mark_day	(guint	      day));
+
+  WRAP_METHOD(gint gtk_calendar_unmark_day(GtkCalendar*,guint),
+	      gint	   unmark_day	(guint	      day));
+
+  WRAP_METHOD(void gtk_calendar_clear_marks(GtkCalendar*),
+	      void	   clear_marks	());
+
+  WRAP_METHOD(void gtk_calendar_display_options(GtkCalendar*,GtkCalendarDisplayOptions),
+	      void	   display_options (GtkCalendarDisplayOptions flags));
+
+  WRAP_METHOD(void gtk_calendar_get_date(GtkCalendar *calendar,guint*,guint*,guint*),
+	      void	   get_date	(guint	     *year,
+					 guint	     *month,
+					 guint	     *day) const);
+
+  //: Locks the display of the calendar until it is thawed with {thaw()}.
+  WRAP_METHOD(void gtk_calendar_freeze(GtkCalendar *calendar),
+	      void	   freeze	());
+
+  //: Defrosts a calendar; all the changes made since the last {freeze()} are displayed.
+  WRAP_METHOD(void gtk_calendar_thaw(GtkCalendar *calendar),
+	      void	   thaw		());
+
+
+  //: Emitted when the user clicks a button to change the selected month on a calendar.
+  SIGNAL_SPEC("month_changed",both,void month_changed());
+  //: Emitted when the user selects a day.
+  SIGNAL_SPEC("day_selected",both,void day_selected());
+  SIGNAL_SPEC("day_selected_double_click",both,void day_selected_double_click());
+  SIGNAL_SPEC("prev_month",both,void prev_month());
+  SIGNAL_SPEC("next_month",both,void next_month());
+  SIGNAL_SPEC("prev_year",both,void prev_year());
+  SIGNAL_SPEC("next_year",both,void next_year());
+};
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Calendar)
+//. name: header_style
+//. type: GtkStyle*
+//. get:
+//. set:
+//. desc:
+
+//. name: label_style
+//. type: GtkStyle*
+//. get:
+//. set:
+//. desc:
+
+//. name: month
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: year
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: selected_day
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: day_month[6]
+//. type: 
+//. get:
+//. set:
+//. desc:
+
+//. name: day[6]
+//. type: 
+//. get:
+//. set:
+//. desc:
+
+//. name: num_marked_dates
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: marked_date
+//. type: 
+//. get:
+//. set:
+//. desc:
+
+//. name: display_flags
+//. type: GtkCalendarDisplayOptions
+//. get:
+//. set:
+//. desc:
+
+//. name: marked_date_color
+//. type: 
+//. get:
+//. set:
+//. desc:
+
+//. name: gc
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: xor_gc
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: focus_row
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: focus_col
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: highlight_row
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: highlight_col
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: private_data
+//. type: gpointer
+//. get:
+//. set:
+//. desc:
+
+//. name: grow_space
+//. type: 
+//. get:
+//. set:
+//. desc:
+

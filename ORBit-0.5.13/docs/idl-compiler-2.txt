@@ -1,0 +1,120 @@
+				Tasks
+
+Headers:
+	Typedefs
+
+	Prototypes (per-interface, per-operation, per-type).
+
+Common:
+	Allocation & freeing (per-type).
+
+Stubs:
+	Stubs (per-operation)
+		Short-circuiting
+		Setup
+		Marshalling
+		Exception & location_forward handling
+		Sending
+		Receiving
+		Freeing/allocating values
+		Demarshalling
+		Return
+
+Skeletons:
+	Skeletons (per-operation)
+		Allocating values
+		Demarshalling
+		Call
+		Setup for reply
+		Exception handling
+		Marshalling
+		Sending
+		Freeing values
+		Return
+
+
+				(de)marshalling tasks
+
+All (de)marshalling tasks can be represented using the following type of data
+structure (PIDL):
+	union MarshalNode switch(NodeType) {
+		case VALUE: {
+			string variable_name;
+			short value_length;
+		}
+		case CONSTANT: {
+			long value;
+		}
+		case ARRAY: {
+			string pointer_name;
+			MarshalNode num_entries;
+		}
+
+		IDL_tree corresponding_idl_node;
+	};
+
+Need to make a data structure that better represents "what we need to do"
+rather than "what we are working on". Something that can say "(de)marshal
+value|increment a pointer|loop back"... Optimization on this will be somewhat
+easier.
+
+/* In skels: If not sending a reply back, don't get a send_buffer
+unless we need to raise an exception. */ Incorrect - for any given op
+you either always need to send something back, or never.
+
+Pieces of a stub (prerequisite steps are in []'s):
+Pre:	If ev == NULL, bomb out.
+1.	Sanity check params (and handle exceptions).
+2.	Check for & handle local call. [1]
+3.	Get connection (and handle exceptions). [1]
+4.	Get send buffer (is it possible for any exceptions to be raised here?).
+5.	Marshal params. [1, 4]
+6.	Write send buffer (and handle exceptions). [5]
+7.	Unuse send buffer. [6]
+8.	Receive reply (and handle exceptions). [6]
+9.	Do any necessary location forwarding & exception handling. [8]
+10.	Allocate any needed memory for retvals.
+11.	Demarshal retvals (with versions for endianness) (and handle exceptions). [9, 10]
+12.	Unuse receive buffer. [11]
+13.	Return. [11]
+
+Could swap 2 & 3, or 7 & 8. 11 & 12 can't be swapped due to 12's flow
+changing effects :-). Don't want to swap 2 & 3 - don't do remote stuff
+it is local. 7 & 8 just maybe could be swapped, but not sure it makes much sense.
+
+Pieces of a skeleton (prerequisite steps are in []'s):
+0.      Allocate any needed memory for params.
+1.	Demarshal (with versions for endianness) (and handle exceptions). [0]
+2.	Call impl. [1]
+3.	Get send reply buffer (can this raise any exceptions?). [2]
+4.	If no exceptions raised:
+		Marshal retvals. [3]
+	else marshal exceptions. [3]
+5.	Write send buffer (and handle exceptions). [4]
+6.	Unuse send buffer.
+
+No pipelining possible in skeletons.
+
+Actually, should integrate memory allocation with demarshalling - it'd
+be cleaner to do (if not a little more space wasting when it comes to
+dual versions for endianness).
+
+You can marshal multi-element pieces of structs.
+
+In skels: If not sending a reply back, don't get a send_buffer unless
+we need to raise an exception.
+
+When demarshalling, maintain a local 'cur' pointer rather than modifying
+the one inside the receive buffer. Will need to update the one inside the
+rbuf if we call a complex demarshaller thing.
+
+Reduce amount of code in stubs by having send_buffer_use() return the
+request_id as part of its operation, instead of having to get a new
+request_id as part of the stub.
+
+Use function pointers instead of a series of if's to speed things up.
+
+Pre-computation of alignment for stuff that can be pre-computed (like
+operation name vecs, etc.)
+
+For multithreading speedups, don't lock the connection until we actually need to send.

@@ -1,0 +1,103 @@
+/* $Id: arrow.gen_h,v 1.36 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* arrow.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/misc.h>
+#include <gtk/gtkarrow.h>
+CLASS_START(Gtk);
+//: Produces an arrow pointing in one of the four cardinal directions.
+//- This is intended for use where a directional arrow (in one of the
+//- four cardinal directions) is desired. As such, it has very limited
+//- functionality and basically only draws itself in a particular 
+//- direction and
+//- with a particular shadow type. 
+//-
+//- {Gtk::Arrow::} will fill any space alloted to it, but since it is inherited 
+//- from {Gtk::Misc::}, it can be padded and/or aligned, to fill exactly 
+//- the space the programmer desires. 
+class Arrow : public Misc {
+  WRAP_CLASS(Arrow,GtkArrow,GTK_ARROW,GTK_IS_ARROW,arrow,Gtk::Misc,GtkMisc,GTK_MISC);
+public:
+
+
+  //: Creates an arrow.
+  //- arrow_type: The direction the arrow points. This is one of: {\enum GTK_ARROW_UP},
+  //- {\enum GTK_ARROW_DOWN}, {\enum GTK_ARROW_LEFT}, or {\enum GTK_ARROW_RIGHT}.
+  //- shadow_type: The style of the arrow. Can be one of:  {\enum GTK_SHADOW_NONE},
+  //- {\enum GTK_SHADOW_IN}, {\enum GTK_SHADOW_OUT}, {\enum GTK_SHADOW_ETCHED_IN},
+  //- or {\enum GTK_SHADOW_ETCHED_OUT}.
+  Arrow(GtkArrowType arrow_type,
+	    GtkShadowType shadow_type);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Changes the direction and shadow of an arrow.
+  WRAP_METHOD(
+    void gtk_arrow_set(GtkArrow*, GtkArrowType, GtkShadowType),
+    void set(GtkArrowType arrow_type,
+	   GtkShadowType shadow_type));
+
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/misc_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+#define MIN_ARROW_SIZE  11
+
+Arrow::Arrow(GtkArrowType arrow_type, GtkShadowType shadow_type)
+  : Misc((GtkMisc*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GtkArrow *arrow=(GtkArrow*)gtkobject;
+
+  GTK_WIDGET (arrow)->requisition.width = MIN_ARROW_SIZE + GTK_MISC (arrow)->xpad * 2;
+  GTK_WIDGET (arrow)->requisition.height = MIN_ARROW_SIZE + GTK_MISC (arrow)->ypad * 2;
+
+  arrow->arrow_type = arrow_type;
+  arrow->shadow_type = shadow_type;
+}
+
+} /* namespace Gtk */
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Arrow)
+//. name: arrow_type
+//. type: gint16
+//. get:
+//. set: {set()}
+//. desc: Specifies which direction the arrow will point.  
+//.
+//. Possible Values: {\enum GTK_ARROW_UP}, {\enum GTK_ARROW_DOWN}, 
+//.  {\enum  GTK_ARROW_LEFT}, {\enum GTK_ARROW_RIGHT}
+
+//. name: shadow_type
+//. type: gint16
+//. get:
+//. set: {set()}
+//. desc: Specifies which direction the arrow will point.  
+//. 
+//. Possible Values:
+//.   {\enum GTK_SHADOW_IN}, {\enum GTK_SHADOW_OUT}
+

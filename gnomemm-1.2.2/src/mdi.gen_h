@@ -1,0 +1,243 @@
+/* $Id: mdi.gen_h,v 1.16 2001/05/10 00:08:42 murrayc Exp $ */
+
+
+/* mdi.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/object.h>
+#include <gnome--/app.h>
+#include <gnome--/mdi-child.h>
+#include <libgnomeui/gnome-mdi.h>
+
+CLASS_START(Gnome);
+
+using SigC::Connection;
+
+namespace MDI_Helpers
+{
+#m4 include(list.m4)
+  GP_LIST(MDIList,MDI,MDIChild)
+  GP_LIST_ITER(G_List_Cpp_Iterator<GnomeMDIChild,MDIChild>)
+  GP_LIST_NOINSERT()
+  void remove(MDIChild &w);
+  GP_LIST_END()
+};
+
+
+// In Gnome MDI holds both views and children, in gnome-- we
+// will make a distinction.  MDI holds children, children hold views,
+// and there is one active view in a MDI at any one time.
+// 
+// Design notes: (not really documentation)
+// MDI contains an APP and Children, Children have views.
+// Views are widget (not toplevel)
+// mdi->children is a list of MDIChild
+// You create a MDI, then ask for a toplevel, add children.
+class MDI : public Gtk::Object
+{
+  WRAP_CLASS(MDI, GnomeMDI,
+             GNOME_MDI, GNOME_IS_MDI,
+             mdi,
+             Gtk::Object, GtkObject, GTK_OBJECT);
+public:
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  enum Mode {
+    DEFAULT  = GNOME_MDI_DEFAULT_MODE,
+    TOPLEVEL = GNOME_MDI_TOPLEVEL,
+    NOTEBOOK = GNOME_MDI_NOTEBOOK,
+    MODAL    = GNOME_MDI_MODAL
+  };
+
+  MDI(const Gtk::string &appname, const Gtk::string &title);
+
+  WRAP_METHOD(void gnome_mdi_set_mode (GnomeMDI*, GnomeMDIMode),
+	      void set_mode (Mode mode=DEFAULT));
+
+  void set_menubar_template(const UI::Array<UI::SubTree> &menu_tmpl);
+  void set_toolbar_template(const UI::Array<UI::Info> &tbar_tmpl);
+
+  // Sets the desired position of child-specific menus (which are added to and
+  // removed from the main menus as views of different children are activated).
+  WRAP_METHOD(void gnome_mdi_set_child_menu_path (GnomeMDI*, const gchar*),
+	      void set_child_menu_path (const Gtk::string &path));
+
+  // Sets the position for insertion of menu items used to activate the MDI
+  // children that were added to the MDI. Note that if
+  // you want all menu items to be inserted in their own submenu, you have to
+  // create that submenu (and leave it empty, of course).
+  WRAP_METHOD(void gnome_mdi_set_child_list_path (GnomeMDI*, const gchar*),
+	      void set_child_list_path (const Gtk::string &path));
+
+  // Disable inserting menu items for MDI children.
+  void clear_child_list_path();
+
+// Lifespan
+
+  WRAP_METHOD(void gnome_mdi_register (GnomeMDI*, GtkObject*),
+	      void register_object (const Gtk::Object &object)); 
+
+  WRAP_METHOD(void gnome_mdi_unregister (GnomeMDI*, GtkObject*),
+	      void unregister_object (const Gtk::Object &object));
+
+// Views
+  // add_view moved to MDIChild::create_view
+  // add_toplevel_view moved to MDIChild::create_toplevel_view
+  // update_child moved to MDIChild::update
+  // set_active_view moved to MDIChild::set_active
+  // remove_view moved to MDIChild
+
+// Children 
+
+  WRAP_METHOD(
+    gint gnome_mdi_add_child (GnomeMDI*, GnomeMDIChild*),
+    gint add(Gnome::MDIChild &child));
+
+  // force is depecated
+  WRAP_METHOD(
+    gint gnome_mdi_remove_child (GnomeMDI*, GnomeMDIChild*, gint),
+    gint remove(Gnome::MDIChild &child, gint force=false));
+
+  // removes all children and views.
+  // force is depecated
+  WRAP_METHOD(
+    gint gnome_mdi_remove_all (GnomeMDI*, gint),
+    gint clear (gint force=false));
+
+  void open_toplevel ();
+
+  WRAP_METHOD(
+    GnomeMDIChild* gnome_mdi_get_child_from_view(GtkWidget*),
+    static Gnome::MDIChild* find_child(Gtk::Widget &name));
+  WRAP_METHOD(
+    GnomeMDIChild* gnome_mdi_find_child(GnomeMDI*,const gchar*),
+    Gnome::MDIChild* find_child(const Gtk::string &name));
+
+  WRAP_METHOD(
+    GtkWidget* gnome_mdi_get_active_view(GnomeMDI *),
+    Gtk::Widget* get_active_view());
+  WRAP_METHOD(
+    GnomeMDIChild* gnome_mdi_get_active_child(GnomeMDI*),
+    Gnome::MDIChild* get_active_child());
+  WRAP_METHOD(
+    GnomeApp* gnome_mdi_get_active_window(GnomeMDI*),
+    Gnome::App* get_active_window());
+
+
+// This *really* doesn't look good
+//  WRAP_METHOD(
+//    GnomeApp* gnome_mdi_get_app_from_view(GtkWidget*),
+//    static Gnome::App* get_app_from_view(const Gtk::Widget &view));
+  
+//  WRAP_METHOD(
+//    GtkWidget* gnome_mdi_get_view_from_window (GnomeMDI*, GnomeApp*),
+//    Gtk::Widget* get_view_from_window(const Gnome::App &app));
+
+//  WRAP_METHOD(GnomeUIInfo* gnome_mdi_get_menubar_info(GnomeApp*),
+//    static GnomeUIInfo* get_menubar_info(const App &app));
+
+//  WRAP_METHOD(GnomeUIInfo* gnome_mdi_get_toolbar_info(GnomeApp*),
+//    static GnomeUIInfo* get_toolbar_info(const App &app));
+
+//  WRAP_METHOD(GnomeUIInfo* gnome_mdi_get_child_menu_info(GnomeApp *),
+//    static GnomeUIInfo* get_child_menu_info(const App &app));
+
+  SIGNAL_SPEC("app_created",both|fake,void app_created(Gnome::App&),
+    void gnomemm_app_created(GnomeMDI *, GnomeApp *));
+
+  typedef MDI_Helpers::MDIList MDIList;
+  MDIList& children()
+    {return reinterpret_cast<MDIList&>(object_self);}
+  const MDIList& children() const
+    {return reinterpret_cast<const MDIList&>(object_self);}
+
+private:
+  UI::Array<UI::SubTree> menu_;
+  UI::Array<UI::Info> toolbar_;
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/object_p.h>
+IMPL_START;
+#include <gnome--/private/mdi_p.h>
+
+namespace Gnome
+{
+
+MDI::MDI(const Gtk::string &appname, const Gtk::string &title)
+  : Gtk::Object(GTK_OBJECT(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+   
+  // we could use a gnome_mid_configure() here, but it's just a couple
+  // of g_strdup(). No big deal.
+  //
+  gtkobj()->appname = g_strdup(appname.c_str());
+  gtkobj()->title = g_strdup(title.c_str());
+}
+
+void
+MDI::set_menubar_template(const UI::Array<UI::SubTree> &menu_tmpl)
+{
+  menu_=menu_tmpl;
+  gnome_mdi_set_menubar_template(gtkobj(), menu_.gtkobj());
+}
+
+void
+MDI::set_toolbar_template(const UI::Array<UI::Info> &tbar_tmpl)
+{
+  toolbar_=tbar_tmpl;
+  gnome_mdi_set_toolbar_template(gtkobj(), toolbar_.gtkobj());
+}
+
+void
+MDI::open_toplevel()
+{
+  gnome_mdi_open_toplevel(gtkobj());
+}
+
+MDI_Helpers::MDIList::iterator
+MDI_Helpers::MDIList::erase(iterator position)
+{
+  
+  if (!position.node||position==end()) return end();
+  iterator next=position;
+  next++;
+
+  gnome_mdi_remove_child(parent_->gtkobj(),(*position)->gtkobj(),0);
+  return next;
+}
+
+void MDI_Helpers::MDIList::remove(MDIChild &w)
+{
+  gnome_mdi_remove_child(parent_->gtkobj(),w.gtkobj(),0);
+}
+
+
+
+              
+}
+              
+
+DOCUMENTATION_START;
+

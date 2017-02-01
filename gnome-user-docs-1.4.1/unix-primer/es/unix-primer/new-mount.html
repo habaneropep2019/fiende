@@ -1,0 +1,394 @@
+<HTML
+><HEAD
+><TITLE
+>Montar y desmontar dispositivos</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.54"><LINK
+REL="HOME"
+TITLE="Si usted es nuevo en Linux/Unix"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Enlaces simbólicos"
+HREF="symlinks.html"><LINK
+REL="NEXT"
+TITLE="Controladores y dispositivos"
+HREF="devices.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Si usted es nuevo en Linux/Unix</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="symlinks.html"
+>Anterior</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="devices.html"
+>Siguiente</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="NEW-MOUNT"
+>Montar y desmontar dispositivos</A
+></H1
+><P
+>      Como hemos mencionado anteriormente, los directorios en un entorno
+      UNIX están organizados en un árbol, cuyo directorio raíz es
+      <TT
+CLASS="FILENAME"
+>/</TT
+>. A diferencia de otros sistemas operativos
+      como MS-DOS, no hay nombres especiales para los archivos en 
+      la unidad de disquete o en el CD-ROM: <I
+CLASS="EMPHASIS"
+>todos</I
+>
+      los archivos accesibles por su sistema deben aparecen en él
+      árbol de directorios principal que empieza por <TT
+CLASS="FILENAME"
+>/</TT
+>.
+    </P
+><P
+>      Por tanto, antes de que usted tenga acceso a los archivos en un
+      disquete o CD-ROM, usted debe dar a su sistema una orden para
+      incorporar los contenidos del disquete en el árbol directorio
+      principal, al cual se le refiere como <I
+CLASS="EMPHASIS"
+>montaje</I
+>
+      del disquete. 
+Puede verlo como el equivalente software a la conexion del dispositivo
+a su sistema.
+Típicamente, los contenidos del CD-ROM aparecen bajo
+      el nombre <TT
+CLASS="FILENAME"
+>mnt/cdrom</TT
+>; los del disquete bajo
+      <TT
+CLASS="FILENAME"
+>/mnt/floppy</TT
+> (éstos son los llamados
+      <I
+CLASS="EMPHASIS"
+>puntos de montaje</I
+> y son definidos en el
+      archivo especial de configuración, <TT
+CLASS="FILENAME"
+>/etc/fstab</TT
+>).
+      El acceso a una unidad, de esta manera, no significa que el sistema
+      copiará todos los archivos del CD al directorio
+      <TT
+CLASS="FILENAME"
+>/mnt/cdrom</TT
+>. En su lugar, esto significa que el
+      directorio <TT
+CLASS="FILENAME"
+>/mnt/cdrom</TT
+> 
+      <I
+CLASS="EMPHASIS"
+>representa</I
+> al CD-ROM: Cuando un programa trata
+      de tener acceso, digamos a un archivo llamado
+      <TT
+CLASS="FILENAME"
+>/mnt/cdrom/index.html</TT
+>, el sistema buscará el
+      archivo <TT
+CLASS="FILENAME"
+>index.html</TT
+> en el CD-ROM.
+    </P
+><P
+>      Por tanto, en pocas palabras: antes de que usted pueda utilizar
+      archivos en una unidad, usted debe "montarlo". Similarmente 
+      <I
+CLASS="EMPHASIS"
+>antes de sacar el disco del lector, usted debe
+      desmontarlo.</I
+>
+    </P
+><P
+>      Cuando utilice GNOME, usualmente no tiene que preocuparse por montar
+      y desmontar: GNOME busca el archivo con la configuración apropiada y
+      localiza los iconos para todas las unidades en su escritorio. Al hacer
+      doble clic en cualquiera de estos iconos, automáticamente se monta la
+      unidad correspondiente (si no estaba montado ya) y ejecuta el
+      gestor de archivos en el directorio apropiado. Similarmente, si usted
+      hace doble clic en el icono unidad y escoge la orden <B
+CLASS="GUIMENUITEM"
+>Sacar
+      disco</B
+> del menú desplegable, GNOME desmonta
+      automáticamente antes de sacarlo. Usted puede también montar/desmontar
+      una unidad presionando con el botón derecho del ratón en el icono de su
+      escritorio y escogiendo <B
+CLASS="GUIMENUITEM"
+>Montar unidad</B
+> o
+      <B
+CLASS="GUIMENUITEM"
+>Desmontar unidad</B
+> del menú desplegable, o
+      utilizando el aplique de montaje de discos.
+    </P
+><P
+>      Note que usted no puede desmontar una unidad si está siendo utilizado
+      por algún programa; por ejemplo, si usted tiene abierta una ventana
+      terminal en el directorio de la unidad que usted está tratando de
+      desmontar. Entonces, recibe el mensaje de error "Controlador ocupado"
+      mientras intenta desmontar la unidad, asegúrese de que ninguna de sus
+      aplicaciones abiertas esté teniendo acceso a un archivo o directorio
+      en esta unidad.
+    </P
+><P
+>      No obstante GNOME no puede impedir que usted saque el disco manualmente
+      de la unidad &#8212;, en este caso es su responsabilidad el desmontar la
+      unidad antes de hacerlo. Para unidades de CD o Zip, el sistema bloquea
+      el botón de sacado de la unidad mientras la unidad esté montado, para
+      los disquetes, esto es técnicamente imposible.
+    </P
+><DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/important.gif"
+HSPACE="5"
+ALT="Importante"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="CENTER"
+><B
+>IMPORTANTE</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>        Si usted saca un disquete utilizando un botón de sacado de la unidad
+        sin desmontarlo primero, usted puede perder sus datos!
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+> Algunos sistemas tienen programas especiales como 
+<TT
+CLASS="APPLICATION"
+>supermount</TT
+> o <TT
+CLASS="APPLICATION"
+>magicdev</TT
+>, 
+      que montan automáticamente una unidad cuando
+      se inserta un disco y desmonta la unidad si ésta no se ha utilizado
+      por un período de tiempo específico. En este caso, usted nunca
+      deberá preocuparse de montar/desmontar unidades usted mismo; no 
+necesita por tanto ni leer esta sección.
+    </P
+><P
+>      El permitir a los usuarios el montar y desmontar unidades conlleva
+      algunos riesgos de seguridad, muchos sistemas multiusuarios se 
+      configuran de modo
+      que sólo el usuario administrador "root"  puede montar y desmontar
+      una unidad. Esta es la causa mas probable de los errores al intentar
+      montar un dispositivo. En este caso, plantee este problema al 
+      administrador de su sistema.
+    </P
+><P
+>      Si la computadora es su estación de trabajo personal o el ordenador
+      personal de casa y no le preocupa la seguridad, usted puede
+      dar permiso de montar unidades a usuarios ordinarios. La manera más
+      fácil de permitir ello es el uso de la aplicación
+      <TT
+CLASS="APPLICATION"
+><I
+CLASS="EMPHASIS"
+>linuxconf</I
+></TT
+> (que sólo
+      puede ser ejecutada por el usuario administrador "root"). Sólo
+      seleccione la unidad a la que quiere acceder en la sección
+      <TT
+CLASS="GUILABEL"
+><B
+>Unidades de acceso local</B
+></TT
+> de la pestaña
+      <TT
+CLASS="GUILABEL"
+><B
+>Opciones</B
+></TT
+> de la opción 
+      <TT
+CLASS="GUILABEL"
+><B
+>Montable por usuarios</B
+></TT
+>. Su unidad será ahora
+      montable por los usuarios.
+    </P
+><P
+>      Si <TT
+CLASS="APPLICATION"
+><I
+CLASS="EMPHASIS"
+>linuxconf</I
+></TT
+>  no está
+      disponible, usted debe editar el archivo
+      <TT
+CLASS="FILENAME"
+>/etc/fstab</TT
+> para incluir acceso a usuarios. Esto
+      se hace añadiendo el atributo del "usuario" a la unidad. Por ejemplo:
+    </P
+><P
+>      Si su archivo <TT
+CLASS="FILENAME"
+>fstab</TT
+> contiene una línea como ésta: 
+    </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/dev/cdrom /mnt/cdrom iso9660 exec,dev,ro,noauto 0 0
+      </PRE
+></TD
+></TR
+></TABLE
+><P
+>      añada la palabra "usuario" a la cuarta columna:
+    </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/dev/cdrom /mnt/cdrom iso9660 user,exec,dev,ro,noauto 0 0
+    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="symlinks.html"
+>Anterior</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+>Inicio</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="devices.html"
+>Siguiente</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Enlaces simbólicos</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Controladores y dispositivos</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

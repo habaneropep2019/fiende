@@ -1,0 +1,244 @@
+<refentry id="bonobo-bonobo-selector">
+<refmeta>
+<refentrytitle>BonoboSelector</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboSelector</refname><refpurpose>a component selector widget</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboSelector">BonoboSelector</link>;
+typedef     <link linkend="BonoboSelectorClass">BonoboSelectorClass</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-selector-new">bonobo_selector_new</link>             (const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> **interfaces_required);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-selector-construct">bonobo_selector_construct</link>       (<link linkend="BonoboSelector">BonoboSelector</link> *sel,
+                                             const <link linkend="gchar">gchar</link> *title,
+                                             <link linkend="BonoboSelectorWidget">BonoboSelectorWidget</link> *selector);
+<link linkend="gchar">gchar</link>*      <link linkend="bonobo-selector-get-selected-id">bonobo_selector_get_selected_id</link> (<link linkend="BonoboSelector">BonoboSelector</link> *sel);
+<link linkend="gchar">gchar</link>*      <link linkend="bonobo-selector-get-selected-name">bonobo_selector_get_selected_name</link>
+                                            (<link linkend="BonoboSelector">BonoboSelector</link> *sel);
+<link linkend="gchar">gchar</link>*      <link linkend="bonobo-selector-get-selected-description">bonobo_selector_get_selected_description</link>
+                                            (<link linkend="BonoboSelector">BonoboSelector</link> *sel);
+<link linkend="gchar">gchar</link>*      <link linkend="bonobo-selector-select-id">bonobo_selector_select_id</link>       (const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> **interfaces_required);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+This <link linkend="GnomeDialog">GnomeDialog</link> allows the user to select a component implementing
+a set of interfaces. The easiest way to do this in your code is by
+using:
+  <example>
+    <title>Simple Bonobo/Control selection</title>
+    <programlisting>
+{
+	char *interfaces [] = { "IDL:Bonobo/Control:1.0", NULL };
+	char *oaf_iid;
+
+	oaf_iid = bonobo_selector_select_id (
+		_("Please select a Control"), interfaces);
+
+	g_warning ("You selected '<literal>s</literal>'", oaf_iid);
+
+	g_free (oaf_iid);
+}
+    </programlisting>
+  </example>
+  This will throw up a dialog containing all the available components
+implementing the IDL:Bonobo/Control:1.0 interface and list them for
+the user to select.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboSelector">BonoboSelector</title>
+<programlisting>typedef struct {
+	GnomeDialog dialog;
+
+	BonoboSelectorPrivate *priv;
+} BonoboSelector;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboSelectorClass">BonoboSelectorClass</title>
+<programlisting>typedef struct {
+	GnomeDialogClass parent_class;
+	
+	void (* ok)	(BonoboSelector *sel);
+	void (* cancel)	(BonoboSelector *sel);
+} BonoboSelectorClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-selector-new">bonobo_selector_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_selector_new             (const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> **interfaces_required);</programlisting>
+<para>
+Creates a new BonoboSelector widget.  The title of the dialog
+is set to <parameter>title</parameter>, and the list of selectable servers is populated
+with those servers which support the interfaces specified in
+<parameter>interfaces_required</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> A string which should go in the title of the
+BonoboSelector window.
+</entry></row>
+<row><entry align="right"><parameter>interfaces_required</parameter>&nbsp;:</entry>
+<entry> A NULL_terminated array of interfaces which a
+server must support in order to be listed in the selector.  Defaults
+to "IDL:Bonobo/Embeddable:1.0" if no interfaces are listed.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A pointer to the newly-created BonoboSelector widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-selector-construct">bonobo_selector_construct ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_selector_construct       (<link linkend="BonoboSelector">BonoboSelector</link> *sel,
+                                             const <link linkend="gchar">gchar</link> *title,
+                                             <link linkend="BonoboSelectorWidget">BonoboSelectorWidget</link> *selector);</programlisting>
+<para>
+Constructs the innards of a bonobo selector window.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sel</parameter>&nbsp;:</entry>
+<entry> the selector to construct
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> the title for the window
+</entry></row>
+<row><entry align="right"><parameter>selector</parameter>&nbsp;:</entry>
+<entry> the component view widget to put inside it.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the constructed widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-selector-get-selected-id">bonobo_selector_get_selected_id ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      bonobo_selector_get_selected_id (<link linkend="BonoboSelector">BonoboSelector</link> *sel);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sel</parameter>&nbsp;:</entry>
+<entry> A BonoboSelector widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A newly-allocated string containing the ID of the
+currently-selected CORBA server (i.e., the corba server whose name
+is highlighted in the list).  The user of this function is
+responsible for freeing this. It will give an oaf iid back.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-selector-get-selected-name">bonobo_selector_get_selected_name ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      bonobo_selector_get_selected_name
+                                            (<link linkend="BonoboSelector">BonoboSelector</link> *sel);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sel</parameter>&nbsp;:</entry>
+<entry> A BonoboSelector widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A newly-allocated string containing the name of the
+currently-selected CORBA server (i.e., the corba server whose name
+is highlighted in the list).  The user of this function is
+responsible for freeing this.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-selector-get-selected-description">bonobo_selector_get_selected_description ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      bonobo_selector_get_selected_description
+                                            (<link linkend="BonoboSelector">BonoboSelector</link> *sel);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sel</parameter>&nbsp;:</entry>
+<entry> A BonoboSelector widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A newly-allocated string containing the description of the
+currently-selected CORBA server (i.e., the corba server whose name
+is highlighted in the list).  The user of this function is
+responsible for freeing this.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-selector-select-id">bonobo_selector_select_id ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      bonobo_selector_select_id       (const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> **interfaces_required);</programlisting>
+<para>
+Calls <link linkend="bonobo-selector-new">bonobo_selector_new</link>() to create a new
+BonoboSelector widget with the specified paramters, <parameter>title</parameter> and
+<parameter>interfaces_required</parameter>.  Then runs the dialog modally and allows
+the user to make a selection.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> The title to be used for the dialog.
+</entry></row>
+<row><entry align="right"><parameter>interfaces_required</parameter>&nbsp;:</entry>
+<entry> A list of required interfaces.  See
+<link linkend="bonobo-selector-new">bonobo_selector_new</link>().
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The Oaf IID of the selected server, or NULL if no server is
+selected.  The ID string has been allocated with g_strdup.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

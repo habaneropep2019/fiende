@@ -1,0 +1,141 @@
+/* $Id: bin.gen_h,v 1.40 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* bin.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gtk/gtkbin.h>
+
+CLASS_START(Gtk);
+//: Signal Widget Container 
+//- Gtk_Bin is an abstract base class from which classes holding 
+//- one widget inside of them derive.  It provides access to methods
+//- relevent to a single object like add_label, add_pixmap, etc.
+class Bin : public Container {
+  WRAP_CLASS(Bin,GtkBin,GTK_BIN,GTK_IS_BIN,bin,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  // get_child() is convenience function to get c++ wrapper of
+  // the contained widget. It may return NULL, if such item is not
+  // available or if it does not have existing C++ wrapper.
+  WRAP_MEMBER(value,child,child,Gtk::Widget*,GtkWidget*);
+
+  //: Remove the contained object
+  //- Since Gtk_Bin can only hold one object it is not necessary to
+  //- specify which object to remove like other containers.
+  void remove();
+
+  void add_label(const string &label,
+                    gfloat x=0.0,
+                    gfloat y=0.5);
+
+  void add_pixmap(const Gdk_Pixmap &pixmap,
+                    const Gdk_Bitmap &bitmap);
+
+  void add_pixlabel(const Gdk_Pixmap &pixmap,
+                    const Gdk_Bitmap &bitmap,
+                    const string &label,
+                    gfloat x=0.0,
+                    gfloat y=0.5);
+
+  void add_pixlabel(const string &pixfile,
+                    const string &label,
+                    gfloat x=0.0,
+                    gfloat y=0.5);
+protected:
+  WRAP_CTOR_DEFAULT;
+};
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+#include <gtk--/adjustment.h>
+#include <gtk--/label.h>
+#include <gtk--/box.h>
+#include <gtk--/pixmap.h>
+
+namespace Gtk
+{
+
+
+void 
+Bin::remove()
+{
+  if (gtkobj()->child)
+    gtk_container_remove(Container::gtkobj(),gtkobj()->child);
+}
+
+void 
+Bin::add_label(const string &str,gfloat x,gfloat y)
+{
+  Label* label=manage(new Label(str,x,y));
+  add(*label);
+  label->show();
+}
+
+void
+Bin::add_pixmap(const Gdk_Pixmap &pixmap,const Gdk_Bitmap &bitmap)
+{
+  Pixmap* p=manage(new Pixmap(pixmap,bitmap));
+  add(*p);
+  p->show();
+}
+
+void
+Bin::add_pixlabel(const Gdk_Pixmap &pixmap,const Gdk_Bitmap &bitmap,const string &str,gfloat x,gfloat y)
+{
+  Pixmap* pmap=manage(new Pixmap(pixmap,bitmap));
+  Label* label=manage(new Label(str,x,y));
+  Box* box=manage(new HBox(false,5));
+
+  box->pack_start(*pmap,false);
+  box->pack_start(*label);
+  box->show_all();
+
+  add(*box);
+}
+
+void
+Bin::add_pixlabel(const string& pixfile,const string &str,gfloat x,gfloat y)
+{
+  Pixmap* pmap=manage(new Pixmap(pixfile));
+  Label* label=manage(new Label(str,x,y));
+  Box* vbox=manage(new HBox(false,5));
+
+  vbox->pack_start(*pmap,false);
+  vbox->pack_start(*label);
+  vbox->show_all();
+
+  add(*vbox);
+}
+
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Bin)
+//. name: child
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:

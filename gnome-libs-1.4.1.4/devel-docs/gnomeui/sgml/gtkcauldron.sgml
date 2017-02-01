@@ -1,0 +1,816 @@
+<refentry id="gnomeui-gtkcauldron">
+<refmeta>
+<refentrytitle>gtkcauldron</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gtkcauldron</refname><refpurpose>Produce gtk/gnome dialog boxes from format strings.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+#define     <link linkend="GTK-CAULDRON-TOPLEVEL-CAPS">GTK_CAULDRON_TOPLEVEL</link>
+#define     <link linkend="GTK-CAULDRON-DIALOG-CAPS">GTK_CAULDRON_DIALOG</link>
+#define     <link linkend="GTK-CAULDRON-POPUP-CAPS">GTK_CAULDRON_POPUP</link>
+#define     <link linkend="GTK-CAULDRON-SPACE-SHIFT-CAPS">GTK_CAULDRON_SPACE_SHIFT</link>
+#define     <link linkend="GTK-CAULDRON-SPACE-MASK-CAPS">GTK_CAULDRON_SPACE_MASK</link>
+#define     <link linkend="GTK-CAULDRON-SPACE1-CAPS">GTK_CAULDRON_SPACE1</link>
+#define     <link linkend="GTK-CAULDRON-SPACE2-CAPS">GTK_CAULDRON_SPACE2</link>
+#define     <link linkend="GTK-CAULDRON-SPACE3-CAPS">GTK_CAULDRON_SPACE3</link>
+#define     <link linkend="GTK-CAULDRON-SPACE4-CAPS">GTK_CAULDRON_SPACE4</link>
+#define     <link linkend="GTK-CAULDRON-SPACE5-CAPS">GTK_CAULDRON_SPACE5</link>
+#define     <link linkend="GTK-CAULDRON-SPACE6-CAPS">GTK_CAULDRON_SPACE6</link>
+#define     <link linkend="GTK-CAULDRON-SPACE7-CAPS">GTK_CAULDRON_SPACE7</link>
+#define     <link linkend="GTK-CAULDRON-SPACE8-CAPS">GTK_CAULDRON_SPACE8</link>
+#define     <link linkend="GTK-CAULDRON-SPACE9-CAPS">GTK_CAULDRON_SPACE9</link>
+#define     <link linkend="GTK-CAULDRON-SPACE10-CAPS">GTK_CAULDRON_SPACE10</link>
+#define     <link linkend="GTK-CAULDRON-SPACE11-CAPS">GTK_CAULDRON_SPACE11</link>
+#define     <link linkend="GTK-CAULDRON-SPACE12-CAPS">GTK_CAULDRON_SPACE12</link>
+#define     <link linkend="GTK-CAULDRON-SPACE13-CAPS">GTK_CAULDRON_SPACE13</link>
+#define     <link linkend="GTK-CAULDRON-SPACE14-CAPS">GTK_CAULDRON_SPACE14</link>
+#define     <link linkend="GTK-CAULDRON-SPACE15-CAPS">GTK_CAULDRON_SPACE15</link>
+#define     <link linkend="GTK-CAULDRON-IGNOREESCAPE-CAPS">GTK_CAULDRON_IGNOREESCAPE</link>
+#define     <link linkend="GTK-CAULDRON-IGNOREENTER-CAPS">GTK_CAULDRON_IGNOREENTER</link>
+#define     <link linkend="GTK-CAULDRON-GRAB-CAPS">GTK_CAULDRON_GRAB</link>
+void        (<link linkend="GtkCauldronNextArgCallback">*GtkCauldronNextArgCallback</link>)   (<link linkend="gint">gint</link> cauldron_type,
+                                             <link linkend="gpointer">gpointer</link> user_data,
+                                             void *result);
+<link linkend="GtkWidget">GtkWidget</link>*  (<link linkend="GtkCauldronCustomCallback">*GtkCauldronCustomCallback</link>)    (<link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+<link linkend="gchar">gchar</link>*      <link linkend="gtk-dialog-cauldron">gtk_dialog_cauldron</link>             (const <link linkend="gchar">gchar</link> *title,
+                                             <link linkend="glong">glong</link> options,
+                                             ...);
+<link linkend="gchar">gchar</link>*      <link linkend="gtk-dialog-cauldron-parse">gtk_dialog_cauldron_parse</link>       (const <link linkend="gchar">gchar</link> *title,
+                                             <link linkend="glong">glong</link> options,
+                                             const <link linkend="gchar">gchar</link> *format,
+                                             <link linkend="GtkCauldronNextArgCallback">GtkCauldronNextArgCallback</link> next_arg,
+                                             <link linkend="gpointer">gpointer</link> user_data,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The following simple example shows basic usage of <link linkend="gtk-dialog-cauldron">gtk_dialog_cauldron</link>()
+for those writing dialogs for GUI applications:
+</para>
+
+<informalexample>
+  <programlisting>
+    gtk_dialog_cauldron ("Search", 0,
+        " ( (Enter search string:) | <literal>Eod</literal> ) / ( <literal>Bqrxfp</literal> || <literal>Bqxfp</literal> ) ", 
+            &amp;search_string, "Ok", "Cancel");
+  </programlisting>
+</informalexample>
+
+<para>The <type>format</type> string consists of a list of frames or widgets which
+are packed consecutively into the top-level window. Each frame is
+specified with an opening and closing frame token (a bracket). Each
+widget specifier consists of a % followed by one or more capital letters
+indicating the widget type, followed by zero or more small letters
+indicating various packing, behaviour and/or data options.</para>
+
+<para>A list of frames or widgets are seperated by one of several
+<type>seperator-tokens</type>. Their meanings are:</para>
+
+<itemizedlist>
+   <listitem><para><emphasis>|</emphasis> Pack side by side.
+   </para></listitem>
+
+   <listitem><para><emphasis>||</emphasis> Pack side by side with
+     homogenous spacing - that is, the widget or frames to the left or
+     right will always have the same size.  </para></listitem>
+
+   <listitem><para><emphasis>/</emphasis> Pack on top of each other.
+   </para></listitem>
+
+   <listitem><para><emphasis>//</emphasis> Pack on top of each other
+     with homogenous spacing. </para></listitem>
+
+</itemizedlist>
+
+<para>If no seperator is specified, then a <emphasis>|</emphasis>
+seperator is implied.  Frames can be nested infinitely within each
+other. Only one type of seperator can be used within a single
+frame. If more than one kind of seperator is used within a single
+frame, then each seperator within that frame will revert to the type
+of the first seperator within that frame.</para>
+
+<para>In the above example, the <emphasis>E</emphasis> stands for
+Entry-widget and the <emphasis>B</emphasis> stands for
+Button-widget. Each of these widgets incurs one format conversion: in
+the case of the entry widget, a <type>char **</type> must be passed,
+while in that case of the button widget, a <type>char *</type> must be
+passed. The entry widget will store its result into
+<emphasis>search_string</emphasis> if the dialog is not cancelled and
+hence <emphasis>search_string</emphasis> must be writable. The entry
+widget also derives its default text from this variable.</para>
+
+<para>The dialog consists of two frames placed above each other,
+(defined by the two pairs of brackets). The buttons are of the same
+size, while the label and entry widgets are spaced as they
+require.</para> 
+
+<refsect2>
+   <title>Reference</title> 
+     <para>The following is a complete list of
+       the widgets. Each widget can take additional options which are
+       described in options section below.</para>
+
+     <itemizedlist>
+       <listitem><para><emphasis><literal>L</literal></emphasis> Label. Causes one
+         va_arg conversion of type <type>gchar *</type> dictating the
+         label's text. This is identical to inline label given in the
+         example above, however this allows for
+         internationalisation.</para></listitem>
+
+       <listitem><para><emphasis><literal>F</literal>, <literal>N</literal>, <literal>E</literal>, <literal>P</literal></emphasis> Entry. This
+         is one of a File, Number, plain text Entry or Password entry
+         widget. Causes one va_arg conversion of type <type>char
+         **</type> which must contain the default text to be inserted
+         into the entry widget, and must be writable to return the
+         result. If the <emphasis>g</emphasis> option is present then
+         entries are the gnome versions of those entries instead. In
+         the case of <emphasis>F</emphasis> and
+         <emphasis>N</emphasis>, two more <type>gchar *</type> are
+         converted - the history_id and the file browser or calculator
+         window title respectively. In the case of <emphasis>E</emphasis>, only one
+         more <type>gchar *</type> is converted: the history_id.</para></listitem>
+
+       <listitem><para><emphasis><literal>D</literal></emphasis> Date edit widget. Causes
+         two va_arg conversions of type <type>gdouble *</type> and type
+	 <type>gint</type>. The first represents the time in seconds
+	 since Jan 1 1970 and is used to initialise the widget as well
+	 as to store the result - it is cast internally to
+	 <type>time_t</type>. The second is the options flag and is the
+	 inclusive <emphasis>OR</emphasis> of one or more of
+         <emphasis>GNOME_DATE_EDIT_SHOW_TIME</emphasis>, <emphasis>GNOME_DATE_EDIT_24_HR</emphasis>, and
+         <emphasis>GNOME_DATE_EDIT_WEEK_STARTS_ON_MONDAY</emphasis>.
+         </para>
+       </listitem>
+
+       <listitem><para><emphasis><literal>B</literal> </emphasis> Button with label. One
+         va_arg conversion of type <type>char *</type>, dictating the
+         button label. If this is NULL, then gtk_button_new is called
+         instead of gtk_button_new_with_label. If the
+         <emphasis>g</emphasis> option is present then a Gnome stock
+         button is drawn, in which case you can pass a Gnome stock
+         pixmap macro instead of a string.</para></listitem>
+
+       <listitem><para><emphasis><literal>C</literal> </emphasis> Check box. Two va_arg
+         conversions of type <type>gchar *label</type> and <type>gint
+         *state</type>. If label is NULL the same applies as with
+         <emphasis>B</emphasis>. result is stored in
+         <emphasis>state</emphasis>. </para></listitem>
+   
+       <listitem><para><emphasis><literal>R</literal> </emphasis> Radio button. Two
+         va_arg conversions of type <type>char *label</type> and
+         <type>gint *state</type>. Multiple radio buttons within the
+         same frame are grouped together. If label is NULL then same
+         applies as with <emphasis>B</emphasis>.</para></listitem>
+
+       <listitem><para><emphasis><literal>S</literal> </emphasis> Seperator. Vertical or
+         horizontal automatically determined. </para></listitem>
+
+       <listitem><para><emphasis><literal>SB</literal> </emphasis> Spin button. Two
+         va_arg conversions of type <type>double climb_rate</type> and
+         <type>gint digits</type>. This is not particularly useful on its own
+         and must be used with option \fIj\fP which causes conversion
+         of an <emphasis>adjustment</emphasis> parameter set. </para></listitem>
+
+       <listitem><para><emphasis><literal>T</literal> </emphasis> Text. One va_arg
+         conversion of the type <type>gchar **text</type>. Must be writable
+         if option <emphasis>e</emphasis> is used to indicate that the text is
+         editable.</para></listitem>
+
+       <listitem><para><emphasis><literal>X</literal> </emphasis> User defined
+         widget. This specifier causes two va_arg conversions: a
+         function of type <emphasis>GtkWidget *(*func) (GtkWidget * widget,
+         gpointer user_data)</emphasis> and <type>gpointer user_data</type> to be
+         passed to the function. The function takes two arguments: the
+         toplevel window widget (which is just to fill in a first
+         argument and needn't have any use), and the user data. The
+         function must return a widget which will then be packed into
+         its enclosing frame.  </para></listitem>
+
+   </itemizedlist>
+</refsect2>
+
+<refsect2>
+   <title>Frames</title> 
+     
+     <para>Different kinds of brackets specify different kinds of
+       frames. These may also take an option, although the option must
+       be specified after the closing bracket and not after the
+       opening bracket.</para>
+
+     <itemizedlist>
+
+       <listitem><para><emphasis>[</emphasis>A visible frame encloses
+         the widget specified between the brackets. </para></listitem>
+
+       <listitem><para><emphasis>%[</emphasis>A frame with a
+         title. Results in one va_arg conversion of type <type>char
+         *title</type> </para></listitem>
+
+       <listitem><para><emphasis>(</emphasis>Invisible hbox or vbox, depending on the enclosed seperators.
+       </para></listitem>
+
+       <listitem><para><emphasis>{</emphasis>Pane box (visible frame
+         with adjustable seperator). Only two objects may be packed
+         inside, further objects are ignored. It is best to pack only
+         other containers into a pane.</para>
+
+         <para>The closing bracket may be followed by options. Eg</para>
+<informalexample>
+<programlisting>
+    [ <literal>B</literal> ]seo
+</programlisting>
+</informalexample>
+
+         <para>is a button inside an shadowed frame. The shadow is of type
+         etched outer.</para>
+
+         <para>The closing <emphasis>) </emphasis> may be followed by
+          the options <emphasis>v </emphasis> or <emphasis>h
+          </emphasis>. This indicates that the box must be packed into
+          a scrollable window. Hence <emphasis> ( <literal>C</literal> // <literal>C</literal> // <literal>C</literal> )v
+          </emphasis> are checkboxes inside a scrollable window with a
+          vertical scrollbar but an automatic horizontal bar
+          (automatic means it appears only if necesary).</para>
+
+         <para>A very useful option is the \fIn\fP option. This
+           creates a <emphasis>notebook page </emphasis> from the
+           frame. Eg,</para>
+
+<informalexample>
+<programlisting>
+    ( <literal>C</literal> // <literal>C</literal> )n ( <literal>L</literal> / <literal>E</literal> )n ( <literal>Te</literal> )n
+</programlisting>
+</informalexample>
+
+         <para> This creates a three page notebook. The <emphasis>n
+          </emphasis> causes one additional conversion of type
+          <type>char *</type>, which is the text to go onto the tag.
+          If the <emphasis>v </emphasis> option is given in addition
+          to the <emphasis>n </emphasis> option, then the notebook
+          will have its tags placed to the left descending vertically,
+          otherwise the tags are place in the conventional position
+          above the notebook.</para></listitem>
+
+     </itemizedlist>
+</refsect2>
+
+<refsect2>
+   <title>Options</title> 
+
+     <para>Conversions caused by an option happen in the following
+       order, regardless of the order in which the options are given:
+       <emphasis>g</emphasis>, <emphasis>j</emphasis>,
+       <emphasis>a</emphasis>, <emphasis>u</emphasis> then
+       <emphasis>c</emphasis>.</para>
+
+     <itemizedlist>
+       <listitem><para><emphasis> x </emphasis>expand, (see
+       gtk_box_pack_start). </para></listitem>
+
+       <listitem><para><emphasis> f </emphasis> fill, (see
+       gtk_box_pack_start) </para></listitem>
+
+       <listitem><para><emphasis> p </emphasis>padding, (see
+         gtk_box_pack_start). This may be specified more than once for
+         additional padding. Padding is in units of 3 pixels per
+         <emphasis>p</emphasis> specified. This default can be
+         changed, see global options below. </para></listitem>
+
+       <listitem><para><emphasis> d </emphasis>default, causes default
+         fill, expand, and padding of the widget into its parent
+         box. This must not be used with <emphasis>x</emphasis>,
+         <emphasis>f</emphasis>, or <emphasis>p</emphasis>. </para></listitem>
+
+       <listitem><para><emphasis>si</emphasis>,
+         <emphasis>so</emphasis>, <emphasis>sei</emphasis>,
+         <emphasis>seo</emphasis> Shadow, (see
+         gtk_frame_set_shadow_type). This stands for one of
+         <emphasis>i</emphasis>nner, <emphasis>o</emphasis>uter,
+         <emphasis>e</emphasis>tched <emphasis>i</emphasis>nner and
+         <emphasis>e</emphasis>tched <emphasis>o</emphasis>uter. The s
+         option must follow the <emphasis>]</emphasis> and not the
+         <emphasis>[</emphasis>. </para></listitem>
+
+       <listitem><para><emphasis> c </emphasis> callback. Indicates
+         that we want a callback function to be run after the widget
+         is created and packed. It causes two va_arg conversions: a
+         function of type <emphasis>*(*func) (GtkWidget * widget,
+         gpointer user_data)</emphasis> and <emphasis>gpointer
+         user_data</emphasis> to be passed to the function. The
+         function takes two arguments: the widget itself, and
+         <emphasis>user_data</emphasis>. This option may be used if
+         their are additional things we want to do to the widget that
+         are out of the scope of the options.</para></listitem>
+
+       <listitem><para><emphasis> r </emphasis>results. For a button
+          widget, causes clicking on the button to assign the current
+          state of each widgets to any user pointers given. This may
+          be given as an option to an `Apply' button, and will
+          necesarily be given as an option to an `Ok' button. </para></listitem>
+
+       <listitem><para><emphasis> q </emphasis> quit. For a button
+       widget, causes the button to exit the dialog.</para></listitem>
+
+       <listitem><para><emphasis> j </emphasis> adjustment. For the
+         Spin Button widget, passes and adjustment object to the Spin
+         Button. This causes 6 convertions: a <emphasis>double
+         *</emphasis> where the initial value is obtained and where
+         the result is stored, and five more
+         <emphasis>double</emphasis> conversions containing: the lower
+         bound, upper bound, step increment, page increment, and page
+         size. (Note that page size must be more than the page
+         increment).</para></listitem>
+
+       <listitem><para><emphasis> e </emphasis> editable. For the text
+         widget, set it to be editable. In this case, the result is
+         assigned to the passed arg. By default the text widget only
+         shows the text and does not allow modification.</para></listitem>
+
+       <listitem><para><emphasis> e </emphasis> inactive. Use 
+         <emphasis>gtk_widget_set_sensitive</emphasis> to disabled
+	 (gray-out) the widget.</para></listitem>
+
+       <listitem><para><emphasis> v </emphasis> vertical
+         scrollbar. For the text widget and for the
+         <emphasis>[</emphasis> <emphasis>]</emphasis> frame, this
+         adds a vertical scrollbar.</para></listitem>
+
+       <listitem><para><emphasis> h </emphasis> horizontal
+         scrollbar. For the text widget and for the
+         <emphasis>[</emphasis> <emphasis>]</emphasis> frame, this
+         adds a horizontal scrollbar.</para></listitem>
+
+        <listitem><para><emphasis> a </emphasis> accelerator. Causes
+          <type>gchar *signal</type>, <type>gint
+          key</type>, <type>gint modifier</type> to be
+          converted. This will add an accelerator in the obvious
+          way. Note that for most widgets, an accelerator need not be
+          added, because the appropriate accelerator is added
+          automatically with the use of an ampersand,
+          <emphasis>&</emphasis>, before the accelerator hotkey in the
+          label. (See accelerator ampersands below.)</para></listitem>
+
+       <listitem><para><emphasis> u </emphasis> accelerator. This
+         accelerator is used for dialogs that are to be
+         internationalised and is similar to
+         <emphasis>a</emphasis>. Causes <emphasis>gchar
+         *signal</emphasis>, <emphasis>gchar *key</emphasis>,
+         <emphasis>gint modifier</emphasis> to be converted. To the
+         <emphasis>key</emphasis> argument is passed the same label
+         that is used to label the widget. The widget will contain an
+         underbar under the character following the & symbol. For
+         example "clicked", "&amp;Cancel", GDK_MOD1_MASK. Binds the widget
+         to Alt-C and completely ignores the remaining characters. You
+         can then use the same label for the actual contents of the
+         cancel button to cause an underbar to be written under the
+         `C'. Note that for most widgets, an accelerator need not be
+         added, because the appropriate accelerator is added
+         automatically with the use of an ampersand,
+         <emphasis>&</emphasis>, before the accelerator hotkey in the
+         label. (See accelerator ampersands below.)</para></listitem>
+
+       <listitem><para><emphasis> o </emphasis> focus. Sets the input
+         focus to this widget. Only one widget must have this
+         option. (Most dialogs have a default widget accepting
+         keyboard input to avoid having to manually set focus with the
+         mouse.)</para></listitem>
+
+       <listitem><para><emphasis> g </emphasis> gnome. Use the Gnome
+         version of the widget. May cause additional conversions, see
+         <emphasis><literal>E</literal></emphasis> above. </para></listitem>
+
+       <listitem><para><emphasis> n </emphasis> notebook. Cause a
+         <emphasis>[</emphasis> <emphasis>]</emphasis> to be become a
+         notebook page. See frames above.</para></listitem>
+
+     </itemizedlist>
+</refsect2>
+
+<refsect2>
+  <title>Accelerator ampersands</title> 
+  
+    <para>Any widget's text having an <emphasis>&</emphasis> sign in
+    it will have an underbar placed below the letter after the
+    <emphasis>&</emphasis> sign. The <emphasis>&</emphasis> will not
+    be shown. To draw an actual & sign, use a double ampersand:
+    <emphasis>&&</emphasis></para>
+
+    <para>Buttons, check-boxes, and radio-buttonsP will also have an
+     accelerator automatically added to them along with the
+     underbar. It will be bound to the key Alt-X where X is the letter
+     following the ampersand.</para>
+</refsect2>
+
+<refsect2>
+   <title>Examples</title>
+<informalexample>
+<programlisting>
+    gtk_dialog_cauldron ("Search", 0,
+    " ( <literal>Ld</literal> | <literal>Eod</literal> ) / %[ ( <literal>Cd</literal> // <literal>Cd</literal> // <literal>Cd</literal> ) ]seo / ( <literal>Bqrxfp</literal> || <literal>Bqxfp</literal> ) ", 
+/* <literal>L</literal> */		"Enter search string:",
+/* <literal>E</literal> */		&amp;search_string,
+/* %[ */		"Search options",
+/* <literal>C</literal> */		"Case sensitive", &amp;case_sensitive,
+/* <literal>C</literal> */		"Whole words only", &amp;whole_word,
+/* <literal>C</literal> */		"Regular expression", &amp;regular_expression,
+/* <literal>B</literal> */		"Ok",
+/* <literal>B</literal> */		"Cancel");
+</programlisting>
+</informalexample>
+
+<para>Interwidget spacing can be increased by inserting more space
+characters between format specifiers, however only the first gab is
+looked at. Eg, spreading out the check boxes can be done with:</para>
+
+<informalexample>
+<programlisting>
+
+    " ( <literal>Ld</literal> | <literal>Ed</literal> ) / %[ ( <literal>Cd</literal>           // <literal>Cd</literal> // <literal>Cd</literal> ) ]seo / 
+( <literal>Bqrefp</literal> || <literal>Bqefp</literal> ) ", 
+</programlisting>
+</informalexample>
+
+<para>The space between the widget and its parent box can be adjusted
+by adding space after the bracket, eg:</para>
+
+<informalexample>
+<programlisting>
+    " (          <literal>Ld</literal> | <literal>Ed</literal> ) / %[ ( <literal>Cd</literal> // <literal>Cd</literal> // <literal>Cd</literal> ) ]seo /
+( <literal>Bqrefp</literal> || <literal>Bqefp</literal> ) ", 
+</programlisting>
+</informalexample>
+
+<para>Each space character counts 3 pixels by default. This default can
+be changed, see global options.</para>
+
+</refsect2>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-TOPLEVEL-CAPS">GTK_CAULDRON_TOPLEVEL</title>
+<programlisting>#define GTK_CAULDRON_TOPLEVEL	(0x1L&lt;&lt;0)
+</programlisting>
+<para>
+This is translated to the top level window (<literal>GTK_WINDOW_TOPLEVEL</literal>)
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-DIALOG-CAPS">GTK_CAULDRON_DIALOG</title>
+<programlisting>#define GTK_CAULDRON_DIALOG		(0x1L&lt;&lt;1)
+</programlisting>
+<para>
+This is translated to the top level window (<literal>GTK_WINDOW_TOPLEVEL</literal>)
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-POPUP-CAPS">GTK_CAULDRON_POPUP</title>
+<programlisting>#define GTK_CAULDRON_POPUP		(0x1L&lt;&lt;2)
+</programlisting>
+<para>
+This is translated to the top level window (<literal>GTK_WINDOW_TOPLEVEL</literal>)
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE-SHIFT-CAPS">GTK_CAULDRON_SPACE_SHIFT</title>
+<programlisting>#define GTK_CAULDRON_SPACE_SHIFT	(3)
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE-MASK-CAPS">GTK_CAULDRON_SPACE_MASK</title>
+<programlisting>#define GTK_CAULDRON_SPACE_MASK	(0xFL&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE1-CAPS">GTK_CAULDRON_SPACE1</title>
+<programlisting>#define GTK_CAULDRON_SPACE1		(0x1L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 1 pixels of each space or p
+characters. 
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE2-CAPS">GTK_CAULDRON_SPACE2</title>
+<programlisting>#define GTK_CAULDRON_SPACE2		(0x2L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 2 pixels of each space or p
+characters. 
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE3-CAPS">GTK_CAULDRON_SPACE3</title>
+<programlisting>#define GTK_CAULDRON_SPACE3		(0x3L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 3 pixels of each space or p
+characters. 
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE4-CAPS">GTK_CAULDRON_SPACE4</title>
+<programlisting>#define GTK_CAULDRON_SPACE4		(0x4L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 4 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE5-CAPS">GTK_CAULDRON_SPACE5</title>
+<programlisting>#define GTK_CAULDRON_SPACE5		(0x5L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+
+Specify a width of 5 pixels of each space or p
+characters. 
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE6-CAPS">GTK_CAULDRON_SPACE6</title>
+<programlisting>#define GTK_CAULDRON_SPACE6		(0x6L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 6 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE7-CAPS">GTK_CAULDRON_SPACE7</title>
+<programlisting>#define GTK_CAULDRON_SPACE7		(0x7L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 7 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE8-CAPS">GTK_CAULDRON_SPACE8</title>
+<programlisting>#define GTK_CAULDRON_SPACE8		(0x8L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 8 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE9-CAPS">GTK_CAULDRON_SPACE9</title>
+<programlisting>#define GTK_CAULDRON_SPACE9		(0x9L&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 9 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE10-CAPS">GTK_CAULDRON_SPACE10</title>
+<programlisting>#define GTK_CAULDRON_SPACE10		(0xAL&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 10 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE11-CAPS">GTK_CAULDRON_SPACE11</title>
+<programlisting>#define GTK_CAULDRON_SPACE11		(0xBL&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 11 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE12-CAPS">GTK_CAULDRON_SPACE12</title>
+<programlisting>#define GTK_CAULDRON_SPACE12		(0xCL&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 12 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE13-CAPS">GTK_CAULDRON_SPACE13</title>
+<programlisting>#define GTK_CAULDRON_SPACE13		(0xDL&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 13 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE14-CAPS">GTK_CAULDRON_SPACE14</title>
+<programlisting>#define GTK_CAULDRON_SPACE14		(0xEL&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 14 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-SPACE15-CAPS">GTK_CAULDRON_SPACE15</title>
+<programlisting>#define GTK_CAULDRON_SPACE15		(0xFL&lt;&lt;GTK_CAULDRON_SPACE_SHIFT)
+</programlisting>
+<para>
+Specify a width of 15 pixels of each space or p
+characters. 
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-IGNOREESCAPE-CAPS">GTK_CAULDRON_IGNOREESCAPE</title>
+<programlisting>#define GTK_CAULDRON_IGNOREESCAPE	(0x1L&lt;&lt;7)
+</programlisting>
+<para>
+Normalling, pressing the Escape key terminates the dialog. This prevents
+this.
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-IGNOREENTER-CAPS">GTK_CAULDRON_IGNOREENTER</title>
+<programlisting>#define GTK_CAULDRON_IGNOREENTER	(0x1L&lt;&lt;8)
+</programlisting>
+<para>
+Normalling, pressing the Enter/Return key assigns the values and
+terminates. This prevents this.
+</para></refsect2>
+<refsect2>
+<title><anchor id="GTK-CAULDRON-GRAB-CAPS">GTK_CAULDRON_GRAB</title>
+<programlisting>#define GTK_CAULDRON_GRAB		(0x1L&lt;&lt;9)
+</programlisting>
+<para>
+Causes a grab on the dialog - that is, no other widgets in the
+application will work until the dialog exits.
+</para></refsect2>
+<refsect2>
+<title><anchor id="GtkCauldronNextArgCallback">GtkCauldronNextArgCallback ()</title>
+<programlisting>void        (*GtkCauldronNextArgCallback)   (<link linkend="gint">gint</link> cauldron_type,
+                                             <link linkend="gpointer">gpointer</link> user_data,
+                                             void *result);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cauldron_type</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>result</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GtkCauldronCustomCallback">GtkCauldronCustomCallback ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  (*GtkCauldronCustomCallback)    (<link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gtk-dialog-cauldron">gtk_dialog_cauldron ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      gtk_dialog_cauldron             (const <link linkend="gchar">gchar</link> *title,
+                                             <link linkend="glong">glong</link> options,
+                                             ...);</programlisting>
+<para>
+This function parses a <parameter>format</parameter> string with
+a variable length list of arguments. The <parameter>format</parameter> string describes a
+dialog box and has intuitive tokens to represent different frames and
+widgets. The dialog box is drawn whereupon <link linkend="gtk-dialog-cauldron">gtk_dialog_cauldron</link>()
+blocks until closed or until an appropriate button is pushed. Results
+from the widgets are then stored into appropriate variables passed in
+the argument list in order to be retrieved by the caller.
+</para>
+<para>
+Retuns NULL is returned if the dialog is
+cancelled. GTK_CAULDRON_ENTERP is returned if the user pressed
+enter (return-on-enter can be overridden - see global options
+below), and GTK_CAULDRON_ESCAPEP is returned if the user
+pressed escape. Otherwise the label of the widget that was used to
+exit the dialog is returned.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> dialog title
+</entry></row>
+<row><entry align="right"><parameter>options</parameter>&nbsp;:</entry>
+<entry> dialog options, see the macro definitions
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gtk-dialog-cauldron-parse">gtk_dialog_cauldron_parse ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      gtk_dialog_cauldron_parse       (const <link linkend="gchar">gchar</link> *title,
+                                             <link linkend="glong">glong</link> options,
+                                             const <link linkend="gchar">gchar</link> *format,
+                                             <link linkend="GtkCauldronNextArgCallback">GtkCauldronNextArgCallback</link> next_arg,
+                                             <link linkend="gpointer">gpointer</link> user_data,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);</programlisting>
+<para>
+This function parses a format
+string exactly like <link linkend="gtk-dialog-cauldron">gtk_dialog_cauldron</link>(), however it derives
+arguments for the <parameter>format</parameter> string from a user function <parameter>next_arg</parameter>.
+<link linkend="gtk-dialog-cauldron-parse">gtk_dialog_cauldron_parse</link>() is primarily used for creating
+wrappers for interpreted languages.
+</para>
+<para>
+Each subsequent call to <parameter>next_arg</parameter> must assign to &lt;type&gt;*result&lt;/type&gt; a
+pointer to data of the type specified by &lt;type&gt;cauldron_type&lt;/type&gt;. (An
+example can be found in &lt;filename&gt;gtk_dialog_cauldron.c&lt;/filename&gt; and the
+pygnome package.) The \fIcauldron_type\fP's are a small set of
+types used for specifying and returning widget data. They are
+enumerated as &lt;type&gt;GTK_CAULDRON_TYPE_*&lt;/type&gt; in the header file gtkcauldron.h.
+</para>
+<para>
+NULL is returned if the dialog is
+cancelled. GTK_CAULDRON_ENTER is returned if the user pressed
+enter (return-on-enter can be overridden - see global options
+below), and GTK_CAULDRON_ESCAPE is returned if the user
+pressed escape. GTK_CAULDRON_ERROR is returned by 
+<link linkend="gtk-dialog-cauldron-parse">gtk_dialog_cauldron_parse</link>() if an error
+occurred (like a malformed format string). The error message can be
+retrieved by <link linkend="gtk-dialog-cauldron-get-error">gtk_dialog_cauldron_get_error</link>().
+Otherwise the label of the widget that was used to
+exit the dialog is returned.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> dialog title
+</entry></row>
+<row><entry align="right"><parameter>options</parameter>&nbsp;:</entry>
+<entry> dialog options, see the macro definitions
+</entry></row>
+<row><entry align="right"><parameter>format</parameter>&nbsp;:</entry>
+<entry> format string that describes the dialog
+</entry></row>
+<row><entry align="right"><parameter>next_arg</parameter>&nbsp;:</entry>
+<entry> user function.
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> data to pass to user function
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

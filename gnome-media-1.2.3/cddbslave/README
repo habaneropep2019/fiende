@@ -1,0 +1,34 @@
+This is a server type thing for CDDB requests, so that the CD app doesn't
+have to deal with connection, etc, to the cddb server.
+
+Basically the app should open a pipe to cddb-slave, and send the lines:
+
+cddb query <discid> <ntrks> <off1> <off2> ... <offN> nsecs
+client <name> <version> <pid>
+
+Where:
+
+discid		CDDB disc id.
+ntrks		Number of tracks on the cd.
+off1 ... offN 	Frame offset of the starting location of each track.
+nsecs		Total playing length of cd in seconds.
+name		Name of client to be reported to cddb server.
+version		Version of client
+pid		Process to signal when request has completed.
+
+The slave will then close the pipe connect, process the request, and then
+send a SIGUSR2 to <pid>, notifying it that the process has been completed.
+The application should then reload the relevent file, and update displays
+accordingly.
+
+If the parent is no longer running, a signal will not be sent, but the cddb
+file will be stored as usual, for later retrieval.
+
+If the slave's request has failed, it will cache the request, and query the
+cddb server again on the next actual request from a client.
+
+If an inexact match has been found, the slave will (if DISPLAY environment 
+variable is set), open a dialog, allowing the user to choose the correct 
+disc. If DISPLAY is not set, the slave will request information on the first
+disc listed by the server. (until a better solution is thought up...)
+

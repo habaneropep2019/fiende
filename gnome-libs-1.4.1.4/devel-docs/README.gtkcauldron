@@ -1,0 +1,272 @@
+
+(This README file is no longer being maintained. Refer the gtk_dialog_cauldron(3)
+man page and/or the gnome texinfo/html/sgml documentation for this function.)
+
+Reference for using gtk_dialog_cauldron:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Function prototype:
+^^^^^^^^^^^^^^^^^^^
+
+char *gtk_dialog_cauldron (gchar *title, glong options, const gchar * fmt,...);
+
+
+gtk_dialog_cauldron is much like printf, using format specifiers to
+draw widgets.
+
+A format specifier consists of a % sign, an upper case letter
+dictating the type of widget, and none or more lower case letters
+dictating various options.
+
+Each format specifier may cause none or more va_arg convertions.
+Each option may cause additional va_arg convertions.
+
+The widgets so far are:
+L - label: causes one va_arg conversion of type `gchar *' dictating the
+	label's text.
+F, N, E - entry: causes one va_arg conversion of type `gchar **' which 
+	must contain the default text to be inserted into the entry
+	widget, and must be writable to return the result. If the g
+	option is present the entries are gnome entries instead,
+	the F being a file entry, N being a number entry, and E
+	being a normal gnome entry. In the case of F and N, two more
+	char * are converted - the history_id and the file browser or
+	calculator window title. In tha case of E, only one more
+	char * is converted - history_id.
+P - `password' (invisible entry).
+B - button with label: one va_arg conversion of type `char *', dictating
+	the button label. If this is NULL, then gtk_button_new is called
+	instead of gtk_button_new_with_label. If the g option is present
+	then a gnome stock button is drawn.
+C - check box: `gchar *label' and `gint *state'. If label is NULL the same
+	applies as with B. result is stored in `state'.
+R - radio button: `gchar *label' and `gint *state'. Multiple radio buttons
+	within the same bracket are grouped together. If label is NULL
+	the same applies as with B.
+S - seperator, vertical or horizontal automatically determined.
+SB - spin button: takes climb rate `double' and digits, `int'. Option j
+	cuases convertion of range values - see below.
+T - text, `gchar **text' - must be writable with option e (`e'ditable).
+
+X - user defined, i.e. a function which returns a widget is specified by
+	the user. This specifier causes 2 va_arg conversions: the
+	function itself, and a pointer to user data that is to be
+	passed to the function. The function takes 2 arguments:
+	the toplevel window widget (which is just to fill in a first
+	argument and needn't have any use), and the user data.
+	The function must return a widget for packing.
+
+Options (some options may not apply all widgets):
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Conversions caused by option happen in the following order,
+regardless of the order in which the options are given:
+    1 - g
+    2 - j
+    3 - a
+    4 - c
+
+x - expand, (see gtk_box_pack_start)
+f - fill, (see gtk_box_pack_start)
+p - padding, (see gtk_box_pack_start), this may be specified more
+	than once for additional padding. Padding is in units of
+	3 pixels per p specified. This default can be changed, see
+	Global Options below.
+d - default, causes default fill, expand, and padding of the widget into
+	its parent box. This must not be used with x, f, or p.
+s - shadow, (see gtk_frame_set_shadow_type) this must be followed by:
+	    i - inner
+	    o - outer
+	    ei - etched inner
+	    eo - etched outer
+	The s option must follow the ] and not the [
+c - callback, causes a callback function to be run after the widget is
+	created and packed. Function is off type
+	GtkCauldronCustomCallback. This option causes 2 va_arg
+	conversions: the function itself, and a pointer to user data
+	that is to be passed to the function. The function takes 2
+	arguments: the widget itself, and the user data. This callback
+	function is used primarily to connect signals to the widget.
+r - results, for a button widget, causes clicking on the button to assign
+	the current state of all the widgets to the user pointers given
+	for any widgets.
+q - quit, for a button widget, causes the button to exit the dialog.
+j - pass adjustment to the widget (for SB only) causes 6 convertions:
+	    `double *'	/* value and where result is stored */
+	    `double'	/* lower bound */
+	    `double'	/* upper bound */
+	    `double'	/* step increment */
+	    `double'	/* page increment */
+	    `double'	/* page size */
+e - for the text widget, make it editable. In this case, the result is
+	assigned, to the passed arg.
+t - gray-out the widget (set inactive).
+v - add vertical scroll bar to text widget.
+h - add horizontal scrollbar to text widget.
+a - accelerator, gchar *signal, gint key, gint modifier is converted.
+g - gnome, gnome version of the widget. May cause additional
+	conversions, see above.
+n - notebook (see below).
+
+Brackets:
+^^^^^^^^^
+
+[ - a frame encloses the widget specified between the brackets.
+%[ - a frame with a title. Results in one va_arg conversion, `char *title'.
+( - invisible h or vbox, depending on the breakers.
+{ - pane box. Only two objects may be packed inside, further objects are
+	ignored. It is best to pack only other containers into a pane.
+
+The closing bracket may be followed by options. Eg
+    [ %B ]seo
+is a button inside etched outer shadow.
+The closing ) may be followed by a v or h. This indicates that the box must
+be packed into a scrollable window. Hence
+    ( %C // %C // %C )v
+are checkboxes inside a scrollable window with a vertical scrollbar but an
+automatic horizontal bar.
+
+A very useful option is the n option. This creates a PAGE OF A NOTEBOOK
+from the frame. A notebook can be created like
+    ( %C // %C )n ( %L / %E )n ( %Te )n
+This creates a three page notebook. n causes conversion of one additional
+of type char *, which is the text to go onto the tag.
+
+Breakers:
+^^^^^^^^^
+
+/  - place below.
+// - place below with homogenous spacing.
+|  - place to the right of.
+|| - place to the right of with homogenous spacing.
+
+The | breaker is the default and need not be explicitely given.
+
+Inline Labels:
+^^^^^^^^^^^^^^
+
+Instead of passing the label as an option, you can place it inline as follows:
+    ..., " (Hello World!) / %Bq ", "Ok")
+However there must be no spaces between the `Hello' and the `('.
+
+
+Examples:
+^^^^^^^^^
+
+Search dialog:
+^^^^^^^^^^^^^^
+
+    gtk_dialog_cauldron ("Search", 0,
+    " ( %Ld | %Ed ) / %[ ( %Cd // %Cd // %Cd ) ]seo / ( %Bqrxfp || %Bqxfp ) ", 
+/* %L */		"Enter search string:",
+/* %E */		&search_string,
+/* %[ */		"Search options",
+/* %C */		"Case sensitive", &case_sensitive,
+/* %C */		"Whole words only", &whole_word,
+/* %C */		"Regular expression", &regular_expression,
+/* %B */		"Ok",
+/* %B */		"Cancel");
+
+Interwidget spacing can be increased by inserting more space
+characters between format specifiers, however only the first gab is
+looked at. Eg, spreading out the check boxes can be done with:
+
+    " ( %Ld | %Ed ) / %[ ( %Cd           // %Cd // %Cd ) ]seo / ( %Bqrefp || %Bqefp ) ", 
+
+The space between the widget and its parent box can be adjusted
+by adding space after the bracket, eg:
+    " (          %Ld | %Ed ) / %[ ( %Cd // %Cd // %Cd ) ]seo / ( %Bqrefp || %Bqefp ) ", 
+
+Each space character counts 3 pixels by default. This default can
+be changed, see Global Options.
+
+
+Global Options:
+^^^^^^^^^^^^^^^
+
+The second argument of gtk_dialog_cauldron can be one or more
+of the following macros OR'd together:
+
+GTK_CAULDRON_TOPLEVEL or GTK_CAULDRON_DIALOG or GTK_CAULDRON_POPUP
+    - these are option translated to the top level window.
+
+GTK_CAULDRON_SPACEx
+    - specify the equivalent width in pixels of each space or p
+	characters. x can have a range of 1 to 15.
+
+GTK_CAULDRON_IGNOREESCAPE
+    - Normalling pressing the Escape key terminates the dialog.
+	This prevents this.
+
+GTK_CAULDRON_IGNOREENTER
+    - Normalling pressing the Enter/Return key assigns the values
+	and terminates. This prevents this.
+
+
+Return Values:
+^^^^^^^^^^^^^^
+
+gtk_dialog_cauldron returns the label of the button that was clicked
+to destroy it. If Enter or Escape was pressed, then it returns
+GTK_CAULDRON_ENTER or GTK_CAULDRON_ESCAPE respectively.
+If the dialog was destroyed by the window manager, then it returns
+NULL.
+
+
+Using gtk_dialog_cauldron from Python:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This example should be self explanatary. Note that as in C the
+results are assigned only if the 'r' option in the button is present,
+otherwise, the default values of the widgets are returned regardless
+of changes made by the user. I'm just starting with Python, so
+forgive me for anything curde. (The following also requires my
+gtk_signal_connect patch to take args to gtk_signal_connect.)
+
+gtk_init()
+
+s = [""]
+
+def user_widget(window,b):
+    def cb_func(w, b):
+	b[0] = "Hello Pressed"
+    w = gtk_button_new_with_label("Hello")
+    gtk_signal_connect(w, "clicked", cb_func, (b,))
+    return w
+
+(button, search_string, case_sens, whole_words, reg_exp) = \
+    gtk_dialog_cauldron (
+	"Search",
+	0,
+	" ( %Ld | %Ed ) / %[ ( %Cd // %Cd // %Cd ) ]seo / ( %Bqrxfp || %Bqxfp ) / ( %Xxf ) ",
+	("Enter search string:",
+	"some default search string",
+	"Search options",
+	"Case sensitive", 1,
+	"Whole words only", 0,
+	"Regular expression", 0,
+	"Ok",
+	"Cancel",
+	user_widget, (s,))
+	)
+
+print s[0]
+print (button)
+print (search_string)
+print ("%d %d %d" % (case_sens, whole_words, reg_exp))
+
+
+Deficiancies and bugs:
+^^^^^^^^^^^^^^^^^^^^^^
+
+The outer must braces should not be present, becaue extra
+outermost braces are always added to make parsing easier. Adding
+your own will cause an extra frame to encapsulte your outermost
+frame which is harmless but inefficient.
+
+It is not possible to have a user defined widget that clears the
+dialog or returns the results. This must be done using a B or Bg
+buttons.
+
+
+

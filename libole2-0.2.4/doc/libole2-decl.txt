@@ -1,0 +1,481 @@
+<ENUM>
+<NAME>MsOlePropertySetID</NAME>
+typedef enum {
+	MS_OLE_PS_SUMMARY_INFO,
+	MS_OLE_PS_DOCUMENT_SUMMARY_INFO,
+	MS_OLE_PS_USER_DEFINED_SUMMARY_INFO
+} MsOlePropertySetID;
+</ENUM>
+<TYPEDEF>
+<NAME>MsOleSummary</NAME>
+typedef struct {
+	guint8			class_id[16];
+	GArray *		sections;
+	GArray *		items;
+	GList *			write_items;
+	gboolean		read_mode;
+	MsOleStream *		s;
+	MsOlePropertySetID	ps_id;
+} MsOleSummary;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>MsOleSummarySection</NAME>
+typedef struct {
+	guint32			offset;
+	guint32			props;
+	guint32			bytes;
+	MsOlePropertySetID	ps_id;
+} MsOleSummarySection;
+</TYPEDEF>
+<FUNCTION>
+<NAME>ms_ole_summary_open</NAME>
+<RETURNS>MsOleSummary  *</RETURNS>
+MsOle *f
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_docsummary_open</NAME>
+<RETURNS>MsOleSummary  *</RETURNS>
+MsOle *f
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_open_stream</NAME>
+<RETURNS>MsOleSummary  *</RETURNS>
+MsOleStream *stream,const MsOlePropertySetID psid
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_create</NAME>
+<RETURNS>MsOleSummary  *</RETURNS>
+MsOle *f
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_docsummary_create</NAME>
+<RETURNS>MsOleSummary  *</RETURNS>
+MsOle *f
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_create_stream</NAME>
+<RETURNS>MsOleSummary  *</RETURNS>
+MsOleStream *s,const MsOlePropertySetID psid
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_get_properties</NAME>
+<RETURNS>GArray  *</RETURNS>
+MsOleSummary *si
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_close</NAME>
+<RETURNS>void 	</RETURNS>
+MsOleSummary *si
+</FUNCTION>
+<ENUM>
+<NAME>MsOleSummaryType</NAME>
+typedef enum {
+	MS_OLE_SUMMARY_TYPE_STRING  = 0x10,
+	MS_OLE_SUMMARY_TYPE_TIME    = 0x20,
+	MS_OLE_SUMMARY_TYPE_LONG    = 0x30,
+	MS_OLE_SUMMARY_TYPE_SHORT   = 0x40,
+	MS_OLE_SUMMARY_TYPE_BOOLEAN = 0x50,
+	MS_OLE_SUMMARY_TYPE_OTHER   = 0x60
+} MsOleSummaryType;
+</ENUM>
+<MACRO>
+<NAME>MS_OLE_SUMMARY_TYPE</NAME>
+#define MS_OLE_SUMMARY_TYPE(x) ((MsOleSummaryType)((x)>>8))
+</MACRO>
+<ENUM>
+<NAME>MsOleSummaryPID</NAME>
+typedef enum {
+/* SummaryInformation Stream Properties */
+/* String properties */
+	MS_OLE_SUMMARY_TITLE          = 0x1002,
+	MS_OLE_SUMMARY_SUBJECT        = 0x1003,
+	MS_OLE_SUMMARY_AUTHOR         = 0x1004,
+	MS_OLE_SUMMARY_KEYWORDS       = 0x1005,
+	MS_OLE_SUMMARY_COMMENTS       = 0x1006,
+	MS_OLE_SUMMARY_TEMPLATE       = 0x1007,
+	MS_OLE_SUMMARY_LASTAUTHOR     = 0x1008,
+	MS_OLE_SUMMARY_REVNUMBER      = 0x1009,
+	MS_OLE_SUMMARY_APPNAME        = 0x1012,
+	
+/* Time properties */
+	MS_OLE_SUMMARY_TOTAL_EDITTIME = 0x200A,
+	MS_OLE_SUMMARY_LASTPRINTED    = 0x200B,
+	MS_OLE_SUMMARY_CREATED        = 0x200C,
+	MS_OLE_SUMMARY_LASTSAVED      = 0x200D,
+	
+/* Long integer properties */
+	MS_OLE_SUMMARY_PAGECOUNT      = 0x300E,
+	MS_OLE_SUMMARY_WORDCOUNT      = 0x300F,
+	MS_OLE_SUMMARY_CHARCOUNT      = 0x3010,
+	MS_OLE_SUMMARY_SECURITY       = 0x3013,
+
+/* Short integer properties */
+	MS_OLE_SUMMARY_CODEPAGE       = 0x4001,
+
+/* Security */	
+	MS_OLE_SUMMARY_THUMBNAIL      = 0x6011,
+
+
+/* DocumentSummaryInformation Properties */
+/* String properties */
+	MS_OLE_SUMMARY_CATEGORY	      = 0x1002,
+	MS_OLE_SUMMARY_PRESFORMAT     = 0x1003,
+	MS_OLE_SUMMARY_MANAGER        = 0x100E,
+	MS_OLE_SUMMARY_COMPANY        = 0x100F,
+
+/* Long integer properties */
+	MS_OLE_SUMMARY_BYTECOUNT      = 0x3004,
+	MS_OLE_SUMMARY_LINECOUNT      = 0x3005,
+	MS_OLE_SUMMARY_PARCOUNT       = 0x3006,
+	MS_OLE_SUMMARY_SLIDECOUNT     = 0x3007,
+	MS_OLE_SUMMARY_NOTECOUNT      = 0x3008,
+	MS_OLE_SUMMARY_HIDDENCOUNT    = 0x3009,
+	MS_OLE_SUMMARY_MMCLIPCOUNT    = 0X300A,
+
+/* Boolean properties */
+	MS_OLE_SUMMARY_SCALE          = 0x500B,
+	MS_OLE_SUMMARY_LINKSDIRTY     = 0x5010
+} MsOleSummaryPID;
+</ENUM>
+<MACRO>
+<NAME>MsOleSummaryAllSecurityFlagsEqNone</NAME>
+#define MsOleSummaryAllSecurityFlagsEqNone        0x00
+</MACRO>
+<MACRO>
+<NAME>MsOleSummarySecurityPassworded</NAME>
+#define MsOleSummarySecurityPassworded            0x01
+</MACRO>
+<MACRO>
+<NAME>MsOleSummarySecurityRORecommended</NAME>
+#define MsOleSummarySecurityRORecommended         0x02
+</MACRO>
+<MACRO>
+<NAME>MsOleSummarySecurityRO</NAME>
+#define MsOleSummarySecurityRO                    0x04
+</MACRO>
+<MACRO>
+<NAME>MsOleSummarySecurityLockedForAnnotations</NAME>
+#define MsOleSummarySecurityLockedForAnnotations  0x08
+</MACRO>
+<TYPEDEF>
+<NAME>MsOleSummaryTime</NAME>
+typedef struct {
+	GTimeVal time;
+	GDate    date;
+} MsOleSummaryTime;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>MsOleSummaryPreview</NAME>
+typedef struct {
+	guint32 len;
+	guint8 *data;
+} MsOleSummaryPreview;
+</TYPEDEF>
+<FUNCTION>
+<NAME>ms_ole_summary_get_string</NAME>
+<RETURNS>gchar  *</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,gboolean *available
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_get_boolean</NAME>
+<RETURNS>gboolean 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,gboolean *available
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_get_short</NAME>
+<RETURNS>guint16 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,gboolean *available
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_get_long</NAME>
+<RETURNS>guint32 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,gboolean *available
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_get_time</NAME>
+<RETURNS>GTimeVal 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,gboolean *available
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_get_preview</NAME>
+<RETURNS>MsOleSummaryPreview 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,gboolean *available
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_preview_destroy</NAME>
+<RETURNS>void 	</RETURNS>
+MsOleSummaryPreview d
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_set_string</NAME>
+<RETURNS>void 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,const gchar *str
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_set_boolean</NAME>
+<RETURNS>void 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,gboolean bool
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_set_short</NAME>
+<RETURNS>void 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,guint16 i
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_set_long</NAME>
+<RETURNS>void 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,guint32 i
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_set_time</NAME>
+<RETURNS>void 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,GTimeVal time
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_summary_set_preview</NAME>
+<RETURNS>void 	</RETURNS>
+MsOleSummary *si,MsOleSummaryPID id,constMsOleSummaryPreview *preview
+</FUNCTION>
+<ENUM>
+<NAME>MsOleErr</NAME>
+typedef enum {
+	MS_OLE_ERR_OK,
+	MS_OLE_ERR_EXIST,
+	MS_OLE_ERR_INVALID,
+	MS_OLE_ERR_FORMAT,
+	MS_OLE_ERR_PERM,
+	MS_OLE_ERR_MEM,
+	MS_OLE_ERR_SPACE,
+	MS_OLE_ERR_NOTEMPTY,
+	MS_OLE_ERR_BADARG
+} MsOleErr;
+</ENUM>
+<STRUCT>
+<NAME>MsOleSysWrappers</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>MsOleSysWrappers</NAME>
+struct MsOleSysWrappers {
+	int     (*open2)	(const char *pathname, int flags);
+	int     (*open3)	(const char *pathname, int flags, mode_t mode);
+	ssize_t (*read)		(int fd, void *buf, size_t count);
+	int     (*close)	(int fd);
+	ssize_t (*write)	(int fd, const void *buf, size_t count);
+	off_t   (*lseek)	(int fd, off_t offset, int whence);
+	int     (*isregfile)	(int fd);
+	int     (*getfilesize)	(int fd, guint32 *size);
+};
+</STRUCT>
+<ENUM>
+<NAME>MsOleSeek</NAME>
+typedef enum {
+	MsOleSeekSet,
+	MsOleSeekCur,
+	MsOleSeekEnd
+} MsOleSeek;
+</ENUM>
+<TYPEDEF>
+<NAME>MsOlePos</NAME>
+typedef guint32 MsOlePos;
+</TYPEDEF>
+<TYPEDEF>
+<NAME>MsOleSPos</NAME>
+typedef gint32  MsOleSPos;
+</TYPEDEF>
+<STRUCT>
+<NAME>MsOle</NAME>
+</STRUCT>
+<ENUM>
+<NAME>MsOleType</NAME>
+typedef enum  {
+	MsOleStorageT = 1,
+	MsOleStreamT  = 2,
+	MsOleRootT    = 5
+} MsOleType;
+</ENUM>
+<STRUCT>
+<NAME>MsOleStat</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>MsOleStat</NAME>
+struct MsOleStat {
+	MsOleType type;
+	MsOlePos  size;
+};
+</STRUCT>
+<MACRO>
+<NAME>ms_ole_open</NAME>
+#define ms_ole_open(fs,path)     ms_ole_open_vfs ((fs), (path), TRUE, NULL)
+</MACRO>
+<FUNCTION>
+<NAME>ms_ole_open_vfs</NAME>
+<RETURNS>MsOleErr 	</RETURNS>
+MsOle **fs,const char *path,gboolean try_mmap,MsOleSysWrappers *wrappers
+</FUNCTION>
+<MACRO>
+<NAME>ms_ole_create</NAME>
+#define ms_ole_create(fs,path)     ms_ole_create_vfs ((fs), (path), TRUE, NULL)
+</MACRO>
+<FUNCTION>
+<NAME>ms_ole_create_vfs</NAME>
+<RETURNS>MsOleErr 	</RETURNS>
+MsOle **fs,const char *path,int try_mmap,MsOleSysWrappers *wrappers
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_destroy</NAME>
+<RETURNS>void 	</RETURNS>
+MsOle **fs
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_unlink</NAME>
+<RETURNS>MsOleErr 	</RETURNS>
+MsOle *fs,const char *path
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_directory</NAME>
+<RETURNS>MsOleErr 	</RETURNS>
+char ***names,MsOle *fs,const char *dirpath
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_stat</NAME>
+<RETURNS>MsOleErr 	</RETURNS>
+MsOleStat *stat,MsOle *fs,const char *dirpath,const char *name
+</FUNCTION>
+<STRUCT>
+<NAME>MsOleStream</NAME>
+</STRUCT>
+<STRUCT>
+<NAME>MsOleStream</NAME>
+struct MsOleStream
+{
+	MsOlePos size;
+
+	gint		(*read_copy)	(MsOleStream *stream,
+					 guint8 *ptr,
+					 MsOlePos length);
+
+	guint8 *	(*read_ptr)	(MsOleStream *stream,
+					 MsOlePos length);
+
+	MsOleSPos	(*lseek)	(MsOleStream *stream,
+					 MsOleSPos bytes,
+					 MsOleSeek type);
+
+	MsOlePos	(*tell)		(MsOleStream *stream);
+
+	MsOlePos	(*write)	(MsOleStream *stream,
+					 guint8 *ptr,
+					 MsOlePos length);
+
+
+	/**
+	 * PRIVATE (do not use)
+	 **/
+	enum {
+		MsOleSmallBlock,
+		MsOleLargeBlock
+	} type;
+	MsOle		*file;
+	void		*pps;		/* Straight PPS */
+	GArray		*blocks;	/* A list of the blocks in the file
+					   if NULL: no file */
+	MsOlePos	 position;	/* Current offset into file.
+					   Points to the next byte to read */
+};
+</STRUCT>
+<MACRO>
+<NAME>MS_OLE_GET_GUINT8</NAME>
+#define MS_OLE_GET_GUINT8(p)  (*((const guint8 *)(p) + 0))
+</MACRO>
+<MACRO>
+<NAME>MS_OLE_GET_GUINT16</NAME>
+#define MS_OLE_GET_GUINT16(p) (guint16)(*((const guint8 *)(p)+0) |        \
+					(*((const guint8 *)(p)+1)<<8))
+</MACRO>
+<MACRO>
+<NAME>MS_OLE_GET_GUINT32</NAME>
+#define MS_OLE_GET_GUINT32(p) (guint32)(*((const guint8 *)(p)+0) |        \
+					(*((const guint8 *)(p)+1)<<8) |   \
+					(*((const guint8 *)(p)+2)<<16) |  \
+					(*((const guint8 *)(p)+3)<<24))
+</MACRO>
+<MACRO>
+<NAME>MS_OLE_GET_GUINT64</NAME>
+#define MS_OLE_GET_GUINT64(p) (MS_OLE_GET_GUINT32(p) | \
+			       (((guint32)MS_OLE_GET_GUINT32((const guint8 *)(p)+4))<<32))
+</MACRO>
+<MACRO>
+<NAME>MS_OLE_SET_GUINT8</NAME>
+#define MS_OLE_SET_GUINT8(p,n)  (*((guint8 *)(p) + 0) = n)
+</MACRO>
+<MACRO>
+<NAME>MS_OLE_SET_GUINT16</NAME>
+#define MS_OLE_SET_GUINT16(p,n) ((*((guint8 *)(p)+0)=((n)&0xff)),         \
+				 (*((guint8 *)(p)+1)=((n)>>8)&0xff))
+</MACRO>
+<MACRO>
+<NAME>MS_OLE_SET_GUINT32</NAME>
+#define MS_OLE_SET_GUINT32(p,n) ((*((guint8 *)(p)+0)=((n))&0xff),         \
+				 (*((guint8 *)(p)+1)=((n)>>8)&0xff),      \
+				 (*((guint8 *)(p)+2)=((n)>>16)&0xff),     \
+				 (*((guint8 *)(p)+3)=((n)>>24)&0xff))
+</MACRO>
+<FUNCTION>
+<NAME>ms_ole_stream_open</NAME>
+<RETURNS>MsOleErr 	</RETURNS>
+MsOleStream ** const stream,MsOle *fs,const char *dirpath,const char *name,char mode
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_stream_close</NAME>
+<RETURNS>MsOleErr 	</RETURNS>
+MsOleStream ** const stream
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_stream_duplicate</NAME>
+<RETURNS>MsOleErr 	</RETURNS>
+MsOleStream **const stream_copy,const MsOleStream *const stream
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_dump</NAME>
+<RETURNS>void 	</RETURNS>
+guint8 const *ptr,guint32 len
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_ref</NAME>
+<RETURNS>void 	</RETURNS>
+MsOle *fs
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_unref</NAME>
+<RETURNS>void 	</RETURNS>
+MsOle *fs
+</FUNCTION>
+<FUNCTION>
+<NAME>ms_ole_debug</NAME>
+<RETURNS>void 	</RETURNS>
+MsOle *fs,int magic
+</FUNCTION>
+<VARIABLE>
+<NAME>libole2_major_version</NAME>
+extern int libole2_major_version;
+</VARIABLE>
+<VARIABLE>
+<NAME>libole2_minor_version</NAME>
+extern int libole2_minor_version;
+</VARIABLE>
+<VARIABLE>
+<NAME>libole2_micro_version</NAME>
+extern int libole2_micro_version;
+</VARIABLE>
+<MACRO>
+<NAME>LIBOLE2_MAJOR_VERSION</NAME>
+#define LIBOLE2_MAJOR_VERSION 0
+</MACRO>
+<MACRO>
+<NAME>LIBOLE2_MINOR_VERSION</NAME>
+#define LIBOLE2_MINOR_VERSION 1
+</MACRO>
+<MACRO>
+<NAME>LIBOLE2_MICRO_VERSION</NAME>
+#define LIBOLE2_MICRO_VERSION 0
+</MACRO>

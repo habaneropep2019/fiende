@@ -1,0 +1,1352 @@
+<HTML
+><HEAD
+><TITLE
+>gnome-i18n</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Library Reference Manual"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Gnome Library"
+HREF="libgnome.html"><LINK
+REL="PREVIOUS"
+TITLE="gnome-history"
+HREF="gnome-gnome-history.html"><LINK
+REL="NEXT"
+TITLE="gnome-metadata"
+HREF="gnome-gnome-metadata.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>Gnome Library Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnome-gnome-history.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnome.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnome-gnome-metadata.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="GNOME-GNOME-I18N"
+>gnome-i18n</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN2197"
+></A
+><H2
+>Name</H2
+>gnome-i18n&nbsp;--&nbsp;Support for localization and internationalization.</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN2200"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;gnome.h&gt;
+
+
+#define     <A
+HREF="gnome-gnome-i18n.html#GETTEXT-MACRO"
+>_</A
+>                               (String)
+#define     <A
+HREF="gnome-gnome-i18n.html#N--CAPS"
+>N_</A
+>                              (String)
+#define     <A
+HREF="gnome-gnome-i18n.html#TEXTDOMAIN"
+>textdomain</A
+>                      (String)
+#define     <A
+HREF="gnome-gnome-i18n.html#GETTEXT"
+>gettext</A
+>                         (String)
+#define     <A
+HREF="gnome-gnome-i18n.html#DGETTEXT"
+>dgettext</A
+>                        (Domain,Message)
+#define     <A
+HREF="gnome-gnome-i18n.html#DCGETTEXT"
+>dcgettext</A
+>                       (Domain,Message,Type)
+#define     <A
+HREF="gnome-gnome-i18n.html#BINDTEXTDOMAIN"
+>bindtextdomain</A
+>                  (Domain,Directory)
+const char* <A
+HREF="gnome-gnome-i18n.html#GNOME-I18N-GET-LANGUAGE"
+>gnome_i18n_get_language</A
+>         (void);
+<GTKDOCLINK
+HREF="GLIST"
+>GList</GTKDOCLINK
+>*      <A
+HREF="gnome-gnome-i18n.html#GNOME-I18N-GET-LANGUAGE-LIST"
+>gnome_i18n_get_language_list</A
+>    (const <GTKDOCLINK
+HREF="GCHAR"
+>gchar</GTKDOCLINK
+> *category_name);
+void        <A
+HREF="gnome-gnome-i18n.html#GNOME-I18N-SET-PREFERRED-LANGUAGE"
+>gnome_i18n_set_preferred_language</A
+>
+                                            (const char *val);
+const char* <A
+HREF="gnome-gnome-i18n.html#GNOME-I18N-GET-PREFERRED-LANGUAGE"
+>gnome_i18n_get_preferred_language</A
+>
+                                            (void);
+void        <A
+HREF="gnome-gnome-i18n.html#GNOME-I18N-INIT"
+>gnome_i18n_init</A
+>                 (void);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2217"
+></A
+><H2
+>Description</H2
+><P
+>  This module allows the programmer to internationalize his
+  application by providing a number of macros that can be used to tag his
+  texts, and some functions that control the internationalization of
+  the application or library.</P
+><P
+>  Typically the programmer would enclose text strings that are
+  displayed to the user in a <A
+HREF="gnome-gnome-i18n.html#GETTEXT-MACRO"
+>_</A
+>() macro call.  This macro serves two
+  purposes: it is used to tag the string for translation (it is a
+  special sequence recognized by the GNU gettext framework) and it is
+  used at run-time to invoke the translation process on the current
+  string.
+
+  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN2222"
+></A
+><P
+><B
+>Example 1. Typical usage of the _ macro</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void print_hello (void)
+{
+        printf (_("Hello World"));
+}
+    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+></P
+><P
+>  The macro <A
+HREF="gnome-gnome-i18n.html#GETTEXT-MACRO"
+>_</A
+>() can map to either an invocation to gettext (which
+  means that the string argument is translated in the default
+  application translation domain) or to dgettext (which means that the
+  string is translated into the
+  <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>GNOME_EXPLICIT_TRANSLATION_DOMAIN</I
+></SPAN
+>.</P
+><P
+>  Typically applications will just include the
+  <TT
+CLASS="FILENAME"
+>gnome.h</TT
+> header file, the
+  <TT
+CLASS="FILENAME"
+>libgnome.h</TT
+> or the
+  <TT
+CLASS="FILENAME"
+>gnome-i18n.h</TT
+> header file and this will define
+  the <A
+HREF="gnome-gnome-i18n.html#GETTEXT-MACRO"
+>_</A
+>() macro as an invocation to <A
+HREF="gnome-gnome-i18n.html#GETTEXT"
+>gettext</A
+>().  In the case of
+  libraries, shared object modules (dynamically linked libraries) or
+  shared object CORBA servers (CORBA servers implemented as shared
+  libraries), you should define the
+  <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>GNOME_EXPLICIT_TRANSLATION_DOMAIN</I
+></SPAN
+> macro to your
+  package name (usually a define in the compilation Makefile or in the
+  config.h file will do it).  By doing this your library, shared
+  library or CORBA server will explicitly translate its string
+  messages in its own translation domain (rather than using the
+  application domain, which will not have a translation table for your
+  messages). </P
+><P
+>  All of the functions in this module do either map to an empty action
+  if the <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>ENABLE_NLS</I
+></SPAN
+> macro is not defined or to
+  actual functions if it is defined.</P
+><P
+>  See the Info page for GNU gettext to learn more on the
+  internationalization process for an application. </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2238"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2240"
+></A
+><H3
+><A
+NAME="GETTEXT-MACRO"
+></A
+>_()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define     _(String)</PRE
+></TD
+></TR
+></TABLE
+><P
+>  Use this to tag strings in an executable path, this macro expands to
+  <A
+HREF="gnome-gnome-i18n.html#GETTEXT"
+>gettext</A
+>() or <A
+HREF="gnome-gnome-i18n.html#DGETTEXT"
+>dgettext</A
+>() if the application supports
+  internationalization.</P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2247"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>String</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2256"
+></A
+><H3
+><A
+NAME="N--CAPS"
+></A
+>N_()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define     N_(String)</PRE
+></TD
+></TR
+></TABLE
+><P
+>  This macro is just an identity macro, the only purpose of this macro
+  is to allow <TT
+CLASS="FILENAME"
+>gettext</TT
+> to identify the string as a
+  translatable message.  This macro can be used in static
+  initializers, where the <A
+HREF="gnome-gnome-i18n.html#GETTEXT-MACRO"
+>_</A
+>() macros can not be used.
+
+  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN2263"
+></A
+><P
+><B
+>Example 2. Typical usage of the N_ macro</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char *days [5] = {
+    	N_("monday"), 
+    	N_("tuesday"), 
+    	N_("wednesday"), 
+    	N_("thursday"), 
+    	N_("friday")
+};
+
+void print_days (void)
+{
+        int i;
+
+        for (i = 0; i &#60; 5; i++)
+             printf (_("The day of the week <TT
+CLASS="LITERAL"
+>s</TT
+> is"), _(days [i]));
+}
+    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2267"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>String</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2276"
+></A
+><H3
+><A
+NAME="TEXTDOMAIN"
+></A
+>textdomain()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#    define textdomain(String) (String)</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2281"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>String</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2290"
+></A
+><H3
+><A
+NAME="GETTEXT"
+></A
+>gettext()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#    define gettext(String) (String)</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2295"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>String</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2304"
+></A
+><H3
+><A
+NAME="DGETTEXT"
+></A
+>dgettext()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#    define dgettext(Domain,Message) (Message)</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2309"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>Domain</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>Message</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2322"
+></A
+><H3
+><A
+NAME="DCGETTEXT"
+></A
+>dcgettext()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#    define dcgettext(Domain,Message,Type) (Message)</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2327"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>Domain</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>Message</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>Type</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2344"
+></A
+><H3
+><A
+NAME="BINDTEXTDOMAIN"
+></A
+>bindtextdomain()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#    define bindtextdomain(Domain,Directory) (Domain)</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2349"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>Domain</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>Directory</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2362"
+></A
+><H3
+><A
+NAME="GNOME-I18N-GET-LANGUAGE"
+></A
+>gnome_i18n_get_language ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>const char* gnome_i18n_get_language         (void);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Returns current language (contents of "LANG" environment variable).</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2368"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2377"
+></A
+><H3
+><A
+NAME="GNOME-I18N-GET-LANGUAGE-LIST"
+></A
+>gnome_i18n_get_language_list ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="GLIST"
+>GList</GTKDOCLINK
+>*      gnome_i18n_get_language_list    (const <GTKDOCLINK
+HREF="GCHAR"
+>gchar</GTKDOCLINK
+> *category_name);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This computes a list of language strings.  It searches in the
+standard environment variables to find the list, which is sorted
+in order from most desirable to least desirable.  The `C' locale
+is appended to the list if it does not already appear.
+If <TT
+CLASS="PARAMETER"
+><I
+>category_name</I
+></TT
+> is <TT
+CLASS="LITERAL"
+>NULL</TT
+>, then LC_ALL is assumed.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2387"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>category_name</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Name of category to look up, e.g. "LC_MESSAGES".</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the list of languages</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2400"
+></A
+><H3
+><A
+NAME="GNOME-I18N-SET-PREFERRED-LANGUAGE"
+></A
+>gnome_i18n_set_preferred_language ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        gnome_i18n_set_preferred_language
+                                            (const char *val);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This sets the user's preferred language in the Gnome config
+database.  This value can always be overridden by the standard
+environment variables.  It exists so that a config applet which
+chooses the preferred language has a standard place to put the
+resulting information.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2406"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>val</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Preferred language</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2415"
+></A
+><H3
+><A
+NAME="GNOME-I18N-GET-PREFERRED-LANGUAGE"
+></A
+>gnome_i18n_get_preferred_language ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>const char* gnome_i18n_get_preferred_language
+                                            (void);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2421"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the preferred language as set in the Gnome config database.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN2430"
+></A
+><H3
+><A
+NAME="GNOME-I18N-INIT"
+></A
+>gnome_i18n_init ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        gnome_i18n_init                 (void);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Initialize the i18n environment variables (if not already set) from
+the Gnome config database.  Ordinarily this should not be called by
+user code.</P
+><P
+></P
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN2436"
+></A
+><H2
+>See Also</H2
+><P
+>  GNU gettext info page</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnome-gnome-history.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnome.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnome-gnome-metadata.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-history</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-metadata</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

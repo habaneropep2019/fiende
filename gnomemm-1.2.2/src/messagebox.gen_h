@@ -1,0 +1,110 @@
+/* $Id: messagebox.gen_h,v 1.8 2001/08/03 20:00:29 murrayc Exp $ */
+
+
+/* messagebox.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/dialog.h>
+#include <libgnomeui/gnome-messagebox.h>
+
+CLASS_START(Gnome);
+//: Create popup windows for simple messages.
+//- Unlike GnomeMessageBox in C, Gnome::MessageBox does not self-destruct when
+//- run() or run_and_close() returns, so you can use it again.
+//- Just delete it later, like any other Window.
+
+class MessageBox : public Dialog
+{
+  WRAP_CLASS(MessageBox, GnomeMessageBox,
+             GNOME_MESSAGE_BOX, GNOME_IS_MESSAGE_BOX,
+             message_box,
+             Dialog, GnomeDialog, GNOME_DIALOG);
+public:
+
+  //: Use stock names to get stock features, or just use your own text.
+  //- message:
+  //-  The text to be displayed.
+  //- messagebox_type:
+  //-  GNOME_MESSAGE_BOX_INFO,
+  //-  GNOME_MESSAGE_BOX_WARNING,
+  //-  GNOME_MESSAGE_BOX_ERROR ,
+  //-  GNOME_MESSAGE_BOX_QUESTION,
+  //-  GNOME_MESSAGE_BOX_GENERIC
+  //- buttons:
+  //-  e.g. GNOME_STOCK_BUTTON_OK: See gnome-stock.h
+  //- Alternatively, add the buttons later with append_button().
+  MessageBox(const Gtk::nstring &message,
+		   const Gtk::nstring &messagebox_type,
+		   const Gtk::SArray &buttons);
+
+	MessageBox(const Gtk::nstring &message = 0,
+		   const Gtk::nstring &messagebox_type = 0);
+		   
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  
+
+  // gnome_message_box_set_modal and gnome_message_box_set_default
+  // are both deprecated
+};
+
+
+
+PRIVATE_START;
+#include <gnome--/private/dialog_p.h>
+IMPL_START;
+#include <gnome--/private/messagebox_p.h>
+#include <gnome--/construct_copies.h>
+
+Gnome::MessageBox::MessageBox(const Gtk::nstring &message,
+				   const Gtk::nstring &messagebox_type,
+				   const Gtk::SArray &buttons)
+  : Dialog(GNOME_DIALOG(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  
+  const gchar **buttons_ = (const gchar**)buttons;
+
+  gnome_message_box_constructv(gtkobj(), message.c_str(), messagebox_type.c_str(), buttons_);
+
+  //Prevent automatic gtkobj destruction upon dialog close.
+  //It's not suitable for C++.
+  close_hides();
+}
+
+Gnome::MessageBox::MessageBox(const Gtk::nstring &message,
+				   const Gtk::nstring &messagebox_type)
+  : Dialog(GNOME_DIALOG(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+
+  //Create empty list of buttons:
+  const gchar* buttons_[1] = {0};
+  
+  gnome_message_box_constructv(gtkobj(), message.c_str(), messagebox_type.c_str(), buttons_);
+
+  //Prevent automatic gtkobj destruction upon dialog close.
+  //It's not suitable for C++.
+  close_hides();
+}
+
+
+DOCUMENTATION_START;
+

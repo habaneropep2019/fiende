@@ -1,0 +1,85 @@
+
+Dynamic Loading
+===============
+
+	- Aim is to allow users of Glade to specify extra libraries
+	  containing more GTK widgets (which Glade has no knowledge of at all!)
+	  so that Glade can use these widgets while creating the interface.
+
+	- How portable is it??
+
+	  On Linux need to link with -ldl (see ld.so info files).
+	  Load library with:    handle = dlopen ("/lib/libm.so", RTLD_LAZY);
+	  Look up symbol with:  cosine = dlsym(handle, "cos");
+	  Call it with:         printf ("%f\\n", (*cosine)(2.0));
+
+	  Does it need a completely different procedure on each Unix platform?
+	  Maybe we could support just Linux and a few other popular platforms.
+	  Maybe someone has written a portable library of functions for this?
+	  (Tim Janik is adding this to glib)
+
+	- How does Glade determine what widgets are available and what
+	  functions?
+	  Need a standard function included with the library to initialize
+	  it and return info on the included widgets?
+
+	  This would call gtk_<widget>_get_type() on all the widgets in the
+	  library.
+
+	  If GTK's get_arg/set_arg mechanism works OK, then all we need
+	  returned is an array of widget type IDs?
+
+	     void *handle;
+	     gint* (*library_info_fn)();
+	     gint* library_info;
+
+	     handle = dlopen (library, RTLD_LAZY);
+	     library_info_fn = dlsym(handle, "library_info");
+             library_info = (*library_info_fn)();
+
+
+	  We create new widgets with:     widget = gtk_type_new(type);
+	  query the widgets properties:   gtk_object_query_args(type);
+	  and show/apply properties with: gtk_object_getv/setv(widget, ...);
+
+	  Is that all we need??
+
+	  Some way of getting icons and tooltips for the palette would be nice
+	  (though we could provide a number of custom icons and the class name
+	   could be used for the tooltip).
+
+	- The libraries could also contain customization functions which,
+	  when called, pop up a dialog box or something to customize the
+	  widget.
+
+	- User could specify additional widget libraries in a Glade config
+	  file. - Or even in a dialog in Glade itself.
+	- Glade could even look for some standard libraries - GtkXmHTML,
+	  Gnome's widget libraries. - May be a problem with versions?
+
+
+In summary, people creating their own widgets to use with Glade (or any other
+UI builder) should:
+
+  1. compile them into a library.
+  2. make sure the widgets are configurable with GTK's get_arg/set_arg
+     mechanism (and also that creating the widget with gtk_type_new()
+     results in a valid widget).
+  3. include one extra function to initialize the widgets and return the
+     types, something like this:
+
+gint*
+library_info()
+{
+  gint types[4];
+
+  types[0] = gtk_myfirstwidget_get_type();
+  types[1] = gtk_mysecondwidget_get_type();
+  types[2] = gtk_mythirdwidget_get_type();
+  types[3] = 0;
+
+  return types;
+}
+
+
+Damon, 14th May 1998

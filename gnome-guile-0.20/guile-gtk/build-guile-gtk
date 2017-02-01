@@ -1,0 +1,1587 @@
+#! /bin/sh
+# -*- scheme -*-
+exec guile -s $0 $*
+!#
+
+;;	Copyright (C) 1997, 1998, 1999 Marius Vollmer
+;; 
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+;; 
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;; 
+;; You should have received a copy of the GNU General Public License
+;; along with this software; see the file COPYING.  If not, write to
+;; the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139,
+;; USA.
+
+(read-enable 'positions)
+(debug-enable 'backtrace)
+(debug-enable 'debug)
+
+(define-module (mini-format))
+
+(define-public (format-with-list-template dst fmt . args)
+  (cond
+   ((eq? dst #t)
+    (apply format-with-list-template (current-output-port) fmt args))
+   ((eq? dst #f)
+    (call-with-output-string
+     (lambda (p)
+       (apply format-with-list-template p fmt args))))
+   (else
+    (let loop ((fmt fmt)
+	       (args args))
+      (if (null? fmt)
+	  #t
+	  (let ((f (car fmt)))
+	    (cond
+	     ((string? f)
+	      (display f dst)
+	      (loop (cdr fmt) args))
+	     ((procedure? f)
+	      (loop (cdr fmt) (f args dst)))
+	     (else
+	      (error "unknown formatting op" f)))))))))
+
+(define (fmt-display args dst)
+  (display (car args) dst)
+  (cdr args))
+
+(define (fmt-write args dst)
+  (write (car args) dst)
+  (cdr args))
+
+(define (fmt-newline args dst)
+  (newline dst)
+  args)
+
+(define-public (string-template->list-template fmt)
+  (let ((tilde (string-index fmt #\~)))
+    (if (and tilde (< tilde (string-length fmt)))
+	(let* ((prefix (substring fmt 0 tilde))
+	       (arg (string-ref fmt (+ tilde 1))))
+	  (if (not (memq arg '(#\a #\d #\s #\%)))
+	      #f
+	      (let* ((rest (string-template->list-template
+			    (substring fmt (+ tilde 2))))
+		     (subst
+		      (case arg
+			((#\a #\d)
+			 fmt-display)
+			((#\s)
+			 fmt-write)
+			((#\%)
+			 (set! prefix (string-append prefix "\n"))
+			 #f))))
+		(and rest
+		     (if (zero? (string-length prefix))
+			 (cons subst rest)
+			 (cons prefix (if subst
+					  (cons subst rest)
+					  rest)))))))
+	;; no ~ in fmt
+	(if (zero? (string-length fmt))
+	    '()
+	    (list fmt)))))
+
+(defmacro-public mini-format-macro (dst fmt . args)
+  (let ((m-fmt (and (string? fmt) (string-template->list-template fmt))))
+    (if m-fmt
+	`(format-with-list-template ,dst ',m-fmt ,@args)
+	(error "unsupported format template" fmt))))
+
+(define-public (mini-format dst fmt . args)
+  (let ((m-fmt (and (string? fmt) (string-template->list-template fmt))))
+    (if m-fmt
+	(apply format-with-list-template dst m-fmt args)
+	(error "unsupported format template" fmt))))
+
+(define-module (build-guile-gtk)
+  :use-module (gtk config)
+  :use-module (mini-format)
+  :use-module (ice-9 common-list))
+
+(define (pk . args)
+  (write args (current-error-port))
+  (newline (current-error-port))
+  (car (last-pair args)))
+
+;; Get verbose error reporting. If you feel this looks much too
+;; involved, you are right.
+
+(define (call-with-error-catching thunk)
+  (catch #t
+	 (lambda ()
+	   (lazy-catch #t
+		       (lambda ()
+			 (start-stack #t (thunk)))
+		       (lambda args
+			 (save-stack 1)
+			 (apply throw args))))
+	 (lambda key-and-args
+	   (if (> (length key-and-args) 4)
+	       (catch #t
+		      (lambda ()
+			(apply handle-system-error key-and-args))
+		      (lambda (key . args)
+			(display key)
+			(display ": ")
+			(write args)
+			(newline)))
+	       (apply throw key-and-args)))))
+
+(defmacro with-error-catching body
+  `(call-with-error-catching (lambda () ,@body)))
+
+(define *imported-types* '())
+
+(define (imported-type? type)
+  (memq type *imported-types*))
+
+(define *extra-options* '())
+
+(define (register-extra-options sym opts)
+  (set! *extra-options* (acons sym opts *extra-options*)))
+
+(define (extra-options sym)
+  (let ((c (assq sym *extra-options*)))
+    (if c (cdr c) '())))
+
+(define *global-options* '())
+
+(define *imported-initfuncs* '())
+
+(define (dirname name)
+  (let ((tail (string-rindex name #\/)))
+    (if tail
+	(substring name 0 tail)
+	".")))
+
+(define (basename name)
+  (let ((tail (string-rindex name #\/)))
+    (if tail
+	(substring name (1+ tail))
+	name)))
+
+(define defsdir (string-append gtkconf-prefix "/share/guile-gtk"))
+(define import-path (list defsdir))
+
+(define (add-import-dir dir)
+  (set! import-path (cons dir import-path)))
+
+(define (read-file name backend)
+
+  (define (search-in-path name path)
+    (let loop ((search-name name)
+	       (path path))
+      (cond ((file-exists? search-name)
+	     search-name)
+	    ((null? path)
+	     name)
+	    (else
+	     (loop (string-append (car path) "/" name) (cdr path))))))
+
+  (define (with-input-from-defs-file name proc)
+    (let ((name (search-in-path name import-path)))
+      (pk 'reading name)
+      (with-input-from-file name (lambda () (proc name)))))
+  
+  (define (read-file-1 importing)
+    (let loop ((res '())
+	       (obj (read)))
+      (cond ((eof-object? obj)
+	     res)
+	    ((and (list? obj) (eq? (car obj) 'import))
+	     (loop (append (read-file-2 (cadr obj) #t) res)
+		   (read)))
+	    ((and (list? obj) (eq? (car obj) 'include))
+	     (loop (append (read-file-2 (cadr obj) importing) res)
+		   (read)))
+	    ((and (list? obj) (eq? (car obj) 'load-scheme))
+	     (pk 'loading-scheme (cadr obj))
+	     (load-from-path (cadr obj))
+	     (loop res (read)))
+	    (else
+	     (loop (append (backend obj importing) res) (read))))))
+
+  (define (read-file-2 name importing)
+    (with-input-from-defs-file name
+      (lambda (name)
+	(read-file-1 importing))))
+
+  (reverse (read-file-2 name #f)))
+
+(define (glue-backend obj importing)
+  (if (list? obj)
+      (case (car obj)
+	((add-options)
+	 (register-extra-options (cadr obj) (cddr obj))
+	 '())
+	((options)
+	 (let* ((opts (cdr obj))
+		(i (get-opt-val opts 'init-func)))
+	   (if (not importing)
+	       (set! *global-options* (append opts *global-options*))
+	       (set! *imported-initfuncs* (cons i *imported-initfuncs*))))
+	 '())
+	(else
+	 (if importing
+	     (if (eq? (car obj) 'define-func)
+		 '()
+		 (begin
+		   (set! *imported-types*
+			 (cons (cadr obj) *imported-types*))
+		   (list obj)))
+	     (list obj))))
+      '()))
+
+(define (->string obj)
+  (cond ((symbol? obj)
+	 (symbol->string obj))
+	((string? obj)
+	 obj)
+	(else
+	 (error "only strings or symbols" obj))))
+
+(define (@ fmt . args)
+  (apply mini-format #t fmt args))
+
+(define (@@ fmt . args)
+  (apply mini-format #f fmt args))
+
+;; string stunts
+
+(define (->string s)
+  (cond
+   ((symbol? s) (symbol->string s))
+   ((string? s) s)
+   (else
+    (error "can't coerce into string" s))))
+
+;; Like STRING-APPEND but also works on symbols.
+
+(define (string-append* . args)
+  (apply string-append (map ->string args)))
+
+(define (string-upcase str)
+  (string-upcase! (string-copy str)))
+
+(define (string-downcase str)
+  (string-downcase! (string-copy str)))
+
+(define (string-capitalize str)
+  (let ((newstr (string-copy str)))
+    (cond ((> (string-length newstr) 0)
+	   (string-set! newstr 0 (char-upcase (string-ref newstr 0)))))
+    newstr))
+
+(define (printable str)
+  (let ((newstr (string-copy str))
+	(len (string-length str)))
+    (let loop ((pos 0))
+      (cond ((< pos len)
+	     (let ((ch (string-ref newstr pos)))
+	       (if (not (or (char-alphabetic? ch) (char-numeric? ch)))
+		   (string-set! newstr pos #\_)))
+	     (loop (1+ pos)))))
+    newstr))
+
+(define (canonicalize str)
+  (let loop ((res '())
+	     (cur "")
+	     (chars (string->list (->string str)))
+	     (prevlower #f))
+    (cond ((null? chars)
+	   (reverse (cons cur res)))
+	  ((or (char=? (car chars) #\-)
+	       (char=? (car chars) #\_))
+	   (loop (cons cur res) "" (cdr chars) #f))
+	  ((and (char-upper-case? (car chars))
+		prevlower)
+	   (loop (cons cur res) "" chars #f))
+	  (else
+	   (loop res (string-append cur 
+				    (string (car chars)))
+		 (cdr chars) (char-lower-case? (car chars)))))))
+
+(define (syllables->string syls del)
+  (cond ((null? syls)
+	 "")
+	((null? (cdr syls))
+	 (car syls))
+	(else
+	 (string-append (car syls) del
+			(syllables->string (cdr syls) del)))))
+
+(define (macroname canon)
+  (syllables->string (map string-upcase canon) "_"))
+
+(define (funcname canon)
+  (syllables->string (map string-downcase canon) "_"))
+
+(define (typename canon)
+  (syllables->string canon ""))
+
+(define (scmname canon)
+  (syllables->string (map string-downcase canon) "-"))
+
+(define (defined-name form)
+  (if (and (pair? form) (pair? (cdr form)) (symbol? (cadr form)))
+      (canonicalize (cadr form))
+      (error "unsupported definition" form)))
+
+;; options
+
+(define (form-options form)
+  (append (extra-options (cadr form))
+	  (case (car form)
+	    ((define-enum define-flags define-string-enum)
+	     (list-tail form 3))
+	    ((define-func)
+	     (list-tail form 4))
+	    ((define-object)
+	     (list-tail form 3))
+	    ((define-struct)
+	     (list-tail form 2))
+	    ((define-ptype)
+	     (list-tail form 2))
+	    ((define-boxed)
+	     (list-tail form 2))
+	    (else
+	     '()))))
+
+(define (get-opt opts sym . def)
+  (let loop ((opts opts))
+    (cond ((null? opts)
+	   (if (pair? def) (car def) (error "must specify option" sym)))
+	  ((eq? (caar opts) sym)
+	   (cdar opts))
+	  (else
+	   (loop (cdr opts))))))
+
+(define (get-opt-val opts sym . def)
+  (car (if (pair? def)
+	   (get-opt opts sym def)
+	   (get-opt opts sym))))
+
+;; emitters
+
+(define (emit-enum/flags-info defs)
+
+  (define (emit-lits name form)
+    (let* ((literals (cddr form))
+	   (nlits (length literals))
+	   (is-senum (eq? (car form) 'define-string-enum))
+	   (form-str (if is-senum 
+			 "  { ~s, ~a },~%" 
+			 "  { SCM_UNDEFINED, ~s, ~a },~%")))
+
+      (@ "~%static sgtk_~a_literal _~a_literals[~a] = {~%"
+	 (if is-senum "senum" "enum")
+	 (funcname name) nlits)
+      (for-each (lambda (lit)
+		  (@ form-str (->string (car lit)) (cadr lit)))
+		literals)
+      (@ "};~%")))
+
+  (define (emit-enum/flags-map type kind tag)
+    (for-each (lambda (form)
+		(if (eq? (car form) tag)
+		    (let ((name (defined-name form)))
+		      (cond
+		       ((imported-type? (cadr form))
+			(@ "extern sgtk_~a_info sgtk_~a_info;~%"
+			   type (funcname name)))
+		       (else
+			(emit-lits name form)
+			(@ "sgtk_~a_info sgtk_~a_info = {~%" 
+			   type (funcname name))
+			(@ "  { ~s, GTK_TYPE_~a }, ~a, _~a_literals,~%"
+			   (typename name)
+			   (case tag
+			     ((define-enum) "ENUM")
+			     ((define-flags) "FLAGS")
+			     ((define-string-enum) "INVALID"))
+			   (length (cddr form))
+			   (funcname name))
+			(@ "};~%")
+			(or (eq? (car form) 'define-string-enum)
+			    (add-enum/flags-init (funcname name))))))))
+	      
+	      defs))
+
+  (emit-enum/flags-map "enum" "enum" 'define-enum)
+  (emit-enum/flags-map "enum" "flags" 'define-flags)
+  (emit-enum/flags-map "senum" "senum" 'define-string-enum))
+
+(define (emit-struct-info defs)
+  (for-each (lambda (form)
+	      (if (memq (car form) '(define-struct define-ptype))
+		  (let* ((name (defined-name form))
+			 (opts (form-options form))
+			 (copy (get-opt-val opts 'copy))
+			 (destroy (get-opt-val opts 'free))
+			 (has-size (get-opt-val opts 'size #f))
+			 (size (if has-size has-size "0"))
+			 (conversion (get-opt-val opts 'conversion #f)))
+		    (cond
+		     ((imported-type? (cadr form))
+		      (@ "extern sgtk_boxed_info sgtk_~a_info;~%"
+			 (funcname name)))
+		     (else
+		      (if conversion
+			  (@ "~%SCM ~a (SCM);" conversion))
+		      (@ "~%GtkTypeInfo sgtk_~a_info_gtk = {~%"
+			 (funcname name))
+		      (@ "  ~s, ~s, 0,~%"
+			 (typename name) 
+			 (if has-size 
+			     size 
+			     (@@ "sizeof (~a)" (cadr form))))
+		      (@ "  (GtkClassInitFunc) NULL,~%")
+		      (@ "  (GtkObjectInitFunc) NULL,~%")
+		      (@ "  (GtkArgSetFunc) NULL,~%")
+		      (@ "  (GtkArgGetFunc) NULL,~%")
+		      (@ "  (GtkClassInitFunc) NULL,~%")
+		      (@ "};~%")
+
+		      (@ "~%sgtk_boxed_info sgtk_~a_info = {~%"
+			 (funcname name))
+		      (@ "  { ~s, GTK_TYPE_BOXED, ~a },~%"
+			 (typename name)
+			 (or conversion "NULL"))
+		      (@ "  (void *(*)(void*))~a,~%" copy)
+		      (@ "  (void (*)(void*))~a,~%" destroy)
+		      (@ "  ~a~%};~%" size))))))
+	    defs))
+
+(define (emit-boxed-info defs)
+  (for-each (lambda (form)
+	      (if (eq? (car form) 'define-boxed)
+		  (let* ((name (defined-name form))
+			 (opts (form-options form))
+			 (copy (get-opt-val opts 'copy))
+			 (destroy (get-opt-val opts 'free))
+			 (size (get-opt-val opts 'size "0"))
+			 (conversion (get-opt-val opts 'conversion #f)))
+		    (cond
+		     ((imported-type? (cadr form))
+		      (@ "extern sgtk_boxed_info sgtk_~a_info;~%"
+			 (funcname name)))
+		     (else
+		      (if conversion
+			  (@ "~%SCM ~a (SCM);" conversion))
+		      (@ "~%sgtk_boxed_info sgtk_~a_info = {~%"
+			 (funcname name))
+		      (@ "  { ~s, GTK_TYPE_BOXED, ~a },~%"
+			 (typename name)
+			 (or conversion "NULL"))
+		      (@ "  (void *(*)(void*))~a,~%" copy)
+		      (@ "  (void (*)(void*))~a,~%" destroy)
+		      (@ "  ~a~%};~%" size))))))
+	    defs))
+
+(define (emit-object-info defs)
+  (for-each (lambda (form)
+	      (if (eq? (car form) 'define-object)
+		  (let ((name (defined-name form))
+			(object-type (if gtkconf-gtk-2-0
+					 'G_TYPE_OBJECT 'GTK_TYPE_OBJECT)))
+		    (cond 
+		     ((imported-type? (cadr form))
+		      (@ "extern sgtk_object_info sgtk_~a_info;~%"
+			 (funcname name)))
+		     (else
+		      (@ "~%sgtk_object_info sgtk_~a_info = {~%"
+			 (funcname name))
+		      (@ "  { ~s, ~s }, ~a_get_type~%"
+			 (typename name) object-type (funcname name))
+		      (@ "};~%"))))))
+	    defs))
+
+(define (emit-type-info defs)
+  (emit-enum/flags-info defs)
+  (emit-struct-info defs)
+  (emit-boxed-info defs)
+  (emit-object-info defs)
+  (@ "~%static sgtk_type_info *type_infos[] = {~%")
+  (for-each (lambda (form)
+	      (if (and (memq (car form) '(define-enum
+					   define-flags
+					   define-string-enum
+					   define-struct
+					   define-ptype
+					   define-boxed
+					   define-object))
+		       (not (imported-type? (cadr form))))
+		  (let ((name (defined-name form)))
+		    (@ "  (sgtk_type_info*)&sgtk_~a_info,~%"
+		       (funcname name)))))
+	    defs)
+  (@ "  NULL~%};~%")
+  (@ "~%static GtkTypeInfo *type_infos_gtk[] = {~%")
+  (for-each (lambda (form)
+	      (if (and (memq (car form) '(define-struct
+					   define-ptype))
+		       (not (imported-type? (cadr form))))
+		  (let ((name (defined-name form)))
+		    (@ "  (GtkTypeInfo*)&sgtk_~a_info_gtk,~%"
+		       (funcname name)))))
+	    defs)
+  (@ "  NULL~%};~%~%")
+)
+
+(define *inits* '())
+
+(define (add-init l)
+  (set! *inits* (cons l *inits*)))
+
+(define *enum/flags-inits* '())
+
+(define (add-enum/flags-init l)
+  (set! *enum/flags-inits* (cons l *enum/flags-inits*)))
+
+(define types '())
+(define composite-types '())
+
+(define (register-type sym def)
+  (set! types (acons sym def types)))
+
+(define (register-composite-realizer name realizer)
+  (set! composite-types (acons name realizer composite-types)))
+
+(define (make-type name ctype isa scm2c c2scm . props)
+  (vector ctype isa scm2c c2scm props name))
+
+(define (type-cname t) (vector-ref t 0))
+(define (type-isa t x) ((vector-ref t 1) x))
+(define (type-set-prop t tag val)
+  (vector-set! t 4 (list* tag val (vector-ref t 4))))
+(define (type-prop t tag def) 
+  (let ((val (memq tag (vector-ref t 4))))
+    (if val (cadr val) def)))
+(define (type-name t) (vector-ref t 5))
+
+;; When type-scm2c-does-type-checking returns #t, type-scm2c is
+;; supposed to do type checking and no resource allocation.  It is
+;; then called as (proc scm_parm pos subr).  POS and SUBR should be
+;; used for the error check.
+
+(define (type-scm2c-does-type-checking t)
+  (type-prop t 'scm2c-does-type-checking #f))
+(define (type-scm2c t . args) (apply (vector-ref t 2) args))
+(define (type-c2scm t x copy) ((vector-ref t 3) x copy))
+(define (type-c2args t x) ((type-prop t 'c2args id) x))
+(define (type-c2refs t x) ((type-prop t 'c2refs
+				      (lambda (x)
+					(@@ "&~a" (type-c2args t x))))
+			   x))
+(define (type-finish t x y) (let ((f (type-prop t 'finish #f)))
+			      (if f (f x y) #f)))
+(define (type-can-be-passed t)
+  (type-prop t 'can-be-passed #t))
+(define (type-can-be-returned t)
+  (type-prop t 'can-be-returned #t))
+(define (type-conversion t)
+  (type-prop t 'conversion #f))
+
+(define (emit-funcs defs)
+
+  ;; composite types
+
+  (define emitted-helpers '())
+
+  (define (emit-composite-helpers t n)
+    (cond ((not (member n emitted-helpers))
+	   (@ "/* helpers for ~a */~%" n)
+	   (cond 
+	    ((type-can-be-passed t)
+	     (@ "~%static int~%_sgtk_helper_valid_~a (SCM obj)~%" n)
+	     (@ "{~%")
+	     (@ "  return obj == SCM_BOOL_F || (~a);~%" (type-isa t "obj"))
+	     (@ "}~%")
+	     (@ "~%static void~%")
+	     (@ "_sgtk_helper_fromscm_~a (SCM obj, void *mem)~%" n)
+	     (@ "{~%")
+	     (if (type-scm2c-does-type-checking t)
+		 (@ "  *(~a*)mem = ~a;~%" (type-cname t)
+		    (type-scm2c t "obj" "SCM_ARG1" "\"composite_helper\""))
+		 (@ "  *(~a*)mem = ~a;~%" (type-cname t) (type-scm2c t "obj")))
+	     (@ "}~%")))
+	   (cond
+	    ((type-can-be-returned t)
+	     (@ "~%static SCM~%_sgtk_helper_toscm_copy_~a (void *mem)~%" n)
+	     (@ "{~%")
+	     (@ "  return ~a;~%" (type-c2scm t (@@ "(*(~a*)mem)"
+						   (type-cname t)) #t))
+	     (@ "}~%")
+	     (@ "~%static SCM~%_sgtk_helper_toscm_nocopy_~a (void *mem)~%" n)
+	     (@ "{~%")
+	     (@ "  return ~a;~%" (type-c2scm t (@@ "(*(~a*)mem)"
+						   (type-cname t)) #f))
+	     (@ "}~%")))
+	   (cond
+	    ((type-conversion t)
+	     (@ "~%static SCM~%_sgtk_helper_inconversion_~a (SCM obj)~%" n)
+	     (@ "{~%")
+	     (@ "  return sgtk_composite_inconversion (obj, ~a);~%"
+		(type-conversion t))
+	     (@ "}~%")
+	     (@ "~%static SCM~%_sgtk_helper_outconversion_~a (SCM obj)~%" n)
+	     (@ "{~%")
+	     (@ "  return sgtk_composite_outconversion (obj, ~a);~%"
+		(type-conversion t))
+	     (@ "}~%")))
+	   (@ "~%")
+	   (set! emitted-helpers (cons n emitted-helpers)))))
+
+  (define (mode-in? m)
+    (memq m '(in inout)))
+
+  (define (mode-out? m)
+    (memq m '(out inout)))
+
+  (define (mode-helper-valid mode n)
+    (if (mode-in? mode)
+	(string-append "_sgtk_helper_valid_" n)
+	"NULL"))
+
+  (define (mode-helper-from mode n)
+    (if (mode-in? mode)
+	(string-append "_sgtk_helper_fromscm_" n)
+	"NULL"))
+
+  (define (mode-helper-to mode n copy)
+    (if (mode-out? mode)
+	(if copy
+	    (string-append* "_sgtk_helper_toscm_copy_" n)
+	    (string-append* "_sgtk_helper_toscm_nocopy_" n))
+	"NULL"))
+
+  (define (mode-def tail)
+    (if (null? tail) 'in (car tail)))
+
+  (define (composite-conversion t mode)
+    (if (type-conversion t)
+	(if (mode-out? mode)
+	    (string-append* "_sgtk_helper_outconversion_" (type-name t))
+	    (string-append* "_sgtk_helper_inconversion_" (type-name t)))
+	#f))
+
+  (define (realize-slist-type t mode)
+    (let ((n (type-name t)))
+      (if (not (type-prop t 'fit-for-list #f))
+	  (error "sorry, can't use this type in a list" n))
+      (emit-composite-helpers t n)
+      (make-type (string-append* "slist:" (type-name t)) "GSList*"
+		 (lambda (x)
+		   (@@ "sgtk_valid_composite (~a, ~a)" x 
+		       (mode-helper-valid mode n)))
+		 (lambda (x)
+		   (@@ "sgtk_scm2slist (~a, ~a)" x (mode-helper-from mode n)))
+		 (lambda (x copy)
+		   (@@ "sgtk_slist2scm (~a, ~a)"
+		       x (mode-helper-to 'out n copy)))
+		 'finish (lambda (x y) (@@ "sgtk_slist_finish (~a, ~a, ~a)"
+					   x y (mode-helper-to mode n #f)))
+		 'conversion (composite-conversion t mode))))
+
+  (define (realize-list-type t mode)
+    (let ((n (type-name t)))
+      (if (not (type-prop t 'fit-for-list #f))
+	  (error "sorry, can't use this type in a list" n))
+      (emit-composite-helpers t n)
+      (make-type (string-append* "list:" (type-name t)) "GList*"
+		 (lambda (x)
+		   (@@ "sgtk_valid_composite (~a, ~a)" x
+ 		       (mode-helper-valid mode n)))
+		 (lambda (x)
+		   (@@ "sgtk_scm2list (~a, ~a)" x (mode-helper-from mode n)))
+		 (lambda (x copy)
+		   (@@ "sgtk_list2scm (~a, ~a)"
+		       x (mode-helper-to 'out n copy)))
+		 'finish (lambda (x y) (@@ "sgtk_list_finish (~a, ~a, ~a)"
+					   x y (mode-helper-to mode n #f)))
+		 'conversion (composite-conversion t mode))))
+
+  (define (realize-cvec-type t mode)
+    (let ((n (type-name t)))
+      (emit-composite-helpers t n)
+      (make-type (string-append "cvec:" (type-name t)) "sgtk_cvec"
+		 (lambda (x)
+		   (@@ "sgtk_valid_composite (~a, ~a)" x
+		       (mode-helper-valid mode n)))
+		 (lambda (x)
+		   (@@ "sgtk_scm2cvec (~a, ~a, sizeof (~a))"
+		       x (mode-helper-from mode n) (type-cname t)))
+		 (lambda (x copy)
+		   (@@ "~a (~a, ~a, sizeof (~a))"
+		       (if copy "sgtk_cvec2scm_copy" "sgtk_cvec2scm")
+		       x (mode-helper-to 'out n #f) (type-cname t)))
+		 'finish (lambda (x y)
+			   (@@ "sgtk_cvec_finish (&~a, ~a, ~a, sizeof(~a))"
+			       x y (mode-helper-to mode n #f) (type-cname t)))
+		 'c2args (lambda (x) (@@ "~a.count, (~a*)~a.vec"
+					 x (type-cname t) x))
+		 'c2refs (lambda (x) (@@ "&~a.count, (~a**)&~a.vec"
+					 x (type-cname t) x))
+		 'conversion (composite-conversion t mode))))
+
+  ;; same as cvec but with &len/ptr (instead of len/ptr)
+  (define (realize-cvecp-type t mode)
+    (let ((n (type-name t)))
+      (emit-composite-helpers t n)
+      (make-type (string-append "cvecp:" (type-name t)) "sgtk_cvec"
+		 (lambda (x)
+		   (@@ "sgtk_valid_composite (~a, ~a)" x
+		       (mode-helper-valid mode n)))
+		 (lambda (x)
+		   (@@ "sgtk_scm2cvec (~a, ~a, sizeof (~a))"
+		       x (mode-helper-from mode n) (type-cname t)))
+		 (lambda (x copy)
+		   (@@ "~a (~a, ~a, sizeof (~a))"
+		       (if copy "sgtk_cvec2scm_copy" "sgtk_cvec2scm")
+		       x (mode-helper-to 'out n #f) (type-cname t)))
+		 'finish (lambda (x y)
+			   (@@ "sgtk_cvec_finish (&~a, ~a, ~a, sizeof(~a))"
+			       x y (mode-helper-to mode n #f) (type-cname t)))
+		 'c2args (lambda (x) (@@ "&~a.count, (~a*)~a.vec"
+					 x (type-cname t) x))
+		 'c2refs (lambda (x) (@@ "&~a.count, (~a**)&~a.vec"
+					 x (type-cname t) x))
+		 'conversion (composite-conversion t mode))))
+
+  ;; same as cvec but with ptr/len args (instead of len/ptr)
+  (define (realize-cvecr-type t mode)
+    (let ((n (type-name t)))
+      (emit-composite-helpers t n)
+      (make-type (string-append "cvecr:" (type-name t)) "sgtk_cvec"
+		 (lambda (x)
+		   (@@ "sgtk_valid_composite (~a, ~a)" x
+		       (mode-helper-valid mode n)))
+		 (lambda (x)
+		   (@@ "sgtk_scm2cvec (~a, ~a, sizeof (~a))"
+		       x (mode-helper-from mode n) (type-cname t)))
+		 (lambda (x copy)
+		   (@@ "~a (~a, ~a, sizeof (~a))"
+		       (if copy "sgtk_cvec2scm_copy" "sgtk_cvec2scm")
+		       x (mode-helper-to 'out n #f) (type-cname t)))
+		 'finish (lambda (x y)
+			   (@@ "sgtk_cvec_finish (&~a, ~a, ~a, sizeof(~a))"
+			       x y (mode-helper-to mode n #f) (type-cname t)))
+		 'c2args (lambda (x) (@@ "(~a*)~a.vec, ~a.count"
+					(type-cname t) x x))
+		 'c2refs (lambda (x) (@@ "(~a**)&~a.vec, &~a.count"
+					(type-cname t) x x))
+		 'conversion (composite-conversion t mode))))
+
+  ;; fixed len vector
+  (define (realize-fvec-type t len mode)
+    (let ((n (type-name t)))
+      (emit-composite-helpers t n)
+      (make-type (@@ "fvec:~a:~a" (type-name t) len) "sgtk_cvec"
+		 (lambda (x)
+		   (@@ "sgtk_valid_complen (~a, ~a, ~a)"
+		       x (mode-helper-valid mode n) len))
+		 (lambda (x)
+		   (@@ "sgtk_scm2cvec (~a, ~a, sizeof (~a))"
+		       x (mode-helper-from mode n) (type-cname t)))
+		 (lambda (x copy)
+		   (error "can't yet return a fixed vector, sorry."))
+		 'finish (lambda (x y)
+			   (@@ "sgtk_cvec_finish (&~a, ~a, ~a, sizeof(~a))"
+			       x y (mode-helper-to mode n #f) (type-cname t)))
+		 'c2args (lambda (x) (@@ "(~a*)~a.vec"
+					 (type-cname t) x))
+		 'conversion (composite-conversion t mode))))
+
+  (define (lookup-type sym)
+    (let* ((cell (assoc sym types))
+	   (def (if cell (cdr cell) #f)))
+      (cond
+       ((vector? def) def)
+       ((symbol? def) (lookup-type def))
+       (else
+	(error "unknown type" sym)))))
+
+  (define (realize-type sym)
+    (if (and (not (assoc sym types)) (pair? sym) (not (null? (cdr sym))))
+	(case (car sym)
+	  ((slist)
+	   (register-type sym
+			  (realize-slist-type (lookup-type (cadr sym))
+					      (mode-def (cddr sym)))))
+	  ((list)
+	   (register-type sym
+			  (realize-list-type (lookup-type (cadr sym))
+					     (mode-def (cddr sym)))))
+	  ((cvec)
+	   (register-type sym
+			  (realize-cvec-type (lookup-type (cadr sym))
+					     (mode-def (cddr sym)))))
+	  ((cvecp)
+	   (register-type sym
+			  (realize-cvecp-type (lookup-type (cadr sym))
+					      (mode-def (cddr sym)))))
+	  ((cvecr)
+	   (register-type sym
+			  (realize-cvecr-type (lookup-type (cadr sym))
+					      (mode-def (cddr sym)))))
+	  ((fvec)
+	   (register-type sym
+			  (realize-fvec-type (lookup-type (cadr sym))
+					     (caddr sym)
+					     (mode-def (cdddr sym)))))
+	  ((ret)
+	   (register-type sym
+			  (realize-fvec-type (lookup-type (cadr sym))
+					     "1"
+					     'out)))
+	  (else
+	   (let ((realizer (assoc (car sym) composite-types)))
+	     (if realizer
+		 (register-type sym ((cdr realizer) sym))
+		 (error "Unknown composite type" sym)))))))
+
+  (define (short-func-name canon)
+    (if (string=? (car (last-pair canon)) "interp")
+	(butlast canon 1)
+	canon))
+
+  (define (emit-func ret name parms scm-name opts emit-body)
+    (if (not (pair? ret))
+	(set! ret (list ret)))
+
+    ;; Realize all referenced composite types
+    (for-each (lambda (p) (realize-type (car p))) parms)
+    (realize-type (car ret))
+
+    (let* ((fname (short-func-name name))
+	   (rtype (lookup-type (car ret)))
+	   (rcopy (get-opt-val (cdr ret) 'copy #t))
+	   (multiple-values (get-opt-val (cdr ret) 'values '()))
+	   (input-parms parms)
+	   (return-parms (map
+			  (lambda (ret)
+			    (find-if (lambda (p) (eq? (cadr p) ret)) parms))
+			  multiple-values))
+	   (ptypes (map (lambda (p) (lookup-type (car p))) parms))
+	   (iptypes (map (lambda (p) (lookup-type (car p))) input-parms))
+	   (n-parms (length parms))
+	   (n-opt 0)
+	   (n-rest (if (get-opt-val opts 'rest-arg #f) 1 0))
+	   (n-return (length multiple-values))
+	   (defer? (not (get-opt-val opts 'undeferred #f))))
+      (for-each (lambda (p)
+		  (if (not (get-opt (cddr p) '= #f))
+		      (if (> n-opt 0)
+			  (error "defaulted parameters must come at the end"))
+		      (set! n-opt (1+ n-opt))))
+		parms)
+      (for-each (lambda (ret)
+		  (set! input-parms
+			(remove-if (lambda (p) (eq? (cadr p) ret))
+				   input-parms)))
+		multiple-values)
+      (set! iptypes (list-head iptypes (length input-parms)))
+
+      (@ "static char s_~a[] = ~s;~%~%" 
+	 (funcname name) (if scm-name scm-name (scmname fname)))
+      (add-init
+       (@@ "scm_make_gsubr (s_~a, ~a, ~a, ~a, sgtk_~a);"
+	   (funcname name) (- n-parms n-opt n-rest n-return) n-opt n-rest
+	   (funcname name)))
+      (@ "SCM~%")
+      (@ "sgtk_~a (~a)~%" 
+	 (funcname name)
+	 (syllables->string (map (lambda (p)
+				   (string-append* "SCM p_" (cadr p)))
+				 input-parms) ", "))
+      (@ "{~%")
+      (if (not (eq? (car ret) 'none))
+	  (@ "  ~a cr_ret;~%" (type-cname rtype)))
+      (if (not (null? multiple-values))
+	  (@ "  SCM ret_list;~%"))
+      (for-each (lambda (t p)
+		  (let ((f (type-prop t 'c-definition #f)))
+		    (if f
+			(f t p)
+			(@ "  ~a c_~a;~%" (type-cname t) (cadr p)))))
+		ptypes parms)
+      (for-each (lambda (t p)
+		  (let ((conv (type-conversion t)))
+		    (if conv
+			(@ "  p_~a = ~a (p_~a);~%" 
+			   (cadr p) conv (cadr p)))))
+		iptypes
+		input-parms)
+      (let ((i 1))
+	(for-each (lambda (t p)
+		    (let* ((n (cadr p))
+			   (p_n (string-append* "p_" n))
+			   (pos (@@ "SCM_ARG~a" (if (< i 8) i "n"))))
+		      (if (get-opt (cddr p) '= #f)
+			  (@ "  if (p_~a != SCM_UNDEFINED)~%  " n))
+		      (cond ((type-scm2c-does-type-checking t)
+			     (@ "  c_~a = ~a;~%"
+				n (type-scm2c 
+				   t p_n pos 
+				   (string-append "s_"  (funcname name)))))
+			    (else
+			     (@ "  SCM_ASSERT (~a~a, "
+				(if (get-opt (cddr p) 'null-ok #f)
+				    (@@ "~a == SCM_BOOL_F || " p_n) "")
+				(type-isa t p_n))
+			     (@ "p_~a, ~a, s_~a);~%"
+				n pos (funcname name))))
+		      (set! i (1+ i))))
+		  iptypes input-parms))
+      (if defer?
+	  (@ "~%  SCM_DEFER_INTS;~%"))
+      (for-each (lambda (t p)
+		  (let ((n (cadr p)))
+		      (cond
+		       ((get-opt (cddr p) '= #f)
+			(@ "  if (p_~a == SCM_UNDEFINED)~%" n)
+			(@ "    c_~a = ~a;~%"  n (get-opt-val (cddr p) '= #f))
+			(@ "  else~%  ")))
+		      (if (not (type-scm2c-does-type-checking t))
+			  (@ "  c_~a = ~a;~%"
+			     n (type-scm2c t (string-append* "p_" n)))
+			  (@ "  ;~%"))))
+		iptypes input-parms)
+      (@ "  ")
+      (emit-body (if (eq? (car ret) 'none) #f "cr_ret")
+		 (map (lambda (p t)
+			(if (memq (cadr p) multiple-values)
+			    (type-c2refs
+			     t (string-append* "c_" (cadr p)))
+			    (type-c2args
+			     t (string-append* "c_" (cadr p)))))
+		      parms ptypes))
+      (for-each (lambda (t p)
+		  (let ((f (get-opt-val (cddr p) 'finish #f)))
+		    (if f (@ "  ~a (c_~a, p_~a);~%" f (cadr p) (cadr p)))))
+		iptypes input-parms)
+      (for-each (lambda (t p)
+		  (let ((f (type-finish t
+					(string-append* "c_" (cadr p))
+					(string-append* "p_" (cadr p)))))
+		    (if f (@ "  ~a;~%" f))))
+		iptypes input-parms)
+      (if defer?
+	  (@ "  SCM_ALLOW_INTS;~%"))
+      (if (null? multiple-values)
+	  (@ "~%  return ~a;~%}~%~%" (type-c2scm rtype "cr_ret" rcopy))
+	  (begin
+	    (@ "~%  ret_list = SCM_LIST0;")
+	    (for-each (lambda (ret)
+			(@ "~%  ret_list = scm_cons(~a, ret_list);"
+			   (type-c2scm (lookup-type (car ret))
+				       (string-append* "c_" (cadr ret)) #f)))
+		      (reverse return-parms))
+	    (if (not (eq? (car ret) 'none))
+		(@ "~%  ret_list = scm_cons (~a, ret_list);"
+		   (type-c2scm rtype "cr_ret" rcopy)))
+	    (@ "~%  return ret_list;~%}~%~%")))))
+
+  (define (emit-defined-func form)
+    (let* ((name  (cadr form))
+	   (ret   (caddr form))
+	   (parms (cadddr form))
+	   (opts  (form-options form))
+	   (prot  (get-opt-val opts 'protection #f)))
+      (if (symbol? prot)
+	  (set! prot (@@ "p_~a" prot)))
+      (set! cur-protection prot)
+      (emit-func ret (canonicalize name) parms
+		 (get-opt-val opts 'scm-name #f) opts
+		 (lambda (cret cparms)
+		   (@ "~a~a (~a);~%" 
+		      (if cret (string-append* cret " = ") "")
+		      name (syllables->string cparms ", "))))
+      (set! cur-protection #f)))
+
+  (define (emit-object-predicate sym)
+    (let ((type (lookup-type sym))
+	  (name (canonicalize sym)))
+      (if (not (imported-type? sym))
+	  (emit-func 'bool (append name '("p")) '((SCM obj)) 
+		     (string-append* (scmname name) "?") '()
+		     (lambda (cret cparms)
+		       (@ "~a = ~a;" cret (type-isa type (car cparms))))))))
+
+  (define (emit-field-accessors typesym fields)
+    (define typename (canonicalize typesym))
+    (define (emit-accessor field)
+      (let* ((ret (list (car field)))
+	     (fieldsym (cadr field))
+	     (fieldname (canonicalize fieldsym))
+	     (name (append typename fieldname))
+	     (setter-name (append typename '(set) fieldname))
+	     (setter? (get-opt-val (cddr field) 'setter #f))
+	     (cfield (get-opt-val (cddr field) 'cname fieldsym)))
+	(cond 
+	 ((not (imported-type? typesym))
+	  (emit-func ret name `((,typesym obj)) #f '()
+		     (lambda (cret cparms)
+		       (@ "~a = ~a->~a;~%" cret (car cparms) cfield)))
+	  (if setter?
+	      (emit-func 'none 
+			 (append setter-name '("x"))
+			 `((,typesym obj) (,ret val))
+			 (string-append* (scmname setter-name) "!") #f
+			 (lambda (cret cparms)
+			   (@ "~a->~a = ~a;~%" 
+			      (car cparms) cfield (cadr cparms)))))))))
+    (for-each emit-accessor fields))
+
+  (define (info-name name)
+    (string-append* "sgtk_" 
+		   (funcname (canonicalize name))
+		   "_info"))
+
+  (define (register-enum-converter name kind . opt-c-name)
+    (let ((iname (info-name name)))
+      (register-type 
+       name 
+       (make-type name (if (null? opt-c-name) name (car opt-c-name))
+		  (lambda (x)
+		    (@@ "sgtk_valid_~a (~a, &~a)" kind x iname))
+		  (lambda (x pos subr)
+		    (@@ "sgtk_scm2~a (~a, &~a, ~a, ~a)" kind x iname pos subr))
+		  (lambda (x copy)
+		    (@@ "sgtk_~a2scm (~a, &~a)" kind x iname))
+		  'scm2c-does-type-checking #t))))
+
+  (define (register-senum-converter name kind . opt-c-name)
+    (let ((iname (info-name name)))
+      (register-type 
+       name 
+       (make-type name (if (null? opt-c-name) name (car opt-c-name))
+		  (lambda (x)
+		    (@@ "sgtk_valid_~a (~a, &~a)" kind x iname))
+		  (lambda (x)
+		    (@@ "sgtk_scm2~a (~a, &~a)" kind x iname))
+		  (lambda (x copy)
+		    (@@ "sgtk_~a2scm (~a, &~a)" kind x iname))))))
+
+  (define (register-boxed-converter name options)
+    (let ((iname (info-name name))
+	  (sname (string-append* name "*")))
+      (register-type 
+       name
+       (make-type name sname
+		  (lambda (x)
+		    (@@ "sgtk_valid_boxed (~a, &~a)" x iname))
+		  (lambda (x)
+		    (@@ "(~a)sgtk_scm2boxed (~a)" sname x))
+		  (lambda (x copy)
+		    (@@ "sgtk_boxed2scm (~a, &~a~a)"
+			    x iname (if copy ", 1" ", 0")))
+		  'fit-for-list #t
+		  'conversion (get-opt-val options 'conversion #f)))))
+
+  (define (register-ptype-converter name options)
+    (let ((iname (info-name name))
+	  (sname name))
+      (register-type 
+       name
+       (make-type name sname
+		  (lambda (x)
+		    (@@ "sgtk_valid_boxed (~a, &~a)" x iname))
+		  (lambda (x)
+		    (@@ "(~a)sgtk_scm2boxed (~a)" sname x))
+		  (lambda (x copy)
+		    (@@ "sgtk_boxed2scm (~a, &~a~a)"
+			    x iname (if copy ", 1" ", 0")))
+		  'fit-for-list #t
+		  'conversion (get-opt-val options 'conversion #f)))))
+
+  (define (register-object-type name options)
+    (let ((tname (string-append* (funcname (canonicalize name))
+				"_get_type ()")))
+      (register-type
+       name
+       (make-type name (string-append* name "*")
+		  (lambda (x)
+		    (@@ "sgtk_is_a_gtkobj (~a, ~a)" tname x))
+		  (lambda (x)
+		    (@@ "(~a*)sgtk_get_gtkobj (~a)" name x))
+		  (lambda (x copy)
+		    (@@ "sgtk_wrap_gtkobj ((GtkObject*)~a)" x))
+		  'fit-for-list #t))))
+
+  (define cur-protection #f)
+
+  (register-type
+   'none 
+   (make-type "none" "void"
+	      (lambda (x) (error "can't pass `none' type"))
+	      (lambda (x) (error "can't pass `none' type"))
+	      (lambda (x copy) "SCM_UNSPECIFIED")
+	      'can-be-passed #f))
+
+  (register-type
+   'SCM
+   (make-type "SCM" "SCM" (lambda (x) "TRUE") id (lambda (x copy) x)))
+
+  (register-type 
+   'string 
+   (make-type "string" "char*"
+	      (lambda (x) 
+		(@@ "(SCM_NIMP(~a) && SCM_RWSTRINGP(~a))" x x))
+	      (lambda (x) 
+		(@@ "((~a) == SCM_BOOL_F? NULL : SCM_CHARS(~a))" x x))
+	      (lambda (x copy) 
+		(@@ "(~a == NULL? SCM_BOOL_F : scm_take0str (~a))" x x))
+	      'fit-for-list #t
+	      'conversion "sgtk_string_conversion"))
+
+  (register-type 
+   'cstring 
+   (make-type "cstring" "const char*"
+	      (lambda (x) 
+		(@@ "(SCM_NIMP(~a) && SCM_RWSTRINGP(~a))" x x))
+	      (lambda (x) 
+		(@@ "((~a) == SCM_BOOL_F? NULL : SCM_CHARS(~a))" x x))
+	      (lambda (x copy) 
+		(@@ "(~a == NULL? SCM_BOOL_F : scm_take0str (~a))" x x))
+	      'fit-for-list #t
+	      'conversion "sgtk_string_conversion"))
+
+  (register-type 
+   'static_string 
+   (make-type "static_string" "char*"
+	      (lambda (x) 
+		(error "can't pass `static-string' type"))
+	      (lambda (x) 
+		(error "can't pass `static-string' type"))
+	      (lambda (x copy) 
+		(@@ "(~a == NULL? SCM_BOOL_F : scm_makfrom0str (~a))" x x))
+	      'fit-for-list #t
+	      'can-be-passed #f))
+
+  ; XXX
+  (register-type 
+   'int 
+   (make-type "int" "gint"
+	      (lambda (x) (@@ "SCM_NUMBERP(~a)" x)) ;; too permissive
+	      (lambda (x pos subr) 
+		(@@ "scm_num2long (~a, (char *)~a, ~a)" x pos subr))
+	      (lambda (x copy)
+		(@@ "scm_long2num (~a)" x))
+	      'scm2c-does-type-checking #t
+	      'fit-for-list #t))
+
+  ; XXX
+  (register-type 
+   'uint 
+   (make-type "uint" "guint"
+	      (lambda (x) (@@ "SCM_NUMBERP(~a)" x)) ;; too permissive
+	      (lambda (x pos subr) 
+		(@@ "scm_num2ulong (~a, (char *)~a, ~a)" x pos subr))
+	      (lambda (x copy) 
+		(@@ "scm_ulong2num (~a)" x))
+	      'scm2c-does-type-checking #t
+	      'fit-for-list #t))
+
+  ; XXX
+  (register-type 
+   'long 
+   (make-type "long" "glong"
+	      (lambda (x) (@@ "SCM_NUMBERP(~a)" x)) ;; too permissive
+	      (lambda (x pos subr) 
+		(@@ "scm_num2long (~a, (char *)~a, ~a)" x pos subr))
+	      (lambda (x copy)
+		(@@ "scm_long2num (~a)" x))
+	      'scm2c-does-type-checking #t
+	      'fit-for-list #t))
+
+  ; XXX
+  (register-type 
+   'ulong 
+   (make-type "ulong" "gulong"
+	      (lambda (x) (@@ "SCM_NUMBERP(~a)" x)) ;; too permissive
+	      (lambda (x pos subr) 
+		(@@ "scm_num2ulong (~a, (char *)~a, ~a)" x pos subr))
+	      (lambda (x copy) 
+		(@@ "scm_ulong2num (~a)" x))
+	      'scm2c-does-type-checking #t
+	      'fit-for-list #t))
+
+  (register-type 
+   'float 
+   (make-type "float" "gfloat"
+	      (lambda (x) 
+		(@@ "sgtk_valid_float (~a)" x))
+	      (lambda (x) 
+		(@@ "sgtk_scm2float (~a)" x))
+	      (lambda (x copy) 
+		(@@ "sgtk_float2scm (~a)" x))))
+
+  (register-type 
+   'double 
+   (make-type "double" "double"
+	      (lambda (x) 
+		(@@ "sgtk_valid_double (~a)" x))
+	      (lambda (x) 
+		(@@ "sgtk_scm2double (~a)" x))
+	      (lambda (x copy) 
+		(@@ "sgtk_double2scm (~a)" x))))
+
+  (register-type 
+   'bool 
+   (make-type "bool" "int"
+	      (lambda (x) 
+		"1")
+	      (lambda (x) 
+		(@@ "SCM_NFALSEP (~a)" x))
+	      (lambda (x copy) 
+		(@@ "((~a)? SCM_BOOL_T : SCM_BOOL_F)" x))))
+
+  (register-type
+   'point
+   (make-type "point" "GdkPoint"
+	      (lambda (x)
+		(@@ "sgtk_valid_point (~a)" x))
+	      (lambda (x)
+		(@@ "sgtk_scm2point (~a)" x))
+	      (lambda (x copy)
+		(@@ "sgtk_point2scm (~a)" x))))
+
+  (register-type
+   'rect
+   (make-type "rect" "GdkRectangle"
+	      (lambda (x)
+		(@@ "sgtk_valid_rect (~a)" x))
+	      (lambda (x)
+		(@@ "sgtk_scm2rect (~a)" x))
+	      (lambda (x copy)
+		(@@ "sgtk_rect2scm (~a)" x))))
+
+  (register-type
+   'type
+   (make-type "type" "GtkType"
+	      (lambda (x)
+		(@@ "sgtk_valid_type (~a)" x))
+	      (lambda (x)
+		(@@ "sgtk_scm2type (~a)" x))
+	      (lambda (x copy)
+		(@@ "sgtk_type2scm (~a)" x))))
+
+  (register-type
+   'callback
+   (make-type "callback" "sgtk_protshell*"
+	      (lambda (x)
+		(@@ "(scm_procedure_p(~a) == SCM_BOOL_T)" x))
+	      (lambda (x)
+		(@@ "sgtk_protect (~a, ~a)"
+		    (cond 
+		     ((eq? cur-protection #t) "SCM_BOOL_T")
+		     ((string? cur-protection) cur-protection)
+		     (else (pk 'no-protection-for x) "SCM_BOOL_T"))
+		    x))
+	      (lambda (x copy)
+		(error "can't return a `callback'"))
+	      'c2args (lambda (x)
+			(@@ "sgtk_callback_marshal, ~a, sgtk_callback_destroy" x))
+	      'can-be-returned #f))
+
+  (register-type
+   'full-callback
+   (make-type "full_callback" "sgtk_protshell*"
+	      (lambda (x)
+		(@@ "(scm_procedure_p(~a) == SCM_BOOL_T)" x))
+	      (lambda (x)
+		(@@ "sgtk_protect (~a, ~a)"
+		    (cond 
+		     ((eq? cur-protection #t) "SCM_BOOL_T")
+		     ((string? cur-protection) cur-protection)
+		     (else (pk 'no-protection-for x) "SCM_BOOL_T"))
+		    x))
+	      (lambda (x copy)
+		(error "can't return a `full-callback'"))
+	      'c2args (lambda (x)
+			(@@ "NULL, sgtk_callback_marshal, ~a, sgtk_callback_destroy" x))
+	      'can-be-returned #f))
+
+  (register-type
+   'file-descriptor
+   (make-type "file_descriptor" "int"
+	      (lambda (x)
+		(@@ "(SCM_NIMP (~a) && SCM_TYP16 (~a) == scm_tc16_fport && SCM_OPPORTP (~a))" x x x))
+	      (lambda (x)
+		(@@ "sgtk_port2fileno (~a)" x))
+	      (lambda (x copy)
+		(@@ "sgtk_fileno2port (~a)" x))))
+
+  (register-type
+   'dont-use-gpointer
+   (make-type "dont_use_gpointer" "void*"
+	      (lambda (x)
+		(@@ "(SCM_NFALSEP (scm_integer_p (~a)))" x))
+	      (lambda (x)
+		(@@ "(void *)scm_num2ulong (~a, (char*)SCM_ARG1, \"gpointer\")"
+		    x))
+	      (lambda (x copy)
+		(@@ "(scm_ulong2num (~a))" x))))
+
+  (register-type
+   'atom
+   (make-type "atom" "GdkAtom"
+	      (lambda (x)
+		(@@ "(SCM_NFALSEP (scm_symbol_p (~a)))" x))
+	      (lambda (x)
+		(@@ "sgtk_scm2atom (~a)" x))
+	      (lambda (x copy)
+		(@@ "sgtk_atom2scm (~a)" x))))
+
+  (letrec ((process-forms 
+	    (lambda (forms)
+	      (for-each (lambda (form)
+			  (let ((name (cadr form))
+				(options (form-options form)))
+			    (case (car form)
+			      ((define-type-alias)
+			       (register-type name (caddr form)))
+			      ((define-enum)
+			       (register-enum-converter name "enum"))
+			      ((define-flags)
+			       (register-enum-converter name "flags"))
+			      ((define-string-enum)
+			       (register-senum-converter name "senum"
+							 "gchar*"))
+			      ((define-boxed)
+			       (register-boxed-converter name options)
+			       (let ((fields (get-opt options
+						      'fields '())))
+				 (emit-field-accessors name fields)))
+			      ((define-struct)
+			       (register-boxed-converter name options)
+			       (let ((fields (get-opt options 
+						      'fields '())))
+				 (emit-field-accessors name fields)))
+			      ((define-ptype)
+			       (register-ptype-converter name options)
+			       (let ((fields (get-opt options
+						      'fields '())))
+				 (emit-field-accessors name fields)))
+			      ((define-object)
+			       (register-object-type name options)
+			       (emit-object-predicate name)
+			       (let ((fields (get-opt options
+						      'fields '())))
+				 (emit-field-accessors name fields)))
+			      ((define-func)
+			       (emit-defined-func form))
+			      ((if)
+			       (if (memq (cadr form) gtkconf-autobuild-flags)
+				   (process-forms (caddr form))
+				   (process-forms (cadddr form)))))))
+			forms))))
+    (process-forms defs)))
+
+(define (->c-identifier s)
+  (let ((str (string-copy (->string s))))
+    (do ((i 0 (1+ i)))
+	((>= i (string-length str)))
+      (let ((ch (string-ref str i)))
+	(if (not (or (char-alphabetic? ch) (char-numeric? ch)))
+	    (string-set! str i #\_))))
+    str))
+
+(define (module->cfunc m)
+  (funcname (map ->c-identifier m)))
+
+(define (module->cname m)
+  (syllables->string (map ->string m) " "))
+
+(define (emit-glue defs-file defs)
+  (@ "/* Generated by build-guile-gtk from ~s.  Do not edit. */~%~%"
+     defs-file)
+  (@ "#include <libguile.h>~%")
+  (@ "#include <guile-gtk.h>~%")
+  (for-each (lambda (inc)
+	      (@ "~a~%" inc))
+	    (get-opt *global-options* 'includes '()))
+  (emit-type-info defs)
+  (emit-funcs defs)
+  (let ((init-func (get-opt-val *global-options* 'init-func))
+	(other-inits (get-opt *global-options* 'other-inits '())))
+    (@ "void~%~a_types ()~%" init-func)
+    (@ "{~%")
+    (@ "  static int done = 0;~%")
+    (@ "  if (!done)~%")
+    (@ "    {~%")
+    (@ "      done = 1;~%")
+    (@ "      sgtk_register_type_infos (type_infos);~%")
+    (@ "      sgtk_register_type_infos_gtk (type_infos_gtk);~%")
+    (@ "~%")
+    (for-each (lambda (type)
+		(@ "      sgtk_enum_flags_init (&sgtk_~a_info);~%" type))
+	      *enum/flags-inits*)
+    (@ "    }~%")
+    (@ "}~%~%")
+    (for-each (lambda (init)
+		(@ "void ~a ();~%" init))
+	      other-inits)
+    (@ "~%")
+    (@ "void~%~a ()~%" init-func)
+    (@ "{~%")
+    (for-each (lambda (i)
+		(@ "  ~a_types ();~%" i))
+	      (cons init-func *imported-initfuncs*))
+    (for-each (lambda (i)
+		(@ "  SGTK_REGISTER_GLUE (~a);~%" i))
+	      other-inits)
+    (let ((init-code (get-opt *global-options* 'extra-init-code '())))
+      (for-each (lambda (l) (@ "  ~a~%" l)) 
+		(append init-code *inits*)))
+    (@ "}~%")))
+
+;; Linking
+
+(define (read-link-info files)
+  (define link-info '())  ; ((init-func libs)...)
+  (define (link-backend obj importing)
+    (if (and (list? obj) (eq? (car obj) 'options))
+	(let ((init-func (string->symbol (get-opt-val (cdr obj) 'init-func)))
+	      (libs (get-opt (cdr obj) 'libs '())))
+	  (if (not (assv init-func link-info))
+	      (set! link-info (cons (list init-func libs) link-info)))))
+    '())
+  (for-each (lambda (f) (read-file f link-backend)) files)
+  link-info)
+
+(define (init-func->module-name init-func)
+  (@@ "gtk %static-initfuncs% ~a" init-func))
+
+(define (emit-main link-info)
+  (@ "/* Generated by build-guile-gtk.  Do not edit. */~%~%")
+  (@ "#include <libguile.h>~%")
+  (@ "#include <guile-gtk.h>~%")
+  (@ "~%")
+  (for-each (lambda (info)
+	      (@ "void ~a ();~%" (car info)))
+	    link-info)
+  (@ "~%static void~%")
+  (@ "inner_main (void *closure, int argc, char **argv)~%")
+  (@ "{~%")
+  (for-each (lambda (info)
+	      (let ((init-func (car info)))
+		(@ "  SGTK_REGISTER_GLUE (~a);~%" init-func)))
+	    link-info)
+  (@ "  sgtk_shell (argc, argv);~%")
+  (@ "}~%")
+  (@ "~%")
+  (@ "int~%")
+  (@ "main (int argc, char **argv)~%")
+  (@ "{~%")
+  (@ "  scm_boot_guile (argc, argv, inner_main, 0);~%")
+  (@ "  return 0; /* never reached */~%")
+  (@ "}~%"))
+
+(define (run-system cmd)
+  (display cmd) (newline)
+  (system cmd))
+
+(define (link-flags link-info)
+  (string-append* (syllables->string (apply append (map cadr link-info)) " ")
+		 " " gtkconf-guilegtk-lib " " gtkconf-guile-libs " "
+		 gtkconf-gtk-libs))
+
+;; The same as link-flags but without the GUILE_LIBS and GTK_LIBS.
+;; Suitable for building shared libraries that are dynamically loaded
+;; by Guile.  The Guile and Gtk libs are referenced from the Guile-gtk
+;; lib.
+
+(define (lib-link-flags link-info)
+  (string-append* (syllables->string (apply append (map cadr link-info)) " ")
+		 " " gtkconf-guilegtk-lib))
+
+(define gtkconf-cflags (@@ "-I~a/include ~a"
+			   gtkconf-prefix gtkconf-gtk-cflags))
+
+(define (do-link link-info cc-flags)
+  (let ((main-file (@@ "~a.c" (tmpnam))))
+    (with-output-to-file main-file (lambda () (emit-main link-info)))
+    (run-system
+     (@@ "~a ~a ~a ~a ~a"
+	 gtkconf-cc (syllables->string cc-flags " ") gtkconf-cflags main-file
+	 (link-flags link-info)))
+    (run-system
+     (@@ "rm -f ~a" main-file))))
+
+;; main
+
+(define (usage)
+  (error "usage: build-guile-gtk [GLOBAL-OPTIONS] CMD [CMD-OPTIONS] DEFS"))
+
+(define args (cdr (program-arguments)))
+
+(define (next-arg)
+  (if (null? args)
+      (usage))
+  (let ((a (car args)))
+    (set! args (cdr args))
+    a))
+
+(define (maybe-next-arg)
+  (cond ((null? args)
+	 #f)
+	(else
+	 (let ((a (car args)))
+	   (set! args (cdr args))
+	   a))))
+
+(define (peek-arg)
+  (if (null? args) #f (car args)))
+
+(define (rest-args) args)
+
+;; parse command line
+
+;; First, all global options
+
+(let loop ()
+  (cond ((equal? (peek-arg) "-I")
+	 (next-arg)
+	 (add-import-dir (next-arg))
+	 (loop))))
+
+;; Then dispatch on the subcommand
+
+(define opsym (string->symbol (next-arg)))
+
+(with-error-catching
+ (case opsym
+   ((glue)
+    (let* ((defs-file (next-arg))
+	   (defs (read-file defs-file glue-backend)))
+      (emit-glue defs-file defs)))
+   ((main)
+    (emit-main (read-link-info (rest-args))))
+   ((libs)
+    (@ "~a~%" (link-flags (read-link-info (rest-args)))))
+   ((liblibs)
+    (@ "~a~%" (lib-link-flags (read-link-info (rest-args)))))
+   ((cflags)
+    (@ "~a~%" gtkconf-cflags))
+   ((link)
+    (letrec ((is-defs-file? 
+	      (lambda (name) 
+		(let ((len (string-length name)))
+		  (and (> len 5)
+		       (string=? (substring name (- len 5)) ".defs"))))))
+      (let ((defs-files (pick is-defs-file? (rest-args)))
+	    (cc-flags (remove-if is-defs-file? (rest-args))))
+	(do-link (read-link-info defs-files) cc-flags))))
+   (else
+    (error "unknown operation"))))

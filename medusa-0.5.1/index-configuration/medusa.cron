@@ -1,0 +1,18 @@
+#!/bin/sh
+
+(
+    sleep 600
+
+    indexing_is_enabled=`/usr//sbin/medusa-test-indexing-status`
+
+    if [ "$indexing_is_enabled" = "Indexing is enabled." ]
+    then
+	killall medusa-indexd
+	killall medusa-searchd
+	/usr//bin/medusa-searchd
+	/usr//bin/medusa-indexd
+    fi
+) &
+
+# Later we'll also remove index files here, if medusa is not enabled
+

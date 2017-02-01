@@ -1,0 +1,352 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(src/orb/orbit_types.h)
+
+AC_PREREQ(2.12) # required version of autoconf
+
+# (From GTK+)
+# Making releases:
+#   ORBIT_MICRO_VERSION += 1;
+#   ORBIT_INTERFACE_AGE += 1;
+#   ORBIT_BINARY_AGE += 1;
+# if any functions have been added, set ORBIT_INTERFACE_AGE to 0.
+# if backwards compatibility has been broken,
+# set ORBIT_BINARY_AGE and ORBIT_INTERFACE_AGE to 0.
+#
+##########
+# Screw the above, just play with the numbers until they match the
+# package version number. As soon as libtool lets us specify
+# sonames we'll start using that for binary compat, but until then
+# caveat user :)
+
+ORBIT_MAJOR_VERSION=0
+ORBIT_MINOR_VERSION=5
+ORBIT_MICRO_VERSION=13
+ORBIT_INTERFACE_AGE=0
+ORBIT_BINARY_AGE=0
+ORBIT_VERSION=$ORBIT_MAJOR_VERSION.$ORBIT_MINOR_VERSION.$ORBIT_MICRO_VERSION
+AC_SUBST(ORBIT_MAJOR_VERSION)
+AC_SUBST(ORBIT_MINOR_VERSION)
+AC_SUBST(ORBIT_MICRO_VERSION)
+AC_SUBST(ORBIT_VERSION)
+
+# libtool versioning
+#LT_RELEASE=$ORBIT_MAJOR_VERSION.$ORBIT_MINOR_VERSION
+#LT_CURRENT=`expr $ORBIT_MICRO_VERSION - $ORBIT_INTERFACE_AGE`
+#LT_REVISION=$ORBIT_INTERFACE_AGE
+#LT_AGE=`expr $ORBIT_BINARY_AGE - $ORBIT_INTERFACE_AGE`
+LT_RELEASE=$ORBIT_VERSION
+LT_CURRENT=$ORBIT_MINOR_VERSION
+LT_REVISION=$ORBIT_MICRO_VERSION
+LT_AGE=$ORBIT_MINOR_VERSION
+AC_SUBST(LT_RELEASE)
+AC_SUBST(LT_CURRENT)
+AC_SUBST(LT_REVISION)
+AC_SUBST(LT_AGE)
+
+# Increment this every time a feature is added in the .idl compiler
+# that needs help from the main libraries.
+ORBIT_SERIAL=9
+AC_SUBST(ORBIT_SERIAL)
+
+# For automake.
+VERSION=$ORBIT_VERSION
+PACKAGE=ORBit
+
+AM_CONFIG_HEADER(config.h)
+
+dnl Initialize automake stuff
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION, no-define)
+
+AM_PROG_LIBTOOL
+AM_MAINTAINER_MODE
+
+if test x$enable_static != xyes ; then
+  AC_MSG_ERROR([Static linking is required for a working ORBit.])
+  exit 1
+fi
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_INSTALL
+
+dnl Handle indent variations 
+dnl default is "sopwith indent", use "--enable-indent=kr" for "kr"appy indent.
+AC_ARG_ENABLE(indent, [  --disable-indent        do not indent output code], use_indent=$enableval, use_indent=yes)
+
+AC_MSG_CHECKING([for indentation command to pipe generated c-files through])
+for test_indent in "$use_indent" "indent -" cat; do
+  case "$test_indent" in
+    yes)
+      INDENT_COMMAND="indent -npro -bad -bap -bc -sob -br -ce -cli2 -npcs -di1 -psl -i3 -lp -st"
+      ;;
+    no)
+      INDENT_COMMAND=cat
+      ;;
+    kr)
+      INDENT_COMMAND="indent -npro -kr -i8 -bad -fca -sc -sob -psl"
+      ;;
+    *)
+      INDENT_COMMAND="$test_indent"
+  esac
+
+  if echo 2>/dev/null | $INDENT_COMMAND 2>/dev/null 1>&2 ; then
+    break
+  fi
+done
+AC_MSG_RESULT($INDENT_COMMAND)
+AC_DEFINE_UNQUOTED(INDENT_COMMAND,"$INDENT_COMMAND")
+
+dnl Checks for libraries.
+
+# Make sure that we have glib>=1.1.16
+AM_PATH_GLIB(1.2.1,,
+AC_MSG_ERROR([
+*** GLIB 1.2.1 or better is required. The latest version of GLIB
+*** is always available from ftp://ftp.gtk.org/.]))
+
+GMODULE_CFLAGS=`glib-config --cflags gmodule`
+AC_SUBST(GMODULE_CFLAGS)
+GMODULE_LIBS=`glib-config --libs gmodule`
+AC_SUBST(GMODULE_LIBS)
+
+AC_PROG_YACC
+AM_PROG_LEX
+AC_PROG_AWK
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h unistd.h sys/endian.h endian.h machine/endian.h sys/machine.h sys/isa_defs.h sys/poll.h)
+AC_CHECK_HEADERS(stddef.h wchar.h wcstr.h wctype.h machine/types.h tcpd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+dnl Checks for library functions.
+AC_FUNC_VPRINTF
+AC_FUNC_ALLOCA
+if test x$ac_cv_header_alloca_h = xyes; then
+	ORBIT_HAVE_ALLOCA_H=1
+else
+	ORBIT_HAVE_ALLOCA_H=0
+fi
+
+AC_SUBST(ORBIT_HAVE_ALLOCA_H)
+AC_CHECK_FUNCS(poll basename)
+AC_CHECK_FUNC(socket,,[AC_CHECK_LIB(socket,socket)])
+AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl,gethostbyname)])
+
+# AC_CHECK_TYPE doesn't work here.
+AC_MSG_CHECKING([for socklen_t])
+AC_TRY_COMPILE(
+  [#include <sys/types.h>
+#include <sys/socket.h>],
+  [socklen_t len;],
+  [AC_MSG_RESULT(yes)],
+  [AC_DEFINE(socklen_t, size_t)
+   AC_MSG_RESULT(no)])
+
+# This is a hack. This is a bad hack in order to work around libtool not letting us
+# link a .a (libwrap.a) into a libtool library (libIIOP.la) for internal use by that
+# libtool library.
+
+# Modified to prefer shared libwrap by Adam Powell
+
+AC_MSG_CHECKING("whether to use TCP wrappers")
+LIBWRAP_PATH=""
+LIB_WRAP=""
+for I in $LDFLAGS $LIBS -L/usr/lib; do
+	case "$I" in
+	-L*)
+	THEFILE="`echo $I | sed -e 's,^-L,,'`"
+	echo "From $I, checking in dir $THEFILE for libwrap.so" 1>&5
+	if test -f $THEFILE/libwrap.so; then
+		LIB_WRAP=-lwrap
+		echo "Found $THEFILE/libwrap.so" 1>&5
+		break
+	else
+		echo "From $I, checking in dir $THEFILE for libwrap.a" 1>&5
+		if test -f $THEFILE/libwrap.a; then
+			LIBWRAP_PATH=$THEFILE/libwrap.a
+			echo "Found $LIBWRAP_PATH" 1>&5
+			break
+		fi
+	fi
+	esac
+done
+if test -n "$LIBWRAP_PATH" || test -n "$LIB_WRAP"; then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
+if test -n "$LIBWRAP_PATH"; then
+	nm $LIBWRAP_PATH | grep 'T setenv' && LIBWRAP_PATH=""
+	if test -z "$LIBWRAP_PATH"; then
+		echo "*********************************************************"
+	        echo " You have a broken TCP wrappers library (setenv included)"
+		echo " Please get the latest TCP wrappers package from your OS"
+		echo " vendor, or recompile TCP wrappers to not include a"
+		echo " setenv() implementation."
+		echo
+		echo "Not using TCP wrappers after all."
+		echo "*********************************************************"
+	fi
+fi
+
+dnl find out if we need -lnsl or whatever
+LIB_NSL=
+if test -n "$LIBWRAP_PATH"; then
+	AC_MSG_CHECKING(whether -lwrap requires -lnsl)
+	ORIG_LIBS="$LIBS"
+	LIBS="$LIBWRAP_PATH $LIB_WRAP $LIBS"
+	AC_TRY_LINK([
+extern int hosts_access;
+int allow_severity, deny_severity;
+], [return hosts_access;], ,[
+dnl try with -lnsl
+OLD_LIBS="$LIBS"
+LIBS="$LIBS -lnsl"
+AC_TRY_LINK([
+extern int hosts_access;
+int allow_severity, deny_severity;
+], [return hosts_access;], LIB_NSL="-lnsl",
+LIBWRAP_PATH="")
+LIBS="$OLD_LIBS"
+])
+	LIBS="$ORIG_LIBS"
+if test -n "$LIB_NSL"; then
+	AC_MSG_RESULT(yes)
+	LIBS="$LIBS $LIB_NSL"
+else
+	AC_MSG_RESULT(no)
+fi
+fi
+
+AC_SUBST(LIBWRAP_PATH)
+AC_SUBST(LIB_WRAP)
+AM_CONDITIONAL(HAVE_HOSTS_ACCESS, test -n "$LIBWRAP_PATH")
+if test -n "$LIBWRAP_PATH"; then
+	AC_DEFINE(HAVE_HOSTS_ACCESS)
+fi
+
+AC_CHECK_FUNC(inet_aton,,[AC_CHECK_LIB(resolv,inet_aton)])
+if test x$ac_cv_func_inet_aton = xno && test x$ac_cv_lib_resolv_inet_aton = xno
+then :
+else
+  AC_DEFINE(HAVE_INET_ATON)
+fi
+
+dnl This generates warnings from autoconf...
+AC_C_BIGENDIAN
+
+AC_TRY_RUN([
+#include <fcntl.h>
+#include <sys/uio.h>
+#define NIOVECS 50
+int main(int argc, char *argv[])
+{
+	char dumbuf[20] = "\n";
+	struct iovec iovecs[NIOVECS];
+	int i,fd;
+
+	for(i = 0; i < NIOVECS; i++) {
+		iovecs[i].iov_base = dumbuf;
+		iovecs[i].iov_len = 1;
+	}
+
+	fd=open("/dev/null", O_WRONLY);
+	if(fd==-1)
+		return(1);
+
+	if(writev(fd, iovecs, NIOVECS) < 0)
+		return 1;
+
+	close(fd);
+	return 0;
+}
+], , AC_DEFINE(HAVE_LIMITED_WRITEV), AC_DEFINE(HAVE_LIMITED_WRITEV))
+AC_SUBST(HAVE_LIMITED_WRITEV)
+
+#######################
+# type alignment test #
+#######################
+
+AC_DEFUN(AC_CHECK_ALIGNOF,
+[changequote(<<, >>)dnl
+dnl The name to #define.
+define(<<AC_TYPE_NAME>>, translit(alignof_$1, [a-z *], [A-Z_P]))dnl
+dnl The cache variable name.
+define(<<AC_CV_NAME>>, translit(ac_cv_alignof_$1, [ *], [_p]))dnl
+changequote([, ])dnl
+AC_MSG_CHECKING(alignment of $1)
+align_save_libs="$LIBS"
+LIBS="$GLIB_LIBS $LIBS"
+AC_CACHE_VAL(AC_CV_NAME,
+[AC_TRY_RUN([
+#include <stdio.h>
+#include "$srcdir/src/ORBitutil/basic_types.h"
+typedef struct {char s1;} CORBA_struct;
+typedef void *CORBA_pointer;
+struct test {char s1; $1 s2;};
+main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%d\n", &(((struct test*)0)->s2));
+  exit(0);
+}], AC_CV_NAME=`cat conftestval`, AC_CV_NAME=0, AC_CV_NAME=0)])dnl
+AC_MSG_RESULT($AC_CV_NAME)
+LIBS="$align_save_libs"
+AC_DEFINE_UNQUOTED(AC_TYPE_NAME, $AC_CV_NAME)
+undefine([AC_TYPE_NAME])dnl
+undefine([AC_CV_NAME])dnl
+])
+
+orig_CPPFLAGS=$CPPFLAGS
+CPPFLAGS="$CPPFLAGS $GLIB_CFLAGS"
+AC_CHECK_ALIGNOF(CORBA_short)
+AC_CHECK_ALIGNOF(CORBA_long)
+AC_CHECK_ALIGNOF(CORBA_unsigned_short)
+AC_CHECK_ALIGNOF(CORBA_unsigned_long)
+AC_CHECK_ALIGNOF(CORBA_float)
+AC_CHECK_ALIGNOF(CORBA_double)
+AC_CHECK_ALIGNOF(CORBA_char)
+AC_CHECK_ALIGNOF(CORBA_boolean)
+AC_CHECK_ALIGNOF(CORBA_octet)
+AC_CHECK_ALIGNOF(CORBA_long_double)
+AC_CHECK_ALIGNOF(CORBA_wchar)
+AC_CHECK_ALIGNOF(CORBA_long_long)
+AC_CHECK_ALIGNOF(CORBA_unsigned_long_long)
+AC_CHECK_ALIGNOF(CORBA_struct)
+AC_CHECK_ALIGNOF(CORBA_pointer)
+CPPFLAGS=$orig_CPPFLAGS 
+
+AC_CONFIG_SUBDIRS(libIDL)
+AC_CONFIG_SUBDIRS(popt)
+
+AC_SUBST(pkglibdir)
+
+AC_OUTPUT(Makefile
+orbit-config
+src/Makefile
+src/ORBitutil/Makefile
+src/ORBitutil/orbit-os-config.h
+src/IIOP/Makefile
+src/orb/orbit.h
+src/orb/Makefile
+src/orbit-idl-compiler/Makefile
+src/orbit-idl-compiler/backends/Makefile
+src/orbit-idl-compiler/backends/c/Makefile
+src/services/Makefile
+src/services/name/Makefile
+src/services/event/Makefile
+src/daemons/Makefile
+src/daemons/interface_repository/Makefile
+test/Makefile
+test/idl/Makefile
+test/test-poa/Makefile
+test/everything/Makefile
+ORBit.pc
+ORBit.spec)

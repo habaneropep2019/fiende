@@ -1,0 +1,1638 @@
+<HTML
+><HEAD
+><TITLE
+>MsOle</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.54"><LINK
+REL="HOME"
+TITLE="libole2 Library Reference Manual"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="API Reference"
+HREF="r19.html"><LINK
+REL="PREVIOUS"
+TITLE="API Reference"
+HREF="r19.html"><LINK
+REL="NEXT"
+TITLE="MsOleStream"
+HREF="libole2-msolestream.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>libole2 Library Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="r19.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="r19.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="libole2-msolestream.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="LIBOLE2-MSOLE"
+>MsOle</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN28"
+></A
+><H2
+>Name</H2
+>MsOle&nbsp;--&nbsp;Handle the filesystem.</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN31"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;libole2/libole2.h&gt;
+
+
+struct      <A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+>;
+#define     <A
+HREF="libole2-msole.html#MS-OLE-OPEN"
+>ms_ole_open</A
+>                     (fs,path)
+<A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    <A
+HREF="libole2-msole.html#MS-OLE-OPEN-VFS"
+>ms_ole_open_vfs</A
+>                 (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> **fs,
+                                             const char *path,
+                                             <GTKDOCLINK
+HREF="GBOOLEAN"
+>gboolean</GTKDOCLINK
+> try_mmap,
+                                             <A
+HREF="libole2-common.html#MSOLESYSWRAPPERS"
+>MsOleSysWrappers</A
+> *wrappers);
+#define     <A
+HREF="libole2-msole.html#MS-OLE-CREATE"
+>ms_ole_create</A
+>                   (fs,path)
+<A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    <A
+HREF="libole2-msole.html#MS-OLE-CREATE-VFS"
+>ms_ole_create_vfs</A
+>               (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> **fs,
+                                             const char *path,
+                                             int try_mmap,
+                                             <A
+HREF="libole2-common.html#MSOLESYSWRAPPERS"
+>MsOleSysWrappers</A
+> *wrappers);
+void        <A
+HREF="libole2-msole.html#MS-OLE-REF"
+>ms_ole_ref</A
+>                      (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs);
+void        <A
+HREF="libole2-msole.html#MS-OLE-UNREF"
+>ms_ole_unref</A
+>                    (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs);
+void        <A
+HREF="libole2-msole.html#MS-OLE-DESTROY"
+>ms_ole_destroy</A
+>                  (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> **fs);
+<A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    <A
+HREF="libole2-msole.html#MS-OLE-UNLINK"
+>ms_ole_unlink</A
+>                   (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             const char *path);
+<A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    <A
+HREF="libole2-msole.html#MS-OLE-STAT"
+>ms_ole_stat</A
+>                     (<A
+HREF="libole2-common.html#MSOLESTAT"
+>MsOleStat</A
+> *stat,
+                                             <A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             const char *dirpath,
+                                             const char *name);
+<A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    <A
+HREF="libole2-msole.html#MS-OLE-DIRECTORY"
+>ms_ole_directory</A
+>                (char ***names,
+                                             <A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             const char *dirpath);
+void        <A
+HREF="libole2-msole.html#MS-OLE-DEBUG"
+>ms_ole_debug</A
+>                    (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             int magic);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN64"
+></A
+><H2
+>Description</H2
+><P
+>	<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> is a filesystem object and handles an open filesystem.</P
+><P
+>	<A
+HREF="libole2-msole.html#MS-OLE-OPEN"
+>ms_ole_open</A
+>() opens a filesystem. <A
+HREF="libole2-msole.html#MS-OLE-CREATE"
+>ms_ole_create</A
+>() creates a new filesystem. <A
+HREF="libole2-msole.html#MS-OLE-DESTROY"
+>ms_ole_destroy</A
+>() closes a filesystem (therefore destroying the filesystem object). <A
+HREF="libole2-msole.html#MS-OLE-OPEN-VFS"
+>ms_ole_open_vfs</A
+>() and <A
+HREF="libole2-msole.html#MS-OLE-CREATE-VFS"
+>ms_ole_create_vfs</A
+>() allow more control on the way the filesystem-in-a-file is actualy accessed.</P
+><P
+>	<A
+HREF="libole2-msole.html#MS-OLE-UNLINK"
+>ms_ole_unlink</A
+>() deletes a stream or a directory on a filesystem. <A
+HREF="libole2-msole.html#MS-OLE-STAT"
+>ms_ole_stat</A
+>() gets information about a stream or a directory. <A
+HREF="libole2-msole.html#MS-OLE-DIRECTORY"
+>ms_ole_directory</A
+>() returns the names of the streams and directories in a directory.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN80"
+></A
+><H3
+><A
+NAME="MSOLE"
+></A
+>struct MsOle</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>struct MsOle;</PRE
+></TD
+></TR
+></TABLE
+><P
+>	<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> is an opaque datatype. It handles an open filesystem.</P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN86"
+></A
+><H3
+><A
+NAME="MS-OLE-OPEN"
+></A
+>ms_ole_open()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define ms_ole_open(fs,path)     ms_ole_open_vfs ((fs), (path), TRUE, NULL)</PRE
+></TD
+></TR
+></TABLE
+><P
+>	Opens the filesystem-in-a-file <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+> and creates the filesystem object <TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>. Returns a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</P
+><P
+>	This is a convenience macro for <A
+HREF="libole2-msole.html#MS-OLE-OPEN-VFS"
+>ms_ole_open_vfs</A
+>().</P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>filesystem object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>path to the filesystem-in-a-file on the actual filesystem.
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN109"
+></A
+><H3
+><A
+NAME="MS-OLE-OPEN-VFS"
+></A
+>ms_ole_open_vfs ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    ms_ole_open_vfs                 (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> **fs,
+                                             const char *path,
+                                             <GTKDOCLINK
+HREF="GBOOLEAN"
+>gboolean</GTKDOCLINK
+> try_mmap,
+                                             <A
+HREF="libole2-common.html#MSOLESYSWRAPPERS"
+>MsOleSysWrappers</A
+> *wrappers);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Opens the filesystem-in-the-file <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+> and creates the filesystem object <TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> path to the filesystem-in-the file on the actual filesystem.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>try_mmap</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> TRUE if try to mmap(2) the filesystem-in-a-file,
+instead of opening.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>wrappers</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> system functions wrappers, <TT
+CLASS="LITERAL"
+>NULL</TT
+> if standard functions are used.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN148"
+></A
+><H3
+><A
+NAME="MS-OLE-CREATE"
+></A
+>ms_ole_create()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define ms_ole_create(fs,path)     ms_ole_create_vfs ((fs), (path), TRUE, NULL)</PRE
+></TD
+></TR
+></TABLE
+><P
+>	Creates the filesystem-in-a-file <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+> and creates the filesystem object <TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>. Returns a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</P
+><P
+>	This is a convenience macro for <A
+HREF="libole2-msole.html#MS-OLE-CREATE-VFS"
+>ms_ole_create_vfs</A
+>().</P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>filesystem object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>path to the filesystem-in-a-file on the actual filesystem.
+&#13;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN171"
+></A
+><H3
+><A
+NAME="MS-OLE-CREATE-VFS"
+></A
+>ms_ole_create_vfs ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    ms_ole_create_vfs               (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> **fs,
+                                             const char *path,
+                                             int try_mmap,
+                                             <A
+HREF="libole2-common.html#MSOLESYSWRAPPERS"
+>MsOleSysWrappers</A
+> *wrappers);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Creates the filesystem-in-the-file <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+> and creates the filesystem <TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> path to the filesystem-in-the file on the actual filesystem.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>try_mmap</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> TRUE if try to mmap(2) the filesystem-in-a-file,
+instead of opening.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>wrappers</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> system functions wrappers, <TT
+CLASS="LITERAL"
+>NULL</TT
+> if standard functions are used.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN209"
+></A
+><H3
+><A
+NAME="MS-OLE-REF"
+></A
+>ms_ole_ref ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        ms_ole_ref                      (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Increment by one the count of references to the filesystem.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN225"
+></A
+><H3
+><A
+NAME="MS-OLE-UNREF"
+></A
+>ms_ole_unref ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        ms_ole_unref                    (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Decrement by one the count of references to the filesystem.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN241"
+></A
+><H3
+><A
+NAME="MS-OLE-DESTROY"
+></A
+>ms_ole_destroy ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        ms_ole_destroy                  (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> **fs);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Closes the filesystem <TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+> and truncates any free blocks.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN258"
+></A
+><H3
+><A
+NAME="MS-OLE-UNLINK"
+></A
+>ms_ole_unlink ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    ms_ole_unlink                   (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             const char *path);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Delete the stream or directory <TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+> on the filesystem <TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>path</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> path of the stream or directory to delete.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN286"
+></A
+><H3
+><A
+NAME="MS-OLE-STAT"
+></A
+>ms_ole_stat ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    ms_ole_stat                     (<A
+HREF="libole2-common.html#MSOLESTAT"
+>MsOleStat</A
+> *stat,
+                                             <A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             const char *dirpath,
+                                             const char *name);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Gets information about the stream or the directory which is in the directory
+<TT
+CLASS="PARAMETER"
+><I
+>dirpath</I
+></TT
+> and its name is <TT
+CLASS="PARAMETER"
+><I
+>file</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>stat</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> stat information.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dirpath</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> directory path.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>name</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> stream or directory name.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN323"
+></A
+><H3
+><A
+NAME="MS-OLE-DIRECTORY"
+></A
+>ms_ole_directory ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+>    ms_ole_directory                (char ***names,
+                                             <A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             const char *dirpath);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Gets the names of the streams and directories in the directory <TT
+CLASS="PARAMETER"
+><I
+>dirpath</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>names</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> array where the names are storesd, it's <TT
+CLASS="LITERAL"
+>NULL</TT
+> ended.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> filesystem object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dirpath</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> directory path.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <A
+HREF="libole2-common.html#MSOLEERR"
+>MsOleErr</A
+> code.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN355"
+></A
+><H3
+><A
+NAME="MS-OLE-DEBUG"
+></A
+>ms_ole_debug ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        ms_ole_debug                    (<A
+HREF="libole2-msole.html#MSOLE"
+>MsOle</A
+> *fs,
+                                             int magic);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fs</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>magic</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="r19.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="r19.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="libole2-msolestream.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>API Reference</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>MsOleStream</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

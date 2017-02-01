@@ -1,0 +1,218 @@
+/* $Id: pixmapmenuitem.gen_h,v 1.8 2000/08/29 18:09:02 kenelson Exp $ */
+
+
+/* gtkpixmapmenuitem.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/menushell.h>
+#include <gtk--/menuitem.h>
+#include <gtk--/pixmap.h>
+#include <gnome--/pixmap.h>
+#include <libgnomeui/gtkpixmapmenuitem.h>
+
+class Gtk::Pixmap;
+class Gnome::Pixmap;
+
+CLASS_START(Gtk);
+class PixmapMenuItem : public MenuItem
+{
+  WRAP_CLASS(PixmapMenuItem, GtkPixmapMenuItem,
+             GTK_PIXMAP_MENU_ITEM, GTK_IS_PIXMAP_MENU_ITEM,
+             pixmap_menu_item,
+             MenuItem, GtkMenuItem, GTK_MENU_ITEM);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  void set_pixmap (Gtk::Pixmap &pixmap);
+  void set_pixmap (Gnome::Pixmap &pixmap);
+
+};
+
+namespace Menu_Helpers // Gnome::Menu_Helpers
+{
+  using namespace Gtk::Menu_Helpers;
+
+  class MenuPixmap
+  {
+  public:
+    MenuPixmap(const Gtk::string &stockId);
+    MenuPixmap(const gchar *stockId);
+    MenuPixmap(const gchar *const xpmData[]);
+    MenuPixmap();
+
+  protected:
+    Gtk::string stockId_;
+    const gchar *const *xpmData_;
+  };
+  
+  typedef SigC::Slot0<void> ItemCallback;
+
+  class PixmapMenuElem : public Gtk::Menu_Helpers::Element
+  {
+  public:
+    PixmapMenuElem(Gtk::MenuItem& child)
+      :  Gtk::Menu_Helpers::Element(child)
+    {}
+
+    //: create a labeled, menuitem with an optional callback
+    PixmapMenuElem(const Gtk::string &label, 
+                   const Gtk::string &tooltip,
+                   ItemCallback callback = 0);
+
+    //: create a labeled, menuitem with an optional callback
+    PixmapMenuElem(const Gtk::string &label, 
+                   const Gtk::string &tooltip,
+                   Gtk::Menu_Helpers::AccelKey accel_key,
+                   ItemCallback callback = 0);
+
+    //: create a labeled, menuitem with a pixmap and an optional
+    //: callback
+    PixmapMenuElem(Pixmap& pixmap, 
+                   const Gtk::string &label, 
+                   const Gtk::string &tooltip,
+                   ItemCallback callback = 0);
+
+    // same, with an accelerator
+    PixmapMenuElem(Pixmap& pixmap, 
+                   const Gtk::string &label, 
+                   const Gtk::string &tooltip,
+                   Gtk::Menu_Helpers::AccelKey accel_key,
+                   ItemCallback callback = 0);
+
+    // create a labeled menuitem with a submenu
+    PixmapMenuElem(const Gtk::string &label, 
+                   const Gtk::string &tooltip,
+                   Gtk::Menu& submenu);
+
+    // create a labeled menuitem with a pixmap and a submenu
+    PixmapMenuElem(Pixmap &pixmap, 
+                   const Gtk::string &label, 
+                   const Gtk::string &tooltip,
+                   Gtk::Menu& submenu);
+
+    virtual ~PixmapMenuElem();
+  protected:
+
+    virtual void create_child_menu_item();
+
+    Gtk::string tooltip_;
+    Pixmap *pixmap_;
+
+  };
+}
+
+
+
+PRIVATE_START;
+#include <gtk--/private/menuitem_p.h>
+IMPL_START;
+#include <gnome--/private/pixmapmenuitem_p.h>
+
+void Gtk::PixmapMenuItem::set_pixmap (Pixmap &pixmap)
+{
+  gtk_pixmap_menu_item_set_pixmap(gtkobj(), GTK_WIDGET(pixmap.gtkobj()));
+}
+
+void Gtk::PixmapMenuItem::set_pixmap (Gnome::Pixmap &pixmap)
+{
+  gtk_pixmap_menu_item_set_pixmap(gtkobj(), GTK_WIDGET(pixmap.gtkobj()));
+}
+
+namespace Gnome {
+
+namespace Menu_Helpers
+{
+
+using namespace Gtk::Menu_Helpers;
+  
+//: create a labeled, menuitem with an optional pixmap and an
+//: optional callback
+PixmapMenuElem::PixmapMenuElem(Pixmap &pixmap,
+                               const Gtk::string &label, 
+                               const Gtk::string &tooltip,
+                               ItemCallback callback)
+  : Element(0),
+    tooltip_(tooltip),
+    pixmap_(&pixmap)
+{
+  init(label, callback, "activate");
+}
+  
+
+// same, with an accelerator
+PixmapMenuElem::PixmapMenuElem(Pixmap &pixmap,
+                               const Gtk::string &label, 
+                               const Gtk::string &tooltip,
+                               AccelKey accel_key,
+                               ItemCallback callback)
+  : Element(0),
+    tooltip_(tooltip),
+    pixmap_(&pixmap)
+{
+  init(label, callback, "activate", accel_key);
+}
+
+
+// create a labeled menuitem with a submenu
+PixmapMenuElem::PixmapMenuElem(const Gtk::string &label, 
+                               const Gtk::string &tooltip,
+                               Gtk::Menu& submenu)
+  : Element(0),
+    tooltip_(tooltip),
+    pixmap_(0)
+{
+  init(label, submenu);
+}
+
+
+// create a labeled menuitem with a pixmap and a submenu
+PixmapMenuElem::PixmapMenuElem(Pixmap &pixmap,
+                               const Gtk::string &label, 
+                               const Gtk::string &tooltip,
+                               Gtk::Menu& submenu)
+  : Element(0),
+    tooltip_(tooltip),
+    pixmap_(&pixmap)
+{
+  init(label, submenu);
+}
+
+
+void
+PixmapMenuElem::create_child_menu_item()
+{
+  Gtk::PixmapMenuItem *tmp = new Gtk::PixmapMenuItem();
+  tmp->set_pixmap(*pixmap_);
+  child_ = tmp;
+}
+
+PixmapMenuElem::~PixmapMenuElem()
+{
+//   if (pixmap_)   
+//     gtk_object_unref(GTK_OBJECT(pixmap_));
+}
+
+} /* namespace Menu_Helpers */
+} /* namespace Gnome */
+
+
+DOCUMENTATION_START;
+

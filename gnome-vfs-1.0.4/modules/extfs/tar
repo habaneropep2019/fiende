@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+sub list {
+	($filename) = @_;
+	$uid = `id -u`;
+	$gid = `id -g`;
+	chomp($uid);
+	chomp($gid);
+	open(TARLIST, "tar tvf $filename|");
+	while(<TARLIST>) {
+		s/\s+/ /g;
+		($perms, $usergroup, $size, $date, $time, $name) = split;
+		
+		# convert tar fmt dates/times to our date/time format
+		($year, $month, $day) = split(/-/, $date);
+		($hours, $mins, $secs) = split(/-/, $time);
+		#printf "-rw-------   1 %-8s %-8s %8s %02d-%02d-%02d %02d:%02d %s\n", $uid, $gid, $size, $day, $month, ($year%100), $hours, $mins, $name;
+		printf "%s   1 %-8s %-8s %8s %02d-%02d-%02d %02d:%02d %s\n", $perms, $uid, $gid, $size, $day, $month, ($year%100), $hours, $mins, $name;
+	}
+}
+
+sub copyout {
+	($archive, $stored, $local) = @_;
+	$result = system("tar xOf $archive $stored > $local");
+	exit $result
+}
+
+$command = $ARGV[0];
+
+if($command eq "list") {
+	list($ARGV[1]);
+} elsif($command eq "copyout") {
+	copyout($ARGV[1], $ARGV[2], $ARGV[3]);
+}

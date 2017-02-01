@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# Creates the Postscript->Various printer conversion filters.
+#
+# Author: Miguel de Icaza
+#
+
+cat << EOF
+#
+# Do not edit. This file has been automatically generated from the
+# gnome-make-postscript-mimes
+#
+EOF
+
+PAPER_SIZES='a4 letter legal'
+
+DEVICES="ljet3-300-300 ljet4-300-300 ljet4-600-600 deskjet-x-x djet500c-x-x djet500-x-x"
+DEVICES="$DEVICES dnj650c-x-x laserjet-x-x ljetplus-x-x ljet2p-x-x ljet3d-x-x"
+DEVICES="$DEVICES cdeskjet-x-x cdj550-x- cdj500-x-x cdj550-x-x"
+DEVICES="$DEVICES pjxl-x-x pjxl300-x-x bj10e-x-x bj200-x-x bjc600-x-x"
+DEVICES="$DEVICES faxg3-x-x faxg32d-x-x faxg4-x-x epsonc-x-x"
+DEVICES="$DEVICES ibmpro-x-x"
+
+for paper in $PAPER_SIZES; do
+    for device in $DEVICES; do
+        res=`echo $device | sed 's/[A-Za-z0-9]*-//'`
+	resx=`echo $res | sed 's/-.*//'`
+	resy=`echo $res | sed 's/.*-//'`
+	dev=`echo $device | sed 's/-.*//'`
+
+	if test $resx = x; then
+		resolution=""
+	else
+		resolution="-r${resx}x${resy}"
+	fi
+
+	echo "application/postscript x-printer/$device-$paper gs -sDEVICE=$dev $resolution -sPAPERSIZE=$paper -sOutputFile=- -q -"
+    done
+done

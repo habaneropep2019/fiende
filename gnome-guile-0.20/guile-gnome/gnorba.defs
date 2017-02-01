@@ -1,0 +1,129 @@
+;;; -*- scheme -*-
+;;; gnome.defs - Export Gnome Gnorba interfaces to Guile.
+;;; 
+;;; Copyright (C) 1999 Martin Baulig
+;;; 
+;;; This program is free software; you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 2, or (at your option)
+;;; any later version.
+;;; 
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;; 
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program; if not, write to the Free Software
+;;; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+;;; 02111-1307, USA.  */
+
+;; (import "gnome.defs")
+
+(options
+ (includes "#include <gnome.h>"
+	   "#include <libgnorba/gnorba.h>"
+	   "#include <gnorba-main.h>"
+	   ""
+	   "typedef struct CORBA_Object_struct CORBA_Object_type;"
+	   "typedef struct CORBA_ORB_type CORBA_ORB_type;"
+	   "typedef struct PortableServer_POA_type PortableServer_POA_type;"
+	   "typedef struct PortableServer_POAManager_type PortableServer_POAManager_type;"
+	   )
+ (init-func "gnome_gnorba_init_guile_glue")
+ (extra-init-code "gnome_gnorba_init_guile_support ();")
+ (libs "-lguilegnorba"))
+
+(define-ptype CORBA_ORB
+  (copy gnorba_corba_orb_copy)
+  (free gnorba_corba_orb_free))
+
+(define-struct CORBA_Environment
+  (copy gnorba_corba_env_copy)
+  (free gnorba_corba_env_free))
+
+(define-ptype PortableServer_POA
+  (copy gnorba_corba_env_copy)
+  (free gnorba_corba_env_free))
+
+(define-ptype PortableServer_POAManager
+  (copy gnorba_corba_env_copy)
+  (free gnorba_corba_env_free))
+
+(define-ptype CORBA_Object
+  (copy gnorba_corba_env_copy)
+  (free gnorba_corba_env_free))
+
+(define-enum GoadServerType
+  (goad-server-shlib GOAD_SERVER_SHLIB)
+  (goad-server-exe GOAD_SERVER_EXE)
+  (goad-server-relay GOAD_SERVER_RELAY)
+  (goad-server-factory GOAD_SERVER_FACTORY))
+
+(define-enum GnorbaInitFlags
+  (init-server-func GNORBA_INIT_SERVER_FUNC)
+  (disable-cookies GNORBA_INIT_DISABLE_COOKIES))
+
+(define-enum GoadActivationFlags
+  (goad-activate-shlib GOAD_ACTIVATE_SHLIB)
+  (goad-activate-remote GOAD_ACTIVATE_REMOTE)
+  (goad-activate-existing-only GOAD_ACTIVATE_EXISTING_ONLY)
+  (goad-activate-new-only GOAD_ACTIVATE_NEW_ONLY)
+  (goad-activate-async GOAD_ACTIVATE_ASYNC))
+
+(define-func gnome_CORBA_init
+  CORBA_ORB
+  ((string app_id)
+   (string app_version)
+   ((cvecp string) args)
+   (GnorbaInitFlags init_flags)
+   (CORBA_Environment ev
+		      (= "gnorba_CORBA_exception_init ()")
+		      (finish gnorba_CORBA_exception_finish))))
+
+(define-func gnorba_CORBA_init
+  CORBA_ORB
+  (((cvecp string) args)
+   (GnorbaInitFlags init_flags)
+   (CORBA_Environment ev
+		      (= "gnorba_CORBA_exception_init ()")
+		      (finish gnorba_CORBA_exception_finish))))
+
+(define-func gnome_CORBA_ORB
+  CORBA_ORB
+  ())
+
+(define-func gnorba_CORBA_exception_init
+  CORBA_Environment
+  ())
+
+(define-func gnorba_CORBA_exception_throw
+  none
+  ((CORBA_Environment ev) (SCM ev_as_scm (= "p_ev"))))
+
+(define-func CORBA_ORB_resolve_initial_references
+  PortableServer_POA
+  ((CORBA_ORB orb)
+   (string object_id)
+   (CORBA_Environment ev
+		      (= "gnorba_CORBA_exception_init ()")
+		      (finish gnorba_CORBA_exception_finish))))
+
+(define-func PortableServer_POA__get_the_POAManager
+  PortableServer_POAManager
+  ((PortableServer_POA poa)
+   (CORBA_Environment ev
+		      (= "gnorba_CORBA_exception_init ()")
+		      (finish gnorba_CORBA_exception_finish))))
+
+(define-func PortableServer_POAManager_activate
+  none
+  ((PortableServer_POAManager pm)
+   (CORBA_Environment ev
+		      (= "gnorba_CORBA_exception_init ()")
+		      (finish gnorba_CORBA_exception_finish))))
+
+(define-func gnome_name_service_get
+  CORBA_Object
+  ())
+

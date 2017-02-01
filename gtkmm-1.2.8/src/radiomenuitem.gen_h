@@ -1,0 +1,125 @@
+/* $Id: radiomenuitem.gen_h,v 1.44 2001/08/04 17:36:51 murrayc Exp $ */
+
+/* radiomenuitem.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/checkmenuitem.h>
+#include <gtk/gtkradiomenuitem.h>
+CLASS_START(Gtk);
+
+class RadioMenuItem;
+
+namespace RadioMenuItem_Helpers {
+  //: Group transfer agent for RadioMenuItem
+  //- Radio items must be grouped together to function.  
+  //- To set up this group, construct a Group and then pass it 
+  //- to the constructor of all radio items.  You do not need
+  //- to keep the group beyond the initial construction. 
+  //- It should not be called with new.
+  class Group 
+    {
+      friend class RadioMenuItem;
+      GSList *group_;
+      void* operator new(size_t);
+      void add(RadioMenuItem& item);
+      public:
+        Group(GSList* group) : group_(group) {}
+	Group() : group_(0) {}
+	operator GSList* () const { return group_; }
+    };
+}
+
+//: A choice from multiple check menu items.
+//- A radio menu item is a check menu item that belongs to a group. Only
+//- one of the radio menu items from a group is selected at a time.
+class RadioMenuItem : public CheckMenuItem {
+  WRAP_CLASS(RadioMenuItem,GtkRadioMenuItem,GTK_RADIO_MENU_ITEM,GTK_IS_RADIO_MENU_ITEM,radio_menu_item,Gtk::CheckMenuItem,GtkCheckMenuItem,GTK_CHECK_MENU_ITEM);
+public:
+  
+  typedef RadioMenuItem_Helpers::Group Group;
+
+  RadioMenuItem(Group &groupx);
+  RadioMenuItem(Group &groupx, const string &label, gfloat xalign=0.0, gfloat yalign=0.5 );
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Returns the group to which the radio menu item belongs.
+  //- Returns: Its group.
+  WRAP_METHOD(Group gtk_radio_menu_item_group(GtkRadioMenuItem*),
+	      Group group());
+
+  //: Sets the group of a radio menu item, or changes it.
+  //- group: The new group.
+  WRAP_METHOD(void gtk_radio_menu_item_set_group(GtkRadioMenuItem*, Group),
+	      void set_group(Group group));
+  
+protected:
+  void constructor(Group group);
+};
+
+PRIVATE_START;
+#include <gtk--/private/checkmenuitem_p.h>
+IMPL_START;
+#include <gtk--/misc.h>
+#include <gtk--/label.h>
+
+typedef Gtk::RadioMenuItem::Group Group;
+
+namespace Gtk
+{
+
+RadioMenuItem::RadioMenuItem(Group &groupx)
+  : CheckMenuItem((GtkCheckMenuItem*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  groupx.add(*this);
+}
+
+RadioMenuItem::RadioMenuItem(Group &groupx, const string &label, gfloat xalign, gfloat yalign)
+  : CheckMenuItem((GtkCheckMenuItem*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  groupx.add(*this);
+  add_label(label, xalign, yalign);
+}
+
+void
+RadioMenuItem_Helpers::Group::add(RadioMenuItem& item)
+{
+  item.set_group(*this);
+  group_=item.gtkobj()->group;
+}
+
+} /* namespace Gtk */
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(gtkradiomenuitem)
+//. name: check_menu_item
+//. type: GtkCheckMenuItem
+//. get:
+//. set:
+//. desc:
+
+//. name: group
+//. type: GSList*
+//. get:
+//. set:
+//. desc:
+

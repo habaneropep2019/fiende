@@ -1,0 +1,241 @@
+<refentry id="bonobo-bonobo-ui-container">
+<refmeta>
+<refentrytitle>BonoboUIContainer</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboUIContainer</refname><refpurpose>The container interface as implemented for BonoboWindow</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboUIContainer">BonoboUIContainer</link>;
+typedef     <link linkend="BonoboUIContainerClass">BonoboUIContainerClass</link>;
+<link linkend="BonoboUIContainer">BonoboUIContainer</link>* <link linkend="bonobo-ui-container-construct">bonobo_ui_container_construct</link>
+                                            (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> corba_container);
+<link linkend="BonoboUIContainer">BonoboUIContainer</link>* <link linkend="bonobo-ui-container-new">bonobo_ui_container_new</link>  (void);
+<link linkend="BonoboUIEngine">BonoboUIEngine</link>* <link linkend="bonobo-ui-container-get-engine">bonobo_ui_container_get_engine</link>
+                                            (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container);
+void        <link linkend="bonobo-ui-container-set-engine">bonobo_ui_container_set_engine</link>  (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container,
+                                             <link linkend="BonoboUIEngine">BonoboUIEngine</link> *engine);
+void        <link linkend="bonobo-ui-container-set-win">bonobo_ui_container_set_win</link>     (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container,
+                                             <link linkend="BonoboWindow">BonoboWindow</link> *win);
+<link linkend="BonoboWindow">BonoboWindow</link>* <link linkend="bonobo-ui-container-get-win">bonobo_ui_container_get_win</link>   (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+A BonoboUIContainer is a very thin object, it implements the CORBA
+interface for doing UI merging, but none of the logic. In order
+to achieve the effect it is associated with a BonoboUIEngine object.
+Traditionaly the UI container was associated with a <link linkend="BonoboWindow">BonoboWindow</link>
+however, this is now strongly deprecated, since the BonoboUIContainer
+can be used with any <link linkend="BonoboUIEngine">BonoboUIEngine</link>, not just that used by BonoboWindow.
+</para>
+
+<para>
+Here is how your code should interact with the BonoboUIContainer
+  <example>
+    <title>How to setup a BonoboUIContainer</title>
+    <programlisting>
+{
+	BonoboWindow      *window;
+	BonoboUIEngine    *engine;
+	BonoboUIContainer *container;
+
+	window = BONOBO_WINDOW (
+		bonobo_window_new ("Window", "My Test Application"));
+	container = <link linkend="bonobo-ui-container-new">bonobo_ui_container_new</link>();
+
+	engine = bonobo_window_get_ui_engine (window);
+	bonobo_ui_container_set_engine (container, engine);
+
+	return window;
+}
+    </programlisting>
+  </example>
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboUIContainer">BonoboUIContainer</title>
+<programlisting>typedef struct {
+	BonoboXObject base;
+
+	BonoboUIContainerPrivate *priv;
+
+	/* For backwards compatibility, strongly deprecated */
+	BonoboWindow *win;
+} BonoboUIContainer;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboUIContainerClass">BonoboUIContainerClass</title>
+<programlisting>typedef struct {
+	BonoboXObjectClass parent;
+
+	POA_Bonobo_UIContainer__epv epv;
+} BonoboUIContainerClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-container-construct">bonobo_ui_container_construct ()</title>
+<programlisting><link linkend="BonoboUIContainer">BonoboUIContainer</link>* bonobo_ui_container_construct
+                                            (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> corba_container);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>container</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>corba_container</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-container-new">bonobo_ui_container_new ()</title>
+<programlisting><link linkend="BonoboUIContainer">BonoboUIContainer</link>* bonobo_ui_container_new  (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a newly created BonoboUIContainer
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-container-get-engine">bonobo_ui_container_get_engine ()</title>
+<programlisting><link linkend="BonoboUIEngine">BonoboUIEngine</link>* bonobo_ui_container_get_engine
+                                            (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container);</programlisting>
+<para>
+Get the associated <link linkend="BonoboUIEngine">BonoboUIEngine</link></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>container</parameter>&nbsp;:</entry>
+<entry> the UI container
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the engine
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-container-set-engine">bonobo_ui_container_set_engine ()</title>
+<programlisting>void        bonobo_ui_container_set_engine  (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container,
+                                             <link linkend="BonoboUIEngine">BonoboUIEngine</link> *engine);</programlisting>
+<para>
+Associates the BonoboUIContainer with a <link linkend="BonoboUIEngine">BonoboUIEngine</link>
+that it will use to handle all the UI merging requests.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>container</parameter>&nbsp;:</entry>
+<entry> the container
+</entry></row>
+<row><entry align="right"><parameter>engine</parameter>&nbsp;:</entry>
+<entry> the engine
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-container-set-win">bonobo_ui_container_set_win ()</title>
+<programlisting>void        bonobo_ui_container_set_win     (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container,
+                                             <link linkend="BonoboWindow">BonoboWindow</link> *win);</programlisting>
+<para>
+This function is deprecated, please use
+bonobo_ui_container_set_engine instead, we plan to
+allow UIContainers to be associated with many things
+apart from BonoboWindows.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>container</parameter>&nbsp;:</entry>
+<entry> the container
+</entry></row>
+<row><entry align="right"><parameter>win</parameter>&nbsp;:</entry>
+<entry> a <link linkend="BonoboWindow">BonoboWindow</link> widget
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-container-get-win">bonobo_ui_container_get_win ()</title>
+<programlisting><link linkend="BonoboWindow">BonoboWindow</link>* bonobo_ui_container_get_win   (<link linkend="BonoboUIContainer">BonoboUIContainer</link> *container);</programlisting>
+<para>
+This is _extremely_ deprecated, there is no garentee
+that a BonoboUIContainer has an associated window, this
+function will spew warnings.
+</para>
+<para>
+If you find yourself wanting to use this function,
+you probably want to be passing a BonoboWindow ( or
+derivative ) around and then using:
+</para>
+<para>
+bonobo_window_get_ui_engine (window)</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>container</parameter>&nbsp;:</entry>
+<entry> the BonoboUIContainer
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a BonoboWindow if it is associated.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="BonoboUIComponent">BonoboUIComponent</link>, <link linkend="BonoboUIEngine">BonoboUIEngine</link>, <link linkend="BonoboWindow">BonoboWindow</link>, <link linkend="BonoboUISync">BonoboUISync</link>, <link linkend="bonobo-ui-util">bonobo-ui-util</link>
+</para>
+</refsect1>
+
+</refentry>

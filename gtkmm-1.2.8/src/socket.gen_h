@@ -1,0 +1,134 @@
+/* $Id: socket.gen_h,v 1.20 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* socket.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gtk/gtksocket.h>
+
+CLASS_START(Gtk);
+//: Container for widgets from other processes.
+//- Together with {Gtk::Plug::}, {\class Gtk::Socket} provides the ability to
+//- embed widgets from one process into another process in a fashion that is
+//- transparent to the user. One process creates a {Gtk::Socket} widget and,
+//- passes the XID of that widget's window to the other process, which then
+//- creates a {Gtk::Plug::} window with that XID. Any widgets contained in
+//- the {Gtk::Plug::} then will appear inside the first applications window.
+//-
+//- The XID of the socket's window is obtained by using the
+//- {\macro GTK_WINDOW_XWINDOW()} macro. Before using this macro, the socket
+//- must have been realized, and for hence, have been added to its parent. 
+//-
+//- Note that if you pass the XID of the socket to another process that will
+//- create a plug in the socket, you must make sure that the socket widget is
+//- not destroyed until that plug is created. Violating this rule will cause
+//- unpredictable consequences, the most likely consequence being that the
+//- plug will appear as a separate toplevel window. You can check if the plug
+//- has been created by examining the plug_window field of the
+//- {\class Gtk::Socket} structure. If this field is non-NULL, then the plug
+//- has been succesfully created inside of the socket.
+//-
+//- When GTK-- is notified that the embedded window has been destroyed, then
+//- it will destroy the socket as well. You should always, therefore, be
+//- prepared for your sockets to be destroyed at any time when the main event
+//- loop is running.
+//-
+//- A socket can also be used to swallow arbitrary pre-existing top-level
+//- windows using {steal()}, though the integration when this is done will
+//- not be as close as between a {Gtk::Plug::} and a {\class Gtk::Socket}.
+class Socket : public Container
+{
+  WRAP_CLASS(Socket,GtkSocket,GTK_SOCKET,GTK_IS_SOCKET,socket,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Reparents a pre-existing toplevel window into a GtkSocket.
+  //- {\var wid}: The XID of an existing toplevel window. 
+  WRAP_METHOD(void gtk_socket_steal (GtkSocket*,guint32),
+	      void steal (guint32 wid));
+};
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Socket)
+//. name: request_width
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: request_height
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: current_width
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: current_height
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: plug_window
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: same_app
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: focus_in
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: have_size
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: need_map
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

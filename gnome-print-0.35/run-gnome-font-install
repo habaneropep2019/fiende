@@ -1,0 +1,166 @@
+# Hey Emacs, this is -*- perl -*-
+
+# This will be run once on the installation machine.  Therefore we will not
+# try to predict the perl path.
+# -----------------------------------------------------------------------------
+
+die "Usage: $0 installer datadir srcdir sysconfdir\n" unless @ARGV == 3 || @ARGV == 4;
+
+my $installer = $ARGV[0];
+my $datadir = $ARGV[1];
+my $srcdir = $ARGV[2];
+my $sysconfdir = $ARGV[3];
+if (!$sysconfdir) {$sysconfdir="/etc";}
+
+die "Error: installer not executable.\n" unless -f $installer && -x $installer;
+die "Error: datadir is not a directory.\n" unless -d $datadir;
+# die "Error: srcdir is not a directory.\n" unless -d $srcdir;
+
+my @default_paths = 
+    (
+     '/usr/share/ghostscript/fonts',
+     '/usr/lib/ghostscript/fonts',
+     '/usr/share/fonts/default/Type1',
+     '/usr/share/fonts/default/ghostscript',
+     '/usr/local/share/ghostscript/fonts',
+     '/usr/local/lib/ghostscript/fonts',
+     '/usr/local/share/fonts/default/Type1',
+     '/usr/local/share/fonts/default/ghostscript',
+     '/usr/share/ghostscript/fonts',
+     '/usr/freeware/share/ghostscript/fonts'
+     );
+
+# -----------------------------------------------------------------------------
+
+#my $targetdir = "$datadir/fonts";
+#my $targetfile = "$targetdir/fontmap2";
+
+# We might be running under a restricted path; try to compensate.
+$ENV{'PATH'} .= ":/bin:/usr/bin:/usr/local/bin:/usr/freeware/bin";
+
+# Ask ghostscript for a list of font directories.
+my @gs_fontpath = ();
+{
+    local (*FIL);
+    if (open (*FIL, "gs -h 2>/dev/null |")) {
+	while (<FIL>) {
+	    if (/^Search path:$/i ... /^\S/) {
+		next if /^\S/;
+
+		s/^\s+//;   # Initial white-space
+		s/\s+$//;   # Terminal white-space including \n.
+		s/\s+:$//;  # " :" at end of line.
+
+		# Absolute paths only.
+		push @gs_fontpath, (grep { m|^/|; } (split (/\s:\s/)));
+	    }
+	}
+	close (*FIL);
+
+	if (@gs_fontpath) {
+	    print "Info: ghostscript was found and has fonts in these directories:\n";
+	    foreach (@gs_fontpath) {
+		print "Info:   $_\n";
+	    }
+	} else {
+	    print STDERR "Error: ghostscript was found, but appeared to have no font\n";
+	    print STDERR "Error: information.  Please file a bug report (see bugs.gnome.org)\n";
+	    print STDERR "Error: and include the verbatim output of \"gs -h\".  Thanks.\n";
+	    print STDERR "Warning: I'll try to limp on...\n";
+	}
+    } else {
+	print STDERR "Warning: could not locate gs (aka ghostscript).\n";
+	print STDERR "Warning: I'll try to limp on...\n";
+    }
+}
+
+# Add in out defaults if they exist.
+{
+    my %seen = ();
+    my $dir;
+
+    foreach $dir (@gs_fontpath) { $seen{$dir} = 1; }
+
+    foreach $dir (@default_paths) {
+#	next if $seen{$dir};
+	next unless -d $dir;
+
+	print "Info: adding default directory $dir to font path.\n";
+	push @gs_fontpath, $dir;
+	$seen{$dir} = 1;
+    }	    
+}
+
+# Now we should have ghostscript paths set up
+
+# Create ghostscript.fontmap
+my @options = (
+	       '--debug',
+	       '--clean',
+	       '--recursive',
+	       '--dynamic',
+	       "--target=$sysconfdir/gnome/fonts/gnome-print-ghostscript.fontmap",
+	       "--aliases=$srcdir/fonts/adobe-urw.font",
+	       "--aliases=$datadir/fonts/adobe-urw.font",
+	       "--aliases=$datadir/gnome/fonts/adobe-urw.font",
+	       "$datadir/fonts/afms",
+	       "$datadir/fonts/pfbs",
+	       "$datadir/fonts/type1"
+	       );
+{
+    my $dir;
+    foreach $dir (@gs_fontpath) {
+	push @options, "$dir";
+    }
+}
+print "Info: running \"$installer ", join (' ', @options), "\".\n";
+system ($installer, @options);
+
+# Create x11.fontmap
+my @options = (
+	       '--debug',
+	       '--clean',
+	       '--recursive',
+	       '--dynamic',
+	       "--target=$sysconfdir/gnome/fonts/gnome-print-x11.fontmap",
+	       "--aliases=$srcdir/fonts/adobe-urw.font",
+	       "--aliases=$datadir/fonts/adobe-urw.font",
+	       "--aliases=$datadir/gnome/fonts/adobe-urw.font",
+	       "$datadir/fonts/afms",
+	       '/usr/X11R6/lib/X11/fonts'
+	       );
+print "Info: running \"$installer ", join (' ', @options), "\".\n";
+system ($installer, @options);
+
+# TeX fontmap
+my @options = (
+	       '--debug',
+	       '--clean',
+	       '--recursive',
+	       '--dynamic',
+	       "--target=$sysconfdir/gnome/fonts/gnome-print-tex.fontmap",
+	       "--aliases=$srcdir/fonts/adobe-urw.font",
+	       "--aliases=$datadir/fonts/adobe-urw.font",
+	       "--aliases=$datadir/gnome/fonts/adobe-urw.font",
+	       "$datadir/fonts/afms",
+	       '/usr/lib/texmf/fonts/afm',
+	       '/usr/lib/texmf/fonts/type1/adobe',
+	       '/usr/lib/texmf/fonts/type1/omega',
+	       '/usr/share/texmf/fonts/afm',
+	       '/usr/share/texmf/fonts/type1/adobe',
+	       '/usr/share/texmf/fonts/type1/omega'
+	       );
+print "Info: running \"$installer ", join (' ', @options), "\".\n";
+system ($installer, @options);
+
+# Whatever remains
+my @options = (
+	       '--debug',
+	       '--smart',
+	       "--aliases=$srcdir/fonts/adobe-urw.font",
+	       "--aliases=$datadir/fonts/adobe-urw.font",
+	       "--aliases=$datadir/gnome/fonts/adobe-urw.font",
+	       );
+print "Info: running \"$installer ", join (' ', @options), "\".\n";
+system ($installer, @options);
+

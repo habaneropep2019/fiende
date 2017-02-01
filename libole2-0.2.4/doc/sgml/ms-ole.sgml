@@ -1,0 +1,330 @@
+<refentry id="libole2-MsOle" revision="9 Jun 2000">
+<refmeta>
+<refentrytitle>MsOle</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBOLE2 Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>MsOle</refname><refpurpose>Handle the filesystem.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;libole2/libole2.h&gt;
+
+
+struct      <link linkend="MsOle">MsOle</link>;
+#define     <link linkend="ms-ole-open">ms_ole_open</link>                     (fs,path)
+<link linkend="MsOleErr">MsOleErr</link>    <link linkend="ms-ole-open-vfs">ms_ole_open_vfs</link>                 (<link linkend="MsOle">MsOle</link> **fs,
+                                             const char *path,
+                                             <link linkend="gboolean">gboolean</link> try_mmap,
+                                             <link linkend="MsOleSysWrappers">MsOleSysWrappers</link> *wrappers);
+#define     <link linkend="ms-ole-create">ms_ole_create</link>                   (fs,path)
+<link linkend="MsOleErr">MsOleErr</link>    <link linkend="ms-ole-create-vfs">ms_ole_create_vfs</link>               (<link linkend="MsOle">MsOle</link> **fs,
+                                             const char *path,
+                                             int try_mmap,
+                                             <link linkend="MsOleSysWrappers">MsOleSysWrappers</link> *wrappers);
+void        <link linkend="ms-ole-ref">ms_ole_ref</link>                      (<link linkend="MsOle">MsOle</link> *fs);
+void        <link linkend="ms-ole-unref">ms_ole_unref</link>                    (<link linkend="MsOle">MsOle</link> *fs);
+void        <link linkend="ms-ole-destroy">ms_ole_destroy</link>                  (<link linkend="MsOle">MsOle</link> **fs);
+<link linkend="MsOleErr">MsOleErr</link>    <link linkend="ms-ole-unlink">ms_ole_unlink</link>                   (<link linkend="MsOle">MsOle</link> *fs,
+                                             const char *path);
+<link linkend="MsOleErr">MsOleErr</link>    <link linkend="ms-ole-stat">ms_ole_stat</link>                     (<link linkend="MsOleStat">MsOleStat</link> *stat,
+                                             <link linkend="MsOle">MsOle</link> *fs,
+                                             const char *dirpath,
+                                             const char *name);
+<link linkend="MsOleErr">MsOleErr</link>    <link linkend="ms-ole-directory">ms_ole_directory</link>                (char ***names,
+                                             <link linkend="MsOle">MsOle</link> *fs,
+                                             const char *dirpath);
+void        <link linkend="ms-ole-debug">ms_ole_debug</link>                    (<link linkend="MsOle">MsOle</link> *fs,
+                                             int magic);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+	<link linkend="MsOle">MsOle</link> is a filesystem object and handles an open filesystem.
+</para>
+<para>
+	<link linkend="ms-ole-open">ms_ole_open</link>() opens a filesystem. <link linkend="ms-ole-create">ms_ole_create</link>() creates a new filesystem. <link linkend="ms-ole-destroy">ms_ole_destroy</link>() closes a filesystem (therefore destroying the filesystem object). <link linkend="ms-ole-open-vfs">ms_ole_open_vfs</link>() and <link linkend="ms-ole-create-vfs">ms_ole_create_vfs</link>() allow more control on the way the filesystem-in-a-file is actualy accessed.
+</para>
+<para>
+	<link linkend="ms-ole-unlink">ms_ole_unlink</link>() deletes a stream or a directory on a filesystem. <link linkend="ms-ole-stat">ms_ole_stat</link>() gets information about a stream or a directory. <link linkend="ms-ole-directory">ms_ole_directory</link>() returns the names of the streams and directories in a directory.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="MsOle">struct MsOle</title>
+<programlisting>struct MsOle;</programlisting>
+<para>
+	<link linkend="MsOle">MsOle</link> is an opaque datatype. It handles an open filesystem.
+</para></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-open">ms_ole_open()</title>
+<programlisting>#define ms_ole_open(fs,path)     ms_ole_open_vfs ((fs), (path), TRUE, NULL)
+</programlisting>
+<para>
+	Opens the filesystem-in-a-file <parameter>path</parameter> and creates the filesystem object <parameter>fs</parameter>. Returns a <link linkend="MsOleErr">MsOleErr</link> code.
+</para>
+<para>
+	This is a convenience macro for <link linkend="ms-ole-open-vfs">ms_ole_open_vfs</link>().
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry>filesystem object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>path to the filesystem-in-a-file on the actual filesystem.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-open-vfs">ms_ole_open_vfs ()</title>
+<programlisting><link linkend="MsOleErr">MsOleErr</link>    ms_ole_open_vfs                 (<link linkend="MsOle">MsOle</link> **fs,
+                                             const char *path,
+                                             <link linkend="gboolean">gboolean</link> try_mmap,
+                                             <link linkend="MsOleSysWrappers">MsOleSysWrappers</link> *wrappers);</programlisting>
+<para>
+Opens the filesystem-in-the-file <parameter>path</parameter> and creates the filesystem object <parameter>fs</parameter>.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> path to the filesystem-in-the file on the actual filesystem.
+</entry></row>
+<row><entry align="right"><parameter>try_mmap</parameter>&nbsp;:</entry>
+<entry> TRUE if try to mmap(2) the filesystem-in-a-file,
+instead of opening.
+</entry></row>
+<row><entry align="right"><parameter>wrappers</parameter>&nbsp;:</entry>
+<entry> system functions wrappers, <literal>NULL</literal> if standard functions are used.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="MsOleErr">MsOleErr</link> code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-create">ms_ole_create()</title>
+<programlisting>#define ms_ole_create(fs,path)     ms_ole_create_vfs ((fs), (path), TRUE, NULL)
+</programlisting>
+<para>
+	Creates the filesystem-in-a-file <parameter>path</parameter> and creates the filesystem object <parameter>fs</parameter>. Returns a <link linkend="MsOleErr">MsOleErr</link> code.
+</para>
+<para>
+	This is a convenience macro for <link linkend="ms-ole-create-vfs">ms_ole_create_vfs</link>().
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry>filesystem object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>path to the filesystem-in-a-file on the actual filesystem.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-create-vfs">ms_ole_create_vfs ()</title>
+<programlisting><link linkend="MsOleErr">MsOleErr</link>    ms_ole_create_vfs               (<link linkend="MsOle">MsOle</link> **fs,
+                                             const char *path,
+                                             int try_mmap,
+                                             <link linkend="MsOleSysWrappers">MsOleSysWrappers</link> *wrappers);</programlisting>
+<para>
+Creates the filesystem-in-the-file <parameter>path</parameter> and creates the filesystem <parameter>fs</parameter>.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> path to the filesystem-in-the file on the actual filesystem.
+</entry></row>
+<row><entry align="right"><parameter>try_mmap</parameter>&nbsp;:</entry>
+<entry> TRUE if try to mmap(2) the filesystem-in-a-file,
+instead of opening.
+</entry></row>
+<row><entry align="right"><parameter>wrappers</parameter>&nbsp;:</entry>
+<entry> system functions wrappers, <literal>NULL</literal> if standard functions are used.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="MsOleErr">MsOleErr</link> code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-ref">ms_ole_ref ()</title>
+<programlisting>void        ms_ole_ref                      (<link linkend="MsOle">MsOle</link> *fs);</programlisting>
+<para>
+Increment by one the count of references to the filesystem.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-unref">ms_ole_unref ()</title>
+<programlisting>void        ms_ole_unref                    (<link linkend="MsOle">MsOle</link> *fs);</programlisting>
+<para>
+Decrement by one the count of references to the filesystem.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-destroy">ms_ole_destroy ()</title>
+<programlisting>void        ms_ole_destroy                  (<link linkend="MsOle">MsOle</link> **fs);</programlisting>
+<para>
+Closes the filesystem <parameter>fs</parameter> and truncates any free blocks.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-unlink">ms_ole_unlink ()</title>
+<programlisting><link linkend="MsOleErr">MsOleErr</link>    ms_ole_unlink                   (<link linkend="MsOle">MsOle</link> *fs,
+                                             const char *path);</programlisting>
+<para>
+Delete the stream or directory <parameter>path</parameter> on the filesystem <parameter>fs</parameter>.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> path of the stream or directory to delete.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="MsOleErr">MsOleErr</link> code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-stat">ms_ole_stat ()</title>
+<programlisting><link linkend="MsOleErr">MsOleErr</link>    ms_ole_stat                     (<link linkend="MsOleStat">MsOleStat</link> *stat,
+                                             <link linkend="MsOle">MsOle</link> *fs,
+                                             const char *dirpath,
+                                             const char *name);</programlisting>
+<para>
+Gets information about the stream or the directory which is in the directory
+<parameter>dirpath</parameter> and its name is <parameter>file</parameter>.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>stat</parameter>&nbsp;:</entry>
+<entry> stat information.
+</entry></row>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><parameter>dirpath</parameter>&nbsp;:</entry>
+<entry> directory path.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> stream or directory name.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="MsOleErr">MsOleErr</link> code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-directory">ms_ole_directory ()</title>
+<programlisting><link linkend="MsOleErr">MsOleErr</link>    ms_ole_directory                (char ***names,
+                                             <link linkend="MsOle">MsOle</link> *fs,
+                                             const char *dirpath);</programlisting>
+<para>
+Gets the names of the streams and directories in the directory <parameter>dirpath</parameter>.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>names</parameter>&nbsp;:</entry>
+<entry> array where the names are storesd, it's <literal>NULL</literal> ended.
+</entry></row>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><parameter>dirpath</parameter>&nbsp;:</entry>
+<entry> directory path.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="MsOleErr">MsOleErr</link> code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-debug">ms_ole_debug ()</title>
+<programlisting>void        ms_ole_debug                    (<link linkend="MsOle">MsOle</link> *fs,
+                                             int magic);</programlisting>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry></entry></row>
+<row><entry align="right"><parameter>magic</parameter>&nbsp;:</entry>
+<entry>
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

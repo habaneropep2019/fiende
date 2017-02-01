@@ -1,0 +1,321 @@
+<HTML
+><HEAD
+><TITLE
+>Panel Orientation</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The GNOME Panel Libraries"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="The Art of Applet Writing"
+HREF="unnamed1.html"><LINK
+REL="PREVIOUS"
+TITLE="Session Saving"
+HREF="unnamed10.html"><LINK
+REL="NEXT"
+TITLE="Panel Size"
+HREF="unnamed12.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The GNOME Panel Libraries</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed10.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed12.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="UNNAMED11"
+>Panel Orientation</A
+></H1
+><P
+>	  How to tell which way the panel on which your applet sits is 
+	  fairly simply. You bind the &quot;change_orient&quot; signal of the
+	  applet. To modify our original hello applet, we'd do:
+
+	  <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN98"
+></A
+><P
+><B
+>Example 10. Freshman Orientation</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;config.h&gt;
+#include &lt;applet-widget.h&gt;
+
+/*this is when the panel orientation changes*/
+static void
+applet_change_orient(GtkWidget *w, PanelOrientType o, gpointer data)
+{
+        switch(o) {
+                case ORIENT_UP: puts(&quot;ORIENT UP&quot;); break;
+                case ORIENT_DOWN: puts(&quot;ORIENT DOWN&quot;); break;
+                case ORIENT_LEFT: puts(&quot;ORIENT LEFT&quot;); break;
+                case ORIENT_RIGHT: puts(&quot;ORIENT RIGHT&quot;); break;
+        }
+}
+
+int
+main(int argc, char **argv)
+{
+        GtkWidget *applet;
+        GtkWidget *label;
+
+        /* Initialize the i18n stuff */
+        bindtextdomain (PACKAGE, GNOMELOCALEDIR);
+        textdomain (PACKAGE);
+
+        /* intialize, this will basically set up the applet, corba and
+           call gnome_init */
+        applet_widget_init(&quot;hello_applet&quot;, NULL, argc, argv, NULL, 0, NULL);
+
+        /* create a new applet_widget */
+        applet = applet_widget_new(&quot;hello_applet&quot;);
+        /* in the rare case that the communication with the panel
+           failed, error out */
+        if (!applet)
+                g_error(&quot;Can't create applet!\n&quot;);
+
+        /* create the widget we are going to put on the applet */
+        label = gtk_label_new(_(&quot;Hello There!&quot;));
+        gtk_widget_show(label);
+
+        /*we have to bind change_orient before we do applet_widget_add 
+          since we need to get an initial change_orient signal to set our
+          initial oriantation, and we get that during the _add call*/
+        gtk_signal_connect(GTK_OBJECT(applet),&quot;change_orient&quot;,
+                           GTK_SIGNAL_FUNC(applet_change_orient),
+                           NULL);
+
+        /* add the widget to the applet-widget, and thereby actually
+           putting it &quot;onto&quot; the panel */
+        applet_widget_add (APPLET_WIDGET (applet), label);
+        gtk_widget_show (applet);
+
+        /* special corba main loop */
+        applet_widget_gtk_main ();
+
+        return 0;
+}
+
+	    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+	</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed10.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed12.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Session Saving</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Panel Size</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

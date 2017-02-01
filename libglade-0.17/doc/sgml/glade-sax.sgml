@@ -1,0 +1,252 @@
+<refentry id="libglade-Libglade-SAX-Parser">
+<refmeta>
+<refentrytitle>Libglade SAX Parser</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBGLADE Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Libglade SAX Parser</refname><refpurpose>Declarations and routines for accessing the SAX based parser.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;glade/glade-widget-tree.h&gt;
+
+
+struct      <link linkend="GladeWidgetTree">GladeWidgetTree</link>;
+struct      <link linkend="GladeStyleInfo">GladeStyleInfo</link>;
+struct      <link linkend="GladeWidgetInfo">GladeWidgetInfo</link>;
+struct      <link linkend="GladeAttribute">GladeAttribute</link>;
+struct      <link linkend="GladeSignalInfo">GladeSignalInfo</link>;
+struct      <link linkend="GladeAcceleratorInfo">GladeAcceleratorInfo</link>;
+
+<link linkend="GladeWidgetTree">GladeWidgetTree</link>* <link linkend="glade-widget-tree-parse-file">glade_widget_tree_parse_file</link>
+                                            (const char *file);
+<link linkend="GladeWidgetTree">GladeWidgetTree</link>* <link linkend="glade-widget-tree-parse-memory">glade_widget_tree_parse_memory</link>
+                                            (char *buffer,
+                                             int size);
+<link linkend="GladeWidgetTree">GladeWidgetTree</link>* <link linkend="glade-widget-tree-ref">glade_widget_tree_ref</link>      (<link linkend="GladeWidgetTree">GladeWidgetTree</link> *tree);
+void        <link linkend="glade-widget-tree-unref">glade_widget_tree_unref</link>         (<link linkend="GladeWidgetTree">GladeWidgetTree</link> *tree);
+void        <link linkend="glade-widget-tree-print">glade_widget_tree_print</link>         (<link linkend="GladeWidgetTree">GladeWidgetTree</link> *tree);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The structures described here are the output of libglade's XML parser.
+These structures are really only useful for people who are extending
+libglade to handle other widget sets, but it could also be useful for
+other applications that need to read glade XML files.
+</para>
+
+<para>If you only wish to use libglade, you don't need to worry about
+these functions and structures.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GladeWidgetTree">struct GladeWidgetTree</title>
+<programlisting>struct GladeWidgetTree {
+    guint ref;
+    GTime mtime;
+    GList *styles;
+    GList *widgets;
+    GHashTable *names;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GladeStyleInfo">struct GladeStyleInfo</title>
+<programlisting>struct GladeStyleInfo {
+    gchar *name;
+    gchar *rc_name;
+    gboolean local : 1;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GladeWidgetInfo">struct GladeWidgetInfo</title>
+<programlisting>struct GladeWidgetInfo {
+    GladeWidgetInfo *parent;
+
+    gchar *class;
+    gchar *name;
+    gchar *tooltip;
+
+    gint width, height;
+    gint border_width;
+
+    /* bit field */
+    gboolean visible : 1;
+    gboolean sensitive : 1;
+    gboolean can_default : 1;
+    gboolean can_focus : 1;
+    gboolean has_default : 1;
+    gboolean has_focus : 1;
+
+    GladeStyleInfo *style;
+
+    /* lists of GladeAttribute's */
+    GList *attributes;
+    GList *child_attributes; /* for the &lt;child&gt;&lt;/child&gt; section */
+
+    GList *signals;
+    GList *accelerators;
+
+    GList *children;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GladeAttribute">struct GladeAttribute</title>
+<programlisting>struct GladeAttribute {
+    gchar *name;
+    gchar *value;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GladeSignalInfo">struct GladeSignalInfo</title>
+<programlisting>struct GladeSignalInfo {
+    gchar *name;
+    gchar *handler;
+    gchar *data;
+    gchar *object; /* NULL if this isn't a connect_object signal */
+    gboolean after : 1;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GladeAcceleratorInfo">struct GladeAcceleratorInfo</title>
+<programlisting>struct GladeAcceleratorInfo {
+    guint key;
+    GdkModifierType modifiers;
+    gchar *signal;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="glade-widget-tree-parse-file">glade_widget_tree_parse_file ()</title>
+<programlisting><link linkend="GladeWidgetTree">GladeWidgetTree</link>* glade_widget_tree_parse_file
+                                            (const char *file);</programlisting>
+<para>
+This routine will parse a file containing Glade XML, and produce a
+GladeWidgetTree structure containing the information in this file.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> the filename of the XML file to parse.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the GladeWidgetTree structure, or NULL on error.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="glade-widget-tree-parse-memory">glade_widget_tree_parse_memory ()</title>
+<programlisting><link linkend="GladeWidgetTree">GladeWidgetTree</link>* glade_widget_tree_parse_memory
+                                            (char *buffer,
+                                             int size);</programlisting>
+<para>
+This routine will parse an in memory buffer containing Glade XML, and
+produce a GladeWidgetTree structure containing the information in this
+buffer.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>buffer</parameter>&nbsp;:</entry>
+<entry> the in memory buffer holding the XML document
+</entry></row>
+<row><entry align="right"><parameter>size</parameter>&nbsp;:</entry>
+<entry> the size of the buffer
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the GladeWidgetTree structure, or NULL on error.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="glade-widget-tree-ref">glade_widget_tree_ref ()</title>
+<programlisting><link linkend="GladeWidgetTree">GladeWidgetTree</link>* glade_widget_tree_ref      (<link linkend="GladeWidgetTree">GladeWidgetTree</link> *tree);</programlisting>
+<para>
+Increment the reference count of a GladeWidgetTree structure.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry> the GladeWidgetTree structure
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the tree argument.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="glade-widget-tree-unref">glade_widget_tree_unref ()</title>
+<programlisting>void        glade_widget_tree_unref         (<link linkend="GladeWidgetTree">GladeWidgetTree</link> *tree);</programlisting>
+<para>
+Decrement the reference count of a GladeWidgetTree structure.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry> the GladeWidgetTree structure
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="glade-widget-tree-print">glade_widget_tree_print ()</title>
+<programlisting>void        glade_widget_tree_print         (<link linkend="GladeWidgetTree">GladeWidgetTree</link> *tree);</programlisting>
+<para>
+Prints out the information stored in the GladeWidgetTree structure.
+This is mainly for debugging to make sure that the parser is producing
+correct output.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>tree</parameter>&nbsp;:</entry>
+<entry> the widget tree.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

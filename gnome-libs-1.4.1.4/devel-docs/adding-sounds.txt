@@ -1,0 +1,65 @@
+Two easy steps to making noises with your app:
+
+1. Determine what application-specific sound events occur, and list them
+in a filename.soundlist file.
+
+For example, the GNOME panel has a panel.soundlist file that looks like:
+
+	[__section_info__]
+	description=Panel
+
+	[open]
+	file=panel/slide.wav
+	description=Expand
+
+	[collapse]
+	file=panel/slide.wav
+	description=Collapse
+
+I assume you know how gnome_config stores its data. The basic format here
+is a special '__section_info__' section with a single key,
+description=<section description>. The section description should be a
+nice few words that say "Panel" or "Balsa" or whatever - this will be what
+the user sees in sound-properties 'category' column.
+
+Then there is a section for each possible sound event. The section name
+would be a unique (to this .soundlist file) ID of the event, and then
+there would be two items, 'file' and 'description'. The 'file' should be a
+default filename relative to the GNOME sound file directory (no absolute
+filenames) that will pick up the sounds installed by the gnome-audio package.
+The 'description' should be a few words telling what type of event this is -
+this will be what the user sees in sound-properties 'event' column.
+
+In the Makefile.am you will need to put something like
+
+	soundlistdir = $(sysconfdir)/sound/events
+	soundlist_DATA = filename.soundlist
+
+to get the .soundlist file installed.
+
+				2. Put the event triggers into your source code.
+
+To trigger a specific sound event, you do
+
+gnome_triggers_do("string describing the event in detail - not used for now",
+		  NULL, "filename", "event", NULL);
+
+Now you remember you called your file "filename.soundlist"? You stick that
+"filename" part in place of "filename" in the above function call. Then you
+put in the "event" name which is the string inside the []'s
+
+So for the panel to indicate a collapse event to the world it would be:
+
+	gnome_triggers_do("", NULL, "panel", "collapse", NULL);
+
+The panel actually does:
+
+	static const char *supinfo[] = {"panel", "collapse", NULL};
+	gnome_triggers_vdo("", NULL, supinfo);
+
+which is equivalent but slightly faster.
+
+Note that if your app needs more than one category, it can install multiple
+.soundlist files, but this is not recommended.
+
+-- Elliot <sopwith@redhat.com>

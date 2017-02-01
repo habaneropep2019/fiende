@@ -1,0 +1,114 @@
+In this file: [overview] [optimizations] [todo]
+
+=======================================================================
+
+				OVERVIEW
+The IDL compiler as a whole is composed of these modules:
+	- libIDL
+		Reads in a .idl file, filters it through the C preprocessor,
+		and parses it into a tree of data structures that represent
+		the .idl file.
+	- driver
+	- C backend
+		Takes the IDL_tree (and associated information) from the driver 
+		and outputs a header file, client-side stubs,
+		server-side skeletons, and miscellaneous routines for
+		a specific interface.
+
+		- header
+			The typedef's and function prototypes for
+			modules/interfaces
+		- stubs
+			client-side marshal/send request/demarshal routines
+		- skeletons
+			server-side demarshal/upcall/marshal routines
+		- common
+			routines such as the type allocation/de-allocation
+			routines that are needed by both stubs & skeletons.
+
+		All four routine categories use the same basic idea of
+		recursively processing the IDL_tree and acting on
+		"interesting" IDL elements as they are found by
+		outputting the appropriate C.
+-- Elliot
+
+=======================================================================
+
+			OPTIMIZATIONS
+
+. When marshalling or demarshalling a parameter, if you know the alignment
+of the previous parameter, you can know whether you need to align the
+current parameter. [implemented, AFAIK] -ECL
+
+. When doing byteswapping, we should do it in place instead of using the
+function pointer. [NYI, but is very to change - just rewrite GET_ATOM()]
+-ECL
+
+. When demarshalling structures with only fixed-size elements in them,
+  we should be able to memcpy directly off the wire.
+  In the normal case, for a
+	struct {
+		int int1;
+		char *string1;
+		int int2;
+	};
+  we have to pull off an int, then pull off a string, then pull off an int.
+
+  Now consider
+	struct {
+		int int1;
+		float float1;
+	};
+
+  If we have to byteswap this, no gain. But in the "don't need to 
+  byteswap" case, we can directly memcpy() this struct from the raw
+  data buffer for a nice gain. -ECL
+  [Implemented]
+
+. there needs to be a way to say "add an iovec to the list"
+  so that things like constant strings can be marshalled super-easily.
+  [implemented]
+
+[Note that since ORBit's IIOP module uses writev() to send out data,
+ and that list of vectors is generated to point at the data to be sent,
+ ORBit will probably perform extremely well if you send large arrays
+ or sequences of basic types, or strings, across the network. If you're 
+ just calling a void dosomething(long n1, long n2, long n3); all day,
+ it will probably be less than optimal. If, on certain architectures, 
+ we can count on n1, n2, and n3 to be consecutive in memory, it might
+ be possible for the IDL compiler to recognize this and output
+ code that does
+	marshal_value_at_address(&n1 /* base address */, sizeof(long)
+* 3 /* length in bytes */);
+
+ (the giop_message_buffer_append*() routines already try to recognize
+  appends of consecutive memory regions and coalesce them, but it's
+  untested, and slower than the above)
+]
+
+If an optimization will slow the IDL compiler down by an order of
+magnitude, that's fine - the idea is to do lots of work at compile
+time in order to save work at runtime.
+
+. For the server-side, we can use gperf to generate a nice hash of the
+  operation names that we know at compile time, for doing the operation
+  name -> class_specific_POA_data conversion.
+  [This would give a nice gain - any takers?]
+  [implemented, not using gperf but a switch statement.]
+
+. Use alloca() in skels to get memory.
+  [Not needed - we just have straight variables on the stack, which is
+   even faster ;-]
+  [We should use alloca() instead of typename__alloc() whenever possible]
+
+. For the last generated demarshaller that will ever use a recv_buffer,
+  we don't need to increment the recv_buffer->cur pointer afterwards.
+  [A pain to implement.]
+
+. Direct mem append of string lengths instead of indirect, in certain
+cases.
+
+. Given a known number of fixed-length values, marshal them into an
+on-stack buffer and then pass that in one call to append_mem.
+
+. Can read & write from a socket at the same time. (multithreading).

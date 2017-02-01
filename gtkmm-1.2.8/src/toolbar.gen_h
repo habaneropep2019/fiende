@@ -1,0 +1,554 @@
+/* $Id: toolbar.gen_h,v 1.90 2001/07/15 13:33:38 murrayc Exp $ */
+
+
+/* toolbar.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gtk/gtktoolbar.h>
+
+CLASS_START(Gtk);
+
+/* toolbar is a bit of a factory.  We will
+represent this by making a virtual list called
+tools.  Tools iterates through the children
+of list.  It looks like list<Toolbar_Helpers::Tool*>
+but inserts Toolbar::Element.  Elements 
+are a factory for spaces, widget, buttons, toggle
+buttons and radio buttons. 
+
+The name "icon" in the gtk+ interface is very
+misleading, it is really a button content
+not a pixmap.  We will rename it to "content".
+
+Confused?  Okay go read the interface.
+*/
+class Toolbar;
+namespace RadioButton_Helpers {
+  class Group;
+}
+
+namespace Toolbar_Helpers
+{
+/*********************************************************************
+***** Elem classes (This should be an easy and cool interface) 
+*********************************************************************/
+
+  // Tool is the output class (very thin wrapper)
+  class Tool: protected GtkToolbarChild
+    {
+      private:
+        Tool& operator=(const Tool&);
+        Tool(const Tool&);
+      protected:
+        Tool(void* do_not_derive_this);
+      public:
+        GtkToolbarChildType get_type() {return GtkToolbarChild::type;}
+        Widget* get_widget();
+        Widget* get_content();
+        Label*  get_label();
+    };
+
+  // Element is the input class  
+  class ToolList;
+  class Element
+    {
+      friend class ToolList;
+      protected:
+        GtkToolbarChildType  type_;
+        Widget*              widget_;  
+        nstring              text_;
+        nstring              tooltip_text_;
+        nstring              tooltip_private_text_;
+        Widget*              content_;  // this does not need to be a pixmap.
+        SigC::Slot0<void>    callback_;
+        Gtk::RadioButton_Helpers::Group* group_;
+  
+      private:
+        Element& operator=(const Element&);
+
+      protected:
+        // some fields are mutually exclusive
+        Element(GtkToolbarChildType  type,
+                Widget          *widget,
+                const nstring   &text,
+                const nstring   &tooltip_text,
+                const nstring   &tooltip_private_text,
+                Widget          *content,
+                SigC::Slot0<void>          callback);
+      public:
+        Element(const Element& p);
+
+        Element(Widget& w,
+                const nstring &tooltip_text=0,
+                const nstring &tooltip_private_text=0);
+    };
+
+  struct Space: public Element
+    {
+      Space();
+    };
+
+  typedef Element WidgetElem;
+
+  // Order here is different than gtk+, watch yourself
+  // Each button set has 3 forms i
+  //   with a string and content
+  //   with a string 
+  //   with content (ie Pixmap, images, etc)
+  struct ButtonElem: public Element
+    {
+      ButtonElem(const nstring &text,
+                 Widget         &content,
+                 SigC::Slot0<void>        callback,
+                 const nstring &tooltip_text=0,
+                 const nstring &tooltip_private_text=0);
+      ButtonElem(Widget         &content,
+                 SigC::Slot0<void>        callback,
+                 const nstring &tooltip_text=0,
+                 const nstring &tooltip_private_text=0);
+      ButtonElem(const nstring &text,
+                 SigC::Slot0<void>        callback,
+                 const nstring &tooltip_text=0,
+                 const nstring &tooltip_private_text=0);
+    };
+
+  struct ToggleElem: public Element
+    {
+      ToggleElem(const nstring &text,
+                 Widget         &content,
+                 SigC::Slot0<void>        callback,
+                 const nstring &tooltip_text=0,
+                 const nstring &tooltip_private_text=0);
+      ToggleElem(Widget         &content,
+                 SigC::Slot0<void>        callback,
+                 const nstring &tooltip_text=0,
+                 const nstring &tooltip_private_text=0);
+
+      ToggleElem(const nstring &text,
+                 SigC::Slot0<void>        callback,
+                 const nstring &tooltip_text=0,
+                 const nstring &tooltip_private_text=0);
+    };
+
+  struct RadioElem: public Element
+    {
+      RadioElem (Gtk::RadioButton_Helpers::Group& group,
+                 const nstring&      text,
+                 Widget&             content,
+                 SigC::Slot0<void>   callback=0,
+                 const nstring&      tooltip_text=0,
+                 const nstring&      tooltip_private_text=0);
+      RadioElem (Gtk::RadioButton_Helpers::Group& group,
+                 Widget&             content,
+                 SigC::Slot0<void>   callback=0,
+                 const nstring&      tooltip_text=0,
+                 const nstring&      tooltip_private_text=0);
+      RadioElem (Gtk::RadioButton_Helpers::Group& group,
+                 const nstring&      text,
+                 SigC::Slot0<void>   callback=0,
+                 const nstring&      tooltip_text=0,
+                 const nstring&      tooltip_private_text=0);
+    };
+
+/*********************************************************************
+***** List properties
+*********************************************************************/
+#m4 include(list.m4)
+  GP_LIST(ToolList,Toolbar,Tool)
+  GP_LIST_FIND(get_widget)
+  GP_LIST_VECTOR()
+        // Non-standard
+        void remove(Widget&);
+  GP_LIST_END()
+
+};
+
+
+//: Create bars of buttons and other widgets.
+class Toolbar : public Container
+{
+  WRAP_CLASS(Toolbar,GtkToolbar,GTK_TOOLBAR,GTK_IS_TOOLBAR,toolbar,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+  typedef Toolbar_Helpers::ToolList ToolList;
+
+  Toolbar(GtkOrientation orientation = GTK_ORIENTATION_HORIZONTAL,
+	      GtkToolbarStyle style = GTK_TOOLBAR_BOTH);
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+// All the gtk+ add methods were horrible interface use tools().
+
+/* Style methods */
+  WRAP_MEMBER(value,orientation,orientation,GtkOrientation,GtkOrientation);
+  //: sets whether a toolbar should appear horizontally or vertically.
+  //- {\var orientation}: A new {\type GtkOrientation}. This is one of:
+  //- {\enum GTK_ORIENTATION_HORIZONTAL}, or {\enum GTK_ORIENTATION_VERTICAL}.
+  WRAP_METHOD(void gtk_toolbar_set_orientation(GtkToolbar*, GtkOrientation),
+	      void set_orientation(GtkOrientation orientation));
+
+  WRAP_MEMBER(value,style,style,GtkToolbarStyle,GtkToolbarStyle);
+  //: alters the view of toolbar to display either icons only, text only, or both.
+  //- {\var style}: The new style for toolbar. This is one of:
+  //- {\enum  GTK_TOOLBAR_ICONS}, {\enum GTK_TOOLBAR_TEXT}, or
+  //- {\enum GTK_TOOLBAR_BOTH}.
+  WRAP_METHOD(void gtk_toolbar_set_style(GtkToolbar*, GtkToolbarStyle),
+	      void set_style(GtkToolbarStyle style));
+
+  WRAP_MEMBER(value,space_size,space_size,gint,gint);
+  //: should be used to set the number of pixels each item of space takes up in a toolbar.
+  //- {\var space_size}: The new number of pixels that spaces should consume.
+  WRAP_METHOD(void gtk_toolbar_set_space_size(GtkToolbar*, gint),
+	      void set_space_size(gint space_size));
+
+  WRAP_MEMBER(value,space_style,space_style,GtkToolbarSpaceStyle,GtkToolbarSpaceStyle);
+  //: sets whether a 'space' in the toolbar appears as a line or just plain empty space.
+  //- {\var space_style}: The new style for the toolbar's spaces. This is one of:
+  //- {\enum  GTK_TOOLBAR_SPACE_EMPTY}, or {\enum GTK_TOOLBAR_SPACE_LINE}.
+  WRAP_METHOD(void gtk_toolbar_set_space_style(GtkToolbar*, GtkToolbarSpaceStyle),
+	      void set_space_style(GtkToolbarSpaceStyle space_style));
+
+  //: sets if the tooltips of a toolbar should be active or not.
+  //- {\enum enable}: Set to 0 to disable the tooltips, or 1 to enable them.
+  WRAP_METHOD(void gtk_toolbar_set_tooltips(GtkToolbar*, bool),
+	      void set_tooltips(bool enable));
+
+  WRAP_MEMBER(value,button_relief,relief,GtkReliefStyle,GtkReliefStyle);
+  WRAP_METHOD(void gtk_toolbar_set_button_relief(GtkToolbar*, GtkReliefStyle),
+	      void set_button_relief(GtkReliefStyle relief));
+
+
+/* signals (not emitable) */
+  //: Should be used if you wish to perform an action when the orientation of a toolbar is changed.
+  SIGNAL_SPEC("orientation_changed",impl,void orientation_changed(GtkOrientation));
+  //: should be used if you wish to perform an action when ever the style of a toolbar is adjusted.
+  //- For example, this would be a useful signal to connect to if you want to display more items
+  //- on the toolbar when it is in icon-only mode; each item takes less space on the bar.
+  SIGNAL_SPEC("style_changed",impl,void style_changed(GtkToolbarStyle));
+
+  ToolList& tools() 
+    {return reinterpret_cast<ToolList&>(toolbar_self); }
+  const ToolList& tools() const 
+    {return reinterpret_cast<const ToolList&>(toolbar_self); }
+};
+
+
+  
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+#include <glib.h>
+#include <gtk--/button.h>
+#include <gtk--/togglebutton.h>
+#include <gtk--/radiobutton.h>
+#include <gtk--/tooltips.h>
+#include <gtk--/pixmap.h>
+#include <gtk--/label.h>
+namespace Gtk
+{
+
+Toolbar::Toolbar(GtkOrientation orientation, GtkToolbarStyle style)
+  : Container((GtkContainer*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GtkToolbar *toolbar = gtkobj();
+  toolbar->orientation = orientation;
+  toolbar->style = style;
+}
+
+/*********************************************************************
+***** Item classes (This should be an easy and cool interface) 
+*********************************************************************/
+
+Toolbar_Helpers::Element::Element(const Element& p)
+   :type_(p.type_),widget_(p.widget_),text_(p.text_),
+    tooltip_text_(p.tooltip_text_),
+    tooltip_private_text_(p.tooltip_private_text_),
+    content_(p.content_),callback_(p.callback_), group_(0)
+  {}
+
+Toolbar_Helpers::Element::Element(GtkToolbarChildType type,
+                Widget*         widget,
+                const nstring   &text,
+                const nstring   &tooltip_text,
+                const nstring   &tooltip_private_text,
+                Widget*         content,
+                SigC::Slot0<void>         callback)
+   :type_(type),widget_(widget),text_(text),
+    tooltip_text_(tooltip_text),
+    tooltip_private_text_(tooltip_private_text),
+    content_(content),callback_(callback),group_(0)
+  {}
+
+Toolbar_Helpers::Element::Element 
+                        (Widget          &w,
+                         const nstring  &tooltip_text,
+                         const nstring  &tooltip_private_text)
+    :type_(GTK_TOOLBAR_CHILD_WIDGET),widget_(&w),text_((char*)0),
+     tooltip_text_(tooltip_text),
+     tooltip_private_text_(tooltip_private_text),
+     content_(0),callback_(0),group_(0)
+  {}
+
+Toolbar_Helpers::Space::Space()
+    :Element(GTK_TOOLBAR_CHILD_SPACE,0,(char*)0,
+             (char*)0,(char*)0,0,0)
+  {} 
+
+Toolbar_Helpers::ButtonElem::ButtonElem 
+                        (const nstring  &text,
+                         Widget          &content,
+                         SigC::Slot0<void>         callback,
+                         const nstring  &tooltip_text,
+                         const nstring  &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_BUTTON,0,text,
+             tooltip_text,tooltip_private_text,&content,callback)
+  {}
+
+Toolbar_Helpers::ButtonElem::ButtonElem 
+                        (const nstring  &text,
+                         SigC::Slot0<void>         callback,
+                         const nstring  &tooltip_text,
+                         const nstring  &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_BUTTON,0,text,
+             tooltip_text,tooltip_private_text,0,callback)
+  {}
+
+Toolbar_Helpers::ButtonElem::ButtonElem 
+                        (Widget          &content,
+                         SigC::Slot0<void>         callback,
+                         const nstring  &tooltip_text,
+                         const nstring  &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_BUTTON,0,0,
+             tooltip_text,tooltip_private_text,&content,callback)
+  {}
+
+
+Toolbar_Helpers::ToggleElem::ToggleElem  
+                        (const nstring  &text,
+                         Widget          &content,
+                         SigC::Slot0<void>         callback,
+                         const nstring  &tooltip_text,
+                         const nstring  &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_TOGGLEBUTTON,0,text,
+             tooltip_text,tooltip_private_text,&content,callback)
+  {}
+
+Toolbar_Helpers::ToggleElem::ToggleElem  
+                        (const nstring  &text,
+                         SigC::Slot0<void>         callback,
+                         const nstring  &tooltip_text,
+                         const nstring  &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_TOGGLEBUTTON,0,text,
+             tooltip_text,tooltip_private_text,0,callback)
+  {}
+
+Toolbar_Helpers::ToggleElem::ToggleElem  
+                        (Widget          &content,
+                         SigC::Slot0<void>         callback,
+                         const nstring  &tooltip_text,
+                         const nstring  &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_TOGGLEBUTTON,0,0,
+             tooltip_text,tooltip_private_text,&content,callback)
+  {}
+
+
+Toolbar_Helpers::RadioElem::RadioElem  
+                        (RadioButton::Group &group,
+                         const nstring &text,
+                         Widget         &content,
+                         SigC::Slot0<void>        callback,
+                         const nstring &tooltip_text,
+                         const nstring &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_RADIOBUTTON,0,text,
+             tooltip_text,tooltip_private_text,&content,callback)
+  { group_=&group; }
+
+Toolbar_Helpers::RadioElem::RadioElem  
+                        (RadioButton::Group &group,
+                         const nstring &text,
+                         SigC::Slot0<void>        callback,
+                         const nstring &tooltip_text,
+                         const nstring &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_RADIOBUTTON,0,text,
+             tooltip_text,tooltip_private_text,0,callback)
+  { group_=&group; }
+
+Toolbar_Helpers::RadioElem::RadioElem  
+                        (RadioButton::Group &group,
+                         Widget        &content,
+                         SigC::Slot0<void>        callback,
+                         const nstring &tooltip_text,
+                         const nstring &tooltip_private_text)
+    :Element(GTK_TOOLBAR_CHILD_RADIOBUTTON,0,0,
+             tooltip_text,tooltip_private_text,&content,callback)
+  { group_=&group; }
+
+
+/*********************************************************************
+***** List properties
+*********************************************************************/
+typedef G_List_Iterator<Toolbar_Helpers::Tool*> tool_iterator;
+
+tool_iterator Toolbar_Helpers::ToolList::insert(tool_iterator position,const Element& e)
+  {
+    gint pos=parent_->gtkobj()->num_children;
+
+    // locate the items desired position
+    if (position.node) 
+      pos=g_list_position(glist(),position.node);
+    
+    // give item to gtk+
+    Widget* w=wrap(gtk_toolbar_insert_element(
+                               parent_->gtkobj(),
+                               e.type_,
+                               ((e.widget_)?e.widget_->gtkobj():0),
+                               e.text_.gc_str(),
+                               e.tooltip_text_.gc_str(),
+                               e.tooltip_private_text_.gc_str(),
+                               ((e.content_)?e.content_->gtkobj():0),
+                               0,
+                               0,pos));
+
+    if (e.group_&&w)
+      { 
+        RadioButton* rb=dynamic_cast<RadioButton*>(w);
+        rb->set_group(*e.group_);
+        *(e.group_)=rb->group();
+      }
+
+    // connect slot
+    if (e.callback_&&Button::isA(w))
+      dynamic_cast<Button*>(w)->clicked.connect(e.callback_);
+
+    // return the right iterator
+    if (pos==0)
+      return begin();
+    if (!position.node) 
+      return --end();
+    return --position;
+  }
+
+
+tool_iterator Toolbar_Helpers::ToolList::erase(tool_iterator position)
+  {
+    if (!position.node) return end();
+    iterator next=position;
+    next++;
+  
+    if ((*position)->get_type()==GTK_TOOLBAR_CHILD_SPACE)
+      {
+        // gtk+ lacks this functionality. Good luck! 
+        parent_->gtkobj()->children=
+          g_list_remove_link(glist(),position.node);
+        g_list_free_1(position.node);
+        if (parent_->is_visible())
+          parent_->queue_resize();
+        return next;
+      }
+
+    gtk_container_remove(parent_->Container::gtkobj(),
+        (*position)->get_widget()->gtkobj());
+
+    return next;
+  }
+
+void Toolbar_Helpers::ToolList::remove(const_reference t)
+  {
+    erase(find(t));
+  }
+
+void Toolbar_Helpers::ToolList::remove(Widget& w)
+  {
+   gtk_container_remove(parent_->Container::gtkobj(),w.gtkobj());
+  }
+
+Widget* Toolbar_Helpers::Tool::get_widget()    
+  {return wrap(((GtkToolbarChild*)this)->widget);}
+Widget* Toolbar_Helpers::Tool::get_content()   
+  {return wrap(((GtkToolbarChild*)this)->icon);}
+Label* Toolbar_Helpers::Tool::get_label()     
+  {return wrap(GTK_LABEL(((GtkToolbarChild*)this)->label));}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_ToolBar)
+//. name: num_children
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: children
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: orientation
+//. type: GtkOrientation
+//. get:
+//. set:
+//. desc:
+
+//. name: style
+//. type: GtkToolbarStyle
+//. get:
+//. set:
+//. desc:
+
+//. name: space_size
+//. type: gint
+//. get:
+//. set:
+//. desc: big optional space between buttons 
+
+//. name: space_style
+//. type: GtkToolbarSpaceStyle
+//. get:
+//. set:
+//. desc:
+
+//. name: tooltips
+//. type: GtkTooltips*
+//. get:
+//. set:
+//. desc:
+
+//. name: button_maxw
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: button_maxh
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: relief
+//. type: GtkReliefStyle
+//. get:
+//. set:
+//. desc:
+

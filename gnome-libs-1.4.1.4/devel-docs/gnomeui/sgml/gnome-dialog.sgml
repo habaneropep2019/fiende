@@ -1,0 +1,748 @@
+<refentry id="GnomeDialog">
+<refmeta>
+<refentrytitle>GnomeDialog</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeDialog</refname><refpurpose>
+Transient ("popup") dialogs.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeDialog-struct">GnomeDialog</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-dialog-new">gnome_dialog_new</link>                (const <link linkend="gchar">gchar</link> *title,
+                                             ...);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-dialog-newv">gnome_dialog_newv</link>               (const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> **buttons);
+void        <link linkend="gnome-dialog-set-parent">gnome_dialog_set_parent</link>         (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="GtkWindow">GtkWindow</link> *parent);
+void        <link linkend="gnome-dialog-button-connect">gnome_dialog_button_connect</link>     (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button,
+                                             <link linkend="GtkSignalFunc">GtkSignalFunc</link> callback,
+                                             <link linkend="gpointer">gpointer</link> data);
+void        <link linkend="gnome-dialog-button-connect-object">gnome_dialog_button_connect_object</link>
+                                            (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button,
+                                             <link linkend="GtkSignalFunc">GtkSignalFunc</link> callback,
+                                             <link linkend="GtkObject">GtkObject</link> *obj);
+<link linkend="gint">gint</link>        <link linkend="gnome-dialog-run">gnome_dialog_run</link>                (<link linkend="GnomeDialog">GnomeDialog</link> *dialog);
+<link linkend="gint">gint</link>        <link linkend="gnome-dialog-run-and-close">gnome_dialog_run_and_close</link>      (<link linkend="GnomeDialog">GnomeDialog</link> *dialog);
+void        <link linkend="gnome-dialog-set-default">gnome_dialog_set_default</link>        (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button);
+void        <link linkend="gnome-dialog-set-sensitive">gnome_dialog_set_sensitive</link>      (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button,
+                                             <link linkend="gboolean">gboolean</link> setting);
+void        <link linkend="gnome-dialog-set-accelerator">gnome_dialog_set_accelerator</link>    (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button,
+                                             const <link linkend="guchar">guchar</link> accelerator_key,
+                                             <link linkend="guint8">guint8</link> accelerator_mods);
+void        <link linkend="gnome-dialog-close">gnome_dialog_close</link>              (<link linkend="GnomeDialog">GnomeDialog</link> *dialog);
+void        <link linkend="gnome-dialog-close-hides">gnome_dialog_close_hides</link>        (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gboolean">gboolean</link> just_hide);
+void        <link linkend="gnome-dialog-set-close">gnome_dialog_set_close</link>          (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gboolean">gboolean</link> click_closes);
+void        <link linkend="gnome-dialog-editable-enters">gnome_dialog_editable_enters</link>    (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="GtkEditable">GtkEditable</link> *editable);
+void        <link linkend="gnome-dialog-append-buttons">gnome_dialog_append_buttons</link>     (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *first,
+                                             ...);
+void        <link linkend="gnome-dialog-append-button">gnome_dialog_append_button</link>      (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *name);
+void        <link linkend="gnome-dialog-append-buttonsv">gnome_dialog_append_buttonsv</link>    (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> **buttons);
+void        <link linkend="gnome-dialog-append-button-with-pixmap">gnome_dialog_append_button_with_pixmap</link>
+                                            (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             const <link linkend="gchar">gchar</link> *pixmap);
+void        <link linkend="gnome-dialog-append-buttons-with-pixmaps">gnome_dialog_append_buttons_with_pixmaps</link>
+                                            (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> **names,
+                                             const <link linkend="gchar">gchar</link> **pixmaps);
+void        <link linkend="gnome-dialog-construct">gnome_dialog_construct</link>          (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *title,
+                                             va_list ap);
+void        <link linkend="gnome-dialog-constructv">gnome_dialog_constructv</link>         (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> **buttons);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBin">GtkBin</link>
+                     +----<link linkend="GtkWindow">GtkWindow</link>
+                           +----GnomeDialog
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+GnomeDialog gives dialogs a consistent look and feel, while making
+them more convenient to program. GnomeDialog makes it easy to use
+stock buttons, makes it easier to handle delete_event, and adds some
+cosmetic touches (such as a separator above the buttons, and a bevel
+around the edge of the window). 
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeDialog-struct">struct GnomeDialog</title>
+<programlisting>struct GnomeDialog;</programlisting>
+<para>
+struct _GnomeDialog
+{
+    	GtkWindow window;
+    	GtkWidget * vbox;
+      
+    	GtkWidget * action_area; /* A button box, not an hbox */
+      
+    	GList *buttons;
+    	GtkAccelGroup * accelerators;
+      
+    	unsigned int click_closes : 1;
+    	unsigned int just_hide : 1;
+      
+    	gpointer padding;
+};
+</para>
+
+<para>
+Only <structfield>vbox</structfield> should be accessed directly.
+</para>
+
+<example>
+  <title>Using GnomeDialog to implement yes/no/cancel</title>
+
+<programlisting>
+<link linkend="include">include</link> <gnome.h>
+
+/*
+ * This function demostrates how to use the GnomeDialog in
+ * modal mode to request a yes/no from the user.
+ *
+ * It sets the title to title and inserts the message in message.
+ *
+ * If main_window is not NULL, it also binds the dialog to that
+ * window (so if you minimize the main window, this dialog also
+ * gets minimized).
+ */
+int
+yes_no (GtkWindow *main_window, char *title, char *message)
+{
+	GtkWidget *dialog, *label;
+	int button;
+
+	dialog = gnome_dialog_new (
+		title,
+		GNOME_STOCK_BUTTON_YES,
+		GNOME_STOCK_BUTTON_NO,
+		NULL);
+        if (main_window)
+	        gnome_dialog_set_parent (GNOME_DIALOG (dialog), main_window);
+
+	label = gtk_label_new (message);
+        gtk_box_pack_start (GTK_BOX (GNOME_DIALOG (dialog)->vbox), label, TRUE, TRUE, 0);
+
+	/*
+	 * Run the dialog and wait for the user to select yes or no.
+	 * If the user closes the window with the window manager, we
+	 * will get a -1 return value
+	 */
+	button = gnome_dialog_run_and_close (GNOME_DIALOG (dialog));
+
+	return button;
+}
+
+int
+main (int argc, char **argv)
+{
+       int button;
+       
+       gnome_init ("SampleProgram", "1.0", argc, argv);
+
+       button = yes_no ("Question?", "Do you like the Bonobos?");
+
+       switch (button){
+              case 0:
+	              printf ("User selected yes\n");
+		      break;
+	      case 1:
+	              printf ("User selected no\n");
+		      break;
+	      case -1:
+	              printf ("User closed the window with the window manager\n");
+		      break;
+       }
+       return 0;
+}
+
+</programlisting>
+</example></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-new">gnome_dialog_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_dialog_new                (const <link linkend="gchar">gchar</link> *title,
+                                             ...);</programlisting>
+<para>
+Creates a new <link linkend="GnomeDialog">GnomeDialog</link>, with the given title, and any button names 
+in the arg list. Buttons can be simple names, such as _("My Button"),
+or gnome-stock defines such as <literal>GNOME_STOCK_BUTTON_OK</literal>, etc. The last
+argument should be NULL to terminate the list.  
+</para>
+<para>
+Buttons passed to this function are numbered from left to right,
+starting with 0. So the first button in the arglist is button 0,
+then button 1, etc.  These numbers are used throughout the
+<link linkend="GnomeDialog">GnomeDialog</link> API.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> The title of the dialog; appears in window titlebar.
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry> NULL-terminated varargs list of button names or GNOME_STOCK_BUTTON_* defines.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The new <link linkend="GnomeDialog">GnomeDialog</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-newv">gnome_dialog_newv ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_dialog_newv               (const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> **buttons);</programlisting>
+<para>
+See <link linkend="gnome-dialog-new">gnome_dialog_new</link>(), this function is identical but does not use
+varargs.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> Title of the dialog.
+</entry></row>
+<row><entry align="right"><parameter>buttons</parameter>&nbsp;:</entry>
+<entry> NULL-terminated vector of buttons names.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The new <link linkend="GnomeDialog">GnomeDialog</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-set-parent">gnome_dialog_set_parent ()</title>
+<programlisting>void        gnome_dialog_set_parent         (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="GtkWindow">GtkWindow</link> *parent);</programlisting>
+<para>
+Dialogs have "parents," usually the main application window which spawned 
+them. This function will let the window manager know about the parent-child
+relationship. Usually this means the dialog must stay on top of the parent,
+and will be minimized when the parent is. Gnome also allows users to 
+request dialog placement above the parent window (vs. at the mouse position,
+or at a default window manger location).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to set the parent of.
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> Parent <link linkend="GtkWindow">GtkWindow</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-button-connect">gnome_dialog_button_connect ()</title>
+<programlisting>void        gnome_dialog_button_connect     (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button,
+                                             <link linkend="GtkSignalFunc">GtkSignalFunc</link> callback,
+                                             <link linkend="gpointer">gpointer</link> data);</programlisting>
+<para>
+Simply <link linkend="gtk-signal-connect">gtk_signal_connect</link>() to the "clicked" signal of the specified button.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to affect.
+</entry></row>
+<row><entry align="right"><parameter>button</parameter>&nbsp;:</entry>
+<entry> Button number.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry> A standard Gtk callback.
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> Callback data.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-button-connect-object">gnome_dialog_button_connect_object ()</title>
+<programlisting>void        gnome_dialog_button_connect_object
+                                            (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button,
+                                             <link linkend="GtkSignalFunc">GtkSignalFunc</link> callback,
+                                             <link linkend="GtkObject">GtkObject</link> *obj);</programlisting>
+<para>
+<link linkend="gtk-signal-connect-object">gtk_signal_connect_object</link>() to the "clicked" signal of the given button.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to affect.
+</entry></row>
+<row><entry align="right"><parameter>button</parameter>&nbsp;:</entry>
+<entry> Button to connect to.
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry> Callback.
+</entry></row>
+<row><entry align="right"><parameter>obj</parameter>&nbsp;:</entry>
+<entry> As for <link linkend="gtk-signal-connect-object">gtk_signal_connect_object</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-run">gnome_dialog_run ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_dialog_run                (<link linkend="GnomeDialog">GnomeDialog</link> *dialog);</programlisting>
+<para>
+Blocks until the user clicks a button, or closes the dialog with the 
+window manager's close decoration (or by pressing Escape).
+</para>
+<para>
+You need to set up the dialog to do the right thing when a button
+is clicked or delete_event is received; you must consider both of
+those possibilities so that you know the status of the dialog when
+<link linkend="gnome-dialog-run">gnome_dialog_run</link>() returns. A common mistake is to forget about
+Escape and the window manager close decoration; by default, these
+call <link linkend="gnome-dialog-close">gnome_dialog_close</link>(), which by default destroys the dialog. If
+your button clicks do not destroy the dialog, you don't know
+whether the dialog is destroyed when <link linkend="gnome-dialog-run">gnome_dialog_run</link>()
+returns. This is bad.
+</para>
+<para>
+So you should either close the dialog on button clicks as well, or
+change the <link linkend="gnome-dialog-close">gnome_dialog_close</link>() behavior to hide instead of
+destroy. You can do this with <link linkend="gnome-dialog-close-hides">gnome_dialog_close_hides</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to use.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  If a button was pressed, the button number is returned. If not, -1 is returned.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-run-and-close">gnome_dialog_run_and_close ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_dialog_run_and_close      (<link linkend="GnomeDialog">GnomeDialog</link> *dialog);</programlisting>
+<para>
+See <link linkend="gnome-dialog-run">gnome_dialog_run</link>(). The only difference is that this function calls 
+<link linkend="gnome-dialog-close">gnome_dialog_close</link>() before returning, if the dialog was not already closed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to use.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> If a button was pressed, the button number. Otherwise -1.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-set-default">gnome_dialog_set_default ()</title>
+<programlisting>void        gnome_dialog_set_default        (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button);</programlisting>
+<para>
+The default button will be activated if the user just presses return.
+Usually you should make the least-destructive button the default.
+Otherwise, the most commonly-used button.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to affect.
+</entry></row>
+<row><entry align="right"><parameter>button</parameter>&nbsp;:</entry>
+<entry> Number of the default button.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-set-sensitive">gnome_dialog_set_sensitive ()</title>
+<programlisting>void        gnome_dialog_set_sensitive      (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button,
+                                             <link linkend="gboolean">gboolean</link> setting);</programlisting>
+<para>
+Calls <link linkend="gtk-widget-set-sensitive">gtk_widget_set_sensitive</link>() on the specified button number.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to affect.
+</entry></row>
+<row><entry align="right"><parameter>button</parameter>&nbsp;:</entry>
+<entry> Which button to affect.
+</entry></row>
+<row><entry align="right"><parameter>setting</parameter>&nbsp;:</entry>
+<entry> TRUE means it's sensitive.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-set-accelerator">gnome_dialog_set_accelerator ()</title>
+<programlisting>void        gnome_dialog_set_accelerator    (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gint">gint</link> button,
+                                             const <link linkend="guchar">guchar</link> accelerator_key,
+                                             <link linkend="guint8">guint8</link> accelerator_mods);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to affect.
+</entry></row>
+<row><entry align="right"><parameter>button</parameter>&nbsp;:</entry>
+<entry> Button number.
+</entry></row>
+<row><entry align="right"><parameter>accelerator_key</parameter>&nbsp;:</entry>
+<entry> Key for the accelerator.
+</entry></row>
+<row><entry align="right"><parameter>accelerator_mods</parameter>&nbsp;:</entry>
+<entry> Modifier.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-close">gnome_dialog_close ()</title>
+<programlisting>void        gnome_dialog_close              (<link linkend="GnomeDialog">GnomeDialog</link> *dialog);</programlisting>
+<para>
+See also <link linkend="gnome-dialog-close-hides">gnome_dialog_close_hides</link>(). This function emits the
+"close" signal, which either hides or destroys the dialog (destroy
+by default). If you connect to the "close" signal, and your
+callback returns TRUE, the hide or destroy will be blocked. You can
+do this to avoid closing the dialog if the user gives invalid
+input, for example.
+</para>
+<para>
+Using <link linkend="gnome-dialog-close">gnome_dialog_close</link>() in place of <link linkend="gtk-widget-hide">gtk_widget_hide</link>() or
+<link linkend="gtk-widget-destroy">gtk_widget_destroy</link>() allows you to easily catch all sources of
+dialog closure, including delete_event and button clicks, and
+handle them in a central location.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to close.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-close-hides">gnome_dialog_close_hides ()</title>
+<programlisting>void        gnome_dialog_close_hides        (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gboolean">gboolean</link> just_hide);</programlisting>
+<para>
+Some dialogs are expensive to create, so you want to keep them around and just 
+<link linkend="gtk-widget-show">gtk_widget_show</link>() them when they are opened, and <link linkend="gtk-widget-hide">gtk_widget_hide</link>() them when 
+they're closed. Other dialogs are expensive to keep around, so you want to 
+<link linkend="gtk-widget-destroy">gtk_widget_destroy</link>() them when they're closed. It's a judgment call you 
+will need to make for each dialog.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to affect.
+</entry></row>
+<row><entry align="right"><parameter>just_hide</parameter>&nbsp;:</entry>
+<entry> If TRUE, <link linkend="gnome-dialog-close">gnome_dialog_close</link>() calls <link linkend="gtk-widget-hide">gtk_widget_hide</link>() instead of <link linkend="gtk-widget-destroy">gtk_widget_destroy</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-set-close">gnome_dialog_set_close ()</title>
+<programlisting>void        gnome_dialog_set_close          (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="gboolean">gboolean</link> click_closes);</programlisting>
+<para>
+This is a convenience function so you don't have to connect callbacks
+to each button just to close the dialog. By default, <link linkend="GnomeDialog">GnomeDialog</link> 
+has this parameter set the FALSE and it will not close on any click.
+(This was a design error.) However, almost all the <link linkend="GnomeDialog">GnomeDialog</link> subclasses,
+such as <link linkend="GnomeMessageBox">GnomeMessageBox</link> and <link linkend="GnomePropertyBox">GnomePropertyBox</link>, have this parameter set to
+TRUE by default.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to affect.
+</entry></row>
+<row><entry align="right"><parameter>click_closes</parameter>&nbsp;:</entry>
+<entry> TRUE if clicking any button should call <link linkend="gnome-dialog-close">gnome_dialog_close</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-editable-enters">gnome_dialog_editable_enters ()</title>
+<programlisting>void        gnome_dialog_editable_enters    (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             <link linkend="GtkEditable">GtkEditable</link> *editable);</programlisting>
+<para>
+Normally if there's an editable widget (such as <link linkend="GtkEntry">GtkEntry</link>) in your
+dialog, pressing Enter will activate the editable rather than the
+default dialog button. However, in most cases, the user expects to
+type something in and then press enter to close the dialog. This 
+function enables that behavior.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to affect.
+</entry></row>
+<row><entry align="right"><parameter>editable</parameter>&nbsp;:</entry>
+<entry> Editable to affect.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-append-buttons">gnome_dialog_append_buttons ()</title>
+<programlisting>void        gnome_dialog_append_buttons     (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *first,
+                                             ...);</programlisting>
+<para>
+This function is mostly for internal library use. You should use
+<link linkend="gnome-dialog-new">gnome_dialog_new</link>() instead. See that function for a description of
+the button arguments.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to add buttons to.
+</entry></row>
+<row><entry align="right"><parameter>first</parameter>&nbsp;:</entry>
+<entry> First button to add.
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry> varargs list of additional buttons, NULL-terminated.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-append-button">gnome_dialog_append_button ()</title>
+<programlisting>void        gnome_dialog_append_button      (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *name);</programlisting>
+<para>
+This function is mostly for internal library use. You should use
+<link linkend="gnome-dialog-new">gnome_dialog_new</link>() instead. See that function for a description of
+the button argument.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to add button to.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-append-buttonsv">gnome_dialog_append_buttonsv ()</title>
+<programlisting>void        gnome_dialog_append_buttonsv    (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> **buttons);</programlisting>
+<para>
+For internal use, language bindings, etc. Use <link linkend="gnome-dialog-new">gnome_dialog_new</link>() instead.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to append to.
+</entry></row>
+<row><entry align="right"><parameter>buttons</parameter>&nbsp;:</entry>
+<entry> NULL-terminated vector of buttons to append.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-append-button-with-pixmap">gnome_dialog_append_button_with_pixmap ()</title>
+<programlisting>void        gnome_dialog_append_button_with_pixmap
+                                            (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             const <link linkend="gchar">gchar</link> *pixmap);</programlisting>
+<para>
+<link linkend="gnome-dialog-new">gnome_dialog_new</link>() does not permit custom buttons with pixmaps, so if you 
+want one of those you need to use this function.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to add the button to.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>pixmap</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-append-buttons-with-pixmaps">gnome_dialog_append_buttons_with_pixmaps ()</title>
+<programlisting>void        gnome_dialog_append_buttons_with_pixmaps
+                                            (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> **names,
+                                             const <link linkend="gchar">gchar</link> **pixmaps);</programlisting>
+<para>
+Simply calls <link linkend="gnome-dialog-append-button-with-pixmap">gnome_dialog_append_button_with_pixmap</link>() repeatedly.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> <link linkend="GnomeDialog">GnomeDialog</link> to append to.
+</entry></row>
+<row><entry align="right"><parameter>names</parameter>&nbsp;:</entry>
+<entry> NULL-terminated vector of button names.
+</entry></row>
+<row><entry align="right"><parameter>pixmaps</parameter>&nbsp;:</entry>
+<entry> NULL-terminated vector of pixmap names.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-construct">gnome_dialog_construct ()</title>
+<programlisting>void        gnome_dialog_construct          (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *title,
+                                             va_list ap);</programlisting>
+<para>
+See <link linkend="gnome-dialog-new">gnome_dialog_new</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> Dialog to construct.
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> Title of the dialog.
+</entry></row>
+<row><entry align="right"><parameter>ap</parameter>&nbsp;:</entry>
+<entry> va_list of buttons, NULL-terminated.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dialog-constructv">gnome_dialog_constructv ()</title>
+<programlisting>void        gnome_dialog_constructv         (<link linkend="GnomeDialog">GnomeDialog</link> *dialog,
+                                             const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> **buttons);</programlisting>
+<para>
+See <link linkend="gnome-dialog-new">gnome_dialog_new</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dialog</parameter>&nbsp;:</entry>
+<entry> Dialog to construct.
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> Title of the dialog.
+</entry></row>
+<row><entry align="right"><parameter>buttons</parameter>&nbsp;:</entry>
+<entry> NULL-terminated array of buttons.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="GnomeAbout">GnomeAbout</link> <link linkend="GnomePropertyBox">GnomePropertyBox</link> <link linkend="GnomeMessageBox">GnomeMessageBox</link> <link linkend="GnomeScores">GnomeScores</link>
+</para>
+</refsect1>
+
+</refentry>

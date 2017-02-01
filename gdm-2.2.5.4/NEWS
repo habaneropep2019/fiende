@@ -1,0 +1,704 @@
+Ahh news...
+
+2.2.5.4 stuff:
+
+- SECURITY FIX! Make sure the egid is reset to the user gid before
+  starting a session.  This could present a security risk under a
+  certain circumstances, that is if your /bin/sh does not drop privilages.
+  It also fixes the failsafe gnome session
+
+- PositionX and PositionY now take negative values that work
+  like standard X geometries.  A negative value is an offset from
+  the right/lower edge.
+
+2.2.5.3 stuff:
+
+- PAM support revamped.  Session open and credentials are done before
+  we do anything else.  Also we work on one pam handle only, and
+  yet again switch setcred/open_session order (Karsten Petersen, me)
+
+- Autologin is now done with a separate pam configuration.  gdm-autologin
+  service.  This just logs anyone in without asking for a password,
+  but this makes autologin work on some all wankered pam setup.  Of course
+  you must now modify gdm-autologin in addition to 'gdm' if you have
+  some weird pam setup.
+
+- Fix gdmconfig saving of server definitions
+
+- Add possibility of multiline welcome message by use of '\n'
+
+- Use the text dialog interface for more errors including the toplevel
+  loop of death
+
+- Fix a USR2 race in the slave if the main daemon is already dead
+  (this makes 'killall gdm' work right)
+
+- Translation updates (Kjartan Maraas, Gustavo Maciel Dias Vieira,
+  Abel Cheung, Christian Rose, Duarte Loreto, Christian Meyer,
+  Stanislav Visnovsky, Peteris Krisjanis, Artis Trops, Akira TAGOH, 
+  Göran Uddeborg, Ole Laursen)
+
+2.2.5.2 stuff:
+
+- If multiple local servers are setup, then wait until one has started
+  plus 3 more seconds before starting the next one, this prevents such
+  not-good things such as full lockups happening
+
+- Fix crash of greeter for timed login setups
+
+- Keep 4 old copies of the X server logs to make debugging bad
+  X setups easy
+
+- The WM now supports NoInput windows, which improves gdm
+  accessibility and makes it possible to run things like xscribble
+  (Crossfire (from debian bug report) and moi)
+
+- Minor leak fixes
+
+- spec file updates (Gregory Leblanc)
+
+- Translation updates (Roy-Magne Mo, Carlos Perelló Marín,
+  Christophe Merlet, Khairulanuar Abd Majid)
+
+2.2.5.1 stuff:
+
+- IMPORTANT: XKeepsCrashing now has different semantics,
+  all the logic of crash recovery is no in this script including
+  gettext and finding the configurator and all that.  So
+  the script no longer takes any arguments.  If you have custom
+  versions of this script you will have to change them to reflect
+  this.  As a result of this XKeepsCrashingConfigurators is gone
+
+- Skipped a version number for greater stability
+
+- By default also look for XFdrake as a configurator on X crashes
+  to work on mandrake out of the box
+
+- pam setup is now the same as in the redhat and mandrake
+  packages
+
+- If the X server crashes within 5 seconds of telling us it's
+  ready, still treat it as a crash, since things like inability
+  to open mouse makes it die after it tells us it's OK
+
+- XKeepsCrashing now handles inability to open mouse and
+  offers to run mouseconfig (or if that's not available
+  just the x configurator it finds)
+
+- Fix crash on FreeBSD with setenv with NULL (just treat NULL
+  as empty string) (Heath Nielson)
+
+- DESTDIR fixes (Frodo Looijaard)
+
+- gdmopen now sets VT_NUMBER env var for it's child
+
+- Focus issues fixed in gdmwm (the windowmanager of the greeter)
+
+- Check for existance of a home directory.  If it doesn't exist,
+  the user has the option of canceling the login or logging in with
+  the home dir set to root.
+
+- Many MANY races fixed in handeling of extra processes.  Gdm should
+  now always clean up after itself well if killed.  And it will
+  now not screw up if the child processes die too quickly.
+
+- Some configure.in and build fixes, require libglade explicitly in
+  the configure script and also make console helper enabled by default
+  if it's possible to use it
+
+- gdmXnestchooser now has quite a few more modes of operation, in effect
+  it can now be used as a generic Xnext launching program.  It also
+  by default reads the Xnest command from gdm.conf
+  
+- Remove VerboseAuth configuration variable as it was utterly useless,
+  and actually resulted in usability degradation when on.
+
+- Include our own gdmmktemp like the mktemp program for shell scripts
+
+- Fix stuff on console with gdmopen by printing \033(K onto the console
+  before it does anything else
+
+- Work with KDE face directories (username.png rather then username) as
+  well (Mandrake)
+
+- Accept keypad enter in the greeter (Mandrake)
+
+- Run ssh-agent if it is found available and not yet running in the Gnome
+  session file (Ximian)
+
+- Errors from pam go into a separate dialog and information messages that
+  come just before login are also in a dialog so that the user gets
+  a chance to see them
+
+- Use the pam wait time on errors, if available, this fixes a bug where
+  the wait time was doubled because it was both the pam one and the
+  gdm one.
+
+- Make sure the cookie file is full of all different local addresses
+  and don't whack out if the local hostname is not resolvable.  Also
+  if we still can't start the server, tell the user rather then giving
+  up quietly.
+
+- Always print the "Please enter your username" message
+
+- Translation updates (Ole Laursen, Stanislav Visnovsky, Christophe Merlet,
+  Peteris Krisjanis, Artis Trops, Marius Andreiana, Christian Rose, 
+  Zbigniew Chyla)
+
+2.2.4.3 stuff:
+
+- Use PAM_ESTABILISH_CRED for pam_setcred
+
+- Parsed login names are now reparsed every time
+
+- Minor fixes and greater paranoia all over the place
+
+- XDMCP timeouts default to 15 instead of 30 seconds
+
+- Autoconf 2.50 / Automake 1.5 compatibility (Ali Akcaagac)
+
+- Translations updated (Zbigniew Chyla, Kjartan Maraas, Ole Laursen,
+  Fatih Demir, me, Stanislav Visnovsky, Gustavo Maciel Dias Vieira)
+
+2.2.4.2 stuff:
+
+- Keep a global pam handle around again, and add a pam conversation
+  dialog when no greeter is up.  Set RHOST and RUSER and fix some
+  other pam related things.  Hopefully we're more pam correct now.
+
+- Have an option that forces 24hour clock even in locales which
+  like 12hour clock (Terje Rosten, Ali Akcaagac, me)
+
+- Change how FLEXI_XNEST works, be more paranoid in who we allow to
+  run an an xnest, and we always run as the user who requested it.
+  It requires that the user has a .Xauthority file with an
+  MIT-MAGIC-COOKIE-1 for the current display.
+
+- Fix many obscure fork races
+
+- Now exports a procol version environmental variable to the greeter
+  so that it's easier to use external greeters.
+
+- Ensure that /tmp/.ICE-unix exists
+
+- X servers now run with root gid and not gdm gid
+
+- Ugly fix to the toolbar deadlock problem, very VERY evil, but
+  it's really a bug in gnome-dock
+
+- When we run a flexi console server, lock the screen with xscreensaver.
+  Also throttle xscreensaver so that it doesn't take extra CPU power.
+
+- Yet another extension to XDMCP, which makes the MANAGED_FORWARD
+  stuff more reliable on bad networks.  It is however 100% compatible
+  with 2.2.4.1 in operation.
+
+- Minor fixes all over the place
+
+- Documentation updates (Trevor Curtis)
+
+- Translations updated (Zbigniew Chyla, Kjartan Maraas, Ole Laursen,
+  Stanislav Visnovsky, Yukihiro Nakai, Roy-Magne Mo, Carlos Perelló Marín,
+  Pablo Saratxaga, Christian Rose, Christophe Merlet, Christopher R. Gabriel)
+
+2.2.4.1 stuff:
+
+- X server editting now actually works, and gdmconfig produces
+  correct config files.  DOH!
+
+- X server editting now enforces strict order of servers (it only sort
+  of did before)
+
+- XDMCP can now run a script to get a custom WILLING status script
+  (Matt Forrest, me)
+
+- Change the gdm extension protocol to XDMCP.  The MANAGED_FORWARD
+  was being used in a wrong way and required a slight protocol change,
+  as this is a non-required part of the protocol nothing will break.
+
+- When declining a connection, give statement why it is, to aid in
+  debugging your XDMCP setup.
+
+- Implement the (previously documented) xdmcp/DisplaysPerHost
+  configuration option.  So now the default is one connection per
+  host, so you may need to change this in your setup if you need
+  more.
+
+- Fix one case of s/login/username/ in the greeter and in XDMCP mode,
+  the button to kill the login is "Disconnect" and not "Quit"
+
+- The reference doc updated a tad, still somewhat out of date,
+  the configurator documentation has not been updated however.
+
+- Many, many fixes mostly leaks, some minor some bigger
+
+- Updated translations (Christian Rose, Abel Cheung, Kjartan Maraas,
+  Zbigniew Chyla)
+
+2.2.4.0 stuff:
+
+- New unix socket protocol for controlling the daemon from outside.
+
+- A way to add servers at runtime by any local user.  So called flexible
+  servers.  That is implementing a "New login" kind of thing.  This new
+  server can also be a nested login with Xnest.  In which case anyone on
+  an X connection can run this.  All without the use of XDMCP and openning
+  up an extra TCP port.  This is more user friendly and also this way the
+  daemon can manage the servers better.
+
+- PAM usage more correct with respect to setting credentials.  This makes
+  pam_group actually work, and probably some other things
+
+- Implement a vt open (gdmopen) alternative inside gdm itself.  This
+  version is stripped down version of open and it works much better for
+  gdm's purposes of it.
+
+- Implement a local helper (if pam is used) for the password asking
+  when attempting to run X configuration.  This is more friendly
+  and more correct.
+
+- Keep track of all new helper processes and kill them off on exit.
+  Previously some of these could be left hanging.
+
+- When a display number is busy, ask the user about starting the
+  server on an empty display number (if no gdmopen or dialog, just
+  do it)
+
+- Keep track of the VT (on linux) of local servers and allow programs to
+  query this list through the socket protocol.  Perhaps to offer the
+  user a menu and a gui way to switch between logins.
+
+- More thorough closing of file descriptors.
+
+- Also look for 'whiptail' when looking for a 'dialog' implementation
+
+- In the photo setup, don't require a browser to be on.  In that case,
+  just warn the user.
+
+- Some doc fixes (Kjartan Maraas)
+
+- Added Galician (gl_ES) and Brazilian Portuguese (pt_BR) to the menu
+  (Jesus Bravo Alvarez)
+
+- Various minor fixes.
+
+- RPM Epoch raised to 1 since it seems others have been in an Epoch arms
+  race.
+
+- Translation updates (Ole Laursen, Christophe Merlet, Abel Cheung,
+  Jesus Bravo Alvarez, Pablo Saratxaga, Andras Timar, Zbigniew Chyla,
+  Kjartan Maraas, Marius Andreiana, me)
+
+2.2.3.2 stuff:
+
+- printf/syslog format bugs fixed which fixes possible security
+  problems (Cyril Diakhate, Abel Cheung, Havoc, me)
+
+- Some fixes coming from the Gnome usability report (Heeten Choxi, me)
+
+- Nicer titlebar
+
+- Run /etc/X11/xinit/xinitrc.d from the Gnome session
+
+- RUNNING_UNDER_GDM defined for init scripts (Owen)
+
+- Embrace and extend XDMCP so that choosing works nicer.  No worries, still
+  100% compatible with XDMCP 1.0
+
+- In the redhat package don't use the GiveConsole/TakeConsole since they're
+  not kosher, pam does this for us, for standard, non rpm build this was never
+  done
+
+- s/Halt/Shut down/
+
+- Don't ask to save Failsafe sessions
+
+- When user doesn't exist, ask for a password anyway
+
+- Various minor fixes (Owen, me)
+
+- Translation updates (Stanislav Visnovsky, Zbigniew Chyla, Christian Rose,
+  Faith Demir, Abel Cheung, Christian Meyer, Kjartan Maraas,
+  Christopher R. Gabriel, Yukihiro Nakai, me)
+
+2.2.3.1 stuff:
+
+- file descriptor leaks and messups dealt with, making gdm2 work again
+  on debian and probably others (Ryan Murray, me)
+
+- Posibility of a "soft" restart, that is scheduling a restart when all logins
+  end.  This is now possible from gdmconfig.
+
+- A new "protocol" for the slave to talk to the daemon by way of a fifo.
+
+- The spec file now schedules a soft restart on install (this will work only
+  for upgrades from 2.2.3.1 to higher versions obviously)
+
+- Handle the slave process crashing much more gracefully.  And be generally
+  more thorough in killing our children.
+
+- Killing an X server while running is no longer treated as an X crash by gdm
+
+- Other cleanups and minor fixes
+
+- Translation updates (Christian Rose, Ole Laursen, Zbigniew Chyla)
+
+2.2.3 stuff:
+
+- Various XDMCP fixes, including a working indirect queries (the host chooser).
+  Plus various chooser enhancements and fixes
+
+- The "window manager" better handles window positioning, to make programs
+  like gkrellm behave more sanely.  Also follow the motif decoration hint.
+
+- The internal error/info dialog uses GNOME to look prettier and is centered
+
+- Build xdmcp only if the libs exist
+
+- Handle upgrades more sanely.
+
+- Scripts get correct environment
+
+- On failsafe xterm session just warp the pointer to transfer focus,
+  this makes pointer focus still work
+
+- An option to always restart server rather then just reinitializing it
+  when a user logs out
+
+- XDMCP login box has a "Quit" menu item which kills the connection,
+  useful if you chose a box you don't know the login to.
+
+- Now handles busy server by notifying the user instead of treating it
+  as a server crash
+
+- Docs and configurator up to date to all new configuration keys
+  (Trevor Curtis, me)
+
+- Better pam and console helper configure setup and other configure fixes
+
+- Add ja and zh_TW.Big5 translations again (Karl Eichwalder, me)
+
+- Assorted fixes, cleanups (Kjartan, Nalin Dahyabhai, me)
+
+- spec file cleanup (Dean Scott)
+
+- Translations (Marius Andreiana, Christian Rose, Ole Laursen,
+	        Karl Eichwalder, "R.I.P. Deaddog", Christian Meyer,
+		Pablo Saratxaga, Kjartan Maraas, Christophe Merlet, 
+		Khairulanuar Abd Majid, me)
+
+2.2.2.1 stuff:
+
+- SECURITY FIX!  Rebake cookies before reinitializing the local X server.
+  Only local X servers are affected, this bug allowed an attacker to log in,
+  save his cookie, which would then be used for the user who logs in next.
+
+- Fix a race preventing users to log in sometimes
+
+- Ability to turn of failsafe and chooser sessions (Havoc)
+
+- Fix mit cookie usage to not clobber cookies containing zeros
+
+- Fix remote XDMCP authentication
+
+- Pinging for XDMCP sessions to detect if they're dead
+
+- Saving current gnome session is done from gdm (gnome-core HEAD no longer
+  saves it)
+
+- Don't change utmp from Pre/Post session scripts
+
+- PAM related fixes
+
+- Better handeling of X failiures
+
+- Nicer iconify button
+
+- gdmphotosetup permissions fixes
+
+- Always add POSIX/C locale setting to language menu
+
+- Nicer minimize button
+
+- Ignore .rpmorig files
+
+- Other fixes
+
+- Translations (Stanislav Visnovsky, Kjartan Maraas, me)
+
+2.2.2 stuff:
+
+- When X keeps crashing ask if we should run the X configuration
+  (after asking for the root password of course:)
+
+- Fixup shadow and crypt authentication methods
+
+- Fix session directory reading in greeter (Rémi Cohen-Scali)
+
+- Fix the -lwrap and other configure issues
+
+- Better "management" of login screen windows
+
+- The face browser actually works now (Rémi Cohen-Scali, me)
+
+- A clock on the login window (Jonathan, me)
+
+- The language list is now translated
+
+- A small proggie to set your gdm browser face
+
+- Accept clicks by the right button as if they are the first button,
+  we don't know if the user is left or right handed yet
+
+- Background color seeps through transparent images and allow limitting
+  remote logins to only a color backgrounds
+
+- Tooltips on things to make the greeter easier to understand
+
+- AllowConfig now on by default
+
+- Properly runs with a missing gdm.conf
+
+- Remove old failsafe stuff and use the new builtin falisafes, which
+  are much nicer
+
+- Saner focus on all gdm windows, and give the failsafe xterm focus
+
+- Gnome and Xsession default sessions now setup xresources and read in
+  keymaps
+
+- Default is default if no default was set and it exists (confusing huh? :)
+
+- More Xinerama support (backgrounds, error dialogs, xterm failsafe session)
+
+- Greeter segfault fixed when no lanugage file present
+
+- Anti-hosification meassures.  GDM will now try to do something to allow
+  itself to be fixed on some mistakes.  Rather then just aborting and leaving
+  crap in the syslog.  And gdmconfig let's you see hosification as it hapens
+
+- Updated fixed icon entry
+
+- gdm-restart script to automate restarting of gdm by HUPing the main daemon
+
+- Mucho fixes
+
+- Bunch more tooltips on things
+
+- Documentation is here! (Trevor Curtis, me)
+
+- Updated translations (Khairulanuar Abd Majid, Christian Meyer, Ole Laursen,
+  Kjartan Maraas, Christian Rose, Fatih Demir, Stanislav Visnovsky,
+  Emese Kovacs, Matthias Warkus, Kjartan Maraas, Jarkko Ranta, me)
+
+2.2.1 stuff:
+
+- Keyboard navigation in the greeter (Ryan Murray)
+
+- debian build stuff (Ian McKellar)
+
+- Ability to set the background color/pixmap,
+  now requires GdkPixbuf because of this.
+
+- The root overlay window is gone now and we have real focus
+  management.  In effect gdmlogin is a VERY simple windowmanager.
+
+- Ability to choose a specific GNOME session
+
+- Ability to run the configurator directly on the login screen,
+  which requires a root password of course (Disabled by default)
+
+- An editor for the Sessions directory in gdmconfig (Lee)
+
+- Title bar can be hidden by configuration
+
+- The icon entry is now sane with the panel icon entry hack
+
+- If no LANG variable set gdm starts out in the DefaultLocale
+  from the config file
+
+- Now non-verbose mode is actually useful and verbose mode
+  is still security safe.
+
+- For consistency AllowRoot now works on pam setups as well,
+  also a setting just for remote root logins.
+
+- Timed login, you can set up gdm to log in a certain user on the
+  first local display after a specified timeout if no one logs in
+  (me, Jim Bray)
+
+- Bunch of other fixes (me, Ryan Murray)
+
+- Security fixes, crash fixes and an increase in general paranoia
+  (me, Ryan Murray)
+
+- More fault/bad setting tolerant all around
+
+- Translation updates (Christian Meyer, Valek Filippov, Kjartan Maraas,
+  Ole Laursen, Jarkko Ranta, Fatih Demir, Stanislav Visnovsky, Martin Norbäck,
+  Christian Rose, Yuri Syrota, Christophe Merlet, Pablo Saratxaga, me,
+  Ian McKellar)
+
+2.2.0 stuff:
+
+- gdmconfig now works with more fontsizes (me, Lee)
+
+- Another minor xinerama fix
+
+- Fixup the pam message voodoo, so that it now is at least functional even
+  though it may not be pretty nor 100% correct.
+
+- Initial gdmconfig documentation (Trevor Curtis, Lee)
+
+- gdmconfig now correctly handles RelaxPerms (Lee)
+
+- gdmconfig has now nice pam console helper setup (Lee)
+
+- gladify/beautify gdmchooser (Lee)
+
+- gdmchooser now apparently works with xdm (Matthias Clasen)
+
+- Better specfile (Gregory Leblanc)
+
+- Packagers should read the comment on end of config/gdm.conf.in (especially
+  debian people)
+
+- Configuration file now does not force the adobe version of helvetica, and
+  postgres and pvm users are excluded by default (Vlad Hrachev)
+
+- i18n fixes (Gediminas Paulauskas)
+
+- New easter egg
+
+- Bunch of minor fixes
+
+- Translation updates (Yukihiro Nakai, Carlos Perelló Marín, Martin Norbäck,
+  Fatih Demir, Simos Xenitellis, Kjartan Maraas, Christian Meyer,
+  Christophe Merlet, Stanislav Visnovsky, me)
+
+2.0.99 stuff:
+
+- Cursor set to pointer rather then left as "X"
+
+- Minor login minimize button cleanup (Jonathan Blandford)
+
+- gdmconfig UI update and fixes (Lee Mallabone)
+
+- Easter egg update
+
+- Fixed restarting with HUP when xdmcp is on
+
+- Login and Chooser fixed up for the true/false vs. 1/0 change (Tim Jansen)
+
+- doc updates for true/false vs 1/0 fixups (Tim Jansen)
+
+- Translation updates (Yukihiro Nakai, Christophe Merlet, Gustavo Maciel Dias
+  Vieira, Fatih Demir, Simos Xenitellis, Kjartan Maraas, Stanislav Visnovsky,
+  Pablo Saratxaga, Jarkko Ranta)
+
+2.0.98.1 stuff:
+
+- a minor Xinerama fix for dialogs
+
+- small XDMCP fix, it apparently works for some people (Matthias Clasen)
+
+- create config files during configure time (Peter Teichman, me)
+
+- Mucho translation updates (Christian Rose, Dan Damian, Simos Xenitellis,
+  Szabolcs Ban, Kjartan Maraas, Christophe Merlet, Christian Meyer)
+
+2.0.98 stuff:
+
+- spec file actually works (Lee Mellabone)
+
+- Bigger! Better! Faster!  gdmconfig.  Much cooler and easier to use
+  (Lee Mellabone)
+
+- More xinerama fixes (Tim Jansen)
+
+- A bit more xdmcp fixes which still don't make it run
+
+- Bunch of other fixes and cleanups
+
+- New translations (Stanislav Visnovsky, Jarkko Ranta, Valek Filippov,
+  Simos Xenitellis)
+
+2.0.97.1 stuff:
+
+- Don't die on non-xinerama supporting display if compiled with xinerama lib
+
+- First cut at a spec file for RedHat 6.x (may work on 7.0 as well maybe)
+
+2.0.97 stuff:
+
+- Graphical configurator in Foot/System/Gdm Confgiurator,
+  or run "gdmconfig" (Lee Mellabone)
+
+- i18n and greeter/slave communication fixes (ChiDeok Hwang)
+
+- int vs. bool mess fixed up in the configuration files
+
+- Use the language from the LANG variable as the default and use
+  the one from gdm.conf as backup only
+
+- Verbose authentication on by default and don't reveal information
+  on verbose authentication.  I may remove this option altogether
+
+- Slower quiver (looks cooler:)
+
+- Reset on main process HUP signal by reexecing self
+
+- Xinerama support for centering the login dialogs (Tim Jansen)
+
+- Mucho fixes to loop of death stuff, race conditions and other such
+  fun things
+
+- Translations, fixes etc...
+  (Kjartan Maraas, Gediminas Paulasukas, ChiDeok Hwang, Stanislav Visnovsky,
+   Valek Filippov, and maybe others)
+
+2.0.96 stuff:
+
+- Multiple local display stuff should now work
+
+- Now autologs in only on the first display
+
+- Bunch of fixes for XDMCP but that still doesn't work, I need
+  help here I think
+
+- Local displays are now reset with SIGHUP rather then killed and
+  signals are set properly to begin with, this should actually help
+  with some buggy X servers I think.
+
+- Login window can be moved (has a titlebar), and this position can be
+  set from the config file (not saved however)
+
+- Bunch of cleanup and bugfixes
+
+Open issues:
+
+- XDMCP doesn't work
+
+- Autologin and i18n is not working well (always in english apparently)
+
+2.0.95 stuff:
+
+- Autologin (AutomaticLogin key in [daemon] section of gdm.conf)
+  This is a string key that if it's set then gdm will log in that
+  user without prompting on the first time it runs a local server.
+  Will not autologin "root" though as that would be dumb.
+
+- You can have your cursor anywhere while you log in, yay!
+
+- [greeter]/BackgroundProgram thingie.  A program that is run from
+  the greeter and killed when the greeter exists.  useful for things
+  that do some cool graphics on the root window.
+
+- If greeter keeps segfaulting, it will "unmanage" that display so that you
+  can actually log in on a console
+
+- Slave process is actually forked
+
+- Bugfixes galore
+
+-George

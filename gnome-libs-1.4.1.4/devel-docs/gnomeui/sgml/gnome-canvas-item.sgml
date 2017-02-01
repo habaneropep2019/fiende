@@ -1,0 +1,820 @@
+<refentry id="GnomeCanvasItem">
+<refmeta>
+<refentrytitle>GnomeCanvasItem</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeCanvasItem</refname><refpurpose></refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeCanvasItem-struct">GnomeCanvasItem</link>;
+<link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* <link linkend="gnome-canvas-item-new">gnome_canvas_item_new</link>      (<link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *parent,
+                                             <link linkend="GtkType">GtkType</link> type,
+                                             const <link linkend="gchar">gchar</link> *first_arg_name,
+                                             ...);
+<link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* <link linkend="gnome-canvas-item-newv">gnome_canvas_item_newv</link>     (<link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *parent,
+                                             <link linkend="GtkType">GtkType</link> type,
+                                             <link linkend="guint">guint</link> nargs,
+                                             <link linkend="GtkArg">GtkArg</link> *args);
+void        <link linkend="gnome-canvas-item-construct">gnome_canvas_item_construct</link>     (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *parent,
+                                             const <link linkend="gchar">gchar</link> *first_arg_name,
+                                             va_list args);
+void        <link linkend="gnome-canvas-item-constructv">gnome_canvas_item_constructv</link>    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *parent,
+                                             <link linkend="guint">guint</link> nargs,
+                                             <link linkend="GtkArg">GtkArg</link> *args);
+void        <link linkend="gnome-canvas-item-set">gnome_canvas_item_set</link>           (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             const <link linkend="gchar">gchar</link> *first_arg_name,
+                                             ...);
+void        <link linkend="gnome-canvas-item-setv">gnome_canvas_item_setv</link>          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="guint">guint</link> nargs,
+                                             <link linkend="GtkArg">GtkArg</link> *args);
+void        <link linkend="gnome-canvas-item-set-valist">gnome_canvas_item_set_valist</link>    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             const <link linkend="gchar">gchar</link> *first_arg_name,
+                                             va_list args);
+void        <link linkend="gnome-canvas-item-move">gnome_canvas_item_move</link>          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> dx,
+                                             <link linkend="double">double</link> dy);
+void        <link linkend="gnome-canvas-item-affine-relative">gnome_canvas_item_affine_relative</link>
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             const <link linkend="double">double</link> affine[6]);
+void        <link linkend="gnome-canvas-item-affine-absolute">gnome_canvas_item_affine_absolute</link>
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             const <link linkend="double">double</link> affine[6]);
+void        <link linkend="gnome-canvas-item-scale">gnome_canvas_item_scale</link>         (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y,
+                                             <link linkend="double">double</link> scale_x,
+                                             <link linkend="double">double</link> scale_y);
+void        <link linkend="gnome-canvas-item-rotate">gnome_canvas_item_rotate</link>        (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y,
+                                             <link linkend="double">double</link> angle);
+void        <link linkend="gnome-canvas-item-raise">gnome_canvas_item_raise</link>         (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             int positions);
+void        <link linkend="gnome-canvas-item-lower">gnome_canvas_item_lower</link>         (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             int positions);
+void        <link linkend="gnome-canvas-item-raise-to-top">gnome_canvas_item_raise_to_top</link>  (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);
+void        <link linkend="gnome-canvas-item-lower-to-bottom">gnome_canvas_item_lower_to_bottom</link>
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);
+void        <link linkend="gnome-canvas-item-show">gnome_canvas_item_show</link>          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);
+void        <link linkend="gnome-canvas-item-hide">gnome_canvas_item_hide</link>          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);
+int         <link linkend="gnome-canvas-item-grab">gnome_canvas_item_grab</link>          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             unsigned int event_mask,
+                                             <link linkend="GdkCursor">GdkCursor</link> *cursor,
+                                             <link linkend="guint32">guint32</link> etime);
+void        <link linkend="gnome-canvas-item-ungrab">gnome_canvas_item_ungrab</link>        (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="guint32">guint32</link> etime);
+void        <link linkend="gnome-canvas-item-w2i">gnome_canvas_item_w2i</link>           (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> *x,
+                                             <link linkend="double">double</link> *y);
+void        <link linkend="gnome-canvas-item-i2w">gnome_canvas_item_i2w</link>           (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> *x,
+                                             <link linkend="double">double</link> *y);
+void        <link linkend="gnome-canvas-item-i2w-affine">gnome_canvas_item_i2w_affine</link>    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> affine[6]);
+void        <link linkend="gnome-canvas-item-i2c-affine">gnome_canvas_item_i2c_affine</link>    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> affine[6]);
+void        <link linkend="gnome-canvas-item-reparent">gnome_canvas_item_reparent</link>      (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *new_group);
+void        <link linkend="gnome-canvas-item-grab-focus">gnome_canvas_item_grab_focus</link>    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);
+void        <link linkend="gnome-canvas-item-get-bounds">gnome_canvas_item_get_bounds</link>    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> *x1,
+                                             <link linkend="double">double</link> *y1,
+                                             <link linkend="double">double</link> *x2,
+                                             <link linkend="double">double</link> *y2);
+void        <link linkend="gnome-canvas-item-request-update">gnome_canvas_item_request_update</link>
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----GnomeCanvasItem
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeCanvasItem-struct">struct GnomeCanvasItem</title>
+<programlisting>struct GnomeCanvasItem;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-new">gnome_canvas_item_new ()</title>
+<programlisting><link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* gnome_canvas_item_new      (<link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *parent,
+                                             <link linkend="GtkType">GtkType</link> type,
+                                             const <link linkend="gchar">gchar</link> *first_arg_name,
+                                             ...);</programlisting>
+<para>
+Creates a new canvas item with <parameter>parent</parameter> as its parent group.  The item is
+created at the top of its parent's stack, and starts up as visible.  The item
+is of the specified <parameter>type</parameter>, for example, it can be
+<link linkend="gnome-canvas-rect-get-type">gnome_canvas_rect_get_type</link>().  The list of object arguments/value pairs is
+used to configure the item.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> The parent group for the new item.
+</entry></row>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> The object type of the item.
+</entry></row>
+<row><entry align="right"><parameter>first_arg_name</parameter>&nbsp;:</entry>
+<entry> A list of object argument name/value pairs, NULL-terminated,
+used to configure the item.  For example, "fill_color", "black",
+"width_units", 5.0, NULL.
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly-created item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-newv">gnome_canvas_item_newv ()</title>
+<programlisting><link linkend="GnomeCanvasItem">GnomeCanvasItem</link>* gnome_canvas_item_newv     (<link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *parent,
+                                             <link linkend="GtkType">GtkType</link> type,
+                                             <link linkend="guint">guint</link> nargs,
+                                             <link linkend="GtkArg">GtkArg</link> *args);</programlisting>
+<para>
+Creates a new canvas item with <parameter>parent</parameter> as its parent group.  The item is
+created at the top of its parent's stack, and starts up as visible.  The item
+is of the specified <parameter>type</parameter>, for example, it can be
+<link linkend="gnome-canvas-rect-get-type">gnome_canvas_rect_get_type</link>().  The list of object arguments is used to
+configure the item.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> The parent group for the new item.
+</entry></row>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> The object type of the item.
+</entry></row>
+<row><entry align="right"><parameter>nargs</parameter>&nbsp;:</entry>
+<entry> The number of arguments used to configure the item.
+</entry></row>
+<row><entry align="right"><parameter>args</parameter>&nbsp;:</entry>
+<entry> The list of arguments used to configure the item.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly-created item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-construct">gnome_canvas_item_construct ()</title>
+<programlisting>void        gnome_canvas_item_construct     (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *parent,
+                                             const <link linkend="gchar">gchar</link> *first_arg_name,
+                                             va_list args);</programlisting>
+<para>
+Constructs a canvas item; meant for use only by item implementations.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> An unconstructed canvas item.
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> The parent group for the item.
+</entry></row>
+<row><entry align="right"><parameter>first_arg_name</parameter>&nbsp;:</entry>
+<entry> The name of the first argument for configuring the item.
+</entry></row>
+<row><entry align="right"><parameter>args</parameter>&nbsp;:</entry>
+<entry> The list of arguments used to configure the item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-constructv">gnome_canvas_item_constructv ()</title>
+<programlisting>void        gnome_canvas_item_constructv    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *parent,
+                                             <link linkend="guint">guint</link> nargs,
+                                             <link linkend="GtkArg">GtkArg</link> *args);</programlisting>
+<para>
+Constructs a canvas item; meant for use only by item implementations.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> An unconstructed canvas item.
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> The parent group for the item.
+</entry></row>
+<row><entry align="right"><parameter>nargs</parameter>&nbsp;:</entry>
+<entry> The number of arguments used to configure the item.
+</entry></row>
+<row><entry align="right"><parameter>args</parameter>&nbsp;:</entry>
+<entry> The list of arguments used to configure the item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-set">gnome_canvas_item_set ()</title>
+<programlisting>void        gnome_canvas_item_set           (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             const <link linkend="gchar">gchar</link> *first_arg_name,
+                                             ...);</programlisting>
+<para>
+Configures a canvas item.  The arguments in the item are set to the specified
+values, and the item is repainted as appropriate.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>first_arg_name</parameter>&nbsp;:</entry>
+<entry> The list of object argument name/value pairs used to configure the item.
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-setv">gnome_canvas_item_setv ()</title>
+<programlisting>void        gnome_canvas_item_setv          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="guint">guint</link> nargs,
+                                             <link linkend="GtkArg">GtkArg</link> *args);</programlisting>
+<para>
+Configures a canvas item.  The arguments in the item are set to the specified
+values, and the item is repainted as appropriate.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>nargs</parameter>&nbsp;:</entry>
+<entry> The number of arguments used to configure the item.
+</entry></row>
+<row><entry align="right"><parameter>args</parameter>&nbsp;:</entry>
+<entry> The arguments used to configure the item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-set-valist">gnome_canvas_item_set_valist ()</title>
+<programlisting>void        gnome_canvas_item_set_valist    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             const <link linkend="gchar">gchar</link> *first_arg_name,
+                                             va_list args);</programlisting>
+<para>
+Configures a canvas item.  The arguments in the item are set to the specified
+values, and the item is repainted as appropriate.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>first_arg_name</parameter>&nbsp;:</entry>
+<entry> The name of the first argument used to configure the item.
+</entry></row>
+<row><entry align="right"><parameter>var_args</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-move">gnome_canvas_item_move ()</title>
+<programlisting>void        gnome_canvas_item_move          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> dx,
+                                             <link linkend="double">double</link> dy);</programlisting>
+<para>
+Moves a canvas item by creating an affine transformation matrix for
+translation by using the specified values.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>dx</parameter>&nbsp;:</entry>
+<entry> Horizontal offset.
+</entry></row>
+<row><entry align="right"><parameter>dy</parameter>&nbsp;:</entry>
+<entry> Vertical offset.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-affine-relative">gnome_canvas_item_affine_relative ()</title>
+<programlisting>void        gnome_canvas_item_affine_relative
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             const <link linkend="double">double</link> affine[6]);</programlisting>
+<para>
+Combines the specified affine transformation matrix with the item's current
+transformation.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> An affine transformation matrix.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-affine-absolute">gnome_canvas_item_affine_absolute ()</title>
+<programlisting>void        gnome_canvas_item_affine_absolute
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             const <link linkend="double">double</link> affine[6]);</programlisting>
+<para>
+Makes the item's affine transformation matrix be equal to the specified
+matrix.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> An affine transformation matrix.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-scale">gnome_canvas_item_scale ()</title>
+<programlisting>void        gnome_canvas_item_scale         (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y,
+                                             <link linkend="double">double</link> scale_x,
+                                             <link linkend="double">double</link> scale_y);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>scale_x</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>scale_y</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-rotate">gnome_canvas_item_rotate ()</title>
+<programlisting>void        gnome_canvas_item_rotate        (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y,
+                                             <link linkend="double">double</link> angle);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>angle</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-raise">gnome_canvas_item_raise ()</title>
+<programlisting>void        gnome_canvas_item_raise         (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             int positions);</programlisting>
+<para>
+Raises the item in its parent's stack by the specified number of positions.
+If the number of positions is greater than the distance to the top of the
+stack, then the item is put at the top.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>positions</parameter>&nbsp;:</entry>
+<entry> Number of steps to raise the item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-lower">gnome_canvas_item_lower ()</title>
+<programlisting>void        gnome_canvas_item_lower         (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             int positions);</programlisting>
+<para>
+Lowers the item in its parent's stack by the specified number of positions.
+If the number of positions is greater than the distance to the bottom of the
+stack, then the item is put at the bottom.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>positions</parameter>&nbsp;:</entry>
+<entry> Number of steps to lower the item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-raise-to-top">gnome_canvas_item_raise_to_top ()</title>
+<programlisting>void        gnome_canvas_item_raise_to_top  (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);</programlisting>
+<para>
+Raises an item to the top of its parent's stack.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-lower-to-bottom">gnome_canvas_item_lower_to_bottom ()</title>
+<programlisting>void        gnome_canvas_item_lower_to_bottom
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);</programlisting>
+<para>
+Lowers an item to the bottom of its parent's stack.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-show">gnome_canvas_item_show ()</title>
+<programlisting>void        gnome_canvas_item_show          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);</programlisting>
+<para>
+Shows a canvas item.  If the item was already shown, then no action is taken.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-hide">gnome_canvas_item_hide ()</title>
+<programlisting>void        gnome_canvas_item_hide          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);</programlisting>
+<para>
+Hides a canvas item.  If the item was already hidden, then no action is
+taken.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-grab">gnome_canvas_item_grab ()</title>
+<programlisting>int         gnome_canvas_item_grab          (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             unsigned int event_mask,
+                                             <link linkend="GdkCursor">GdkCursor</link> *cursor,
+                                             <link linkend="guint32">guint32</link> etime);</programlisting>
+<para>
+Specifies that all events that match the specified event mask should be sent
+to the specified item, and also grabs the mouse by calling
+<link linkend="gdk-pointer-grab">gdk_pointer_grab</link>().  The event mask is also used when grabbing the pointer.
+If <parameter>cursor</parameter> is not NULL, then that cursor is used while the grab is active.
+The <parameter>etime</parameter> parameter is the timestamp required for grabbing the mouse.
+</para>
+<para>
+Return value: If an item was already grabbed, it returns <literal>AlreadyGrabbed</literal>.  If
+the specified item was hidden by calling <link linkend="gnome-canvas-item-hide">gnome_canvas_item_hide</link>(), then it</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>event_mask</parameter>&nbsp;:</entry>
+<entry> Mask of events that will be sent to this item.
+</entry></row>
+<row><entry align="right"><parameter>cursor</parameter>&nbsp;:</entry>
+<entry> If non-NULL, the cursor that will be used while the grab is active.
+</entry></row>
+<row><entry align="right"><parameter>etime</parameter>&nbsp;:</entry>
+<entry> The timestamp required for grabbing the mouse, or GDK_CURRENT_TIME.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>GrabNotViewable</literal>.  Else, it returns the result of calling
+<link linkend="gdk-pointer-grab">gdk_pointer_grab</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-ungrab">gnome_canvas_item_ungrab ()</title>
+<programlisting>void        gnome_canvas_item_ungrab        (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="guint32">guint32</link> etime);</programlisting>
+<para>
+Ungrabs the item, which must have been grabbed in the canvas, and ungrabs the
+mouse.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item that holds a grab.
+</entry></row>
+<row><entry align="right"><parameter>etime</parameter>&nbsp;:</entry>
+<entry> The timestamp for ungrabbing the mouse.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-w2i">gnome_canvas_item_w2i ()</title>
+<programlisting>void        gnome_canvas_item_w2i           (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> *x,
+                                             <link linkend="double">double</link> *y);</programlisting>
+<para>
+Converts a coordinate pair from world coordinates to item-relative
+coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry> X coordinate to convert (input/output value).
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry> Y coordinate to convert (input/output value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-i2w">gnome_canvas_item_i2w ()</title>
+<programlisting>void        gnome_canvas_item_i2w           (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> *x,
+                                             <link linkend="double">double</link> *y);</programlisting>
+<para>
+Converts a coordinate pair from item-relative coordinates to world
+coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry> X coordinate to convert (input/output value).
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry> Y coordinate to convert (input/output value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-i2w-affine">gnome_canvas_item_i2w_affine ()</title>
+<programlisting>void        gnome_canvas_item_i2w_affine    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> affine[6]);</programlisting>
+<para>
+Gets the affine transform that converts from the item's coordinate system to
+world coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> An affine transformation matrix (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-i2c-affine">gnome_canvas_item_i2c_affine ()</title>
+<programlisting>void        gnome_canvas_item_i2c_affine    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> affine[6]);</programlisting>
+<para>
+Gets the affine transform that converts from item-relative coordinates to
+canvas pixel coordinates.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> An affine transformation matrix (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-reparent">gnome_canvas_item_reparent ()</title>
+<programlisting>void        gnome_canvas_item_reparent      (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="GnomeCanvasGroup">GnomeCanvasGroup</link> *new_group);</programlisting>
+<para>
+Changes the parent of the specified item to be the new group.  The item keeps
+its group-relative coordinates as for its old parent, so the item may change
+its absolute position within the canvas.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>new_group</parameter>&nbsp;:</entry>
+<entry> A canvas group.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-grab-focus">gnome_canvas_item_grab_focus ()</title>
+<programlisting>void        gnome_canvas_item_grab_focus    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);</programlisting>
+<para>
+Makes the specified item take the keyboard focus, so all keyboard events will
+be sent to it.  If the canvas widget itself did not have the focus, it grabs
+it as well.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-get-bounds">gnome_canvas_item_get_bounds ()</title>
+<programlisting>void        gnome_canvas_item_get_bounds    (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item,
+                                             <link linkend="double">double</link> *x1,
+                                             <link linkend="double">double</link> *y1,
+                                             <link linkend="double">double</link> *x2,
+                                             <link linkend="double">double</link> *y2);</programlisting>
+<para>
+Queries the bounding box of a canvas item.  The bounds are returned in the
+coordinate system of the item's parent.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Leftmost edge of the bounding box (return value).
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Upper edge of the bounding box (return value).
+</entry></row>
+<row><entry align="right"><parameter>x2</parameter>&nbsp;:</entry>
+<entry> Rightmost edge of the bounding box (return value).
+</entry></row>
+<row><entry align="right"><parameter>y2</parameter>&nbsp;:</entry>
+<entry> Lower edge of the bounding box (return value).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-canvas-item-request-update">gnome_canvas_item_request_update ()</title>
+<programlisting>void        gnome_canvas_item_request_update
+                                            (<link linkend="GnomeCanvasItem">GnomeCanvasItem</link> *item);</programlisting>
+<para>
+To be used only by item implementations.  Requests that the canvas queue an
+update for the specified item.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> A canvas item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

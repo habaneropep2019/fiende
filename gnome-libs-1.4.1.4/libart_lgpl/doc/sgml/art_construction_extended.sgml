@@ -1,0 +1,275 @@
+<refentry id="libart-Extended-Construction-APIs">
+<refmeta>
+<refentrytitle>Extended Construction APIs</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBART Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Extended Construction APIs</refname><refpurpose>Extended Construction API</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="ArtVpathDash">ArtVpathDash</link>;
+<link linkend="ArtVpath">ArtVpath</link>*   <link linkend="art-vpath-dash">art_vpath_dash</link>                  (const <link linkend="ArtVpath">ArtVpath</link> *vpath,
+                                             const <link linkend="ArtVpathDash">ArtVpathDash</link> *dash);
+enum        <link linkend="ArtPathStrokeJoinType">ArtPathStrokeJoinType</link>;
+enum        <link linkend="ArtPathStrokeCapType">ArtPathStrokeCapType</link>;
+<link linkend="ArtSVP">ArtSVP</link>*     <link linkend="art-svp-vpath-stroke">art_svp_vpath_stroke</link>            (<link linkend="ArtVpath">ArtVpath</link> *vpath,
+                                             <link linkend="ArtPathStrokeJoinType">ArtPathStrokeJoinType</link> join,
+                                             <link linkend="ArtPathStrokeCapType">ArtPathStrokeCapType</link> cap,
+                                             <link linkend="double">double</link> line_width,
+                                             <link linkend="double">double</link> miter_limit,
+                                             <link linkend="double">double</link> flatness);
+<link linkend="ArtVpath">ArtVpath</link>*   <link linkend="art-vpath-new-circle">art_vpath_new_circle</link>            (<link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y,
+                                             <link linkend="double">double</link> r);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The simple construction APIs we have described just before
+allow you to build your own simple vector paths but it is often useful
+to be able to create circles, ellipses, straight lines with a non-zero width
+and such... To do so, we have the folowing functions available.
+Sample code for these API functions (namely, <function>art_svp_vpath_stroke</function>
+and <function>art_vpath_dash</function>) can be found <ulink url="./art-dash.tar.gz">there</ulink>
+in the function <function>make_path</function>.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="ArtVpathDash">struct ArtVpathDash</title>
+<programlisting>struct ArtVpathDash {
+  double offset;
+  int n_dash;
+  double *dash;
+};
+</programlisting>
+<para>
+This structure describes the dashing style to be
+applied with <function>art_vpath_dash</function> 
+to a vpath.
+	<figure>
+	  <title>Dashes</title>
+	  <graphic fileref="art-dash-style.png" scale="50"></graphic>
+	</figure>
+The folowing code examplifies how to use this structure: it creates the <function>dash_style</function>
+corresponding to the example represented in the figure above: the first dash (the black one) has a length 
+of <filename>dash_style.dash[0] - dash_style.offset</filename>. The second dash has a length of 
+<filename>dash_style.dash[1]</filename> and the third
+dash has a length of <filename>dash_style.dash[0]</filename>...
+<programlisting>
+static ArtSVP *
+  ArtVpathDash dash_style;
+
+  dash_style.offset = 5;
+  dash_style.n_dash = 3;
+  dash_style.dash = art_new (double, 3);
+  dash_style.dash[0] = 10;
+  dash_style.dash[1] = 20;
+
+</programlisting>
+</para><informaltable pgwide="1" frame="none" role="struct">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row>
+<entry><link linkend="double">double</link> <structfield>offset</structfield></entry>
+<entry>specifies the phase of the pattern. That is, how many pixels into the dash-list 
+the pattern should actually begin.
+</entry>
+</row>
+<row>
+<entry>int <structfield>n_dash</structfield></entry>
+<entry>number of elements in <parameter>dash</parameter>.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> *<structfield>dash</structfield></entry>
+<entry>the initial and alternating elements (second, fourth, and so on) of the
+dash_list are the even dashes, and the others are the odd
+dashes.  Each element specifies a dash length. All of the elements must be nonzero.
+Specifying an odd-length list is equivalent to
+specifying the same list concatenated with itself to produce an even-length list
+
+</entry>
+</row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-vpath-dash">art_vpath_dash ()</title>
+<programlisting><link linkend="ArtVpath">ArtVpath</link>*   art_vpath_dash                  (const <link linkend="ArtVpath">ArtVpath</link> *vpath,
+                                             const <link linkend="ArtVpathDash">ArtVpathDash</link> *dash);</programlisting>
+<para>
+Creates a new vpath that is the result of applying dash style <parameter>dash</parameter>
+to <parameter>vpath</parameter>.
+</para>
+<para>
+This implementation has two known flaws:
+</para>
+<para>
+First, it adds a spurious break at the beginning of the vpath. The
+only way I see to resolve this flaw is to run the state forward one
+dash break at the beginning, and fix up by looping back to the
+first dash break at the end. This is doable but of course adds some
+complexity.
+</para>
+<para>
+Second, it does not suppress output points that are within epsilon
+of each other.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>vpath</parameter>&nbsp;:</entry>
+<entry> Original vpath.
+</entry></row>
+<row><entry align="right"><parameter>dash</parameter>&nbsp;:</entry>
+<entry> Dash style.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Newly created vpath.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ArtPathStrokeJoinType">enum ArtPathStrokeJoinType</title>
+<programlisting>typedef enum {
+  ART_PATH_STROKE_JOIN_MITER,
+  ART_PATH_STROKE_JOIN_ROUND,
+  ART_PATH_STROKE_JOIN_BEVEL
+} ArtPathStrokeJoinType;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="ArtPathStrokeCapType">enum ArtPathStrokeCapType</title>
+<programlisting>typedef enum {
+  ART_PATH_STROKE_CAP_BUTT,
+  ART_PATH_STROKE_CAP_ROUND,
+  ART_PATH_STROKE_CAP_SQUARE
+} ArtPathStrokeCapType;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="art-svp-vpath-stroke">art_svp_vpath_stroke ()</title>
+<programlisting><link linkend="ArtSVP">ArtSVP</link>*     art_svp_vpath_stroke            (<link linkend="ArtVpath">ArtVpath</link> *vpath,
+                                             <link linkend="ArtPathStrokeJoinType">ArtPathStrokeJoinType</link> join,
+                                             <link linkend="ArtPathStrokeCapType">ArtPathStrokeCapType</link> cap,
+                                             <link linkend="double">double</link> line_width,
+                                             <link linkend="double">double</link> miter_limit,
+                                             <link linkend="double">double</link> flatness);</programlisting>
+<para>
+Computes an svp representing the stroked outline of <parameter>vpath</parameter>. The
+width of the stroked line is <parameter>line_width</parameter>.
+</para>
+<para>
+Lines are joined according to the <parameter>join</parameter> rule. Possible values are
+ART_PATH_STROKE_JOIN_MITER (for mitered joins),
+ART_PATH_STROKE_JOIN_ROUND (for round joins), and
+ART_PATH_STROKE_JOIN_BEVEL (for bevelled joins). The mitered join
+is converted to a bevelled join if the miter would extend to a
+distance of more than <parameter>miter_limit</parameter> * <parameter>line_width</parameter> from the actual
+join point.
+</para>
+<para>
+If there are open subpaths, the ends of these subpaths are capped
+according to the <parameter>cap</parameter> rule. Possible values are
+ART_PATH_STROKE_CAP_BUTT (squared cap, extends exactly to end
+point), ART_PATH_STROKE_CAP_ROUND (rounded half-circle centered at
+the end point), and ART_PATH_STROKE_CAP_SQUARE (squared cap,
+extending half <parameter>line_width</parameter> past the end point).
+</para>
+<para>
+The <parameter>flatness</parameter> parameter controls the accuracy of the rendering. It
+is most important for determining the number of points to use to
+approximate circular arcs for round lines and joins. In general, the
+resulting vector path will be within <parameter>flatness</parameter> pixels of the "ideal"
+path containing actual circular arcs. I reserve the right to use
+the <parameter>flatness</parameter> parameter to convert bevelled joins to miters for very
+small turn angles, as this would reduce the number of points in the
+resulting outline path.
+</para>
+<para>
+The resulting path is "clean" with respect to self-intersections, i.e.
+the winding number is 0 or 1 at each point.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>vpath</parameter>&nbsp;:</entry>
+<entry> <link linkend="ArtVPath">ArtVPath</link> to stroke.
+</entry></row>
+<row><entry align="right"><parameter>join</parameter>&nbsp;:</entry>
+<entry> Join style.
+</entry></row>
+<row><entry align="right"><parameter>cap</parameter>&nbsp;:</entry>
+<entry> Cap style.
+</entry></row>
+<row><entry align="right"><parameter>line_width</parameter>&nbsp;:</entry>
+<entry> Width of stroke.
+</entry></row>
+<row><entry align="right"><parameter>miter_limit</parameter>&nbsp;:</entry>
+<entry> Miter limit.
+</entry></row>
+<row><entry align="right"><parameter>flatness</parameter>&nbsp;:</entry>
+<entry> Flatness.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Resulting stroked outline in svp format.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-vpath-new-circle">art_vpath_new_circle ()</title>
+<programlisting><link linkend="ArtVpath">ArtVpath</link>*   art_vpath_new_circle            (<link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y,
+                                             <link linkend="double">double</link> r);</programlisting>
+<para>
+Creates a new polygon closely approximating a circle with center
+(<parameter>x</parameter>, <parameter>y</parameter>) and radius <parameter>r</parameter>. Currently, the number of points used in the
+approximation is fixed, but that will probably change.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry> X coordinate of center.
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry> Y coordinate of center.
+</entry></row>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry> radius.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The newly created <link linkend="ArtVpath">ArtVpath</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

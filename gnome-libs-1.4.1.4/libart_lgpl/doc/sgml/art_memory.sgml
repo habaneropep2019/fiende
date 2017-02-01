@@ -1,0 +1,119 @@
+<refentry id="libart-Memory-Management">
+<refmeta>
+<refentrytitle>Memory Management</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBART Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Memory Management</refname><refpurpose>Memory Management API for libart users.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+#define     <link linkend="art-alloc">art_alloc</link>
+#define     <link linkend="art-free">art_free</link>
+#define     <link linkend="art-realloc">art_realloc</link>
+#define     <link linkend="art-new">art_new</link>                         (type, n)
+#define     <link linkend="art-renew">art_renew</link>                       (p, type, n)
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+These API functions are a set of wrapper functions around the OS-specific
+memory management functions: they are used to keep the user-level code portable.
+Their definitions are straighforward so we will not get into any details.
+XXX: check for g_new behaviour when memory allocation problem.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="art-alloc">art_alloc</title>
+<programlisting>#define art_alloc malloc
+</programlisting>
+<para>
+Same semantics as those of the standard C <function>malloc</function> function.
+</Para></refsect2>
+<refsect2>
+<title><anchor id="art-free">art_free</title>
+<programlisting>#define art_free free
+</programlisting>
+<para>
+Same semantics as those of the standard C <function>free</function> function.
+</para></refsect2>
+<refsect2>
+<title><anchor id="art-realloc">art_realloc</title>
+<programlisting>#define art_realloc realloc
+</programlisting>
+<para>
+Same semantics as those of the standard C <function>realloc</function> function.
+</para></refsect2>
+<refsect2>
+<title><anchor id="art-new">art_new()</title>
+<programlisting>#define art_new(type, n) ((type *)art_alloc ((n) * sizeof(type)))
+</programlisting>
+<para>
+This macro is not equivalent to the glib <function>g_new</function> function. As
+<function>g_new</function>, it takes two parameters: the type of the object to
+instantiate as first parameter and the number of such objects to instantiate as
+second parameter. It will return a dynamically allocated array of memory you can
+use to store objects in. In case of failure of the memory allocation, it will
+return NULL (this is very diffrent from <function>g_new</function> which does not
+return in case of failure. <function>g_new</function> allways suceeds).
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry>the type of the object to instantiate.
+</entry></row>
+<row><entry align="right"><parameter>n</parameter>&nbsp;:</entry>
+<entry>number of objects to instantiate.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-renew">art_renew()</title>
+<programlisting>#define art_renew(p, type, n) ((type *)art_realloc (p, (n) * sizeof(type)))
+</programlisting>
+<para>
+This macro allows you to reallocate a dynamically allocated array of objects.
+As with <function>realloc</function> and <function>malloc</function>, if <parameter>p</parameter> is NULL, 
+this is equivalent to art_new.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>p</parameter>&nbsp;:</entry>
+<entry>the object array to renew.
+</entry></row>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry>the type of the objects.
+</entry></row>
+<row><entry align="right"><parameter>n</parameter>&nbsp;:</entry>
+<entry>the new number of objects you want in the array.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

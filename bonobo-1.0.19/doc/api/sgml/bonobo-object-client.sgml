@@ -1,0 +1,338 @@
+<refentry id="bonobo-bonobo-object-client">
+<refmeta>
+<refentrytitle>BonoboObjectClient</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboObjectClient</refname><refpurpose>Object activation routines</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboObjectClient">BonoboObjectClient</link>;
+typedef     <link linkend="BonoboObjectClientClass">BonoboObjectClientClass</link>;
+void        (<link linkend="BonoboObjectClientAsyncCallback">*BonoboObjectClientAsyncCallback</link>)
+                                            (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *o,
+                                             const char *error,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+<link linkend="BonoboObjectClient">BonoboObjectClient</link>* <link linkend="bonobo-object-client-from-corba">bonobo_object_client_from_corba</link>
+                                            (<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> o);
+<link linkend="BonoboObjectClient">BonoboObjectClient</link>* <link linkend="bonobo-object-client-construct">bonobo_object_client_construct</link>
+                                            (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object_client,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> corba_object);
+<link linkend="BonoboObjectClient">BonoboObjectClient</link>* <link linkend="bonobo-object-activate">bonobo_object_activate</link>  (const char *iid,
+                                             <link linkend="gint">gint</link> oaf_flags);
+void        <link linkend="bonobo-object-activate-async">bonobo_object_activate_async</link>    (const char *iid,
+                                             <link linkend="gint">gint</link> oaf_flags,
+                                             <link linkend="BonoboObjectClientAsyncCallback">BonoboObjectClientAsyncCallback</link> callback,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-object-client-has-interface">bonobo_object_client_has_interface</link>
+                                            (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object,
+                                             const char *interface_desc,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> <link linkend="bonobo-object-client-query-interface">bonobo_object_client_query_interface</link>
+                                            (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object,
+                                             const char *interface_desc,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+void        <link linkend="bonobo-object-client-ref">bonobo_object_client_ref</link>        (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object_client,
+                                             <link linkend="BonoboObject">BonoboObject</link> *opt_exception_obj);
+void        <link linkend="bonobo-object-client-unref">bonobo_object_client_unref</link>      (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object_client,
+                                             <link linkend="BonoboObject">BonoboObject</link> *opt_exception_obj);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  The <link linkend="BonoboObjectClient">BonoboObjectClient</link> object is used primarly to activate Bonobo
+  components (mainly by using <link linkend="bonobo-object-activate">bonobo_object_activate</link>()).  The CORBA
+  object reference to the Bonobo object is wrapped in a <link linkend="BonoboObject">BonoboObject</link>.
+</para>
+
+<para>
+  The <link linkend="BonoboObjectClient">BonoboObjectClient</link> object is also used to wrap an arbitrary
+  Bonobo::Unknown CORBA object reference into a <link linkend="BonoboObject">BonoboObject</link> (by using
+  <link linkend="bonobo-object-client-from-corba">bonobo_object_client_from_corba</link>()).
+</para>
+
+<para>
+  The main activation entry point is the <link linkend="bonobo-object-activate">bonobo_object_activate</link>()
+  function.  This is a high-level routine that knows how to activate
+  components or activate and restore components.  <link linkend="bonobo-object-activate">bonobo_object_activate</link>()
+  uses the supplied OAFIID to activate the object with OAF (GOAD 
+  activation is no longer supported).  If you want to activate an 
+  object with a moniker, use <link linkend="bonobo-get-object">bonobo_get_object</link>() instead.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboObjectClient">BonoboObjectClient</title>
+<programlisting>typedef struct {
+	BonoboObject parent;
+} BonoboObjectClient;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboObjectClientClass">BonoboObjectClientClass</title>
+<programlisting>typedef struct {
+	BonoboObjectClass parent_class;
+} BonoboObjectClientClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboObjectClientAsyncCallback">BonoboObjectClientAsyncCallback ()</title>
+<programlisting>void        (*BonoboObjectClientAsyncCallback)
+                                            (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *o,
+                                             const char *error,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>o</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>error</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-client-from-corba">bonobo_object_client_from_corba ()</title>
+<programlisting><link linkend="BonoboObjectClient">BonoboObjectClient</link>* bonobo_object_client_from_corba
+                                            (<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> o);</programlisting>
+<para>
+Wraps the <parameter>corba_object</parameter> CORBA object reference in a BonoboObjectClient
+object.  This is typically used if you got a CORBA object yourself and not
+through one of the activation routines and you want to have a BonoboObjectClient
+handle to use in any of the Bonobo routines.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>o</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A wrapped BonoboObjectClient.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-client-construct">bonobo_object_client_construct ()</title>
+<programlisting><link linkend="BonoboObjectClient">BonoboObjectClient</link>* bonobo_object_client_construct
+                                            (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object_client,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> corba_object);</programlisting>
+<para>
+Initializes <parameter>object_client</parameter> with the CORBA object for the
+Bonobo::Unknown interface provided in <parameter>corba_object</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object_client</parameter>&nbsp;:</entry>
+<entry> The BonoboObjectClient object to construct
+</entry></row>
+<row><entry align="right"><parameter>corba_object</parameter>&nbsp;:</entry>
+<entry> The remote CORBA object this object_client refers to
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the initialized BonoboObjectClient object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-activate">bonobo_object_activate ()</title>
+<programlisting><link linkend="BonoboObjectClient">BonoboObjectClient</link>* bonobo_object_activate  (const char *iid,
+                                             <link linkend="gint">gint</link> oaf_flags);</programlisting>
+<para>
+This activates the object from the IID using OAF; you probably
+don't want to do this, you might want to use bonobo_get_object
+which does object activation through the moniker system.
+</para>
+<para>
+You might also consider doing property-based activation using the 
+the OAF-based capabilities.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>iid</parameter>&nbsp;:</entry>
+<entry> an OAFIID
+</entry></row>
+<row><entry align="right"><parameter>oaf_flags</parameter>&nbsp;:</entry>
+<entry> activation flags
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> An activated object client or NULL on failure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-activate-async">bonobo_object_activate_async ()</title>
+<programlisting>void        bonobo_object_activate_async    (const char *iid,
+                                             <link linkend="gint">gint</link> oaf_flags,
+                                             <link linkend="BonoboObjectClientAsyncCallback">BonoboObjectClientAsyncCallback</link> callback,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+This activates the object from the IID using OAF; you probably
+don't want to do this; instead do capability based activation
+using OAF directly.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>iid</parameter>&nbsp;:</entry>
+<entry> an OAFIID
+</entry></row>
+<row><entry align="right"><parameter>oaf_flags</parameter>&nbsp;:</entry>
+<entry> activation flags
+</entry></row>
+<row><entry align="right"><parameter>callback</parameter>&nbsp;:</entry>
+<entry> a callback function
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> user data
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-client-has-interface">bonobo_object_client_has_interface ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_object_client_has_interface
+                                            (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object,
+                                             const char *interface_desc,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+Queries the object to see if it implements the interface
+described by <parameter>interface_desc</parameter>. Basically a thin
+Bonobo_Unknown::query_interface wrapper.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> object to query interface of
+</entry></row>
+<row><entry align="right"><parameter>interface_desc</parameter>&nbsp;:</entry>
+<entry> interface description
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry> optional exception environment, or NULL
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if the interface is available else FALSE.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-client-query-interface">bonobo_object_client_query_interface ()</title>
+<programlisting><link linkend="Bonobo-Unknown">Bonobo_Unknown</link> bonobo_object_client_query_interface
+                                            (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object,
+                                             const char *interface_desc,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+Queries the object to see if it implements the interface
+described by <parameter>interface_desc</parameter>. Basically a thin
+Bonobo_Unknown::query_interface wrapper.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> object to query interface of
+</entry></row>
+<row><entry align="right"><parameter>interface_desc</parameter>&nbsp;:</entry>
+<entry> interface description
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry> optional exception environment, or NULL
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A valid Bonobo_Unknown reference or
+CORBA_OBJECT_NIL if anything untoward happens.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-client-ref">bonobo_object_client_ref ()</title>
+<programlisting>void        bonobo_object_client_ref        (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object_client,
+                                             <link linkend="BonoboObject">BonoboObject</link> *opt_exception_obj);</programlisting>
+<para>
+Increments the Bonobo ref count on the remote object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object_client</parameter>&nbsp;:</entry>
+<entry> the object client
+</entry></row>
+<row><entry align="right"><parameter>opt_exception_obj</parameter>&nbsp;:</entry>
+<entry> optional CORBA exception environment
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-object-client-unref">bonobo_object_client_unref ()</title>
+<programlisting>void        bonobo_object_client_unref      (<link linkend="BonoboObjectClient">BonoboObjectClient</link> *object_client,
+                                             <link linkend="BonoboObject">BonoboObject</link> *opt_exception_obj);</programlisting>
+<para>
+Decrements the Bonobo ref count on the remote object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object_client</parameter>&nbsp;:</entry>
+<entry> the object client
+</entry></row>
+<row><entry align="right"><parameter>opt_exception_obj</parameter>&nbsp;:</entry>
+<entry> optional CORBA exception environment
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="BonoboMoniker">BonoboMoniker</link> <link linkend="BonoboObject">BonoboObject</link>
+</para>
+</refsect1>
+
+</refentry>

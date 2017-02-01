@@ -1,0 +1,793 @@
+/* $Id: menushell.gen_h,v 1.82 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* menushell.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gdk/gdkkeysyms.h>
+#include <gtk/gtkmenushell.h>
+#include <gtk--/container.h>
+#include <gtk--/menuitem.h>
+#include <gtk--/radiomenuitem.h>
+#include <gtk--/checkmenuitem.h>
+#include <gtk--/tearoffmenuitem.h>
+
+CLASS_START(Gtk);
+
+class Menu;
+class MenuShell;
+class Window;
+
+namespace Menu_Helpers
+{
+/*********************************************************************
+***** Accelerator Key
+*********************************************************************/
+  static const guint SHIFT  = 1<<15;
+  static const guint LOCK   = 1<<16;
+  static const guint CTL    = 1<<17;
+  static const guint MOD1   = 1<<18;
+  static const guint MOD2   = 1<<19;
+  static const guint MOD3   = 1<<20;
+  static const guint MOD4   = 1<<21;
+  static const guint MOD5   = 1<<22;
+  static const guint RELEASE= 1<<28;
+  static const guint ALT    = 1<<18;
+
+  static const guint KEY_MASK = 0xFFFF;
+  static const guint MOD_MASK = 0xFF0000;
+
+  struct AccelKey
+    {
+      guint key_;
+
+      guint key() { return key_&KEY_MASK; }
+      guint mod() { return (key_&MOD_MASK) >> 15; }
+      string abrev();
+
+      AccelKey(): key_(GDK_VoidSymbol) {}
+      AccelKey(guint s): key_(s) {}
+      AccelKey(const string &s);
+      AccelKey(const char* s);
+
+      private:
+        void parse(string s);
+    };
+
+
+/*********************************************************************
+***** Menu Properties
+*********************************************************************/
+
+  // input class (MenuItem-Factory)
+  class Element
+  {
+  protected:
+    MenuItem *child_;
+
+  public:
+    Element(MenuItem* child)
+      : child_(child)
+    {}
+    Element(MenuItem& child)
+      : child_(&child)
+    {}
+
+    virtual ~Element();
+
+    friend class MenuList;
+    
+
+  protected:
+    // connects a callback to the activate signal
+    void set_callback(SigC::Slot0<void> callback,
+                      const string &accel_signal);
+
+    // creates a label and sets up for navigation and accelerator
+    void set_navigation(const string& str,
+                        const AccelKey& accel_key=AccelKey());
+
+    virtual void create_child_menu_item();
+
+    MenuItem *get_child() const { return child_; }
+
+    virtual void init(const string &label,
+                      SigC::Slot0<void> callback,
+                      const string &accel_signal,
+                      const AccelKey &key = AccelKey());
+
+    virtual void init(const string &label,
+                      Gtk::Menu& submenu,
+                      const AccelKey &key = AccelKey());
+  };
+
+  class MenuElem : public Element
+  {
+  public:
+    MenuElem(MenuItem& child)
+      : Element(&child)
+    {}
+
+    //: create a labeled, non-accelerated menuitem with a callback
+    MenuElem(const string &label, SigC::Slot0<void> callback = 0,
+             const string &accel_signal = "activate") ;
+
+    //: create a labeled, accelerated menuitem with a callback
+    MenuElem(const string &label, const AccelKey &key, 
+             SigC::Slot0<void> callback = 0,
+             const string &accel_signal = "activate");
+
+    //: create a labeled, non-accelerated menuitem with a submenu
+    MenuElem(const string &label, Gtk::Menu& submenu);
+
+    //: create a labeled, accelerated menuitem with a submenu
+    MenuElem(const string &label, const AccelKey &key, Gtk::Menu& submenu);
+
+  };
+
+  class SeparatorElem : public Element
+  {
+  public:
+    SeparatorElem(void);
+  };
+
+  class CheckMenuElem : public Element
+  {
+  public:
+    CheckMenuElem(CheckMenuItem& child)
+      : Element(&child)
+    {}
+
+    //: create a labeled, non-accelerated menuitem with a callback
+    CheckMenuElem(const string &label, SigC::Slot0<void> callback = 0,
+                  const string &accel_signal = "toggled") ;
+
+    //: create a labeled, accelerated checkmenuitem with a callback
+    CheckMenuElem(const string &label, const AccelKey &key,
+                  SigC::Slot0<void> callback = 0,
+                  const string &accel_signal = "toggled");
+
+  protected:
+    virtual void create_child_menu_item();
+  };
+
+
+  class RadioMenuElem : public Element
+  {
+  public:
+    RadioMenuElem(RadioMenuItem& child)
+      : Element(&child), gr_(0)
+    {}
+
+    //: create a labeled, non-accelerated menuitem with a callback
+    RadioMenuElem(RadioMenuItem::Group&, const string &label, 
+                  SigC::Slot0<void> callback = 0,
+                  const string &accel_signal = "toggled");
+
+    //: create a labeled, accelerated checkmenuitem with a callback
+    RadioMenuElem(RadioMenuItem::Group&, const string &label, 
+                  const AccelKey &key,
+                  SigC::Slot0<void> callback = 0,
+                  const string &accel_signal = "toggled");
+
+  protected:
+    virtual void create_child_menu_item();
+    RadioMenuItem::Group *gr_;
+  };
+
+  class TearoffMenuElem : public Element
+  {
+  public:
+    TearoffMenuElem(TearoffMenuItem& child)
+      : Element(&child)
+    {}
+
+    //: create a non-accelerated tearoffmenuitem with a callback
+    TearoffMenuElem(SigC::Slot0<void> callback = 0,
+                    const string &accel_signal = "activate") ;
+
+    //: create accelerated tearoffmenuitem with a callback
+    TearoffMenuElem(const AccelKey &key, 
+                    SigC::Slot0<void> callback = 0,
+                    const string &accel_signal = "activate");
+
+  protected:
+    virtual void create_child_menu_item();
+    virtual void init(SigC::Slot0<void> callback,
+                      const string &accel_signal,
+                      const AccelKey &accel_key = AccelKey());
+  };
+    
+
+/*********************************************************************
+***** List properties
+*********************************************************************/
+
+#m4 include(list.m4)
+  GP_LIST(MenuList,MenuShell,MenuItem)
+  GP_LIST_HELPER(Menu)
+  GP_LIST_ITER(G_List_Cpp_Iterator<GtkMenuItem,MenuItem>)
+  GP_LIST_CONTAINER_REMOVE()
+  GP_LIST_VECTOR()
+  GP_LIST_END()
+
+};
+
+//: A base class for menu objects.
+//- A {\class Gtk::MenuShell} is the abstract base class used to derive the
+//- {\class Gtk::Menu} and {\class Gtk::MenuBar} subclasses.
+//-
+//- A {\class Gtk::MenuShell} is a container of {\class Gtk::MenuItem}
+//- objects arranged in a list which can be navigated, selected, and
+//- activated by the user to perform application functions. A
+//- {\class Gtk::MenuItem} can have a submenu associated with it, allowing
+//- for nested hierarchical menus.
+class MenuShell : public Container 
+{
+  WRAP_CLASS(MenuShell,GtkMenuShell,GTK_MENU_SHELL,GTK_IS_MENU_SHELL,menu_shell,
+             Gtk::Container,GtkContainer,GTK_CONTAINER);
+
+public:
+
+  typedef Menu_Helpers::AccelKey AccelKey;
+  typedef Menu_Helpers::MenuList MenuList;
+  friend class Menu_Helpers::MenuList;
+
+  //: (deprecated) append a MenuItem
+  WRAP_METHOD(void gtk_menu_shell_append(GtkMenuShell*,GtkWidget*),
+        void append (Gtk::MenuItem& menu_item));
+
+  //: (deprecated) prepend a MenuItem
+  WRAP_METHOD(void gtk_menu_shell_prepend(GtkMenuShell*,GtkWidget*),
+        void prepend (Gtk::MenuItem& menu_item));
+
+  //: (deprecated) insert a MenuItem
+  WRAP_METHOD(void gtk_menu_shell_insert(GtkMenuShell*,GtkWidget*,gint),
+        void insert (Gtk::MenuItem& menu_item, gint position));
+
+  //: Selects the menu item from the menu shell.
+  //- menu_item: The {\class Gtk::MenuItem} to select.
+  WRAP_METHOD(void gtk_menu_shell_select_item(GtkMenuShell*, GtkWidget*),
+        void select_item(Gtk::MenuItem& menu_item));
+
+  WRAP_METHOD(void gtk_menu_shell_deselect(GtkMenuShell*),
+        void deselect());
+
+  //: Activates the menu item within the menu shell.
+  //- menu_item: The GtkMenuItem to activate.
+  //-
+  //- force_deactivate: If TRUE, force the deactivation of the menu shell after the menu item is activated.
+  WRAP_METHOD(void gtk_menu_shell_activate_item(GtkMenuShell*, GtkWidget*, bool),
+        void activate_item(Gtk::MenuItem& menu_item, bool force_deactivate));
+
+  //: This signal is emitted when a menu shell is deactivated.
+  SIGNAL_SPEC("deactivate",both,void deactivate(),gtk_menu_shell_deactivate);
+  //: This signal is emitted when a selection has been completed within a menu shell.
+  SIGNAL_SPEC("selection_done",both,void selection_done());
+  //: An action signal which moves the current menu item in the direction specified by direction.
+  SIGNAL_SPEC("move_current",both,void move_current(GtkMenuDirectionType));
+  //: An action signal that activates the current menu item within the menu shell.
+  SIGNAL_SPEC("activate_current",both,void activate_current(gboolean));
+  //: An action signal which cancels the selection within the menu shell.
+  //: Causes the {GtkMenuShell::selection-done} signal to be emitted.
+  SIGNAL_SPEC("cancel",both,void cancel());
+
+  MenuList& items() 
+    {return reinterpret_cast<MenuList&>(menu_shell_self); }
+  const MenuList& items() const 
+    {return reinterpret_cast<const MenuList&>(menu_shell_self); }
+
+  //: assign the menu to a window
+  //- Use this function to assign a popup menu to act as keyboard
+  //- accelerators for a window.  A popup menu is one which acts
+  //- without a parent.
+  //-
+  //- This function has no gtk+ equivelent.  In gtk+, you create
+  //- an accelerator group and then create items with the group
+  //- then later assign the group to the window.  To automate this
+  //- and save passing arround the group, assignment of accelerators
+  //- is held off until you assign the menu to its window.
+  //-
+  //- It is not necessary to call this on menubars as they perform this
+  //- automatically.  
+  void accelerate(Gtk::Window&);
+
+  // returns 0 is widget is not yet realized or accelerated
+  Gtk::AccelGroup* get_accel_group() const {return nav_group_;}
+
+protected:
+
+  MenuShell(void);
+
+protected:
+  virtual void realize_impl();
+  virtual gint event_impl(GdkEvent*);
+
+  AccelGroup* nav_group_;
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+#include <gtk--/menu.h>
+#include <gtk--/menubar.h>
+#include <gtk--/label.h>
+#include <gtk--/window.h>
+#include <gtk--/accelgroup.h>
+
+#include <iostream>
+
+IMPL_START;
+
+#include <strings.h>
+
+namespace Gtk
+{
+
+MenuShell::MenuShell(void)
+ : Container((GtkContainer*)(gtk_object_new(get_type(),0))),
+   nav_group_(0)
+{ 
+  initialize_class();
+}
+
+MenuShell::MenuShell(GtkMenuShell* castitem)
+: Container(GTK_CONTAINER(castitem)),
+  nav_group_(0)
+{
+  initialize_class();
+}
+
+MenuShell::~MenuShell()
+{
+  if (nav_group_) nav_group_->unref();
+}
+
+
+void 
+MenuShell::realize_impl()
+{
+  Widget::realize_impl();
+  if (get_toplevel()->is_toplevel())
+    accelerate(*get_toplevel());
+}
+
+gint 
+MenuShell::event_impl(GdkEvent* event)
+{
+  if (nav_group_ && event->type==GDK_KEY_PRESS)
+    {
+      GdkEventKey* key_event=(GdkEventKey*)event;
+      if (nav_group_->activate(key_event->keyval,GdkModifierType(key_event->state)))
+        return TRUE;
+    }
+  return Widget::event_impl(event);
+}
+
+void 
+MenuShell::accelerate(Gtk::Window& window)
+{
+  Window* parent=get_toplevel();
+  AccelGroup* window_group=window.get_accel_group();
+
+  if (!nav_group_) 
+    {
+      nav_group_=AccelGroup::create();
+      nav_group_->ref();
+    }
+
+  MenuList::iterator i;
+  Menu* menu=0;
+  set_data("gtkmm-accel-window",&window);
+
+  for (i=items().begin();i!=items().end();++i)
+    (*i)->accelerate();
+
+}
+
+/*********************************************************************
+***** List properties
+*********************************************************************/
+typedef G_List_Cpp_Iterator<GtkMenuItem,MenuItem> menu_iterator;
+
+menu_iterator Menu_Helpers::MenuList::insert(menu_iterator position, const Element& e)
+  {
+    int pos;
+    Gtk::MenuItem* item=e.get_child();
+    if (!item) return position;
+
+    // locate the items desired position
+    if (!parent_) return iterator();
+    if (!position.node)
+      pos = -1;
+    else
+      pos = g_list_position(glist(),position.node);
+
+    gtk_menu_shell_insert(GTK_MENU_SHELL(parent_->gtkobj()),
+                          GTK_WIDGET(item->gtkobj()), pos);
+
+    // bad hack
+    if (parent_->nav_group_)
+      item->accelerate();
+
+    // return the right iterator
+    if (pos==0)
+      return begin();
+    if (!position.node)
+      return --end();
+    return --position;
+  }
+
+/*********************************************************************
+***** Elements
+*********************************************************************/
+namespace Menu_Helpers {
+
+Element::~Element()
+{}
+  
+
+void
+Element::set_callback(SigC::Slot0<void> callback,const string &accel_signal)
+  {
+    g_return_if_fail (child_!=0);
+    if (callback)
+      {
+        if(accel_signal == "activate")
+          child_->activate.connect(callback);
+        else if (accel_signal == "toggled")
+          {
+            g_return_if_fail (CheckMenuItem::isA(child_));
+            static_cast<CheckMenuItem*>(child_)->toggled.connect(callback);
+          }
+        else
+          g_warning("Menu_Helpers::MenuElem: Connecting to signal \"%s\" "
+                    "not yet implemented\n", accel_signal.c_str());
+      }
+  }
+
+void
+Element::set_navigation(const string& str,const AccelKey& accel_key) 
+{
+  g_return_if_fail (child_!=0);
+  Label *label=manage(new Label(str, 0.0, 0.5));
+  label->show();
+  child_->add(*label);
+  child_->accel_key=accel_key.key_;
+  child_->nav_key=label->parse_uline(str);
+}
+
+void
+Element::create_child_menu_item()
+{
+  child_=manage(new MenuItem());
+}
+
+void
+Element::init(const string &label,
+               SigC::Slot0<void> callback,
+               const string &accel_signal,
+               const AccelKey &key)
+{
+  create_child_menu_item();
+  set_navigation(label, key);
+  set_callback(callback,accel_signal);
+  child_->show();
+}
+  
+void
+Element::init(const string &label, Gtk::Menu& submenu, const AccelKey &key)
+{
+  create_child_menu_item();
+  set_navigation(label, key);
+  child_->set_submenu(submenu);
+  child_->show();
+}
+
+MenuElem::MenuElem(const string &label, SigC::Slot0<void> callback,
+    const string &accel_signal) 
+  : Element(0)
+{
+  init(label, callback, accel_signal);
+}
+
+MenuElem::MenuElem(const string &label, const AccelKey& accel_key, 
+        SigC::Slot0<void> callback,
+        const string &accel_signal) 
+   : Element(0)
+{
+  init(label, callback, accel_signal, accel_key);
+} 
+
+MenuElem::MenuElem(const string &label, Menu& submenu)
+  : Element(0)
+{
+  init(label, submenu);
+}
+
+MenuElem::MenuElem(const string &label, const AccelKey& accel_key,
+                   Menu& submenu)
+   : Element(0)
+{
+  init(label, submenu, accel_key);
+}
+
+SeparatorElem::SeparatorElem(void)
+  : Element(0)
+{
+  create_child_menu_item();
+  child_->show(); 
+}
+
+CheckMenuElem::CheckMenuElem(const string &label, SigC::Slot0<void> callback,
+                             const string &accel_signal) 
+  : Element(0)
+{
+  init(label, callback, accel_signal);
+}
+
+CheckMenuElem::CheckMenuElem(const string &label, const AccelKey& accel_key,
+                             SigC::Slot0<void> callback,
+                             const string &accel_signal)
+  : Element(0)
+{
+  init(label, callback, accel_signal, accel_key);
+} 
+
+void
+CheckMenuElem::create_child_menu_item()
+{
+  child_=manage(new CheckMenuItem());
+}
+
+
+
+RadioMenuElem::RadioMenuElem(RadioMenuItem::Group& gr, 
+                             const string &label, 
+                             SigC::Slot0<void> callback,
+                             const string &accel_signal) 
+  : Element(0),
+    gr_(&gr)
+{
+  init(label, callback, accel_signal);
+}
+
+RadioMenuElem::RadioMenuElem(RadioMenuItem::Group& gr, 
+                             const string &label, 
+                             const AccelKey &accel_key,
+                             SigC::Slot0<void> callback,
+                             const string &accel_signal)
+  : Element(0),
+    gr_(&gr)
+{
+  init(label, callback, accel_signal, accel_key);
+} 
+
+void
+RadioMenuElem::create_child_menu_item()
+{
+  child_=manage(new RadioMenuItem(*gr_));
+}
+
+TearoffMenuElem::TearoffMenuElem(SigC::Slot0<void> callback,
+                                 const string &accel_signal) 
+  : Element(0)
+{
+  init(callback,accel_signal);
+}
+
+TearoffMenuElem::TearoffMenuElem(const AccelKey &accel_key,
+                                 SigC::Slot0<void> callback,
+                                 const string &accel_signal) 
+  : Element(0)
+{
+  init(callback,accel_signal,accel_key);
+}
+
+void
+TearoffMenuElem::create_child_menu_item()
+{
+  child_ = manage(new TearoffMenuItem());
+}
+
+void
+TearoffMenuElem::init(SigC::Slot0<void> callback,
+                      const string &accel_signal,
+                      const AccelKey &accel_key)
+{
+  create_child_menu_item();
+  child_->accel_key = accel_key.key_; 
+  child_->nav_key   = accel_key.key_&KEY_MASK;
+  set_callback(callback,accel_signal);
+  child_->show();
+}
+
+/**************************************************************************/
+
+struct AccelKeyMod
+{
+  const char * name;
+  guint mod;
+};
+
+static AccelKeyMod modifiers[]= 
+{
+  { "<release>", Menu_Helpers::RELEASE },
+  { "<shift>", Menu_Helpers::SHIFT },
+  { "<control>", Menu_Helpers::CTL },
+  { "<ctl>",  Menu_Helpers::CTL },
+  { "<alt>",  Menu_Helpers::ALT },
+  { "<mod1>", Menu_Helpers::MOD1 },
+  { "<mod2>", Menu_Helpers::MOD2 },
+  { "<mod3>", Menu_Helpers::MOD3 },
+  { "<mod4>", Menu_Helpers::MOD4 },
+  { "<mod5>", Menu_Helpers::MOD5 },
+  { 0 , 0}
+};
+
+AccelKey::AccelKey(const string &str)
+{
+  parse(str);
+}
+
+AccelKey::AccelKey(const char *str)
+{
+  key_=0;
+  if (str) parse(str);
+}
+
+string AccelKey::abrev()
+{
+  if (key()==GDK_VoidSymbol) return "";
+  string out;
+  // Note: Shift is a special case, as mask is 1<<15, but there
+  //       are also (unshifted) keysyms where bit 15 is set.
+  char *sym=gdk_keyval_name(key());
+  
+  if (key_&SHIFT) {
+    guint gdkKey=key();
+
+    if(!sym) 
+      sym=gdk_keyval_name(gdkKey&~SHIFT);
+    if(sym)
+      gdkKey=gdk_keyval_from_name(sym);
+
+    if((gdkKey|SHIFT)!=gdkKey) {
+      out+="Shft+";
+    }
+  }
+
+  if (key_&CTL)   out+="Ctl+";
+  if (key_&ALT)   out+="Alt+";
+  if (key_&MOD2) out+="M2-";
+  if (key_&MOD3) out+="M3-";
+  if (key_&MOD4) out+="M4-";
+  if (key_&MOD5) out+="M5-";
+
+  if (sym) out+=string(sym);
+  return out;
+}
+
+void AccelKey::parse(string str)
+{
+  key_=0;
+  string::size_type start, stop;
+  string::size_type npos = string::npos;
+  bool found;
+
+  while ((start=str.find('<')) != npos &&
+         (stop=str.find('>',start)) != npos)
+    {
+      string part(str.substr (start,stop-start+1));
+      // do not remove the space between 'substr' and '(' - it prevents
+      // m4 macro invocation
+      str.erase(start,stop-start+1);
+      found=false;
+      for (AccelKeyMod *i=modifiers;i->name!=0;i++)
+#ifdef GTKMM_MSC
+        if (!stricmp(part.c_str(),i->name))
+#else
+          if (!strcasecmp(part.c_str(),i->name))
+#endif
+            { 
+              key_|=i->mod; 
+              found=true; 
+              break; 
+            }
+      if (!found) 
+        g_warning("unable to parse accelerator string (%s)\n",part.c_str());
+    }
+
+  //    if (str.length()!=1)
+  //      g_warning("unable to parse accelerator string (%s)\n",str.c_str());
+
+  key_|=gdk_keyval_from_name(str.c_str());
+}
+
+} // namespace Menu_Helpers
+
+} // namespace Gtk
+
+DOCUMENTATION_START;
+//+ PROPERTIES(Gtk_MenuShell)
+//. name: children
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: active_menu_item
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: parent_menu_shell
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: active
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: have_grab
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: have_xgrab
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: button
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: ignore_leave
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: menu_flag
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: ignore_enter
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: activate_time
+//. type: guint32
+//. get:
+//. set:
+//. desc:
+

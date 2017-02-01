@@ -1,0 +1,21 @@
+if MAINTAINER_MODE
+png_files := $(shell cd $(srcdir); echo *.png)
+
+# depends on $(theme_pngs) to handle deleted files
+Makefile.am: Makefile.am.in $(png_files) $(theme_pngs)
+	cd $(srcdir); \
+	cp Makefile.am.in makam-temp; \
+	echo 'theme_pngs = $(png_files)' >> makam-temp; \
+	mv makam-temp Makefile.am
+
+# handle deleted files, by forcing a rebuild
+$(theme_pngs): 
+
+endif
+
+EXTRA_DIST = $(theme_DATA) Makefile.am.in
+
+themedir = $(datadir)/themes/Pixmap/gtk
+
+theme_DATA = gtkrc $(theme_pngs)
+

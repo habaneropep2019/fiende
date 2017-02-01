@@ -1,0 +1,228 @@
+/* $Id: druid.gen_h,v 1.5 2001/04/28 15:10:32 murrayc Exp $ */
+
+
+/* druid.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gnome--/druid-page.h>
+#include <libgnomeui/gnome-druid.h>
+
+CLASS_START(Gnome);
+
+namespace Druid_Helpers {
+
+class PageList
+  {
+    public:
+      typedef DruidPage*                value_type;
+      typedef value_type &         reference;
+      typedef const value_type &   const_reference;
+
+      typedef G_List_Iterator<value_type>        iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t               difference_type;
+      typedef size_t               size_type;
+
+    private:
+      GnomeDruid *parent_;
+
+      GList*& glist() const;      // front of list
+
+      iterator begin_() const;
+      iterator end_() const;
+   
+    public: 
+      inline iterator begin()
+        {return begin_();}
+      inline iterator end()
+        {return end_();}
+
+      inline const_iterator begin() const
+        { return const_iterator(begin_()); }
+      inline const_iterator end() const
+        { return const_iterator(end_()); }
+
+      inline reverse_iterator rbegin()
+        { return reverse_iterator(end_()); }
+      inline reverse_iterator rend()
+        { return reverse_iterator(begin_()); }
+
+      inline const_reverse_iterator rbegin() const
+        { return const_reverse_iterator(reverse_iterator(end_())); }
+      inline const_reverse_iterator rend() const
+        { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      size_type size(void) const;
+      inline size_type max_size(void) { return size_type(-1); }
+      inline bool empty(void) { return glist() == 0; }
+
+      iterator insert(iterator loc,DruidPage &e);
+      void push_front(DruidPage& e);
+      void push_back(DruidPage& e);
+ 
+      inline void pop_front()   { erase(begin()); }
+      inline void pop_back()    { erase(--end()); }
+
+      void clear();
+
+      iterator erase(iterator);
+      void erase(iterator start, iterator stop);
+      void remove(const_reference);
+      void remove(DruidPage& w);
+
+      value_type operator[](size_type l) const;
+  };
+
+} /* namespace Druid_Helpers */
+
+class Druid : public Gtk::Container
+{
+  WRAP_CLASS(Druid, GnomeDruid,
+             GNOME_DRUID, GNOME_IS_DRUID,
+             druid,
+             Gtk::Container, GtkContainer, GTK_CONTAINER);
+public:
+  typedef Druid_Helpers::PageList PageList;
+  typedef DruidPage Page;
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(void gnome_druid_set_buttons_sensitive (GnomeDruid*, gboolean , gboolean , gboolean),
+	      void set_buttons_sensitive (bool back_sensitive,
+					  bool next_sensitive,
+					  bool cancel_sensitive));
+
+  WRAP_METHOD(void gnome_druid_set_show_finish (GnomeDruid*, gboolean),
+	      void set_show_finish (bool show_finish));
+
+  //: (deprecated)
+  WRAP_METHOD(void gnome_druid_prepend_page (GnomeDruid*, GnomeDruidPage*),
+	      void prepend_page (const Gnome::DruidPage &page));
+
+  //: (deprecated)
+  WRAP_METHOD(void gnome_druid_insert_page (GnomeDruid*, GnomeDruidPage*, GnomeDruidPage*),
+	      void insert_page (const Gnome::DruidPage &back_page, const Gnome::DruidPage &page));
+
+  //: (deprecated)
+  WRAP_METHOD(void gnome_druid_append_page (GnomeDruid*, GnomeDruidPage*),
+	      void append_page (const Gnome::DruidPage &page));
+
+  WRAP_METHOD(void gnome_druid_set_page (GnomeDruid*, GnomeDruidPage*),
+	      void set_page (const Gnome::DruidPage &page));
+
+  SIGNAL_SPEC("cancel", both, void cancel());
+
+  Page* get_current() const;
+
+  PageList& pages() 
+    {return reinterpret_cast<PageList&>(gtkobject); }
+  const PageList& pages() const 
+    {return reinterpret_cast<const PageList&>(gtkobject); }
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+#include <gnome--/private/druid_p.h>
+
+namespace Gnome {
+
+DruidPage* Druid::get_current() const
+  {
+    return Gtk::wrap(gtkobj()->current);
+  }
+
+namespace Druid_Helpers {
+
+GList*& PageList::glist() const
+{ return parent_->children; }
+
+
+PageList::iterator PageList::insert(iterator i,DruidPage& e)
+  {
+    if (i!=end())
+      {
+        gnome_druid_insert_page(parent_,(*i)->gtkobj(),e.gtkobj());
+        return ++i;
+      }
+    push_back(e);
+    return --end();
+  }
+
+void PageList::push_front(DruidPage& e)
+  {
+    gnome_druid_prepend_page(parent_,e.gtkobj());
+  }
+
+void PageList::push_back(DruidPage& e)
+  {
+    gnome_druid_append_page(parent_,e.gtkobj());
+  }
+
+void PageList::remove(DruidPage &w)
+  {
+    gtk_container_remove((GtkContainer*)parent_,(GtkWidget*)(w.gtkobj()));
+  }
+
+PageList::iterator PageList::erase(iterator position)
+  {
+    if (!position.node||position==end()) return end();
+    iterator next=position;
+    next++;
+
+    gtk_container_remove((GtkContainer*)parent_,
+        (GtkWidget*)((*position)->gtkobj()));
+    return next;
+  }
+
+void PageList::erase(iterator start, iterator stop)
+  { while(start != stop) start=erase(start); }
+
+void PageList::clear()
+  { erase(begin(),end()); }
+
+PageList::value_type PageList::operator[](size_type l) const
+  { 
+    size_type j; iterator i; 
+    for (i=begin(),j=0;i!=end(),j<l;++i,++j);
+    return (*i);
+  }
+
+PageList::iterator PageList::begin_() const
+{return iterator(glist(),glist());}
+
+PageList::iterator PageList::end_() const
+{return iterator(glist(),(GList*)0);}
+
+PageList::size_type PageList::size() const
+  { return g_list_length(glist()); }
+
+
+} /* namespace Druid_Helpers */
+} /* namespace Gnome */
+
+DOCUMENTATION_START;
+

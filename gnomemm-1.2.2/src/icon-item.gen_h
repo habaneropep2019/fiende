@@ -1,0 +1,112 @@
+/* $Id: icon-item.gen_h,v 1.7 2001/02/08 18:51:34 murrayc Exp $ */
+
+
+/* icon-item.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/canvas-item.h>
+#include <libgnomeui/gnome-icon-item.h>
+
+CLASS_START(Gnome);
+
+//: IconTextItem is a CanvasItem.
+
+class IconTextItem : public CanvasItem
+{
+  WRAP_CLASS(IconTextItem, GnomeIconTextItem,
+             GNOME_ICON_TEXT_ITEM, GNOME_IS_ICON_TEXT_ITEM,
+             icon_text_item,
+             CanvasItem, GnomeCanvasItem, GNOME_CANVAS_ITEM);
+public:
+  IconTextItem(const CanvasGroup &parent, 
+		     const gchar *first_arg_name, ...);
+
+  IconTextItem(const CanvasGroup &parent);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  void configure(int x, int y, int width,
+			      const Gtk::string &fontname,
+			      const Gtk::string &text,
+			      bool is_editable = true);
+
+  WRAP_METHOD(void gnome_icon_text_item_setxy (GnomeIconTextItem*, int , int),
+	      void setxy (int x, int y));
+
+  WRAP_METHOD(void gnome_icon_text_item_select (GnomeIconTextItem*, int),
+	      void select (int sel));
+
+  WRAP_METHOD(gchar* gnome_icon_text_item_get_text(GnomeIconTextItem*),
+	      Gtk::string get_text());
+
+  WRAP_METHOD(void gnome_icon_text_item_start_editing (GnomeIconTextItem*),
+	      void start_editing ());
+
+  WRAP_METHOD(void gnome_icon_text_item_stop_editing (GnomeIconTextItem*, gboolean),
+	      void stop_editing (bool accept));
+
+  SIGNAL_SPEC("text_changed",      both, int text_changed());
+  SIGNAL_SPEC("height_changed",    both, void height_changed());
+  SIGNAL_SPEC("width_changed",     both, void width_changed());
+  SIGNAL_SPEC("editing_started",   both, void editing_started());
+  SIGNAL_SPEC("editing_stopped",   both, void editing_stopped());
+  SIGNAL_SPEC("selection_started", both, void selection_started());
+  SIGNAL_SPEC("selection_stopped", both, void selection_stopped());
+
+};
+
+
+
+PRIVATE_START;
+#include <gnome--/private/canvas-item_p.h>
+IMPL_START;
+#include <gnome--/private/icon-item_p.h>
+
+Gnome::IconTextItem::IconTextItem(const CanvasGroup &parentx,
+				       const gchar *first_arg_name,
+				       ...)
+  : CanvasItem(GNOME_CANVAS_ITEM(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  va_list ap;
+
+  va_start(ap,first_arg_name);
+  item_construct(parentx, first_arg_name, ap);
+  va_end(ap);
+}
+
+Gnome::IconTextItem::IconTextItem(const CanvasGroup &parentx)
+  : CanvasItem(GNOME_CANVAS_ITEM(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  item_construct(parentx);
+}
+
+void Gnome::IconTextItem::configure(int x, int y, int width,
+			      const Gtk::string &fontname,
+			      const Gtk::string &text,
+			      bool is_editable = true)
+{
+  gnome_icon_text_item_configure(gtkobj(), x, y, width,
+                                 fontname.c_str(), text.c_str(),
+                                 is_editable, false /* is_static */ );
+}
+
+DOCUMENTATION_START;
+

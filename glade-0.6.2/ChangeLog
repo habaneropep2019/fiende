@@ -1,0 +1,2648 @@
+2001-03-28  Damon Chaplin  <damon@ximian.com>
+
+	* Released Glade 0.6.2 (for Gnome 1.4)
+
+2001-03-25  Dan Mueth  <dan@eazel.com>
+
+        Setting up OMF metadata and integration with scrollkeeper
+
+	* Makefile.am:
+	* configure.in:
+	* doc/C/Makefile.am:
+	* doc/C/faq-C.omf:
+	* doc/C/turbo-start-C.omf:
+	* doc/C/user-guide-C.omf:
+	* glade.spec.in:
+	* omf-install/Makefile.am:
+
+2001-03-25  Dan Mueth  <dan@eazel.com>
+
+        Fixing some of the markup to be gnome-db2html2 compliant. It
+        doesn't spew errors now, but still TOC extraction is broken.
+
+	* doc/C/user-guide.sgml:
+
+2001-03-21  Dan Mueth  <dan@eazel.com>
+
+	Fixed FAQ so it renders with gnome-db2html2 properly.
+
+	* doc/C/faq.sgml:
+
+2001-03-12  Damon Chaplin  <damon@ximian.com>
+
+	* Released Glade 0.6.1 (for Gnome 1.4 RC1)
+
+2001-03-12  Damon Chaplin  <damon@ximian.com>
+
+	* doc/C/turbo-start.sgml: 
+	* doc/C/user-guide.sgml: changed my email address to damon@ximian.com
+
+2001-02-23  Carlos Perelló Marín <carlos@gnome-db.org>
+
+	* Makefile.am: Updated to really use xml-i18n-tools
+	* glade.desktop: Removed, now is automaticly generated.
+
+2001-02-22    <damon@ximian.com>
+
+	* INSTALL_FROM_CVS: added xml-i18n-tools to requirements.
+
+2001-02-22  Damon Chaplin  <damon@ximian.com> applied patch from
+	Carlos Perelló Marín <carlos@gnome-db.org>
+
+	* glade/gnome-db/gnomedbiconlist.c: Added
+	* glade/gnome-db/gnomedbdsnconfig.c: Added
+	* glade/gnome-db/gnomedbdataset.c: Added
+	* glade/gnome-db/gnomedbbrowser.c: Updated to the new Gnome-DB version
+	  (a Pau <linuxnow@terra.es>'s patch modification)
+	* Makefile.am, configure.in, glade.desktop.in: Adapted to use the
+	  xml-i18n-tools
+
+2001-02-16  Damon Chaplin  <damon@ximian.com>
+
+	* glade/utils.c (glade_util_close_window): check the window exists.
+
+2001-02-16  Christopher R. Gabriel  <cgabriel@softwarelibero.org>
+
+	* configure.in (AC_OUTPUT): added italian translation of the Glade
+	FAQ.
+	
+2001-02-15  Damon Chaplin  <damon@ximian.com>
+
+	* Released Glade 0.6.0 (for Gnome 1.4 beta 1)
+
+2001-02-15  Damon Chaplin  <damon@ximian.com>
+
+	* FAQ: added a few more questions & answers.
+
+	* doc/C/faq.sgml: updated.
+
+	* glade/glade_project_window.c (glade_project_window_about): added
+	Martijn to the authors list, and added a link to Glade's home page.
+
+	* glade/utils.c: added functions to set and reset the TZ environment
+	variable.
+
+	* glade/glade_clipboard.c (glade_clipboard_paste): 
+	* glade/load.c (load_project_file): used the above functions for
+	setting TZ, and tidied up a little.
+
+	* glade/utils.c (glade_util_ensure_directory_exists): check that
+	it has a parent directory before trying to create it.
+
+	* glade/utils.c (glade_util_parent_directory): handle case where the
+	parent directory is the root directory.
+
+	* glade/property.c (property_create): changed "Basic" property page
+	to "Common", since these are properties common to all widgets.
+
+	* glade/utils.c (glade_util_get_label_text): fixed to handle '_'
+	characters which are part of the label. We need to repeat these since
+	GTK+ uses them to denote keyboard accelerators.
+
+	* glade/gbwidgets/gbcombo.c (write_items_source_callback): used a
+	(gpointer) cast to keep g++ happy.
+
+	* glade/gnome/gnomeanimator.c: set widget_data->width & height when
+	created, and use these when creating the source code, NOT the widget's
+	allocation which may not even be set if the dialog hasn't been shown.
+
+	* glade/gbwidgets/gbbutton.c (gb_button_get_properties): don't show
+	the Icon property for normal buttons in the GTK+ version.
+
+2001-01-15  Stanislav Brabec  <utx@penguin.cz>
+
+        * glade.desktop: Updated cs. Changed da->de for German.
+
+2001-01-06  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/glade_clipboard.c (glade_clipboard_paste): 
+	* glade/load.c (load_project_file): reverted most of Morten's changes
+	since it wasn't compiling.
+	I did remove the 'g_free (new_timezone)' since putenv() doesn't make a
+	copy of it. This means we leak a bit of	memory at the moment, but I'll
+	fix it later.
+	I left the tzset() calls in, though I'm not sure we need it.
+
+	* glade/gbwidgets/gbmenuitem.c (gb_menu_item_write_accel_source): 
+	* glade/gbwidgets/gblabel.c (gb_label_write_source): 
+	* glade/gbwidgets/gbbutton.c (gb_button_write_uline_accel_source): 
+	add cast to (GtkAccelFlags) to avoid problems compiling the Glade C
+	output with a C++ compiler.
+
+	* glade/gbsource.c (get_type_name): updated to use the type numbers
+	rather than the type names, which were changed in GTK+ 1.2.
+
+	* glade/gbwidgets/gbfixed.c (gb_fixed_write_add_child_source): output
+	the position using wdata->x and wdata->y rather than the allocation,
+	which won't even be set if the window hasn't been shown.
+
+	* configure.in (using_oaf): fixed the AM_CONDITIONAL test arg and typo.
+
+2000-12-27  Morten Welinder <terra@diku.dk>
+
+	* glade/gbwidgets/gbbutton.c (gb_button_set_stock_button): Plug
+ 	leak.
+
+	* glade/gbwidget.c (gb_widget_create_from_full): Plug leak.
+
+	* glade/gnome/gnomecontrol.c (gb_bonobo_control_init): Plug leaks.
+
+	* glade/editor.c (clear_child_windows): Properly free children,
+ 	not the empty list.
+
+	* glade/load.c (load_project_file): Better way of restoring TZ.
+  	(Leaving freed pointers in the environment is inadvisable.)
+	Also call tzset as needed.  Avoid g_strdup-ing NULLs.
+
+	* glade/glade_clipboard.c (glade_clipboard_paste): Ditto.
+
+2000-12-22  Stanislav Visnovsky <visnovsky@nenya.ms.mff.cuni.cz>
+
+	* configure.in: Added Slovak [sk] to ALL_LINGUAS.
+
+Tue Nov 07 21:14:27 2000  George Lebl <jirka@5z.com>
+
+	* glade/glade_project_view.c
+	  (glade_project_view_clear_component_selection):  copy the
+	  selection list first as it will be modified during the iteration.
+
+2000-11-02  Michael Meeks  <michael@helixcode.com>
+
+	* configure.in: require Bonobo >= 0.27
+
+2000-10-25  Federico Mena Quintero  <federico@helixcode.com>
+
+	* glade/glade_project_window.c (EditMenu): The menu item should
+	say "Delete", not "Clear", since it deletes the selected widget.
+	Also, give it a trash stock icon.  And stupid GTK+ won't display
+	the GDK_DELETE accelerator even though we have set it to be just
+	that.
+
+2000-10-22  John Gotts  <jgotts@linuxsavvy.com>
+
+	* glade.spec.in: Changed group from X11/Libraries to Development/Tools.
+
+2000-10-21  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/property.c (property_add_int):
+	(property_add_float): connect to the "activate"
+	signal of the entry rather than the "changed" signal, since we only
+	want to be notified after the user has finished typing in the value.
+	We may also need to think some more about other types of properties,
+	e.g. it may not be wise to update some string properties after each
+	letter is added, as we do now. Maybe we need an option for this.
+	(property_create): changed "Place" page label to "Packing", since that
+	is more descriptive of what those properties are for.
+
+2000-10-17  Szabolcs BAN <shooby@gnome.hu>
+
+	* po/hu.po, configure.in: Added Hungarian support.
+
+2000-10-13  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/utils.c (glade_util_show_message_box): 
+	(glade_util_create_dialog_with_buttons): 
+	(glade_util_show_entry_dialog): added transient_widget argument to
+	make it easy to set the transient_parent.
+
+	* *.c: updated all calls to glade_util_show_message_box to set the
+	transient widget if we can.
+	
+	* glade/gbwidgets/gbmenubar.c (dialogize): 
+	* glade/glade_project_window.c (glade_project_window_new_errors_dialog): 
+	* glade/editor.c (editor_show_grid_settings_dialog): 
+	(editor_show_snap_settings_dialog): 
+	* glade/tree.c (tree_init): 
+	* glade/property.c (show_style_dialog): 
+	(property_create): 
+	* glade/glade_project_options.c (glade_project_options_init): 
+	* glade/glade_palette.c (glade_palette_init): 
+	* glade/glade_clipboard.c (glade_clipboard_init): used a TOPLEVEL
+	window instead of a DIALOG. DIALOG windows should only be used for
+	short-lived modal dialogs (i.e. hardly ever).
+
+	* glade/glade_clipboard.c (glade_clipboard_init): set a reasonable
+	default size.
+
+	* glade/glade_project_window.c (glade_project_window_show_quit_dialog):
+	changed button labels to 'Quit' & 'Cancel'.
+
+	* glade/glade_project_window.c (glade_project_window_new_project): 
+	changed button labels to 'OK' & 'Cancel'.
+
+	* glade/glade_menu_editor.c (glade_menu_editor_update_menu): update
+	the gbwidget in the widget data since we may have changed the menu item
+	type.
+
+2000-10-11  Christophe Merlet  <christophe@merlet.net>
+
+	* glade/property.c: Marked somes strings for translations.
+
+2000-10-01  Damon Chaplin  <damon@helixcode.com>
+
+	* Released Glade 0.5.11
+
+2000-10-01  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gnome/gnomemessagebox.c: added workaround for bug in gnome-libs
+	1.2.3. We create the GnomeMessageBox with one button and then remove
+	it. Otherwise it will SEGV. Also changed the generated code to do this.
+
+	* glade/gbwidgets/gbbutton.c: 
+	* glade/glade_gnome.c: patch from Fernando Pereira
+	<fjp@deea.isel.ipl.pt> to avoid warnings when using g++.
+
+	* glade/property.c (create_signals_property_page): 
+	* glade/gbsource.c (gb_widget_write_signals_source): added
+	gtk_widget_grab_focus() and gtk_widget_activate_default() to the
+	lists of standard signal handlers.
+
+2000-09-25  Federico Mena Quintero  <federico@helixcode.com>
+
+	* glade/tree.c (select_node): New function to select the node in
+	the tree in addition to ensuring it is visible on the tree view.
+	This makes the widget tree much more usable.
+	(tree_select_widget): Use select_node().
+
+2000-09-24  Damon Chaplin  <damon@helixcode.com>
+
+	* Released Glade 0.5.10
+
+2000-09-24  Damon Chaplin  <damon@helixcode.com>
+
+	* configure.in: changed version to 0.5.10.
+
+	* NEWS: 
+	* TODO: updated.
+
+	* README: 
+	* AUTHORS: changed glade@glade.pn.org to damon@helixcode.com
+	There are still a few references in the code but I don't want to
+	change a translated string just before a release.
+
+2000-09-24  Carlos Perelló Marín <carlos@hispalinux.es>
+
+	* glade/glade_gtk12lib.c: Marked some strings to translate.
+
+2000-09-23  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/source.c (source_write_gtk_makefile_am): in bin_PROGRAMS use
+	the actual program name, not the name used as the Makefile.am target.
+	This should fix the bug where a program name given as e.g. glade-editor
+	ended up as glade_editor.
+
+2000-09-22  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gbwidget.c (get_standard_properties): allow GtkCheckButton
+	and GtkRadioButton widgets to have tooltips, since they do work even
+	though these are sometimes NO_WINDOW widgets. (They create their own
+	InputOnly windows and still get enter/leave events which tooltips use.)
+
+2000-09-21  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gbwidget.c (add_standard_bottom_menu_items): Only show the
+	Cut, Paste & Delete items if the widget can be deleted.
+
+	* glade/editor.c (editor_can_delete_widget): don't let child menus
+	be deleted.
+
+2000-09-18  Damon Chaplin  <damon@helixcode.com>
+
+	* doc/C/.cvsignore: added *.junk
+
+	* glade/editor.c (editor_on_widget_destroyed): new function to remove
+	any references to a widget being destroyed. Fixes bug where the
+	mouse_over_widget was destroyed leaving us with an invalid pointer.
+
+	* glade/gbwidget.c (on_widget_destroy): call the above function.
+
+	* glade/gbwidgets/gblabel.c (gb_label_new): set labels in tables to
+	be left-aligned by default.
+
+	* glade/gbwidget.c (gb_widget_replace_child): when adding labels/
+	buttons etc. to	tables set the default x options to GTK_FILL, since
+	I think that is more useful (especially when you want to left-align
+	labels.
+
+2000-09-17  Damon Chaplin  <damon@helixcode.com>
+
+	* doc/C/faq.sgml: 
+	* FAQ: added Q2.3 about problem trying to use Gnome stock items in
+	a GTK+ app.
+
+	* glade/glade_project_options.c (glade_project_options_check_valid): 
+	accept an empty source directory, used when the source files are
+	output in the project's toplevel directory.
+
+	* glade/source.c: output EXTRA_DIST in the project's toplevel
+	Makefile.am to contain the XML file and autogen.sh.
+
+	* glade/glade_menu_editor.c (glade_menu_editor_init): added a "None"
+	item first, so it is easy to reset the icon to none.
+	(on_entry_changed): checked if "None" was selected, and if it was
+	set the entry text to "".
+
+2000-09-16  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/glade_menu_editor.c (set_interface_state): made the Icon
+	property insensitive for check/radio items since it can't be used.
+
+	* glade/gbwidgets/gbtogglebutton.c (gb_toggle_button_get_properties): 
+	* glade/gbwidgets/gbradiobutton.c (gb_radio_button_get_properties): 
+	hid the Icon property when not in a toolbar, since it can't be used.
+
+	* glade/Makefile.am (glade_DEPENDENCIES): added this since the one
+	automatically generated by automake would not include
+	$(GLADE_GNOME_LIB) etc. So the glade app would not be automatically
+	rebuilt when the files in gnome/ or gnome-db/ were changed.
+
+	* glade/property.c (create_widget_property_page): Make the Class
+	property sensitive but not editable.
+
+	* glade/gbwidget.c (gb_widget_redisplay_window): 
+	* glade/editor.c (editor_on_key_press_event): queued a resize when
+	Crl+R or the Redisplay popup command is used so it works again.
+	(It is supposed to redisplay the window in roughly what will be its
+	final size. Of course it may be slightly messed up by placeholders
+	and custom widgets.)
+
+	* glade/gbwidgets/gbbutton.c: added "relief" property, but this is not
+	used for toolbar button items or Gnome dialog buttons.
+
+	* glade/gbwidgets/gbtogglebutton.c: added "relief" property, but not
+	for toolbar items.
+
+2000-09-15  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gnome/gnomedruid.c: allowed the start & finish pages to be
+	removed and added again, so people can use their own start/end pages.
+
+	* glade/glade_widget_data.[hc]: new files. Moved the code related to
+	the GbWidgetData struct here, and added a copy function.
+
+	* *.[hc]: renamed GbWidgetData to GladeWidgetData, and all the flags
+	from GB_xxx to GLADE_xxx.
+
+2000-09-14  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gbwidget.c (gb_widget_output_translatable_text_in_lines): new
+	function like gb_widget_output_translatable_text() but the text is
+	split into lines when output to the translatable strings file.
+
+	* glade/save.c (save_translatable_text_in_lines): similar to above.
+
+	* glade/gbwidgets/gboptionmenu.c (gb_option_menu_get_properties): 
+	* glade/gbwidgets/gbcombo.c (gb_combo_get_properties): use
+	gb_widget_output_translatable_text_in_lines() to split the items into
+	single lines in the translatable strings file.
+
+	* glade/glade_menu_editor.c (glade_menu_editor_update_menu): reserved
+	the names of the new menu widgets. Previously it was destroying the old
+	widgets, which resulted in the old names being released, but it wasn't
+	reserving the new names, which meant that name clashes happened
+	occasionally. I noticed this problem ages ago but couldn't spot it.
+
+	* glade/glade_project.c (glade_project_new_widget_name): removed any
+	existing id on the end of the name. Otherwise if you pass "label1"
+	as the base_name, it would return "label11" and set the last id of
+	"label1" to 1, which could mess up other label names.
+
+	* glade/gnome/gnomeabout.c (find_gnome_about_info): declared
+	gtk_handler_quark as a GQuark.
+
+	* configure.in: turned Bonobo off by default (again!). I don't want
+	to turn it on until Bonobo is stable, or we'll just cause problems
+	for users with different versions of Bonobo lying around, and I'll
+	have to release new versions of Glade each time Bonobo changes.
+
+	* glade/glade_gnome.c: added #include "glade_project.h".
+
+2000-09-13  Damon Chaplin  <damon@helixcode.com>
+
+	Applied most of patch from Jon K Hellan  <hellan@acm.org>, except
+	I think <Ret> should only activate the default action in small dialogs
+	with only 1 or 2 fields, so I took out the changes to the project
+	options & menu editor dialogs. Also changed glade_util_spin_button_new
+	so it uses climb_rate & digits.
+
+	Jon's patch comments:
+	
+	A bunch of changes to
+	- make sure that dialogs become transient children of the windows
+	  they are invoked from.
+	- make the GUI easier to use from the keyboard: <Esc> works as a
+ 	  synonym for cancel, and <Ret> in entry fields and spinbuttons
+	  invoke the default action for the dialog. Finally, keyboard
+	  focus should be set when a dialog is popped up, but we've only
+	  just started fixing up that.
+	Still to be done is assigning underline accelerators to buttons
+	and fields in dialogs.
+
+	* glade/utils.h: Include gtkwindow.h and gtkobject.h.
+	(GladeEscAction): New typedef.
+
+	* glade/utils.[ch] (glade_util_check_key_is_esc): New keypress
+	event handler: Make <Esc> work as Cancel in dialog.
+	(glade_util_entry_new): New constructor. Returns a new entry ready
+	to insert in a dialog.  The entry is set up so that <Return> will
+	invoke the default action. The returned widget must be added to a
+	container in the dialog.
+	(glade_util_spin_button_new): New constructor. Returns a new
+	spinbutton ready to insert in a dialog.  A pointer to the spin
+	button is added as object data to the dialog. The spinbutton is
+	set up so that <Return> will invoke the default action. The
+	returned widget must be added to a container in the dialog.
+
+	* glade/utils.c (glade_util_show_message_box,
+	glade_util_show_entry_dialog): Added FIXME comment.
+	(glade_util_show_message_box): Set initial focus to OK button.
+	(glade_util_create_dialog_with_buttons): Set initial focus to
+	default button.
+	(glade_util_show_message_box): Make <Esc> work as Cancel in dialog
+	- non Gnome. Gnome case was already OK.
+	(glade_util_create_dialog_with_buttons,
+	glade_util_show_entry_dialog, glade_util_create_dialog): Make
+	<Esc> work as Cancel in dialog.
+	(glade_util_show_entry_dialog): Make <Ret> in entry fields invoke
+	default by using glade_util_entry_new constructor.
+
+	* glade/editor.c (editor_show_grid_settings_dialog,
+	editor_show_snap_settings_dialog): Make dialog a transient child
+	of window called from. Add widget parameter to make this possible.
+	Rename window variable to dialog.  Make <Esc> work as Cancel.
+	(editor_show_grid_settings_dialog): Make <Ret> in spinbuttons
+	invoke default by using glade_util_spin_button_new constructor.
+	Set initial focus to first spinbutton.
+	(editor_show_snap_settings_dialog): Set initial focus to first
+	checkbutton.  Make <Esc> work as Cancel.
+	(on_grid_settings_ok, on_snap_settings_ok): Rename window variable
+	to dialog.
+
+	* glade/editor.h (editor_show_grid_settings_dialog,
+	editor_show_snap_settings_dialog): Declare new signature with
+	widget parameter.
+
+	* glade/glade.[ch] (glade_show_grid_settings,
+	glade_show_snap_settings): These functions call
+	editor_show_(grid|snap)_settings_dialog, but those now take a
+	widget parameter. Here, we don't know any widgets. Since the
+	functions are unused, they're commented out. I guess it would be
+	even better to remove them outright.
+
+	* glade/glade_clipboard.c (glade_clipboard_init): Added "FIXME"
+	comment.
+
+	* glade/glade_menu_editor.c (glade_menu_editor_init): Make <Ret>
+	in entry fields invoke default by using glade_util_entry_new
+	constructor.
+	(on_icon_button_clicked): Make <Esc> work as Cancel in dialog.
+	Make it a transient child of window called from.
+
+	* glade/glade_project_options.c (glade_project_options_init): Make
+	<Ret> in entry fields invoke default by using glade_util_entry_new
+	constructor. Make <Esc> work as Cancel in dialog.
+	(glade_project_options_show_file_selection): Make dialog a
+	transient child of window called from.
+
+	* glade/glade_project_window.c
+	(glade_project_window_on_open_project,
+	glade_project_window_edit_options,
+	glade_project_window_save_project_as,
+	glade_project_window_show_error): Make dialog a transient child of
+	project window.
+	(glade_project_window_on_open_project,
+	glade_project_window_new_errors_dialog,
+	glade_project_window_save_project_as): Make <Esc> work as Cancel
+	in dialog.
+	(glade_project_window_save_project_as): Make <Esc> work as Cancel
+	in dialog.
+	(glade_project_window_edit_grid_settings): Call
+	editor_show_grid_settings_dialog with widget parameter.
+	(glade_project_window_edit_snap_settings): s/grid/snap/.
+	(glade_project_window_about): Make dialog a transient child of
+	project window. Gnome only - non Gnome cases uses
+	glade_util_show_message_boxm where this is impossible until the
+	signature is changed.
+
+	* glade/property.c (property_create, create_accelerators_dialog):
+	Added FIXME comment.
+	(show_colorsel_dialog, show_filesel_dialog,
+	create_accelerators_dialog, show_events_dialog, show_keys_dialog,
+	show_signals_dialog, show_font_dialog, show_style_dialog): Make
+	<Esc> work as Cancel in dialog. Make dialog a transient child of
+	window called from.
+
+	* glade/tree.c (tree_init): Added FIXME comment.
+
+	* glade/gbwidgets/gbclist.c (show_clist_dialog): Make <Ret> in
+	spinbuttons invoke default by using glade_util_spin_button_new
+	constructor.
+
+	* glade/gbwidgets/gbmenubar.c (dialogize): New function - make
+	window behave like a dialog. For use when called from the
+	properties window.
+	(gb_menu_bar_on_edit_menu, gb_menu_bar_on_edit_menu_activate): Use
+	it.
+
+	* glade/gbwidgets/gbctree.c (show_ctree_dialog): Ditto.
+
+	* glade/gbwidgets/gbhbox.c (show_hbox_dialog): Ditto
+
+	* glade/gbwidgets/gbhbuttonbox.c (show_hbbox_dialog): Ditto
+
+	* glade/gbwidgets/gbimage.c (show_image_dialog): Ditto.
+
+	* glade/gbwidgets/gbnotebook.c (show_notebook_dialog):  Ditto.
+
+	* glade/gbwidgets/gbtable.c (show_table_dialog): Ditto.
+
+	* glade/gbwidgets/gbtoolbar.c (show_toolbar_dialog): Ditto.
+
+	* glade/gbwidgets/gbvbox.c (show_vbox_dialog): Ditto.
+
+	* glade/gbwidgets/gbvbuttonbox.c (show_vbbox_dialog): Ditto.
+
+	* glade/gnome/gnomedruid.c (show_druid_dialog): Ditto.
+
+	* glade/gnome/gnomepropertybox.c (show_gnome_property_box_dialog):
+	Ditto.
+
+	* glade/property.[ch]: Add GbClass property name for widget class.
+
+	* glade/property.c (property_set_widget,
+	create_widget_property_page): Add widget class to property editor
+	display. Make it insensitive.
+
+	* glade/gbwidget.c (get_standard_properties): 
+	Ditto.
+
+2000-09-13  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/utils.c (glade_util_ensure_directory_exists): 
+	* glade/save.c: 
+	* glade/editor.c: applied most of patch from Arnaud Charlet
+	<charlet@ACT-Europe.FR>	to compile on Win32.
+
+2000-09-12  Damon Chaplin  <damon@helixcode.com>
+
+	* configure.in: removed setting of PACKAGE_PIXMAPS_DIR.
+	* Makefile.am: install the logo in $(datadir)/pixmaps/glade rather
+	than using PACKAGE_PIXMAPS_DIR (`gnome-config --datadir`/pixmaps/glade)
+	This avoids problems when people want to install in their home
+	directories etc.
+
+	* glade/source.c (source_write_gnome_configure_in): 
+	(source_write_gnome_makefile_am_pixmaps_targets): remove use of
+	PACKAGE_PIXMAPS_DIR, and just install pixmaps in
+	$(datadir)/pixmaps/$(PACKAGE). This means the person installing the
+	package will have to make sure pixmaps get picked up by Gnome.
+
+2000-08-26  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gbwidget.c (gb_widget_show_popup_menu): unref the menu on
+	the "hide" signal. Should fix leak spotted using Purify by
+	SigWait <sigwait@yahoo.com>.
+
+	* glade/glade_project.c (glade_project_destroy): free program_name,
+	fix from SigWait <sigwait@yahoo.com>.
+
+	* glade/gbwidgets/gbtoolbar.c (gb_toolbar_write_add_child_source): 
+	patch from Josh Green <greenjo@hiscs.org> to add space before toolbar
+	widgets, if needed.
+
+	* glade/main.c (write_source): patch from Rick Niles <niles@scyld.com>
+	to handle relative paths to the XML file.
+
+2000-08-12  Michael Meeks  <michael@helixcode.com>
+
+	* glade/gnome/gnomecontrol.c: Revise for new Bonobo.
+	(gb_bonobo_control_set_properties): add ugly hack to get some items
+	to have icons.
+
+2000-08-09  Dan Mueth <d-mueth@uchicago.edu>
+
+	* doc/C/user-guide.sgml: Put Michael Vance as author and
+	updated license to FDL.
+
+2000-08-03  JP Rosevear  <jpr@helixcode.com>
+
+	* configure.in : Check for bonobo > 0.15 and use bonobox to build. 
+
+2000-07-21  Fatih Demir  <kabalak@gmx.net> 
+
+	* glade.desktop: Added the Turkish desktop entries.
+
+2000-07-15  Michael Meeks  <michael@helixcode.com>
+
+	* configure.in (Configuration): add std. configuration summary.
+	update bonobo check so it works with recent bonobos & depend on
+	0.15 at least. (try_bonobo): use unless called --without-bonobo
+
+2000-06-25  Damon Chaplin  <damon@helixcode.com>
+
+	* doc/C/.cvsignore: added.
+
+2000-06-25  Damon Chaplin  <damon@helixcode.com>
+
+	* configure.in (ALL_LINGUAS): added ko (Korean).
+
+2000-06-10  Fatih Demir	<kabalak@gmx.net>
+	
+	* configure.in: Added tr to ALL_LINGUAS.
+	
+2000-06-09  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gbwidgets/gbwindow.c (gb_window_write_standard_source): 
+	check widget->title is non-NULL. Fixes SEGV in GnomePropertyBox.
+
+2000-05-31  Carlos Perelló Marín <carlos@hispafuentes.com>
+
+	* Updated Spanish translation
+
+2000-05-23  Damon Chaplin  <damon@helixcode.com>
+
+	* doc/C/turbo-start.sgml: added to CVS. This was in 0.5.9.
+
+2000-05-21  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/property.c (create_standard_property_page): mark GbX tip for
+	translation.
+
+2000-05-20  Damon Chaplin  <damon@helixcode.com>
+
+	* Released Glade 0.5.9
+
+2000-05-20  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gnome/gnomepropertybox.c: 
+	* glade/gnome/gnomemessagebox.c: patch from James M. Cape
+	<jcape@jcinteractive.com> to allow setting of the Title in
+	GnomeMessageBox, and remove the Type property, and allow setting of
+	all the standard window properties in GnomePropertyBox except Type.
+
+	* glade/glade_palette.c: patch from James M. Cape
+	<jcape@jcinteractive.com> to use the toolbar relief set in the Gnome
+	user preferences (i.e. the Control Panel) for the palette.
+
+	* doc/C/turbo-start.sgml: 
+	* doc/C/Makefile.am: 
+	* doc/C/topic.dat: added Turbo-Start from Paul J. Drongowski 
+	<paul.drongowski@compaq.com>.
+
+2000-05-14  Damon Chaplin  <damon@helixcode.com>
+
+	* Released Glade 0.5.8
+
+2000-05-13  Damon Chaplin  <damon@helixcode.com>
+
+	* doc/file_format.txt: 
+	* glade/glade_project_options.[hc]: 
+	* glade/glade_project.[hc]: added gnome_help_support project option.
+	  Currently we just output the GNOME_UIINFO_HELP macro at the top of
+	  the Help GnomeUIInfo structs, but we will output a template help
+	  file with build files in future.
+
+	* glade/gnome/gnomedockitem.c (gb_gnome_dock_item_write_add_child_source): 
+	install the menu's hints in the status bar if the GnomeApp has one.
+
+	* glade/glade_gnome.c (glade_gnome_is_app_dock_item): changed it so
+	it returned the GnomeApp rather than TRUE.
+
+	* glade/main.c: applied modified version of a patch from Jan Kratochvil
+	<kratochvil@suse.cz> to support a --write-source command-line option.
+	Note that it will need an X connection to work. Jan also sent a patch
+	to set up batch building of Glade projects, though I haven't applied
+	that.
+	
+2000-05-11  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/glade_project_window.c (HelpMenu): added GNOMEUIINFO_HELP
+	macro, to automatically add the stuff from topic.dat.
+
+	* doc/C/*: Glade User Guide & FAQ added.
+
+	* doc/Makefile.am: added SUBDIRS = C
+
+	* configure.in (AC_OUTPUT): added doc/C/Makefile
+
+2000-05-10  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gbwidget.c (set_position_properties): workaround for GTK+ bug
+	 - when loading, hide widgets before calling set_uposition() or we may
+	get a warning like this:
+		Gtk-WARNING **: gtk_widget_size_allocate(): attempt to allocate widget with width 65519 and height 65535
+
+2000-05-01  Michael Meeks  <michael@helixcode.com>
+
+	* glade/gnome/gnomecontrol.c: kill nasty hacked prototypes, include
+	bonobo-object-directory.h
+
+	* glade/main.c (main): oafize.
+
+	* configure.in (have_bonobo): Move check around.
+
+2000-05-01  Anders Carlsson  <andersca@gnu.org>
+
+	* glade/main.c: oafize.
+	
+2000-04-23  JP Rosevear  <jpr@arcavia.com>
+
+	* glade/glade_project_window.c (glade_project_window_about): Combine
+	separate NLS strings into one (compiler doesn't concat them like
+	regular const strings).
+
+2000-04-20  Martin Norbäck  <d95mback@dtek.chalmers.se>
+
+	* glade/glade_project_window.c: made more strings translatable
+
+2000-04-18  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): added Catalan
+
+2000-04-16  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/gbwidget.c (gb_widget_get_class_id): If the widget does not
+	have an associated GbWidget, just return the widget's class name.
+
+2000-04-15  Pablo Saratxaga <pablo@andrakesoft.com>
+
+	* configure.in (ALL_LINGUAS): Added Greek language to list
+
+2000-04-08  Ruben Lopez  <ryu@mundivia.es>
+
+	* glade.desktop: Added Galician (gl) translation.
+        * configure.in: Added Galician (gl) translation to ALL_LINGUAS.
+
+2000-04-02  Damon Chaplin  <damon@helixcode.com>
+
+	* configure.in: added GnomeDB support and tidied up a bit.
+
+	* glade/gnome-db/*: New directory to support GnomeDB.
+	
+	* glade/gnome/gnomemessagebox.c (gb_gnome_message_box_write_source): 
+	patch from Ralf Corsepius <corsepiu@faw.uni-ulm.de> to fix default
+	click_closes property (the default is TRUE for GnomeMessageBox).
+
+	* glade/gbwidgets/gbpixmap.c (gb_pixmap_write_source): always create
+	a pixmap, even if the filename isn't set. Otherwise there are problems
+	in widgets like notebooks where all children must exist or the order
+	of the children is messed up.
+
+	* glade/source.c (source_create_pixmap): handle empty filenames.
+
+	* glade/source.c (source_write_gnome_create_pixmap_functions): 
+	(source_write_gtk_create_pixmap_functions): if the filename is empty
+	return a dummy pixmap.
+
+	* glade/gbwidget.c (gb_widget_lookup): Added a fallback to the original
+	way we looked up the GbWidget*, for cases in which widgets do not have
+	a GbWidgetData attached (e.g. popup menus seems to have a problem when
+	the source code is generated).
+
+	* glade/source.c (source_write_gnome_macro_files): added gperf-check.m4
+	to the macros files to fix problem with 'make dist' on a project.
+
+	* glade/gnome/gnomeiconlist.c (gb_gnome_icon_list_write_source): patch
+	from Jens Finke <pearl@darkride.net> to output code to set selection
+	mode if needed.
+
+	* glade/gbsource.c (gb_widget_write_signals_source): 
+	* glade/property.c (create_signals_property_page): updated lists of
+	built-in GTK+ signal handler functions. We shouldn't duplicate these,
+	and they should change according to the project's language.
+
+	* glade/glade_gnome.c (glade_gnome_write_menu_item_standard_source): 
+	set check/radiomenuitems active if needed. Also set sensitivity.
+
+	* glade.spec.in: patch from John GOTTS <jgotts@linuxsavvy.com>.
+
+	* tools/mkskel.pl (OutputWidgetFile): output "#include <config.h>"
+
+2000-04-01  Michael Meeks  <michael@helixcode.com>
+
+	* configure.in (have_bonobo): Ask for 0.10.
+
+	* glade/gnome/gnomecontrol.c (gb_bonobo_control_create_properties),
+	(gb_bonobo_control_set_propertiesm gb_bonobo_control_get_properties): 
+	Update for CVS bonobo, hopefully this finishes property API breakage
+	for good.
+
+2000-03-28  Michael Meeks  <michael@helixcode.com>
+
+	* glade/gnome/gnomecontrol.c: conditional compile whole file.
+
+	* glade/gnome/Makefile.am: back out yesterday's fix: Damon
+	doesn't like it.
+
+2000-03-27  Michael Meeks  <michael@helixcode.com>
+
+	* glade/gnome/Makefile.am (BONOBO_FILES): add.
+
+	* configure.in (have_bonobo): fixup.
+
+2000-03-13  Alastair McKinstry  <mckinstry@computer.org>
+
+	* glade.desktop: Added Irish (ga) translation.
+	* configure.in (ALL_LINGUAS): Added Irish (ga).
+
+2000-03-10  Michael Meeks  <michael@helixcode.com>
+
+	* glade/gnome/gnomecontrol.c (gb_bonobo_control_init): Use
+	IDL:Bonobo/Control; doh.
+
+2000-03-10  Michael Meeks  <michael@helixcode.com>
+
+	* glade/gnome/gnomecontrol.c (create_prop_name): kill case bending
+	since case problems have disappeared.
+
+2000-03-08  Michael Meeks  <michael@helixcode.com>
+
+	* glade/main.c: include bonobo headers.
+	(final_setup): create, (main): farm final setup bits off into a
+	one shot idle handler, since we can't do CORBA stuff until we
+	hit the main loop. On load we need to use CORBA.
+
+	* glade/load.c (real_load_project_file): correct case on GTK-Interface.
+	(load_token): kill g_strdown fixing xml case problems.
+
+	* glade/glade_project.c: s/class_name/class_id/
+
+	* glade/glade_palette.c: s/classname/classid/
+
+	* glade/glade_gnomelib.h: add gb_bonobo_control_init
+
+	* glade/gbwidget.h: kill gb_widget_real_initialize
+
+	* glade/gbwidget.c (gb_widgets_init): add gb_bonobo_control_init
+	(gb_widget_register_gbwidget): store the class_id in the gbwidget.
+	(gb_widget_lookup): Use the object_data & GbWidgetData gbwidget
+	pointer. Kill special Custom code.
+	(gb_widget_get_type_name): rename to (gb_widget_get_class_id): re-write.
+	(gb_widget_init_struct): init class_id.
+	(gb_widget_create_from): Setup class_id & fix custom widgets.
+	(gb_widget_new_widget_data): add gbwidget parameter.
+	(gb_widget_real_initialize): moved up and made static.
+	(set_special_child_properties): add debug.
+	(gb_widget_new_full): add warnings & pass gbwidget to gb_widget_new_widget_data
+	s/class_name/class_id/
+	
+	* glade/gbsource.c: s/class_name/class_id/
+
+	* glade/glade.[ch]: s/class_name/class_id/
+
+	* configure.in: add bonobo support.
+
+	* acconfig.h: #undef ENABLE_BONOBO
+
+	* glade/gnome/gnomecontrol.c: Created.
+
+	* glade/gnome/Makefile.am: Add gnomecontrol.c
+
+2000-02-20  Andreas Hyden  <andreas.hyden@telia.com>
+
+	* src/utils.c: Added _() around buttons[i]
+	in gtk_button_new_with_label () so they
+	get marked for translation.
+
+2000-02-19  Damon Chaplin  <damon@helixcode.com>
+
+	* Released Glade 0.5.7
+
+2000-02-19  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/source.c (source_write_gnome_macro_files): commented out
+	gnome-gettext.m4 since it has been removed.
+
+2000-02-12  Damon Chaplin  <damon@helixcode.com>
+
+	* Released Glade 0.5.6
+
+2000-02-12  Damon Chaplin  <damon@helixcode.com>
+
+	* glade/editor.c (editor_on_button_press): patch from 
+         <michael@helixcode.com> to show a message & tip about containers
+	when the user tries to add a widget in an invalid position.
+
+	* README: 
+	* TODO:
+	* INSTALL: updated.
+
+2000-02-06  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* README: updated.
+	
+2000-02-04  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* FAQ: update answer about m4 files, to suggest using ACLOCAL_FLAGS
+	instead of copying m4 files around.
+
+	* glade/gbwidget.c (gb_widget_children_foreach): use new function
+	box_foreach() so that children are saved and the source code written
+	in the correct order.
+
+2000-02-01  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/utils.[hc] (glade_util_is_component): new function to test if
+	a widget is a project component (window/dialog/popup menu).
+
+	* glade/gbwidget.c (get_lang_specific_properties):
+	* glade/gbwidget.c (set_standard_properties): use new function
+	glade_util_is_component() to test for toplevel widgets.
+
+	* glade/glade_project_options.c (glade_project_options_check_valid): 
+	check that the translatable strings filename has been set if needed.
+
+2000-01-29  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* doc/file_format.txt: new section describing defaults for the project
+	options. Future Glade versions will only output the options in the XML
+	file if	they differ from the defaults, so code generators should be
+	updated if necessary.
+
+	* glade/glade_project.c (glade_project_save_options): Only use default
+	values for C options which won't affect Glade versions 0.5.0-0.5.5.
+
+2000-01-22  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/editor.c
+	* glade/glade_plugin.c
+	* glade/glade_project.c
+	* glade/save.c
+	* glade/source.c
+	* glade/source_os2.c
+	* glade/utils.c: Patch from Arnaud Charlet <charlet@ACT-Europe.FR>
+	to compile Glade on Win32.
+
+	* glade/glade_gnome.c (glade_gnome_write_menu_item_source): fixed a
+	few bugs when using normal pixmaps in menuitems.
+
+	* glade/glade/editor.c
+	* glade/glade/glade_clipboard.c
+	* glade/glade/glade_keys_dialog.c
+	* glade/glade/glade_menu_editor.c
+	* glade/glade/glade_project_options.c
+	* glade/glade/glade_project_window.c
+	* glade/glade/property.c
+	* glade/glade/tree.c:
+	* glade/glade/palette.c:
+	patch from James M. Cape <jcape@jcinteractive.com> to set the WM_NAME
+	& WM_CLASS properties of all windows, so window managers can remember
+	their positions. Plus a few changes from me.
+
+	* glade/glade_project_window.c: added a confirm dialog before quitting
+	so people don't lose work accidentally.
+
+	* glade/gbwidget.c (get_lang_specific_properties): only output
+	cxx_use_heap if it is different from the default value of 0, otherwise
+	it is output for all widgets in projects for other languages.
+
+	* glade/glade_project.c (glade_project_save_options): 
+	(glade_project_load_options): used defaults for most project options
+	so most will not appear in the XML. When loading also made sure that
+	any unset options are set to the same defaults.
+
+	* glade/gbwidgets/gbhpaned.c (gb_paned_write_add_child_source): 
+	* glade/gbwidgets/gbvpaned.c (gb_vpaned_init): 
+	* glade/gb.h: wrote out proper code to add widgets to paned containers.
+
+	* glade/gbwidgets/gbtext.c (gb_text_set_properties): 
+	(gb_text_write_source): don't realize the text widget before inserting
+	text, since that isn't needed any more, and it causes problems with
+	notebooks (a bug in GTK+ I think).
+
+	* glade/property.c (on_signal_clear, on_signal_add): set "signal after"
+	button to FALSE when signal added and when cleared, such behavior is
+	more intuitive. (Patch from Arturo Tena  <arturo@directmail.org>)
+
+	* glade/main.c (parse_command_line): const fix.
+
+	* glade/gbwidgets/gbprogressbar.c (gb_progress_bar_set_properties): 
+	fixed one-line bug 'min = adjustment->upper', should be max.
+
+1999-12-23  Matthias Warkus  <mawa@iname.com>
+
+	* glade.png: Added icon by Eduardo da Silva
+
+1999-11-22  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/glade_gtk12lib.c (standard): added Custom widget to Martijn's
+	palette on the standard page.
+
+1999-11-18  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* configure.in: fixed setting of GLADE_DATA_DIR, so --datadir works.
+
+1999-11-24  Yuri Syrota  <rasta@renome.rovno.ua>
+
+	* configure.in (ALL_LINGUAS): Added uk to ALL_LINGUAS
+
+1999-11-14  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbsource.c (gb_widget_write_source): set data->write_children
+	to TRUE near top of function, in case the current widget is skipped.
+
+1999-11-09  Martijn van Beers  <martijn@earthling.net>
+
+	* glade/source.c (source_create_valid_identifier):
+	  prepend an _ when the identifier starts with a number, so that
+	  widgets 4thwidget and 5thwidget are still unique
+
+1999-11-11  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released Glade 0.5.5
+
+1999-11-11  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/property.c (create_accelerators_dialog): fixes for GTK+
+	version.
+
+	* glade/source.c (source_write_component): used (void) for the function
+	prototypes in interface.c, for use with -Wstrict-prototypes.
+
+1999-11-06  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released Glade 0.5.4
+
+1999-11-06  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidgets/gbcombo.c (gb_combo_get_properties): 
+	(add_label): 
+	* glade/source.c (source_write_gnome_makefile_am): 
+	* glade/gbsource.c (gb_widget_write_signal_handler_source): 
+	* glade/gbwidget.c (gb_widget_create_child_properties): 
+	* glade/gbwidgets/gbhbox.c (gb_box_set_child_properties): 
+	fix a few warnings for Mips 10000, some of which were minor bugs.
+
+	* glade/glade_gnome.c (glade_gnome_write_menu_item_source): use
+	source_make_static_string() for the tooltips since they are used in the
+	GNOME_UI_INFO structs.
+
+	* glade/load.c (load_parse_color): multiply colors by 257 rather than
+	256 so that ff gets mapped to ffff.
+
+	* glade/gbwidgets/gbpacker.c (gb_packer_write_add_child_source): always
+	use GtkPackerOptions cast in the source code (for g++).
+
+	* glade/gnome/gnomedruidpagefinish.c (gb_gnome_druid_page_finish_get_properties): 
+	* glade/gnome/gnomedruidpagestart.c (gb_gnome_druid_page_start_get_properties): 
+	* glade/gnome/gnomedruidpagestandard.c (gb_gnome_druid_page_standard_get_properties): Output titles and text as translatable.
+
+	* glade/gbwidget.c (gb_widget_load_style): return OK status so styles
+	are skipped properly.
+
+	* glade/editor.c (editor_can_delete_widget): allow labels in buttons/
+	menuitems to be deleted.
+	Stop the child widgets of GtkCombo, GnomeEntry etc. from being deleted.
+	(editor_on_button_press): don't allow widgets to be added to a
+	GnomeCanvas, since we don't support that.
+
+	* glade/utils.c (glade_util_parent_directory): few _() added.
+
+	* FAQ: added question on connecting to adjustment signals.
+
+	* glade/source.c (source_write_main_c): wrap calls to bindtextdomain()
+	and textdomain in #ifdef ENABLE_NLS to get rid of warnings about
+	statements with no effect when NLS is disabled.
+	(source_write_support_files): include config.h in GTK+ apps to make
+	sure ENABLE_NLS is set.
+
+	* glade/property.c: moved accelerators from a property page to a
+	dialog box, since they are very rarely needed.
+
+	* glade/property.c (show_signals_dialog): sort signals alphabetically,
+	added ' signals' to group names, e.g. 'GtkButton signals', and
+	skipped classes with no signals.
+
+	* glade/glade_gnome.c: updated the stock arrays to latest gnome-libs
+	(i.e. added the Midi pixmaps, which weren't in gnome-libs 1.0.0)
+
+	* glade/gnome/gnomeanimator.c: supported the easy properties. Haven't
+	added support for the frames of the animation yet, though.
+
+	* glade/gbwidget.c (gb_widget_write_standard_source): don't output code
+	to set the size of GnomeAnimator widgets since it is set when creating
+	the widget. I didn't want to have 2 separate 'Width' & 'Height'
+	properties so I overloaded the basic properties.
+
+	* FAQ: added question about scrolled window warnings.
+
+1999-10-27  Martin Norbäck  <norpan@bigfoot.com>
+
+	* glade.desktop: added swedish desktop entry
+
+Wed Oct 13 08:50:57 1999  ape@gandalf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/source_os2.c: Adding GNOME support for makefile.os2.
+
+1999-10-10  Martijn van Beers  <martijn@earthling.net>
+
+	* glade/gbsource.[ch]: New files
+	* glade/gbwidget.[ch]: Moved all source-generating stuff
+	                       to gbsource.[ch]
+	* glade/Makefile.am: put new files in build.
+
+Sun Oct  3 15:47:34 1999  ape@gandalf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/source.c (source_write_include_files): Add this function
+	for printout of header files. Add also <sys/types.h> to remove
+	compiler warning under OS/2.
+
+1999-09-27  Anders Carlsson  <andersca@gnu.org>
+
+	* configure.in (ALL_LINGUAS): Added sv to ALL_LINGUAS
+
+1999-09-12  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released Glade 0.5.3
+
+1999-09-10  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/glade_clipboard.c: set pointers to a project to NULL when the
+	project is destroyed, so we never have invalid pointers.
+
+	* glade/gbwidgets/gblayout.c: 
+	* glade/gbwidgets/gbtext.c: 
+	* glade/gbwidgets/gbctree.c: 
+	* glade/gbwidgets/gbclist.c: changed the way we connect handlers to
+	the adjustments. It should be more reliable now.
+
+	* glade/editor.c (placeholder_finish_replace): Automatically insert
+	scrolled windows or viewports depending on the widget being added.
+
+	* glade/gbwidget.c (add_standard_bottom_menu_items): 
+	(gb_widget_add_scrolled_window): 
+	(gb_widget_remove_scrolled_window): new popup menu commands to add or
+	remove a scrolled window from widgets which can handle scrolling.
+
+	* glade/tree.c (tree_remove_widget_parent): changed parent argument to
+	grandparent so it can be called after the widget hierarchy has been
+	rearranged.
+
+	* FAQ: added a few more questions.
+
+	* glade/glade_gnome.c (glade_gnome_gettext): checked for ENABLE_NLS.
+
+1999-09-05  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released Glade 0.5.2
+
+1999-09-05  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* FAQ: added a few more common questions & answers.
+
+	* glade/gbwidgets/gbhscale.c: 
+	* glade/gbwidgets/gbvscale.c: 
+	* glade/gbwidgets/gbhscrollbar.c: 
+	* glade/gbwidgets/gbvscrollbar.c: 
+	* glade/gbwidgets/gbspinbutton.c: update all the adjustment property
+	names so all of them use 'value', 'lower', 'upper', 'step', 'page'
+	and 'page_size' instead of 'hvalue', 'hlower' etc. and 'vvalue',
+	'vlower' etc. That made no sense for GtkSpinButton, GtkVScale was using
+	'hvalue' etc., and the 'h's and 'v's aren't really necessary.
+
+	Glade will accept old & new property names on input and	write out the
+	new ones, so external tools should just support the new	names.
+
+1999-09-05  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidgets/gblabel.c: added support for focus_target and
+	default_focus_target properties. The focus_target property is the
+	widget which should get the keyboard focus when the underlined
+	accelerator key in the label is used. It is selected from a combo
+	containing all the widgets in the component which can accept the focus.
+
+	The first option in the list is 'Auto' which tells Glade to try to
+	find the target itself. If this is used, focus_target will not appear
+	in the XML file, but a default_focus_target property may be saved
+	containing the name of the default target widget found by Glade.
+	(Though it may not be able to find one.)
+
+1999-09-04  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidget.c: 
+	* glade/palette.c: 
+	* glade/glade_palette.h: 
+	* glade/glade_palette.c: 
+	* glade/glade_project.h: 
+	* glade/glade_project.c: 
+	* glade/glade_project_options.h: 
+	* glade/glade_project_options.c: reverted Martin's changes since there
+	were a few problems which need to be fixed first.
+
+	* glade/gbwidgets/gbpixmap.c: added build_insensitive boolean property.
+
+	* glade/gbwidgets/gbcombo.c: added value_in_list & ok_if_empty
+	boolean properties.
+
+	* glade/*.h: got rid of all the '#pragma }' lines and renamed the top
+	#ifdef's since we shouldn't really use names starting with '__' as
+	that is reserved.
+	
+	* glade/editor.c: use gdk_window_get_pointer() instead of
+	gtk_widget_get_pointer() since the latter will subtract the allocation
+	if the widget has no window, which confuses our code.
+
+	* glade/editor.c (editor_get_event_widget): it now looks up the
+	widget hierarchy for a GbWidget to direct the event to as well.
+	If we don't do this, then a widget may pinch the event before we get
+	it. This meant that GnomeIconEntry and GnomeIconSelection couldn't be
+	selected easily.
+
+	* glade/gnome/gnomedruid.c: 
+	* glade/gnome/gnomedruidpagestart.c: 
+	* glade/gnome/gnomedruidpagestandard.c: 
+	* glade/gnome/gnomedruidpagefinish.c: 
+	* glade/gnome/gnomepixmap.c: 
+	* glade/gnome/gnomepropertybox.c: 
+	* glade/gnome/gnomeiconselection.c: 
+	* glade/gnome/gnomeiconlist.c: new widgets supported.
+
+	* glade/property.c (create_signals_property_page): hid the signal
+	data & object properties. I hope not too many people have been using
+	them. They make signals too complicated. The 'After' flag can cause
+	problems too, but I don't think we can get rid of that.
+
+	* glade/gbwidgets/gbwindow.c (gb_window_write_standard_source): fixed
+	output of gtk_window_set_wmclass(). Remember source_make_string() uses
+	the same buffer for every call! I think this should be fixed somehow
+	since it often causes problems. Maybe allocate memory for each string,
+	but then it would have to be freed after use. Maybe use one GString
+	to contain all the strings for one widget, then free it all, but I'm
+	not sure GString supports that. Or maybe keep a pool of GStrings.
+
+	* glade/glade_gnome.c (glade_gnome_write_radio_menu_item_source): 
+	incremented the uiinfo index so the GNOME_APP_UI_RADIOITEMS item is
+	skipped properly.
+
+	* glade/gbwidget.h: got rid of GB_INITIAL_EXPOSE flag since it didn't
+	work properly. Some widgets never got an expose event since their area
+	was completely covered by their child widgets. We connect to
+	size_allocate and update the position properties there if necessary,
+	so we should be OK. We now use GB_SIZE_NOT_ALLOCATED flag instead.
+
+	* glade/gbwidget.c: removed code which the set size of a GtkCombo's
+	entry whenever the combo's size was changed. Also removed it from the
+	source code output as well. It seems to be fixed in GTK+ now.
+
+	* glade/property.c: 
+	* glade/gbwidget.c: cut out a lot of the style-related code using
+	'#ifdef GLADE_STYLE_SUPPORT'. It isn't finished and it is buggy so it
+	is probably best to take it out for now.
+
+	* glade/editor.c (editor_delete_widget): don't rely on the placeholder
+	still being there after gb_widget_replace_child(). If it is added to
+	a table, and there is already a widget in the same position, it will
+	be destroyed immediately.
+
+	* glade/gbwidgets/gbtable.c (gb_table_set_child_properties): fixed
+	updating of table child's position.
+
+	* glade/gbwidgets/gbpacker.c (gb_packer_write_add_child_source): 
+	output "(GtkPackerOptions) 0" rather than just "0" to keep g++ happy.
+
+	* glade/gbwidgets/gblayout.c: new widget supported, like GtkFixed
+	but with builting support for scrolling.
+
+	* glade/gbwidgets/gbctree.c: 
+	* glade/gbwidgets/gbclist.c: improved redrawing when scrolling.
+
+	* glade/utils.c (glade_util_find_toolbar_accelerator_target): new
+	function to find default accelerator target in a toolbar.
+	(glade_util_find_default_accelerator_target): initialized target to
+	NULL.
+
+	* glade/gbwidgets/gblabel.c (gb_label_write_source): forgot to output
+	code to create the label when the accelerator target wasn't found.
+
+	* glade/utils.c (glade_util_find_focus_child): returns the child of
+	a widget which should get the keyboard focus when an accelerator is
+	setup.
+
+	* glade/gbwidgets/gbarrow.c (gb_arrow_set_properties): fixed setting
+	of direction and shadow type properties.
+
+1999-09-02  Martin Baulig  <martin@home-of-linux.org>
+
+	* glade/glade_palette.h (GladePaletteClass): Added `create_item'
+	as new signal function.
+
+	* glade/glade_palette.c (on_palette_button_toggled): Emit
+ 	"create_item" signal if the user pressed the shift button so
+ 	you can create arbitrary widgets by holding down the shift button.
+
+	* glade/palette.c (on_palette_create_item): New function to
+	create arbitrary widgets.
+
+	* glade/gbwidget.c (gb_widget_save): Don't save placeholders if
+	we disabled them in the project options.
+
+	* glade/glade_project.h (GladeProject): Added `save_placeholders'
+	(glade_project_get_save_placeholders): New function.
+	(glade_project_set_save_placeholders): New function.
+
+	* glade/glade_project.c (glade_project_show_component):
+	If the component is neither a menu nor a toplevel, add it to
+	a newly created toplevel window and show it.
+
+	* glade/glade_project_options.h (GladeProjectOptions):
+ 	Added `save_placeholders'.
+
+Wed Sep  1 16:01:49 1999  Pablo Saratxaga <pablo@mandrakesoft.com>
+
+	* configure.in, po/da.po: added Danish language file
+
+Thu Aug 26 19:20:01 1999  ape@gandalf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/save.c (save_project_file_internal): remove backup file
+	before rename the original to it. Only for OS/2 !
+
+Fri Aug  6 21:46:39 1999  ape@gandalf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/source_os2.c (source_write_makefile_simple): New makefile.os2 format.
+
+Thu Aug  5 22:07:14 1999  ape@gandalf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/source.c (source_write_build_files): Patch for OS/2 version
+ 	only. Parameter missing.
+
+1999-08-01  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released Glade 0.5.1
+
+1999-08-01  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidgets/gbcombo.c: 
+	* glade/gnome/gnomeentry.c: 
+	* glade/gnome/gnomefileentry.c: 
+	* glade/gnome/gnomenumberentry.c: 
+	* glade/gnome/gnomepixmapentry.c: made the GtkEntry widgets special
+	children, so that its properties can be set and signal handlers can
+	be added. For GnomePixmapEntry the GnomeFileEntry is also made a
+	special child.
+
+	* glade/gbwidget.c (gb_widget_write_standard_source): for toplevel
+	widgets we don't ref the widget since if we do it never gets destroyed.
+
+	* glade/utils.c (glade_util_get_label_text): used the wide char version
+	of the label text and converted to multi-byte when returning.
+
+	* glade/editor.c (editor_delete_widget): widgets in a GtkPacker get
+	deleted completely, just like widgets in a GtkFixed.
+
+	* glade/gnome/*.c: included <config.h> first so i18n works OK.
+
+	* glade/gnome/gbpixmapmenuitem.c (gb_pixmap_menu_item_destroy): remove
+	the pixmap from the project when the menuitem is destroyed.
+
+	* glade/glade_menu_editor.c (on_stock_item_entry_changed): call
+	set_interface_state after changing the stock item so that the label
+	and icon become editable if appropriate.
+	(glade_menu_editor_update_menu): always use a GtkPixmapMenuItem when
+	an icon has been specified, even it it couldn't be loaded, since the
+	pixmap file is added to the project and is only removed in the destroy
+	function of GtkPixmapMenuItem.
+
+	* glade/tree.c (tree_add_widget): If the widget has already been
+	added, check if its name needs updating.
+
+	* glade/gbwidget.h (struct _GbWidgetWriteSourceData): added
+	focus_widget and default_widget so we can set these after creating the
+	entire component. GnomeDialog messes the default up otherwise.
+	We can also check if several widgets have these flags set, so we can
+	output warnings.
+
+	* glade/gbwidgets/gbbutton.c (gb_button_set_stock_button): when setting
+	back to normal button check if it is a normal button or a GnomeDialog
+	button and recreate as appropriate.
+
+	* glade/gbwidgets/gbradiobutton.c (gb_radio_button_write_source): 
+	* glade/gbwidgets/gbtogglebutton.c (gb_toggle_button_write_source): 
+	* glade/gbwidgets/gbcheckbutton.c (gb_check_button_write_source): 
+	* glade/gbwidgets/gbbutton.c (gb_button_write_source):
+	* glade/gbwidgets/gblabel.c (gb_label_write_source): setup accelerator
+	key if the label has an underlined character.
+
+	* glade/gbwidgets/gbhbox.c: added Position child packing property,
+	so children of a box can be reordered easily. Though it may be a little
+	confusing due to the PACK_START/END flags. It isn't saved in the XML.
+
+	* glade/gbwidgets/gboptionmenu.c: fixed the initial choice property.
+
+	* glade/save.c (save_project_file_internal): backup existing XML file.
+
+	* glade/gbwidgets/gbcolorselection.c (gb_color_selection_write_source):
+	* glade/gbwidgets/gbmenuitem.c (gb_menu_item_write_accel_source): two
+	bugs found thanks to G_GNUC_PRINTF and fixed.
+
+	* glade/gbwidgets/gbpacker.c: added spacing, default border width,
+	default padx, pady, ipadx, ipady properties.
+	Added use_default child property.
+	Added child position property which isn't saved in the XML.
+
+	* glade/editor.c (editor_on_button_press): do selection/add widget
+	only on single button press, not double-clicks.
+
+	* glade/gbwidget.c (gb_widget_input_adjustment): 
+	* glade/gbwidgets/gbtable.c (gb_table_set_properties): 
+	(gb_table_set_child_properties): 
+	* glade/gbwidgets/gbscrolledwindow.c (gb_scrolled_window_set_properties): 
+	* glade/gbwidgets/gbprogressbar.c (gb_progress_bar_set_properties): 
+	* glade/gbwidgets/gbpixmap.c (gb_pixmap_set_properties): 
+	* glade/gbwidgets/gbpacker.c (gb_packer_set_child_properties): 
+	* glade/gbwidgets/gbwindow.c (gb_window_set_standard_properties): 
+	* glade/gbwidgets/gbimage.c (gb_image_set_properties): 
+	* glade/gbwidgets/gbvbuttonbox.c (gb_vbutton_box_set_properties): 
+	* glade/gbwidgets/gblabel.c (gb_label_set_properties): 
+	* glade/gbwidgets/gbvruler.c (gb_vruler_set_properties): 
+	* glade/gbwidgets/gbhruler.c (gb_hruler_set_properties): 
+	* glade/gbwidgets/gbhbuttonbox.c (gb_hbutton_box_set_properties): 
+	* glade/gbwidgets/gbhbox.c (gb_box_set_child_properties): 
+	* glade/gbwidgets/gbgammacurve.c (gb_gamma_curve_set_properties): 
+	* glade/gbwidgets/gbcurve.c (gb_curve_set_properties): 
+	* glade/gbwidgets/gbaspectframe.c (gb_aspect_frame_set_properties): 
+	* glade/gbwidgets/gbarrow.c (gb_arrow_set_properties): 
+	* glade/gbwidgets/gbalignment.c (gb_alignment_set_properties): 
+	* glade/gbwidgets/gbaccellabel.c (gb_accel_label_set_properties): 
+	corrected code which sets multiple properties at once, so that any
+	properties which aren't set retain their old values.
+	
+	* glade/gnome/gnomedock.c (gb_gnome_dock_write_source): 
+	(gb_gnome_dock_write_add_child_source): floating dock items are set
+	to initially appear cascaded from 100,100 in 50x50 increments.
+
+	* glade/gbwidgets/gbhandlebox.c: added shadow_type, handle_position,
+	and snap_edge properties.
+
+	* glade/gbwidgets/gbmenubar.c: added shadow_type property.
+
+	* glade/source.h: used G_GNUC_PRINTF () so gcc can type-check calls
+	to source_add() etc.
+
+	* glade/gbwidgets/gbarrow.c (GbShadowChoices): in GTK+ 1.2 arrow now
+	supports all shadow choices - none, in, out, etched in, etched out.
+
+	* glade/glade_project_window.c (glade_project_window_update_title): 
+	Display "<untitled>" if the project name hasn't been set.
+
+	* glade/tree.c (tree_add_widget): set expanded to FALSE when adding
+	new widgets to the tree. The tree really needs buttons or something
+	to expand/collapse all widgets.
+
+	* glade/gbwidgets/gbwindow.c: 
+	* glade/gbwidgets/gbcolorselectiondialog.c: 
+	* glade/gbwidgets/gbdialog.c: 
+	* glade/gbwidgets/gbfontselectiondialog.c: 
+	* glade/gbwidgets/gbfileselection.c: 
+	* glade/gbwidgets/gbinputdialog.c: 
+	* glade/gnome/gnomeapp.c: 
+	* glade/gnome/gnomedialog.c: 
+	* glade/gnome/gnomemessagebox.c: 
+	* glade/gnome/gnomeabout.c: used common functions in gbwindow.c for
+	all the common window properties - title, type, position, modal,
+	default w & h, shrink, grow, autoshrink, wmname & wmclass.
+	Some of these properties weren't supported by some of the widgets, so
+	I've added support for them where they are appropriate.
+	Changed position so we store it separate from the widget, so it doesn't
+	affect the window position while in Glade.
+	The Modal property is a new property, also stored separately so it
+	doesn't affect Glade.
+	The Default Width & Height properties are also new.
+	
+	* glade/gbwidget.c (gb_widget_redisplay_window): 
+	* glade/editor.c (editor_on_key_press_event): added accelerator key,
+	Ctrl-R,	and popup menu command, "Redisplay", to redisplay a window.
+	This resets the window's size so hopefully the window now appears at
+	the exact size it will be in the final interface.
+	
+	* glade/gnome/gnomemessagebox.c: XML change - changed "type" property
+	to "message_box_type" since it clashed with the standard GtkWindow
+	"type" property which I've added.
+
+	* glade/gbwidgets/gbtoolbar.c: 
+	* glade/gbwidgets/gbhbox.c: 
+	* glade/gbwidgets/gbvbox.c: 
+	* glade/gbwidgets/gbpacker.c: 
+	* glade/gbwidgets/gbtable.c: 
+	* glade/gbwidget.[hc]: 
+	* glade/property.[hc]: Moved all code to do with creating child
+	packing properties to the individual GbWidgets. Added 2 new functions
+	to the GbWidget struct - gb_widget_create_child_properties() and
+	gb_widget_get_child_properties(). (We already had
+	gb_widget_set_child_properties.)
+
+	* glade/gbwidgets/gbvpaned.c: 
+	* glade/gbwidgets/gbhpaned.c: added Position property, and Shrink
+	and Resize child packing properties.
+
+	* glade/gbwidgets/*.c: got rid of gb_widget_init_struct2() calls,
+	since it's not really better than gb_widget_init_struct() and we were
+	left with some calls to one and some to the other making it confusing.
+
+	* glade/utils.c (glade_util_create_pixmap_using_colormap): unref the
+	gdkpixmap & mask since the GtkPixmap adds refcounts to them.
+
+	* glade/gbwidget.c (gb_widget_input_child_label): when creating a label
+	for a menuitem call set_accel_widget() so any accelerator appears.
+
+1999-07-22  Herbert Valerio Riedel  <hvr@hvrlab.dhs.org>
+
+	* glade.spec.in: changed configure options in order to 
+	build on all alphas
+
+Sat Jul  3 20:08:10 1999  ape@gandalf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/source_os2.h (source_write_os2_files): 
+	* glade/source_os2.c (source_write_os2_files): Add parameters.
+
+1999-06-29  Nat Friedman  <nat@gnome-support.com>
+
+	* glade.spec: Removed this autogenerated file.
+
+1999-06-29  Jose Mercado  <jmercado@mit.edu>
+
+	* glade.spec.in (Source): Changed glade-0.4.1.tar.gz to
+ 	glade-%{ver}.tar.gz.
+
+	Changed %{prefix}/share/apps/Development/glade.desktop to
+ 	%{prefix}/share/gnome/apps/Development/glade.desktop.
+
+1999-06-28  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released patch to Glade 0.5.0
+
+1999-06-28  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/source.c (source_write_gnome_makefile_am_pixmaps_targets): 
+	(source_write_gtk_makefile_am_pixmaps_targets): used $(srcdir) when
+	installing the app's pixmaps, just like Nuno's fix for Glade below.
+
+	* glade/gbwidgets/gbentry.c (gb_entry_create_properties): renamed
+	'Visible' property to 'Text Visible' and updated description.
+	(The property is still saved as "text_visible" so the XML is unchanged)
+
+	* glade/gbwidgets/gbtoolbar.c (gb_toolbar_create_properties): added
+	button relief property (choice of normal, none, half).
+
+	* glade/gbwidgets/gbmenuitem.c (gb_menu_item_write_source): 
+	(gb_menu_item_write_accel_source): 
+	* glade/gbwidgets/gbradiomenuitem.c (gb_radio_menu_item_write_source): 
+	* glade/gbwidgets/gbcheckmenuitem.c (gb_check_menu_item_write_source): 
+	* glade/gb.h: setup accelerator signals for underlined keys.
+
+	* glade/gbwidget.c (gb_widget_write_standard_source): set separator
+	menuitems insensitive so they are skipped when moving up/down with the
+	cursor keys.
+
+	* glade/glade_clipboard.c (glade_clipboard_paste): added checks to
+	make sure we don't try to paste things where they shouldn't go.
+	Shows popup dialogs to indicate why a Paste command was not done.
+	Integrated with project window so you can select windows there and
+	copy/paste them (though we should eventually let GladeProject control
+	widget selection and make it emit signals which views can act upon).
+	
+	* glade/gbwidgets/gbhbox.c (gb_box_set_size): added call to
+	tree_add_widget() when new buttons are added to button boxes.
+
+	* glade/gbwidgets/gbnotebook.c (gb_notebook_insert_next): added calls
+	to tree_add_widget() to add new tab labels to the tree.
+	Tidied up the code which updated the number of pages in the property
+	editor after adding/removing pages.
+
+	* glade/gnome/gnomedock.c (gb_gnome_dock_add_band): added call to
+	tree_add_widget() to add new dock items to the tree.
+
+	* glade/gnome/gnomeapp.c (gb_gnome_app_new): set the GbStockIcon index
+	properly for the toolbar icons. We don't need to add 1 to it any more,
+	since 'None' was added which is equivalent to no setting.
+	Removed the GnomeApp's accel_group from the window, since we don't use
+	it and it interferes with our accelerators.
+
+	* glade/gbwidgets/gbtoolbar.c: updated GtkToolbarChild struct when we
+	change the icon.
+
+	* configure.in: 
+	* Makefile.am: install Glade logo so it appears in GnomeAbout dialog.
+
+	* glade/glade_gnome.c (glade_gnome_write_menu_item_source): output
+	empty GnomeUIInfo struct for stock subtree items with no child menu.
+
+	* glade/gnome/gnomeless.c (gb_gnome_less_write_source): called
+	gb_widget_write_standard_source().
+
+	* glade/gnome/gnomehref.c (gb_gnome_href_write_source): used
+	source_make_string() to output the URL.
+
+	* glade/gnome/gnomemessagebox.c: added properties from GnomeDialog
+	and GtkWindow, and added the write_source() function.
+
+1999-06-24  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* Makefile.am (install-data-local): Install files from $(srcdir).
+
+	* glade/data/gtk/Makefile.am (install-data-local): Install
+	autogen.sh from $(srcdir).
+
+1999-06-20  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released Glade 0.5.0
+
+1999-06-20  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+	
+	* glade/glade_project_window.c: functions to save the XML and write
+	the source now show the Project Options dialog if all the needed
+	options haven't been set, instead of showing file selection dialogs.
+	The project options dialog will fill in default values, so simply
+	clicking 'OK' will save the project or build the source code.
+
+	* glade/glade_project_options.[hc]: rewritten to make it easier to
+	setup projects.
+
+	* several other fixes and Gnome additions.
+
+1999-06-17  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidgets/gbcalendar.c: XML change - changed property names to
+	lower case.
+
+1999-06-13  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/glade_project_options.[hc]: added option to save translatable
+	strings, so interfaces loaded by libglade can be translated.
+	I'm going to rearrange the project options a bit so that everything
+	can be set relative to the project directory.
+
+	* glade/gbwidgets/gbbutton.c: added support for buttons in GnomeDialog
+	and GnomeMessageBox - these can be stock buttons or a stock icon
+	and a label.
+
+	* glade/gbwidgets/gbmenubar.c (gb_menu_bar_write_source): 
+	* glade/gbwidgets/gbmenu.c (gb_menu_write_source): added support for
+	using gnome_app_fill_menu() to fill a menu with using GnomeUIInfo
+	data. We need this for popup menus and for menubars which aren't in
+	a GnomeApp. Unfinished - need to support accelerators better.
+
+	* glade/gbwidgets/gblabel.c: fixed justify property. Added wrap.
+
+1999-06-07  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/glade_project_window.c (glade_project_window_new): set
+	show grid and snap to grid toggle menu items.
+
+	* glade/gbwidgets/gbprogressbar.c: added a few properties -
+	Value, Min, Max, Format, XAlign, YAlign.
+
+	* glade/glade_project.c (glade_project_init): fixed typo.
+
+1999-06-06  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/source.c (source_write_component): initialized data->parent to
+	NULL, so we don't get SEGVs.
+
+	* glade/save.[hc]
+	* glade/gbwidget.[hc]
+	* glade/gbwidgets/*.c
+	* glade/gnome/*.c: added support for saving translatable string
+	properties, so that we can save a C file containing all the
+	translatable strings in the interface. When using libglade, this file
+	can be added to an app's POTFILES.in, and thus the interface can be
+	translated easily. This is not quite finished - I need to add the file
+	as a project option.
+	
+1999-06-05  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Lots of Gnome changes.
+
+	* glade/source.c: major reorganization, to split the code into
+	decent functions and handle errors better.
+
+	* glade/glade.[hc]: added GladeError data type which holds an error
+	code, a possible errno code for system errors, and an error message.
+	Also function to create errors and free them.
+	GladeStatusCode didn't really contain enough info to give the user
+	decent error messages, and we were duplicating system error codes.
+	GladeError is used mainly in source.c for now, but I may update other
+	parts of Glade to use it.
+
+	*glade/graphics/*: updated most Gnome icons, and a few GTK+ ones.
+	Still not perfect, but adequate.
+	
+1999-05-11  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* updated lots of Gnome-related code - loading & saving should work
+	  for most things.
+	* added const to many function arguments.
+	* in source output connected signals last, so any widget names used
+	  in the object/data fields will be OK.
+	* added support for using the same handler in several places - we only
+	  output it once. Though handler prototypes may not match - we leave
+	  that problem to the user for now.
+	* added "gtk_widget_hide" as a standard signal handler.
+	* fixed selection of viewport children.
+	* added initial (empty) DocBook manual.
+	* changed default fill/expand options for widgets in boxes/tables, and
+	  made sure placeholders don't expand and mess up other widgets' sizes.
+	* connected to menubar "size_request" to ensure it's a reasonable size.
+	
+	* glade/load.c: 
+	* glade/property.[hc]: stopped using GtkPreview to display style
+	colors.	We weren't using it properly, which led to problems on some
+	systems. To use it properly we have to set the colormap of the entire
+	property editor window to the GtkPreview's desired colormap, which can
+	mean lots of colormap swapping on low-color displays. So instead we
+	just use the closest color we can. (The colorsel dialog may still use
+	its own colormap but that's not so bad as it is a temporary dialog.)
+	Also changed it to use GdkColors internally so we can save colors as
+	16-bit values in future, i.e. using the format "RGB:rrrr/gggg/bbbb".
+
+Mon May 10 11:54:33 1999  omega@cse.ogi.edu  (Erik Walthinsen)
+
+	* removed glade/glade.desktop, made sure the top-level one is up
+	to date.
+
+Thu May  6 13:47:23 1999  omega@cse.ogi.edu  (Erik Walthinsen)
+
+	* put the glade.desktop file back in place (where'd it go??)
+
+Wed May  5 17:08:00 1999  omega@cse.ogi.edu  (Erik Walthinsen)
+
+	* glade.spec.in: added line for new m4 files
+
+1999-05-05  Jacob Berkman  <jberk+@cmu.edu>
+
+	* glade/Makefile.am (Developmentdir): install the .desktop in
+	in the correct directory
+
+Sun May  2 14:04:45 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/utils.c: Add <sys/types.h>
+
+1999-04-28  Martijn van Beers  <martijn@earthling.net>
+
+	* glade/gbwidget.[ch]: Added a gb_widget_set_child_props function
+	  pointer to GbWidget, and have set_special_child_properties use it.
+	* tools/mkskel.pl: added the gb_widget_set_child_props here
+	* glade/gbwidgets/gbtable.c:
+	* glade/gbwidgets/gb[hv]box.c:
+	* glade/gbwidgets/gbtoolbar.c:
+	* glade/gbwidgets/gbpacker.c: Copied code from
+	  set_special_child_properties to here.
+	* utils.[ch]: added a glade_widget_to_gb function that gets the
+	  gbwidget for a widget. Gets used where appropriate.
+
+1999-04-27  Martijn van Beers  <martijn@earthling.net>
+
+	* acconfig.h:
+	* configure.in:
+	* glade/Makefile.am: Added configure flag to decide what kind
+	  of palette layout you want
+	* gbwidget.c(gb_widget_init): Put adding items to palette here
+	  (gb_widget_init_widget_lib): New function for adding the widgets
+	  in one lib
+	* palette.[ch]: Changed to have widgets added from gbwidget.c
+	* glade_gtk11lib.[ch]: renamed/split  to glade_gtk12lib.[ch] and
+	  glade_gnomelib.[ch]
+
+1999-04-25  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidgets/gbvbuttonbox.c (on_vbbox_dialog_ok): 
+	* glade/gbwidgets/gbhbuttonbox.c (on_hbbox_dialog_ok): 
+	* glade/gbwidget.c (gb_widget_update_box_size): set GTK_CAN_DEFAULT
+	flag for new buttons in a button box.
+
+	* glade/glade_project_window.c: Updated Gnome code to make it conform
+	more to the Gnome style guide - gnome-libs/devel-docs/suggestions.txt,
+	by using stock menu items where possible, adding underlined accelerator
+	keys to all menu items, and adding a 'Settings' menu for the grid and
+	snap settings. Let me know of anything which doesn't conform.
+	Also set up the status bar so it shows tips for each menuitem, though
+	unfortunately these are often hidden by the menus.
+	
+	* configure.in: 
+	* glade/Makefile.am: added BUILD_GNOME conditional to build gnome
+	GbWidgets only if Gnome is installed and --disable-gnome isn't used.
+
+	* glade/gnome/*: added new directory to support Gnome widgets.
+	* glade/glade_gtk11lib.c: added Gnome widgets to a new section.
+
+	* glade/glade_menu_editor.[hc]: added support for stock Gnome menuitems
+	and icons. Got rid of handler data and object entries. These would be
+	quite awkward to use, and I don't think are essential. Gnome doesn't
+	support setting the object, and using the data field would be quite
+	difficult as well.
+	Made more self-contained - all the caller has to do now is pass it
+	the project & menu to edit. It updates the menu itself.
+	Added support for underlining the labels, for keyboard shortcuts.
+	
+	* glade/gbwidget.c: 
+	* glade/gbwidgets/*.c: got rid of 'child' arguments. I don't think
+	these would have worked, and having separate functions for handling
+	child properties is cleaner anyway.
+
+	* glade/*.[hc]:
+	* glade/gbwidgets/*.c: Got rid of '#include <gtk/gtk.h>' from most
+	files, and included only those headers which are needed by each file.
+	This speeds up compilation quite a bit.
+	
+	* glade/gladeconfig.h: Got rid of '#include <gnome.h>' and replaced it
+	with files needed for i18n, to speed up compilation for those files
+	which don't need all of the Gnome headers included.
+
+1999-04-25  Martijn van Beers  <martijn@earthling.net>
+
+	* glade/gbwidget.[ch]:
+	* glade/gbwidgets/*.c: finally reverted my 03-11 commit
+
+Thu Apr 24 00:22:15 1999  omega@cse.ogi.edu (Erik Walthinsen)
+
+	* new spec.in file, changes to Makefile.am and configure.in
+	* glade.desktop file, appropriate changes to glade/Makefile.am
+
+Mon Apr  5 11:13:46 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/gbwidgets/gbtext.c (gb_text_write_source): Remove some
+	debug printouts.
+
+Thu Apr  1 15:51:20 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/source.c (source_write_makefile): Open files in TEXT mode.
+	"Simplify" the parameter passing of source_write_makefile(),,
+
+Wed Mar 31 20:54:59 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/gbwidgets/gbtoolbar.c (gb_toolbar_init): 
+	* glade/gbwidgets/gbtogglebutton.c (gb_toggle_button_init): 
+	* glade/gbwidgets/gbtext.c (gb_text_init): 
+	* glade/gbwidgets/gbtable.c (gb_table_init): 
+	* glade/gbwidgets/gbstatusbar.c (gb_statusbar_init): 
+	* glade/gbwidgets/gbspinbutton.c (gb_spin_button_init): 
+	* glade/gbwidgets/gbscrolledwindow.c (gb_scrolled_window_init): 
+	* glade/gbwidgets/gbradiomenuitem.c (gb_radio_menu_item_init): 
+	* glade/gbwidgets/gbradiobutton.c (gb_radio_button_init): 
+	* glade/gbwidgets/gbprogressbar.c (gb_progress_bar_init): 
+	* glade/gbwidgets/gbpreview.c (gb_preview_init): 
+	* glade/gbwidgets/gbpixmap.c (gb_pixmap_init): 
+	* glade/gbwidgets/gbpacker.c (gb_packer_init): 
+	* glade/gbwidgets/gboptionmenu.c (gb_option_menu_init): 
+	* glade/gbwidgets/gbnotebook.c (gb_notebook_init): 
+	* glade/gbwidgets/gbmenuitem.c (gb_menu_item_init): 
+	* glade/gbwidgets/gbmenubar.c (gb_menu_bar_init): 
+	Use gb_widget_init_struct2().
+	
+1999-03-28  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released Glade 0.4.1
+	
+1999-03-28  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidget.c (gb_widget_write_standard_source): updated code to
+	set the widget size & position.
+	(set_position_properties): set GB_X_SET, GB_WIDTH_SET etc. when
+	loading widgets.
+
+	* glade/property.c (property_set_sensitive_full): set the toggle
+	buttons active according to if the value is sensitive.
+
+	* glade/glade_project.[hc]: added Ada95 language, and separate
+	functions to output the source code for each language.
+
+	* glade/utils.c: changed glade_util_show_dialog() to
+	glade_util_create_dialog_with_buttons() and updated slightly.
+
+	* glade/glade.[hc]: added glade_current_directory variable which
+	contains the current directory when Glade was started. We need to
+	remember it since that we use chdir when writing the source.
+
+	* glade/gbwidgets/gbprogressbar.c (gb_progress_bar_write_source): a
+	couple of source output fixes.
+
+	* glade/gbwidgets/gbvruler.c (gb_vruler_write_source): 
+	* glade/gbwidgets/gbhruler.c (gb_hruler_write_source): minor fix to
+	source output to use 'GTK_RULER ()'.
+
+	* glade/Makefile.am: added source_os2.[hc]
+
+	* glade/glade_project_window.c: added confirmation dialog when creating
+	a new project, so the user doesn't accidentally lose the current one.
+	Added support for running external source code generators.
+
+	* glade/glade_project_options.c (glade_project_options_ok): ordered
+	calls to set project options so that defaults are used if some options
+	are not set.
+
+	* glade/gbwidget.[hc]: added GB_X_SET and GB_Y_SET to GbWidgetData
+	flags, similar to GB_WIDTH_SET and GB_HEIGHT_SET.
+	Updated get/set_position_properties.
+	Fixed tooltips bug which meant all tooltips were lost.
+	Fixed problem pasting toolbar buttons into other containers.
+	
+	* glade/editor.c (add_widget_to_fixed_finish): set GB_X_SET and
+	GB_Y_SET when adding new widgets.
+
+	* glade/property.c: added property_add_optional_int_range() to use for
+	the x, y, width and height properties, and callbacks used when the
+	properties are turned on/off.
+	Added property page for Ada95 options (though there aren't any yet).
+	
+	* glade/gbwidgets/gbcolorselectiondialog.c (gb_color_selection_dialog_set_properties): 
+	* glade/gbwidgets/gbdialog.c (gb_dialog_set_properties): 
+	* glade/gbwidgets/gbfileselection.c (gb_file_selection_set_properties): 
+	* glade/gbwidgets/gbfontselectiondialog.c (gb_font_selection_dialog_set_properties): 
+	* glade/gbwidgets/gbwindow.c (gb_window_set_properties): update the
+	position properties after the window position property is changed.
+	
+	* glade/gbwidgets/gbcalendar.c: use '::' in property names instead
+	of ':'.
+
+	* examples/editor/gladesrc.c (create_pixmap): fixed bug which caused
+	infinite loops when the app was installed.
+
+1999-03-21  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Released Glade 0.4.0
+	
+1999-03-20  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/source.c (source_write_main_c_preamble): fixed searching of
+	pixmap directories.
+
+Mon Mar 15 16:03:51 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/gbwidgets/gbwindow.c (gb_window_init): 
+	* glade/gbwidgets/gbvseparator.c (gb_vseparator_init): 
+	* glade/gbwidgets/gbvscrollbar.c (gb_vscrollbar_init): 
+	* glade/gbwidgets/gbvscale.c (gb_vscale_init): 
+	* glade/gbwidgets/gbvruler.c (gb_vruler_init): 
+	* glade/gbwidgets/gbvpaned.c (gb_vpaned_init): 
+	* glade/gbwidgets/gbviewport.c (gb_viewport_init): 
+	* glade/gbwidgets/gbvbuttonbox.c (gb_vbutton_box_init): 
+	* glade/gbwidgets/gbvbox.c (gb_vbox_init): 
+	* glade/gbwidgets/gbtreeitem.c (gb_tree_item_init): 
+	* glade/gbwidgets/gbtree.c (gb_tree_init): 
+	Use gb_widget_init_struct2().
+
+1999-03-14  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/graphics/calendar.xpm: 
+	* glade/gbwidgets/gbcalendar.c: New files for GtkCalendar.
+
+	* glade/gbwidget.c (set_position_properties): 
+	* glade/editor.c (add_widget_to_fixed_finish): for children of fixed
+	containers we were using the allocation to keep the width & height.
+	But this doesn't work since it is only calculated when the widget is
+	shown. So we use wdata->w & wdata->h instead.
+
+	* glade/load.c: use a few macros for better performance.
+
+	* glade/utils.c (glade_util_strstr): fixed for loops which used
+	strlen() and so were very slow (also a few other places as well).
+
+	* glade/glade_project.c (glade_project_real_ensure_widgets_named): 
+	forgot to pass project to gb_widget_children_foreach().
+
+	* glade/glade_project_window.c (glade_project_window_new): changed
+	all uses of _ to N_ in the GnomeUIInfo structs.
+
+	* glade/main.c (parse_command_line): Don't do this for Gnome, since
+	they use popt.
+
+	* glade/glade_project_options.c (glade_project_options_ok): don't
+	destroy the filesel here since it is destroyed in
+	glade_project_options_destroy().
+
+	* glade/glade_project_options.[hc]: added xml_filename_entry, for
+	setting the XML filename.
+
+	* glade/utils.[hc]: add glade_util_copy_string() which is similar to
+	g_strdup() but returns NULL if the string is empty.
+
+	* glade/glade_project.c: use glade_util_copy_string() when loading
+	project options, so empty directories are set to NULL.
+
+	* glade/glade_project_window.c: handle directories set to NULL or "",
+	just in case. Also include <gnome.h> when USE_GNOME set.
+
+	* glade/glade_clipboard.c (glade_clipboard_paste): 
+	* glade/gbwidget.c (gb_widget_add_child): 
+	* glade/gbwidget.h: we now use the real parent when replacing a widget,
+	otherwise widget creation functions may not work. We store a pointer
+	to the widget being replaced instead of the original boolean.
+
+	* glade/property.c (property_redirect_key_press): only allow short
+	one-line labels to be edited via type-over, since GtkText can crash if
+	it hasn't already been realized etc.
+
+	* glade/gbwidget.c (gb_widget_output_child_icon): if the widget is not
+	a toolbar button we clear the icon property and set in insensitive.
+
+1999-03-11  Martijn van Beers  <martijn@earthling.net>
+
+	* gbwidget.h: added an extra param to gb_widget_*_properties
+	* gbwidget.c: add the extra param to gb_widget_*properties
+	* gbwidgets/*.c: add the new param here too
+	* gbwidgets/gbctree.c: use gbclist's _add_child function
+
+Wed Mar 10 16:46:25 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/gbwidget.c (gb_widget_init_struct2): Add this new function.
+	* glade/gbwidgets/gbprogressbar.c (gb_progress_bar_init): Use it.
+	
+Tue Mar  9 20:22:47 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/gbwidget.c (gb_widget_add_child): Add return
+	when parent == NULL otherwise glade crash !
+
+1999-03-09  Martijn van Beers  <martijn@earthling.net>
+
+	* gbwidget.h: Added gb_widget_add_child function to GbWidget
+	* gbwidget.c: Make use of new GbWidget function
+	put gb_widget_insert_toolbar_child declaration in gbwidget.h.
+
+	* gbwidgets/gbbutton.c:
+	* gbwidgets/gbclist.c:
+	* gbwidgets/cbmenuitem.c:
+	* gbwidgets/gbnotebook.c:
+	* gbwidgets/gbtoolbar.c: Implement new GbWidget function
+
+Sun Feb 28 11:58:35 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/source_os2.h: 
+	* glade/source_os2.c: New files.
+
+	* glade/source.c: Genertate makefiles for OS/2 version.
+	Made function create_file_if_not_exist() global.
+
+Fri Feb 26 17:05:08 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* configure.in: Add check for os2.h (OS/2 version)
+
+Wed Feb 24 16:20:09 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/glade_clipboard.c (glade_clipboard_paste): 
+	Use load_init_before_read().
+	* glade/load.c (load_init_before_read): Added this function.
+
+	* glade/glade_project_window.c (glade_project_window_new): 
+	* glade/glade_menu_editor.c (glade_menu_editor_init): 
+	* glade/glade_keys_dialog.c (glade_keys_dialog_init): 
+	* glade/glade_clipboard.c (glade_clipboard_init): 
+        Use gb_box_clist_auto_policy() function.
+	* glade/property.c: 
+	* glade/gbwidget.c (gb_box_clist_auto_policy): Moved this function
+	from property.c to gbwidget.c.
+	
+
+Tue Feb 23 16:28:31 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/property.c (gb_box_clist_auto_policy): Add this function.
+
+Mon Feb 22 08:37:04 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/glade_clipboard.c: 
+	* glade/load.c: Added:	
+	void load_show_error_list(GList *p);
+	void load_free_error_list(GList *p);
+
+Sun Feb 21 11:51:07 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/glade_clipboard.c (glade_clipboard_paste): 
+	* glade/load.c (real_load_project_file): 
+	use gb_init_load_properties() and gb_free_load_properties().
+
+	* glade/gbwidget.c (gb_add_properties): added this function
+	to simplify the handling of the properties.
+	Also added:
+	void        gb_free_load_properties (GbLoadPropControl *p);
+	void        gb_init_load_properties (GbLoadPropControl *p);
+	void gb_realloc_properties_if_needed (GbLoadPropControl *p);
+	
+
+Sat Feb 20 18:23:49 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/load.c: 
+	* glade/gbwidget.c:
+	* glade/glade_clipboard.c: 
+	* glade/gbwidget.h (struct _GbLoadPropControl): add this struct.
+
+Fri Feb 19 21:58:05 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/glade_project.c (glade_project_open): Fix error so
+	source code can be written to "source_directory".
+
+1999-02-18  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* Major changes to the project-related code and the widget tree.
+	This needed changes to most of the main source files.
+	
+	* glade_project.[hc]: 
+	* glade/projconfr.[hc]: 
+	* glade/projconf.[hc]: removed.
+
+	* glade/glade_project_window.[hc]: 
+	* glade/glade_project_view.[hc]: 
+	* glade/glade_project_options.[hc]: 
+	* glade/glade_project.[hc]: new files containing a more OO
+	implementation of projects. Eventually we will be able to support
+	multiple open projects.
+
+	* glade/tree.[hc]: major changes to make it easier to use and more
+	reliable. Also changed the way widgets are added to the tree, getting
+	rid of gb_widget_add_callback() and the children field of
+	GbWidgetNewData, which was previously used for several of the dialogs
+	in gbwidgets/.
+	
+	* glade/graphics/*.xpm: updated all pixmaps so that transparency is
+	only used for the edges of the widgets, not inside the widgets. This
+	makes the widget tree look better. Also took transparency out of the
+	placeholder.xpm since it isn't needed.
+
+	* glade/glade_clipboard.[hc]: New files to support Cut & Paste, though
+	this isn't quite finished yet.
+
+	* glade/property.c
+	* glade/gbwidget.c: Added support for a few C and C++ source code
+	options for each widget. (But they are not used yet.)
+
+	* glade/editor.c
+	* glade_property.c: Added experimental support for typing in widget
+	labels while the mouse is over the label/button in the interface.
+	Unfortunately GtkText SEGVs if the label is a few lines long, so we
+	may not be able to use this.
+	
+	* glade/utils.[hc]: Moved DayNames, MonthNames and
+	find_start_of_tag_name() from save.[hc] to here and renamed them.
+	Also added/moved more utility functions.
+
+	* glade/gbwidgets/gbscrolledwindow.c: added support for
+	GTK_POLICY_NEVER (for GTK 1.1).
+
+	* glade/gbwidgets/gbfontselectiondialog.c: added get_child() function
+	so loading works OK.
+
+	* glade/project.c: added icons for project options and writing source,
+	& Ctrl-W accelerator to write source.
+
+	* glade/editor.c (editor_on_button_press): 
+	(editor_on_motion_notify): ignore events on clist column resize
+	windows, so columns can still be resized.
+	(editor_on_button_release): remove the grab on the widget just
+	moved/resized, i.e. the one we added the grab on.
+	(editor_on_key_press_event): use Ctrl-L to refresh the component.
+	(add_mouse_signals_recursive): stop 'enter_notify' and 'leave_notify'
+	signals getting to widgets while we move/resize them, to cut down
+	on flickering (a bit).
+	(do_drag_action): we don't need to show the position properties since
+	they are now shown in on_size_allocate(). Also, set wdata->x etc.
+	before calling gtk functions since they trigger callbacks.
+
+	* glade/gbwidgets/gbdialog.c (gb_dialog_new): better initial size.
+
+	* glade/gbwidgets/gbwindow.c (gb_window_new): set initial size to
+	400x300.
+
+	* glade/editor.c (add_widget_to_fixed_finish): use a reasonable
+	size for clists/ctrees and notebooks in fixed containers.
+
+	* glade/glade_menu_editor.c: only update the radio group combo when
+	an item's properties are shown in the right half of the dialog, or
+	when the menu being edited is first set.
+	The new GTK 1.1 combo changes the entry text as you drag the mouse
+	over the popup menu. This was causing the menu editor to try to
+	recreate the popup menu (while it was displayed), which caused a SEGV.
+
+	* glade/gbwidget.c (gb_widget_write_source): For empty notebook
+	pages we create a dummy vbox, so it still runs OK. For empty tabs,
+	we increment the 'last_child' value so the order isn't messed up.
+	We also do this for empty clist/ctree titles.
+	(gb_widget_save):
+	(gb_widget_load): For placeholders we still load & save the
+	'child_name' property.
+
+Sun Feb 14 18:22:33 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/source.c (create_file_if_not_exist): add this function.
+	Open all text files with "wt" instead of "w".
+
+Sat Feb 13 11:26:15 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/gbwidget.c (gb_widget_save): call save_newline with
+	pointer to  GbBuffControl.
+
+	* glade/save.h: new input structure.
+ 	    save_newline (GbBuffControl *data);
+
+	* glade/save.c (save_buffer_add): use GbBuffControl 
+
+	* glade/project.c (gb_menu_seperator): Adding this function.
+
+Sun Feb  7 20:05:07 1999  ape@spacetec.no  (Asbjorn Pettersen)
+
+	* glade/projconf.c: add #include "project.h"
+
+	* glade/project.c: 
+	* glade/main.c (main): current_project variable is seen from the
+ 	main function and not hidden inside projconfr.c  .
+
+	* glade/glade.c (glade_init): decoupled the
+	global variable current_project.
+
+	* glade/projconfr.c (init_current_project): decoupled the
+	global variable current_project.
+
+Sat Feb  6 18:03:10 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/load.c (load_entity): added 2 new functions:
+
+	gboolean read_entity(GbWidgetSetArgData * data, gchar *entity);
+
+	void load_entity (GbWidgetSetArgData * data);
+
+	
+	load_buffer_add_char() use GbBuffControl instead of GbWidgetSetArgData. 
+
+Thu Feb  4 12:44:21 1999  ape@lrdpf.spacetec.no  (Asbjorn Pettersen)
+
+	* glade/gbwidgets/gboptionmenu.c: 
+	* glade/gbwidgets/gbpixmap.c:
+	* glade/gbwidgets/gbradiobutton.c:
+	* glade/gbwidgets/gbradiomenuitem.c:
+	* glade/save.c: 
+	* glade/source.c: 
+	* glade/gbwidget.c: 
+	* glade/gbwidget.h (struct _GbWidgetGetArgData): use
+	GbBuffControl . 
+
+	* glade/load.c (real_load_project_file): Use the new struct
+	GbBuffControl and function gb_init_buffer_struct().
+
+	* glade/gbwidget.c (gb_init_buffer_struct): added new function	
+	gb_init_buffer_struct (int pos, int space, GbBuffControl * p);
+
+	Changed all buffer to buffer.ptr, buffer_pos to buffer.pos,,,
+
+Thu Feb  4 12:39:18 1999  ape@spacetec.no  (Asbjorn Pettersen)
+
+	* glade/gbwidget.h (struct _GbBuffControl): add this struct.
+        used in struct _GbWidgetSetArgData. 
+
+Mon Feb  1 16:58:04 1999  ape@spacetec.no  (Asbjorn Pettersen)
+
+	* glade/property.h: GbEventMaskSymbols and GbEventMaskValues
+	must be declared external.
+
+1999-01-25  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidget.c (gb_widget_add_child): 
+	(gb_widget_write_add_child_source): handle CTree column titles
+	just like CList column titles.
+
+	* glade/gbwidgets/gbctree.c: updated code to handle column titles.
+
+1999-01-22  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/glade_menu_editor.c (glade_menu_editor_update_menu): based
+	names of submenus on the name of the parent item, rather than
+	generating a new name each time (from Elliot Turner).
+
+	* glade/source.c (source_write_component): Put "tooltips" in object's
+	datalist, so the developer can access it (from Elliot Turner).
+
+	* glade/main.c: new file to contain main().
+	* glade/debug.[ch]: new files for debugging functions/macros.
+	* glade/glade.[ch]: moved GladeStatusCode declaration to the header,
+	and added functions to be called by gIDE.
+	
+	* glade/*.h: Added #ifdef __cplusplus tests to several headers.
+
+	* glade/*.[ch]: Changed names of several structs/enums:
+	GbProjectStruc -> GladeProject.
+	GbStatusCode -> GladeStatusCode.
+	glade_palette_section -> GladePaletteSectionData.
+	glade_widget -> GladeWidgetInitData.
+	Also renamed the status codes to begin with 'GLADE_STATUS_' rather
+	than just 'GB_'.
+	
+	* glade/glade_palette.[hc]: Added 'select_item' and 'unselect_item'
+	signals to the palette.
+	* glade/palette.c (on_palette_select_item): creates toplevel items
+	when they are selected on the palette.
+	* glade/glade_gtk10lib.c: 
+	* glade/glade_gtk11lib.c: add toplevel items to the palettes.
+	* glade/project.c: removed toplevel items from toolbar, and added
+	standard 'New', 'Open' & 'Save' buttons instead. Also added status bar,
+	with messages when files opened/saved or source is written.
+
+	* glade/projconf.c: removed the Glade support functions get_widget()
+	and set_notebook_tab().
+
+	* glade/graphics/text.xpm: Tweaked a bit to look nicer.
+
+1999-01-21  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/project.c: added support for rc files. Removed code to set
+	tooltips colors, since it doesn't work with GTK 1.1. Tidied up a bit.
+
+1999-01-19  Jeff Garzik  <jgarzik@pobox.com>
+
+	* glade/source.c:
+	Cleaned up autoconf/automake output source a bit.  CFLAGS and LIBS 
+	are now computed in Makefile.am, config.h is conditionally
+	included in every file, and some other minor cleanups.
+	autoheader is now used to generated config.h.in as well.
+
+	* glade/editor.c:
+	Declare glade_palette_reset_selection to eliminate warnings.
+
+	* glade/gbwidget.c, glade/projconf.c, glade/projconfr.c,
+	  glade/project.c, glade/project.h, glade/save.c,
+	  glade/source.c:
+	Add intl strings property.
+
+	* glade/gtkfontsel.c, glade/projconf.c:
+	Marked more strings for translation.
+
+	* glade/project.c:
+	Include string.h to eliminate warnings.
+	Small fixes for USE_GNOME support.
+
+	* po/POTFILES.in, po/cat-id-tbl.c, po/de.po, po/es.po,
+	  po/fr.po, po/glade.pot, po/pt_BR.po:
+	Added glade/glade_palette.c to POTFILES.in.  That and new
+	translated strings from the above changes triggered *.po
+	updates.
+
+1999-01-19  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/palette.[ch]: moved most of the code to glade_palette.[ch]
+	which also resulted in minor changes in a few other files.
+
+	* glade/glade_gtk11lib.c: 
+	* glade/glade_gtk10lib.c: added copyright and tidied up. Also added
+	alternative layout for GTK 1.1 so we can decide between them.
+	(Note that using windows & dialogs from the palette causes a crash
+	at the moment.)
+
+	* glade/glade_palette.[ch]: renamed gladepalette.[ch] to fit in with
+	the other widgets, and changed code quite a bit.
+
+1999-01-18  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/graphics/handlebox.xpm: designed a nicer icon. Now I'm pretty
+	happy with all the icons, except maybe the font selection ones.
+
+1999-01-16  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* doc/developer.txt: added description of how to compile and set up
+	Glade for debugging.
+
+	* glade/gladeconfig.h: changed the MSG macros so that they can be
+	turned on/off by setting the GLADE_DEBUG env var. Set it to 'messages'
+	to see all the debugging output (you must compile with --enable-debug
+	as well). If you want Glade to abort on warnings as well, use
+	export GLADE_DEBUG='messages:warnings' or similar.
+
+1999-01-15  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidgets/gbtoolbar.c: added dialog for creating toolbars,
+	a 'Size' property like the boxes, and menu commands to add items etc.
+
+	I'm afraid the toolbar needed a lot of special code! ...
+	
+	* glade/gbwidget.c (gb_widget_new_toolbar_button): 
+	(gb_widget_insert_toolbar_child): 
+	(gb_widget_is_toolbar_button): 
+	(gb_widget_get_toolbar_button_widgets): 
+	(gb_widget_get_new_toolbar_group): 
+	(gb_widget_set_new_toolbar_group): 
+	(gb_widget_write_toolbar_button_source): added several utility
+	functions for toolbars.
+
+	(gb_widget_add_child): handle loading of toolbar children.
+	(gb_widget_replace_child): handle toolbar children. Also, don't copy
+	the child name to a toolbar button which is replaced, since it may
+	not be a toolbar button.
+
+	(get_special_child_properties): 
+	(set_special_child_properties): handle toolbar 'New Group' property.
+
+	(gb_widget_input_child_label): 
+	(gb_widget_output_child_label): handle toolbar button labels.
+
+	(gb_widget_output_child_icon): 
+	(gb_widget_input_child_icon): handle toolbar button icons.
+
+	(gb_widget_create_toolbar_button_popup_menu):
+	(gb_widget_convert_toolbar_button): create menu commands to turn
+	toolbar buttons into ordinary widgets in the toolbar.
+
+	(gb_widget_write_standard_source): don't unset CAN_FOCUS for toolbar
+	children since that is the default. Also don't set the tooltip for
+	toolbar	children, since that is set when they are created.
+	(gb_widget_write_add_child_source): handle toolbar children which are
+	standard widgets. Toolbar buttons are added to the toolbar when
+	they are created instead.
+
+	* glade/gbwidget.c (gb_widget_replace_child): for menubars and
+	toolbars in a box, we set expand to FALSE by default as that is what
+	is wanted most of the time.
+
+	* glade/gbwidgets/gbtogglebutton.c: 
+	* glade/gbwidgets/gbradiobutton.c: 
+	* glade/gbwidgets/gbbutton.c: added support for toolbar buttons which
+	are a special case - they have a child icon & label.
+
+	* glade/gbwidget.c (get_standard_properties): don't allow widgets with
+	no windows to have tooltips, since they won't work anyway. Also
+	for toolbar children we use the toolbar's own tooltips.
+
+1999-01-13  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidgets/gbentry.c: use gtk_entry_get_text () instead of the
+	GtkEntry text field which is now GtkWChar rather than gchar.
+
+	* glade/project.c: 
+	* glade/project.h: added support for passing debugging options into
+	Glade via environment variables. The only option at present is
+	'warnings' which will cause an abort() when a WARNING message is issued
+	so you can use gdb to see exactly what happened and where.
+	(This only works with GTK 1.1.x)
+
+	* glade/property.c (create_style_property_page): 
+	(create_style_page): 
+	(property_add_adjustment): 
+	* glade/palette.c (palette_create): 
+	Changed 'gettext' to '_' so that we always specify the domain,
+	which I think we need to do if Glade becomes a library.
+	(Otherwise we implicitly use the current domain which may be set by
+	the main application, e.g. gIDE, so translations won't be found.)
+	
+1999-01-11  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/gbwidgets/gbtoolbar.c: some code for editing toolbars, which
+	doesn't work yet. I think I am going to create a dummy GtkToolbarItem
+	object, since the GtkToolbar isn't very object-oriented.
+
+1999-01-07  Damon Chaplin  <damon@karuna.freeserve.co.uk>
+
+	* glade/load.c (load_project_file): set TZ env var to GMT while
+	loading a project, so that we can easily parse RFC1123 dates and
+	convert them to time_t using mktime().
+
+	* glade/gbwidget.c (set_standard_properties): made sure CAN_FOCUS is
+	always set/unset when XML file is loaded.
+
+1998-12-22  Damon Chaplin  <DAChaplin@msn.com>
+
+	* glade/projconfr.c: changed all gtk_signal_connect_object() to
+	gtk_signal_connect() since I think that was what was intended.
+	It was causing the 'OK' and 'Cancel' buttons on the Filenames page to
+	disappear before.
+
+1998-12-14  Elliot Turner  <turnere@MimeStar.com>
+
+      * glade/gbwidget.c:
+      * glade/projconf.c:
+      * glade/projconf.h:
+      * glade/projconfr.c:
+      * glade/projconfr.h:
+      * glade/project.c:
+      * glade/project.h:
+      * glade/save.c: added support for project directory configuration
+        option, with loading/saving in the project XML file.
+
+      * glade/glade_menu_editor.c:
+      * glade/glade_menu_editor.h: added signal handler data and object
+      configuration options to the glade menu editor.
+
+      * glade/editor.c:
+      * glade/editor.h:
+      * glade/gbwidget.c:
+      * glade/gbwidget.h:
+      * glade/project.c:
+      * glade/source.c: added "convert to/from embedded component"
+        functionality in editor, along with changes to allow for subcomponent
+        creation in the  source code generation subsystem.
+
+1998-12-03  Damon Chaplin  <DAChaplin@msn.com>
+
+	* configure.in: Changed version to 0.4.0
+	* configure.in: added AC_LINK_FILES back since we are now using
+	Gnome's intl directory which is gettext 0.10.32. Though I think it
+	is going to be removed from Gnome and users must install gettext
+	themselves.
+
+	* glade/project.c: 
+	* glade/save.c: 
+	* glade/source.c: include <sys/types.h> before <sys/stat.h> for OS/2
+
+1998-12-02  Damon Chaplin  <DAChaplin@msn.com>
+
+	* glade/source.c: 
+	* glade/source.h (source_make_string): added translatable parameter,
+	so that we can output gettext macros if desired.
+	* glade/*.c glade/gbwidgets/*.c: updated all calls to
+	source_make_string().
+	* glade/gbwidget.h: added use_gettext boolean option to
+	GbWidgetWriteSourceData.
+	
+1998-12-02  Damon Chaplin  <DAChaplin@msn.com>
+
+	* Released Glade 0.3.9
+	
+1998-11-30  Damon Chaplin  <DAChaplin@msn.com>
+
+	* glade/property.c (create_widget_property_page): for GTK 1.1.[45] we
+	use GTK_SCROLLED_WINDOW (page)->child, for the latest CVS version
+	(the one with GTK_HAVE_FEATURES_1_1_5 defined) we use
+	GTK_BIN (page)->child.
+
+	* glade/gbwidget.c (gb_widget_replace_child): handle scrolled window
+	children in GTK 1.1.5.
+
+1999-01-18  Martijn van Beers  <martijn@earthling.net>
+
+	* configure.in: Changes to support checking whether we have gtk-1.1
+	in Makefile.am
+	* Makefile.am: added new files
+	* glade/gbwidgetarray.[ch]: removed in favor of glade_gtk1?lib.[ch]
+	* glade/glade.h:
+	* glade/glade_gtk10lib.[ch]:
+	* glade/glade_gtk11lib.[ch]: new files to support the new palette
+	* glade/gladepalette.[ch]: the new palette code
+	* glade/gb.h:
+	* glade/gbwidget.c:
+	* glade/palette.c:
+	* po/POTFILES.in: changes to support the new palette
+	
+1998-12-01  Damon Chaplin  <DAChaplin@msn.com>
+
+	* glade/gbwidget.c (gb_widget_replace_child): remove '//' comment.
+	* glade/tree.c (tree_init): removed '//' comment.
+
+	* glade/gbwidget.c (gb_widget_write_source): use gtk_object_newv to
+	create the standard widgets that we get the default properties from,
+	since otherwise GTK 1.1.5 complains when they are destroyed.
+
+	* glade/gbwidgets/gbctree.c: 
+	* glade/gbwidgets/gbclist.c: use gtk_clist_set_shadow_type() instead of
+	the deprecated gtk_clist_set_border().
+
+	* glade/editor.c (add_mouse_signals_recursive): use
+	gb_widget_children_foreach() so we also add signals to the clist
+	titles,	which means they can be selected in GTK 1.1.x.
+
+	* configure.in: Changed version to 0.3.9
+
+	* glade/property.c (create_widget_property_page): for GTK 1.1.4 we
+	use gtk_scrolled_window_add_with_viewport().
+
+	* glade/editor.c: 
+	* glade/gbwidget.c: 
+	* glade/gbwidgets/gbtable.c: 
+	* glade/gbwidgets/gbvbox.c: 
+	* glade/gbwidgets/gbhbox.c: remove gtk_container_block/unblock_resize()
+	calls for GTK 1.1.4 since it is deprecated.
+	
+	* glade/gbwidgets/gbscrolledwindow.c: 
+	* glade/gbwidgets/gbnotebook.c: 
+	* glade/gbwidgets/gbctree.c: 
+	* glade/gbwidgets/gbclist.c: 
+	* glade/editor.c: changed all the GTK_HAVE_FEATURES_1_1_5 to
+	GTK_HAVE_FEATURES_1_1_4 since GTK_HAVE_FEATURES_1_1_5 was added
+	after GTK 1.1.5 was released, which messed us up.
+
+1998-11-30  Damon Chaplin  <DAChaplin@msn.com>
+
+	* Released Glade 0.3.8
+	
+1998-11-29  Damon Chaplin  <DAChaplin@msn.com>
+
+	* glade/tree.c: updated code for clist to handle 1.1.5 changes.
+	* glade/gbwidgets/gbnotebook.c: replaced border property with hborder
+	& vborder for GTK 1.1.5.
+	* glade/editor.c: 
+	* glade/gbwidgets/gbctree.c: 
+	* glade/gbwidgets/gbclist.c: used ifdef to remove calls to
+	gtk_widget_draw_children() which isn't available in GTK 1.1.5.
+	* glade/project.c (on_project_new): added call to init_current_project
+	to reset source code directory.
+	(on_component_list_select): show the properties of the toplevel
+	widget in the component, so a popup menu name can be changed.
+	* glade/load.c: fixed bug parsing dates - was using scanf with %i
+	which assumes a number starting with 0 is in octal - used %d instead.
+	* glade/gbwidget.c: merged in patch to fix bug writing signal handlers.
+	* po/es.po: updated.
+	* Makefile.am (SUBDIRS): added macros
+	* configure.in: Changed version to 0.3.8, output macros/Makefile
+
+1998-11-24  Jeff Garzik  <jgarzik@pobox.com>
+
+	* acinclude.m4: new file, adds gettext macros
+	* autogen.sh: script to build from CVS, stolen from gnome-libs
+	* configure.in: added libtool and macro subdir support.  GNOME
+	  macros apparently want libtool support -- aclocal warns about
+	  it -- even though all it adds to Glade, apparently, is a
+	  slightly slower compile time.
+	* glade/.cvsignore: ignore generated files
+	* glade/gbwidgets/.cvsignore: ignore generated files
+	* po/.cvsignore: ignore generated files
+

@@ -1,0 +1,403 @@
+<refentry id="libart-Pixel-buffer-affine-transformations">
+<refmeta>
+<refentrytitle>Pixel buffer affine transformations</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBART Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Pixel buffer affine transformations</refname><refpurpose></refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+enum        <link linkend="ArtFilterLevel">ArtFilterLevel</link>;
+void        <link linkend="art-rgb-pixbuf-affine">art_rgb_pixbuf_affine</link>           (<link linkend="art-u8">art_u8</link> *dst,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             int dst_rowstride,
+                                             const <link linkend="ArtPixBuf">ArtPixBuf</link> *pixbuf,
+                                             const <link linkend="double">double</link> affine[6],
+                                             <link linkend="ArtFilterLevel">ArtFilterLevel</link> level,
+                                             <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> *alphagamma);
+void        <link linkend="art-rgb-affine">art_rgb_affine</link>                  (<link linkend="art-u8">art_u8</link> *dst,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             int dst_rowstride,
+                                             const <link linkend="art-u8">art_u8</link> *src,
+                                             int src_width,
+                                             int src_height,
+                                             int src_rowstride,
+                                             const <link linkend="double">double</link> affine[6],
+                                             <link linkend="ArtFilterLevel">ArtFilterLevel</link> level,
+                                             <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> *alphagamma);
+void        <link linkend="art-rgb-rgba-affine">art_rgb_rgba_affine</link>             (<link linkend="art-u8">art_u8</link> *dst,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             int dst_rowstride,
+                                             const <link linkend="art-u8">art_u8</link> *src,
+                                             int src_width,
+                                             int src_height,
+                                             int src_rowstride,
+                                             const <link linkend="double">double</link> affine[6],
+                                             <link linkend="ArtFilterLevel">ArtFilterLevel</link> level,
+                                             <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> *alphagamma);
+void        <link linkend="art-rgb-bitmap-affine">art_rgb_bitmap_affine</link>           (<link linkend="art-u8">art_u8</link> *dst,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             int dst_rowstride,
+                                             const <link linkend="art-u8">art_u8</link> *src,
+                                             int src_width,
+                                             int src_height,
+                                             int src_rowstride,
+                                             <link linkend="art-u32">art_u32</link> rgba,
+                                             const <link linkend="double">double</link> affine[6],
+                                             <link linkend="ArtFilterLevel">ArtFilterLevel</link> level,
+                                             <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> *alphagamma);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="ArtFilterLevel">enum ArtFilterLevel</title>
+<programlisting>typedef enum {
+  ART_FILTER_NEAREST,
+  ART_FILTER_TILES,
+  ART_FILTER_BILINEAR,
+  ART_FILTER_HYPER
+} ArtFilterLevel;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="art-rgb-pixbuf-affine">art_rgb_pixbuf_affine ()</title>
+<programlisting>void        art_rgb_pixbuf_affine           (<link linkend="art-u8">art_u8</link> *dst,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             int dst_rowstride,
+                                             const <link linkend="ArtPixBuf">ArtPixBuf</link> *pixbuf,
+                                             const <link linkend="double">double</link> affine[6],
+                                             <link linkend="ArtFilterLevel">ArtFilterLevel</link> level,
+                                             <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> *alphagamma);</programlisting>
+<para>
+Affine transform the source image stored in <parameter>src</parameter>, compositing over
+the area of destination image <parameter>dst</parameter> specified by the rectangle
+(<parameter>x0</parameter>, <parameter>y0</parameter>) - (<parameter>x1</parameter>, <parameter>y1</parameter>). As usual in libart, the left and top edges
+of this rectangle are included, and the right and bottom edges are
+excluded.
+</para>
+<para>
+The <parameter>alphagamma</parameter> parameter specifies that the alpha compositing be
+done in a gamma-corrected color space. In the current
+implementation, it is ignored.
+</para>
+<para>
+The <parameter>level</parameter> parameter specifies the speed/quality tradeoff of the
+image interpolation. Currently, only ART_FILTER_NEAREST is
+implemented.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Destination image RGB buffer.
+</entry></row>
+<row><entry align="right"><parameter>x0</parameter>&nbsp;:</entry>
+<entry> Left coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>y0</parameter>&nbsp;:</entry>
+<entry> Top coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Right coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Bottom coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>dst_rowstride</parameter>&nbsp;:</entry>
+<entry> Rowstride of <parameter>dst</parameter> buffer.
+</entry></row>
+<row><entry align="right"><parameter>pixbuf</parameter>&nbsp;:</entry>
+<entry> source image pixbuf.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> Affine transform.
+</entry></row>
+<row><entry align="right"><parameter>level</parameter>&nbsp;:</entry>
+<entry> Filter level.
+</entry></row>
+<row><entry align="right"><parameter>alphagamma</parameter>&nbsp;:</entry>
+<entry> <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> for gamma-correcting the compositing.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-rgb-affine">art_rgb_affine ()</title>
+<programlisting>void        art_rgb_affine                  (<link linkend="art-u8">art_u8</link> *dst,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             int dst_rowstride,
+                                             const <link linkend="art-u8">art_u8</link> *src,
+                                             int src_width,
+                                             int src_height,
+                                             int src_rowstride,
+                                             const <link linkend="double">double</link> affine[6],
+                                             <link linkend="ArtFilterLevel">ArtFilterLevel</link> level,
+                                             <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> *alphagamma);</programlisting>
+<para>
+Affine transform the source image stored in <parameter>src</parameter>, compositing over
+the area of destination image <parameter>dst</parameter> specified by the rectangle
+(<parameter>x0</parameter>, <parameter>y0</parameter>) - (<parameter>x1</parameter>, <parameter>y1</parameter>). As usual in libart, the left and top edges
+of this rectangle are included, and the right and bottom edges are
+excluded.
+</para>
+<para>
+The <parameter>alphagamma</parameter> parameter specifies that the alpha compositing be done
+in a gamma-corrected color space. Since the source image is opaque RGB,
+this argument only affects the edges. In the current implementation,
+it is ignored.
+</para>
+<para>
+The <parameter>level</parameter> parameter specifies the speed/quality tradeoff of the
+image interpolation. Currently, only ART_FILTER_NEAREST is
+implemented.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Destination image RGB buffer.
+</entry></row>
+<row><entry align="right"><parameter>x0</parameter>&nbsp;:</entry>
+<entry> Left coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>y0</parameter>&nbsp;:</entry>
+<entry> Top coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Right coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Bottom coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>dst_rowstride</parameter>&nbsp;:</entry>
+<entry> Rowstride of <parameter>dst</parameter> buffer.
+</entry></row>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> Source image RGB buffer.
+</entry></row>
+<row><entry align="right"><parameter>src_width</parameter>&nbsp;:</entry>
+<entry> Width of source image.
+</entry></row>
+<row><entry align="right"><parameter>src_height</parameter>&nbsp;:</entry>
+<entry> Height of source image.
+</entry></row>
+<row><entry align="right"><parameter>src_rowstride</parameter>&nbsp;:</entry>
+<entry> Rowstride of <parameter>src</parameter> buffer.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> Affine transform.
+</entry></row>
+<row><entry align="right"><parameter>level</parameter>&nbsp;:</entry>
+<entry> Filter level.
+</entry></row>
+<row><entry align="right"><parameter>alphagamma</parameter>&nbsp;:</entry>
+<entry> <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> for gamma-correcting the compositing.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-rgb-rgba-affine">art_rgb_rgba_affine ()</title>
+<programlisting>void        art_rgb_rgba_affine             (<link linkend="art-u8">art_u8</link> *dst,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             int dst_rowstride,
+                                             const <link linkend="art-u8">art_u8</link> *src,
+                                             int src_width,
+                                             int src_height,
+                                             int src_rowstride,
+                                             const <link linkend="double">double</link> affine[6],
+                                             <link linkend="ArtFilterLevel">ArtFilterLevel</link> level,
+                                             <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> *alphagamma);</programlisting>
+<para>
+Affine transform the source image stored in <parameter>src</parameter>, compositing over
+the area of destination image <parameter>dst</parameter> specified by the rectangle
+(<parameter>x0</parameter>, <parameter>y0</parameter>) - (<parameter>x1</parameter>, <parameter>y1</parameter>). As usual in libart, the left and top edges
+of this rectangle are included, and the right and bottom edges are
+excluded.
+</para>
+<para>
+The <parameter>alphagamma</parameter> parameter specifies that the alpha compositing be
+done in a gamma-corrected color space. In the current
+implementation, it is ignored.
+</para>
+<para>
+The <parameter>level</parameter> parameter specifies the speed/quality tradeoff of the
+image interpolation. Currently, only ART_FILTER_NEAREST is
+implemented.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Destination image RGB buffer.
+</entry></row>
+<row><entry align="right"><parameter>x0</parameter>&nbsp;:</entry>
+<entry> Left coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>y0</parameter>&nbsp;:</entry>
+<entry> Top coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Right coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Bottom coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>dst_rowstride</parameter>&nbsp;:</entry>
+<entry> Rowstride of <parameter>dst</parameter> buffer.
+</entry></row>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> Source image RGBA buffer.
+</entry></row>
+<row><entry align="right"><parameter>src_width</parameter>&nbsp;:</entry>
+<entry> Width of source image.
+</entry></row>
+<row><entry align="right"><parameter>src_height</parameter>&nbsp;:</entry>
+<entry> Height of source image.
+</entry></row>
+<row><entry align="right"><parameter>src_rowstride</parameter>&nbsp;:</entry>
+<entry> Rowstride of <parameter>src</parameter> buffer.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> Affine transform.
+</entry></row>
+<row><entry align="right"><parameter>level</parameter>&nbsp;:</entry>
+<entry> Filter level.
+</entry></row>
+<row><entry align="right"><parameter>alphagamma</parameter>&nbsp;:</entry>
+<entry> <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> for gamma-correcting the compositing.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-rgb-bitmap-affine">art_rgb_bitmap_affine ()</title>
+<programlisting>void        art_rgb_bitmap_affine           (<link linkend="art-u8">art_u8</link> *dst,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             int dst_rowstride,
+                                             const <link linkend="art-u8">art_u8</link> *src,
+                                             int src_width,
+                                             int src_height,
+                                             int src_rowstride,
+                                             <link linkend="art-u32">art_u32</link> rgba,
+                                             const <link linkend="double">double</link> affine[6],
+                                             <link linkend="ArtFilterLevel">ArtFilterLevel</link> level,
+                                             <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> *alphagamma);</programlisting>
+<para>
+Affine transform the source image stored in <parameter>src</parameter>, compositing over
+the area of destination image <parameter>dst</parameter> specified by the rectangle
+(<parameter>x0</parameter>, <parameter>y0</parameter>) - (<parameter>x1</parameter>, <parameter>y1</parameter>).
+</para>
+<para>
+The source bitmap stored with MSB as the leftmost pixel. Source 1
+bits correspond to the semitransparent color <parameter>rgba</parameter>, while source 0
+bits are transparent.
+</para>
+<para>
+See <link linkend="art-rgb-affine">art_rgb_affine</link>() for a description of additional parameters.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dst</parameter>&nbsp;:</entry>
+<entry> Destination image RGB buffer.
+</entry></row>
+<row><entry align="right"><parameter>x0</parameter>&nbsp;:</entry>
+<entry> Left coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>y0</parameter>&nbsp;:</entry>
+<entry> Top coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>x1</parameter>&nbsp;:</entry>
+<entry> Right coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>y1</parameter>&nbsp;:</entry>
+<entry> Bottom coordinate of destination rectangle.
+</entry></row>
+<row><entry align="right"><parameter>dst_rowstride</parameter>&nbsp;:</entry>
+<entry> Rowstride of <parameter>dst</parameter> buffer.
+</entry></row>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> Source image bitmap buffer.
+</entry></row>
+<row><entry align="right"><parameter>src_width</parameter>&nbsp;:</entry>
+<entry> Width of source image.
+</entry></row>
+<row><entry align="right"><parameter>src_height</parameter>&nbsp;:</entry>
+<entry> Height of source image.
+</entry></row>
+<row><entry align="right"><parameter>src_rowstride</parameter>&nbsp;:</entry>
+<entry> Rowstride of <parameter>src</parameter> buffer.
+</entry></row>
+<row><entry align="right"><parameter>rgba</parameter>&nbsp;:</entry>
+<entry> RGBA foreground color, in 0xRRGGBBAA.
+</entry></row>
+<row><entry align="right"><parameter>affine</parameter>&nbsp;:</entry>
+<entry> Affine transform.
+</entry></row>
+<row><entry align="right"><parameter>level</parameter>&nbsp;:</entry>
+<entry> Filter level.
+</entry></row>
+<row><entry align="right"><parameter>alphagamma</parameter>&nbsp;:</entry>
+<entry> <link linkend="ArtAlphaGamma">ArtAlphaGamma</link> for gamma-correcting the compositing.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

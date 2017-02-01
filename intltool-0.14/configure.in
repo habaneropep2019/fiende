@@ -1,0 +1,49 @@
+dnl Process this file with autoconf to create configure.
+AC_INIT(intltoolize.in)
+INTLTOOL_VERSION=0.14
+
+AM_INIT_AUTOMAKE(intltool, $INTLTOOL_VERSION)
+
+AC_PROG_CC
+AC_STDC_HEADERS
+AC_ARG_PROGRAM
+AC_CHECK_LIB(popt, poptStrippedArgv,, AC_MSG_ERROR([popt 1.5 or newer is required to build
+intltool. You can download the latest version from ftp://ftp.rpm.org/pub/rpm/dist/rpm-4.0.x/]))
+
+LIBXML_REQUIRED=2.2.8
+
+PKG_CHECK_MODULES(DOC_I18N_TOOL, libxml-2.0 >= $LIBXML_REQUIRED, build_xml=yes, build_xml=no)
+AC_SUBST(DOC_I18N_TOOL_CFLAGS)
+AC_SUBST(DOC_I18N_TOOL_LIBS)
+AM_CONDITIONAL(HAVE_LIBXML, test "x$build_xml" = "xyes")
+
+pkgdatadir='${datadir}'"/${PACKAGE}"
+AC_SUBST(pkgdatadir) dnl automake does not need this, but libtoolize does
+aclocaldir='${datadir}'/aclocal
+AC_SUBST(aclocaldir)
+
+AC_PATH_PROG(PERL, perl)
+if test -z "$PERL"; then
+   AC_MSG_ERROR([perl not found])
+fi
+if test -z "`$PERL -v | fgrep '5.' 2> /dev/null`"; then
+   AC_MSG_ERROR([perl 5.x required for intltool])
+fi
+
+AC_OUTPUT([
+Makefile
+doc-i18n-tool/Makefile
+doc/Makefile
+intltool-extract.in
+intltool-merge.in
+intltool-prepare
+intltool-unicodify
+intltool-update.in
+intltool.spec
+intltoolize
+tests/Makefile
+tests/cases/Makefile
+tests/results/Makefile
+tests/selftest.pl
+xml-i18n-toolize
+])

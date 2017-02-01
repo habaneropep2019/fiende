@@ -1,0 +1,129 @@
+
+Bonobo component properties, version 0.1
+by Michael Meeks <mmeeks@gnu.org>
+
+
+A brief discussion of how to use the property API to add a
+simple to use configuration mechanism to your bonobo component.
+
+
+1.	Properties and bags.
+
+	A property is an attribute that is attached to a Bonobo object.
+It can have any type, although the standard types boolean, long, float,
+double, string are handled in a convenient fashion. Properties are
+attached to a PropertyBag object that is attached to your control or
+component in some way.
+
+
+2.	BonoboArgs.
+
+	A bonobo arg contains the value of a property whilst it is
+'in flight' between a property and a requestor. The bonobo arg system
+is designed to make ORBit's 'any' code easier to use and less error
+prone.
+
+	A number of macros and helper functions are provided in
+bonobo-arg.h. Particularly, the type macros of BonoboArgType eg.
+
+	BONOBO_ARG_BOOLEAN, BONOBO_ARG_LONG, BONOBO_ARG_STRING
+
+	And a number of access procedures for getting and setting
+standard values from a BonoboArg. Eg. if 'a' is a BonoboArg * we
+should use:
+
+	BONOBO_ARG_GET_STRING (a)	 to get its string value
+or
+	BONOBO_ARG_SET_STRING (a, "GNU") to set its string value
+
+NB. Passing a NULL string to ARG_SET_STRING will result in internal
+ORBit crashes.
+
+	The bonobo-arg code also provides functions for mapping GtkArgs
+to BonoboArgs and VV.
+
+
+3.	PropertyBag creation
+
+	To add properties to an object first we must create a property
+bag hence:
+
+BonoboPropertyBag *bonobo_property_bag_new (BonoboPropertyGetFn get_prop,
+                                            BonoboPropertySetFn set_prop,
+                                            gpointer            user_data);
+
+	Each property has a get / set / user_data (GSU) triplet that
+handles that property's behavior. In a typical scenario all object
+properties in a bag utilise the same GSU triplet, and are identified
+inside the get / set functions by a unique enumerated constant arg_id.
+Inside the function this arg_id can then be used with a switch statement
+to provide efficient (de)multiplexing of property requests.
+
+	For particularly obtuse persons wanting more flexibility it is
+possible to specify the GSU triplet per property using the add_full
+variant.
+
+
+4.	Property Creation
+
+	Each basic property is created by this function:
+
+void bonobo_property_bag_add (BonoboPropertyBag  *pb,
+                              const char         *name,
+			      int                 idx,
+                              BonoboArgType       type,
+		              BonoboArg          *default_value,
+	    		      const char         *docstring,
+                              BonoboPropertyFlags flags);
+
+	It looks horrendous, but is horribly simple in most cases; the idx
+is the index that will be passed to a generic get / set function for this
+property. The type is one of the BonoboArgType macros discussed in section 2
+which maps to an ORBit TypeCode [ hence any arbitary type can be added
+without the property-bag knowing anything about it ( allocation of that
+type is the users responsibility ) ]. Default_value is either NULL or a
+value created thusly:
+
+	BonoboArg *def = bonobo_arg_new (BONOBO_ARG_DOUBLE);
+	BONOBO_ARG_SET_DOUBLE (def, 0.3127);
+
+	It's reference is stored in the property_bag.
+
+	The rest of the code is internal and extremely transparent. In
+order to implement the get / set functions I would copy & paste the
+sample code in:
+
+	bonobo/samples/controls/bonobo-clock-control.c.
+
+
+5.	Wrapping Gtk Objects
+
+	If you have already implemented a GtkObject that has the set of
+GtkArgs that you wish to export as BonoboArgs then it is trivial to add
+them to the property bag using a transparent mapping. This means that
+you do not have to write any more code, simply use:
+
+	bonobo_property_bag_add_gtk_args (pb, my_object);
+
+
+6.	Using properties in your client application
+
+	Since the contract between client and server is very tight I have
+added some more tightness in the form of some vararg methods to possibly
+make using controls simpler and ( incidentaly ) to decrease type safety
+beyond all previous limits.
+
+	eg.
+
+	CORBA_double i;
+
+	bonobo_widget_get_property (control, "value", &i, NULL);
+	i+= 0.37;
+	bonobo_widget_set_property (control, "value", i, NULL);
+
+	This is theoreticaly slower than using the alternative
+
+	bonobo_property_bag_client_get_value_gdouble (pb, "value", &i);
+
+	since to determine the type of i the client has to query the bag
+and then do its varargs stuff. It is however far more convenient.

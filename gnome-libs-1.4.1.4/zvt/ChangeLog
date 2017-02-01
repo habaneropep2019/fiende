@@ -1,0 +1,2869 @@
+2002-01-22  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* vt.c, vt.h, zvtterm.c, zvtterm.h: Add support for dtterm escape
+	sequences. Patch from bugzilla. (Debian) Please test.
+	* zvtterm.c (vt_draw_text): Fix off by one error in underlining.
+	(Ximian)
+	
+2002-01-12  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* update.c, zvtterm.c: Remove unused stuff.
+	
+2002-01-10  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* *.1, Makefile.am: Add man pages.
+	
+2001-11-23  Gregory Leblanc  <gleblanc@linuxweasel.com>
+
+	* gnome-pty-helper.c: (init_term_with_defaults):
+	* update.c: (vt_line_update), (vt_update), (vt_update_rect),
+	(vt_fix_selection), (vt_expand_line), (vt_draw_cursor):
+	* vt.c: (vt_line_mblen), (vt_query_line_mbchar), (vt_parse_vt):
+	* vt.h:
+	* zterm.c: (main):
+	* zvtterm.c: (zvt_term_init), (zvt_term_destroy),
+	(zvt_term_set_color_scheme), (zvt_term_realize),
+	(zvt_term_set_fonts_internal), (zvt_term_set_font_name),
+	(request_paste), (zvt_term_convert_selection),
+	(zvt_term_selection_get), (zvt_term_selection_received),
+	(zvt_term_set_open_im), (zvt_im_preedit_set_spot),
+	(zvt_im_preedit_set_foreground), (zvt_im_preedit_set_background),
+	(zvt_im_preedit_set_font), (zvt_term_key_press),
+	(zvt_term_set_background), (vt_draw_text), (load_background):
+	* zvtterm.h:
+
+	Miguel asked me to apply this patch.  It's the rest of the changes
+	from RedHat to support multibyte locales, I believe.  Things
+	applied without any conflicts, and I've tested that it compiles,
+	so I'm putting this into CVS.  Enjoy, and flame me if it's broken
+	(but tell somebody else, since I can't fix it)
+	
+2001-11-11  Miguel de Icaza  <miguel@ximian.com>
+
+	* gnome-pty-helper.c (init_term_with_defaults): Integrate patch
+	from Red Hat (set initial settings to ECHOK, Alan Cox posted a
+	description a few months ago about it).
+
+2001-10-14  Xavier Bestel  <xavier.bestel@free.fr>
+
+       * zvt/vt.c: Now correctly reports mouse wheel events
+       to applications (e.g. VIM).
+
+2001-09-13  Havoc Pennington  <hp@redhat.com>
+
+	* Makefile.am (libzvtincludedir): move to includedir/gnome-1.0
+
+2001-09-18  jacob berkman  <jacob@ximian.com>
+
+	* zvtterm.c (zvt_term_init): default to cursor not filled
+	(zvt_term_realize): don't start the blinking here.  fixes gnome
+	#13120
+
+2001-06-14  Miguel de Icaza  <miguel@ximian.com>
+
+	* subshell-includes.h: From Dan McNichol: IBM compiler defines
+	_XOPEN_SOURCE, only define this if it is not defined before.
+
+	* zvtterm.h: Remove comma in last member of enum.
+
+2001-04-18  Dan Winship  <danw@ximian.com>
+
+	* gnome-pty-helper.c: Remove #include <malloc.h>
+
+2001-03-05  Stanislav Brabec  <utx@penguin.cz>
+
+	* zvtterm.h, zvtterm.c: New bit del_is_del, new function
+	zvt_term_set_del_is_del. New default behavior of Delete. Main
+	purpose of new default behavior is to be in sync with XFree86 and
+	allow "Emacs-friendly" mode (make difference between Ctrl-H,
+	Delete and BackSpace). Delete now defaults to Esc[3~ (VT220's
+	kdch1) and del_is_del forced DEL/^H.
+
+        * zvtterm.c: Changed codes for Home and End keys from X11R5 ones
+        (Esc[1~ and Esc[4~) to X11R6 key_home/end ones (EscOH and EscOF).
+	If keys don't work with readline apps, you probably need to fix
+	terminfo entry.
+
+	* zvtterm.c: "Metafy" characters with MOD1 or MOD4. Fast solution
+	of fact, that XTerm metafies characters with MOD1 on 102 keyboards
+	and with MOD4 with 105 keyboards.
+
+	* zvtterm.c: Generate code for Menu key.
+
+	* TODO: Note about modifier remapping.
+
+2000-11-25  Not Zed  <NotZed@HelixCode.com>
+
+	* vt.c
+	(vt_parse_vt): When we get a utf-8 start character, check that it
+	is in range (max of 4 chars for a valid utf-8 char), see standard,
+	section 3.8, D36.  Fixes some crashes where a big shift char (like
+	0xff) could create an over-run c.
+
+2000-10-23  Jacob "Ulysses" Berkman  <jacob@helixcode.com>
+
+	* zvtterm.c (zvt_term_motion_notify): don't increment y by the
+	scrollheight here, since it wasn't done before the previous patch
+
+	This fixes selection when the window is scrolled back
+	
+2000-08-24  Not Zed  <NotZed@HelixCode.com>
+
+	* update.c (vt_line_update): Dont clear the line modification
+	count here.  Basically when we get an expose event, we shouldn't
+	clear the tag that says we have new data to render, for a line,
+	unless we are rendering the whole line.  Otherwise because we
+	process scroll expose events recursively, we can end up losing
+	changes to the display.  Fixes, well i dunno, probably a whole
+	bunch of bugs to do with rendering/scrolling etc.
+	(vt_update_rect): Set the modcount to 0 if we do render a whole
+	line.
+	(vt_update): Reset the modcount of all lines in the final pass of
+	processing.
+
+	* zvtterm.c: A bunch of patches from redhat:
+	- Fix for a problem with pointer grabbing in selection.
+	- Another for motion notify again in selection.
+	- Background rendering fix.
+	- Fix from Paul Warren <pdw@ex-parrot.com> to ignore double-clicks
+	of the middle mouse button (and expanded to include wheel buttons).
+	(zvt_term_button_press): A fix from Justin Mason <jm@jmason@org>
+	to make sure button presses take the border into account.
+	(zvt_term_button_release): And applied here.
+	(zvt_term_motion_notify): And here too.
+
+2000-06-20  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* gnome-utmp.c (write_login_record): Fix some warnings.
+	
+Sat Jun 17 20:14:37 2000  George Lebl <jirka@5z.com>
+
+	* zvtterm.c (vt_cursor_state): don't draw the cursor outline when 
+	  in backscroll (using the same logic as in vt_draw_cursor)
+
+Fri Jun 16 12:17:53 2000  George Lebl <jirka@5z.com>
+
+	* zvtterm.c (vt_cursor_state): Draw the no-focus cursor as an
+	  unfilled rectangle.  This makes figuring out which terminal is
+	  focused much easier and is consistent with the xterm behaviour
+
+2000-05-20  Jacob Berkman  <jacob@helixcode.com>
+
+	* subshell.c (zvt_init_subshell): set SIGHUP to default, since
+	gnome-terminal is now ignoring it
+
+2000-05-12  NotZed  <NotZed@HelixCode.com>
+
+	* zvtterm.c (vt_scroll_area): Ok, so we do have to handle all
+	expose events before continuing.  Must've been some sort of race
+	condition that didn't show up on my system before.  Bug #10182
+	fixed.
+
+2000-03-20  Jacob Berkman  <jacob@helixcode.com>
+
+	* gnome-utmp.c (write_login_record): patch from Gerald Britton
+	<gbritton@mit.edu> for utmp handling
+
+2000-03-06  Elliot Lee <sopwith@redhat.com>
+	* gnome-utmp.c: strncmp returns an int, not a pointer - act
+	accordingly.
+
+2000-03-02  NotZed  <NotZed@HelixCode.com>
+
+	* update.c (vt_update): When scroll-updating, dont update till the
+	end of the screen, unless we have a background pixmap.  Fixes a
+	rendering glitch when multiple scrolled regions have occured
+	between updates.
+
+2000-02-14  Timur Bakeyev <timur@gnu.org>
+
+	* gnome-utmp.c: Changed [sizeof()] to [sizeof()-1]. That prevents
+	overriding next field. Stupid me...
+
+2000-02-14  Timur Bakeyev <timur@gnu.org>
+
+	* gnome-pty-helper.[ch], gnome-utmp.c, subshell.c, zvt-term.h,
+	zterm.c: Applied patches from Andrew J. Korty <ajk@waterspout.com>
+	that fixes/extends such parts:
+	
+	* gnome-pty-helper didn't raise permissions after dropping them, so,
+	updates to the utmp/tty permissions didn't work... Thanks a lot!
+	
+	* Add support for lastlog records, if possible.
+	
+	Patches re-worked a bit to be more consistent. Also, some mine fixes
+	to the original code.	
+	
+2000-01-29  NotZed  <notzed@zedzone.helixcode.com>
+
+	* zvtterm.c (zvt_term_destroy): Free colours if they are set.
+	(zvt_term_init): Initialise queue_*, and use g_malloc0() for
+	private data.
+	Fixes for bug #5574, fixes from Petr Tesarik
+	<tesarik@petr.lupa.cz>, and Fabrice Bellet
+	<Fabrice.Bellet@creatis.insa-lyon.fr>
+
+2000-01-22  NotZed  <notzed@zedzone.helixcode.com>
+
+	* zvtterm.c/h (term_force_size): Back-port resize and colour-setting
+	fixes from HEAD version.
+
+	* vt.c (vt_reset): Send a properly formatted DA response, and
+	implement a DA2 response.  DA2 should only be sent if this is a
+	vt220.  Duh.
+	(vt_parse_vt): Added state 10 for \e[> ...
+
+1999-12-21  Miguel de Icaza  <miguel@helixcode.com>
+
+	* zvtterm.c (zvt_term_key_press): Pass the time request_paste
+	(fixes ICCCM compliancy bug, check bug tracking system).
+	(zvt_term_button_press): ditto
+	(zvt_term_selection_received): ditto.
+	(request_paste): Take time argument;  Pass this to
+	gtk_selection_convert instead of GDK_CURRENT_TIME.
+
+	Fixes #4273
+
+1999-12-06  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* Marked this point with zvt-merge-1, to indicate last merge with
+	HEAD.
+	
+	* vt.c (vt_up/down/left/right): Use gotoxy to move the cursor.
+
+1999-11-16  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zterm.c (main): Highlight url's using colour as well as
+	underline.  Ick red on green!
+
+	* vtx.h (struct vt_match_block): Include 'saveline', a place to
+	store a copy of the line if we're highlighting using colour.
+
+	* update.c (copy_line): Convenience function, clones a vt line.
+	(vt_highlight): If the highlight includes colour, then save the
+	line temporarily.
+	(vt_unhighlight): New function, removes highlight.  If the
+	highlight line was saved, then restore that, rather than just
+	inverting.
+	(vt_match_highlight): Call vt_match_unhighlight() when removing a
+	match highlight.
+	(vt_free_match_blocks): Free the b->saveline, if it is set (should
+	never happen ...).
+	(vt_getmatches): Initilaise saveline to 0.
+
+	* zvtterm.c (zvt_term_match_add): Dont strip off colour bits.
+	Updated doco.
+
+1999-11-02  Miguel de Icaza  <miguel@gnu.org>
+
+	* gnome-pty-helper.c (open_ptys): Use cfsetispeed and cfsetospeed
+	for setting the line speed instead.
+
+1999-10-28  Miguel de Icaza  <miguel@gnu.org>
+
+	* gnome-pty-helper.c (open_ptys): The defaults are now set to stty
+	sane. 
+
+1999-11-01  Dick Porter <dick@acm.org>
+
+	* gnome-pty-helper.c: Fix fcntl() error handling
+
+1999-10-29  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* vt.c (vt_setmode): Oops, inverted the blank cursor logic.
+
+1999-10-28  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* update.c (vt_getmatches): Incase we get a dumb regex that
+	matches an empty string, we need to scan the whole line, character
+	by character.  Slow slow.
+
+	* vt.h (VTMODE_BLANK_CURSOR): New flag bit for mode.  Indicates a
+	blank cursor - do not poke this bit directly!
+
+	* update.c (vt_draw_cursor): Do not draw the cursor at all, if we
+	are in blank cursor mode.  Blank cursor by issuing \E[?25h,
+	\E[?25l to turn it on again.
+
+	* vt.c (vt_setmode): Implement cursor blank control character.
+
+1999-10-20  Miguel de Icaza  <miguel@gnu.org>
+
+	* gnome-pty-helper.c (open_ptys): VDISCARD character is control-o,
+	not control-u, which is already used for VKILL.  Fixes problem
+	posted to gnome-libs.
+
+1999-10-19  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* vt.c (vt_lf): Make sure we dont linefeed off the end of the
+	screen, bug #2885 (and probably most other segfaults).  This may
+	cause problems elsewhere, but probably not.
+
+1999-09-28  Elliot Lee <sopwith@redhat.com>
+	* zvtterm.c (zvt_term_key_press): Catch GDK_Tab _and_ GDK_ISO_Left_Tab
+	and use them appropriately. I don't think GDK_Tab really needed to be caught,
+	but oh well.
+
+	Also make builds with d(x) = x work.
+
+1999-09-29  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zvtterm.c (zvt_term_button_release): Ahh no, we dont want to do
+	the extend selection thing if the button was pressed, tahts why
+	this damn moved flag is here in the first place ...
+	(zvt_term_button_press): We want to indicate a 'moved' mouse
+	whenever we get a right click.  Raph was right!
+
+1999-09-28  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* vt.c (vt_setmode): Ahh .. if we switch from alt screen using
+	1047, we must clear the screen.  How obvious.
+
+1999-09-26  Martin Baulig  <martin@home-of-linux.org>
+
+	* update.c (vt_match_clear): You must use g_free() to free a
+	g_malloc()ed piece of memory, not libc's free(); this segv's
+	when using malloc checking in glib.
+
+1999-09-23  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* update.c (vt_getmatches): Keep track of the position of the
+	current match for multiple match scans on the same line.
+
+	* gnome-pty-helper.c (open_ptys): Another attempt ... this time
+	conditionally check every bloody flag before we try and use it.
+
+1999-09-22  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* gnome-pty-helper.c: Make the use of ECHOKE/ECHOCTL conditional.
+	More portability fixes (this time its broken-irix bug #2321).
+
+1999-09-19  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* vt.c (vt_set_text): Return VTTITLE_XPROPERTY as a title type
+	when the mode number is 3.
+
+	* vt.h (VTTITLE_XPROPERTY): New title type, requests a setting of
+	an X property.
+
+	* vt.c (vt_setmode): #@$@#$@#$# when the send mouse was being set,
+	the mask was beign applied inverted, and blowing away all the
+	other mode bits.
+	
+1999-09-19  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zvtterm.c: Removed the zvt_term_match_clicked() prototype,
+	function no longer exists.
+
+	* gnome-pty-helper.c (open_ptys): If the system defines the
+	default tty settings (TTYDEF_xFLAG), then use them, otherwise
+	create our own (hopefully portable?) versions.
+
+1999-09-19  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_button_release): Make sure we update the
+	selection for a right click, even if the mouse hasn't moved.
+
+1999-09-14  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* gnome-pty-helper.c (open_ptys): init the termio's structure to
+	0's (unknown fields?).  Added some portability fixes for Solaris
+	at least (maybe this isn't as portable as it was supposed to be?)
+	(main): Fixed a warning with the uid type.
+
+1999-09-14  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* gnome-pty-helper.c (open_ptys): Added patch from Alan Cox
+	<alan@lxorguk.ukuu.org.uk> to set termios to a known state,
+	instead of taking the terminal defaults.
+
+	* vt.c (vt_lf): Fixed line-feed implementation, for when the
+	scroll-range has been set.  It was quite broken.
+
+1999-09-14  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* vt.c (vt_setmode): Properly handle 1047 (==47) and 1048
+	(save/restore cursor position).
+
+1999-09-12  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zterm.c (button_press_event): Changed to perform the lookup
+	manually, instead of relying on the signal - pity, the code was
+	cleaner before, but this isn't too much of a price to pay for bin
+	compat.
+
+	* update.c (vt_match_clear): Changed my totally stupid use of the
+	double-linked list (treating it as a single-linked list), to a
+	more sane and accurate version.
+
+	* zvtterm.c (zvt_term_class_init): Remove the match_clicked
+	signal.
+	(zvt_term_class_init): Ditto.
+	(zvt_term_button_press): No longer check/emit a match_clicked
+	signal.
+	(zvt_term_match_clicked): Removed dummy callback fn.
+
+1999-09-12  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zvtterm.c (zvt_term_match_check): New function, api call to get
+	the match string, when the application already gets the mouse
+	button events (hmph).
+
+1999-09-11  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* Merge of ZVT_MATCH into HEAD.
+
+1999-09-10  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* Makefile.am (EXTRA_DIST): Include the gnome-pty-helper sources
+	here, since we build it manually.  Yuck.  Blame Solaris' ld.
+
+	* vt.h (VTMODE_SEND_MOUSE): Put this flag back in.  Make the other
+	mouse flags use this bit always, when they are active.  Bit of an
+	annoying hack for backward compatability.
+
+1999-09-09  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* vt.c (vt_report_button): Propertly report the 2 different mouse
+	modes.  Only button presses, no qualifiers (X10 mode), and button
+	press/release + qualifiers (X11 mode?).  Fixes bug #1888.
+
+	* zvtterm.c (zvt_term_button_press): Indicates direction of button
+	press to vt_report_button().
+	(zvt_term_button_release): Indicates direction of button press to
+	vt_report_button().  Also now passes the button number.
+
+	* Makefile.am (gnome-pty-helper): Added manual build target for
+	gnome-pty-helper.  Because of some broken linkers we need to limit
+	what gets put on the link line (see bug #1246/#1576).
+
+1999-09-11  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_get_capabilities): Added the new capability,
+	and updated the documentation to match.
+
+	* zvtterm.h (ZVT_TERM_MATCH_SUPPORT): New capability to indicate
+	the match functions exist/work.
+
+	* update.c (vt_match_clear): Free and match blocks (some of which
+	may point to this match type).
+
+	* zvtterm.c: Added missing gtk/gtkselection.h include.
+
+	* update.c (vt_update): Force highlighted matches to be cleared.
+	(vt_free_match_blocks): Ditto, after this the pointers are no
+	longer valid.
+
+	* zterm.c (main): Fixed invocations of zvt_term_match_add().
+
+	* zvtterm.c (zvt_term_feed): Turn off any match before reading any
+	data.
+	(zvt_term_readdata): Same.
+	(zvt_term_motion_notify): If we move the mouse over a match,
+	change the pointer to a hand, and highlight the match
+	appropriately.
+	(zvt_term_match_add): Added new parameter to specify the type of
+	highlighting to use - taken from vt attributes currently.
+	(zvt_term_set_pointer): New internal funtion to set the mouse
+	pointer and the reference to what it is currently, but only if it
+	has changed.
+
+	* update.c (vt_getmatches): Have each match include a number of
+	match blocks, rather than each match block indicating its parent
+	match.
+	(vt_free_match_blocks): Fixed for above change.
+	(vt_match_highlight): Highlight toggle, or clear a highlight match.
+	(vt_highlight): Implement toggling the highlight.  Currently
+	it has to be somehting reversible, e.g. toggle bold/underline/etc,
+	or invert colours.
+
+	* zvtterm.c (zvt_term_show_pointer): Changed to check if we are
+	currently the dot cursor.
+	(zvt_term_unrealize): Free the zp->cursor_hand.
+	(zvt_term_realize): Allocate a zp->cursor_hand.
+
+1999-09-07  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_motion_notify): Check for matches if we
+	haven't before, and the screen has changed.
+
+	* zvtterm.h (struct _ZvtTermClass): Added the new match_clicked
+	signal.
+
+	* zvtterm.c (zvt_term_button_press): Emit a match_clicked signal
+	when we get a right mouse button event over a match string.  Hmm,
+	I can't see how we can do this for the other buttons without
+	interfering with normal operation :(
+
+	* update.c (vt_match_check): Check for a match given screen char
+	coordinates.
+
+	* zvtterm.c (zvt_term_match_clear): User function - to clear one
+	or all of the match strings.
+	(zvt_term_match_add): User function - adds a new match string.
+	(zvt_term_match_clicked): Dummy signal handler for the (new)
+	match_clicked signal.
+	(zvt_term_class_init): Add the new match_clicked signal.
+
+	* vtx.h: Added new 'magic match' data structures.
+
+	* update.c (vt_free_magic_blocks): New function - free's the list
+	of matched blocks (if there are any) and indicates that no match
+	attempt has been tried on the current display.
+	(vt_getmatches): New function - scans the _currently displayed_
+	screen for matches against the match regular expressiones.  If any
+	are found they are stored as 'match blocks' which map to
+	rectangles on the screen.
+	(vtx_new): Initialise the new match functions.
+	(vtx_destroy): Free new match resources.
+	(vt_match_clear): Remove one or all the match regular expressions.
+
+1999-09-05  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* update.c (vt_line_update): Removed a dead comment.
+
+1999-08-26  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zvtterm.h (struct _zvtprivate): Added new parameters for
+	asynchronous writing/pasting of lots of text.
+	(zvt_term_writechild): New public function.  Shouldn't be used by
+	pre 1.2 (1.0.50?) code.
+
+	* zvtterm.c (zvt_term_selection_received): Now calls
+	zvt_term_writechild() to write data to the child.
+	(zvt_term_writechild): New function - writes any amount of data to
+	the child sub-process through the child pipe, asynchronously if
+	required.  Can be called mutiple times before writes are complete.
+	(zvt_term_writemore): New io write callback.  Used to deal out
+	blocks of data overflowed from zvt_term_writechild() until its run
+	out.  These changes fix bug #1899 & #1539.
+	(zvt_term_init): Initialise zp->paste_id & paste pointer.
+	(zvt_term_destroy): Free any resources from zp->paste_id or paste
+	pointer.
+
+1999-08-16  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* update.c (vt_line_update): When checking for common blocks of
+	unchanged characters following changed characters, make sure the
+	current attr is taken into account.
+
+1999-08-02  Elliot Lee <sopwith@redhat.com>
+	* subshell.c, gnome-pty-helper.c: Actually the problem was
+	that zvt was depending on receiving certain signals, but
+	zvt didn't do sigprocmask() to unblock signals that had been
+	blocked by the panel.
+
+1999-08-02  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell.c (zvt_shutdown_subshell): Fix the problem Elliot is
+	experimenting.  Basically the code now allowed for two different
+	paths: one was the process natural death, and the other was an
+	explicit kill from the parent.
+
+	I think that the explicit kill is not required as closing all the
+	file descriptors should provide EOFs in good quantity to the child
+	process.  *Unless* There is a file descriptor leak.  If there is
+	an FD leak we should plug that instead of doing a kill SIGHUP the
+	child process.
+
+	I have kept this patch semantically correct with the previous
+	version on CVS but implemented correctly.  But we should really
+	investigate this rather than putting a kill signal here.
+
+	So basically, we now keep track of whether the process has died or
+	not, and if so, the exit status of the process (to return this
+	value from the zvt_shutdown_subshell routine.
+
+	* gnome-utmp.c (write_login_record): Remove warning about unused
+	vaiable. 
+
+1999-07-28  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* update.c (vt_select_block): NUL terminate selection.  Bug #1631.
+
+1999-07-26  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_size_allocate): When resizing, turn off the
+	selection.  Can cause inconsistencies in state.  Fixes bug #1744.
+
+1999-07-19  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* update.c (vt_fix_selection): Some fixes from Matthijs Melchior
+	<mmelchio@xs4all.nl> for word selection.
+
+1999-07-02  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zvtterm.c (request_paste): Fix an out-by-1 array bounds check.
+
+1999-06-26  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* update.c (vt_line_update): When reverse video set, then force
+	background render always.  Fixes a really nasty bug where lots of
+	text starts to vanish.
+	(vt_fix_selection): Another minor select-by-word fix.
+
+	* vt.c (vt_tab): When storing tab, dont over-write blank
+	attributes.
+
+1999-06-23  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* update.c (vt_in_wordclass): Make sure we ignore attributes before
+	doing character type tests.
+
+1999-06-20  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (vt_draw_text): When we render bold, dont offset y as
+	well as x (well you can, but its kinda hard to read :)
+
+1999-06-20  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* subshell-includes.h: Under Solaris at least, defining
+	_XOPEN_SOURCE means that the winsize stuff is NOT defined.  I've
+	added a __EXTENSIONS__ define so it does get defined.  Either that
+	or _XOPEN_SOURCE must be undefined.  Hopefully this is portable to
+	other unices ...
+	This fixes bug #1435.
+
+1999-06-19  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.h: Removed unecessary include of X11.h and Xlib.h.
+
+	* vt.h: Merged ZVT_UTF to head.  Yay UTF8 font support.  Roll on
+	new bugs I guess.
+
+1999-06-18  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_key_press): Support function keys right upto
+	GDK_F20.
+
+1999-06-17  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.h (struct _zvtprivate): New field transpix to store the
+	transparency pixmap pointer.
+
+	* zvtterm.c (zvt_term_draw): When we are asked to draw, make sure
+	the background fill colour is still right (themes can change them!
+	the cads!)
+	(zvt_term_draw): Go back to drawing clearing the whole area before
+	rendering, if we are using a pixmap (otherwise a bit of border can
+	be left).
+	(zvt_term_draw): Well if we are going to draw the background, make
+	sure we dont draw it when we draw the text too (set fill=17).
+	(free_transpix): New function, free the foreign pixmap wrapper for
+	the transparency pixmap.
+	(zvt_term_destroy): Free the transparency pixmap wrapper if it
+	exists.
+	(zvt_term_init): Set the tranparenxy pixmap to null.
+	(load_background): Fixed up a rather embarassing oops, freeing a
+	pointer we're using 3 lines above.  The tranparency pixmap is
+	stored separately to the background pixmap, so we can free it and
+	track it properly, since we cannot unref it.  I dont know how this
+	didn't crash more often!
+
+	* zvtterm.h: Removed the zvt_term_get/set_adjusetment() ifdef'd
+	out functions, so they dont confuse developers.
+
+1999-06-14  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* update.c (vt_expand_line): Range check start value.
+	(vt_fix_selection): Range check x values, at least above 0.  For
+	bug #966.
+	(vt_update): When checking to see if we update the line, always
+	update if the scrollbar moved.  vt_line_update() will optimise
+	rendering anyway.
+	(vt_fix_selection): Cleaner implementation of select-by-word.  No
+	longer flickers/funny over selecting tabbed text.
+
+	* zterm.c (set_hints): Renamed size_allocate to set_hints.
+	Changed to use gtk_window_set_geometry_hints() instead of the X
+	call.
+	(main): Change the size_allocate signal to a realize signal, to
+	set the window hints once the window is realized.
+
+	* zvtterm.c (zvt_term_size_request): Removed bogus 'magic numbers'
+	from some of the size values.
+	(zvt_term_size_allocate): Removed a couple more magic numbers from
+	the size stuff, since it actually seems to work now.
+
+1999-06-10  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* gnome-pty-helper.c (open_ptys): Use fchown()/fchmod() to set the
+	slave pty's ownership/permissions after openpty() returns.  IMHO
+	this is fixing a non-existant bug, but who am I to argue?
+	(): Also include sys/stat.h, for S_* defines.
+	(open_ptys): Rewrote the last change to be a bit simpler!
+
+1999-06-02  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_draw): Use a forced fill to draw the
+	background, rather than a big rectangle.  Makes it smoother.
+
+	* update.c (vt_scroll_update): When we request an update, use
+	bl->width (the actual window width), not l->width (the stored line
+	width, which may not match).
+	(vt_update): Same.
+	(vt_draw_selection_part): Same again!
+
+	* zvtterm.c (vt_scroll_area): Added back some old code from about
+	version 1.10, that forces all expose events to be processed before
+	scrolling exits.  If we are rendering scrolled pixmaps, things get
+	kinda bogged down and events get processed out of order.
+	(create_shaded_pixmap): When creating a pixmap for a partially
+	off-screen window, also treat that as a "tile".
+
+	* Merged ZVT_PXIMAP branch back to head!
+
+1999-06-02  Michael Zucchi  <zucchi@zedzone.mmc.com.au >
+
+	* zvtterm.c (zvt_term_init): Set _zvtprivate data before calling
+	any functions.
+	(zvt_term_set_fonts_internal): Create the bold-save pixmap of the
+	right size, if we need it (rendering bold).
+	(vt_draw_text): When drawing a bold text, grab 1 pixel of data
+	past the end of the text, draw it, embolden it, then draw the
+	pixmap back again.  What a mess, but required for some TINY fonts
+	which use up all of thier size.
+	(zvt_term_destroy): Free the bold_save pixmap if it was setup.
+	(zvt_term_init): Initialise bold_save pointer to null.
+
+	* zvtterm.h (struct _zvtprivate): Add bold_save - a pixmap used to
+	save possibly overwritten screen when algorithmically generating
+	bold.
+
+	* update.c (vt_draw_selection_part): Make sure the back line
+	matches the draw line.  Broke badly on selecting in scrollback.
+
+1999-06-02  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* update.c (vt_line_update): Added background line to use for
+	updates.  Fixed all callers.  Saves a lot of calls to
+	vt_list_index() for each line rendered (maybe tops 2-3% difference).
+
+	* zvtterm.c (zvt_term_draw): Pass in background colour just
+	cleared to update_rect, so we dont render it twice.
+	(zvt_term_expose): Ditto.
+
+	* update.c (vt_line_update): Almost completely rewritten.
+	Simpler, and more obvious, and faster too!
+	(vt_update_rect): Added a fill argument, the fill colour that the
+	rectangle is set to.
+	(vt_draw_selection_part): Dont force update, cleaner selection
+	visual.
+	(vt_update): Only force background update if we are on a scrolled pixmap.
+
+1999-06-01  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_set_color_scheme): Removed reference to
+	term_window.
+	(zvt_term_realize): Same.
+	(vt_draw_text): Dont draw a background box explicity, use
+	XDrawImageString() when we can get away with it.  Maybe this saves
+	X traffic?
+
+	* vt.c (vt_resize_lines): Fixed up the indenting again.
+	(vt_resize): More indenting fixes.
+
+	* vtx.h (struct _vtx): Added scroll_type to the _vtx structure.
+	Indicates how the display might be scrolled, always (no
+	background) sometimes (scrolling background), or never (static
+	background).  Added to end of structure, still bin compatible.
+
+	* zvtterm.c (zvt_term_realize): No longer setup a separate
+	terminal window.
+	(zvt_term_unrealize): Removed references to term_window.
+	(zvt_term_map): Ditto.
+	(zvt_term_unmap): Ditto.
+	(zvt_term_focus_in): Ditto.
+	(zvt_term_draw): Ditto.  Also use back_gc as the clearing
+	mechanism.
+	(zvt_term_expose): Ditto.  Also use fill to back_gc as the
+	clearning mechanism for pixmap backgrounds.
+	(zvt_term_show_pointer): Ditto.
+	(zvt_term_hide_pointer): Ditto.
+	(zvt_term_button_press): Ditto.
+	(zvt_term_button_release): Ditto.
+	(vt_draw_text): Ditto, plus a whole bunch of other messy changes!
+	Render pixmaps differently, and use XDrawImageString() when we can
+	for less X traffic.  Offset rendering by klass->width/height,etc.
+	(vt_scroll_area): Ditto.  Account for scrolling pixmap offsets
+	here.
+	(load_background): Ditto.  General code cleanup.  Renamed from
+	draw_back_pixmap.
+
+	* zvtterm.h: New options, ZVT_TERM_PIXMAPSCROLL_SUPPORT and
+	ZVT_TERM_TRANSPARENCY_SUPPORT, indicating that the terminal can do
+	transparency/scrolling pixmap.  Transparency support is calculated
+	at run time.  These should be checked with a #ifdef for 1.0.x
+	code.
+	New flag options to set_background.
+
+	* update.c (vt_scroll_update): Significant changes.  The update
+	algorithm now knows about scrolled/static backgrounds.  It uses
+	this to try and optimise screen updates.
+	(vt_update): A whole bunch of changes to accomodate the changes to
+	the scroll_update.
+	(vt_line_update): If we are in a scrolled-background mode, never
+	let the background text match, since the background !=
+	background.  This should be dependent on if we are updating a
+	previously scrolled section or not?  Room for minor speedup.
+	(vt_fix_selection): Removed some old dead code.
+
+1999-05-31  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zterm.c (main): Repaired the fucked-up indenting.
+
+	* vt.c (vt_erase_chars): Only erase 'n' characters, rather than
+	from here+n to end of line.  I think i got that really wrong last
+	time.
+
+1999-05-29  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* vt.c (vt_tab): Set attributes for tab's too.
+
+1999-05-24  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-login-support.c: Do not use ifdef (HAVE_STROPTS) but ifdef
+	HAVE_STROPTS.  Thanks for Brandon for pointing this out.
+
+1999-05-24  David KAELBLING <drk@sgi.com>
+
+	* vt.c (vt_func): Do not use un-initialized variable.
+
+	* gnome-login-support.c (pty_open_slave): Remove compilation
+	warning.  Use ifdef XXX, not ifdef (XXX)
+	
+	* subshell.c (zvt_shutdown_subshell): Assign NULL to vt->pty_tag,
+	do not compare it (it was a no-op).
+
+1999-05-24  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* Makefile.am (install-exec-local): Uses separate `chown root' and
+	`chgrp root' rather than `chown root.root'.
+
+1999-05-18  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* vt.c (vt_insert_lines): range check upper limit.
+	(vt_delete_lines): Ditto.
+	(vt_scroll_down): Ditto.
+	(vt_scroll_up): Ditto.
+	(vt_scrollback_add): Fixed more indenting.
+	(vt_parse_vt): Force all arguments to be unsigned values (assumes
+	2's complement storage).
+
+	* zvtterm.c (zvt_term_scroll): More indenting repair.
+	(zvt_term_set_font_name): Ditto (etc for everything else i spot).
+	Please use K&R style indenting if you make changes!
+
+	* TODO: Updated a bit.
+
+	* zvtterm.c (vt_draw_text): If a font is a 2-byte font, first
+	expand it to an XChar2b array.  This will need to be changed so
+	it accepts 16 bit characters by default (but is a bigger task!).
+	Setting a -iso10464- (unicode) font should now at least render ok.
+	(zvt_term_readdata): Repair the Jay-ded indenting.
+	(zvt_term_readmsg): Ditto.
+	(zvt_term_set_background): Ditto.
+	(vt_draw_text): Ditto.
+	(vt_scroll_area): Ditto.
+
+	* zvtterm.h (struct _zvtprivate): Added text16/text16len to
+	zvtprivate - buffer for expanding 2-byte fonts.
+
+1999-05-15  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* update.c (vt_line_update): Because some mental fonts use every
+	pixel position we need to clear the next character pos after a
+	bold font.  Just render this last blank character always to make
+	sure.
+	(vt_draw_selection): Dont draw anything if the selected area
+	amounts to nothing, and it hasn't moved.
+
+1999-05-10  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_destroy): Patch to clean up the timeout
+	handler if it is still running, from Timo Sirainen
+	<cras@fun157.kivikko.hoas.fi>.
+
+1999-05-07  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_button_press): Use a better extend-select
+	end-choosing method.  i.e. same as xterm.  If you click before the
+	middle of the selection, it changes the start, otherwise it
+	changes the end.
+
+	* update.c (vt_fix_selection): If selecting the first word of a
+	line, 'by word', and it was 1 space from the left border, it would
+	select that space too - no longer!.
+
+	* zvtterm.c (zvt_term_button_press): Remove the input handler for
+	input_id when selecting text - i.e. block during selection.
+	(zvt_term_button_release): re-enable input if it was removed, and
+	the childfd exists.
+	(zvt_term_button_release): Only allow dropping of button-release
+	events if we're not selecting something (otherwise, select-drag,
+	hold ctrl, and release - it doesn't!).
+
+Mon May 03 20:14:49 1999  George Lebl  <jirka@5z.com>
+
+	* zvtterm.c: change the way we draw the background for transparent
+	  images so that it works with tiled images (we assume every
+	  background is tiled which is not always the case, this can
+	  probably be fixed if anyone feels the need to do that, this
+	  should work good enough for most people:)
+
+Mon May 03 20:04:10 1999  George Lebl  <jirka@5z.com>
+
+	* zvtterm.c: removed an #if 0 from the _draw method as it is
+	  obviously there by mistake (if not then the code would need
+	  to be fixed for background pixmap/transparency stuff).
+	  Also fixed the code that clears the area to draw text on, now
+	  it properly draws pixmaps, while preserving the speed improvements
+	  made by michael for non-background terminals
+
+1999-05-03  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* update.c (vt_expand_line): Fixed selection of single characters
+	at the start of an otherwise empty line (bug#1168).
+
+1999-04-24  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* vt.c (vt_newline): Make sure a new-line is initialised with an
+	invalid line number.
+	(vt_scrollback_add): Set the new line's line no to -1.
+	(vt_resize): Set the line no's of lines that are no longer there
+	to -1.
+
+	* zterm.c (size_allocate): Make sure we add the PADDING width to
+	the size allocation of the terminal window when setting the window
+	base width hint.  Hey it sizes right now!  Now just to fix
+	gnome-terminal ...
+	(main): Add \n to the end of usage info.
+
+	* zvtterm.c (vt_draw_text): Changed conditions under which the
+	background is 'reset'.  Should speed up refresh under expose
+	(since the screen is already cleared to the background colour).
+	(zvt_term_key_press): Implementation of application keypad
+	keycodes, from Kenn Humborg <kenn@avalon.wombat.ie>.
+	(zvt_term_button_press): Clear the rendered selection upon a
+	single-click.
+	(zvt_term_size_allocate): Dont size the terminal if it hasn't
+	changed.  Also, why set size_pending?  We just sized!
+	(zvt_term_size_allocate): Make sure we remove the PADDING area off
+	the size after we've sized it.
+
+1999-04-15  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* vt.c (vt_scroll_up): Make sure vt->this_line is correct still
+	after the scroll!
+	(vt_scroll_down): And the same here.
+
+1999-04-13  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* zvtterm.c (vt_draw_text): When drawing underline, dont go beyond
+	our char boundaries.  I think this fixes the dot problems.  Thanks
+	to Jesus Bravo Alvarez for this one.
+	(zvt_term_set_fonts): No need to check that 'font' is NULL.  Its
+	not allowed to be by the api, and the g_return* assertion prevents
+	it from being called.
+
+1999-04-10  Michael Fulbright  <msf@majestic.labs.redhat.com>
+
+	* zvtterm.c (zvt_term_size_allocate): set term->grid_[height/width]
+	based on new geometry - seems to fix problem of terminal resizing
+	back to old size when you hide/show menubar.
+
+1999-04-09  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-pty-helper.c (open_ptys): First set the GID, and then the
+	UID, since once the UID changes, you *might* not be able to change
+	the GID.  
+
+	Thanks again to Morten for keeping such a good eye on our changes
+	and code. 
+
+1999-04-08  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-pty-helper.c (init_msg_pass): Return a value.
+
+1999-04-06  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* update.c (vt_expand_line): declare c as unsigned so comparisions
+	work. Should't zvt be using unsigned char all over the place to
+	prevent things like this? By the way, this fixes bug #144.
+
+1999-04-06  Jaka Mocnik  <jaka.mocnik@kiss.uni-lj.si>
+
+	* zvtterm.c (zvt_term_set_fonts): only gdk_font_ref() fonts if
+	they are non-null in order to prevent some segfaults.
+	
+1999-04-04  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* zvtterm.h: Changed capability bits to #define's so they can more
+	easily be checked in new coder.
+
+	* zvtterm.c (zvt_term_get_capabilities): Set
+	ZVT_TERM_EMBOLDEN_SUPPORT for this version of the terminal.
+
+	* zvtterm.h (enum): ZVT_TERM_EMBOLDEN_SUPPORT - can call set fonts with a
+	NULL bold font to auto-generate bold effect.
+
+1999-04-03  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* update.c (vt_fix_selection): Make sure we only increment 'ex' if
+	it equals 'sx' on the same line, otherwise 'ex' can creep.
+
+	* Merged in ZVT_XTERMNEW branch again, to pick up Miguel's
+	stropts.h changes.
+
+1999-04-01  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-login-support.c (pty_open_slave): Use the strams ioctls
+	only if the system has <stropts.h> header files.
+
+1999-04-02  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* zvtterm.c (zvt_term_set_fonts_internal): Query the XFontStruct
+	for the real font width, rather than picking 'width("M")' - might
+	fix the bold artifacts problem.
+	(zvt_term_set_fonts_internal): If no bold font is supplied, leave
+	it NULL.
+	(zvt_term_set_fonts): Allow a bold font to be null.
+	(vt_draw_text): If there is no bold font set, then use
+	over-striking to acheive the same result.
+
+	* subshell.h (zvt_shutdown_subshell, zvt_close_msgfd): Fixed
+	header entries/removed for changes.
+
+	* vt.c (vt_closepty): Just calls zvt_shutdown_subshell() and
+	returns the child exit status.
+
+	* subshell.c (zvt_shutdown_subshell): Moved all the shutdown
+	functionality here, includeing parts of vt_closepty(), and
+	zvt_close_msgfd().
+	(zvt_close_msgfd): Removed, no longer needed.
+
+	* vt.c (vt_closepty): Do an explicit waitpid() on the child process.
+	(vt_closepty): Dont set childfd==-1 before we see if it == keyfd.
+
+1999-03-30  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* vt.c (vt_keypadon): Set VTMODE_APP_KEYPAD in vt->mode.
+	(vt_keypadoff): Clear " .
+	(vt_scroll): Only set scroll region on state 2.
+
+	* vt.h (VTMODE_APP_KEYPAD): New flag to signal application keypad
+	on.  Doesn't do anything yet.
+
+	* vt.c (vt_gotoabsy): \E[nd -> goto n-1 y position absolute.
+	(vt_gotoabsx): \E[nG -> goto n-1 x position absolute.
+	(vt_erase_char): Callback function - erase characters.
+	(vt_erase_chars): Implement erase n characters.
+
+1999-03-30  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* vt.c (vt_mode): Reset terminal attributes on '\E[27m'.
+	(vt_parse_vt): Add new state 8 for '\E[!x' sequence.  Added
+	'\E[!p' terminal reset.
+	(vt_deccharmode): Add dumy callback for dec character mode stuff
+	(wide/tall chars, etc).  '\E#n' sequences.
+	(vt_jumps[]): Added '\E[nT' pan up.
+	(vt_parse_vt): Added state 9, '\E[n'X' sequence.
+
+	* vt.h: Added integer argument array.  Its a union with the text
+	argument space.  The old redundant text argument variables are
+	still present, appended with _dummy - to be removed next major
+	release.
+
+	* vt.c (vt_scroll_reverse): New function, implements reverse
+	scroll sequence '\E[n^'.  For ISO-6429 (ECMA-48) standard.
+	(vt_scroll_left): Scroll window left.
+	(vt_scroll_right): Scroll window right.
+	(vt_scroll_forward): Forward scroll - '\E[nS'.
+	(vt_up): Implements scroll window right '\En A' for state==7.
+	(vt_insert_char): Implements scroll window left '\E[n @' for state==7.
+
+	* update.c (vt_line_update): Implemented VTATTR_CONCEALED -
+	concealed text.
+
+	* zterm.c (main): Default size = 24 lines.
+
+	* vt.c (vt_init): No longer setup vt->args pointers.
+	(vt_insert_char): Changed to binary args in arg.num.intargs[]
+	(vt_delete_char): Ditto.
+	(vt_insert_line): Ditto.
+	(vt_delete_line): Ditto, and check state in switch.
+	(vt_cleareos): Ditto.
+	(vt_clear_lineportion): Ditto.
+	(vt_goto): Ditto.
+	(vt_modeh): Ditto.  Also handle mulitple arguments.
+	(vt_model): Ditto.  Also handle multiple arguments.
+	(vt_modek): Ditto.
+	(vt_mode): Ditto.
+	(vt_gx_set): Ditto.
+	(vt_dsr): Ditto.
+	(vt_scroll): Ditto.  Also check that scrolltop<scrollbottom.
+	(vt_func): Ditto!
+	(vt_set_text): Changed to use string arguments union.
+	(vt_parse_vt): A number of changes.  Added extra state '6', to
+	handle \E[?nnn;nn;nY sequence.  All numerical arguments are now
+	decoded as they are encountered.  Should be faster, and allows
+	more arguments to functions (upto 20).  All control codes no
+	longer reset vt->argcnt.  '\E]...' uses the arg.txt.args_mem area
+	to store its strings.  '\EOx' sets intargs[0]=0 before calling
+	callbacks.
+
+1999-03-28 Luca Lizzeri <ll@niche.it>
+
+	* gnome-pty.c (write_login_record): Fixed a typo with extra ")".
+
+1999-03-28 Timur Bakeyev <mc@bat.ru>
+
+	* gnome-pty.c (update_utmp): New function, which accumulates OS 
+	specific utmp-handling routines. Fixed a problem with BSD systems,
+	introdused by previous patch.
+	A bit different aproach for ut->ut_id and /dev/pts - original code
+	by Michael Zucchi, just inserted. Keeps 4 chars for ut_id.
+
+1999-03-27  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* vt.c (vt_mode): Patch from Matthijs Melchior to support extended
+	foreground/background colours (the 'bright' set).  Also support
+	un-setting render attributes individually.
+
+1999-03-24  Erik Troan  <ewt@redhat.com>
+
+	* gnome-pty.c (write_logout_record): Before writing a utmp record,
+	you need to reset the utmp file pointer (esp as we have multiple
+	utmp entries per process). ut->ut_id was also being set to a string
+	of 4 chars on /dev/pts systems, which makes the '\0' on the end
+	overwrite ut_user -- use a 3 character string instead.
+
+	* gnome_pty_helper.c (open_ptys): Set effective user and group ids
+	to real user and group before opening unix98 ptys (this forces the
+	proper owner/group on the /dev/pts file
+
+1999-03-21  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* vt.c (vt_delete_line): Changed to properly handle the difference
+	between \EM and \E[M - it was checking the wrong thing for state.
+
+1999-03-18  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (libzvt_la_LDFLAGS): Updated library version number.
+
+1999-03-18  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* -- MERGED IN ZVT_SCROLLSELECT BRANCH --
+		No longer binary incompatible (thanks Miguel :)
+		Framework for future extension similarly.
+	
+	* zvtterm.h (struct _zvtprivate): Created new structure for
+	private data.x
+
+	* zvtterm.c (zvt_term_init): Changed to use "_zvtprivate" data for
+	scrollselect info.
+	(zvt_term_button_press): Ditto.
+	(zvt_term_button_release): Ditto.
+	(zvt_selectscroll): Ditto.
+	(zvt_term_motion_notify): Ditto.
+	(zvt_term_scrollbar_moved): Ditto.
+	(zvt_term_destroy): Free zvtprivate data on destroy.  Do the input
+	handlers need destorying?
+	(zvt_term_init): Setup zvtprivate data on create.
+
+	* zvtterm.h: Added prototype for zvt_term_reset().
+
+	* zvtterm.c (zvt_term_reset): New function - external API to
+	vt_reset_terminal().
+
+	* vt.c (vt_reset): Removed terminal reset code into
+	vt_reset_terminal().
+
+	* vt.h: Added prototype for vt_reset_terminal().
+
+	* vt.c (vt_reset_terminal): New function - soft(hard) reset of
+	terminal.
+
+1999-02-28  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_selection_clear): Changed header so it isn't
+	auto-documented.
+	(zvt_term_bell): Same.
+	(zvt_term_set_size): Add documentation.
+
+1999-02-26  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* vt.h: Include unistd.h, for pid_t.
+
+1999-03-18  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zterm.c (main): Catch "destroy" signal to die on.
+
+	* zvtterm.c (zvt_term_closepty): Revert yesterdays' changes.  As
+	suggested by ewt, catch for "destroy" signal to detect end of life
+	from window system.
+
+1999-03-17  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zvtterm.c (zvt_term_closepty): Make sure we raise a "child_died"
+	when the child is being terminated (and it existed).  SIGCHLD just
+	wont raise it, because after this point it no longer exists (in
+	the 'children' list, see subshell.c).
+
+1999-03-16  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zvtterm.c (zvt_term_key_press): Changed all cursor keys to send
+	\E[x, rather than \EOx.  Hell I dont know how this ever worked
+	really.
+	(vt_scroll_area): Scroll based on terminal width (as terminal
+	height is done), rather than on size of border window - border
+	width.  Also properly handle PADDING setting and border width.
+	(zvt_term_key_press): Honour VTMODE_APP_CURSOR when outputting
+	cursor keys.
+
+1999-03-12  Richard Hult <rhult@hem2.passagen.se>
+
+	* zvtterm.c (zvt_term_scroll_by_lines): New internal function. 
+	(zvt_term_button_press): Add support for mouse wheel.
+
+1999-03-11  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell.c (get_ptys): Set close on exec flag for our pipes.
+	Otherwise we end up sharing these descriptors with sub-processes,
+	and thus gnome-pty-helper wont notice when we are gone until the
+	shells are killed. 
+
+1999-03-08  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_key_press): Add support for SHIFT-INSERT to
+	mean paste.
+	(request_paste): New routine, used in two spots now.
+
+	* subshell.c (zvt_init_subshell): Also reset SIGPIPE.
+
+1999-02-24  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell.c (zvt_init_subshell): Put the stuff on the right branch.
+	* (zvt_init_subshell): Reset the child signal handlers
+	to SIG_DFL and the job-control signals to SIG_IGN (to let subshell
+	set those up by itself).
+
+1999-02-25  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* vt.c (vt_tab): Check for cursorx=width, and dont tab (unless
+	wrap is on).  Also, after tabbing cursor, if cursox=width, then
+	dont linefeed.  Handle wrap mode properly(?)
+	(vt_clear_line_portion): Range check input.
+	(vt_restore_cursor): Allow cursorx to be width.
+
+	* update.c (vt_draw_cursor): It is possible to for the cursorx
+	value to be 'off' the right hand edge of the screen by 1 character
+	outside of internal updates.  Dont draw the cursor in this case
+	(should fix mc rh-border glitch).  Wasn't pure afterall :)
+
+1999-02-24  Timur Bakeyev <mc@bat.ru>
+
+	* gnome-utmp.c (write_logout_record): Fix for Linux systems and partly,
+	for Solaris.
+
+1999-02-25  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* vt.c (vt_delete_chars): Make sure delete character is blank.
+	(vt_delete_chars): Range check input value to width of line.
+	(vt_insert_chars): Ditto.
+
+Thu Feb 25 03:47:44 1999  Timur Bakeyev <mc@bat.ru>
+
+	* gnome-pty.h, gnome-utmp.c: Added function write_login_record as
+	opposit to write_logout_record.
+
+	Design rewritten. Supposed, should work on all platforms.
+
+1999-02-24  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* vt.c (vt_set_screen): Removed call to vt_clear_lines here, as
+	the page flipping should not clear the screen.
+	(vt_restore_cursor): Do not restore the alternate screen when
+	issueing this command.
+	(vt_set_screen): Made the code clearer in the screen switching part.
+
+1999-02-24  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zvtterm.c (zvt_term_button_press): Same as below fix for
+	triple-click.  Otherwise hightlighted text wont actually be
+	selected if the mouse isn't dragged.
+
+1999-02-23  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_button_press): Consider double-click as
+	VT_SELTYPE_MOVED.  Closes critical bug report 315.
+
+1999-02-22  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	These fixes are from Chris Evans audit on gnome-pty-helper.
+	
+	* gnome-utmp.c (update_dbs): Add check for malloc return value
+	here. 
+	(update_dbs): 0-terminate ut->ut_host.
+
+	* gnome-pty-helper.c (open_ptys): Check for alloca return value.
+	(pty_add): Call memset after we check the value returned from
+	malloc. 
+	(pty_add): Check for return value of strdup.
+
+	* gnome-pty-helper.c (sanity_checks): We were checking if stdin
+	was open twice instead of testing stdin and stdout
+
+1999-02-23  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* vt.c (vt_parse_vt): Dont process more than VTPARAM_MAXARGS
+	parameters for all cases.
+	(vt_parse_vt): Make sure vt->argcnt is set on invocation of
+	callbacks.
+
+1999-02-22  Elliot Lee  <sopwith@redhat.com>
+
+	* zvtterm.c: Translate \n -> \r when pasting (fixes
+	pastes with newlines in them).
+
+1999-02-21  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* Makefile.am (zterm_LDADD): Use libzvt.la without the path from
+	the topdir so that AM_MAKEFLAGS=-j4 works.
+
+1999-02-21  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* vt.c (vt_resize): If we remove lines from the top of the buffer,
+	then make sure we also move the cursor up (but not beyond the top
+	of the screen).
+	(vt_resize): If we have reduced the size of the scrollback buffer
+	below the current displayed area, then make sure we reduce the
+	offset.
+
+1999-02-18  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* vt.c (vt_scroll_up): Apply CLEARMASK to blank character (and
+	then actually use it).
+	(vt_scroll_down): Apply CLEARMASK to blank character.
+	(vt_delete_chars): When deleting characters, extend the attributes
+	from the end of the line (dont apply the latest attributes!).
+	(vt_insert_lines): Apply CLEARMASK to blank character.
+	(vt_delete_lines): Ditto.
+	(vt_clear_line_portion): Ditto.
+	(vt_newline): Ditto!
+	(vt_resize): Ditto (for vt_resize_lines calls).
+	(vt_insert_chars): Ditto for inserting blanks.
+
+	* vt.h (VTATTR_CLEARMASK): Mask to apply to the attributes to
+	generate a 'clear' character.
+
+Thu Feb 18 03:29:00 1999  Timur Bakeyev <mc@bat.ru>
+
+        * gnome-utmp.c: Re-arrange source, so (suppose) it compilable on
+	both SVR and BSD. Everything #ifdef'ed. Removed dependences from
+	USE_SYSV_UTMP macro. Add update_utmp() function for BSD systems.
+	
+	* gnome-pty.h: Remove USE_SYSV_UTMP macro.
+	
+	* gnome-login-support.h: Add declarations from libutil.h for BSDI,
+	which has libutil.a, but not .h :(
+	
+	* gnome-pty-helper.c: Add casting to caddr_t for msg_control to avoid
+	warnings.
+	
+	* Makefile.am: Added $(UTIL_LIBS) to zvt dependences.
+	
+	* test-utmp.c: Now it does login/logout.
+
+1999-02-18  Michael Zucchi  <mzucchi@denr.sa.gov.au>
+
+	* zterm.c (main): Added bad argument/-h usage instructions, and
+	'r' option to put the scrollbar on the right (changed the default
+	to left!).
+
+	* zvtterm.c (zvt_term_motion_notify): Record when selecting mouse
+	has moved.
+	(zvt_term_button_press): Make sure we fix selection/update if it
+	is only a single click.
+
+	* vtx.h (VT_SELTYPE_MOVED): Flag to indicate mouse has moved.
+
+	* zvtterm.c (zvt_term_button_release): Dont select anything if the
+	mouse hasn't moved.
+	(zvt_term_button_press): Dont re-render selection yet.
+
+1999-02-17  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_size_allocate): Do not remove the PADDING
+	here.  I need to figure out where the grid step information is
+	passed ot the Window Manager.
+
+Wed Feb 17 12:20:21 1999  Maciej Stachowiak  <mstachow@alum.mit.edu>
+
+	* gnome-login-support.c (login_tty): Replace an #elsif with an
+ 	#else in the fix below. D'oh!
+
+	* gnome-login-support.c (login_tty): On SVR4 systems, make sure to
+ 	allocate a controlling terminal. Since the right way to do this is
+ 	simply to open a terminal after calling setsid(), but we already
+ 	have it open at that point, reopen it and then close it.
+	
+1999-02-14  Tomas Ogren  <stric@ing.umu.se>
+
+	* zvtterm.c: Fixed a tyop in the docs
+
+Sat Feb 13 01:47:41 PST 1999 <jpaint@serv.net>
+
+	* zvtterm.c: don't draw if the zvtterm widget is not
+	drawable.
+
+1999-02-09  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell.c (zvt_close_msgfd): Implement with GList.
+	(sigchld_handler): Do not reset the child->pid here to zero, or
+	there wont be a way to eliminate this child from the list, and
+	thus waitpid test will get hossed.
+
+	* gnome-pty-helper.c (sanity_checks): Ignore SIGINT.
+	(shutdown_pty): record logout.  Keep track of the utmp/wtmp
+	updating.
+
+	* subshell.c: Add support for split utmp/wtmp recording.
+
+	* zterm.c: log everything by default.
+
+1999-02-09  Michael Zucchi  <zucchi@zzedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_set_blink): Remap true state to 1, false to
+	0, so XOR test works.
+
+1999-02-07  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell.c 	(receive_fd): Remove the getmsg usage, this was really broken.
+	(s_pipe): Split the creation of the pipe mechanism.
+	In SVR4 use pipe, on BSD use socketpair.
+
+	* vt.c (vt_restore_cursor): Only restore the cursor modes (this
+	does not include cursor tracking).
+
+	* zvtterm.c (zvt_term_size_request): I do not think the code for
+	set_grid_size_pending is working as it should.  If you send
+	another size_allocate, it will get the broken 8/2 defaults.  This
+	fixes gnome-terminal starting up in 8x2
+
+1999-02-06  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* update.c (vt_set_wordclass): Fix loop end condition so it
+	doesn't drop last of a range, or single characters.
+
+	* zterm.c (main): Set word selection class so it will get url's ok.
+	* zterm.c (main): Use the zvt_term_new_with_size function to
+	create the widget.
+
+	* vt.c (vt_modeh): Set relative cursor mode.
+	(vt_model): Remove relative cursor mode.
+	(vt_gotoxy): goto position based on args.
+	(vt_goto): Handle relative origin mode for goto.
+	(vt_scroll): Reset cursor position when origin/size changed.
+
+	* vt.c: Added ESC[x;xf "horizontal and vertical position" command.
+	For ESCD do cursor down (IND), not ignore.
+	(vt_parse_vt): Store state back into vt->state so callbacks know
+	where they were called from.
+	(vt_nl): Support ESCE for "next line" function.
+	(vt_left): Always cursor left, at least 1.
+	(vt_right): Always cursor right, at least 1.
+	(vt_parse_vt): In state ESC[xxxY, handle embedded control codes by
+	executing them.
+	(vt_parse_vt): Support linewrap mode on/off.
+	(vt_modeh): Support linewrap setting ESC?7h
+	(vt_model): Support linewrap setting ESC?7l
+	(vt_restore_cursor): Restore mode/attributes and character set as
+	well as position.
+	(vt_save_cursor): Save mode/attributes and character set as well
+	as position.
+
+1999-02-06  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_set_wordclass): User API call to set the
+	character class for words.
+
+	* update.c (vt_set_wordclass): New function, sets the bitmap used
+	to lookup word classes.
+	(vt_in_wordclass): Now uses a bitmap (in the vtx structure) to
+	determine which characters are part of a word.
+	(vtx_new): Initialise the wordclass to alphanumerics + "_".
+
+	* zvtterm.c (zvt_term_size_request): Set the minimum grid size to
+	8x2.  1x1 is useless.
+
+	* zterm.c (main): I want a blinking cursor, who changed it? :P
+
+	* zvtterm.c (zvt_term_init): Changed default init size to 80x24.
+	This doesn't change the resize behaviour.
+	(zvt_term_new): Changed the description to more accurately reflect
+	the inital size behaviour.
+	(zvt_term_size_request): Change sense of grid_width/height test -
+	to make sure its not negative or 0.  Properly reset the
+	set_grid_size_pending flag off.
+	(zvt_term_set_font_name): Removed redundant "cleanup" label.  Why
+	is everything reformatted wrong?
+
+	* update.c (vt_get_selection): Fixed calling vt_get_selection, so
+	a null *len is allowed.
+
+	* zvtterm.c (zvt_term_get_buffer): Update the documentation to
+	reflect the change from malloc/free to g_malloc/g_free.
+	(zvt_term_get_buffer): Do not set vx->selection_size when
+	returning the buffer contents.
+	(zvt_term_button_release): Removed useless 'len' argument to
+	vt_get_selection().  The api was int anyway, not gint.
+
+	* update.c: Changed to else/if when comparing line lengths.  More
+	obvious that only one case will be executed (and hence memory wont
+	be lost).
+	Removed goto.
+	Removed g_malloc()/g_free() of runbuffer.  Now statically
+	allocated, but grown if need be.
+	(vtx_new): Set runbuffer/runbuffer_size on init.
+	(vtx_destroy): Free runbuffer on destroy.
+
+	* zvtterm.h(zvt_term_new_with_size): New allocate-with-size api
+	call.
+
+Thu Feb  4 16:34:03 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* vt.c (vt_mode): Add support for ESC[39m and ESC[49m
+	to reset foreground and background colors respectivly.
+	(Supported by Linux console and xterm among others)
+
+1999-02-04  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_init): Set shadow to none.  We should kill
+	this code, as it broke my hack to add the extra padding to make
+	the terminals readable.
+
+	Use PADDING bytes on the left as well to work as a padding region 
+	(zvt_term_draw): Check against GTK_SHADOW_NONE
+	(zvt_term_expose): ditto.
+
+1999-01-22  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell-includes.h (_XOPEN_SOURCE): Define as 1, not as nothing.
+
+1999-01-17  Jeff Garzik <jgarzik@pobox.com>
+
+	* zterm.c:
+	s/gtk_container_border_width/gtk_container_set_border_width/
+
+1999-59-15  Erik Troan  <ewt@redhat.com>
+
+	* subshell.c, vt.h, vt.c: Use a separate keyfd for relaying
+	keystrokes. Normally this is identical to childfd, but this
+	allows the applications to abitrarily filter keystrokes before
+	they get to the application.
+
+1999-01-12  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-pty-helper.c: Only define _XOPEN_SOURCE in IRIX>
+
+1998-01-09  Jeff Garzik  <jgarzik@pobox.com>
+
+	* subshell-includes.h, gnome-pty-helper.c:
+	Terminate some #if's.
+
+1999-01-09  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell-includes.h: Provide the same header files as the
+	gnome-pty-helper to address the compilation problems on AIX. 
+
+	* gnome-login-support.c: Use termios.h, not sys/termios.h
+
+	* gnome-pty-helper.c (path_max): PATH_MAX support for various
+	fashions of operating systems
+
+1999-01-07  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell.c: Removed the defines that make gcc -ansi -pedantic
+	works as it breaks compilation on FreeBSD.
+
+	* gnome-pty-helper.c: Ditto. 
+
+	* gnome-pty-helper.c (pty_remove): Return here instead of
+	continuing (this was causing pty-helper to die prematurely).
+
+1999-01-03  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.c: removed ifdefs so building without background pixmap
+	support is no longer a option; cleaned up the flickering a little
+	with scrolling when we have a background pixmap.
+
+1999-01-03  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.c, zvtterm.h: more widget cleanup, rearranged structure
+	to take up less memory by putting all the bitfields at the end of
+	the zvtterm structure (and breaking binary compatibility); fixed
+	a bunch of memory leads caused by not unref(ing) fonts, objects.
+
+1999-01-03  Jay Painter <jpaint@serv.net>
+
+	* zterm.c: made the test program work better by properly duplicating
+	and setting up the environment for the forked pty.
+
+	* vt.c: fixed a resizing behavior so that the current line will
+	not get moved up into the scrolling buffer; instead, it will
+	destroy lines from the bottom of the terminal once it hits the
+	current line when moving top lines into the scrollback area.
+
+1999-01-02  Jay Painter <jpaint@serv.net>
+
+	* vt.h, vt.c, update.c, zvtterm.c: fixed multiple buffer overruns
+	thanks to electric fence.  Changed default color of terminal to
+	black on white.
+
+	* zterm.c: changed widget packing, and main window size hints to
+	accureately reflect terminal grid size.	
+
+1999-01-02  Jeff Garzik  <jgarzik@pobox.com>
+
+	* gnome-pty-helper.c, subshell.c,
+	  zterm.c, zvtterm.c:
+	Include _xxx_SOURCE defines for 'gcc -ansi -pedantic'
+
+	* gnome-pty.h:
+	removed global var login_name not referenced anywhere.
+	removed unnecessary comma.
+
+	* gnome-pty-helper.c: include autoconf alloca incantation
+	
+1998-12-31  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.c, vtx.h, update.c: changed the way the zvtterm
+	widget preforms size requests to be more consistant with the
+	way other GTK+ widgets do -- that is, they only request their
+	minimum allocation size and let their parents allocate more.
+	Unfortunately, this scheme doesn't work well for a terminal 
+	widget because it's hard for the parent widgets to know exactly
+	how much to allocate; therefore, there is an additional API for
+	setting the terminal grid size (zvt_term_set_size) which will
+	preform a widget resize to the appropriate grid dimentions.
+	
+1998-12-30  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.c: fixed "unterminated macro 1511" syntax error
+	that I didn't catch during my last merge.
+
+1998-12-30  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* vt.c (vt_tab): Ok, use the VTATTR_CLEAR for tabs, not just
+	"no-attributes".  This fixes the tab problem with other colors.
+	Thanks to Jay for pointing this out.
+	
+1998-12-30  Jay Painter <jpaint@serv.net>
+
+	* memory.[ch]: removed!  replaced with glib g_malloc, g_free
+	and friends; this is for code clarty and to also fix a nasty
+	bug that tried to free un-allocated memory when you resized
+	while scrolled up.
+
+	* vt.c, update.c: g_memory stuff all the way; removed all calls
+	to alloca; 
+
+	* zvtterm.c: just some formatting changes here and there
+
+1998-12-29  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.[ch]: massive reformatting, added many meaningful 
+	asserts, added gtk_widget_queue_resizes after font changes and
+	maybe in another place or two; added framework for getting this
+	widget to size itself like a normal GTK+ widget, but I havn't
+	implimented it yet.  Replaced the alloca string allocations with
+	GString(s) because if I remember right once you've increased your
+	stack frame size, all stack frames called under it are at least
+	that size -- but then I could also be on drugs.  I probably did 
+	somthing else too...
+
+1998-12-28  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (draw_back_pixmap): Do not reset the _tile to the
+	previous value.  We probably do not care, as we have reset the
+	fill style anyways (and tile only makes sense if the fill is set
+	to GDK_TILED).
+	
+	(zvt_term_get_capabilities): Only allow the pixmap settings to
+	take effect if the visuals are compatible. 
+	
+	(zvt_term_set_background): Even if we have support, make sure we
+	do not acknowledge any calls if _capabilities does not allow us to
+	use it. 
+
+	Do not know why XSetTile does not accept a NULL pixmap though to
+	reset this value. 
+
+	* vt.c (vt_tab): Fix for the tab problem reported by Alan.  It
+	happens that tabs are transparent regarding attributes.
+
+Wed Dec 16 16:52:53 1998  Owen Taylor  <otaylor@redhat.com>
+
+	* zvtterm.c (zvt_term_init): Initialize timeout_id to -1.
+
+1998-12-31  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.c, vtx.h, update.c: changed the way the zvtterm
+	widget preforms size requests to be more consistant with the
+	way other GTK+ widgets do -- that is, they only request their
+	minimum allocation size and let their parents allocate more.
+	Unfortunately, this scheme doesn't work well for a terminal 
+	widget because it's hard for the parent widgets to know exactly
+	how much to allocate; therefore, there is an additional API for
+	setting the terminal grid size (zvt_term_set_size) which will
+	preform a widget resize to the appropriate grid dimentions.
+
+1998-12-30  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-pty-helper.c (open_ptys): Use pathmax, as the sysconfig
+	tty size does not include the whole pathname.
+
+	* vt.c (vt_tab): Ok, use the VTATTR_CLEAR for tabs, not just
+	"no-attributes".  This fixes the tab problem with other colors.
+	Thanks to Jay for pointing this out.
+
+1998-12-30  Jay Painter <jpaint@serv.net>
+
+	* memory.[ch]: removed!  replaced with glib g_malloc, g_free
+	and friends; this is for code clarty and to also fix a nasty
+	bug that tried to free un-allocated memory when you resized
+	while scrolled up.
+
+	* vt.c, update.c: g_memory stuff all the way; removed all calls
+	to alloca; 
+
+	* zvtterm.c: just some formatting changes here and there
+
+1998-12-29  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.[ch]: massive reformatting, added many meaningful 
+	asserts, added gtk_widget_queue_resizes after font changes and
+	maybe in another place or two; added framework for getting this
+	widget to size itself like a normal GTK+ widget, but I havn't
+	implimented it yet.  Replaced the alloca string allocations with
+	GString(s) because if I remember right once you've increased your
+	stack frame size, all stack frames called under it are at least
+	that size -- but then I could also be on drugs.  I probably did 
+	somthing else too...
+
+1998-12-28  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (draw_back_pixmap): Do not reset the _tile to the
+	previous value.  We probably do not care, as we have reset the
+	fill style anyways (and tile only makes sense if the fill is set
+	to GDK_TILED).
+	
+	(zvt_term_get_capabilities): Only allow the pixmap settings to
+	take effect if the visuals are compatible. 
+	
+	(zvt_term_set_background): Even if we have support, make sure we
+	do not acknowledge any calls if _capabilities does not allow us to
+	use it. 
+
+	Do not know why XSetTile does not accept a NULL pixmap though to
+	reset this value. 
+
+	* vt.c (vt_tab): Fix for the tab problem reported by Alan.  It
+	happens that tabs are transparent regarding attributes.
+
+Wed Dec 16 16:52:53 1998  Owen Taylor  <otaylor@redhat.com>
+
+	* zvtterm.c (zvt_term_init): Initialize timeout_id to -1.
+
+1998-12-09  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* update.c (vt_get_selection): Fixed the paste problems.  We need
+	to set the selection_size when we set the selection
+	(vt_in_wordclass): Punctuation characters are not in wordclass
+
+Wed Dec  9 05:39:05 PST 1998 Manish Singh <yosh@gimp.org>
+
+	* zvtterm.[ch]: fix for IC changes in new gtk. It compiles,
+	and zterm works, someone want to verify it is correctly fixed?
+
+1998-12-05  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-pty-helper.c (sanity_checks): Figure out if file
+	descriptor 2 is valid, if not, then try using /dev/tty and
+	/dev/null as replacements.
+	(sanity_checks): Verify that descriptors 0 and 1 are valid. 
+
+1998-12-05  Havoc Pennington  <hp@pobox.com>
+
+	* vt.h: Change name of "this" member to "this_line," so C++
+	doesn't puke. Add extern "C" stuff.
+	* vt.c: reflect change throughout
+	* update.c: same
+	* vtx.h: extern "C"
+	
+1998-12-05  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* zvtterm.c (zvt_term_get_buffer): New api function.  Returns a
+	malloc'd block of memory containing buffer/scrollback contents as
+	a sequence of bytes.
+
+	* update.c (vt_select_block): New function, returns a malloc'd
+	block of memory containing the scrollback contents.
+	(vt_get_selection): Moved most of the code into vt_select_block.
+
+Fri Dec  4 16:45:11 1998  Manish Vachharajani <mvachhar@vger.rutgers.edu>
+
+	* gnome-pty-helper.c: Don't bail out if we can't open /dev/tty.
+	Seems to cause problems.
+	
+Wed Dec 02 03:16:07 1998  George Lebl  <jirka@5z.com>
+
+	* zvtterm.c: (vt_scroll_area) check for background pixmap in
+	addition to transparency to do the cheap ass scrolling hack by
+	repainting the entire window
+
+Sun Nov 29 02:59:32 1998  George Lebl  <jirka@5z.com>
+
+	* zvterm.[ch]: added function zvt_term_get_capabilities, which
+	  returns the bitmask of capabilities supported by the zvt widget
+	  right now, this is only the pixmap support, which is
+	  ZVT_TERM_PIXMAP_SUPPORT
+
+1998-11-26  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell.c (get_ptys): Use n_read, just like gnome-pty-helper. 
+
+	* gnome-pty-helper.c (main): Deal properly with read().  read
+	might return -1/EINTR for an interrupted system call.  read might
+	return less bytes than requested and read might return 0 on eof. 
+
+	* gnome-login-support.c (n_read): New utility routine to deal with
+	all of the read () system calls details.
+	
+	* subshell.c (zvt_init_subshell): Init SIGCHLD before the first
+	fork. 
+
+	* gnome-pty-helper.c: Duh.  Test was wrong.  Relaxed limits. 
+
+	* zvtterm.c (zvt_term_title_changed_raise): Fix prototype.
+
+	* gnome-pty-helper.c (sanity_checks): New routine takes care of
+	making sure environment is sane for running a suid program.
+	Thanks to Pavel Kankovsky for providing sample code for resource
+	checks and signal checks.
+	
+	(main): Check for open return value.  Thanks
+	to Pavel Kankovsky again for pointing this out.
+
+1998-11-26  Jeff Garzik  <jgarzik@pobox.com>
+
+	* vt.c, zterm.c, zvtterm.c:
+	Replaced sprintf calls with g_snprintf.
+	Updated a couple hardcoded length values to instead of sizeof().
+
+1998-11-24  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	The following changes have been implemented after the comments
+	from Pavel Kankovsky (peak@kerberos.troja.mff.cuni.cz) who audited
+	the gnome-pty-helper code.
+
+	Now I understand why Theo says that most of us mere programmers
+	do not get properly aquainted with the proper Unix system call API.
+	
+	* gnome-login-support.c (pty_open_slave_bsd): Set the owner and
+	group even if getgrnam fails due to a low memory condition on the system
+
+	* gnome-pty-helper.c: Make the pty_info->line information be a
+	character pointer instead of a static array.
+	(pty_add, pty_remove): fix accordingly.
+	
+	(open_ptys): Size the array passed to openpty correctly: use
+	sysconf (_SC_TTY_NAME_MAX) if available or PATH_MAX otherwise.
+
+	dup2() might fail with EINTR, handle this case.
+
+	A couple of extra problems still remain, will fix those tomorrow.
+	
+1998-11-23  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.c: added zvt_term_map & zvt_term_unmap so that the
+	terminal and its subwindows are mapped/unmapped properly.
+
+1998-11-23  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-pty.h (USE_SYSV_UTMP): Define USE_SYSV_UTMP in the shared
+	header file
+
+	* subshell.c (zvt_shutdown_subshell): Duh, I was missing the tag
+	write.  Protocol fixed.  This should fix gnome-terminal for everyone.
+
+	* zvtterm.c (zvt_term_bell): Fix prototype.
+
+1998-11-22  Jay Painter <jpaint@serv.net>
+
+	* zvtterm.c: widget now creates a separate term_window for the
+	terminal window.  This is sized inside of the widget->window
+	so that the terminal widget has a relieved border.  I also 
+	cleaned up a couple of leaks and moved some stuff from the
+	_destroy method into the _unrealize method.  Sorry Michael,
+	I tried to e-mail you before this commit but the mail bounced!
+
+1998-11-21  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* zterm.c: Made window global.
+
+	* zvtterm.c (zvt_term_get_bell): Fixed return if fail to be return
+	val if fail.  Personally I can't imagine where you would ever need
+	this function.
+	(zvt_term_title_changed_raise): Function to actually raise the
+	signal, when we get called by the terminal.
+
+	* zvtterm.h: Fix zvt_term_bell prototype.
+
+	* vt.c (vt_bell): Changed to call callback with user_data.
+	vt.c: include <string.h> for strchr prototype.
+
+	* zvtterm.c (zvt_term_bell): Changed prototype/callback to supply
+	user-data (i.e. the widget pointer).
+
+	* zterm.c (main): Add support for title_changed event callback.
+	(title_changed_event): Set titles based on title_changed event.
+
+	* vt.c (vt_init): Init change_my_name and user_data to NULL.
+	(vt_set_text): Handle callbacks for setting titles.
+
+	* update.c: Fixed vx->user_data references.
+
+	* vtx.h: Removed user_data from struct _vtx.  Avoid duplication.
+	Fixed all references.
+
+	* vt.h: Added change_my_name callback, for title changes.  Added
+	user_data field (to be removed from vtx).
+
+	* zvtterm.c (zvt_term_title_changed): Dummy handler for
+	title_changed signal.
+	
+	* zvtterm.h (struct _ZvtTermClass): Added title_changed callback.
+
+	* zvtterm.c (zvt_term_class_init): Added "title_changed" signal.
+
+1998-11-20  Manish Vachharajani <mvachhar@vger.rutgers.edu>
+
+	* zvtterm.h: 
+	* zvtterm.c: Added zvt_term_get_bell function
+	
+1998-11-19  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* zvtterm.c (vt_hightlight_block): Removed.  Function not used
+	anymore.
+
+1998-11-18  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* zvtterm.c (zvt_term_selection_received): Only scroll to bottom
+	if scroll on keystroke is set, now that it should be safe to do
+	so.
+
+	* vt.c (vt_scrollback_add): Properly adjust scrollbackoffset and
+	scrollbackold if extra data is added to the scrollback, and
+	scrollback is 'active' (scrollbackoffset != 0).
+
+	* update.c (vt_update): Handle edge condition when scanning
+	backwards at edge of scrollback/real buffers properly.
+
+	* vt.c (vt_scrollback_add): Force a newly added scrollback line to
+	slot into the right sequence if scrollback is active.  This should
+	fix scrolling output when viewing scrollback.  Only 3 @#$@ hours
+	later.
+
+	* zvtterm.c (zvt_term_bell): Definition of function.
+	(zvt_term_init): Set the new ring_my_bell pointer callback.
+	(zvt_term_set_bell): New function.  Sets ring_my_bell or clears it
+	depending on the requested state.
+
+	* zvtterm.h (zvt_term_bell): New external function to beep in a
+	terminal-way.
+
+	* vt.c (vt_bell): Use the new ring_my_bell callback if it is set.
+	(vt_init): Set ring_my_bell to NULL on initialisation.
+
+	* vt.h (ring_my_bell): callback function for bell ringers.
+
+1998-11-17  Martin Baulig  <martin@home-of-linux.org>
+
+	* gnome-pty-helper.c, test-utmp.c (update_dgs): Only call this
+ 	function if USE_SYSV_UTMP is defined.
+
+	[NOTE: This is only some kind of hack since we define this
+	function conditionally to USE_SYSV_UTMP in gnome-utmp.c.]
+
+1998-11-16  Walter Mueller <walt@pi4.informatik.uni-mannheim.de>
+
+	* gnome-utmp.c (write_logout_record): Changes for Solaris compilation.
+
+1998-11-15  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* zvtterm.c (zvt_term_selection_received): Always scroll to bottom
+	on non-empty paste.  This 'hides' a bug where the screen list can
+	get corrupt.  Not sure if its in the parser or the update code.
+
+	* vt.c (vt_dump): Replaced coded constant masks with defined
+	values.
+	(vt_parse_vt): Likewise.
+	(vt_resize): Likewise.
+	(vt_tab): Simplified processing.  Dont try and over-write anything
+	onscreen, unless its empty.
+	(vt_parse_vt): Remove 'handled' loop from interpreter.  It just
+	wasn't doing anything useful ...
+	(vt_parse_vt): Remove unecessary null-pointer check in state 5
+	case.  Also force character to 7 bits when interpreting it.
+
+	* update.c (vt_line_update): Replaced coded constant masks with
+	defined values.
+	(vt_scroll_update): Likewise.
+	(vt_update): Likewise.
+
+	* vt.h: Removed VTATTR_CHANGED flag.  This gives one extra
+	attribute bit.
+	(VTATTR_MASK): New mask - all attribute bits.
+	(VTATTR_DATAMASK): No attribute bits.
+
+1998-11-13  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* subshell.c (sigchld_handler): Only call the previous signal
+	handler if it was set.
+
+1998-11-14  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* vt.c (vt_cleareos): Fix ^[J command to clear in the right
+	direction.
+	(vt_resize): When expanding lines from scrollback, fill remainder
+	of line with attributes of last character.
+
+1998-11-11  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_set_del_key_swap):
+	(zvt_term_key_press): Add support for swapping the sequences
+	emited by DEL and Backspace.
+	(zvt_term_set_del_key_swap): Actually implement it.
+
+1998-11-10  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* gnome-utmp.c (update_dbs): Add support for UTMPX
+	implementations. 
+	Use getutid to find an available slot.
+	(write_logout_record): New function to write a logout record.
+
+	* vt.c (vt_closepty): Shutdown the pty properly (to register
+	logout state). 
+
+	* subshell.c (zvt_shutdown_subshell): Ask the PTY helper to
+	write the logout record information.
+
+
+	* subshell.c (get_ptys):
+	* gnome-pty-helper.c: Use STDIN_FILENO to transfer protocol
+	information.  Use STDOUT_FILENO to transfer file descriptors, as
+	some BSD kernels crash if you use the same socket for transfering
+	data and file descriptors (this information comes from Theo de
+	Raadt). 
+	
+	* subshell.c (sigchld_handler): Chain signal handlers.
+	Use waitpid with WNOHANG set to check for any of our known
+	processes. 
+
+	* gnome-utmp.c (update_dbs): Clear the utmp structure, per Theo de
+	Raddt's recomendation.
+
+1998-11-10  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* update.c (vt_scroll_update): Get the scroll fill colour from the
+	corresponding new line, not the old line (the 'fill' is free, it
+	may as well more likely match what we want - even if it doesn't it
+	just slows it down a bit).
+
+	* vt.c (vt_reset): Changed vt_cleareos call to vt_clear_lines.
+	(vt_cleareos): Handle screen clear options properly, not just
+	'clear to end'.
+	(vt_insert_lines): Simplified clear condition - always clear
+	(mumble grumble).
+	(vt_delete_lines): Always clear line contents.
+	(vt_clear_lines): Remove VTATTR_CHANGED from update.
+	(vt_delete_chars): Remove VTATTR_CHANGED.
+	(vt_insert_chars): Ditto.
+	(vt_scroll_up): Ditto.
+	(vt_scroll_down): Ditto.
+	(vt_clear_line_portion): Ditto.
+	(vt_tab): Ditto.
+	(vt_parse_vt): Ditto.
+	(vt_newline): Ditto.
+
+1998-11-10  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* vt.c (vt_down): Out by one on bounds checking against the bottom
+	of the screen.
+
+1998-11-10  Michael Zucchi  <zucchi@zedzone.mmc.com.au>
+
+	* vtx.h (vt_scroll_area): Fix prototype for new 'fill' parameter.
+
+	* update.c (vt_scroll_update): Calculate the scroll expose colour
+	from the previous background colour on that line (or start of),
+	and pass that to vt_scroll_area.  Make sure the line is 'cleared'
+	with the same colour.  And by jove, we have it!
+
+	* zvtterm.c (vt_scroll_area): Take a new option 'fill' - specifies
+	the background colour to fill in the scrolled area.
+
+1998-11-09  Jay Cox  <jaycox@earthlink.net>
+
+	* zterm.c: replaced rindex with strrchr for portability.
+
+1998-11-09  Martin Baulig  <baulig@merkur.uni-trier.de>
+
+	* subshell.c, gnome-pty-helper.c: Include <sys/un.h> if we have it.
+	(CMSG_DATA): Define this if if is not already defined.
+
+1998-11-09  Martin Baulig  <martin@home-of-linux.org>
+
+	* gnome-pty-helper.c (struct pty_info): Added `line' field.
+	(shutdown_pty): Added logout code for FreeBSD.
+	(open_ptys): Added some code for FreeBSD.
+
+	* zterm.c: Added new `-l' command line parameter to make
+	the shell a login shell.
+
+	* gnome-login-support.h: Include <libutil.h> on FreeBSD.
+
+	* gnome-pty.h (GnomePtyOps): Make it explicitly start with 1.
+
+	* gnome-utmp.c (_HAVE_UT_USER, _HAVE_UT_TIME): Use this #ifdefs.
+	(WTMP_FILENAME): Define if not already defined.
+	(HAVE_LOGIN): If we have the login () function, call it - otherwise
+	use the pututline () ... code.
+
+1998-11-09  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* gnome-login-support.h: Include pty.h only if it exists, or
+	util.h if that exists (for OpenBSD).
+
+	* zvtterm.c: More slight doco updates/spelling fixes.
+
+1998-11-07  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* vt.c: Mods to the doco - bit more meat and better spelling :)
+
+1998-11-06  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* subshell.c (receive_fd) [!HAVE_SENDMSG]: Fix typos.
+	* gnome-pty-helper.c (init_msg_pass) [!HAVE_SENDMSG]: New empty
+	function. 
+	* gnome-login-support.c (pty_open_master): Declare `slave_name'.
+	Pass `used_bsd' to pty_open_master_bsd.
+	* gnome-utmp.c (paths.h): Protect inclusion with HAVE_PATHS_H.
+	(UTMP_FILENAME): Ensure that it is defined.
+	From "Brandon S. Allbery" <allbery@ece.cmu.edu>.
+	
+1998-11-02  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c, vt.c: Added documentation to the API entyr points in
+	zvt and vt.
+
+	* gnome-pty-helper.c: New suid program that takes care of pty
+	allocation, permission setting and utmp/wtmp record updating. 
+
+	* gnome-login-support.c: Utility functions to portably open pseudo
+	terminals.  The code in this module is used by gnome-pty-helper.
+
+	* Makefile.am (libzvt_la_SOURCES): Do not install subshell.h this
+	is an internal header file.
+	
+	Add helper program.  Makie gnome-pty-helper program setuid root.
+	
+	* subshell.c (zvt_resize_subshell), vt.c: Cleaned up the name
+	space. 
+	
+Tue Oct 27 14:19:15 1998  George Lebl  <jirka@5z.com>
+
+	(this is a detailed changelog even for the last commit)
+	* zvtterm.h: added transparent,shaded,pixmap_filename and background
+	  pixmaps and zvt_term_set_background
+
+	* zvtterm.c: added get_desktop_window for getting the current desktop
+	  window, get_pixmap_prop, for getting an arbitrary pixmap property
+	  on a window load_pixmap_back to load a pixmap, create_shaded_pixmap,
+	  to make a shaded background pixmap, draw_back_pixmap for drawing
+	  the background, which is done in draw and expose, and sometimes in
+	  vt_draw_text. the call to set background stuff is
+	  zvt_term_background. scrolling is done by calling a redraw even for
+	  the entire widget
+
+Tue Oct 27 01:07:21 1998  George Lebl  <jirka@5z.com>
+
+	* zvtterm.[ch]: transparency hacks, it's not 100% clean and probably
+	  doesn't work well with enlightenment desktops. it isn't much code
+	  but if you really really don't want it (it doesn't affect the
+	  normal operation at all) you can change a define in zvtterm.h,
+	  it still  needs a lot of cleanup and I hope that committing it will
+	  get people to make it work with their windowmanagers (hint hint
+	  raster)
+	
+	* zvtterm.c,update.c: add headers to avoid warnings
+
+1998-10-24  Martin Baulig  <martin@home-of-linux.org>
+
+	* update.c: Only #include <alloca.h> if we `HAVE_ALLOCA_H'.
+
+1998-10-22  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* update.c (vt_update_rect): Was going to the wrong next node when
+	starting the screen list.
+	(vt_update_rect): Bounds-check csy - cey to height.
+	(vt_line_update): Removed assertion about runbuffer (alloca
+	doesn't return null).
+	(vt_line_update): Add node->next==NULL assertion to check for
+	end-of-list.
+	
+1998-10-21  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* zterm.c (main): Set window hints/minimum size.  Now the terminal
+	can be resized smaller!  (should this be done to gnome-terminal?)
+
+	* vt.c (vt_resize): Make sure widened lines are cleared with a
+	blank character.
+
+	* lists.c (vt_list_remtail): This would never have worked.  Just
+	lucky I never used it!  Changed tail to tailpred.
+	(vt_list_addhead): This would never have worked either.  Changed
+	tailpred to head *sigh*.
+
+	* vt.c (vt_scrollback_add): Changed to static.
+	(vt_dump): Changed to static.
+
+	* memory.h (vt_mem_unget): Add vt_mem_unget() prototype.
+
+	* memory.c: Include "memory.h" for prototypes.
+
+	* vt.c (vt_resize): Recover old scrollback lines if they exist,
+	and the view is getting bigger.
+
+	* memory.c (MEM_BLOCK_ALIGN): New constant - defines alignment of
+	allocations.  Pointers need to align to this.
+
+1998-10-20  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* update.c: Include (missing) alloca.h.
+	(vt_line_update): Handle line size changes (i.e. if rendering
+	scrollback from before a resize).  Removed the g_return_if_fail
+	for line size mismatch.
+
+1998-10-19  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* update.c (vt_line_update): Toggle, not OR reverse bit, for
+	rendering selected areas.
+	(vt_line_update): Typo in bitmask was stripping most attributes
+	from each character (7fff000->7fff0000).
+
+Sun Oct 18 19:03:47 1998  Owen Taylor  <otaylor@gtk.org>
+
+	* zvtterm.c: Changes to match the new GTK+ selection
+	handling API.
+
+1998-10-18  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* update.c (vt_fix_selection): When selecting by character, use
+	the same start-of-selection criteria as used with selection-by
+	word (stops the last character on a line from always being
+	selected).
+	(vt_scroll_update): Removed some bulky comments.
+
+	* vtx.h: Removed vt_draw_text_select prototype.
+
+	* update.c (vt_fix_selection): When selecting by word or
+	character, force the initial selection to contain at least 1
+	character.
+	(vt_line_update): Removed warnings: Removed noclear, unused variable.
+	(vt_scroll_update): Changed to static.
+	(vt_update): Typecast list references to struct vt_line *'s.
+	(vt_update): Removed un-used 'count'.
+	(vt_in_wordclass): Changed to static.
+	(vt_expand_line): Changed to static.
+	(vt_draw_selection_part): Changed to static.
+	(vt_draw_text_select): Force re-render of selected block's
+	background, when rendering the selection.
+	(vt_line_update): Integrated 'selection' rendering into here.  Now
+	the code can properly determine exactly the screen rendering
+	attributes before they are rendered.
+	(vt_draw_text_select): Removed.  Functionality integrated into the
+	vt_line_update routine.
+
+	* zvtterm.c (zvt_term_button_press): Ignore button presses when
+	CTRL is activated.  This interferes with the pop-up menu in
+	gnome-terminal (semantically it makes no sense to support
+	selection with any qualifiers anyway).
+	(zvt_term_button_release): Likewise for button up.
+
+	* TODO: Cleaned out some done todo's.
+
+	* zvtterm.c (vt_draw_text): Doh!  Forgot to remove some debug.
+
+1998-10-15  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* zvtterm.c (zvt_term_scroll): Some code here broke the new update
+	stuff. scrollbackold should *never* be set outside of the update
+	routine.
+	(zvt_term_selection_clear): Modularised what had been, removed the
+	fixme (calls vtx_unrender_selection()).
+	(vtx_unrender_selection): Killed FIXME.
+	(zvt_term_draw): Always force re-draw (through 'in_expose').
+	(vt_draw_text): Change the sense of the dont-draw-background
+	condition.  Always redraw background for expose events (will slow
+	down refresh though - FIXME: the screen representation needs to be
+	cleared to match the window, even for refresh).
+
+1998-10-14  Michael Zucchi  <zucchi@zzedzone.fsi.com.au>
+
+	* update.c (vt_line_update): Fix back_match determination.  Only
+	match on all attributes for any blank rendering characters.  When
+	this is the case the area behind text will not be cleared (often
+	twice-cleared otherwise).
+
+	* zvtterm.c (vt_draw_text): Hopefully properly fixed the 'dont
+	clear the background if we've already cleared the background
+	optimisation' bugs.
+
+	* update.c (vt_scroll_update): Removed 'fn' - first node of update
+	scroll area.  No longer reliable or useful - due to scrollback
+	changes.
+	(vt_update): Integrated scrollback update within the same main
+	loop(s).  Now scrollback should have the same performance as
+	normal scrolling.  Has a (messier) problem with using scrollback
+	and screen update, which should be addressed with the scrollback
+	counter/bar elsewhere.
+
+	* vt.c (vt_tab): Change tab behaviour somewhat.  Dont overwrite
+	attributes of existing characters.  Dont blank beyond the first
+	space encountered [also, dont affect attributes].  Cleaned up code
+	a little bit.
+
+	* update.c (vt_update_rect): Make this take into account
+	vx->vt.scrollbackoffset when rendering the rectangle.
+	(vt_draw_cursor): Make sure the cursor is turned off when
+	scrolling (using scrollbackold rather than scrollbackoffset).
+
+	* zvtterm.c (zvt_term_scrollbar_moved): Only update 'scrollback'
+	mode, rather then refresh.
+
+1998-09-24  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_feed): New routine.  Used to feed
+	information to a zvtterm from the application.
+
+	* zvtterm.h: Changed the timeout it to be integer.
+
+1998-09-14  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* subshell.c (close_msgfd): Change prototype to agree with
+	declaration (use `pid_t', not int).
+
+1998-20-14  Erik Troan  <ewt@redhat.com>
+
+	* zvtterm.c, zvtterm.h: added optional automatic scrolling
+	on keystrokes and/or output
+
+1998-40-08  Erik Troan  <ewt@redhat.com>
+
+	* subshell.c (pty_open_slave, pty_open_master): Set close-on-exec
+	flag for slave and master file descriptors
+	* handle SIGCHLD for proper termination detection
+
+1998-09-04    <nicholas@cefiro.cs.nthu.edu.tw>
+
+	* vt.c (vt_goto): reset vt->cursorx or vt->cursory to zero
+	when it is negative number
+
+1998-08-31  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_scroll): Clear any pending cached
+	information about scrollback when the user has triggered a
+	scroll view change.
+
+1998-26-31  Erik Troan  <ewt@redhat.com>
+
+	* vt.c (process_vt): accept : as a parameter seperator,
+	not just ; (xterm does, linux console doesn't; we're
+	supposed to be TERM=xterm, right?)
+	* vt.c (vt_clear_lineportion): made ^[[K handle parameters 
+	properly (only ^[[0K was supported)
+	* vt.c (vt_delete_lines): cells containing spaces were
+	never updated; if the attribute is being changed they
+	need updating, however
+
+1998-08-28  Erik Troan  <ewt@redhat.com> 
+
+	* vt.c (process_vt): wrapped some debugging printf()
+	statements with d()
+	* vt.c (process_vt): don't let ^]*X (w/ X >= 0x80)
+	segv the box
+	* vt.h: made the parameter stuff unsigned chars
+
+1998-08-26  Erik Troan  <ewt@redhat.com>
+
+	* zvtterm.c (vt_draw_text): attempted vx->back_match 
+	optimization was incorrect, and to ghost selections
+
+1998-07-25  Jonathan Blandford  <jrb@redhat.com>
+
+	* zvtterm.c (zvt_term_realize): Changed GdkIM*Nothing to
+	GDK_IM_*_NOTHING to reflect the changes in gdk.
+	
+1998-07-19  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zvtterm.c (zvt_term_init): Initialise in_expose variable at
+	startup.
+
+	* update.c (vt_draw_cursor): Force back_match==0 when drawing
+	cursor - forces screen update.
+
+	* zvtterm.c (vt_draw_text): Dont clear the background, if the
+	screen already has the right colour [cleared], or we're in expose
+	events.
+	(zvt_term_expose): Set in_expose around expose events.  Optimises
+	text drawing.
+
+	* update.c (vt_line_update): Cleaned up logic a little.  Also, now
+	scans back buffer to find out if it is already clear, set
+	vx->back_match if it is.
+
+1998-07-05  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* zvtterm.c (zvt_term_scroll): Check bounds when scrolling. You
+	could Shift-PageDown while already on the last line and then would
+	require 2 Shift-PageUp to start scrolling up again.
+
+1998-06-15  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* update.c (vt_line_update): Was usually drawing 1 more character
+	than necessary.
+	(vt_draw_cursor): Map NUL or TAB to ' ' when drawing the cursor.
+
+	* zvtterm.c (zvt_term_key_press): Insert \033 before backspace for
+	meta-bs.
+	(zvt_term_key_press): Same for delete.  Should probably be a
+	cleaner/more generic way to do this.
+
+	* vt.c (vt_gx_set): New function, sets the current font remappings
+	for G0 to G3 font.
+	(vt_init): Initialise vt->Gx, and vt->G[x]
+	(vt_init): Initialise vt_remap_dec[]
+	(vt_alt_start): Removed old redundant code.  Now sets G[1] charset
+	as current.
+	(vt_alt_end): Changed to reset to G[0] charset.
+	(vt_reset): Reset Gx and G[x]
+
+Sun Jun 14 14:07:34 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (INCLUDES): Look in intl build directory.  Don't
+	unconditionally look in support directory (configure will
+	determine whether this is needed).
+
+Sat Jun 13 21:08:50 1998  Tom Tromey  <tromey@cygnus.com>
+
+	Fixed all -Wall warnings:
+	* zterm.c: Include <stdlib.h> for atoi().
+	* zvtterm.c: Include <string.h> for memset().
+
+1998-06-10  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zvtterm.c (zvt_term_set_color_scheme): Changed background to
+	colour index 17 - colour index 18 doesn't exist!
+	(zvt_term_readdata): Removed the 'read failed' message.
+
+	* vt.c (vt_set_screen): Clear alternate screen on a switch.
+
+	* update.c (vt_draw_selection_part): Check the line is on-screen
+	before trying to re-render it.  Fixes a nasty segfault.
+	(vt_line_update): Added some sanity checks to ensure segfaults are
+	banished.
+
+1998-06-07  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zvtterm.c (zvt_term_key_press): Added debug macro around the key
+	press printf.
+	(zvt_term_key_press): Changed the ctrl-space handling code, so the
+	default case doesn't grow into another switch statement to handle
+	all possible cases [which is what the existing switch is for].
+
+	* vt.c (vt_delete_line): For reverse scroll, compare to
+	vt->scrolltop, and not 0 - fixes reverse scroll in pine.
+
+1998-06-01  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_key_press): Handle control-space.
+
+Mon Jun  1 19:44:25 CEST 1998  Eckehard Berns  <eb@berns.prima.de>
+
+	* zvtterm.c: added input context to support deadkeys.
+
+Mon Jun  1 17:34:41 CEST 1998  Eckehard Berns  <eb@berns.prima.de>
+
+	* zvtterm.c (zvt_term_key_press): added GDK_Mode_switch and
+	GDK_Multi_key to the switch statement to avoid [ff..] when pressing
+	AltGr or Multikey
+
+1998-05-25  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* update.c (vt_get_attr_at): New function, returns the
+	attribute/char pair at a given column/row.
+
+1998-05-23  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* vt.c (parse_vt): Looks up process() function at start of loop,
+	enabling the rest of the routine to be 8 bit clean.
+
+1998-05-21  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_draw): Implement a draw handler.
+
+1998-05-12  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zvtterm.c (zvt_term_selection_clear): Added call to
+	gtk_selection_clear() to let gtk know the selection has been
+	cleared.
+	(zvt_term_button_release): Changed to use event->time rather than
+	GDK_CURRENT_TIME in selection owner set.
+
+1998-05-10  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zvtterm.c (zvt_term_set_font_name): Removed "loading xxx font"
+	message.  Probably needs some fallback if it can't load a font
+	... better than the one it has.
+	(vt_draw_text): Only set 'bright' colours, if a bold equivalent exists.
+
+	* update.c (vt_draw_cursor): only draw/undraw cursor if not
+	scrolled back at all.
+
+	* zvtterm.c (zvt_term_button_release): Added GDK_SHIFT_MASK check
+	before reporting mouse up events.
+
+	* update.c (vt_draw_selection_part): Changed to use rendered
+	selection, rather than inverting the rectangle.  May be slower for
+	detailed screens.  Some of the arguments are now not used.
+
+	* vtx.h: Added vt_draw_cursor() prototype.
+
+	* zvtterm.c (vt_draw_text): Expanded to use 5 bit colour
+	selection.  Put back in old default-colour handling code - needed
+	for new cursor rendering algorithm.  Now swaps the referenced gc's
+	rather than the gc's referenced colour,	when inverse mode set.
+	Should fix some rendering glitches.
+
+	* vt.c (vt_mode): removed VTATTR_FORE/BACK_SET bit settings, as
+	these bits no longer exist.
+
+	* vt.h : redordered VTATTR_* bits.  Modified fore/background
+	colour to have 5 bits.
+
+	* zvtterm.c (vt_cursor_state): Calls vt_draw_cursor() to render
+	the cursor.
+
+	* update.c (vt_get_selection): Fixed bug where it added the first
+	line of a selection twice to the selection buffer.
+	(vt_draw_text_select): Fixed update bug when refreshing could
+	corrupt first and last line of a selection.
+	(vt_draw_cursor): New function.  Draws the cursor onto the
+	display.  Draws the cursor using vt_draw_text() and not an
+	inverted box.
+
+	* zvtterm.c: Fixed up calls to vt_draw_selection(), to call
+	vt_fix_selection() where appropriate.
+
+	* update.c (vt_draw_selection): Removed call to
+	vt_fix_selection().  Now must be performed explicitly by caller.
+
+1998-05-09  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* update.c (vt_update): Changed behaviour slightly for scroll-wrap
+	lines.  Always update them.
+
+	* vt.c (vt_delete_chars): Fixed out-by-1 error in scrolling the
+	deleted charcters into place.
+
+1998-05-08  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_set_color_scheme): Set the GdkWindow color
+	to the default background of the terminal.  This avoids the
+	flashing gray when switching desktops. 
+
+1998-05-06  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (vt_draw_text): Use the default background/foreground
+	unless an attribute has been specified.
+
+	default_red, grn, blu: The colors 16 and 17 are default foreground
+	and default background. 
+
+Wed May  6 13:15:16 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* subshell.c: Include <config.h>.  Conditionally include
+	<sys/select.h>.
+
+1998-05-04  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* subshell.c (pty_open_master): Removed warnings.
+
+	* vt.c (vt_model): Added case 47 - alternate screen off.
+	(vt_modeh): Added case 47 - alternate screen on.
+	(vt_set_screen): New function.  Sets the current screen.
+	(vt_resize): Added code to handle resize of alternate screen too.
+	(vt_scroll_up): Only add to scrollback if we are on the primary
+	screen.
+	(vt_reset): Resets screen to primary.
+	(vt_destroy): Added cleanup for alternate screen and image buffer.
+
+	* vt.h (VTMODE_ALTSCREEN): New definition.  Covers alternate
+	screen switching.
+
+1998-05-03  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zterm.c (main): Allow window to be shrinked when the font
+	changes. 
+
+	* zvtterm.c (zvt_term_key_press): Add support for checking the
+	scrollback contents with shift-pgup, shift-pgdn in zvtterm.
+
+1998-05-03  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* vt.c (vt_resize): Now calls resize_subshell() instead of calling
+	the ioctl directly.
+
+	* subshell.h: New file.  Defines functions in subshell.c.
+
+	* subshell.c: New file.  Includes init_subshell() and
+	resize_subshell() commands.  Taken from 'mc' source tree.
+
+	* vt.c (vt_forkpty): Changed to use init_subshell() call from
+	subshell.c.  No longer needs forkpty() function!
+
+1998-05-02  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* vt.c (vt_swap_buffers): Removed.  Not needed in the end.
+	* update.c (vt_scroll_update): Cleaned up some dead code.
+	(vt_scroll_update): Added code to perform scrolling of on-screen
+	image buffer.
+	(vt_line_update): Modified to use screen image buffer to optimise
+	updates.  Seems to work very well!
+
+1998-05-01  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_set_color_scheme): Add support for changing
+	the color set in the terminal.
+	(zvt_term_key_press): Add support for handling meta-key, for us,
+	emacs users :-).
+
+Thu Apr 30 23:19:07 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* forkpty.c (openpty): Removed buffer, buflen, and grbuffer
+	variables.  Correctly call getgrnam.
+
+1998-04-30  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.h: Use unsigned ints for the flags.
+
+	* zvtterm.c (vt_cursor_state): Test for drawability.
+
+1998-04-30  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zvtterm.c (zvt_term_realize): Put GDK_POINTER_MOTION_MASK back
+	in, because we *ARE* interested in the events even when the button
+	isn't pressed.  Otherwise the mouse doesn't un-blank :)
+
+1998-04-29  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* zvtterm.c (zvt_term_realize): Removed the
+	GDK_POINTER_MOTION_HINT_MASK, as this was preventing the motion
+	from being reported back to the application;  Removed the
+	GDK_POINTER_MOTION_MASK, as we are only interested in the events
+	when the button is held pressed.
+	
+	(zvt_term_button_press): If shift key is pressed, then do not try
+	to report the button operations to the application (standars
+	behaviour :-)
+
+	(zvt_term_readdata): signal_emission might have killed this
+	process, do not call zvt_term_fix_scrollbar (ie, do a return on
+	the if-part for the dead process).
+
+1998-04-28  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* vt.c (vt_newline): Initialize the whole array, as it can be
+	accessed past the screen size when the whole line is selected. 
+
+	* zvtterm.c (zvt_term_readdata): Always show the cursor if
+	blinking has been disabled.
+	
+1998-04-30  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zvtterm.c (vt_draw_text): Bold now renders 'bright' colours.
+	This is really only necessary (?) to emulate the use of the linux
+	console colours.
+	(vt_scroll_area): Does not clear the scrolled area exited space
+	anymore.  Doesn't seem to be needed and cleans up scrolling.
+
+	* vt.c (vt_swap_buffers): New function.  Not used yet.  Working on
+	some very experimental update optimisation code.  Maybe it will
+	speed things up a little <maybe>.
+
+	* update.c (vt_update_rect): Added range check for cex/csx.  Could
+	be 1 character too large from expose event.
+
+	* zvtterm.c (zvt_term_readdata): *ALWAYS* turn the cursor back on
+	after an update.  This must have got lost somewhere and was the
+	cause of the "blinking cursor usually off" bug that's been giving
+	me the shits :)  Ahhhh, thats much better.
+	(vt_draw_text): Removed the need for the "VTATTR_FORE/BACK_SET"
+	flag.  All it needed was a changed VTATTR_CLEAR define :)
+	Check it works properly though Miguel?
+
+	* vt.c: Removed some unecessary prototypes/comments.
+		Oh dear, its tommorow already :(
+
+1998-04-29  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* vt.c (vt_scrollback_set): Changed back to the way it was and
+	also fixed the boundary condition.  It is safe to call vt_mem_push
+	with a null location.
+
+1998-04-28  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* vt.c (vt_scrollback_set): ln might be null after calling
+	vt_list_remhead, only execute vt_mem_push if ln is not null.
+	Michael, I do not know if this is the correct fix, could you check this?
+
+	* zvtterm.c (zvt_term_forkpty): set term->input_id to the file
+	descriptor of the chid.
+
+1998-04-28  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zterm.c (child_died_event): New function, exits.  This is the
+	signal handler for the "child_died" event.
+
+	* zvtterm.c (zvt_term_destroy): Added call to zvt_term_closepty
+	and vtx_destroy, to clean up emulator resources.  Not sure if its
+	working right though.
+	(zvt_term_init): Removed some redundant code.
+	(zvt_term_child_died): Default signal handler for child death.
+	Does nothing.
+	(zvt_term_readdata): Emits "child_died" signal when read fails.
+	(zvt_term_class_init): Added "child_died" signal creation to
+	class.
+
+	* vt.c (vt_init): Sets the line number on initialisation of
+	lines.  Maybe cleaner rendering on startup?
+
+	* zvtterm.c (zvt_term_destroy): Added call to vtx_destory.
+
+	* vt.c (vt_destory): New function.  Cleans up memory associated
+	with vt run-time.  Scrollback and lines.  Closes child file
+	descriptor.
+
+	* update.c (vtx_destroy): New function.  Cleans up the vtx
+	structure and free's it.
+
+	* zvtterm.c (zvt_term_killchild): New function.  Calls
+	vt_killchild().
+	(zvt_term_forkpty): Checks validity of arguments.  Also doesn't
+	allow a 'forked terminal' to fork again.
+	(zvt_term_closepty): New function.  Close the child's process
+	master terminal, and removes the gdk input handler.  Logical
+	inverse of zvt_term_forkpty()
+
+	* vt.h (vt_closepty): Added api functions killchild/closepty.
+	Perhaps it should also SIGHUP the child?
+
+	* vt.c (vt_killchild): New function.  Sorry about the name.
+	Equivalent of 'kill(2)'.
+	(vt_closepty): Inverse of forkpty().  Just closes the master pty.
+
+	* zvtterm.h: Added fore_last and back_last to keep track of the
+	last foreground/background colour used in the fore/back_gc's.
+
+	* update.c (vt_update): Added initialisation of fn and firstline
+	so that gcc won't complain about logic it couldn't follow.
+
+	* zvtterm.c (vt_scroll_area): Clears the scrolled area using the
+	term->back_gc, which cleans up scrolling.
+	(vt_term_realize): Initialises fore_last/back_last.
+	(vt_draw_text): Removed static variables last_fore, last_back to
+	term->fore_last, term->back_last.
+
+1998-04-27  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* vt.h (VTATTR_BACK_SET): Added two new attribute flags to
+	indicate if explicit foreground or background have been set. 
+
+	* zvtterm.c (zvt_term_class_init): New overwritten method:
+	unrealize
+	(zvt_term_unrealize): Relese resources allocated on the realize
+	method. 
+	(zvt_term_realize): Allocate a color context for the foreground
+	and one for the backgroudn;  Allocate colors with the gdk color
+	context code.  
+	(vt_draw_text): Add color support. 
+
+	* vt.c (vt_mode): fix, process any number of arguments to the mode
+	escape sequence.
+
+	* zvtterm.c (zvt_term_key_press): Backspace sends ^H; Delete sends
+	\177, and KP_Delete sends \033[3~.
+
+1998-04-27  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* zvtterm.c (vt_scroll_area): Generates and processes graphics_expose
+		events when scrolling from off-window areas.
+
+	* update.c (vt_update_rect): Modified to keep old state of cursor
+		on exit.
+		(vt_update): Modified to keep old state of cursor on exit.
+
+	* zvtterm.c (vt_cursor_state): Modified to return the previous
+		state of the cursor.
+
+1998-04-26  Michael Zucchi  <zucchi@zzedzone.box.net.au>
+
+	* memory.c: renamed mem_* functions to vt_mem_* functions.
+
+	* update.c (vt_get_selection): Added a sanity check to
+		ensure the selection lines exist.
+
+	* zterm.c (main): Added scrollbar.
+		Added -s <number> scrollback size option.
+		Added call to zvt_term_set_font_name().
+
+	* vt.c (vt_delete_char): Fixed typo in if test.
+	(vt.c): Removed globals inadvertantly left in the code.
+		Renamed mem_* functions to vt_mem_* functions.
+	(vt_scrollback_set): New function.
+	(parse_vt): Now reads \E] command - set text options, although
+		does not process it.
+		Multiple arguments were being passed to \EM command
+		- reverse scroll, wrongly.
+	(vt_modeh/l): Detects/removes application cursor key mode.
+	
+	* zvtterm.c (zvt_term_fix_scrollbar): Added new function.
+		Signals adjustemnt when a change occurs.
+	(zvt_term_size_allocate): Added call to zvt_term_fix_scrollbar.
+	(zvt_term_readdata): Added call to zvt_term_fix_scrollbar.
+	(zvt_term_init): Fixed signal connect to point to the term widget.
+	(zvt_term_scrollbar_moved): Implemented adjustment change callback.
+	(zvt_term_selection_handler): Changed to void.  Fixed g_return() macros.
+	(zvt_term_size_request): Added input validation.
+	(vt_draw_text): Added input validation.
+	(vt_scroll_area): Added input validation.
+	(zvt_term_init): Added cast to gtk_adjustment_new().
+	(zvt_term_set_scrollback): New function.  Calls vt_scrollback_set
+		and fixes the scrollbar too.
+	(zvt_term_set_fonts): New function.  Sets fonts.
+	(zvt_term_set_font_name): New function, sets fonts by name.
+	(vt_draw_text): Added underline rendering support.
+

@@ -1,0 +1,74 @@
+/* $Id: dial.gen_h,v 1.5 2000/05/07 04:59:59 kenelson Exp $ */
+
+
+/* gtkdial.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <libgnomeui/gtkdial.h>
+
+CLASS_START(Gtk);
+class Dial : public Widget
+{
+  WRAP_CLASS(Dial, GtkDial,
+             GTK_DIAL, GTK_IS_DIAL,
+             dial,
+             Widget, GtkWidget, GTK_WIDGET);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(GtkAdjustment* gtk_dial_get_adjustment(GtkDial*),
+              Gtk::Adjustment* get_adjustment() const);
+
+  WRAP_METHOD(void gtk_dial_set_update_policy (GtkDial*, GtkUpdateType),
+	      void set_update_policy (GtkUpdateType policy));
+
+  // gtk+ does not creat one for you on this interface
+  WRAP_METHOD(void gtk_dial_set_adjustment(GtkDial*,GtkAdjustment*),
+              void set_adjustment (Gtk::Adjustment &adjustment));
+
+  WRAP_METHOD(gfloat gtk_dial_set_percentage (GtkDial*, gfloat),
+	      gfloat set_percentage (gfloat percent));
+
+  WRAP_METHOD(gfloat gtk_dial_get_percentage (GtkDial*),
+	      gfloat get_percentage ());
+
+  WRAP_METHOD(gfloat gtk_dial_set_value (GtkDial*, gfloat),
+	      gfloat set_value (gfloat value));
+
+  WRAP_METHOD(gfloat gtk_dial_get_value (GtkDial*),
+	      gfloat get_value ());
+
+  WRAP_METHOD(void gtk_dial_set_view_only (GtkDial*, gboolean),
+	      void set_view_only (bool view_only=true));
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+IMPL_START;
+#include <gtk--/adjustment.h>
+#include <gnome--/private/dial_p.h>
+
+DOCUMENTATION_START;
+

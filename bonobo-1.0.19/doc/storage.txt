@@ -1,0 +1,41 @@
+Storages and Streams
+--------------------
+
+The Bonobo interfaces contain a mechanism for storing compound
+documents based on CORBA.
+
+The top-level component will create a "Storage" in which it will store
+its data as well as its containee's data.  The storage provides the
+operations of a file system and its whole contents are usually stored
+in a single file in the native file system.
+
+Storages can contain other Storages and Streams.  Storages are used to
+create a file-system hierachy.  Streams on the other hand represent
+files inside the hierarchy.
+
+Storages, as other Bonobo objects are CORBA servers: they are created
+by the toplevel container and a handle to sub-storages and sub-streams
+is passed down to containee objects to store their information in.
+
+
+The implementation
+
+As with other Bonobo objects, Storages and Streams are implemented by the
+GTK-object GnomeStorage and GnomeStream.  These are abstract classes
+that provide the basic corba hookup.  The actual storage faciliy
+depends on the features you want.
+
+The recommended storage facility is Dietmar Maurer's libefs which
+provides an Embedded File System (EFS). This will provide the data
+aggregation inherant in the Storage / Stream structure within the
+convenient unit of a single file.
+
+Another storage implementation available is the GnomeStorageFS /
+GnomeStreamFS combibation:  these represent the top-level storage
+as a directory on a native filesystem, each stream being an
+actual file in the conventional sense.
+
+Shortly an OLE2 file compatible storage facility will be available.
+
+Also there are plans to implement a storage facility based on Josh
+Macdonald's librepo and using a db2 database to store the information. 

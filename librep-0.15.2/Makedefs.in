@@ -1,0 +1,108 @@
+# Makedefs.in -- input for the common Makefile definitions
+# Copyright (C) 1998 John Harper <john@dcs.warwick.ac.uk>
+# $Id: Makedefs.in,v 1.32 2001/08/10 02:37:48 jsh Exp $
+#
+# This file is part of Jade.
+#
+# Jade is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# Jade is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Jade; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+version=@version@
+libversion=@libversion@
+SHELL=/bin/sh
+
+top_srcdir=@top_srcdir@
+srcdir=@srcdir@
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+datadir=@datadir@
+bindir=@bindir@
+includedir=@includedir@
+infodir=@infodir@
+libdir=@libdir@
+libexecdir=@libexecdir@
+localstatedir=@localstatedir@
+mandir=@mandir@
+sharedstatedir=@sharedstatedir@
+aclocaldir=@aclocaldir@
+emacssitelispdir=@emacssitelispdir@
+
+host_type=@host@
+repdir=@repdir@
+replispdir=@replispdir@
+repexecdir=@repexecdir@
+repcommonexecdir=@repcommonexecdir@
+repdocfile=@repdocfile@
+
+CC=@CC@
+LIBTOOL=@LIBTOOL@
+MAKEDEP=@MAKEDEP@
+CPPFLAGS=-DHAVE_CONFIG_H -I. -I$(top_srcdir)/src -I.. @CPPFLAGS@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
+LIBS=@LIBS@
+LIBOBJS=@LIBOBJS@
+EXTRA_LIBOBJS=@EXTRA_LIBOBJS@
+READLINE_LIBS=@READLINE_LIBS@
+GMP_LIBS=@GMP_LIBS@
+GDBM_LIBS=@GDBM_LIBS@
+ALLOCA=@ALLOCA@
+
+DESTDIR=
+INSTALL=@INSTALL@
+INSTALL_DATA=@INSTALL_DATA@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+INSTALL_SCRIPT=@INSTALL_SCRIPT@
+
+MAKEINFO = makeinfo
+MAKEINFOFLAGS =
+TEXI2DVI = texi2dvi
+TEXI2PDF = texi2pdf
+DVIPS = dvips
+
+HAVE_X11=@HAVE_X11@
+HAVE_UNIX=@HAVE_UNIX@
+
+.PHONY: clean realclean install
+
+rep_prog = $(top_builddir)/libtool --mode=execute $(top_builddir)/src/rep
+COMPILE_ENV = REPLISPDIR=$(top_builddir)/lisp \
+	      REP_DL_LOAD_PATH=$(top_builddir)/src/.libexec \
+	      REPDOCFILE=$(top_builddir)/DOC
+
+include $(top_srcdir)/rules.mk
+rep_LIBTOOL=@LIBTOOL@
+
+# Rule for ``normal'' C objects
+%.o : %.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+
+# Rule for ``normal'' executables
+% : %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
+
+# Rule for libtool controlled C objects
+%.lo : %.c
+	$(LIBTOOL) --mode=compile $(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+
+# Rule for dlopen'able C objects
+%.la : %.c
+	$(LIBTOOL) --mode=compile $(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $*.lo
+
+# Build dependancy files from C source files.
+.%.d : %.c
+	$(SHELL) -ec '$(MAKEDEP) $(CPPFLAGS) $< \
+	| sed '\''s/$*\.o/& $*.lo .$*\.d/g'\'' > $@'

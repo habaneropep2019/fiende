@@ -1,0 +1,1075 @@
+/* $Id: widget.gen_h,v 1.154 2001/11/03 19:32:41 cactus Exp $ */
+
+/* widget.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+/* this file is quite critical for our compile times... keep #includes minimal
+ */
+
+/* object.h is needed because of derivation */
+#include <gtk--/object.h>
+//#include <glib.h>
+#include <gtk/gtkdnd.h>
+#include <gtk/gtkwidget.h>
+
+typedef struct _GtkTargetEntry GtkTargetEntry;
+typedef struct _GtkTargetList GtkTargetList;
+CLASS_START(Gtk);
+class Style;
+class AccelGroup;
+class Adjustment;
+class Window;
+
+//: Abstract Widget (Base class for all widgets)
+//- As the base class of all widgets this contains all of the properties
+//- and methods common to all widgets.  It is an abstract class that
+//- can not be instantiated.
+//-
+//- Important part of widgets is the *_event signals and virtual methods
+//- that every widget has. Those are events coming directly from gdk and
+//- thus also from XLib. By overriding those virtual methods you can
+//- trap everything a widget can ever do.
+//- In order to capture events from a widget, the event mask must
+//- first be set with {set_events()}. 
+//-
+//- Only widgets with a Gdk_Window on the server side are allowed to 
+//- capture events.  Widgets in the {Gtk::Misc::} group for example lack
+//- a Gdk_Window.
+class Widget : public Object {
+  
+  WRAP_CLASS(Widget,GtkWidget,GTK_WIDGET,GTK_IS_WIDGET,widget,Gtk::Object,GtkObject,GTK_OBJECT);
+public:
+  friend class Main;
+
+/*
+  Not implemented:
+    signal gint destroy_event(GdkEventAny*) 
+      This is useless for users, so we dont provide it - saves us
+      from confusion.
+
+    void destroyed            (Gtk_Widget* w); ??
+      Utility function: sets widget_pointer 
+      to 0 when widget is destroyed.
+
+    void gtk_widget_modify_style(GtkWidget*,GtkRcStyle*)
+      Need to wrap GtkRcStyle with gdk-- first.
+
+    void gtk_widget_set_parent(GtkWidget*,GtkWidget*)
+      Set the widgets parent.  
+      This is better left to the container to which the widget
+      gets added.  (Not for application use)
+
+    bool gtk_widget_hide_on_delete(GtkWidget*)
+      This doesn't appear to do anything but call hide!
+
+    gboolean gtk_widget_set_scroll_adjustments(GtkWidget*,
+                   GtkAdjustment*,GtkAdjustment*),
+    gboolean gtk_widget_set_scroll_adjustments(GtkWidget*,
+                   GtkAdjustment*,GtkAdjustment*),
+      This is gtk+ idea of MI.  They define a function which 
+      can't be used on most classes here then the impl later. (bad, bad) 
+      return type is if it worked or not.
+*/
+
+  WRAP_CTOR_CAST;
+  
+  WRAP_METHOD(
+    void gtk_widget_unparent  (GtkWidget*),
+    void unparent             ());
+
+  WRAP_METHOD(
+    void gtk_widget_show_now(GtkWidget*),
+    void show_now());
+
+/* QUEUE DRAWS */
+
+  WRAP_METHOD(
+    void gtk_widget_queue_draw(GtkWidget*),
+    void queue_draw());
+
+  WRAP_METHOD(
+    void gtk_widget_queue_draw_area(GtkWidget*,gint,gint,gint,gint),
+    void queue_draw_area  (gint                 x,
+  			   gint                 y,
+  			   gint                 width,
+			   gint                 height));
+
+  WRAP_METHOD(
+    void gtk_widget_queue_clear(GtkWidget*),
+    void queue_clear());
+
+  WRAP_METHOD(
+    void gtk_widget_queue_clear_area(GtkWidget*,gint,gint,gint,gint),
+    void queue_clear_area (gint                 x,
+			   gint                 y,
+			   gint                 width,
+			   gint                 height));
+
+  WRAP_METHOD(
+    void gtk_widget_queue_resize(GtkWidget*),
+    void queue_resize());
+
+/* ACCELERATORS - none are user callable */
+
+// (internal)
+// WRAP_METHOD(
+//   guint gtk_widget_accelerator_signal(GtkWidget*,GtkAccelGroup*,guint,guint),
+//   guint accelerator_signal(Gtk::AccelGroup &accel_group,
+//			   guint                accel_key,
+//			   guint                accel_mods));
+
+  WRAP_METHOD(
+    void gtk_widget_lock_accelerators(GtkWidget*),
+    void lock_accelerators  ());
+  WRAP_METHOD(
+    void gtk_widget_unlock_accelerators(GtkWidget*),
+    void unlock_accelerators  ());
+
+#if GTK_VERSION_GT_MICRO(1,2,0)
+  //: (Gtk 1.1)
+  bool accelerators_locked();
+#endif
+
+  //: (internal) adds a key to an accelerator group for this widget
+  WRAP_METHOD(
+    void gtk_widget_add_accelerator(GtkWidget *,const gchar*,
+                                    GtkAccelGroup*,guint,guint,GtkAccelFlags),
+    void add_accelerator  (const nstring    &accel_signal,
+			   Gtk::AccelGroup &accel_group,
+			   guint                accel_key,
+			   guint                accel_mods,
+			   GtkAccelFlags        accel_flags));
+
+  //: (internal) removes a key to an accelerator group for this widget
+  WRAP_METHOD(
+    void gtk_widget_remove_accelerator(GtkWidget*,GtkAccelGroup*,guint,guint),
+    void remove_accelerator(Gtk::AccelGroup &accel_group,
+			    guint                accel_key,
+			    guint                accel_mods));
+
+  //: (internal) removes all accelerators to this object
+  WRAP_METHOD(
+    void gtk_widget_remove_accelerators(GtkWidget*, const gchar*, gboolean),
+    void remove_accelerators (const nstring   &accel_signal,
+			    bool		visible_only));
+
+  //:
+  WRAP_METHOD(
+    gboolean gtk_widget_activate  (GtkWidget*),
+    bool activate             ());
+
+
+  //: Change a widgets parent.
+  //- Equivalent to removing widget from old parent and adding it to
+  //- the new parent, except that the widget will not be temporarily
+  //- unrealized if both the old parent and the new parent are realized.
+  //- 
+  //- Use this in place of {set_parent()} in an application.
+  WRAP_METHOD(
+    void gtk_widget_reparent(GtkWidget*,GtkWidget*),
+    void reparent             (Gtk::Widget & newparent));
+
+  WRAP_METHOD(
+    void gtk_widget_popup(GtkWidget*,gint,gint),
+    void popup                (gint x, 
+                               gint y));
+
+  WRAP_METHOD(
+    gint gtk_widget_intersect(GtkWidget*,GdkRectangle*,GdkRectangle*),
+    gint intersect          (const Gdk_Rectangle &area,
+			     const Gdk_Rectangle &intersection) const);
+
+  WRAP_METHOD(
+    void gtk_widget_grab_default (GtkWidget*),
+    void grab_default           ());
+
+  //: Set the name of the widget.
+  //- You can name your widgets, so that you can know which one you
+  //- have a pointer to. I don't think that this has anything to do
+  //- with a text label that is shown on the widget.
+  WRAP_METHOD(
+    void gtk_widget_set_name(GtkWidget*,const gchar*),
+    void set_name                (const nstring &name));
+
+  //: Return the {name} of the widget.
+  WRAP_METHOD(
+    gchar* gtk_widget_get_name(GtkWidget*),
+    Gtk::nstring get_name              () const);
+
+  GtkStateType get_state() const;
+  WRAP_METHOD(
+    void gtk_widget_set_state(GtkWidget*,GtkStateType),
+    void set_state               (GtkStateType state));
+
+  //: Change the widgets sensitivty.
+  //- The sensitivity of a widget is whether it will accept user
+  //- input or not. Usually this also changes the widget's look,
+  //- to incicate it's usability. Set true to allow user input on
+  //- the widget, false to disable user input.
+  WRAP_METHOD(
+    void gtk_widget_set_sensitive(GtkWidget*,gboolean),
+    void set_sensitive           (bool sensitive));
+
+  WRAP_METHOD(
+    void gtk_widget_set_app_paintable  (GtkWidget*,bool),
+    void set_app_paintable  (bool app_paintable));
+
+  //: Return the {parent} of this widget.
+  WRAP_MEMBER(value,parent,parent,Gtk::Widget*,GtkWidget*);
+
+  WRAP_METHOD(
+    void gtk_widget_set_parent_window(GtkWidget*,GdkWindow*),
+    void set_parent_window       (const Gdk_Window &parent_window));
+
+  //: Return the parent's Gdk_Window.
+  WRAP_METHOD(
+    GdkWindow *gtk_widget_get_parent_window(GtkWidget*),
+    Gdk_Window get_parent_window () const);
+
+
+  WRAP_METHOD(
+    void gtk_widget_set_uposition(GtkWidget*,gint,gint),
+    void set_uposition        (gint x, 
+			       gint y));
+
+  //: Set the minumum widget size.
+  //- Set either x or y to -1 to keep it's old size.
+  WRAP_METHOD(
+    void gtk_widget_set_usize(GtkWidget*,gint,gint),
+    void set_usize            (gint x, 
+			       gint y));
+
+  //: Set the events the widget wishs to capture.
+  //- The available event masks that the user can select are:
+  //- {\enum GDK_EXPOSURE_MASK}, {\enum GDK_POINTER_MOTION_MASK},
+  //- {\enum GDK_POINTER_MOTION_HINT_MASK}, {\enum GDK_BUTTON_MOTION_MASK},
+  //- {\enum GDK_BUTTON1_MOTION_MASK}, {\enum GDK_BUTTON2_MOTION_MASK},
+  //- {\enum GDK_BUTTON3_MOTION_MASK}, {\enum GDK_BUTTON_PRESS_MASK},
+  //- {\enum GDK_BUTTON_RELEASE_MASK}, {\enum GDK_KEY_PRESS_MASK},
+  //- {\enum GDK_KEY_RELEASE_MASK}, {\enum GDK_ENTER_NOTIFY_MASK},
+  //- {\enum GDK_LEAVE_NOTIFY_MASK}, {\enum GDK_FOCUS_CHANGE_MASK},
+  //- {\enum GDK_STRUCTURE_MASK}, {\enum GDK_PROPERTY_CHANGE_MASK},
+  //- {\enum GDK_VISIBILITY_NOTIFY_MASK}, {\enum GDK_PROXIMITY_IN_MASK},
+  //- {\enum GDK_PROXIMITY_OUT_MASK}, {\enum GDK_SUBSTRUCTURE_MASK}
+  //- 
+  WRAP_METHOD(
+    void gtk_widget_set_events(GtkWidget*,gint),
+    void set_events           (gint events));
+
+  //: Add additional events to be monitored by the widget.
+  WRAP_METHOD(
+    void gtk_widget_add_events(GtkWidget*,gint),
+    void add_events          (gint	        events));
+
+  WRAP_METHOD(
+    void gtk_widget_set_extension_events (GtkWidget*,GdkExtensionMode),
+    void set_extension_events (GdkExtensionMode mode));
+
+  WRAP_METHOD(
+    GdkExtensionMode gtk_widget_get_extension_events (GtkWidget*),
+    GdkExtensionMode get_extension_events () const);
+
+  //:
+  //-
+  Gtk::Window* get_toplevel ();
+
+  //:
+  //-
+  WRAP_METHOD(
+    GtkWidget* gtk_widget_get_ancestor(GtkWidget*,GtkType),
+    Gtk::Widget* get_ancestor  (GtkType type) const );
+
+  //: Return the widget's colormap.
+  WRAP_METHOD(
+    GdkColormap* gtk_widget_get_colormap(GtkWidget*),
+    Gdk_Colormap get_colormap () const);
+ 
+  //: Return the widget's visual.
+  WRAP_METHOD(
+    GdkVisual* gtk_widget_get_visual(GtkWidget*),
+    Gdk_Visual get_visual     () const);
+
+  //: Set colormap prior to realization.
+  //  This function must not be called on an already
+  //  {realized()} widget. Because it is possible that somebody
+  //  can call {get_colormap()} or {get_visual()} and save the
+  //  result, this function is only safe to
+  //  call in a widget's {\func init}() function.
+  WRAP_METHOD( 
+    void gtk_widget_set_colormap(GtkWidget*,GdkColormap*),
+    void set_colormap                        (const Gdk_Colormap &colormap));
+
+  //: Set visual prior to realization.
+  //  This function must not be called on an already
+  //  {realized()} widget. Because it is possible that somebody
+  //  can call {get_colormap()} or {get_visual()} and save the
+  //  result, this function is only safe to
+  //  call in a widget's {\func init}() function.
+  WRAP_METHOD(
+    void gtk_widget_set_visual(GtkWidget *,GdkVisual*),
+    void set_visual                          (const Gdk_Visual &visual));
+
+  //: Get the widget's events (bitwise or'd together).
+  WRAP_METHOD(
+    gint gtk_widget_get_events(GtkWidget*),
+    gint get_events           () const);
+
+  WRAP_METHOD(
+    void gtk_widget_get_pointer(GtkWidget*,gint*,gint*),
+    void get_pointer          (gint &x, gint &y) const);
+
+  WRAP_METHOD(
+    gint gtk_widget_is_ancestor(GtkWidget*,GtkWidget*),
+    bool is_ancestor          (Gtk::Widget &widget) const);
+
+  //: Set the widget's style.
+  //- The style of a widget includes font, color, and other
+  //- information.
+  WRAP_METHOD(
+    void gtk_widget_set_style(GtkWidget*,GtkStyle*),
+    void set_style            (Gtk::Style &style));
+
+  WRAP_METHOD(
+    void gtk_widget_set_rc_style (GtkWidget*),
+    void set_rc_style         ());
+
+  WRAP_METHOD(
+    void gtk_widget_ensure_style (GtkWidget*),
+    void ensure_style         ());
+
+  // GtkStyle* gtk_widget_get_style(GtkWidget*);
+  //: Get the widget's style.
+  //- Once a style is used it is constant and unchangeable.
+  WRAP_METHOD(
+    GtkStyle* gtk_widget_get_style(GtkWidget*),
+    Gtk::Style* get_style() const);
+
+  WRAP_METHOD(
+    void gtk_widget_restore_default_style(GtkWidget*),
+    void restore_default_style());
+
+  WRAP_METHOD(
+    void gtk_widget_set_composite_name(GtkWidget*,fixmegtkconst gchar *),
+    void   set_composite_name (const nstring &name));
+
+  WRAP_METHOD(
+    gchar* gtk_widget_get_composite_name(GtkWidget*),
+    Gtk::nstring get_composite_name ());
+  
+  WRAP_METHOD(
+    void gtk_widget_reset_rc_styles(GtkWidget*),
+    void reset_rc_styles());
+
+
+/* PUSH/POP */
+
+  //: Sets a new style for the widget, and saves the old one.
+  WRAP_METHOD(
+    void gtk_widget_push_style(GtkStyle*),
+    static void push_style	 (Gtk::Style &style));
+
+  WRAP_METHOD(
+    void gtk_widget_push_colormap(GdkColormap *),
+    static void push_colormap	 (const Gdk_Colormap &cmap));
+
+  WRAP_METHOD(
+    void gtk_widget_push_visual(GdkVisual*),
+    static void push_visual	 (const Gdk_Visual &visual));
+
+  WRAP_METHOD(
+    void gtk_widget_push_composite_child(),
+    static void push_composite_child());
+
+  //: Restores the old style for the widget.
+  WRAP_METHOD(
+    void gtk_widget_pop_style    (),
+    static void pop_style	 ());
+
+  WRAP_METHOD(
+    void gtk_widget_pop_colormap (),
+    static void pop_colormap	 ());
+
+  WRAP_METHOD(
+    void gtk_widget_pop_visual	 (),
+    static void pop_visual	 ());
+   
+  WRAP_METHOD(
+    void gtk_widget_pop_composite_child(),
+    static void pop_composite_child());
+
+
+/* DEFAULTS */
+
+  WRAP_METHOD(
+    void gtk_widget_set_default_style(GtkStyle*),
+    static void set_default_style            (Gtk::Style    &style));
+
+  WRAP_METHOD(
+    void gtk_widget_set_default_colormap(GdkColormap*),
+    static void set_default_colormap         (const Gdk_Colormap &colormap));
+
+  WRAP_METHOD(
+    void gtk_widget_set_default_visual(GdkVisual*),
+    static void set_default_visual           (const Gdk_Visual   &visual));
+
+  WRAP_METHOD(
+    GtkStyle* gtk_widget_get_default_style(),
+    static Gtk::Style* get_default_style());
+
+  WRAP_METHOD(
+    GdkColormap* gtk_widget_get_default_colormap (),
+    static Gdk_Colormap get_default_colormap ());
+
+  WRAP_METHOD(
+    GdkVisual*   gtk_widget_get_default_visual   (),
+    static Gdk_Visual get_default_visual     ());
+
+//  WRAP_METHOD(
+//    GtkStyle*   gtk_widget_peek_style(),
+//    static Gtk::Style* get_current_style());
+
+//  WRAP_METHOD(
+//    GdkColormap*   gtk_widget_peek_colormap(),
+//    static Gdk_Colormap get_current_colormap());
+
+//  WRAP_METHOD(
+//    GdkVisual*   gtk_widget_peek_visual(),
+//    static Gdk_Visual get_current_visual());
+
+  WRAP_METHOD(
+    void gtk_widget_shape_combine_mask (GtkWidget*,GdkBitmap*,gint,gint),
+    void shape_combine_mask (const Gdk_Bitmap &shape_mask,
+			     gint       offset_x,
+			     gint       offset_y));
+private:
+  // why is this private??
+  WRAP_METHOD(
+    void gtk_widget_reset_shapes(GtkWidget *),
+    void reset_shapes());
+
+public:
+
+  //: (Gtk 1.1)
+  // void gtk_widget_path(GtkWidget*,guint*,gchar**,gchar**);
+  void path		   (string    &path,
+			    string    &path_reversed);
+
+  //: (Gtk 1.1)
+  // void gtk_widget_class_path(GtkWidget*,guint*,gchar**,gchar**);
+  void class_path	   (string    &path,
+			    string    &path_reversed);
+
+
+
+  //: Return the Gdk_Window on which the widget is drawn.
+  Gdk_Window get_window        () const;
+
+ 
+
+/* DRAG'N DROP */
+  WRAP_METHOD(
+    GdkDragContext* gtk_drag_begin(GtkWidget*,GtkTargetList*,GdkDragAction,gint,GdkEvent*),
+    GdkDragContext* gtkmm_drag_begin(GtkTargetList*,GdkDragAction,gint,GdkEvent*));
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_get_data(GtkWidget*,GdkDragContext*,GdkAtom,guint32),
+    void drag_get_data        (Gdk_Drag_Context &context,
+			       Gdk_Atom         target,
+			       guint32         time));
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_finish(GdkDragContext *, gboolean, gboolean, guint32),
+    static void drag_finish (Gdk_Drag_Context &context,
+			     bool            success,
+			     bool            del,
+			     guint32         time));
+   
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_highlight(GtkWidget*),
+    void drag_highlight());
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_unhighlight(GtkWidget*),
+    void drag_unhighlight());
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_dest_set(GtkWidget*,GtkDestDefaults,const GtkTargetEntry *,
+                          gint, GdkDragAction),
+    void drag_dest_set (GtkDestDefaults           flags,
+			const GtkTargetEntry     *targets,
+			gint                      n_targets,
+			GdkDragAction             actions));
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_dest_set_proxy (GtkWidget*, GdkWindow*,
+       GdkDragProtocol, gboolean),
+    void drag_dest_set_proxy (Gdk_Window         &proxy_window,
+			      GdkDragProtocol     protocol,
+			      bool                use_coordinates));
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_dest_unset(GtkWidget*),
+    void drag_dest_unset());
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_source_set  (GtkWidget*, GdkModifierType,
+       const GtkTargetEntry *, gint, GdkDragAction ),
+    void drag_source_set(GdkModifierType start_button_mask, 
+			const GtkTargetEntry  *targets,
+			gint            n_targets,
+			GdkDragAction    actions));
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_source_unset(GtkWidget*),
+    void drag_source_unset());
+  
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_source_set_icon (GtkWidget*, GdkColormap*, 
+      GdkPixmap*, GdkBitmap*),
+    void drag_source_set_icon(Gdk_Colormap   &colormap, 
+			    Gdk_Pixmap     &pixmap,
+			    Gdk_Bitmap     &mask));
+
+  /* these may not belong here, as they don't are widget member
+     functions. however, they group nicely with the other
+     drag_* functions
+
+     (should move to Gdk_DragContext)
+  */
+  WRAP_METHOD(
+    GtkWidget *gtk_drag_get_source_widget (GdkDragContext*),
+    static Gtk::Widget* drag_get_source_widget(GdkDragContext *context));
+
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_set_icon_widget(GdkDragContext*, GtkWidget*, gint, gint),
+    static void drag_set_icon_widget(Gdk_Drag_Context   &context,
+				   Gtk::Widget         &widget,
+				   gint               hot_x,
+				   gint               hot_y));
+
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_set_icon_pixmap(GdkDragContext*,
+      GdkColormap*, GdkPixmap*, GdkBitmap*, gint, gint),
+    static void drag_set_icon_pixmap(Gdk_Drag_Context   &context,
+				   Gdk_Colormap       &colormap,
+				   Gdk_Pixmap         &pixmap,
+				   Gdk_Bitmap         &mask,
+				   gint               hot_x,
+				   gint               hot_y));
+
+  //: (Gtk 1.1)
+  // move to Drag_Context??
+  WRAP_METHOD(
+    void gtk_drag_set_icon_default (GdkDragContext    *context),
+    static void drag_set_icon_default(Gdk_Drag_Context  &context));
+   
+  //: (Gtk 1.1)
+  WRAP_METHOD(
+    void gtk_drag_set_default_icon (GdkColormap*,
+                                GdkPixmap*, GdkBitmap*, gint, gint),
+    static void drag_set_default_icon(Gdk_Colormap   &colormap,
+				    Gdk_Pixmap     &pixmap,
+				    Gdk_Bitmap     &mask,
+				    gint           hot_x,
+				    gint           hot_y));
+
+
+/* FLAGS */
+
+  //: Returns property {flags.toplevel}.
+  bool is_toplevel() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_TOPLEVEL)?true:false; } 
+
+  //: Returns property {flags.nowindow}.
+  bool has_no_window() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_NO_WINDOW)?true:false; }
+
+  //: Returns property {flags.realized}.
+  bool is_realized() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_REALIZED)?true:false; }
+
+  //: Returns property {flags.mapped}.
+  bool is_mapped() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_MAPPED)?true:false; }
+
+  //: Returns property {flags.visible}.
+  bool is_visible() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_VISIBLE)?true:false; }
+
+  //: Returns if the widget is ready to be drawn to.
+  // Checks to see if the widget is both visible and mapped which
+  // makes it possible to perform drawing commands on.
+  bool is_drawable() const 
+    { return (is_visible() && is_mapped())?true:false; }
+  
+  //: Returns property {flags.sensitive}. You might want to check
+  // is_sensitive instead.
+  bool sensitive() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_SENSITIVE)?true:false; }
+
+  bool parent_sensitive() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_PARENT_SENSITIVE)?true:false; }
+  bool is_sensitive() const 
+    { return (GTK_WIDGET_IS_SENSITIVE(GTK_WIDGET(gtkobj())))?true:false; }
+  bool can_focus() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_CAN_FOCUS)?true:false; }
+  bool has_focus() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_HAS_FOCUS)?true:false; }
+  bool can_default() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_CAN_DEFAULT)?true:false; }
+  bool has_default() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_HAS_DEFAULT)?true:false; }
+  bool rc_style() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_RC_STYLE)?true:false; }
+  bool has_grab() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_HAS_GRAB)?true:false; }
+  bool is_composite_child() const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_COMPOSITE_CHILD)?true:false; }
+  bool app_paintable()      const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_APP_PAINTABLE)?true:false; }
+  bool recieves_default()   const 
+    { return (GTK_OBJECT_FLAGS (gtkobj()) & GTK_RECEIVES_DEFAULT)?true:false; }
+
+  //: Set a member of the {flags} field.
+  void set_flags(gint flag) { GTK_OBJECT_SET_FLAGS(gtkobj(), flag); }
+
+  //: Clear a member of the {flags} field.
+  void unset_flags(gint flag) { GTK_OBJECT_UNSET_FLAGS(gtkobj(), flag); }
+
+
+/* SIGNALS */
+    
+  //: Show a widget.
+  //- If the widget is not already destroyed, this will make the widget
+  //- visible by setting {flags.visible}.
+  SIGNAL_SPEC("show",both,void show(),gtk_widget_show);
+
+  //: Show a widget and all items inserted to it.
+  SIGNAL_SPEC("show_all",vfunc|impl,void show_all(),gtk_widget_show_all);
+
+  //: Hide a widget
+  SIGNAL_SPEC("hide",both,void hide(),gtk_widget_hide);
+
+  //: Hide a widget and all items inserted to it
+  SIGNAL_SPEC("hide_all",vfunc|impl,void hide_all(),gtk_widget_hide_all);
+
+  //: Emitted on mapping of a widget to the screen.
+  //- See {flags.mapped}.  This should not be called by the user.
+  SIGNAL_SPEC("map",both,void map_(),gtk_widget_map);
+
+  //- See {flags.mapped}.  This should not be called by the user.
+  SIGNAL_SPEC("unmap",both,void unmap_(),gtk_widget_unmap);
+
+  //: Emitted on realization of a widget.
+  //- See {flags.realized}.  This is also responsible for
+  //- setting {flags.realized} when it is done.  Therefore, 
+  //- when overriding the impl method, you should call the 
+  //- default realize method.
+  SIGNAL_SPEC("realize",both,void realize(),gtk_widget_realize);
+
+  //- See {flags.realized}.  This should not be called by the user.
+  //SIGNAL_SPEC("unrealize",both,void unrealize_(),gtk_widget_unrealize);
+ 
+  SIGNAL_SPEC("grab_focus",both,void grab_focus(),gtk_widget_grab_focus);
+
+  //: Emitted to draw the widget.
+  //- This is a gtk virtual function.  It can only be
+  //- overriden with the impl method.  
+  SIGNAL_SPEC("draw",vfunc|impl,void draw(GdkRectangle*),gtk_widget_draw);
+
+  //: Emitted to draw the widget in a focused state.
+  SIGNAL_SPEC("draw_focus",both,void draw_focus(),gtk_widget_draw_focus);
+
+  //: Emitted to draw the widget in a normal state.
+  SIGNAL_SPEC("draw_default",both,void draw_default(),gtk_widget_draw_default);
+    
+  SIGNAL_SPEC("size_request",both,void size_request(GtkRequisition*),gtk_widget_size_request);
+    
+  SIGNAL_SPEC("size_allocate",both,void size_allocate(GtkAllocation*),gtk_widget_size_allocate);
+
+// Changed signals -- inform widget of internal changes.
+// We rename parent_set => parent_changed 
+//  and      style_set  => style_changed 
+//  to avoid confusion with set_parent and set_style.
+
+  //: Informs objects that their state has changed.
+  //- The old state is passed as the argument.
+  SIGNAL_SPEC("state_changed",both,void state_changed(GtkStateType));
+
+  //: Informs objects that their parent changed.
+  //- The widget passed is the former parent, which may be 0 if 
+  //- there was no parent. (was parent_set in gtk+)
+  SIGNAL_SPEC("parent_set",both|noemit,void parent_changed(Gtk::Widget*),void parent_set(GtkWidget*,GtkWidget*));
+
+  //: Informs objects that their style has been changed.
+  //- The former style is passed as the argument. (was style_set in gtk+)
+  SIGNAL_SPEC("style_set",both|noemit,void style_changed(Gtk::Style*),void style_set(GtkWidget*,GtkStyle*));
+
+  SIGNAL_SPEC("event",both|emit|marsh,gint event(GdkEvent*),gtk_widget_event);
+
+  //: Event triggered by user pressing button.
+  SIGNAL_SPEC("button_press_event",	both|emit|marsh,	gint button_press_event(GdkEventButton*));
+
+  //: Event triggered by user releasing button.
+  SIGNAL_SPEC("button_release_event",	both|emit|marsh,	gint button_release_event(GdkEventButton*));
+
+  //: Event triggered by user moving pointer.
+  SIGNAL_SPEC("motion_notify_event",	both|emit|marsh,	gint motion_notify_event(GdkEventMotion*));
+
+  //: Event triggered by window begin closed. 
+  SIGNAL_SPEC("delete_event",both|emit|marsh,gint delete_event(GdkEventAny*));
+
+  //: Event triggered by window requiring a refresh.
+  //- Expose events cover a rectangular area that was covered
+  //- or obscured by another window.  That area is now exposed
+  //- and thus is needs to be redrawn.  
+  //-
+  //- If the application is not capable of redrawing sections
+  //- it should watch the count field and only draw on the last
+  //- even indicated.  This is important for things such as 
+  //- {Gtk::DrawingArea::}. 
+  SIGNAL_SPEC("expose_event",		both|emit|marsh,	gint expose_event(GdkEventExpose*));
+
+  //: Event triggered by a key press will widget has focus.
+  SIGNAL_SPEC("key_press_event",	both|emit|marsh,	gint key_press_event(GdkEventKey*));
+
+  //: Event triggered by a key release will widget has focus.
+  SIGNAL_SPEC("key_release_event",	both|emit|marsh,	gint key_release_event(GdkEventKey*));
+
+  //: Event triggered by pointer entering widget area.
+  SIGNAL_SPEC("enter_notify_event",	both|emit|marsh,	gint enter_notify_event(GdkEventCrossing*));
+
+  //: Event triggered by pointer leaving widget area.
+  SIGNAL_SPEC("leave_notify_event",	both|emit|marsh,	gint leave_notify_event(GdkEventCrossing*));
+ 
+  //: Event triggered by a window resizing.
+  SIGNAL_SPEC("configure_event",	both|emit|marsh,	gint configure_event(GdkEventConfigure*));
+  SIGNAL_SPEC("focus_in_event",		both|emit|marsh,	gint focus_in_event(GdkEventFocus*));
+  SIGNAL_SPEC("focus_out_event",	both|emit|marsh,	gint focus_out_event(GdkEventFocus*));
+  SIGNAL_SPEC("map_event",		both|emit|marsh,	gint map_event(GdkEventAny*));
+  SIGNAL_SPEC("unmap_event",		both|emit|marsh,	gint unmap_event(GdkEventAny*));
+  SIGNAL_SPEC("property_notify_event",	both|emit|marsh,	gint property_notify_event(GdkEventProperty*));
+  SIGNAL_SPEC("selection_clear_event",	both|emit|marsh,	gint selection_clear_event(GdkEventSelection*));
+  SIGNAL_SPEC("selection_request_event",both|emit|marsh,	gint selection_request_event(GdkEventSelection*));
+  SIGNAL_SPEC("selection_notify_event",	both|emit|marsh,	gint selection_notify_event(GdkEventSelection*));
+  SIGNAL_SPEC("proximity_in_event",	both|emit|marsh,	gint proximity_in_event(GdkEventProximity*));
+  SIGNAL_SPEC("proximity_out_event",	both|emit|marsh,	gint proximity_out_event(GdkEventProximity*));
+  SIGNAL_SPEC("client_event",		both|emit|marsh,	gint client_event(GdkEventClient*));
+  SIGNAL_SPEC("no_expose_event",	both|emit|marsh,	gint no_expose_event(GdkEventAny*));
+  SIGNAL_SPEC("visibility_notify_event",both|emit|marsh,	gint visibility_notify_event(GdkEventVisibility*));
+  SIGNAL_SPEC("debug_msg",		both,	void debug_msg(const gchar*));
+  
+  SIGNAL_SPEC("selection_get",		both,	void selection_get(GtkSelectionData*,guint,guint));
+  SIGNAL_SPEC("selection_received",	both,	void selection_received(GtkSelectionData*,guint));
+
+/* DRAG'N DRAW */
+  SIGNAL_SPEC("drag_begin",		both,   void drag_begin(GdkDragContext*));
+
+  SIGNAL_SPEC("drag_end",		both,	void drag_end(GdkDragContext*));
+  SIGNAL_SPEC("drag_data_get",		both,	void drag_data_get(GdkDragContext*,GtkSelectionData*,guint,guint));
+
+  SIGNAL_SPEC("drag_data_delete",	both,	void drag_data_delete(GdkDragContext*));
+  SIGNAL_SPEC("drag_leave",		both,	void drag_leave(GdkDragContext*,guint));
+  SIGNAL_SPEC("drag_motion",		both|marsh,	gboolean drag_motion(GdkDragContext*,gint,gint,guint));
+  SIGNAL_SPEC("drag_drop",		both|marsh,	gboolean drag_drop(GdkDragContext*,gint,gint,guint));
+  SIGNAL_SPEC("drag_data_received",	both,	void drag_data_received(GdkDragContext*,gint,gint,GtkSelectionData*,guint,guint32));
+    
+
+  //: Returns width of widget.    
+  gint width() const { return gtkobj()->allocation.width; }
+
+  //: Returns height of widget.    
+  gint height() const { return gtkobj()->allocation.height; }
+    
+protected:
+  void realize_if_needed();
+  WRAP_CTOR_DEFAULT;
+};
+
+PRIVATE_START;
+#include <gtk--/private/object_p.h>
+IMPL_START;
+
+//#include <vector>
+#include <gtk--/adjustment.h>
+#include <gtk--/window.h>
+#include <gtk--/accelgroup.h>
+#include <gtk--/style.h>
+#include <gtk/gtkdnd.h>
+#include <gtk/gtkselection.h>
+#include <gtk/gtkwidget.h>
+#include <gtk/gtkcontainer.h>
+
+namespace Gtk
+{
+
+Widget::~Widget()
+{
+}
+
+void
+Widget::realize_if_needed()
+{
+  if (!is_realized()) realize();
+}
+
+Gdk_Window 
+Widget::get_window() const
+{
+  g_return_val_if_fail(is_realized(),0);
+  return Gdk_Window(gtkobj()->window);
+}
+
+Gtk::Window*
+Widget::get_toplevel ()
+{
+    Gtk::Widget *toplevel_widget = Gtk::wrap (gtk_widget_get_toplevel (gtkobj ()));
+    Gtk::Window *toplevel_window = dynamic_cast<Gtk::Window*> (toplevel_widget);
+
+    if (!toplevel_window)
+	g_warning ("The toplevel is not a Gtk::Window -- use gtk_widget_get_toplevel");
+
+    return toplevel_window;
+}
+
+#if GTK_VERSION_GT_MICRO(1,2,0)
+bool
+Widget::accelerators_locked()
+{
+  return (gtk_widget_accelerators_locked(gtkobj()))?true:false;
+}
+#endif
+
+void
+Widget::path(string    &pathx,
+		 string    &path_reversed)
+{
+  guint path_length;
+  gchar *_path, *_path_reversed;
+  
+  gtk_widget_path(gtkobj(), &path_length, &_path, &_path_reversed);
+  pathx = _path;
+  path_reversed = _path_reversed;
+  g_free(_path);
+  g_free(_path_reversed);
+}
+
+void
+Widget::class_path(string    &pathx,
+		       string    &path_reversed)
+{
+  guint path_length;
+  gchar *_path, *_path_reversed;
+  
+  gtk_widget_class_path(gtkobj(), &path_length, &_path, &_path_reversed);
+  pathx = _path;
+  path_reversed = _path_reversed;
+  g_free(_path);
+  g_free(_path_reversed);
+}
+
+GtkStateType Widget::get_state() const
+{ 
+  return GtkStateType(GTK_WIDGET_STATE (GTK_WIDGET(gtkobj()))); 
+}
+  
+} /* namespace Gtk */
+
+DOCUMENTATION_START;
+//+ PROPERTIES(GTK_WIDGET)
+//. name: allocation
+//. type: GtkAllocation
+//. get:    
+//. set:  {size_allocate()}
+//. desc: The widgets actual size.
+
+//. name: flags
+//. type: GTK_OBJECT_FLAGS
+//. get:  See below. 
+//. set:  {set_flags()}, {unset_flags()}
+//. desc: A large set of flags controlling the behaviors of the widget.
+
+//. name: flags.can_focus
+//. type: bool 
+//. get:  {can_focus()}
+//. set:  NA
+//. desc: This flag determines whether a widget is able to handle focus grabs.
+//. There are no directly corresponding functions for setting/unsetting
+//. this flag, but it can be affected by the {has_focus()} argument
+//. via {set_arg()}.
+
+//. name: flags.can_default
+//. type: bool 
+//. get:  {can_focus()}
+//. set:  NA
+//. desc: Same as {can_focus} for the default widget.
+
+//. name: flags.has_focus
+//. type: bool 
+//. get:  {has_focus()}
+//. set:  {grab_focus()} 
+//. desc: 
+//. This flag will be set by {grab_focus()} for widgets that also
+//. have {\enum GTK_CAN_FOCUS} set. The flag will be unset once another widget
+//. grabs the focus.
+
+//. name: flags.has_default
+//. type: bool 
+//. get:  {has_default()}
+//. set:  NA
+//. desc: Same as {has_focus} for the default widget.
+
+//. name: flags.has_grab
+//. type: bool 
+//. get:  {has_grab()}
+//. set:  NA
+//. desc: This flag indicated the widget is in the grab_widgets stack, 
+//. and will be the preferred
+//. one for receiving events other than ones of cosmetic value.
+
+//. name: flags.mapped
+//. type: bool 
+//. get:  {mapped()}
+//. set:  NA
+//. desc: Indicates that {show()} has been called on the widgets window(s).
+//. Mapping follows realization.
+
+//. name: flags.no_window
+//. type: bool 
+//. get:  {no_window()}
+//. set:  NA
+//. desc:  This flag is indicative for a widget that does not provide
+//. its own GdkWindow. Visible action (e.g. drawing) is performed
+//. on the parent's GdkWindow.
+//.
+//. See {Gtk::EventBox::} and {Gtk::Misc::}
+//. for more details.
+
+//. name: flags.realized
+//. type: bool 
+//. get:  {realized()}
+//. set:  NA
+//. desc: Indicates if a widget has been realized on the
+//. server.  A widget may be constructed, but not yet mapped 
+//. into the X server yet.  The process of constructing a 
+//. server side object is called realization.  After realization
+//. the widget has a GdkWindow (or its parent does in the case of
+//. {flags.no_window} )
+
+//. name: flags.sensitive
+//. type: bool 
+//. get:  {sensitive()}
+//. set:  NA
+//. desc: 
+//. The sensitivity of a widget determines whether it will receive
+//. certain events (e.g. button or key presses). One premise for
+//. the widgets sensitivity is to have {flags.sensitive} set.
+
+//. name: flags.parent_sensitive
+//. type: bool 
+//. get:  {parent_sensitive()}
+//. set:  NA
+//. desc: 
+//. This is the second premise for the widgets sensitivity. Once
+//. it has {flags.sensitive} and {flags.parent_sensitive}
+//. set, its state is
+//. effectively sensitive. 
+
+//. name: flags.visible
+//. type: bool 
+//. get:  {visible()}
+//. set:  {show()}, {hide()}
+//. desc: 
+//. Implies that a widget will be flagged {flags.mapped} as soon as its
+//. parent is mapped. If not set, implies that a widget is not onscreen, 
+//. therefore !{flags.mapped}.
+
+//. name: name
+//. type: string 
+//. get:  {get_name()}
+//. set:  {set_name()}
+//. desc: The widgets name. If the widget does not have a name
+//.   then its name is its classes name.
+//.   Among other things, the widget name is used to determine
+//.   the style to use for a widget.
+
+//. name: parent
+//. type: Gtk_Widget *
+//. get:    
+//. set:  {set_parent()}, {reparent()}
+//. desc: Parent of this widget.  
+//.
+//. This is normally set by the
+//. container to which the widget is added.
+
+//. name: requisition
+//. type: GtkRequisition
+//. get:    
+//. set:  {size_request()}
+//. desc: The widgets desired size.
+
+//. name: state
+//. type: GtkStateType
+//. get:  {get_state()} 
+//. set:  {set_state()}
+//. desc: The saved state of the widget. When a widgets state
+//.     is changed to {\enum GTK_STATE_INSENSITIVE} via
+//.     set_state or set_sensitive
+//.     the old state is kept around in this field. The state
+//.     will be restored once the widget gets sensitive again.
+//.
+//.     Available states:
+//.     {\enum GTK_STATE_NORMAL, GTK_STATE_ACTIVE, GTK_STATE_PRELIGHT, 
+//.     GTK_STATE_SELECTED, GTK_STATE_INSENSITIVE }
+
+//. name: style
+//. type: Gtk::Style *
+//. get:  {get_style()}
+//. set:  {set_style()}
+//. desc:  The style for the widget. The style contains the
+//.      colors the widget should be drawn in for each state
+//.      along with graphics contexts used to draw with and
+//.      the font to use for text.
+//.
+//.      Set {Gtk::Style::} for more info.
+
+//. name: window
+//. type: Gdk_Window 
+//. get:  {get_window()}
+//. set:    
+//. desc: The widgets window or its parent window if it does
+//.   not have a window, which will be indicated 
+//.   {no_window()}.  
+
+
+

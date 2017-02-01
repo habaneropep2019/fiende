@@ -1,0 +1,730 @@
+<!DOCTYPE Article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+
+]>
+
+<article class=faq id="index"> <!-- please do not change the id -->
+
+ <!-- ============= Document Header ============================= -->
+ <artheader> 
+  <title>Glade FAQ</title>
+  <copyright>
+   <year>2000</year>
+   <holder>Damon Chaplin</holder>
+  </copyright>
+
+  <copyright>
+   <year>2001</year>
+   <holder>Fabrizio Stefani (traduzione italiana)</holder>
+  </copyright>
+
+  <!-- do not put authorname in the header except in copyright - use
+  section "authors" below -->
+
+  <legalnotice>
+   <para>
+    È permesso copiare, distribuire e/o modificare questo documento 
+    secondo i termini della <citetitle>GNU Free Documentation
+    License</citetitle>, Versione 1.1 o qualsiasi altra versione
+    successiva pubblicata dalla Free Software Foundation, senza
+    Sezioni non modificabili, senza nessun Testo Copertina e senza nessun
+    Testo di retro copertina. È possibile ottenere una copia della
+    <citetitle>GNU Free Documentation License</citetitle> dalla Free
+    Software Foundation visitando <ulink url="http://www.fsf.org/"
+    type="http">il loro sito web</ulink> oppure scrivendo a:
+    Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+    Boston, MA 02111-1307, USA.
+   </para>
+   <para>
+    Molti dei nomi usati dalle compagnie per identificare i loro prodotti
+    e servizi sono dichiarati marchi registrati. Quando tali nomi appaiono
+    in un qualsiasi documento GNOME, e qualora tali nomi siano noti ai
+    membri dello GNOME Documentation Project, essi vengono stampati in
+    maiuscolo o con iniziali maiuscole.
+   </para>
+  </legalnotice>
+  
+  <releaseinfo>
+   Questa è la versione 1.0 di Glade FAQ.
+  </releaseinfo>
+ </artheader>
+
+ <!-- ============= Document Body ============================= -->
+
+ <para>
+  Questo è un elenco delle più gettonate domande ricorrenti su
+  <application>Glade</application>, il costruttore di interfaccie
+  utente Gtk+/GNOME.
+ </para>
+
+ <qandaset>
+
+  <!-- ============= General Questions ========================= -->
+  <qandadiv>
+   <title>Generali</title>
+
+   <qandaentry>
+    <question>
+     <para>
+      Quando aggiungo un widget ad una finestra, questo me la occupa 
+      interamente e non posso aggiungere nessun altro widget.
+     </para>
+    </question>
+    <answer>
+     <para>
+      Non è un bug di <application>Glade</application>! In GTK+
+      si usano dei contenitori per disporre i widget. I contenitori
+      più usati si trovano in fondo alla finestra principale della palette.
+      Prova ad aggiungere alla finestra un riquadro verticale. Ora
+      aggiungi una tabella in una delle divisioni del riquadro verticale.
+      Adesso hai afferrato l'idea?
+     </para>
+     <para>
+      Se proprio vuoi posizionare i widget in specifiche coordinate
+      prova il contenitore a Posizioni fisse. Però questa tecnica è
+      sconsigliata perché le tue finestre (normali o di dialogo) non
+      avranno un bel aspetto quando vengono ridimensionate; e se poi
+      traduci il testo delle etichette e dei pulsanti in altre lingue,
+      le scritte potrebbero non entrarci.
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Quando salvo lo XML gli stili vengono scritti correttamente, ma
+      se lo carico e compilo il codice sorgente essi spariscono.
+     </para>
+    </question>
+    <answer>
+     <para>
+      Gli stili non sono ancora supportati. Tuttavia puoi usare i file
+      rc GTK+ standard per impostare font e colori dei tuoi widget. Se
+      in <application>Glade</application> abiliti l'opzione di progetto 
+      <guilabel>Imposta nomi dei widget</guilabel> ti si potrebbe 
+      facilitare il lavoro. Vedi la sezione <citetitle>Resource 
+      Files</citetitle> della documentazione in <ulink
+      url="http://developer.gnome.org/doc/API/gtk/index.html"
+      type="http">developer.gnome.org/doc/API/gtk/index.html</ulink>. 
+     </para>
+     <para>
+      (In effetti ho tolto il codice non completo sugli stili nella
+      0.5.2, quindi spero che nessuno me lo chiederà mai più!)
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Come aggiungo un disegno ad un pulsante?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Crea un pulsante e seleziona <guilabel>Rimuovi etichetta</guilabel>
+      dal menu a comparsa. Ora puoi aggiungere al pulsante qualsiasi 
+      widget tu voglia; ad es. un riquadro orizzontale con dentro un 
+      disegno e una etichetta (<application>Glade</application> in futuro
+      potrebbe rendere questa operazione ancora più semplice).
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Come faccio ad aggiungere più di un widget (dello stesso tipo) alla 
+      volta?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Tieni premuto il tasto 'Control' quando selezioni il widget nella
+      <interface>Palette</interface>. Rimarrà selezionato finché non 
+      scegli un widget diverso oppure clicchi sul
+      <interface>Selettore</interface>.
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Tutte le volte che uso una finestra di scorrimento ottengo il 
+      seguente avvertimento:
+      Gtk-WARNING **: <errorname>gtk_scrolled_window_add(): cannot add
+      non scrollable widget use
+      gtk_scrolled_window_add_with_viewport() instead</errorname>
+     </para>
+    </question>
+    <answer>
+     <para>
+      Puoi tranquillamente ignorarlo. È emesso da GTK+ per ricordare ai
+      programmatori di aggiornare il proprio codice; ciò perché il
+      comportamento delle finestre di scorrimento è cambiato abbastanza
+      fra GTK+ 1.0 e GTK+ 1.2. Ma il codice di 
+      <application>Glade</application> è a posto. L'avvertimento non
+      dovrebbe apparire nella tua applicazione finale.
+     </para>
+    </answer>
+   </qandaentry> 
+
+  </qandadiv>
+
+
+  <!-- ============= Building Generated Code ================== -->
+  <qandadiv>
+   <title>Compilare il codice generato</title>
+
+   <qandaentry>
+    <question>
+     <para>
+      Come faccio a compilare il codice generato da Glade?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Per compilare il codice C generato da <citetitle>Glade</citetitle>
+      ti servono <application>automake</application> >= 1.4 e
+      <application>autoconf</application> >= 2.13. Se hai attivato il 
+      supporto per <application>gettext</application> allora ti serve
+      anche <application>gettext</application> >= 0.10.35. Per dei 
+      riferimenti sull'argomento vedi la sezione
+      <citetitle>Requirements</citetitle> nel file
+      <filename>README</filename>.
+     </para>
+     <para>
+      Lancia <command>./autogen.sh</command> nella directory base del
+      progetto per eseguire <application>automake</application>,
+      <application>autoconf</application> e le relative utilità per
+      generare i <filename>Makefile</filename>. Passagli tutte le
+      opzioni che vuoi siano passate al configure; ad es. dài 
+      <command>./autogen.sh --prefix /usr/local/gnome</command>.
+     </para>
+     <para>
+      Poi lancia il <command>make</command> per compilare l'applicazione.
+     </para>
+     <para>
+      Nota che per le applicazioni GNOME devi dare anche un <command>make 
+      install</command> di modo che i pixmap vengano installati 
+      appropriatamente. Se non lo fai l'applicazione funzionerà lo stesso,
+      ma non vedrai i pixmap.
+     </para>
+    </answer>
+   </qandaentry>
+
+   <qandaentry>
+    <question>
+     <para>
+      Mi dà questo errore:
+      aclocal: configure.in: 10: <errorname>macro `AM_PATH_GTK' not
+      found in library</errorname>
+     </para>
+    </question>
+    <answer>
+     <para>
+      Significa che non è possibile trovare il file 
+      <filename>gtk.m4</filename> (<filename>gtk.m4</filename> è un
+      insieme di macro m4 che vengono installate come parte di GTK+ e
+      sono usate per compilare i programmi che usano GTK+). 
+      <application>aclocal</application> (che fa parte di
+      <application>automake</application>) ricerca queste macro per
+      aggiungerle ad <filename>aclocal.m4</filename> nella directory
+      principale del tuo programma.
+     </para>
+     <para>
+      Per scoprire dove è stato installato GTK+ lancia <command>gtk-config
+      --prefix</command>. Il file <filename>gtk.m4</filename> dovrebbe
+      trovarsi nella sottodirectory 
+      <filename class="directory">share/aclocal</filename>. Per sapere
+      qual è la directory che sta usando <application>aclocal</application>
+      lancia <command>aclocal --print-ac-dir</command>. 
+     </para>
+     <para>
+      Dovresti aggiungere la directory in cui sono installati i file GTK+
+      m4 alla variabile d'ambiente <varname>ACLOCAL_FLAGS</varname>; cioè
+      se i file GTK+ m4 si trovano in <filename
+      class="directory">/usr/local/share/aclocal</filename>, allora 
+      aggiungi <command>export ACLOCAL_FLAGS="-I
+      /usr/local/share/aclocal/"</command> al tuo 
+      <filename>$HOME/.profile</filename>.
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+        Mi dà questo errore:
+	** CRITICAL **: file glade_gnome.c: line 939
+	    (glade_gnome_write_menu_item_source):
+		assertion `source_buffer != NULL' failed.
+     </para>
+    </question>
+    <answer>
+     <para>
+      Stai tentando di usare i menu di Gnome in una applicazione che è 
+      solo GTK+. Edita tutti i menu del tuo progetto ed assicurati che la 
+      proprietà "Oggetto Stock" sia impostata a "Nessuno" in tutte le voci 
+      di menu.
+     </para>
+    </answer>
+   </qandaentry> 
+
+   </qandadiv>
+
+  <!-- ============= Using The Generated Code =============== -->
+  <qandadiv>
+   <title>Usare il codice generato</title>
+
+   <qandaentry>
+    <question>
+     <para>
+      Quali sono i file scritti da Glade?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Ecco un elenco dei file che vengono scritti di solito; se hai 
+      cambiato le opzioni del progetto alcuni nomi potrebbero essere
+      diversi.
+     </para>
+
+     <formalpara>
+      <title>
+       <filename>autogen.sh</filename>
+      </title>
+      <para>
+       Uno script che lancia nel giusto ordine 
+       <application>automake</application>, 
+       <application>autoconf</application> e i programmi correlati, 
+       facilitando enormemente la compilazione dell'applicazione.
+       Devi passargli tutti gli argomenti che vuoi siano passati a
+       <application>configure</application>. Dopo averlo eseguito
+       puoi dare <command>make</command> per compilare l'applicazione.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>configure.in</filename>
+      </title>
+      <para>
+       È lo script standard passato ad <application>autoconf</application>
+       per generare lo script di configurazione.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>Makefile.am</filename>
+      </title>
+      <para>
+       Contiene le direttive standard di compilazione, passate ad automake 
+       per generare il <filename>Makefile.in</filename>, che lo script
+       configure trasforma nel <filename>Makefile</filename>. 
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>acconfig.h</filename>
+      </title>
+      <para>
+       Contiene alcune macro che vengono impostate dallo script
+       configure e aggiunte al file header <filename>config.h</filename>
+       (che deve essere il primo file di cui si fa #include in tutti
+       i tuoi file sorgenti). La maggior parte di queste macro servono
+       per il supporto a gettext (ENABLE_NLS, HAVE_CATGETS, HAVE_GETTEXT, 
+       HAVE_LC_MESSAGES, HAVE_STPCPY), HAVE_LIBSM serve a Gnome (ma non
+       danneggia le applicazioni GTK+) e solo alcune sono aggiunte da
+       <application>Glade</application> (PACKAGE_LOCALE_DIR,
+       PACKAGE_DATA_DIR, PACKAGE_SOURCE_DIR).
+      </para>
+     </formalpara>
+   
+     <formalpara>
+      <title>
+       <filename>stamp-h.in</filename>
+      </title>
+      <para>
+       Usata come timestamp (data/ora) da <application>automake</application>,
+       per ricompilare alcuni dei file generati.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>AUTHORS</filename>, <filename>ChangeLog</filename>,
+       <filename>NEWS</filename>, <filename>README</filename>
+      </title>
+      <para>
+       Questi file sono tutti inizialmente vuoti, vengono creati solo per
+       aderire alle convenzioni GNU.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>src/Makefile.am</filename>
+      </title>
+      <para>
+       Il file standard di make.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>src/main.c</filename>
+      </title>
+      <para>
+       Contiene la funzione <function>main</function>() che creerà per
+       te tutte le finestre (normali e di dialogo).
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>src/interface.h</filename>
+      </title>
+      <para>
+       Dichiarazioni delle funzioni che puoi chiamare per creare le
+       finestre (normali e di dialogo) che sono state preparate in
+       <application>Glade</application>.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>src/interface.c</filename>
+      </title>
+      <para>
+       Il codice per creare le finestre (normali e di dialogo) e tutti
+       i widget.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>src/callbacks.h</filename>
+      </title>
+      <para>
+       Dichiarazioni delle funzioni di callback e dei gestori di segnale 
+       che scriverai.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>src/callbacks.c</filename>
+      </title>
+      <para>
+       Le funzioni di callback e i gestori di segnale.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>src/support.h</filename>
+      </title>
+      <para>
+       Dichiarazioni di alcune funzioni di supporto, compresa
+       <function>lookup_widget</function>() che puoi usare per ottenere
+       dei puntatori ai widget.
+      </para>
+     </formalpara>
+
+     <formalpara>
+      <title>
+       <filename>src/support.c</filename>
+      </title>
+      <para>
+      </para>
+     </formalpara>
+
+     <para>
+      Se è abilitato il supporto per <application>gettext</application>
+      viene creata la directory <filename class="directory">po</filename> 
+      con un <filename>POTFILES.in</filename> ed un 
+      <filename>ChangeLog</filename> separati.
+      <filename>POTFILES.in</filename> elenca i file sorgenti che 
+      contengono delle stringhe traducibili e dovresti aggiungere qui
+      tutti i file sorgente che crei.
+     </para>
+
+     <para>
+      Per i progetti GNOME viene aggiunta anche la directory <filename
+      class="directory">macros</filename>, che contiene tutte le macro
+      m4 usate per compilare il progetto (veramente queste avrebbero
+      dovuto essere installate come parte di GNOME, ma sfortunatamente
+      ciò non è stato fatto in GNOME 1.0.x; si spera che questa cosa
+      venga corretta in una futura versione di GNOME, al che questa
+      directory non sarà più necessaria).
+     </para>
+
+     <para>
+      <note>
+       <title>Cambiare le opzioni di supporto per GNOME e gettext</title>
+       <para>
+        Dopo aver compilato il progetto, se cambi le opzioni
+	<guilabel>Supporto per Gnome</guilabel> o
+        <guilabel>Supporto per gettext</guilabel>, allora dovrai aggiornare
+	alcuni dei file compilati, come <filename>configure.in</filename> e
+	<filename>Makefile.am</filename>. La soluzione migliore probabilmente
+	è di cambiare la directory del progetto nella finestra di dialogo
+	<interface>Opzioni del progetto</interface> e ricompilare il
+	progetto da zero. Tuttavia così facendo dovrai ricopiare tutto il 
+	codice che avevi, eventualmente, aggiunto per gestire i segnali. 
+	Un'alternativa è quella di cancellare <filename>autogen.sh</filename>,
+        <filename>configure.in</filename>, <filename>Makefile.am</filename>,
+        <filename>src/Makefile.am</filename>, 
+	<filename>src/main.c</filename> e ricrearli usando 
+        <application>Glade</application>. Ma se avevi fatto dei cambiamenti
+	in tali file allora dovrai rifarli (si spera che in futuro 
+        <application>Glade</application> gestisca meglio questo problema).
+       </para>
+      </note>
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Quali file possono essere modificati tranquillamente dallo sviluppatore
+      e quali invece vengono sovrascritti?
+     </para>
+    </question>
+    <answer>
+     <para>
+      <application>Glade</application> non sovrascrive quasi nessuno
+      dei file. Esso ricreerà i file necessari per la compilazione, se
+      non esistono già (e di conseguenza verrà abilitata la corrispondente
+      opzione del progetto).
+     </para>
+     <para>
+      I file che <application>Glade</application> sovrascrive sono:
+      <filename>interface.h</filename>, <filename>interface.c</filename>, 
+      <filename>support.h</filename> e <filename>support.c</filename>
+      (sebbene, nel tuo progetto, potresti averli chiamati diversamente,
+      cambiandoli nella finestra di dialogo <interface>Opzioni del 
+      progetto</interface>).
+     </para>
+     <para>
+      Tali file hanno tutti un avvertimento in cima che dice <quote>DO
+      NOT EDIT</quote> (NON MODIFICARE).
+     </para>
+     <para>
+      Se hai aggiunto, o aggiornato, un qualunque gestore di segnale,
+      esso verrà accodato nei file <filename>callbacks.h</filename> e
+      <filename>callbacks.c</filename>. In questo modo qualunque codice
+      di callback tu avessi già aggiunto è completamente al sicuro!
+      Se hai cambiato nome ad una funzione di gestione di segnale allora
+      sta a te cancellare la vecchia versione e copiare il codice in
+      quella nuova.
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Come faccio ad aggiungere al progetto i miei file sorgenti?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Aggiungili, compresi i file header, in 
+      <filename>src/Makefile.am</filename>, nella variabile 
+      <varname><replaceable>project1</replaceable>_SOURCES</varname>
+      (dove <replaceable>project1</replaceable> è il nome del tuo
+      progetto).
+     </para>
+     <para>
+      Se usi <application>gettext</application> probabilmente vorrai
+      aggiungere i file sorgente anche in 
+      <filename>po/POTFILES.in</filename>; di modo che le stringhe possano
+      essere tradotte.
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Come ottengo un puntatore ad un widget da dentro un gestore di segnale?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Usa la funzione <function>lookup_widget</function>() (la puoi
+      trovare in <filename>support.c</filename>).
+     </para>
+     <para>
+      Gli passi un puntatore ad un qualsiasi widget di una finestra e il
+      nome del widget che vuoi ottenere. Di solito, da dentro i gestori di 
+      segnale, puoi usare il primo argomento del gestore di segnale come
+      primo parametro di <function>lookup_widget</function>(); ad es:
+      <programlisting>
+void
+on_button1_clicked                     (GtkButton       *button,
+                                        gpointer         user_data)
+{
+  GtkWidget *entry1;
+
+  entry1 = lookup_widget (GTK_WIDGET (button), "entry1");
+
+  ...
+}
+      </programlisting>
+     </para>
+     <para>
+      Nota che ciò non funzionerà se stai usando libglade. Il codice 
+      corrispondente per libglade è:
+      <programlisting>
+
+void
+on_button1_clicked                     (GtkButton       *button,
+                                        gpointer         user_data)
+{
+  GladeXML* xml;
+  GtkWidget* entry1;
+
+  xml = glade_get_widget_tree (GTK_WIDGET (button1));
+  entry1 = glade_xml_get_widget (xml, "entry1");
+
+  ...
+}
+      </programlisting>
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Come ottengo il valore di un GtkOptionMenu?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Per ottenere la voce di menu correntemente selezionata, chiama
+      <function>gtk_menu_get_active</function>() con il menu 
+      GtkOptionMenu. Per trovare il suo indice nel menu puoi usare 
+      <function>g_list_index</function>():
+      <programlisting>
+void
+on_button1_clicked                     (GtkButton       *button,
+                                        gpointer         user_data)
+{
+  GtkWidget *option_menu, *menu, *active_item;
+  gint active_index;
+
+  option_menu = lookup_widget (GTK_WIDGET (button), "optionmenu1");
+  menu = GTK_OPTION_MENU (option_menu)->menu;
+  active_item = gtk_menu_get_active (GTK_MENU (menu));
+  active_index = g_list_index (GTK_MENU_SHELL (menu)->children, active_item);
+
+  g_print ("Active index: %i\n", active_index);
+}
+      </programlisting>
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry id="gtkoptionmenu">
+    <question>
+     <para>
+      Come faccio a far chiamare una funzione a GtkOptionMenu quando cambia?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Al momento <application>Glade</application> non ha un modo per 
+      aiutarti a farlo, ma puoi farlo manualmente.
+     </para>
+     <para>
+      Quando crei la finestra prendi il menu opzioni e connettilo al segnale
+      <quote>deactivate</quote> emesso dal suo menu:
+      <programlisting>
+  window1 = create_window1 ();
+  option_menu = lookup_widget (window1, "optionmenu1");
+  gtk_signal_connect (GTK_OBJECT (GTK_OPTION_MENU (option_menu)->menu),
+                      "deactivate", GTK_SIGNAL_FUNC (on_option_selected),
+                      NULL);
+      </programlisting>
+     </para>
+
+     <para>
+      Poi aggiungi un gestore in <filename>callbacks.c</filename>.
+      Puoi ottenere l'indice della voce selezionata nel modo spiegato
+      nella domanda precedente:
+      <programlisting>
+static void
+on_option_selected (GtkMenuShell *menu_shell,
+                    gpointer data)
+{
+  GtkWidget *active_item;
+  gint item_index;
+
+  active_item = gtk_menu_get_active (GTK_MENU (menu_shell));
+  item_index = g_list_index (menu_shell->children, active_item);
+
+  g_print ("In on_option_selected active: %i\n", item_index);
+}
+      </programlisting>
+     </para>
+    </answer>
+   </qandaentry> 
+
+   <qandaentry>
+    <question>
+     <para>
+      Come mi connetto ai segnali GtkAdjustment?
+     </para>
+    </question>
+    <answer>
+     <para>
+      Al momento <application>Glade</application> non lo supporta;
+      ma puoi farlo manualmente, in modo simile a quanto visto nella
+      domanda 3.6.
+     </para>
+     <para>
+      Quando crei la finestra prendi un puntatore al widget che contiene 
+      l'adattamento e connettilo al segnale <quote>changed</quote> o
+      <quote>value_changed</quote>:
+      <programlisting>
+  window1 = create_window1 ();
+  hscale = lookup_widget (window1, "hscale1");
+  gtk_signal_connect (GTK_OBJECT (GTK_RANGE (hscale)->adjustment),
+                      "changed", GTK_SIGNAL_FUNC (on_adjustment_changed),
+                      NULL);
+      </programlisting>
+     </para>
+    </answer>
+   </qandaentry> 
+
+  </qandadiv>
+
+ </qandaset>
+
+  <!-- ============= Authors ================================ -->
+
+   <para>
+    Questa FAQ è stata scritta da Damon Chaplin
+    (<email>damon@ximian.com</email>). Per favore, invia commenti e
+    suggerimenti riguardanti questo manuale all'autore.
+    Per maggiori informazioni su <application>Glade</application>, o
+    sulle mailing list riguardanti <application>Glade</application>,
+    visita la <ulink url="http://glade.pn.org" type="http">pagina web
+    di Glade</ulink>.
+   </para>
+
+   <para>
+    Traduzione italiana di Fabrizio Stefani
+    (<email>fstef@it.gnome.org</email>). Per favore, inviare commenti e
+    suggerimenti riguardanti questa traduzione al suddetto indirizzo.
+   </para>
+
+</article>

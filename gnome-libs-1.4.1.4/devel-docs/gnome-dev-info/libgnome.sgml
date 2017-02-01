@@ -1,0 +1,472 @@
+<sect1 id="gnome-config">
+  <title>gnome-config</title>
+  <sect2><title>Author(s)</title>
+  <para>
+  Miguel de Icaza &lt;miguel@nuclecu.unam.mx&gt;
+  </para>
+  </sect2>
+<sect2><title>Description</title>
+<para>
+A set of routines for manipulating the database of configuration
+information.
+</para>
+</sect2>
+<sect2><title>Glossary</title>
+<para>
+<itemizedlist>
+<listitem><para>"config path" - a string that specifies which item to
+retrieve from the configuration database. For example, a config path
+of "/myapp/display_toolbox" could be used to retrieve the setting for
+whether 'myapp' should display its toolbox.
+</para>
+</listitem>
+<listitem><para>"default" - when retrieving a config item, specifies
+the value to be used if the item is not found.</para></listitem>
+<listitem><para>"private configuration data" - Normally, config item
+data is located in files under the ~user/.gnome directory in a .ini-like
+format. These files are world-readable. Items that have security or
+privacy implications are stored and retrieved using the "private"
+versions of the gnome-config routines, and the data for these items is
+stored in files under the ~user/.gnome_private directory, which is not
+accessable by anyone except that user and the system administrator.
+</para>
+</listitem>
+<listitem><para>"translated" strings - GNOME's multilingual support
+means that multiple languages must be supported for configuration items.
+The gnome_config_*get_translated_string() and
+gnome_config_*set_translated_string() routines allow you to specify
+which language a string item should be accessed for.
+</para></listitem>
+<listitem><para>"section" - a group of config items and other config
+sections</para></listitem>
+</itemizedlist>
+</para>
+    </sect2>
+<sect2 id="gnome-config-get">
+<title>gnome_config_*get_* - routines to retrieve information for a
+specified config path.</title>
+<funcsynopsis><funcdef>type
+<function>gnome_config_get_typename</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>Routine to retrieve a config item. 'typename' would be one of
+string, translated_string, int, bool, float, or vector. In the case of
+the gnome_config_get_string(), gnome_config_get_translated_string(),
+and gnome_config_get_vector(), ownership of the memory used by the
+returned value is given over to the application.
+When the application is done with it, it should be freed using g_free() or
+g_string_array_free() as appropriate.
+</para>
+<para>
+Combinations of "private" and "with_default" versions of these
+routines exist. For example, there are gnome_config_get_string(),
+gnome_config_get_string_with_default()
+gnome_config_private_get_string(), and
+gnome_config_private_get_string_with_default() routines.
+</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+char *myitem;
+gboolean is_default;
+
+myitem =
+gnome_config_get_string_with_default("/foo/blah=DefaultValue", &amp;is_default);
+</programlisting>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist>
+<listitem><para>const char *<parameter>path</parameter></para>
+<para>The config path to the config item being accessed.</para>
+</listitem>
+<listitem>
+<para>gboolean *<parameter>def</parameter>
+(gnome_config_get_*_with_default() routines only)</para>
+<para>Address of a gboolean variable. Used to return an indication to
+the caller as to whether the return value is a default value or was
+retrieved from the config database for the specified 'path'.
+</para>
+	  </listitem>
+</itemizedlist>
+</sect3>
+</sect2>
+<sect2 id="gnome-config-set">
+<title>gnome_config_set_* - routines to store information for a
+specified config path.</title>
+<funcsynopsis><funcdef>void
+<function>gnome_config_set_typename</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+<paramdef>type <parameter>value</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description></title>
+<para>
+Stores the specified value into the configuration database at the
+specified config path.
+</para>
+<para>Note that there are "private" variations on all the regular
+routines, e.g. gnome_config_set_string() and
+gnome_config_private_set_string().</para></sect3>
+<sect3><title>Usage</title>
+<programlisting>
+char *values[] = {"A one", "a two", "a three"};
+
+gnome_config_set_vector("/foo/bar/baz", 3, values);
+</programlisting>
+</sect3>
+</sect2>
+<sect2 id="gnome-config-has-section">
+<title>gnome_config_has_section - Checks whether a config section
+exists</title>
+<funcsynopsis><funcdef>gboolean
+<function>gnome_config_has_section</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>
+This routine returns TRUE if the specified section/item exists, xor
+FALSE if it does not.
+</para>
+<para>A parallel gnome_config_private_has_section() routine also
+is available.</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+if(gnome_config_has_section("/foo/bar/baz")) {
+        g_print("You have saved preferences.\n");
+} else {
+        g_print("You haven't saved preferences yet.\n");
+}
+</programlisting></sect3>
+<sect3><title>Parameters</title>
+<itemizedlist>
+<listitem><para>const char *<parameter>path</parameter></para>
+<para>Config path of the item/section of interest</para></listitem>
+</itemizedlist>
+</sect3>
+</sect2>
+<sect2 id="gnome-config-init-iterator">
+<title>gnome_config_init_iterator - Setup an iterator to get a listing
+of items in a specified config section.</title>
+<funcsynopsis><funcdef> void
+*<function>gnome_config_init_iterator</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>This routine is used to begin a loop over all the items in a
+config section. gnome_config_iterator_next() is used to advance to the
+next item.</para>
+<para>Note that a gnome_config_private_init_iterator() variant
+exists.</para>
+</sect3>
+<sect3><title>Usage</title>
+<para>See the gnome_config_iterator_next() usage example</para>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist><listitem><para>const char
+*<parameter>path</parameter></para>
+<para>Config section to list the items in.</para>
+	  </listitem>
+</itemizedlist>
+</sect3>
+</sect2>
+<sect2 id="gnome-config-init-iterator-sections">
+<title>gnome_config_init_iterator - Setup an iterator to get a listing
+of sections in a specified config section.</title>
+<funcsynopsis><funcdef> void
+*<function>gnome_config_init_iterator_sections</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>This routine is used to begin a loop over all the items in a
+config section. gnome_config_iterator_next() is used to advance to the
+next item.</para>
+<para>Note that a gnome_config_private_init_iterator_sections() variant
+exists.</para>
+</sect3>
+<sect3><title>Usage</title>
+<para>See the gnome_config_iterator_next() usage example</para>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist><listitem><para>const char
+*<parameter>path</parameter></para>
+<para>Config section to list the sub-sections of.</para>
+	  </listitem>
+</itemizedlist>
+</sect3>
+</sect2>
+<sect2 id="gnome-config-iterator-next">
+<title>gnome_config_iterator_next - get the next item from an
+iterator</title>
+<funcsynopsis><funcdef>void
+*<function>gnome_config_iterator_next</function></funcdef>
+<paramdef>void *<parameter>s</parameter></paramdef>
+<paramdef>char **<parameter>key</parameter></paramdef>
+<paramdef>char **<parameter>value</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>
+This function normally serves as the loop update for a config item or
+section iterator. The return value is an opaque pointer needed by
+gnome_config_iterator_next, or NULL if there are no more available
+data in the iterator.
+</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+char *section_name, *key, *value;
+void *section_iter, *item_iter;
+GString *tmpstr;
+tmpstr = g_string_new(NULL);
+for(section_iter = gnome_config_init_iterator_sections("/foo");
+    section_iter != NULL;
+    section_iter = gnome_config_iterator_next(section_iter, NULL, &amp;section_name)) {
+    
+    g_string_sprintf(tmpstr, "/foo/%s", section_name);
+    
+    for(item_iter = gnome_config_init_iterator(tmpstr->str);
+        item_iter;
+        item_iter = gnome_config_iterator_next(item_iter, &amp;key, &amp;value)) {
+        g_print("Got key %s -> value %s in section %s of /foo\n",
+                key, value, section_name);
+
+        g_free(key); g_free(value);
+    }
+
+    g_free(section_name);
+}
+g_string_free(tmpstr);
+</programlisting>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist>
+<listitem><para>void *<parameter>s</parameter></para>
+<para>A value returned by either gnome_config_*_init_iterator_*() or
+gnome_config_iterator_next().</para></listitem>
+<listitem><para>char **<parameter>key</parameter></para>
+<para>The address of a char * variable. Used to return a pointer to
+the key for item iterators. For section iterators, this should be
+NULL.</para>
+</listitem>
+<listitem><para>char **<parameter>value</parameter></para>
+<para>The address of a char * variable. Used to return a pointer to
+the value for item iterators, or to the section name for section
+iterators.</para>
+</listitem>
+</itemizedlist>
+</sect3>
+</sect2>
+<sect2 id="gnome-config-drop-all"><title>gnome_config_drop_all - drops all the cached config data from the in-memory cache</title>
+<funcsynopsis><funcdef>void <function>gnome_config_drop_all</function></funcdef><void></funcsynopsis>
+<sect3><title>Description</title>
+<para>
+The gnome_config routines cache the configuration entries in memory to
+increase speed. Calling gnome_config_drop_all() causes the cache to be
+cleared. <!-- XXX verify this information with Miguel -->
+</para></sect3>
+</sect2>
+<sect2 id="gnome-config-sync"><title>gnome_config_sync - writes all
+unwritten config entries to the config database</title>
+<funcsynopsis><funcdef>void <function>gnome_config_sync</function></funcdef><void></funcsynopsis>
+<sect3><title>Description</title>
+<para>
+As previously stated, the gnome_config routines cache configuration
+entries in memory to increase speed. This routine flushes the cache to
+disk - you would ordinarily use it after a number of
+gnome_config_set_* operations.
+</para></sect3>
+</sect2>
+<sect2 id="gnome-config-clean"><title>gnome_config_*clean_* - routines for removing a configuration database entry or subtree altogether</title>
+<funcsynopsis><funcdef>void <function>gnome_config_clean_file</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<funcsynopsis><funcdef>void <function>gnome_config_private_clean_file</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<funcsynopsis><funcdef>void <function>gnome_config_clean_section</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<funcsynopsis><funcdef>void <function>gnome_config_private_clean_section</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<funcsynopsis><funcdef>void <function>gnome_config_clean_key</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<funcsynopsis><funcdef>void <function>gnome_config_private_clean_key</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>These routines delete all the configuration entries associated with the specified entity (either a file, section, or key).</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+char *val1, *val2;
+
+gnome_config_set_string("/foo/bar", "baz");
+val1 = gnome_config_get_string("/foo/bar");
+gnome_config_clean_section("/foo");
+val2 = gnome_config_get_string("/foo/bar");
+if(val1 && val2 && !strcmp(val1, val2)) {
+    g_error("The values match! gnome_config_clean_section is broken!");
+} else {
+    g_message("gnome_config_clean_section worked.");
+}
+</programlisting>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist>
+<listitem><para>const char *<parameter>path</parameter></para>
+<para>The config path to the config item which is to be removed.</para>
+	  </listitem>
+	</itemizedlist>
+      </sect3>
+    </sect2>
+    <sect2 id="gnome-config-get-real-path"><title>gnome_config_*get_real_path</title>
+<funcsynopsis><funcdef>char *<function>gnome_config_get_real_path</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<funcsynopsis><funcdef>char *<function>gnome_config_private_get_real_path</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>
+Occasionally an application writer may want to get the local filename
+where a config item is stored. When passed a config path, these
+routines (currently implemented as macros) return that filename.
+</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+char *filename = gnome_config_get_real_path("/foo/bar");
+FILE *filehandle = fopen(filename, "w");
+/* do devious things with the file */
+</programlisting>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist>
+<listitem><para>const char *<parameter>path</parameter></para>
+<para>The config path to the config item being accessed.</para>
+</listitem>
+</itemizedlist></sect3>
+</sect2>
+</sect1>
+
+<sect1 id="gnome-defs">
+  <title>gnome-defs</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-dentry">
+  <title>gnome-dentry</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-fileconvert">
+  <title>gnome-fileconvert</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-help">
+  <title>gnome-help</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-history">
+  <title>gnome-history</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-hook">
+  <title>gnome-hook</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-i18n">
+  <title>gnome-i18n</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-mime">
+  <title>gnome-mime</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-score">
+  <title>gnome-score</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-string">
+  <title>gnome-string</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-triggers">
+  <title>gnome-triggers</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1 id="gnome-util">
+  <title>gnome-util</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<sect1>
+  <title>libgnome</title>
+<sect2><title>Description</title>
+<para>
+Not descripted</para>
+</sect2>
+
+</sect1>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:("gnome-dev-info.sgml" "book" "sect1" "")
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

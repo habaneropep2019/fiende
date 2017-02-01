@@ -1,0 +1,718 @@
+<HTML
+><HEAD
+><TITLE
+>gnome-regex</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Library Reference Manual"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Gnome Library"
+HREF="libgnome.html"><LINK
+REL="PREVIOUS"
+TITLE="gnome-popt"
+HREF="gnome-gnome-popt.html"><LINK
+REL="NEXT"
+TITLE="gnome-remote"
+HREF="gnome-gnome-remote.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>Gnome Library Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnome-gnome-popt.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnome.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnome-gnome-remote.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="GNOME-GNOME-REGEX"
+>gnome-regex</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN3785"
+></A
+><H2
+>Name</H2
+>gnome-regex&nbsp;--&nbsp;Regular expression cache implementation</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN3788"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;gnome.h&gt;
+
+
+struct      <A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+>;
+<A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+>* <A
+HREF="gnome-gnome-regex.html#GNOME-REGEX-CACHE-NEW"
+>gnome_regex_cache_new</A
+>      (void);
+void        <A
+HREF="gnome-gnome-regex.html#GNOME-REGEX-CACHE-DESTROY"
+>gnome_regex_cache_destroy</A
+>       (<A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+> *rxc);
+void        <A
+HREF="gnome-gnome-regex.html#GNOME-REGEX-CACHE-SET-SIZE"
+>gnome_regex_cache_set_size</A
+>      (<A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+> *rxc,
+                                             int new_size);
+<GTKDOCLINK
+HREF="REGEX-T"
+>regex_t</GTKDOCLINK
+>*    <A
+HREF="gnome-gnome-regex.html#GNOME-REGEX-CACHE-COMPILE"
+>gnome_regex_cache_compile</A
+>       (<A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+> *rxc,
+                                             const char *pattern,
+                                             int flags);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN3801"
+></A
+><H2
+>Description</H2
+><P
+>Provides a cache for regular expressions.  Applications first allocate
+a cache with <A
+HREF="gnome-gnome-regex.html#GNOME-REGEX-CACHE-NEW"
+>gnome_regex_cache_new</A
+>() and access the regular
+expressions through the <A
+HREF="gnome-gnome-regex.html#GNOME-REGEX-CACHE-COMPILE"
+>gnome_regex_cache_compile</A
+>() function (this
+will fetch the compiled value from the cache or re-compile it if
+required).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN3806"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3808"
+></A
+><H3
+><A
+NAME="GNOMEREGEXCACHE"
+></A
+>struct GnomeRegexCache</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct {
+	int size;		/* Total number of cache slots.  */
+	int next;		/* Next available slot.  */
+	char **regexs;		/* Regular expression strings.  */
+	regex_t *patterns;	/* Compiled expressions.  */
+	/* FIXME: probably should cache compilation flags along with
+	   regex and use those to determine caching.  For now we
+	   assume that the flags never change.  Another option would
+	   be to put the flag info into this structure and just not
+	   let the user ever change it.  */
+} GnomeRegexCache;</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3813"
+></A
+><H3
+><A
+NAME="GNOME-REGEX-CACHE-NEW"
+></A
+>gnome_regex_cache_new ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+>* gnome_regex_cache_new      (void);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Creates a new regular expression cache object.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN3820"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the new cache object.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3829"
+></A
+><H3
+><A
+NAME="GNOME-REGEX-CACHE-DESTROY"
+></A
+>gnome_regex_cache_destroy ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        gnome_regex_cache_destroy       (<A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+> *rxc);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Destroys a regular expression cache object.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN3836"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>rxc</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> A regular expression cache object</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3845"
+></A
+><H3
+><A
+NAME="GNOME-REGEX-CACHE-SET-SIZE"
+></A
+>gnome_regex_cache_set_size ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        gnome_regex_cache_set_size      (<A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+> *rxc,
+                                             int new_size);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Sets the maxiumum number of regular expressions the cache can
+hold.  If this is less than the number of currently cached
+expressions, then the oldest expressions are deleted.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN3852"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>rxc</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> A regular expression cache object</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>new_size</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> new size of cache</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN3865"
+></A
+><H3
+><A
+NAME="GNOME-REGEX-CACHE-COMPILE"
+></A
+>gnome_regex_cache_compile ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="REGEX-T"
+>regex_t</GTKDOCLINK
+>*    gnome_regex_cache_compile       (<A
+HREF="gnome-gnome-regex.html#GNOMEREGEXCACHE"
+>GnomeRegexCache</A
+> *rxc,
+                                             const char *pattern,
+                                             int flags);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This compiles a regular expression.  If the expression is cached,
+the previously computed value is returned.  Otherwise, the
+expression is compiled, cached, and then returned.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN3873"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>rxc</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> A regular expression cache object</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>pattern</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> A string representing a regular expression</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Flags to pass to <GTKDOCLINK
+HREF="REGCOMP"
+>regcomp</GTKDOCLINK
+>()</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a compiled regular expression, or <TT
+CLASS="LITERAL"
+>NULL</TT
+> on error.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnome-gnome-popt.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnome.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnome-gnome-remote.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-popt</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-remote</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

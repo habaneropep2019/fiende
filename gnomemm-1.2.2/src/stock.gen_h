@@ -1,0 +1,254 @@
+/* $Id: stock.gen_h,v 1.15 2001/03/28 12:28:41 murrayc Exp $ */
+
+/***************************************************************
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+****************************************************************
+This file is currently fresh, parts or functions have not
+been tested completely. 
+***************************************************************/
+
+
+/* stock.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/imlib.h>
+#include <gtk--/window.h>
+#include <gtk--/button.h>
+#include <gnome--/pixmap.h>
+#include <libgnomeui/gnome-stock.h>
+
+// the concept of Stock is that you have special icon name which
+// which confers a set of pixmaps for (focused, unfocused, disabled)
+// with symbolic names passed by strings.
+
+
+namespace Gtk { class MenuItem; }
+CLASS_START(Gnome);
+
+namespace Stock {
+typedef const char* Type;
+typedef const char* State;
+typedef const char* RGB;
+extern State STATE_REGULAR;  
+extern State STATE_DISABLED;
+extern State STATE_FOCUSED;
+
+// Registering new stock types
+void register_imlib           (Type             type,
+                               State            state,
+                               const Gdk_Imlib::Image & im);
+
+void register_imlib           (Type             type,
+                               State            state,
+                               const Gdk_Imlib::Image & im,
+                               int              width,
+                               int              height);
+
+void register_file            (Type              type,
+                               State             state,
+                               const Gtk::string&     label, 
+                               const Gtk::string&     path);
+
+void register_pathname        (Type              type,
+                               State             state,
+                               const Gtk::string&     label,
+                               const Gtk::string&     path);
+
+void register_xpm             (Type              type,
+                               State             state, 
+                               const Gtk::string&     label,
+                               const char**      xpm);
+
+} /* namespace Stock  */
+///////////////////////////////////////////////////////////////////////////
+
+#m4 GTKMM_CONVERSION(const char*,Stock::Type,`$3',`$3')
+class StockPixmap: public Gnome::Pixmap
+{
+  WRAP_CLASS(StockPixmap, GnomeStock,
+             GNOME_STOCK, GNOME_IS_STOCK,
+             stock,
+             Gnome::Pixmap, GnomePixmap, GNOME_PIXMAP);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  StockPixmap(Stock::Type type);
+  WRAP_METHOD(gboolean gnome_stock_set_icon(GnomeStock*, const char*),
+	      bool set_icon(Stock::Type type));
+};
+
+class StockButton : public Gtk::Button
+{
+public:
+  StockButton(Stock::Type type);
+  ~StockButton();
+};
+
+namespace Stock {
+typedef StockPixmap Pixmap;
+typedef StockButton Button;
+
+
+} /* namespace Stock */
+
+
+PRIVATE_START;
+#include <gnome--/private/pixmap_p.h>
+IMPL_START;
+#include <gnome--/private/stock_p.h>
+#include <gtk--/menuitem.h>
+
+namespace Gnome {
+
+StockPixmap::StockPixmap(Stock::Type type)
+  :     Gnome::Pixmap((GnomePixmap*)(gtk_object_new(get_type(),0)))
+  {
+    set_icon(type);
+  }
+
+StockButton::StockButton(Stock::Type type)
+   : Gtk::Button(GTK_BUTTON(gnome_stock_button(type))) {}
+StockButton::~StockButton() {}
+
+namespace Stock {
+
+State STATE_REGULAR  = GNOME_STOCK_PIXMAP_REGULAR;
+State STATE_DISABLED = GNOME_STOCK_PIXMAP_DISABLED;
+State STATE_FOCUSED = GNOME_STOCK_PIXMAP_FOCUSED;
+
+
+//TODO: What are these? Why were they commented out?
+//  static Stock* pixmap_widget(const Gtk::Window &window,
+//                              const Gtk::string &icon);
+//
+//  static Stock* pixmap_widget(const Gtk::Window &window,
+//                              const Gtk::string &icon,
+//                              guint width,
+//                              guint height);
+//
+//  static gint pixmap_register (const Gtk::string &icon,
+//			       const Gtk::string &subtype,
+//			       const StockPixmapEntry &entry);
+//  WRAP_METHOD(gint gnome_stock_pixmap_change (const char*, const char*, GnomeStockPixmapEntry*),
+//   gint pixmap_change (const char *icon, const char *subtype, GnomeStockPixmapEntry *entry));
+// GnomeStockPixmapEntry *gnome_stock_pixmap_checkfor (const char *icon,
+// 				    const char *subtype);
+// static Gtk::Button* pixmap_button(const Pixmap &pixmap, const Gtk::string &text);
+//  static void button_can_default(Gtk::Button &button, bool can_default);
+//  WRAP_METHOD(gboolean gnome_stock_menu_accel (const char*, guchar*, guint8*),
+//    gboolean menu_accel (const char *type, guchar *key, guint8 *mod));
+//   WRAP_METHOD(void gnome_stock_menu_accel_parse(const char*),
+//     void menu_accel_parse(const char *section));
+//   WRAP_METHOD(void gnome_stock_pixmap_gdk (const char*, const char*, GdkPixmap**, GdkPixmap**),
+//      void pixmap_gdk (const char *icon, const char *subtype, GdkPixmap **pixmap, GdkPixmap **mask));
+//  static Gtk::MenuItem* menu_item(const Gtk::string &type, const Gtk::string &text);
+
+void register_imlib           (Type             type,
+                               State            state,
+                               const Gtk::string&    label,
+                               const Gdk_Imlib::Image & iml)
+  {
+     GdkImlibImage* im=iml.gdkobj();
+     GnomeStockPixmapEntry *entry;
+     entry = (GnomeStockPixmapEntry*) g_malloc(sizeof(GnomeStockPixmapEntry));
+     entry->imlib.type = GNOME_STOCK_PIXMAP_TYPE_IMLIB;
+     entry->imlib.label = g_strdup(label.c_str());
+     entry->imlib.width = im->rgb_width;
+     entry->imlib.height = im->rgb_height;
+     entry->imlib.rgb_data = (char*) g_malloc(im->rgb_width * im->rgb_height * 3);
+     memcpy((char *)entry->imlib.rgb_data, im->rgb_data,
+       im->rgb_width * im->rgb_height * 3);
+     entry->imlib.shape = im->shape_color;
+     gnome_stock_pixmap_register(type,state,entry); // never free
+  }
+
+void register_imlib           (Type             type,
+                               State            state,
+                               const Gtk::string&    label,
+                               const Gdk_Imlib::Image& iml,
+                               int              width,
+                               int              height)
+  {
+     GdkImlibImage* im=iml.gdkobj();
+     GnomeStockPixmapEntry *entry;
+     entry = (GnomeStockPixmapEntry*) g_malloc(sizeof(GnomeStockPixmapEntry));
+     entry->imlib_s.type = GNOME_STOCK_PIXMAP_TYPE_IMLIB_SCALED;
+     entry->imlib_s.label = g_strdup(label.c_str());
+     entry->imlib_s.scaled_width = width;
+     entry->imlib_s.scaled_height = height;
+     entry->imlib_s.width = im->rgb_width;
+     entry->imlib_s.height = im->rgb_height;
+     entry->imlib_s.rgb_data = (char*) g_malloc(im->rgb_width * im->rgb_height * 3);
+     memcpy((char *)entry->imlib_s.rgb_data, im->rgb_data,
+       im->rgb_width * im->rgb_height * 3);
+     entry->imlib_s.shape = im->shape_color;
+     gnome_stock_pixmap_register(type,state,entry); // never free
+  }
+
+void register_file            (Type              type,
+                               State             state,
+                               const Gtk::string&     label, 
+                               const Gtk::string&     path)
+  {
+     GnomeStockPixmapEntry *entry;
+     entry = (GnomeStockPixmapEntry*) g_malloc(sizeof(GnomeStockPixmapEntry));
+     entry->file.type = GNOME_STOCK_PIXMAP_TYPE_FILE;
+     entry->file.label = g_strdup(label.c_str());
+     entry->file.filename = g_strdup(path.c_str());
+     entry->file.width = 0;
+     entry->file.height = 0;
+     gnome_stock_pixmap_register(type,state,entry); // never free
+  }
+
+void register_pathname        (Type              type,
+                               State             state,
+                               const Gtk::string&     label,
+                               const Gtk::string&     path)
+  {
+     GnomeStockPixmapEntry *entry;
+     entry = (GnomeStockPixmapEntry*) g_malloc(sizeof(GnomeStockPixmapEntry));
+     entry->path.type = GNOME_STOCK_PIXMAP_TYPE_PATH;
+     entry->path.label = g_strdup(label.c_str());
+     entry->path.pathname = g_strdup(path.c_str());
+     entry->path.width = 0;
+     entry->path.height = 0;
+     gnome_stock_pixmap_register(type,state,entry); // never free
+  }
+
+void register_xpm             (Type              type,
+                               State             state, 
+                               const Gtk::string&     label,
+                               const char**      xpm)
+  {
+     GnomeStockPixmapEntry *entry;
+     entry = (GnomeStockPixmapEntry*) g_malloc(sizeof(GnomeStockPixmapEntry));
+     entry->data.type = GNOME_STOCK_PIXMAP_TYPE_DATA;
+     entry->data.label = g_strdup(label.c_str());
+     entry->data.xpm_data  = const_cast<char**>(xpm);
+     entry->data.width = 0;
+     entry->data.height = 0;
+     gnome_stock_pixmap_register(type,state,entry); // never free
+  }
+
+
+} /* namespace Stock */
+} /* namespace Gnome */
+

@@ -1,0 +1,505 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(medusa-config.in)
+
+MEDUSA_MAJOR_VERSION=0
+MEDUSA_MINOR_VERSION=5
+MEDUSA_MICRO_VERSION=1
+MEDUSA_VERSION="$MEDUSA_MAJOR_VERSION.$MEDUSA_MINOR_VERSION.$MEDUSA_MICRO_VERSION"
+AM_INIT_AUTOMAKE(medusa, $MEDUSA_VERSION)
+AC_SUBST(MEDUSA_MAJOR_VERSION)
+AC_SUBST(MEDUSA_MINOR_VERSION)
+AC_SUBST(MEDUSA_MICRO_VERSION)
+dnl <= needed for the medusa-config script
+AC_SUBST(MEDUSA_VERSION)
+dnl =>
+
+dnl Specify a header configuration file
+AM_CONFIG_HEADER(config.h)
+
+dnl Initialize maintainer mode
+AM_MAINTAINER_MODE
+
+dnl Initialize libtool
+AM_DISABLE_STATIC
+AM_PROG_LIBTOOL
+
+dnl Build time sanity check
+AM_SANITY_CHECK
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_ISC_POSIX
+
+dnl Checks for fucntions
+AC_CHECK_FUNCS(getmntinfo getmntent setmntent endmntent statfs statvfs)
+
+dnl Checks for headers
+AC_CHECK_HEADERS(sys/mnttab.h sys/vfs.h)
+
+
+dnl Check for libdb
+AC_ARG_ENABLE(prefer-db1, [  --enable-prefer-db1     Prefer Berkeley DB 1.x] [default=no]],[prefer_db1="$enableval"],[prefer_db1=no])
+dnl
+dnl Check for db stuff (gnome-metadata)
+dnl
+DB_LIB=
+AC_CHECK_FUNC(dbopen, [],
+if test "$prefer_db1" = "yes"; then
+ AC_CHECK_LIB(db1, dbopen, DB_LIB="-ldb1",
+  AC_CHECK_LIB(db, dbopen, DB_LIB="-ldb",
+   AC_CHECK_LIB(db-3, __db185_open, DB_LIB="-ldb-3",
+    AC_MSG_ERROR([Your db library is missing db 1.85 compatibility mode])
+   )
+  )
+ )
+else
+ AC_CHECK_LIB(db, dbopen, DB_LIB="-ldb",
+  AC_CHECK_LIB(db1, dbopen, DB_LIB="-ldb1",
+   AC_CHECK_LIB(db-3, __db185_open, DB_LIB="-ldb-3",
+    AC_MSG_ERROR([Your db library is missing db 1.85 compatibility mode])
+   )
+  )
+ )
+fi
+)
+
+AC_SUBST(DB_LIB)
+
+dnl look for db headers
+if test "$prefer_db1" = "yes"; then
+	AC_CHECK_HEADERS(db_185.h db1/db.h)
+	if test "$ac_cv_header_db_185_h$ac_cv_header_db1_db_h" = nono; then
+	  AC_MSG_ERROR([Berkeley db library required for Gnome])
+	fi
+	AC_DEFINE(PREFER_DB1)
+else
+	AC_CHECK_HEADERS(db.h db_185.h db1/db.h)
+
+	if test "$ac_cv_header_db_h$ac_cv_header_db_185_h$ac_cv_header_db1_db_h" = nonono; then
+	  AC_MSG_ERROR([Berkeley db library required for Gnome])
+	fi
+fi
+
+dnl =================================================
+dnl Hacks from XScreenSaver for the X activity daemon
+dnl =================================================
+
+#
+AC_DEFUN(AC_CHECK_X_HEADER, [
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  if test \! -z "$includedir" ; then 
+    CPPFLAGS="$CPPFLAGS -I$includedir"
+  fi
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  AC_CHECK_HEADER([$1], [$2])
+  CPPFLAGS="$ac_save_CPPFLAGS"])
+
+AC_DEFUN(AC_CHECK_X_LIB, [
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  ac_save_LDFLAGS="$LDFLAGS"
+#  ac_save_LIBS="$LIBS"
+
+  if test \! -z "$includedir" ; then 
+    CPPFLAGS="$CPPFLAGS -I$includedir"
+  fi
+  # note: $X_CFLAGS includes $x_includes
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+
+  if test \! -z "$libdir" ; then
+    LDFLAGS="$LDFLAGS -L$libdir"
+  fi
+  # note: $X_LIBS includes $x_libraries
+  LDFLAGS="$LDFLAGS $X_LIBS $X_EXTRA_LIBS"
+
+  AC_CHECK_LIB([$1], [$2], [$3], [$4], [$5])
+  CPPFLAGS="$ac_save_CPPFLAGS"
+  LDFLAGS="$ac_save_LDFLAGS"
+#  LIBS="$ac_save_LIBS"
+  ])
+
+
+
+# Usage: HANDLE_X_PATH_ARG([variable_name],
+#                          [--command-line-option],
+#                          [descriptive string])
+#
+# All of the --with options take three forms:
+#
+#   --with-foo (or --with-foo=yes)
+#   --without-foo (or --with-foo=no)
+#   --with-foo=/DIR
+#
+# This function, HANDLE_X_PATH_ARG, deals with the /DIR case.  When it sees
+# a directory (string beginning with a slash) it checks to see whether
+# /DIR/include and /DIR/lib exist, and adds them to $X_CFLAGS and $X_LIBS
+# as appropriate.
+#
+AC_DEFUN(HANDLE_X_PATH_ARG, [
+   case "$[$1]" in
+    yes) ;;
+    no)  ;;
+
+    /*)
+     AC_MSG_CHECKING([for [$3] headers])
+     d=$[$1]/include
+     if test -d $d; then
+       X_CFLAGS="-I$d $X_CFLAGS"
+       AC_MSG_RESULT($d)
+     else
+       AC_MSG_RESULT(not found ($d: no such directory))
+     fi
+
+     AC_MSG_CHECKING([for [$3] libs])
+     d=$[$1]/lib
+     if test -d $d; then
+       X_LIBS="-L$d $X_LIBS"
+       AC_MSG_RESULT($d)
+     else
+       AC_MSG_RESULT(not found ($d: no such directory))
+     fi
+
+     # replace the directory string with "yes".
+     [$1]_req="yes"
+     [$1]=$[$1]_req
+     ;;
+
+    *)
+     echo ""
+     echo "error: argument to [$2] must be \"yes\", \"no\", or a directory."
+     echo "       If it is a directory, then \`DIR/include' will be added to"
+     echo "       the -I list, and \`DIR/lib' will be added to the -L list."
+     exit 1
+     ;;
+   esac
+  ])
+
+
+###############################################################################
+#
+#       Check for the MIT-SCREEN-SAVER server extension.
+#
+###############################################################################
+
+have_mit=no
+with_mit_req=unspecified
+AC_ARG_WITH(mit-ext,
+[  --with-mit-ext          Include support for the MIT-SCREEN-SAVER extension.],
+  [with_mit="$withval"; with_mit_req="$withval"],[with_mit=yes])
+
+HANDLE_X_PATH_ARG(with_mit, --with-mit-ext, MIT-SCREEN-SAVER)
+
+if test "$with_mit" = yes; then
+  AC_CHECK_X_HEADER(X11/extensions/scrnsaver.h, [have_mit=yes])
+
+  # Now check to see if it's really in the library; XF86Free-3.3 ships
+  # scrnsaver.h, but doesn't include the code in libXext.a, the idiots!
+  #
+  if test "$have_mit" = yes; then
+    AC_CHECK_X_LIB(Xext, XScreenSaverRegister, [true], [have_mit=no], -lm)
+
+    if test "$have_mit" = no; then
+      # Fuck!  Looks like XF86Free-3.3 actually puts it in XExExt instead
+      # of in Xext.  Thank you master, may I have another.
+      AC_CHECK_X_LIB(XExExt, XScreenSaverRegister,
+                     [have_mit=yes; SAVER_LIBS="$SAVER_LIBS -lXExExt"],
+                     [true], -lX11 -lXext -lm)
+    fi
+
+    if test "$have_mit" = no; then
+      # Double fuck!  Looks like some versions of XFree86 (whichever version
+      # it is that comes with RedHat Linux 2.0 -- I can't find a version 
+      # number) put this garbage in Xss instead of Xext.  Thank you master,
+      #  may I have another.
+      AC_CHECK_X_LIB(Xss, XScreenSaverRegister,
+                     [have_mit=yes; SAVER_LIBS="$SAVER_LIBS -lXss"],
+                     [true], -lX11 -lXext -lm)
+    fi
+
+  if test "$have_mit" = yes; then
+    AC_DEFINE(HAVE_MIT_SAVER_EXTENSION)
+  fi
+
+  fi
+
+elif test "$with_mit" != no; then
+  echo "error: must be yes or no: --with-mit-ext=$with_mit"
+  exit 1
+fi
+
+
+###############################################################################
+#
+#       Check for the XIDLE server extension.
+#
+###############################################################################
+
+have_xidle=no
+with_xidle_req=unspecified
+AC_ARG_WITH(xidle-ext,
+[  --with-xidle-ext        Include support for the XIDLE extension.],
+  [with_xidle="$withval"; with_xidle_req="$withval"],[with_xidle=yes])
+
+HANDLE_X_PATH_ARG(with_xidle, --with-xidle-ext, XIDLE)
+
+if test "$with_xidle" = yes; then
+  AC_CHECK_X_HEADER(X11/extensions/xidle.h,
+                    [have_xidle=yes
+                     AC_DEFINE(HAVE_XIDLE_EXTENSION)])
+elif test "$with_xidle" != no; then
+  echo "error: must be yes or no: --with-xidle-ext=$with_xidle"
+  exit 1
+fi
+
+
+###############################################################################
+#
+#       Check for the SGI-VIDEO-CONTROL server extension.
+#
+###############################################################################
+
+have_sgivc=no
+with_sgivc_req=unspecified
+AC_ARG_WITH(sgivc-ext,
+[  --with-sgivc-ext        Include support for the SGI-VIDEO-CONTROL extension.],
+  [with_sgivc="$withval"; with_sgivc_req="$withval"],[with_sgivc=yes])
+
+HANDLE_X_PATH_ARG(with_sgivc, --with-sgivc-ext, SGI-VIDEO-CONTROL)
+
+if test "$with_sgivc" = yes; then
+
+  # first check for XSGIvc.h
+  AC_CHECK_X_HEADER(X11/extensions/XSGIvc.h, [have_sgivc=yes])
+
+  # if that succeeded, then check for the -lXsgivc
+  if test "$have_sgivc" = yes; then
+    have_sgivc=no
+    AC_CHECK_X_LIB(Xsgivc, XSGIvcQueryGammaMap,
+                  [have_sgivc=yes; SAVER_LIBS="$SAVER_LIBS -lXsgivc"], [true],
+                  -lXext -lX11)
+  fi
+
+  # if that succeeded, then we've really got it.
+  if test "$have_sgivc" = yes; then
+    AC_DEFINE(HAVE_SGI_VC_EXTENSION)
+  fi
+
+elif test "$with_sgivc" != no; then
+  echo "error: must be yes or no: --with-sgivc-ext=$with_sgivc"
+  exit 1
+fi
+
+AC_SUBST(X_CFLAGS)
+AC_SUBST(X_LIBS)
+
+
+###############################################################################
+#
+#       Check for /proc/interrupts.
+#
+###############################################################################
+
+have_proc_interrupts=no
+with_proc_interrupts_req=yes
+AC_ARG_WITH(proc-interrupts,
+[  --with-proc-interrupts  Include support for consulting the /proc/interrupts
+                          file to notice keyboard activity.],
+  [with_proc_interrupts="$withval"; with_proc_interrupts_req="$withval"],
+  [with_proc_interrupts=yes])
+
+if test "$with_proc_interrupts" = yes; then
+
+   AC_CACHE_CHECK([whether /proc/interrupts contains keyboard data],
+    ac_cv_have_proc_interrupts,
+    [ac_cv_have_proc_interrupts=no
+     if grep keyboard /proc/interrupts >/dev/null 2>&1 ; then
+       ac_cv_have_proc_interrupts=yes
+     fi
+    ])
+   have_proc_interrupts=$ac_cv_have_proc_interrupts
+
+  if test "$have_proc_interrupts" = yes; then
+    AC_DEFINE(HAVE_PROC_INTERRUPTS)
+  fi
+
+elif test "$with_proc_interrupts" != no; then
+  echo "error: must be yes or no: --with-proc-interrupts=$with_proc_interrupts"
+  exit 1
+fi
+
+
+
+dnl ====================================
+dnl =
+dnl = Profiling support
+dnl =
+dnl ====================================
+ENABLE_PROFILER=
+AC_ARG_ENABLE(profiler,
+[  --enable-profiler		Enable profiler],
+ENABLE_PROFILER=1
+AC_DEFINE(ENABLE_PROFILER))
+
+if test "x$ENABLE_PROFILER" = "x1"
+then
+	CFLAGS="-g -O -gdwarf-2 -finstrument-functions -D__NO_STRING_INLINES"
+	LDFLAGS="/gnome/PROFILE/lib/libprofiler.so -lpthread"
+fi
+
+AC_SUBST(ENABLE_PROFILER)
+AM_CONDITIONAL(ENABLE_PROFILER, test "x$ENABLE_PROFILER" = "x1")
+dnl ====================================
+dnl = Profiling support
+dnl ====================================
+
+dnl Prefix so medusa can find its installed files
+if test "x$prefix" = "xNONE"; then
+ 	medusa_prefix=${ac_default_prefix}
+else
+ 	medusa_prefix=${prefix}
+fi 
+AC_DEFINE_UNQUOTED(MEDUSA_PREFIX, "${medusa_prefix}")
+
+dnl <= get the prefix for the medusa-config script
+MEDUSA_PREFIX="${medusa_prefix}"
+AC_SUBST(MEDUSA_PREFIX)
+dnl =>
+
+dnl This "eval echo" business is surely not the right thing to do,
+dnl but I don't know how else to get "/etc/medusa" into the #define
+dnl instead of "${prefix}/medusa", needing another level of shell
+dnl variable expansion.  If anyone knows how to do it better, please
+dnl tell eric@eazel.com.
+
+MEDUSA_SYSCONFDIR="`eval echo ${sysconfdir}/medusa`"
+AC_DEFINE_UNQUOTED(MEDUSA_SYSCONFDIR, "${MEDUSA_SYSCONFDIR}")
+AC_SUBST(MEDUSA_SYSCONFDIR)
+
+MEDUSA_LOCALSTATEDIR="`eval echo ${localstatedir}/medusa`"
+AC_DEFINE_UNQUOTED(MEDUSA_LOCALSTATEDIR, "${MEDUSA_LOCALSTATEDIR}")
+AC_SUBST(MEDUSA_LOCALSTATEDIR)
+
+dnl ============================
+dnl end configuration files
+dnl ============================
+
+
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+
+dnl glib
+AM_PATH_GLIB(1.2.0,,
+AC_MSG_ERROR([
+*** GLIB 1.2.0 or better is required. The latest version of GLIB
+*** is always available from ftp://ftp.gtk.org/.]), gmodule)
+
+dnl gtk, so we can test gnome vfs async crap with medusa
+AM_PATH_GTK(1.2.0,,
+AC_MSG_ERROR([
+*** Gtk+ 1.2.0 or better is required. The latest version of GTK
+*** is always available from ftp://ftp.gtk.org/.]))
+
+
+dnl gnome, including gnome-vfs
+AM_PATH_GNOME(1.0.0,,AC_MSG_ERROR([*** GNOME 1.0.0 or better is
+required.]), vfs)
+AC_SUBST(VFS_CFLAGS)
+AC_SUBST(VFS_LIBS)
+
+dnl gnome-xml
+AC_PATH_PROG(XML_CONFIG,xml-config,no)
+if test x$XML_CONFIG = xno; then
+  AC_MSG_ERROR(Couldn't find xml-config please install the gnome-xml package)
+fi
+XML_LIBS=`$XML_CONFIG --libs`
+XML_CFLAGS=`$XML_CONFIG --cflags`
+AC_SUBST(XML_LIBS)
+AC_SUBST(XML_CFLAGS)
+
+APP_LIBS=""
+AC_SUBST(APP_LIBS)
+
+dnl Turn on more warnings and make them errors for cvs version
+dnl to force contributors to pay attention to warnings.
+AC_ARG_ENABLE(more-warnings,
+[  --enable-more-warnings  Maximum compiler warnings],
+set_more_warnings="$enableval",[
+if test -f $srcdir/CVSVERSION; then
+	set_more_warnings=yes
+else
+	set_more_warnings=no
+fi
+])
+if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
+	echo "enable compile warnings = $set_more_warnings"
+	CFLAGS="$CFLAGS \
+	-Wall \
+	-Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
+	-Wnested-externs -Wpointer-arith \
+	-Werror"
+
+	for option in -Wsign-promo -Wno-sign-compare; do
+		SAVE_CFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS $VFS_CFLAGS $option"
+		AC_MSG_CHECKING([whether gcc understands $option])
+		AC_TRY_COMPILE([], [],
+			has_option=yes,
+			has_option=no,)
+		CFLAGS="$SAVE_CFLAGS"
+		if test $has_option = yes; then
+		  VFS_CFLAGS="$VFS_CFLAGS $option"
+		fi
+		AC_MSG_RESULT($has_option)
+		unset has_option
+		unset SAVE_CFLAGS
+	done
+	unset option
+fi
+
+AC_OUTPUT([
+medusa.spec
+medusa-config
+Makefile
+libmedusa/Makefile
+libmedusa-internal/Makefile
+indexer/Makefile
+search-service/Makefile
+msearch/Makefile
+tests/Makefile
+doc/Makefile
+index-configuration/Makefile
+index-configuration/medusa.cron
+index-configuration/medusa-idled.sh
+index-configuration/medusa-idled.csh
+index-configuration/medusa-init
+gnome-vfs-module/Makefile
+medusa-idled/Makefile
+doc/medusa-file-index-stoplist.5
+doc/medusa.conf.5
+doc/medusa-searchd.8
+])
+
+dnl <= Configuration summary =>
+
+echo "<= medusa configuration summary :"
+dnl <= Profile support? =>
+case "X$ENABLE_PROFILER" in
+X1)
+echo "
+Enable profiler         : YES"
+;;
+*)
+echo "
+Enable profiler         : NO"
+echo
+;;
+esac
+
+dnl <= CFLAGS and LDFLAGS =>
+echo "
+CFLAGS                  : $CFLAGS
+LDFLAGS                 : $LDFLAGS"
+echo

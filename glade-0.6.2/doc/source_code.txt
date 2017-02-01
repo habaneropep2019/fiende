@@ -1,0 +1,147 @@
+
+These are my notes when I first started on generating source code in Glade.
+They are a bit out-of-date now.
+
+
+Writing Source Code
+===================
+
+My original notes:
+	- C first, other languages later hopefully (any volunteers??).
+	- Write create_<window_name>() functions for all windows in one file
+	  and write prototypes of signal handlers in another file which the
+	  user can edit. Could alternatively put each window in a separate
+	  file.
+	- Hopefully it would be possible to edit the interface again after
+	  code has been added by the user. If the user doesn't change the
+	  window creation code that would be possible. New signal handler
+	  prototypes could be added on to the end of the handlers file.
+	- Need to allow the creation of multiple windows of the same type,
+	  so need to be careful about global variable naming. My current
+	  idea is to use the object hash of each window to store pointers
+	  to all the widgets in the window, using the name as the key. That
+	  would make it easy for the programmer to access any widget.
+	- Also need to be careful about the order of some Gtk commands.
+	  Some of them need the widget to be realized first etc.
+	  e.g. gtk_widget_grab_default() must be after setting CAN_DEFAULT.
+	  + need to realize a widget to create pixmaps.
+	  + need to realize a text widget before setting the text?
+	- Output resource '.rc' files?
+	- See the section on Custom widgets.
+	- Ouput Makefile, or better a Makefile.am and configure.in?
+	- Should pixmaps be included in the source, or loaded from a file
+	  when the program is run? Project option? Also, should make pixmap
+	  filenames relative, so code tree is portable.
+
+
+I think you need to make several passes through the widget tree, so for
+external programs using Glade's output, you'll have to read in a component
+at a time. (Actually I did the C code in one pass, adding code to several
+buffers which are then output in the correct order.)
+
+I'm thinking of C output here. For other languages this may be different.
+
+There are 4 output files - two pairs of .c & .h files.
+The first pair contains code to create the components, and declarations.
+The second pair contains empty signal handler functions, and declarations.
+
+
+Strings
+=======
+
+NOTE: be careful with strings in the resulting code. I added a function
+source_make_string() which converts all non-printable characters to escape
+codes so that the output can be compiled OK.
+
+e.g. if you have a label with the text:
+
+"first \line
+second line"
+
+It is converted to
+
+"first \\line\nsecond line"
+
+when output.
+
+
+Stages:
+=======
+
+1. Write start of all 4 files -
+      For main source file:
+	#include <gtk/gtk.h>
+	#include "<main source file>.h"
+	#include "<signal handler declarations>.h"
+
+      For signal handler source file:
+	#include <gtk/gtk.h>
+	#include "<main source file>.h"
+	#include "<signal handler declarations>.h"
+
+
+	(Any globals needed?)
+	possibly some utility functions like create/load_pixmap()
+	also convenience function to get a widget from the widget hash,
+	could be called with any widget in a component - calls get_toplevel()
+	to get the component, then get_data to get the named widget.
+
+	create all styles in an init() function? or just named styles?
+	- create widget's own styles in widget code?
+
+
+2. Iterate over components:
+
+2.1 Write function prototype to source file -
+      Add to main source file:
+	GtkWidget* create_<component name>() {
+
+      Add to main header file:
+	GtkWidget* create_<component name>();
+
+2.2 Write variable declarations. For this we need to scan the component
+    hierarchy to collect the types and names needed, e.g.
+	GtkWidget *window1, *hbox1, *table1, *entry1, *label1, *label2; ...
+	GtkTooltips *tooltips;
+
+2.3 Create tooltips if needed by the component. (May need to walk the tree to
+    find out if tooltips are needed.)
+	tooltips = gtk_tooltips_new();
+
+2.4 Walk the hierarchy, creating and adding widgets as we go. We also have to
+    set up any signals and accelerators.
+
+      Add to main source file:
+	entry1 = gtk_entry_new();
+	gtk_box_pack_start(GTK_BOX(hbox1), entry, TRUE, TRUE, 2);
+	gtk_entry_set_editable(GTK_ENTRY(entry1), FALSE);
+	gtk_entry_set_visible(GTK_ENTRY(entry1), FALSE);
+	gtk_signal_connect(GTK_OBJECT(entry1), "key_press_event",
+			   GTK_SIGNAL_FUNC(on_entry1_key_press_event), NULL);
+
+      Add widget to hash of component? - So programmers can find easily.
+      The other alternative is to create a struct for each component which
+      contains all the widgets in it.
+
+      Add to handlers header file (Note: we have to figure out the prototype):
+	gint on_entry1_key_press_event(GtkWidget *widget, GdkEventKey *event,
+				       gpointer data);
+
+      Add to handlers source file:
+	gint on_entry1_key_press_event(GtkWidget *widget, GdkEventKey *event,
+				       gpointer data) {
+
+	  return FALSE;
+	}
+
+    Note: for events which correspond to X events add 'return FALSE' as above,
+    so that code will run OK without changes.
+    Note: if we try to use Args wherever possible, then the output may be
+    more portable to other languages?
+
+
+2.5 Write function end. For C that's just '}'.
+
+
+
+Damon, 24 June 1998

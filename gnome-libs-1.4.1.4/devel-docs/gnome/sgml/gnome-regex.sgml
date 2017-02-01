@@ -1,0 +1,150 @@
+<refentry id="gnome-gnome-regex">
+<refmeta>
+<refentrytitle>gnome-regex</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-regex</refname><refpurpose>Regular expression cache implementation</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeRegexCache">GnomeRegexCache</link>;
+<link linkend="GnomeRegexCache">GnomeRegexCache</link>* <link linkend="gnome-regex-cache-new">gnome_regex_cache_new</link>      (void);
+void        <link linkend="gnome-regex-cache-destroy">gnome_regex_cache_destroy</link>       (<link linkend="GnomeRegexCache">GnomeRegexCache</link> *rxc);
+void        <link linkend="gnome-regex-cache-set-size">gnome_regex_cache_set_size</link>      (<link linkend="GnomeRegexCache">GnomeRegexCache</link> *rxc,
+                                             int new_size);
+<link linkend="regex-t">regex_t</link>*    <link linkend="gnome-regex-cache-compile">gnome_regex_cache_compile</link>       (<link linkend="GnomeRegexCache">GnomeRegexCache</link> *rxc,
+                                             const char *pattern,
+                                             int flags);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+Provides a cache for regular expressions.  Applications first allocate
+a cache with <link linkend="gnome-regex-cache-new">gnome_regex_cache_new</link>() and access the regular
+expressions through the <link linkend="gnome-regex-cache-compile">gnome_regex_cache_compile</link>() function (this
+will fetch the compiled value from the cache or re-compile it if
+required).
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeRegexCache">struct GnomeRegexCache</title>
+<programlisting>typedef struct {
+	int size;		/* Total number of cache slots.  */
+	int next;		/* Next available slot.  */
+	char **regexs;		/* Regular expression strings.  */
+	regex_t *patterns;	/* Compiled expressions.  */
+	/* FIXME: probably should cache compilation flags along with
+	   regex and use those to determine caching.  For now we
+	   assume that the flags never change.  Another option would
+	   be to put the flag info into this structure and just not
+	   let the user ever change it.  */
+} GnomeRegexCache;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-regex-cache-new">gnome_regex_cache_new ()</title>
+<programlisting><link linkend="GnomeRegexCache">GnomeRegexCache</link>* gnome_regex_cache_new      (void);</programlisting>
+<para>
+Creates a new regular expression cache object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the new cache object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-regex-cache-destroy">gnome_regex_cache_destroy ()</title>
+<programlisting>void        gnome_regex_cache_destroy       (<link linkend="GnomeRegexCache">GnomeRegexCache</link> *rxc);</programlisting>
+<para>
+Destroys a regular expression cache object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>rxc</parameter>&nbsp;:</entry>
+<entry> A regular expression cache object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-regex-cache-set-size">gnome_regex_cache_set_size ()</title>
+<programlisting>void        gnome_regex_cache_set_size      (<link linkend="GnomeRegexCache">GnomeRegexCache</link> *rxc,
+                                             int new_size);</programlisting>
+<para>
+Sets the maxiumum number of regular expressions the cache can
+hold.  If this is less than the number of currently cached
+expressions, then the oldest expressions are deleted.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>rxc</parameter>&nbsp;:</entry>
+<entry> A regular expression cache object
+</entry></row>
+<row><entry align="right"><parameter>new_size</parameter>&nbsp;:</entry>
+<entry> new size of cache
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-regex-cache-compile">gnome_regex_cache_compile ()</title>
+<programlisting><link linkend="regex-t">regex_t</link>*    gnome_regex_cache_compile       (<link linkend="GnomeRegexCache">GnomeRegexCache</link> *rxc,
+                                             const char *pattern,
+                                             int flags);</programlisting>
+<para>
+This compiles a regular expression.  If the expression is cached,
+the previously computed value is returned.  Otherwise, the
+expression is compiled, cached, and then returned.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>rxc</parameter>&nbsp;:</entry>
+<entry> A regular expression cache object
+</entry></row>
+<row><entry align="right"><parameter>pattern</parameter>&nbsp;:</entry>
+<entry> A string representing a regular expression
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> Flags to pass to <link linkend="regcomp">regcomp</link>()
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a compiled regular expression, or <literal>NULL</literal> on error.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

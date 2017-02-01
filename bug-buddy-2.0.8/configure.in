@@ -1,0 +1,75 @@
+dnl Configure script for bug-buddy
+
+AC_INIT(src/bug-buddy.c)
+
+AM_CONFIG_HEADER(config.h)
+
+AM_INIT_AUTOMAKE(bug-buddy, 2.0.8)
+
+AM_MAINTAINER_MODE
+
+AM_ACLOCAL_INCLUDE(macros)
+AM_PROG_XML_I18N_TOOLS
+
+GNOME_INIT
+
+AC_PROG_CC
+AC_ISC_POSIX
+AC_HEADER_STDC
+AC_ARG_PROGRAM
+AM_PROG_LIBTOOL
+
+GNOME_COMPILE_WARNINGS
+
+dnl Check for new enough gnome-libs
+CFLAGS_save=$CFLAGS
+LIBS_save=$LIBS
+CFLAGS=`gnome-config --cflags xml gnomeui`
+LIBS=`gnome-config --libs xml gnomeui`
+
+AC_CHECK_LIB(gnomeui, gnome_window_icon_set_default_from_file, ,[
+AC_MSG_ERROR(gnome-libs 1.0.60 or higher is required.)])
+
+CFLAGS=$CFLAGS_save
+LIBS=$LIBS_save
+
+AM_PATH_LIBGLADE(,,gnome)
+
+ALL_LINGUAS="az ca cs da de el en_AU en_GB es fi fr ga gl hu it ja ko lt nl nn no pl pt_BR ro ru sk sl sv tr uk wa zh_CN.GB2312 zh_TW.Big5"
+AM_GNOME_GETTEXT
+
+dnl AC_MSG_CHECKING(whether this is boc's machine)
+dnl if test -d /debian/var/state/apt/lists; then
+dnl    DEBIAN_ROOT="/debian"
+dnl    AC_SUBST(DEBIAN_ROOT)
+dnl    AC_MSG_RESULT(maybe)
+dnl else
+dnl    AC_MSG_RESULT(no)
+dnl fi
+
+EXTRA_GNOME_CFLAGS=`gnome-config --cflags xml gnomeui libglade gdk_pixbuf gnomecanvaspixbuf vfs`
+EXTRA_GNOME_LIBS=`gnome-config   --libs   xml gnomeui libglade gdk_pixbuf gnomecanvaspixbuf vfs`
+AC_SUBST(EXTRA_GNOME_CFLAGS)
+AC_SUBST(EXTRA_GNOME_LIBS)
+
+AC_OUTPUT([
+bug-buddy.spec
+Makefile
+docs/Makefile
+docs/C/Makefile
+docs/it/Makefile
+intl/Makefile
+pixmaps/Makefile
+po/Makefile.in
+src/Makefile
+])
+
+echo "
+
+Configuration:
+
+	CFLAGS:	${EXTRA_GNOME_CFLAGS}
+
+	LIBS:	${EXTRA_GNOME_LIBS}
+
+"

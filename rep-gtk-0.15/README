@@ -1,0 +1,110 @@
+-*- text -*-
+
+This is rep-gtk 0.0, a binding of GTK+/GNOME/libglade for the rep Lisp
+system. It is based on Marius Vollmer's guile-gtk binding (initially
+version 0.15, updated to 0.17), with a new glue-code generator.
+
+For more details see:
+
+	http://rep-gtk.sourceforge.net/
+
+Browse the CVS history at:
+
+	http://tizer.dcs.warwick.ac.uk:8080/cgi-bin/cvsweb/rep-gtk
+
+
+Installation
+============
+
+Basically, `./configure ; make ; make install'. If you're building from
+the CVS repository, execute `aclocal ; autoconf' first.
+
+Currently it only works with GTK 1.2.
+
+
+Usage
+=====
+
+Do `(require 'gui.gtk.gtk)' to load the library, then call functions as
+in guile-gtk. The only difference is that Lisp conventions are used for
+booleans, i.e. nil for #f, and non-nil for #t.
+
+I changed the names of three functions:
+
+	gtk-idle-add-full => gtk-idle-add
+	gtk-container-foreach-full => gtk-container-foreach
+	gtk-signal-set-class-function-full => gtk-signal-set-class-function
+
+
+libglade
+========
+
+Also included is a binding of James Henstridge's excellent libglade
+(http://www.daa.com.au/~james/gnome/)
+
+From the libglade README file:
+
+    This library allows you to load glade interface files in a program
+    at runtime. It doesn't require GLADE to be used, but GLADE is by
+    far the easiest way to create the interface files.
+
+So you can now use GLADE with rep! Here's an example from the
+examples/test-libglade script:
+
+    (require 'gui.gtk.libglade)
+
+    (let ((xml (or (glade-xml-new (car command-line-args))
+		   (error "something bad happened"))))
+      (glade-xml-signal-autoconnect xml)
+      (gtk-main))
+
+The glade-xml-new function takes a filename, and creates a widget
+hierarchy. glade-xml-signal-autoconnect connects all signal handlers to
+the lisp functions named in the GLADE file. You can also use the
+glade-xml-signal-connect function to connect individually named
+handlers. (see libglade.defs for the complete function list)
+
+
+GNOME
+=====
+
+There's also now reasonably complete bindings of gnome and gnomeui.
+These extra modules will get built and installed:
+
+	gui.gnome.lib		Non-UI GNOME functions, doesn't require GTK
+	gui.gnome.ui		GNOME UI widgets and utilities
+	gui.gnome.canvas	GNOME Canvas widgets and utilities
+	gui.gtk.gdk-pixbuf	Image loading and rendering
+	gui.gnome.canvas-pixbuf	CanvasItem for displaying GdkPixbuf's
+
+see the .defs files for the gruesome details about what goes in what.
+The dependence tree is something like:
+
+			   gdk-pixbuf
+			 /
+	types -+- gtk -+- libglade
+		     \	 \
+		      \	   ui -+- canvas
+		       \	\
+			 lib	  canvas-pixbuf
+
+gui.gtk.types provides conversions for the basic C types (and GLIB's
+GList and GSList types).
+
+When `gui.gnome.ui' is loaded the gnome-init function is called
+automatically. If the special variables `*gnome-app-id*' and
+`*gnome-app-version*' are bound to strings, then these values will be
+used, otherwise something will be fabricated.
+
+However, if using `gui.gnome.lib' without `gui.gnome.ui', you should
+call `gnomelib-init' manually.
+
+To use libglade with the GNOME widgets, load the `gui.gnome.libglade'
+module instead of `gui.gtk.libglade'
+
+
+Caveats
+=======
+
+It's still too easy to crash the Lisp interpreter through invalid use
+of GTK..

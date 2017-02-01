@@ -1,0 +1,23 @@
+#!/bin/sh
+exec rep "$0" "$@"
+!#
+
+(if (get-command-line-option "--gnome")
+    (progn
+      (require 'libglade-gnome)
+      (require 'gnomeui)
+      (gnome-init "test-libglade" "0.0"))
+  (require 'libglade))
+
+(let
+    ((xml (or (glade-xml-new (car command-line-args))
+	      (error "something bad happened while creating the interface"))))
+
+  (glade-xml-signal-autoconnect xml)
+  (gtk-main))
+
+(throw 'quit 0)
+
+;; Local variables:
+;; major-mode: lisp-mode
+;; End:

@@ -1,0 +1,84 @@
+/* $Id: propertybox.gen_h,v 1.7 2001/08/03 20:00:29 murrayc Exp $ */
+
+
+/* propertybox.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/dialog.h>
+#include <libgnomeui/gnome-propertybox.h>
+
+CLASS_START(Gnome);
+//: Dialog with Apply, OK, Cancel, and Help buttons.
+//- Unlike GnomePropertyBox in C, Gnome::PropertyBox does not self-destruct when
+//- run() or run_and_close() returns, so you can use it again.
+//- Just delete it later, like any other Window.
+
+class PropertyBox : public Dialog
+{
+  WRAP_CLASS(PropertyBox, GnomePropertyBox,
+             GNOME_PROPERTY_BOX, GNOME_IS_PROPERTY_BOX,
+             property_box,
+             Dialog, GnomeDialog, GNOME_DIALOG);
+public:
+  PropertyBox();
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(void gnome_property_box_changed (GnomePropertyBox*),
+	      void changed ());
+
+  WRAP_METHOD(void gnome_property_box_set_modified(GnomePropertyBox*, gboolean),
+	      void set_modified(bool state));
+
+  gint append_page(Gtk::Widget &child, Gtk::Widget &tab_label);
+
+  SIGNAL_SPEC("apply", both, void apply(gint page_num));
+  SIGNAL_SPEC("help",  both, void help(gint page_num));
+
+};
+
+
+
+PRIVATE_START;
+#include <gnome--/private/dialog_p.h>
+IMPL_START;
+#include <gnome--/private/propertybox_p.h>
+
+Gnome::PropertyBox::PropertyBox()
+ : Dialog(GNOME_DIALOG(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  
+  //Prevent automatic gtkobj destruction upon dialog close.
+  //It's not suitable for C++.
+  close_hides();
+}
+
+gint
+Gnome::PropertyBox::append_page(Gtk::Widget &child,
+			       Gtk::Widget &tab_label)
+{
+  return gnome_property_box_append_page(gtkobj(),
+					child.gtkobj(),
+					tab_label.gtkobj());
+}
+
+  
+DOCUMENTATION_START;
+

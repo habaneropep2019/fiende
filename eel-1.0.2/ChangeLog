@@ -1,0 +1,2742 @@
+2001-10-02  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-background.c: (eel_background_is_dark): Remove an
+	extra factor of 2 that was making all backgrounds seem dark.
+
+2001-10-01  Darin Adler  <darin@bentspoon.com>
+
+	Now that we are setting the translation domain properly to make
+	_() use eel translations, we must use explicit gettext calls
+	when we want application translations.
+
+	* eel/eel-dnd.c: (eel_drag_drop_action_ask): Switch into the
+	eel domain when calling gnome_popup_menu_new so we get the
+	eel translations of the menu items.
+
+	* eel/eel-enumeration.c:
+	(eel_enumeration_get_nth_description_translated):
+	* eel/eel-preferences-box.c: (preferences_box_populate_pane),
+	(eel_preferences_box_populate):
+	* eel/eel-xml-extensions.c: (eel_xml_get_property_translated):
+	Use gettext, not _(), to translate strings passed from elsewhere.
+
+	* eel/eel-preferences.c:
+	(eel_preferences_get_user_level_name_for_display):
+	Use _(), not gettext, to translate strings in this code.
+
+	* eel/eel-gdk-font-extensions.c:
+	* eel/eel-preferences-group.c:
+	Remove gnome-i18n.h include where it's not used.
+
+2001-09-17  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-background.c: (eel_background_is_dark): Make this work
+	with background images that are transparent or partly-transparent.
+	It turns out this was another part of the problem with the default
+	Nautilus theme's text color.
+	
+	* eel/eel-gdk-pixbuf-extensions.h:
+	* eel/eel-gdk-pixbuf-extensions.c:
+	(eel_gdk_pixbuf_average_value_argb): Change algorithm so
+	that it handles the alpha channel too. Also made it use 64-bit
+	arithmetic for simplicity -- hope that doesn't make it too slow.
+	Also changed it to use an argb value instead of a GdkColor.
+	(eel_gdk_pixbuf_average_value): Cover for compatibility with old
+	Nautilus.
+	(check_average_value): Fixed bugs in the code to test alpha.
+	(eel_self_check_gdk_pixbuf_extensions): Changed test to include
+	alpha checks -- still doesn't do tests of all the interesting
+	alpha channel cases.
+	
+2001-09-17  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-gdk-pixbuf-extensions.c: (eel_gdk_pixbuf_average_value):
+	Oops, G_MAXULONG is from glib 2, not glib 1. Back to the C
+	standard ULONG_MAX (wondering why glib needs its own anyway).
+
+2001-09-16  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-gdk-pixbuf-extensions.c: (eel_gdk_pixbuf_average_value):
+	Use glib constants to make it a tiny bit more portable.
+
+2001-09-16  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-gdk-pixbuf-extensions.c: (eel_gdk_pixbuf_average_value):
+	Fix bug that caused incorrect average values in pixbufs with more
+	than about 66000 pixels. Alex Larsson found the problem and
+	provided a fix similar to this one.
+	(check_average_value), (eel_self_check_gdk_pixbuf_extensions):
+	Added a few tests for the edge cases for this function.
+
+2001-09-09  Abel Cheung  <maddog@linux.org.hk>
+
+	* configure.in (ALL_LINGUAS): zh_TW.Big5 -> zh_TW
+
+2001-08-31  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-gtk-extensions.c:
+	(eel_gtk_class_name_make_like_existing_type),
+	(eel_gtk_get_system_font): Fix storage leaks by using
+	gtk_object_sink to get rid of temporary widgets that are never
+	parented instead of using gtk_object_destroy.
+
+2001-08-27  Alex Larsson  <alexl@redhat.com>
+
+	* eel/eel-list-column-title.c (truncate_string):
+	Fix elipsis truncation on multibyte locales.
+
+2001-08-23  Anders Carlsson  <andersca@gnu.org>
+
+	* eel/eel-canvas-rect.c (rect_update): Free our fill_svp
+	if it exists.
+
+	* eel/eel-smooth-text-layout.c (eel_text_layout_new): Free
+	the wc_separators string.
+
+	* eel/eel-gdk-font-extensions.c (xlfd_string_get_nth_as_int): 
+	Free strings returned by xlfd_string_get_nth.
+
+2001-08-22  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-gconf-extensions.c: (eel_gconf_value_set_string_list):
+	Fix leaks introduced in last checkin.
+	
+2001-08-22  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-gconf-extensions.h:
+	* eel/eel-gconf-extensions.c: (eel_gconf_is_default): Use value
+	free cover that does its own not NULL checking.
+	(eel_gconf_value_get_string_list),
+	(eel_gconf_value_set_string_list): New function to deal with
+	GConfValue lists of GNONF_VALUE_STRING type.
+
+	* eel/eel-preferences.c: (preferences_gconf_value_get_int),
+	(preferences_gconf_value_get_bool),
+	(preferences_gconf_value_get_string),
+	(preferences_gconf_value_get_string_list), (preferences_get_value),
+	(preferences_preference_is_gconf_key), (preferences_key_make),
+	(preferences_find_first_non_null_default_value),
+	(eel_preferences_get_visible_user_level),
+	(eel_preferences_set_visible_user_level),
+	(eel_preferences_set_is_invisible), (eel_preferences_set_boolean),
+	(eel_preferences_get_boolean), (eel_preferences_set_integer),
+	(eel_preferences_get_integer), (eel_preferences_set),
+	(eel_preferences_get), (eel_preferences_set_string_list),
+	(eel_preferences_get_string_list),
+	(eel_preferences_default_set_integer),
+	(eel_preferences_default_get_integer),
+	(eel_preferences_default_set_boolean),
+	(eel_preferences_default_get_boolean),
+	(eel_preferences_default_set_string),
+	(eel_preferences_default_get_string),
+	(eel_preferences_default_set_string_list),
+	(eel_preferences_default_get_string_list),
+	(preferences_entry_invoke_callbacks_if_needed),
+	(preferences_entry_update_cached_value),
+	(preferences_entry_ensure_gconf_connection),
+	(preferences_entry_free), (preferences_global_table_free),
+	(eel_preferences_add_callback), (eel_preferences_add_auto_string),
+	(eel_preferences_add_auto_string_list),
+	(eel_preferences_add_auto_integer),
+	(eel_preferences_add_auto_boolean),
+	(eel_preferences_remove_auto_string),
+	(eel_preferences_remove_auto_string_list),
+	(eel_preferences_remove_auto_integer),
+	(eel_preferences_remove_auto_boolean),
+	(preferences_while_alive_disconnector),
+	(eel_preferences_add_callback_while_alive),
+	(eel_preferences_remove_callback),
+	(eel_preferences_set_description),
+	(eel_preferences_set_enumeration_id),
+	(eel_preferences_visible_in_current_user_level),
+	(eel_preferences_initialize):
+	Cleanup whacky system where preference visibilities and default
+	values were stored using gconf.  Instead, store the visibilities
+	and defaults values in the already existing table of preferences.
+	The changes make this code a bit simpler.  In particular, the code
+	to create the right keys is now gone.  Add some covers for getting
+	values out of GConfValue safely and with some extra checking the
+	the types are right.
+	
+2001-08-20  Maciej Stachowiak  <mjs@noisehavoc.org>
+
+	* configure.in: Change the way we generate libtool's dependency
+	info so the major .so version is once again 0, restoring binary
+	compatibility.
+
+	* eel/eel-clist.c: (eel_clist_set_column_justification,
+	size_allocate_title_buttons): Try to remove some sources of
+	crashing when EelList is used as a drop-in replacement for
+	GtkCList. (Using EelCList directly still crashes).
+	* eel/eel-list-column-title.c: (eel_list_column_title_paint): More
+	potential crash reduction.
+
+	* test/Makefile.am: Speed up the build a bit by removing some
+	redundant libraries.
+	* eel/Makefile.am: Likewise.
+
+2001-08-17  Ramiro Estrugo  <ramiro@fateware.com>
+
+	Make these widgets more useful outside Nautilus by providing
+	functions to change ui elements (such as titles and descriptions)
+	as well iterators.
+
+	These changes do not affect either binary or source compatibility
+	for Nautilus.
+	
+	* eel/eel-preferences-box.h:
+	* eel/eel-preferences-box.c:
+	(preferences_box_populate_pane), (eel_preferences_dialog_new),
+	(eel_preferences_dialog_get_box), Add accessor for the preferences
+	box of a dialog.
+	(eel_preferences_dialog_populate), Separate the populate function
+	out on its own.
+	(eel_preferences_box_for_each_pane), New function for iterating
+	panes.
+	(eel_preferences_box_rename_pane), New function to rename a pane.
+	(eel_preferences_box_get_pane_name): New function to find the name
+	of a pane.
+
+	* eel/eel-preferences-group.h:
+	* eel/eel-preferences-group.c:
+	(eel_preferences_group_set_title_label), New function for changing
+	the title label of a group.
+	(eel_preferences_group_for_each_item): New function for iterating
+	items.
+
+	* eel/eel-preferences-pane.h:
+	* eel/eel-preferences-pane.c: (eel_preferences_pane_initialize),
+	(eel_preferences_pane_destroy), (eel_preferences_pane_new),
+	(eel_preferences_pane_add_group),
+	(preferences_pane_get_max_caption_width),
+	(eel_preferences_pane_update),
+	(eel_preferences_pane_add_control_preference), Use more consistent
+	paramter names.
+	(eel_preferences_pane_for_each_group): New function for iterating
+	groups.
+
+	* eel/eel-preferences-item.h:
+	* eel/eel-preferences-item.c:
+	(eel_preferences_item_initialize_class),
+	(preferences_item_update_custom),
+	(preferences_item_set_main_child),
+	(preferences_item_create_enumeration_list),
+	(preferences_item_create_boolean),
+	(preferences_item_create_editable_string),
+	(preferences_item_create_editable_integer),
+	(preferences_item_create_enumeration_menu),
+	(preferences_item_create_font),
+	(preferences_item_create_smooth_font),
+	(eel_preferences_item_get_name), (update_text_settings_at_idle),
+	(preferences_item_update_text_settings_at_idle),
+	(update_integer_settings_at_idle),
+	(preferences_item_update_editable_integer_settings_at_idle),
+	(preferences_item_update_description),
+	(eel_preferences_item_set_control_preference),
+	(eel_preferences_item_set_control_action),
+	(preferences_item_get_control_showing),
+	(eel_preferences_item_enumeration_list_set_unique_exceptions),
+	(eel_preferences_item_set_description):
+	Add new functions for changing the descriptions of items.  Factor
+	out the code to set descriptions into its own function and make
+	that public.  Use more consistent parameter names.  Add signal for
+	notifying custom items about description changes.
+
+Wed Aug 15 16:32:56 2001  Jonathan Blandford  <jrb@redhat.com>
+
+	* eel/eel-dnd.c (eel_drag_default_drop_action_for_icons): make the
+	trash directory.
+
+2001-08-15  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-gdk-pixbuf-extensions.c: Use a 64K buffer instead of
+	a 4K one.
+
+2001-08-14  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-background-canvas-group.c:
+	(eel_background_canvas_group_initialize_class),
+	(eel_background_canvas_group_draw),
+	(eel_background_canvas_group_render):
+	Remove the use of "update" as a time to prepare the background.
+	There's nothing that will cause an update at the right time, so
+	we shouldn't bother to try using it that way.
+
+	* eel/eel-font-manager.c: (eel_font_manager_get_bold):
+        Remove another ill-advised call to
+        eel_font_manager_file_is_scalable_font. Even if we do want
+        to test the file's type, we definitely don't want to do it
+        inside g_return_if_fail.
+
+2001-08-14  Alex Larsson  <alexl@redhat.com>
+
+	* eel/eel-scalable-font.c (eel_scalable_font_new):
+	Don't test eel_font_manager_file_is_scalable_font (),
+	it does slow I/O.
+	(eel_scalable_font_get_default_font,
+	eel_scalable_font_get_default_bold_font):
+	Don't keep recreating new EelScalableFonts for the
+	default font.
+
+2001-08-09  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-extensions.c: (eel_art_point_assign),
+	(eel_art_point_clamp), (eel_art_point_offset_by):
+	Add ArtPoint version of some functions.
+	
+	* eel/eel-gtk-container.c: (eel_gtk_container_child_draw):
+	Remove superfluous child not NULL test.  Make sure the widget is
+	visible before drawing it.
+	
+2001-08-01  Darin Adler  <darin@bentspoon.com>
+
+	* configure.in: Roll compiler option fix from HEAD. The old
+	code was setting VFS_CFLAGS.
+
+2001-08-01  Darin Adler  <darin@bentspoon.com>
+
+	Patch from James Su <suzhe@gnuchina.org> to fix problems in
+	multibyte locales.
+
+	* eel/eel-gdk-font-extensions.c: (eel_string_ellipsize_start),
+	(eel_string_ellipsize_end), (eel_string_ellipsize_middle): Convert
+	to wide characters before ellipsizing, then back afterward.
+	
+	* eel/eel-smooth-text-layout.c: (wcs_scalable_font_text_width):
+	Helper function.
+	(eel_text_layout_new): Use wide characters.
+
+2001-07-27  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-gtk-container.h:
+	* eel/eel-gtk-container.c: (eel_gtk_container_child_draw):
+	Add function to conveniently forward draw events to children.
+	
+	* eel/eel-labeled-image.c: (eel_labeled_image_initialize_class),
+	(eel_labeled_image_expose_event), (eel_labeled_image_draw):
+	Make sure we properly forward draw events to children.
+	
+2001-07-26  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-features.c:
+	* eel/eel-features.h.in:
+	Added to eel-1-0 branch from HEAD.
+
+	* configure.in:
+	* eel/.cvsignore:
+	* eel/Makefile.am:
+	* eel/eel.h:
+	Add eel-features.[ch] so that the version of the library can be
+	checked at runtime.
+	
+2001-07-26  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-image.h:
+	* eel/eel-image.c: (eel_image_initialize_class),
+	(eel_image_initialize), (eel_image_set_arg), (eel_image_get_arg),
+	(eel_image_expose_event), (eel_image_get_pixbuf_opacity),
+	(eel_image_set_pixbuf_insensitive_opacity),
+	(eel_image_get_pixbuf_insensitive_opacity):
+	Add support for rendering the image pixbuf at a lower opacity when
+	the widget state is insensitive.
+	
+2001-07-25  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel.spec.in:
+	Add missing translations.
+	Cleanup some.
+	
+2001-07-25  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* data/fonts/urw/Makefile.am:
+	* eel.spec.in:
+	* eel/Makefile.am:
+	Ok, I goofed.  The data dir change cannot happen for the stable
+	branch cause it could break existing users of Nautilus - for
+	example - if they have a font preference that references one of
+	the fallback fonts.  Nautilus in theory will deal with the missing
+	font, but its lame to break the stable branch anyway so im
+	reverting the change.
+	
+2001-07-25  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* configure.in:
+	Add defines for Eel library major, minor and micro version numbers
+	so that we can use these to properly set the shared library
+	version info.
+	Make the includedir be eel-1/eel' instead of 'eel' so that we can
+	have GNOME1 and GNOME2 installations of Eel cohabiting in the
+	same $prefix.
+
+	* data/fonts/urw/Makefile.am:
+	Data dir is now 'share/eel-1/eel' instead of 'share/eel'
+
+	* eel.spec.in:
+	Update for includedir and datadir changes.
+	
+	* eel/Makefile.am:
+	Set the shared library version info.
+	Install headers in the new 'eel-1/eel' includedir.
+	Update EEL_DATADIR for new 'eel-1/eel' data location so that
+	fallback fonts can be found in the right place.
+	
+2001-07-24  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c: (eel_string_list_prepend): New function
+	to prepend a string to the collection.
+	(eel_string_list_append_string_list): Rename from
+	eel_string_list_append () which was a confusing name.
+	This API change doesnt affect Nautilus or Eel since neither used
+	this function.
+	
+2001-07-20  Maciej Stachowiak  <mjs@eazel.com>
+
+	* eel/eel-ctree.c: (draw_row): Fix bugzilla.eazel.com bug 8387
+	(Dragging elements to a folder entry should make it hilighted) by
+	making the text of the drop target row bold in addition to making
+	the icon darker. I think this looks a lot better.
+
+2001-07-20  Andy Hertzfeld  <andy@differnet.com>
+
+	* eel/eel-background.c:
+	(eel_background_receive_dropped_background_image):
+	remove the hack of using the "reset.png" filename to reset the
+	background; it's now done with a special drop type.
+	
+2001-07-18  Darin Adler  <darin@bentspoon.com>
+
+	* acconfig.h: Also need to add GNOME_EXPLICIT_TRANSLATION_DOMAIN
+	here for autoheader.
+
+2001-07-17  Darin Adler  <darin@bentspoon.com>
+
+	* configure.in: Add GNOME_EXPLICIT_TRANSLATION_DOMAIN so messages
+	within eel get translated properly.
+
+2001-07-17  jacob berkman  <jacob@ximian.com>
+
+	* eel/eel-font-manager.c (collect_fonts_from_directory): fix an
+	obvious tyop
+
+2001-07-11  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-font-manager.c: (collect_fonts_from_directory):
+	Fix SEGFAULT at startup caused by NULL MIME type.
+
+2001-07-09  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-extensions.c: (eel_art_drect_get_width),
+	(eel_art_drect_get_height), (eel_art_irect_assign_end_points),
+	(eel_art_drect_assign_end_points), (eel_art_ipoint_offset_by),
+	(eel_art_point_equal):
+	More ArtDRect versions of point/rectangle stuff.
+	
+==== eel 1.0.1 ====
+
+2001-07-05  Darin Adler  <darin@bentspoon.com>
+
+	* configure.in: Bumped version to 1.0.1
+	* NEWS: Some notes about recent changes.
+
+2001-06-26  Alexander Larsson  <alla@lysator.liu.se>
+
+	* eel/eel-font-manager.c (eel_font_manager_get_default_font,
+	eel_font_manager_get_default_bold_font):
+	Don't keep looking for the files after we found them the first
+	time.
+
+2001-06-26  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-extensions.c: (eel_art_irect_is_empty): New function.
+	(eel_art_ipoint_offset_by): New function.
+
+2001-06-25  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-extensions.c: (eel_dimensions_clamp),
+	(test_dimensions_clamp), (eel_self_check_art_extensions):
+	New constant points.  New function to clamp dimensions .
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c: (eel_string_list_insert_string_list):
+	New function to insert a string list into another.
+	
+2001-06-06  Ramiro Estrugo  <ramiro@fateware.com>
+
+        Patch from Frederic Devernay <Frederic.Devernay@sophia.inria.fr> 
+        (tweaked by me to | bits instead of +) to make the Eel Font Manager 
+        follow links when determining the mime type of fonts. 
+ 
+	* eel/eel-font-manager.c: (collect_fonts_from_directory),
+	(eel_font_manager_file_is_scalable_font):
+
+2001-06-06  Darin Adler  <darin@bentspoon.com>
+
+	Integrated a revised version of a patch by Eungkyu Song
+	<eungkyu@sparcs.org> to make the font manager code accept either a
+	tab or a space as the separator.
+
+	* eel/eel-font-manager.c: (font_description_table_add): Use
+	strpbrk instead of strstr.
+
+2001-06-06  Alex Larsson  <alexl@redhat.com>
+
+	* eel/eel-background.[ch] (eel_background_draw):
+	This function now takes both the src and dest coordinates.
+	(eel_background_draw_to_drawable): Update to the new
+	eel_background_draw API.
+	* eel/eel-background-canvas-group.c
+	(eel_background_canvas_group_draw): Update to the new
+	eel_background_draw API.
+
+2001-06-05  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-gtk-container.c: (eel_gtk_container_child_size_allocate):
+	Move the critical after the child check for NULL since we allow
+	a NULL child to be given.
+	
+2001-06-05  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-art-extensions.c: (eel_art_ipoint_clamp),
+	(test_irect_intersect), (test_irect_union), (test_ipoint_clamp),
+	(eel_self_check_art_extensions):
+	* eel/eel-art-extensions.h:
+	New function to clamp a point plus checks for that.
+	
+2001-06-04  Ramiro Estrugo  <ramiro@fateware.com>
+
+	* eel/eel-debug-drawing.h:
+	* eel/eel-debug-drawing.c:
+	(eel_debug_show_pixbuf_in_external_viewer):
+	Replace the hard coded eog viewer to one that can accept any
+	external viewer.  I ran into the problem that the Eog binary
+	changed names from "eog" to "eog-shell" so I decided to make this
+	debug feature more generic.
+	
+	* eel/Makefile.am:
+	* eel/eel.h:
+	* eel/eel-gtk-container.h:
+	* eel/eel-gtk-container.c: (eel_gtk_container_child_expose_event),
+	(eel_gtk_container_child_map), (eel_gtk_container_child_unmap),
+	(eel_gtk_container_child_add), (eel_gtk_container_child_remove),
+	(eel_gtk_container_child_size_allocate):
+	New files.  Functions to simplify the implementations of
+	GtkContainer widgets.
+	
+	* eel/eel-gtk-extensions.c: (eel_gtk_widget_standard_realize):
+	Dont hardcode the event mask.  Use gtk_widget_get_events()
+	instead.  Also document this fact so that users are aware that
+	they need to set the event mask using gtk_widget_set_events () -
+	which is the right Gtk+ way anyway.
+
+	* eel/eel-image-chooser.c: (eel_image_chooser_initialize):
+	Call gtk_widget_set_events() with the right event mask for the
+	image chooser.
+
+	* eel/eel-labeled-image.c: (eel_labeled_image_size_allocate),
+	(eel_labeled_image_expose_event), (eel_labeled_image_map),
+	(eel_labeled_image_unmap), (eel_labeled_image_add),
+	(eel_labeled_image_remove):
+	Simplify the implementations of GtkContainer methods by using the
+	functions in eel-gtk-container.[ch].  Theres probably other
+	widgets in Eel and Nautilus that could benefit from this
+	simplification/code sharing as well.
+
+	* eel/eel-self-checks.c: (eel_check_double_result):
+	* eel/eel-self-checks.h:
+	New checks for double values.
+	
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c: (eel_string_list_new_from_string_array):
+	New function to allocate a EelStringList from a regular C string
+	array.
+	(eel_string_list_assign_from_string_array): New function to assign
+	a regular C string array to a EelStringList.
+	(eel_string_list_reverse): New function to reverse a string list.
+	(test_string_list_reverse), (test_new_from_string_array),
+	(eel_self_check_string_list): Self checks for the above new
+	functions.
+
+	* test/dumb-box.c: (eel_dumb_box_initialize_class),
+	(eel_dumb_box_expose): Some dumb cleanup of old comment cruft.
+	* test/test-eel-font-simple.c: (main):
+	* test/test-eel-font.c: (main):
+	* test/test-eel-glyph-simple.c: (main):
+	* test/test-eel-glyph.c: (main):
+	* test/test-eel-smooth-text-layout.c: (main):
+	Update for changes in debug function to view pixbufs in external
+	viewers.
+	
+2001-06-04  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-font-manager.c: (collect_fonts_from_directory),
+	(eel_font_manager_file_is_scalable_font):
+	* test/test-eel-background.c: (main):
+	* test/test-eel-label.c: (widget_set_eel_background_image):
+	* test/test.c: (test_gtk_widget_set_background_image):
+	Fix all code that prepends "file://" to try to make a URI from a
+	path. Use gnome_vfs_get_uri_from_local_path instead.
+
+2001-06-01  Alex Larsson  <alexl@redhat.com>
+
+	* eel/eel-background.c (eel_background_draw_flat_box):
+	Only render area if we get passed an area.
+	(eel_background_draw): Do correct translation of
+	coordinates for destination drawable.
+
+2001-06-01  Darin Adler  <darin@bentspoon.com>
+
+	* configure.in: Bump version number to 1.0.0.1
+	* NEWS: Mention the plans to release 1.0.1
+
+2001-06-01  Darin Adler  <darin@bentspoon.com>
+
+	* eel/eel-list.c: (eel_list_button_release): Fixed code that was
+	passing x twice instead of x and y that prevented single-click
+	from working in the Nautilus list view. Also did some other
+	cleanups to behavior when multiple buttons are pressed at once.
+
+2001-05-22  John Harper  <jsh@pixelslut.com>
+
+	Fallout from fixing bug 8220 (Having Ctrl as default "modifier
+	key used for default WM shortcuts" breaks everything...):
+
+	* eel/eel-list.c (eel_list_keyboard_move_to,
+	eel_list_keyboard_space): changed to use Control modifier
+	instead of Alt
+
+2001-05-20  Darin Adler  <darin@eazel.com>
+
+	Checked in change for Miguel Rodríguez Pérez
+	<migras@atlas.uvigo.es>.
+
+	* eel/eel-preferences-item.c 
+	(preferences_item_update_editable_string): 
+	(preferences_item_update_editable_integer): Only update
+	text if it changed.
+
+2001-05-19  George Lebl  <jirka@5z.com>
+ 
+	* configure.in, po/cs.po: Add czech translations
+ 
+2001-05-17  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-gtk-extensions.c:
+	(eel_gtk_signal_connect_full_while_alive): Weakened a
+	too-strong g_return_if_fail.
+
+2001-05-09  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-self-checks.h:
+	* eel/eel-self-checks.c:
+	Make eel_after_check() and eel_report_check_failure() public so
+	that third party projects can use them to construct their own
+	checks and still be able to use the same check failure reporting
+	machinery.
+	
+2001-05-08  Darin Adler  <darin@eazel.com>
+
+	* RENAMING: Refine the renaming ideas.
+
+==== eel 1.0 ====
+
+2001-05-04  Robin * Slomkowski  <rslomkow@rslomkow.org>
+
+	* configure.in: fixed lirsvg test for 1.0.x
+
+2001-05-04  Robin * Slomkowski  <rslomkow@rslomkow.org>
+
+	* configure.in: upped version to 1.0 and changed upped
+	  dependance too librsvg 1.0.0
+
+2001-05-04  Robin * Slomkowski  <rslomkow@rslomkow.org>
+
+	* configure.in: upped version to 0.1
+
+2001-05-04  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-preferences-item.c:
+	(preferences_item_create_editable_string):
+	Restore a silly hack for the sake of Nautilus.  Id like to
+	properly fix this, but not so close to a release.
+	
+2001-05-04  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* configure.in:
+	Add GConf and OAF dependency.
+
+	* eel.spec.in:
+	Add GConf and OAF dependency.  Also add missing BuildRequires
+	entries.
+	
+	* eel/Makefile.am:
+	Need to set librsvg cflags directly here, since librsvg does not
+	appear in any public eel headers and thus not exported in
+	eel-config --cflags.
+
+	* eel/eel-dateedit-extensions.c:
+	* eel/eel-dateedit-extensions.h:
+	* eel/eel-gconf-extensions.c:
+	* eel/eel-gconf-extensions.h:
+	* eel/eel-generous-bin.c:
+	* eel/eel-generous-bin.h:
+	* eel/eel-lib-self-check-functions.h:
+	* eel/eel-preferences-box.c:
+	* eel/eel-preferences-box.h:
+	* eel/eel-preferences-group.c:
+	* eel/eel-preferences-group.h:
+	* eel/eel-preferences-item.c:
+	* eel/eel-preferences-item.h:
+	* eel/eel-preferences-pane.c:
+	* eel/eel-preferences-pane.h:
+	* eel/eel-preferences.c:
+	* eel/eel-preferences.h:
+	* eel/eel.h:
+	Move over some more stuff over from Nautilus.
+	
+2001-05-03  Darin Adler  <darin@eazel.com>
+
+	* RENAMING: Some renaming ideas.
+
+2001-05-03  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-vfs-extensions.h:
+	* eel/eel-vfs-extensions.c: (eel_make_uri_from_half_baked_uri),
+	(eel_self_check_vfs_extensions): Add new call to make a canonical
+	URI from the kind of half-baked URIs that are used in gmc URL
+	files and in drag and drop. The definition of a half-baked URI is
+	that it starts with "file:" and then has a normal path, without
+	URI escaping.
+
+	* Makefile.am: Fixed a typo.
+	
+2001-05-03  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-gdk-extensions.h: Add an opaque version of the color
+	packing macro.
+	* eel/eel-gdk-extensions.c: (eel_self_check_gdk_extensions): Add
+	checks for color packing macros.
+
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-extensions.c: (eel_art_irect_intersect),
+	(eel_art_irect_union), (eel_dimensions_assign),
+	(eel_dimensions_equal), (eel_art_ipoint_assign),
+	(eel_art_ipoint_equal), (test_intersect), (test_union),
+	(eel_self_check_art_extensions): Some more art extensions.
+	Currently unused in Eel or Nautilus.
+
+	* eel/eel-self-checks.h:
+	* eel/eel-self-checks.c:
+	Add self check machinery for EelArtIPoints.
+	
+	* eel/eel-gdk-pixbuf-extensions.h: Dumb spacing tweak.
+
+2001-05-02  Darin Adler  <darin@eazel.com>
+
+	Fixed bug 8219 (crash under libefence):
+
+	* eel/eel-scalable-font.c: (eel_scalable_font_new),
+	(free_global_font_handle_table): Dup the font names before using
+	them as keys, since the underlying freetype font can last longer
+	than the EelScalableFont.
+
+2001-05-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-debug-drawing.c: (eel_debug_show_pixbuf_in_eog):
+	Update for EOG name change.  eog got renamed to eog-shell.
+	
+2001-05-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* configure.in:
+	Lots of improvement.  Make dealing with dependency libs/cflags simpler.
+
+	* eel/Makefile.am:
+	* test/Makefile.am:
+	Eliminate cut-n-paste disease by using dependency macros defined
+	in configure.in.
+	
+2001-05-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* autogen.sh:
+	Detect whether the invocation of configure failed and print a
+	message accordingly.  We used to always assume that configure was
+	successful and print misleading "now type make to build $PROJECT"
+	messages.
+
+2001-05-01  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* configure.in:
+	Simplify the freetype2 detection insanity by using autoconf macro
+	technology.  The new test should work with both FreeType2 RPMS as
+	well as freetype built from source in any prefix.
+	
+2001-05-01  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-gdk-pixbuf-extensions.c:
+	* eel/eel-gdk-pixbuf-extensions.h:
+	* eel/eel-glyph.c:
+	* eel/eel-glyph.h:
+	* eel/eel-label.c:
+	* eel/eel-scalable-font.c:
+	* eel/eel-scalable-font.h:
+	* eel/eel-smooth-text-layout.c:
+	* eel/eel-smooth-widget.c:
+	* test/test-eel-font-simple.c:
+	* test/test-eel-font.c:
+	* test/test-eel-glyph-simple.c:
+	* test/test-eel-glyph.c:
+	* test/test-eel-smooth-text-layout.c:
+	More work on changing parameters for functions that accept and
+	return ArtIRect, EelArtIPoint, ArtDRect, EelDimensions to pass by
+	value instead of by pointer.
+
+2001-05-01  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* test/Makefile.am:
+	Add include flag for test directory.
+	
+2001-05-01  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-image-chooser.c:
+	Respect the GtkStyle.
+	
+	* test/.cvsignore:
+	* test/Makefile.am:
+	* test/dumb-box.h:
+	* test/dumb-box.c:
+	* test-eel-gtk-style.c:
+	Add a GtkStyle debugging tool	
+	
+	* test/test-eel-image-chooser.c:
+	Update for style respect changes.
+	
+2001-04-30  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am:
+	Remove some garbage that apparently satan tried to sneak in.
+	
+2001-04-30  Darin Adler  <darin@eazel.com>
+
+	reviewed by: John Sullivan <sullivan@eazel.com>
+
+	Fixed bug 8198 ("New Terminal" does not use GNOME default
+	applications). This involved changing the API, so it requires
+	changes to Nautilus too.
+
+	* eel/eel-glib-extensions.c: (eel_shell_quote): Make it smarter so
+	it doesn't quote simple things with no fancy characters in them.
+	(eel_self_check_glib_extensions): Update test.
+	
+	* eel/eel-gnome-extensions.h:
+	* eel/eel-gnome-extensions.c: (try_terminal_command),
+	(try_terminal_command_argv), (get_terminal_command_prefix): New
+	functions, used to implement eel_gnome_open_terminal. These look
+	at the gnome-config setting that controls which terminal program
+	is used.
+	(eel_gnome_make_terminal_command): New public function. We've now
+	eliminated the concept of just getting the name of a terminal
+	program.
+	(eel_gnome_open_terminal): Use eel_gnome_make_terminal_command to
+	do the hard part.
+
+2001-04-30  John Sullivan  <sullivan@eazel.com>
+
+	Fixed bug 6234 (Escape should close Properties window)
+	Fixed bug 6271 (Close dialogs with Escape to match GNOME standard)
+
+	* eel/eel-gtk-extensions.c:
+	(eel_gtk_window_event_is_close_accelerator): Close dialogs with
+	Escape as well as Control-W. (non-GnomeDialogs can either call 	
+	eel_gtk_window_set_up_close_accelerator to arrange this, or can call
+	this querying function directly).
+
+2001-04-30  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-art-extensions.c:
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-gtk-extensions.c:
+	* eel/eel-art-gtk-extensions.h:
+	* eel/eel-clickable-image.c:
+	* eel/eel-debug-drawing.c:
+	* eel/eel-debug-drawing.h:
+	* eel/eel-gdk-pixbuf-extensions.c:
+	* eel/eel-gdk-pixbuf-extensions.h:
+	* eel/eel-glyph.c:
+	* eel/eel-glyph.h:
+	* eel/eel-gnome-extensions.c:
+	* eel/eel-gnome-extensions.h:
+	* eel/eel-image-chooser.c:
+	* eel/eel-image-table.c:
+	* eel/eel-image-with-background.c:
+	* eel/eel-image.c:
+	* eel/eel-label.c:
+	* eel/eel-labeled-image.c:
+	* eel/eel-region.h:
+	* eel/eel-smooth-text-layout.c:
+	* eel/eel-smooth-text-layout.h:
+	* eel/eel-smooth-widget.c:
+	* eel/eel-smooth-widget.h:
+	* eel/eel-wrap-table.c:
+	* test/test-eel-font.c:
+	* test/test-eel-glyph-simple.c:
+	* test/test-eel-glyph.c:
+	* test/test-eel-pixbuf-tile.c:
+	* test/test-eel-smooth-text-layout.c:
+	* test/test.c:
+	Change parameters for functions that accept and return ArtIRect,
+	EelArtIPoint, ArtDRect, EelDimensions to pass by value instead of
+	by pointer.
+	
+2001-04-29  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-enumeration.c: (eel_self_check_enumeration):
+	Add one more check.
+	
+	* eel/eel-string-picker.h:
+	* eel/eel-string-picker.c: (eel_string_picker_set_string_list),
+	(eel_string_picker_insert_string),
+	(eel_string_picker_insert_separator):
+	Add support for separators.
+	
+2001-04-26  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-extensions.c: (eel_art_irect_align),
+	(eel_dimensions_are_empty), (eel_art_irect_assign_dimensions),
+	(eel_self_check_art_extensions): Change constants to be lower
+	case.  Also declare them as "extern const" and not just "extern."
+
+	* eel/eel-art-gtk-extensions.c: (eel_gdk_rectangle_to_art_irect),
+	(eel_gdk_window_get_bounds),
+	(eel_gdk_window_get_screen_relative_bounds),
+	(eel_gtk_widget_get_bounds), (eel_gtk_widget_get_dimensions),
+	(eel_gtk_widget_get_preferred_dimensions),
+	(eel_gdk_window_clip_dirty_area_to_screen),
+	(eel_gdk_window_get_dimensions):
+	* eel/eel-debug-drawing.c: (debug_pixbuf_viewer_size_request):
+	* eel/eel-gdk-pixbuf-extensions.c: (eel_gdk_pixbuf_get_dimensions),
+	(eel_gdk_pixbuf_intersect):
+	* eel/eel-glyph.c: (eel_glyph_get_dimensions),
+	(eel_glyph_intersect):
+	* eel/eel-image-chooser.c: (image_chooser_get_partial_dimensions):
+	* eel/eel-image.c: (image_get_pixbuf_dimensions),
+	(image_get_pixbuf_bounds), (image_get_tile_dimensions):
+	* eel/eel-label.c: (label_composite_text_callback_cached),
+	(label_get_text_dimensions), (label_get_text_bounds),
+	(label_get_content_dimensions), (label_get_content_bounds),
+	(label_get_tile_dimensions):
+	* eel/eel-labeled-image.c: (labeled_image_get_image_dimensions),
+	(labeled_image_get_label_dimensions),
+	(labeled_image_get_image_bounds_fill),
+	(eel_labeled_image_get_image_bounds),
+	(labeled_image_get_label_bounds_fill),
+	(eel_labeled_image_get_label_bounds),
+	(labeled_image_get_content_dimensions),
+	(labeled_image_get_content_bounds):
+	* eel/eel-scalable-font.c: (eel_scalable_font_measure_text):
+	* eel/eel-smooth-text-layout.c:
+	(eel_smooth_text_layout_get_dimensions):
+	* eel/eel-smooth-widget.c: (smooth_widget_get_tile_origin_point),
+	(eel_smooth_widget_get_tile_bounds),
+	(eel_smooth_widget_get_preferred_dimensions):
+	* eel/eel-viewport.c: (eel_viewport_get_scroll_offset):
+	* eel/eel-wrap-table.c: (wrap_table_art_irect_max_dimensions),
+	(wrap_table_get_max_child_dimensions),
+	(wrap_table_get_content_dimensions),
+	(wrap_table_get_content_bounds), (wrap_table_get_scroll_offset):
+	Update for art extensions constants renaming.
+	
+2001-04-26  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-image-chooser.c: (image_chooser_motion_notify_event),
+	(image_chooser_button_press_event),
+	(image_chooser_button_release_event):
+	Use pointer grab technology to prevent the list from getting
+	events from unrelated widgets.
+	
+2001-04-26  John Sullivan  <sullivan@eazel.com>
+
+	* eel/eel-list.c: (eel_list_get_cell_hit_rectangle), (draw_cell):
+	Made drawing and hit-testing code immune to NULL text. This was
+	spewing out tons of complaints before in search results view
+	(from the fancy date-squeezing code).
+
+2001-04-26  John Sullivan  <sullivan@eazel.com>
+
+	Merged from nautilus-1 branch:
+
+	2001-03-30  Ramiro Estrugo  <ramiro@eazel.com>
+
+	reviewed by: John Harper  <jsh@eazel.com>
+
+	* eel/eel-stock-dialogs.c: (create_message_box):
+	Make sure the label is not NULL before changing its line wrap.
+	This works around the crashing problem.  Why the label is NULL is
+	still a mystery.
+
+2001-04-26  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-debug.h:
+	* eel/eel-debug.c: (call_default_log_handler_with_better_message):
+	Add comment about handling cases where we're out of
+	memory. Removed unneeded NULL-handling code.
+	(eel_assert_computed_str), (eel_str_equal_with_free): Removed an
+	old unused feature.
+	
+	* eel/eel-gnome-extensions.c: Formatting tweaks.
+
+2001-04-26  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-enumeration.h:
+	* eel/eel-enumeration.c:
+	(eel_enumeration_get_nth_description_translated),
+	(eel_enumeration_id_get_nth_description),
+	(eel_enumeration_id_get_nth_description_translated):
+	New functions to fetch translated descriptions.
+	
+2001-04-26  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am:
+	Build the image chooser widget.
+	
+	* eel/eel-art-gtk-extensions.h:
+	* eel/eel-art-gtk-extensions.c: (eel_gdk_get_pointer_position):
+	New function to obtain the pointer position as a point.
+	
+	* eel/eel-caption.h:
+	* eel/eel-caption.c: (eel_caption_initialize_class),
+	(eel_caption_destroy), (caption_show_all),
+	(eel_caption_set_show_title):
+	Fix some rotten comments and other minor style tweaks.  Remove
+	unused defines.  Fix wrongly named show_all method, a cut-n-paste
+	mistake.
+	
+	* eel/eel-gdk-extensions.h:
+	* eel/eel-gdk-extensions.c: (eel_gdk_rgb_to_color):
+	Return the resulting color as a structure instead of a pointer.
+	
+	* eel/eel-gtk-extensions.h:
+	* eel/eel-gtk-extensions.c: (eel_gtk_widget_standard_realize),
+	(eel_gtk_widget_standard_draw),
+	(eel_gtk_bin_standard_size_allocate),
+	(eel_gtk_bin_standard_size_request):
+	Implementations of some standard gtk widget methods.
+	
+	* eel/eel-label.c:
+	(eel_label_set_solid_background_color),
+	(eel_label_set_text_color): Fix a bug where the label
+	wouldnt properly update when some color attributes changed because
+	of a stale solid pixbuf cache.
+
+	* eel/eel-radio-button-group.h:
+	* eel/eel-radio-button-group.c:
+	(eel_radio_button_group_clear): New function to clear out all the
+	items in the group.
+	(eel_radio_button_group_initialize_class):
+	(eel_radio_button_group_initialize),
+	(eel_radio_button_group_destroy), (button_toggled),
+	(eel_radio_button_group_insert):
+	Nautilus style tweaks.  Remove unused constant.  Change signal
+	signature to be simpler.  Remove the signal data nastiness and let
+	the caller find out the active item by using the getter methods
+	instead.  	
+	(eel_radio_button_group_get_active_index),
+	(eel_radio_button_group_set_active_index): Use signed integers for
+	the active index.
+
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c: (eel_string_list_append):
+	New function to append one string list to another.
+	
+	* eel/eel-viewport.h:
+	* eel/eel-viewport.c: (eel_gtk_scrolled_window_add_with_viewport):
+	New convenience function to create scrolled windows with an
+	EelViewport as the child.
+	
+	* eel/eel.h:
+	Add eel-image-chooser.h
+	
+	* test/.cvsignore:
+	* test/Makefile.am:
+	Build the image chooser test.
+
+	* test/test.h:
+	Include eel.h instead of the individual headers.
+	
+2001-04-26  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-image-chooser.h:
+	* eel/eel-image-chooser.c:
+	New widget to choose an image from a list.
+	
+	* test/test-eel-image-chooser.c:
+	Test program for the new widget.
+	
+2001-04-24  Darin Adler  <darin@eazel.com>
+
+	reviewed by: Ramiro Estrugo <ramiro@eazel.com>
+
+	* eel/eel-debug.c:
+	(eel_make_warnings_and_criticals_stop_in_debugger):
+	Add more log domains, most importantly "".
+
+2001-04-20  John Harper  <jsh@eazel.com>
+
+	reviewed by: Darin Adler  <darin@eazel.com>
+
+	* eel/eel-gnome-extensions.h, eel/eel-gnome-extensions.c
+	(eel_gnome_win_hints_get_area,
+	eel_gnome_win_hints_get_current_area,
+	eel_gnome_win_hints_set_area,
+	eel_gnome_win_hints_set_current_area): new functions
+
+	* eel/eel-gtk-extensions.c (eel_gtk_window_present): changed to
+	use the above new functions
+
+	* eel/eel-gtk-extensions.h, eel/eel-gtk-extensions.c
+	(eel_gtk_window_is_on_current_workspace_and_area): new function
+
+2001-04-20  jacob berkman  <jacob@ximian.com>
+
+	* eel/eel-gtk-extensions.c (eel_gtk_window_present): make sure the
+	window is also on the current viewport/area.  sawfish needs to be
+	updated to listen to _WIN_AREA changes though.
+
+2001-04-20  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-font-manager.c: (try_using_font_server):
+	Remove printf left in by accident.
+	
+2001-04-20  Ramiro Estrugo  <ramiro@eazel.com>
+
+	Fix for 8084 - Not all fonts are added to the font list in
+	preferences dialog.
+	
+	* eel/eel-font-manager.c: (try_using_font_server),
+	(ensure_local_font_table):
+	Try more than just one know location for the font server
+	configuation file.  If different systems (like different Linux
+	distributions) put this in other places, then we'll have to update
+	this code as we know more.  Seems lame, but I guess if
+	distributors and "users" have a choice where to put config files,
+	then we have no choice but comply.
+	
+2001-04-20  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-glib-extensions.h:
+	* eel/eel-glib-extensions.c: (eel_get_operating_system_name),
+	(eel_self_check_glib_extensions):
+	New function to find out the system name.
+	
+2001-04-20  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* configure.in:
+	Use /usr/X instead of /usr/openwin which is the new way on
+	solaris.
+	
+2001-04-20  Ramiro Estrugo  <ramiro@eazel.com>
+
+	Fix for bug 7847 - SOLARIS: When Smoother Graphics turned on -
+	cannot change Fonts.
+
+	* acconfig.h:
+	* configure.in:
+	* eel/eel-font-manager.c: (ensure_local_font_table):
+	Add support for reaping fonts even when the system is not using
+	the font server.
+	
+	* eel/eel-string-list.c: (eel_self_check_string_list):
+	Add a few more checks for string tokenizing.
+	
+2001-04-19  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am: Add a log domain define for Eel.
+	* eel/eel-debug.c: 
+	(eel_make_warnings_and_criticals_stop_in_debugger): Remove
+	G_LOG_DOMAIN item as it will be the same as Eel for this module.
+	Add Gdk-Pixbuf to the list of standard log domains.
+
+2001-04-19  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-debug.c:
+	(eel_make_warnings_and_criticals_stop_in_debugger):
+	Add a list of "standard" domains for which this debugging feature
+	is always turned on.
+	
+2001-04-19  Darin Adler  <darin@eazel.com>
+
+	reviewed by: Ramiro Estrugo <ramiro@eazel.com>
+
+	* eel/eel-debug.c: (get_process_name),
+	(call_default_log_handler_with_better_message), (log_handler),
+	(set_log_handler),
+	(eel_make_warnings_and_criticals_stop_in_debugger):
+	Add the process name and number prefix to all lines. Also fix
+	the use of getuid where we meant to use getpid. Also tweak
+	the names of things a bit to make it nicer.
+
+2001-04-19  Ramiro Estrugo  <ramiro@eazel.com>
+
+	reviewed by: Darin Adler  <darin@eazel.com>
+
+	* eel/eel-debug.c: (get_process_command_line): A function to try
+	and obtain the command line used to invoke the process.
+	(eel_stop_after_default_log_handler):  Print out the process id
+	and possible command line to make the warning/critical more
+	useful.
+
+2001-04-18  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-canvas-rect.c: (canvas_item_update_svp_no_repaint),
+	(canvas_item_update_svp_clip_no_repaint), (rect_update): Renamed
+	the internal functions to make it more clear what they do.
+	(eel_canvas_rect_initialize_class): Improved comment.
+	(rects_intersect): Changed name.
+	(diff_rects): Update for new name of rects_intersect.
+	(test_rects_intersect), (eel_self_check_canvas_rect): Added tests
+	for rects_intersect.
+
+2001-04-18  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-canvas-rect.c: (rect_update): Removed a bunch of code
+	that's not needed since we decided to optimize only the case
+	where the canvas is an anti-aliased one.
+
+2001-04-18  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-canvas-rect.c: (rect_update): Fixed backwards logic that
+	made it never draw the outline.
+
+2001-04-18  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-canvas-rect.c: (make_drect): New function.
+	(make_empty_drect): New function.
+	(make_rect_vpath): Changed to take ArtDRect.
+	(eel_canvas_item_update_svp), (eel_canvas_item_update_svp_clip):
+	Stole functions from GnomeCanvas code, because we need versions
+	that don't do a request_update.
+	(canvas_request_update_rect): New function.
+	(rect_update): Changed to do smart calculation about what to
+	update using the diff_rects function.
+	(diff_rects_guts), (diff_rects): New implementation that doesn't
+	use macros. Also changed to leave out empty rectangles.
+	(eel_self_check_canvas_rect): Updated tests that involve empty
+	rectangles and added some new ones.
+
+2001-04-18  Christopher James Lahey  <clahey@ximian.com>
+
+	* eel/eel-canvas-rect.c (intersect_rectangles): Fixed the
+	intersect_rectangles function to have rectangles that are tangent
+	return as not intersecting.
+	(eel_self_check_canvas_rect): Fixed the tests.
+
+2001-04-18  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-canvas-rect.c: (rect_update): Call diff_rectangles so we
+	don't get an unused function warning.
+	(diff_rectangles): Took out of #if 0 and made it compile without
+	warnings.
+	(test_diff_rectangles): Test function that uses string for result.
+	(eel_self_check_canvas_rect): Added two self-tests. The one that
+	currently fails is commented out.
+
+2001-04-18  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-canvas-rect.h:
+	* eel/eel-canvas-rect.c: (set_gc_foreground), (set_stipple),
+	(set_outline_gc_width), (re_update_shared), (re_get_bounds),
+	(make_rect_vpath), (rect_update): Copied the update function
+	and everything it needs in here, so we can prepare to modify it.
+
+2001-04-18  Christopher James Lahey  <clahey@ximian.com>
+
+	* eel/eel-canvas-rect.c: Added some tests #ifdefed out.  Wrote the
+	diff and intersection functions.
+
+2001-04-18  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-canvas-rect.c: (eel_self_check_canvas_rect):
+	* eel/eel-lib-self-check-functions.h:
+	Added a self-check function for EelCanvasRect.
+
+	* eel/eel-self-checks.c: (eel_exit_if_self_checks_failed):
+	Formatting tweak.
+
+2001-04-18  Darin Adler  <darin@eazel.com>
+
+	* eel/Makefile.am:
+	* eel/eel-canvas-rect.c:
+	* eel/eel-canvas-rect.h:
+	Added new class that Chris Lahey and I are working on should make
+	the selection rectangle in Nautilus much faster.
+
+2001-04-18  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am: Add the generated files to the CLEANFILES so
+	that 'make clean' gets rid of them properly.
+
+2001-04-18  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-enumeration.h:
+	* eel/eel-enumeration.c: (eel_enumeration_contains_name),
+	(eel_enumeration_id_contains_name), (eel_self_check_enumeration):
+	New functions to check whether an enumeration contains a specific
+	name.
+	
+	* eel/eel-string-picker.h:
+	* eel/eel-string-picker.c: (eel_string_picker_initialize),
+	(eel_string_picker_destroy), (option_menu_activate_callback),
+	(menu_item_set_sensitivity_callback),
+	(menu_item_update_sensitivity),
+	(string_picker_update_menu_sensitivities),
+	(eel_string_picker_set_insensitive_list):
+	Add support for installing a list of insensitive choices.
+	(eel_string_picker_set_string_list): Make sure the list is
+	different before actually doing any work.
+	(eel_string_picker_get_string_list),
+	(eel_string_picker_get_selected_string),
+	(eel_string_picker_set_selected_string),
+	(eel_string_picker_set_selected_string_index),
+	(eel_string_picker_insert_string), (eel_string_picker_contains),
+	(eel_string_picker_get_index_for_string),
+	(eel_string_picker_clear): Some minor tweaking to conform with
+	Nautilus style some more.
+	
+2001-04-17  Darin Adler  <darin@eazel.com>
+
+	* eel/Makefile.am:
+	* eel/eel.h:
+	Take eel-dnd.h out. This should go back to Nautilus at some
+	point, I think.
+
+	* eel/eel-dnd.h:
+	* eel/eel-dnd.c:
+	(is_path_that_gnome_uri_list_extract_filenames_can_parse),
+	(add_one_compatible_uri), (eel_drag_drag_data_get): Another cut
+	at making the kind of "URL" that is compatible with bad old
+	URL-parsing code.
+
+2001-04-17  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c: 
+	(eel_string_list_copy): Better name for this function.  Dont need
+	case_sensitive parameter since it can be fetched from the
+	string_list we are about to copy.
+	(eel_string_list_as_g_slist): Change list variable name to make
+	things a tiny bit clearer.
+	(eel_string_list_as_string): Better name for this function.  Add a
+	num_strings parameter that can be used to limit the number of
+	strings from the list used to make the new concatenated string.
+	(eel_self_check_string_list):  Update for _as_string changes.
+
+	* eel/eel-enumeration.c: (eel_enumeration_copy),
+	(eel_enumeration_get_names): Update for _copy changes.
+
+	* eel/eel-gdk-font-extensions.c: (xlfd_string_replace_nth): 
+	Update for _as_string changes.
+
+	* eel/eel-self-checks.c: (eel_check_string_list_result): Update
+	for _as_string changes.
+
+	* eel/eel-string-picker.c: (eel_string_picker_get_string_list),
+	(eel_string_picker_insert_string): Update for _copy changes.
+
+2001-04-17  Darin Adler  <darin@eazel.com>
+
+	* eel/eel-dnd.c: (add_one_path_with_file_prefix): Coddle existing
+	drag and drop recipients who use the gnome-libs helper functions.
+	For them, we must provide a "URL" (quotes intentional) that is
+	just a full path with "file:" stuck on the beginning.
+
+2001-04-17  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c:
+	(eel_string_list_new_from_g_slist): New function to create string
+	lists from GLists.
+	(eel_string_list_new_from_g_list), (eel_string_list_as_g_slist):
+	Better names for the GLlist and GSList functions.
+	(eel_string_list_as_concatenated_string): Return an empty string
+	("") if the input string list is NULL.
+	(eel_string_list_for_each): Make the for_each iterator a little
+	more type safe.
+	(eel_self_check_string_list): New checks for GSList functions.
+	New function to create string lists from GLists.  Better names for
+	the GLlist and GSList functions.
+	
+2001-04-17  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c: (eel_string_list_new_from_slist),
+	(eel_string_list_as_slist), (eel_self_check_string_list):
+	New function to create string lists from slists.	
+	
+2001-04-17  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c: (eel_string_list_new),
+	(eel_string_list_new_from_string),
+	(eel_string_list_new_from_string_list),
+	(eel_string_list_new_from_tokens),
+	(eel_string_list_assign_from_string_list),
+	(eel_string_list_insert), (eel_string_list_nth),
+	(eel_string_list_nth_as_integer), (eel_string_list_modify_nth),
+	(eel_string_list_remove_nth), (eel_string_list_contains),
+	(eel_string_list_find_by_function), (eel_string_list_get_length),
+	(eel_string_list_clear), (eel_string_list_equals),
+	(eel_string_list_as_g_slist),
+	(eel_string_list_get_index_for_string),
+	(eel_string_list_as_concatenated_string), (eel_string_list_sort),
+	(eel_string_list_sort_by_function),
+	(eel_string_list_remove_duplicates), (eel_string_list_for_each),
+	(eel_string_list_get_longest_string),
+	(eel_string_list_get_longest_string_length), (str_is_equal),
+	(eel_self_check_string_list):
+	Change implementation of string list to use a GSList instead of a
+	GList.  A few changes to match the nautilus style more.
+
+2001-04-16  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am:
+	Use RSVG_CFLAGS not RSVG_LIBS.
+	
+	* eel/eel-self-checks.c: (eel_check_string_list_result):
+	* eel/eel-self-checks.h:
+	Add support for EelStringList checks.
+	
+	* eel/eel-string-list.h:
+	* eel/eel-string-list.c: (eel_string_list_is_case_sensitive):
+	New function that returns whether the string list is case
+	sensitive or not.
+	
+2001-04-16  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am: Make the self checks header private and dont
+	install it.  Remove some unused include flags and a debug printf.
+
+	* eel/eel.h: Dont include the self checks header since its now
+	private.
+	
+	* test/Makefile.am: Remove some unused include flags.
+
+2001-04-16  Maciej Stachowiak  <mjs@eazel.com>
+
+	* eel/Makefile.am: Fix `make distcheck'.
+
+2001-04-16  Darin Adler  <darin@eazel.com>
+
+	* eel/Makefile.am: Remove stray reference to eel-boxed.defs
+	that was making the Tinderbox unhappy.
+
+2001-04-16  Maciej Stachowiak  <mjs@eazel.com>
+
+	* configure.in, eel/.cvsignore, eel/Makefile.am, eel/eel-types.c,
+	eel/eel-types.h, eel/eel.h, eel/makeenums.pl, eel/maketypes.awk:
+	Automatically generate GtkTypes for the various enumerations in
+	eel like gtk+ and gnome do. This is needed for language bindings.
+
+2001-04-13  Pavel Cisler  <pavel@eazel.com>
+
+	* eel/eel-list.c: (get_cell_text),
+	(eel_list_get_cell_hit_rectangle), (eel_list_item_hit),
+	(eel_list_button_press), (eel_list_button_release):
+	Add proper hit testing to the list view -- items now only get hit when
+	you click on text or an icon, clicking in empty space deselects.
+	
+	* eel/eel-list.c:(eel_list_setup_style_colors):
+	Tweak divider line colors to match Arlo's original spec.
+	
+	* eel/eel-list.c: (draw_cell),
+	(eel_list_get_initial_drag_offset):
+	Some small tweaks.
+
+2001-04-13  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-gdk-font-extensions.c: (eel_gdk_font_get_fixed):
+	Dont use the translated font anymore, thats the old broken way.
+	Try to load just a font (not a fontset) if the first try fails.
+	
+2001-04-12  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/check-program.c: (main):
+	* eel/eel-glib-extensions.c: (eel_g_hash_table_new_free_at_exit):
+	Use NAUTILUS_DEBUG, not EEL_DEBUG for now.
+
+	* eel/eel-font-manager.c: (ensure_local_font_table):
+	Use ~/.nautilus instead of ~/.eel for compatibility.
+	
+2001-04-09  Pavel Cisler  <pavel@eazel.com>
+
+	reviewed by: Mike Engber <engber@eazel.com>
+
+	* eel/eel-ellipsizing-label.c: (recompute_ellipsized_text):
+	* eel/eel-gdk-font-extensions.c: (eel_string_ellipsize),
+	(eel_self_check_ellipsize):
+	* eel/eel-gdk-font-extensions.h:
+	Tweak the API of the ellipsizing functions to make it a little
+	more convenient to use.
+
+2001-04-09  John Sullivan  <sullivan@eazel.com>
+
+	reviewed by: Pavel Cisler  <pavel@eazel.com>
+
+	* eel/eel-list-column-title.h:
+	* eel/eel-list-column-title.c:
+	(eel_list_column_title_queue_draw): New public function.
+	
+	* eel/eel-list.h:
+	* eel/eel-list.c:
+	(eel_list_set_sort_column), (eel_list_set_sort_type): New
+	functions that call eel_clist versions and also make the
+	column titles redraw.
+
+2001-04-08  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-enumeration.h:
+	* eel/eel-enumeration.c: (eel_enumeration_new),
+	(eel_enumeration_copy), (eel_enumeration_free),
+	(eel_enumeration_insert), (eel_enumeration_get_id),
+	(eel_enumeration_get_nth_name),
+	(eel_enumeration_get_nth_description),
+	(eel_enumeration_get_nth_value), (eel_enumeration_get_length),
+	(eel_enumeration_new_from_tokens),
+	(eel_enumeration_get_name_position),
+	(eel_enumeration_get_description_position),
+	(eel_enumeration_get_value_position), (eel_enumeration_get_names),
+	(eel_enumeration_insert_entries),
+	(enumeration_table_free_one_node), (enumeration_table_free),
+	(enumeration_table_get), (enumeration_table_lookup),
+	(enumeration_register), (eel_enumeration_register),
+	(eel_enumeration_lookup), (eel_enumeration_id_get_nth_name),
+	(eel_enumeration_id_get_nth_description),
+	(eel_enumeration_id_get_nth_value),
+	(eel_enumeration_id_get_length),
+	(eel_enumeration_id_get_name_position),
+	(eel_enumeration_id_get_description_position),
+	(eel_enumeration_id_get_value_position),
+	(eel_self_check_enumeration):
+	Add a way to register and query a global preference table using
+	string ids.  Makes it easier to deal with enumerations.  Perhaps
+	we can even lost the non id based functions.
+	
+2001-04-05  Andy Hertzfeld  <andy@eazel.com>
+
+	* eel/eel-gtk-extensions.c: (eel_gtk_marshal_POINTER__POINTER_INT):
+	* eel/eel-gtk-extensions.h:
+	added marshalling function needed for my post-1_0 branch
+	
+2001-04-05  Pavel Cisler  <pavel@eazel.com>
+
+	reviewed by: John Harper  <jsh@eazel.com>
+
+	Code needed to support nice list view column resizing.
+	
+	* eel/eel-gtk-extensions.c:
+	(eel_gtk_marshal_POINTER__INT_INT_POINTER_POINTER):
+	* eel/eel-gtk-extensions.h:
+	Add a marshalling function.
+
+	* eel/eel-list.c: (eel_list_initialize_class), (get_cell_text),
+	(draw_cell):
+	* eel/eel-list.h:
+	Use a signal to get the cell text, formatted for the right width.
+
+2001-04-05  Pavel Cisler  <pavel@eazel.com>
+
+	* eel/Makefile.am:
+	More fixes to not pick up libraries from /usr/lib first.
+	Checking in for Ramiro.
+
+2001-04-05  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am:
+	Put freettype and png libs at end of link line to prevent /usr/lib conflict.
+	
+2001-04-05  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-dnd.h:
+	* eel/eel-dnd.c: (eel_drag_init), (eel_drag_selection_item_new),
+	(drag_selection_item_destroy), (eel_drag_build_selection_list),
+	(eel_drag_items_local), (eel_drag_items_in_trash),
+	(eel_drag_default_drop_action_for_icons):
+	Make some constant private as they were not used anywhere else.
+	Make sure all public structures have an Eel namespace.
+
+	* eel/eel-clist.c:
+	* eel/eel-clist.h:
+	* eel/eel-list.c:
+	* eel/eel-list.h:
+	Indentation.
+
+	* Makefile.am:
+	* eel/eel-string-map.h:
+	* eel/eel-string-map.c:
+	* eel/eel-lib-self-check-functions.h:
+	Retire unused code.
+	
+	* eel/eel-vfs-extensions.h:
+	* eel/eel-vfs-extensions.c:
+	Fix the authors blurb.
+	
+2001-04-04  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am:
+	* eel/eel-clist.c:
+	* eel/eel-clist.h:
+	* eel/eel-ctree.c:
+	* eel/eel-ctree.h:
+	* eel/eel-dnd.c:
+	* eel/eel-dnd.h:
+	* eel/eel-list-column-title.c:
+	* eel/eel-list-column-title.h:
+	* eel/eel-list.c:
+	* eel/eel-list.h:
+	Move clist, ctree, and list widgets over from Nautilus.
+	
+2001-04-04  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel.spec.in:
+	Fix a dumb mistake in how the date was specified.
+
+2001-04-04  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/Makefile.am:
+	* eel/eel-lib-self-check-functions.h:
+	* eel/eel-vfs-extensions.h:
+	* eel/eel-vfs-extensions.c: (eel_read_entire_file),
+	(read_file_close_callback), (read_file_close),
+	(read_file_succeeded), (read_file_failed),
+	(read_file_read_callback), (read_file_read_chunk),
+	(read_file_open_callback),
+	(pthread_eel_read_file_callback_idle_binder),
+	(pthread_eel_read_file_callback_common),
+	(pthread_eel_read_file_synchronous_callback),
+	(pthread_eel_read_file_asynchronous_callback),
+	(pthread_eel_read_file_thread_entry),
+	(pthread_eel_read_file_async),
+	(pthread_eel_read_file_async_cancel), (eel_read_file_async),
+	(eel_read_entire_file_async), (eel_read_file_cancel),
+	(eel_uri_is_trash), (eel_uri_is_trash_folder),
+	(eel_uri_is_in_trash), (eel_format_uri_for_display),
+	(is_valid_scheme_character), (has_valid_scheme),
+	(eel_make_uri_from_input), (file_uri_from_local_relative_path),
+	(eel_make_uri_from_shell_arg), (eel_uri_get_basename),
+	(eel_uri_get_scheme), (is_uri_partial),
+	(remove_internal_relative_components),
+	(eel_uri_make_full_from_relative), (eel_uri_is_local_scheme),
+	(eel_handle_trailing_slashes), (eel_make_uri_canonical),
+	(eel_make_uri_canonical_strip_fragment), (uris_match),
+	(eel_uris_match), (eel_uris_match_ignore_fragments),
+	(eel_is_remote_uri), (eel_make_directory_and_parents),
+	(eel_copy_uri_simple), (eel_self_check_vfs_extensions):
+	Move gnome-vfs extensions over from
+	nautilus/nautilus-file-utilities.[ch]
+	
+2001-04-04  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* HACKING:
+	* README:
+	* RENAMING:
+	* THANKS:
+	Updated to be Eel specific.  Removed crufy leftover from Nautilus
+	move.
+
+	* configure.in:
+	* eel.spec.in:
+	Remove unused popt and imlib depenencies.
+	
+2001-04-04  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/check-program.c: (main):
+	Cleanup a lot of leftover cruft.
+	
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-gtk-extensions.h:
+	* eel/eel-background-canvas-group.c:
+	* eel/eel-background.c:
+	* eel/eel-background.h:
+	* eel/eel-caption-table.c:
+	* eel/eel-caption-table.h:
+	* eel/eel-caption.c:
+	* eel/eel-caption.h:
+	* eel/eel-clickable-image.c:
+	* eel/eel-clickable-image.h:
+	* eel/eel-debug-drawing.c:
+	* eel/eel-debug-drawing.h:
+	* eel/eel-debug.h:
+	* eel/eel-ellipsizing-label.c:
+	* eel/eel-ellipsizing-label.h:
+	* eel/eel-enumeration.h:
+	* eel/eel-font-manager.c:
+	* eel/eel-font-manager.h:
+	* eel/eel-font-picker.c:
+	* eel/eel-font-picker.h:
+	* eel/eel-gdk-extensions.h:
+	* eel/eel-gdk-font-extensions.c:
+	* eel/eel-gdk-font-extensions.h:
+	* eel/eel-gdk-pixbuf-extensions.c:
+	* eel/eel-gdk-pixbuf-extensions.h:
+	* eel/eel-glib-extensions.h:
+	* eel/eel-glyph.c:
+	* eel/eel-glyph.h:
+	* eel/eel-gnome-extensions.h:
+	* eel/eel-graphic-effects.h:
+	* eel/eel-gtk-extensions.h:
+	* eel/eel-image-table.c:
+	* eel/eel-image-table.h:
+	* eel/eel-image.c:
+	* eel/eel-image.h:
+	* eel/eel-label.c:
+	* eel/eel-label.h:
+	* eel/eel-labeled-image.c:
+	* eel/eel-labeled-image.h:
+	* eel/eel-password-dialog.c:
+	* eel/eel-password-dialog.h:
+	* eel/eel-radio-button-group.c:
+	* eel/eel-radio-button-group.h:
+	* eel/eel-region.h:
+	* eel/eel-scalable-font.c:
+	* eel/eel-scalable-font.h:
+	* eel/eel-self-checks.h:
+	* eel/eel-smooth-text-layout-cache.c:
+	* eel/eel-smooth-text-layout-cache.h:
+	* eel/eel-smooth-text-layout.c:
+	* eel/eel-smooth-text-layout.h:
+	* eel/eel-smooth-widget.c:
+	* eel/eel-smooth-widget.h:
+	* eel/eel-stock-dialogs.h:
+	* eel/eel-string-list.c:
+	* eel/eel-string-list.h:
+	* eel/eel-string-map.c:
+	* eel/eel-string-map.h:
+	* eel/eel-string-picker.c:
+	* eel/eel-string-picker.h:
+	* eel/eel-string.h:
+	* eel/eel-text-caption.c:
+	* eel/eel-text-caption.h:
+	* eel/eel-viewport.c:
+	* eel/eel-viewport.h:
+	* eel/eel-wrap-table.c:
+	* eel/eel-wrap-table.h:
+	* eel/eel-xml-extensions.h:
+	Many style and indention changes.
+	
+2001-04-03  Darin Adler  <darin@eazel.com>
+
+	reviewed by: Ramiro
+
+	* eel/Makefile.am: Make a eel-background-canvas-group.h
+	private. Remove duplicate FREETYPE2_LIBS.
+	* eel/eel-glib-extensions.h: Get rid of EEL_MACRO_BEGIN and
+	EEL_MACRO_END (too close to G_STMT_START/END).
+
+2001-04-03  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-ellipsizing-label.c: (recompute_ellipsized_text):
+	Synchronize with Nautilus (for the last time hopefully).
+
+2001-04-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* test/test-eel-label.c:
+	* test/test.h:
+	Remove rogue unused #includes.
+	
+2001-04-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* configure.in:
+	Stuff that goes in eelConf.sh was missing.
+	
+2001-04-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel-config.in:
+	* eelConf.sh.in:
+	Eelify.
+	
+2001-04-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/check-eel:
+	Run checks with --sm-disable so that the session manager will not
+	hang and show dialogs.
+	
+2001-04-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel/eel-background-canvas-group.c:
+	(eel_background_canvas_group_initialize_common):
+	* eel/eel-font-manager.c: (eel_font_manager_get_default_font):
+	* eel/eel-gdk-font-extensions.c:
+	* eel/eel-stock-dialogs.c:
+	(timed_wait_delayed_close_timeout_callback), (timed_wait_free):
+	* eel/eel-text-caption.c:
+	Synchronize with Nautilus.
+	
+2001-04-02  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* acconfig.h:
+	* configure.in:
+	* eel.spec.in:
+	* eel/Makefile.am:
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-gtk-extensions.h:
+	* eel/eel-background-canvas-group.c:
+	(eel_background_canvas_group_initialize_common):
+	* eel/eel-background.c: (eel_background_destroy):
+	* eel/eel-background.h:
+	* eel/eel-caption-table.h:
+	* eel/eel-caption.c: (eel_caption_set_child),
+	(eel_caption_set_extra_spacing):
+	* eel/eel-caption.h:
+	* eel/eel-clickable-image.h:
+	* eel/eel-debug-drawing.c: (eel_debug_show_pixbuf_in_eog):
+	* eel/eel-debug-drawing.h:
+	* eel/eel-debug.h:
+	* eel/eel-ellipsizing-label.h:
+	* eel/eel-entry.c: (emacs_shortcuts_preference_changed_callback),
+	(eel_entry_initialize), (eel_entry_destroy):
+	* eel/eel-entry.h:
+	* eel/eel-enumeration.c: (eel_enumeration_new_from_tokens),
+	(eel_enumeration_get_entry_position),
+	(eel_enumeration_get_value_position),
+	(eel_enumeration_get_entries), (eel_self_check_enumeration):
+	* eel/eel-enumeration.h:
+	* eel/eel-file-utilities.h:
+	* eel/eel-font-factory.c:
+	(eel_font_factory_get_font_from_preferences):
+	* eel/eel-font-factory.h:
+	* eel/eel-font-manager.c: (font_description_table_add),
+	(font_description_table_new), (directory_contains_file),
+	(ensure_local_font_table), (eel_font_manager_get_default_font),
+	(eel_font_manager_get_default_bold_font),
+	(eel_self_check_font_manager):
+	* eel/eel-font-manager.h:
+	* eel/eel-font-picker.h:
+	* eel/eel-gdk-extensions.h:
+	* eel/eel-gdk-font-extensions.c: (eel_string_ellipsize_start),
+	(eel_string_ellipsize_end), (eel_string_ellipsize_middle),
+	(eel_self_check_ellipsize), (eel_self_check_ellipsize_start),
+	(eel_self_check_ellipsize_middle), (eel_self_check_ellipsize_end),
+	(eel_self_check_gdk_font_extensions):
+	* eel/eel-gdk-font-extensions.h:
+	* eel/eel-gdk-pixbuf-extensions.h:
+	* eel/eel-glib-extensions.h:
+	* eel/eel-glyph.h:
+	* eel/eel-gnome-extensions.h:
+	* eel/eel-graphic-effects.h:
+	* eel/eel-gtk-extensions.h:
+	* eel/eel-image-table.h:
+	* eel/eel-image.h:
+	* eel/eel-label.c: (eel_label_set_text):
+	* eel/eel-label.h:
+	* eel/eel-labeled-image.h:
+	* eel/eel-lib-self-check-functions.h:
+	* eel/eel-password-dialog.h:
+	* eel/eel-radio-button-group.h:
+	* eel/eel-region.h:
+	* eel/eel-scalable-font.h:
+	* eel/eel-self-checks.h:
+	* eel/eel-smooth-text-layout-cache.h:
+	* eel/eel-smooth-text-layout.h:
+	* eel/eel-smooth-widget.c:
+	(eel_smooth_widget_global_set_is_smooth),
+	(eel_smooth_widget_register):
+	* eel/eel-smooth-widget.h:
+	* eel/eel-stock-dialogs.h:
+	* eel/eel-string-list.h:
+	* eel/eel-string-map.h:
+	* eel/eel-string-picker.h:
+	* eel/eel-string.h:
+	* eel/eel-text-caption.h:
+	* eel/eel-viewport.h:
+	* eel/eel-wrap-table.h:
+	* eel/eel-xml-extensions.h:
+	* test/Makefile.am:
+	* test/test.c: (eel_pixmap_file):
+	* test/test.h:
+	Synchronize with nautilus.
+	
+2001-03-28  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* eel.spec.in:
+	First pass at making the spec file valid.
+	
+2001-03-28  Ramiro Estrugo  <ramiro@eazel.com>
+
+	* Makefile.am:
+	* acconfig.h:
+	* configure.in:
+	Remove more Nautilus cruft.  Make distcheck now passes.
+	
+2001-03-28  Ramiro Estrugo  <ramiro@eazel.com>
+
+	Change 'nautilus' namespace to 'eel' everywhere.
+	
+	* eel/Makefile.am:
+	* eel/check-program.c: (main):
+	* eel/eel-art-extensions.c: (eel_art_irect_contains_irect),
+	(eel_art_irect_contains_point), (eel_art_irect_hits_irect),
+	(eel_art_irect_equal), (eel_art_drect_equal),
+	(eel_art_irect_is_valid), (eel_art_irect_assign),
+	(eel_art_irect_get_width), (eel_art_irect_get_height),
+	(eel_art_irect_align), (eel_dimensions_empty),
+	(eel_art_irect_assign_dimensions), (eel_art_irect_offset_by),
+	(eel_art_irect_offset_to), (eel_art_irect_scale_by),
+	(eel_art_irect_inset), (eel_art_drect_offset_by),
+	(eel_art_drect_offset_to), (eel_art_irect_offset_by_point),
+	(eel_art_irect_offset_to_point), (eel_art_drect_scale_by),
+	(eel_art_drect_inset), (eel_self_check_art_extensions):
+	* eel/eel-art-extensions.h:
+	* eel/eel-art-gtk-extensions.c: (eel_gdk_rectangle_to_art_irect),
+	(eel_screen_get_dimensions), (eel_gdk_window_get_bounds),
+	(eel_gdk_window_get_screen_relative_bounds),
+	(eel_gtk_widget_get_bounds), (eel_gtk_widget_get_dimensions),
+	(eel_gtk_widget_get_preferred_dimensions),
+	(eel_gdk_window_clip_dirty_area_to_screen),
+	(eel_art_irect_to_gdk_rectangle), (eel_gdk_window_get_dimensions):
+	* eel/eel-art-gtk-extensions.h:
+	* eel/eel-background-canvas-group.c:
+	(eel_background_canvas_group_initialize_class),
+	(eel_background_canvas_group_initialize_common),
+	(eel_background_canvas_group_initialize),
+	(eel_background_canvas_group_supplant_root_class),
+	(eel_background_canvas_group_update),
+	(eel_background_canvas_group_draw),
+	(eel_background_canvas_group_render):
+	* eel/eel-background-canvas-group.h:
+	* eel/eel-background.c: (eel_background_initialize_class),
+	(eel_background_initialize), (eel_background_remove_current_image),
+	(eel_background_destroy), (eel_background_get_combine_mode),
+	(eel_background_set_combine_mode),
+	(eel_background_get_image_placement),
+	(eel_background_set_image_placement_no_emit),
+	(eel_background_set_image_placement), (eel_background_new),
+	(reset_cached_color_info),
+	(eel_background_ensure_gradient_buffered),
+	(fill_canvas_from_gradient_buffer),
+	(eel_background_image_totally_obscures),
+	(eel_background_ensure_image_scaled), (eel_background_pre_draw),
+	(eel_background_draw), (eel_background_draw_to_drawable),
+	(eel_background_draw_to_pixbuf), (draw_pixbuf_tiled_aa),
+	(eel_background_draw_aa), (eel_background_draw_to_canvas),
+	(eel_background_get_color), (eel_background_get_image_uri),
+	(eel_background_set_color_no_emit), (eel_background_set_color),
+	(eel_background_load_image_callback),
+	(eel_background_is_image_load_in_progress),
+	(eel_background_cancel_loading_image),
+	(eel_background_start_loading_image),
+	(eel_background_set_image_uri_helper),
+	(eel_background_set_image_uri),
+	(set_image_and_color_image_loading_done_callback),
+	(eel_background_set_image_uri_and_color),
+	(eel_background_receive_dropped_background_image),
+	(eel_gtk_style_get_default_class), (eel_gdk_window_update_sizes),
+	(eel_background_draw_flat_box),
+	(eel_background_get_gtk_style_class),
+	(eel_background_set_widget_style), (eel_background_is_set),
+	(eel_background_is_loaded), (eel_background_reset),
+	(eel_background_set_up_canvas), (eel_widget_background_changed),
+	(eel_get_widget_background), (eel_widget_has_attached_background),
+	(eel_gtk_widget_find_background_ancestor),
+	(eel_background_is_too_complex_for_gtk_style),
+	(eel_background_is_dark), (eel_background_receive_dropped_color),
+	(eel_self_check_background):
+	* eel/eel-background.h:
+	* eel/eel-caption-table.c: (eel_caption_table_initialize_class),
+	(eel_caption_table_initialize), (caption_table_destroy),
+	(eel_caption_table_resize), (caption_table_index_of_entry),
+	(caption_table_find_next_sensitive_entry), (entry_activate),
+	(eel_caption_table_new), (eel_caption_table_set_row_info),
+	(eel_caption_table_set_entry_text),
+	(eel_caption_table_set_entry_readonly),
+	(eel_caption_table_entry_grab_focus),
+	(eel_caption_table_get_entry_text),
+	(eel_caption_table_get_num_rows):
+	* eel/eel-caption-table.h:
+	* eel/eel-caption.c: (eel_caption_initialize_class),
+	(eel_caption_initialize), (eel_caption_destroy),
+	(eel_font_picker_show_all), (update_title), (eel_caption_new),
+	(eel_caption_set_title_label), (eel_caption_set_show_title),
+	(eel_caption_get_title_label), (eel_caption_get_title_label_width),
+	(eel_caption_set_child), (eel_caption_set_spacing):
+	* eel/eel-caption.h:
+	* eel/eel-clickable-image.c:
+	(eel_clickable_image_initialize_class),
+	(eel_clickable_image_initialize), (eel_clickable_image_destroy),
+	(eel_clickable_image_get_arg), (eel_clickable_image_realize),
+	(label_enter), (label_leave), (label_handle_motion),
+	(label_handle_button_press), (label_handle_button_release),
+	(ancestor_enter_notify_event), (ancestor_leave_notify_event),
+	(ancestor_motion_notify_event), (ancestor_button_press_event),
+	(ancestor_button_release_event),
+	(eel_clickable_image_expose_event),
+	(eel_clickable_image_set_up_pixbufs), (eel_clickable_image_new),
+	(eel_clickable_image_new_from_file_name),
+	(eel_clickable_image_new_solid),
+	(eel_clickable_image_set_prelight):
+	* eel/eel-clickable-image.h:
+	* eel/eel-debug-drawing.c: (debug_pixbuf_viewer_destroy),
+	(debug_pixbuf_viewer_size_request),
+	(debug_pixbuf_viewer_expose_event),
+	(debug_pixbuf_viewer_set_pixbuf),
+	(eel_debug_draw_rectangle_and_cross),
+	(eel_debug_show_pixbuf_in_eog), (eel_debug_show_pixbuf),
+	(eel_debug_pixbuf_draw_point), (eel_debug_pixbuf_draw_rectangle),
+	(eel_debug_pixbuf_draw_rectangle_inset):
+	* eel/eel-debug-drawing.h:
+	* eel/eel-debug.c: (eel_stop_in_debugger),
+	(eel_stop_after_default_log_handler),
+	(eel_set_stop_after_default_log_handler),
+	(eel_make_warnings_and_criticals_stop_in_debugger),
+	(eel_get_available_file_descriptor_count),
+	(eel_str_equal_with_free):
+	* eel/eel-debug.h:
+	* eel/eel-ellipsizing-label.c:
+	(eel_ellipsizing_label_initialize_class),
+	(eel_ellipsizing_label_initialize), (real_destroy),
+	(eel_ellipsizing_label_new), (recompute_ellipsized_text),
+	(eel_ellipsizing_label_set_text), (real_size_request),
+	(real_size_allocate), (real_style_set):
+	* eel/eel-ellipsizing-label.h:
+	* eel/eel-entry.c: (eel_entry_initialize), (eel_entry_new),
+	(eel_entry_new_with_max_length), (eel_entry_destroy),
+	(obscure_cursor), (eel_entry_key_press), (eel_entry_motion_notify),
+	(eel_entry_select_all), (select_all_at_idle),
+	(eel_entry_select_all_at_idle), (eel_entry_set_text),
+	(eel_entry_set_selection), (eel_entry_button_press),
+	(eel_entry_button_release), (eel_entry_insert_text),
+	(eel_entry_delete_text), (eel_entry_selection_clear),
+	(eel_entry_initialize_class):
+	* eel/eel-entry.h:
+	* eel/eel-enumeration.c: (eel_enumeration_new),
+	(eel_enumeration_free), (eel_enumeration_insert),
+	(eel_enumeration_get_nth_entry),
+	(eel_enumeration_get_nth_description),
+	(eel_enumeration_get_nth_value), (eel_enumeration_get_num_entries),
+	(eel_self_check_enumeration):
+	* eel/eel-enumeration.h:
+	* eel/eel-file-utilities.c: (eel_format_uri_for_display),
+	(eel_make_uri_from_input), (file_uri_from_local_relative_path),
+	(eel_make_uri_from_shell_arg), (eel_uri_get_basename),
+	(eel_uri_get_scheme), (eel_uri_make_full_from_relative),
+	(eel_uri_is_trash), (eel_uri_is_trash_folder),
+	(eel_uri_is_in_trash), (eel_uri_is_local_scheme),
+	(eel_handle_trailing_slashes), (eel_make_uri_canonical),
+	(eel_make_uri_canonical_strip_fragment), (uris_match),
+	(eel_uris_match), (eel_uris_match_ignore_fragments),
+	(eel_file_name_matches_hidden_pattern),
+	(eel_file_name_matches_backup_pattern), (eel_make_path),
+	(eel_get_user_directory), (eel_get_desktop_directory),
+	(eel_user_main_directory_exists), (eel_get_pixmap_directory),
+	(eel_is_remote_uri), (eel_pixmap_file), (eel_read_entire_file),
+	(read_file_close), (read_file_succeeded), (read_file_failed),
+	(read_file_read_callback), (read_file_read_chunk),
+	(read_file_open_callback),
+	(pthread_eel_read_file_callback_idle_binder),
+	(pthread_eel_read_file_callback_common),
+	(pthread_eel_read_file_synchronous_callback),
+	(pthread_eel_read_file_asynchronous_callback),
+	(pthread_eel_read_file_thread_entry),
+	(pthread_eel_read_file_async),
+	(pthread_eel_read_file_async_cancel), (eel_read_file_async),
+	(eel_read_entire_file_async), (eel_read_file_cancel),
+	(eel_make_directory_and_parents), (eel_copy_uri_simple),
+	(eel_unique_temporary_file_name), (eel_get_build_time_stamp),
+	(eel_get_build_message), (eel_self_check_file_utilities):
+	* eel/eel-file-utilities.h:
+	* eel/eel-font-factory.c: (eel_get_current_font_factory),
+	(eel_font_factory_get), (eel_font_factory_initialize),
+	(eel_font_factory_initialize_class), (destroy),
+	(font_hash_node_lookup), (font_hash_node_lookup_with_insertion),
+	(eel_font_factory_get_font_by_family),
+	(eel_font_factory_get_font_from_preferences):
+	* eel/eel-font-factory.h:
+	* eel/eel-font-manager.c: (font_description_new),
+	(font_description_table_add), (font_get_font_type),
+	(font_description_table_find), (font_description_table_for_each),
+	(font_description_table_new), (directory_contains_file),
+	(font_directory_is_ignored), (font_foundry_is_ignored),
+	(font_family_is_ignored), (font_manager_collect_font_tables),
+	(ensure_local_font_table), (eel_font_manager_for_each_font),
+	(eel_font_manager_get_default_font),
+	(eel_font_manager_get_default_bold_font),
+	(eel_font_manager_file_is_scalable_font),
+	(font_list_find_bold_callback), (eel_font_manager_get_bold),
+	(eel_font_manager_weight_is_bold), (get_test_font_dir),
+	(eel_self_check_font_manager):
+	* eel/eel-font-manager.h:
+	* eel/eel-font-picker.c: (eel_font_picker_initialize_class),
+	(option_menu_button_press_event), (menu_deactivate),
+	(eel_font_picker_initialize), (eel_font_picker_destroy),
+	(font_list_find), (style_menu_item_activate_callback),
+	(style_menu_item_button_release_event), (font_picker_add_item),
+	(font_picker_populate), (font_find_style), (font_make_style_name),
+	(font_slant_string_to_enum), (font_set_width_string_to_enum),
+	(font_style_entry_new), (font_list_count_families),
+	(compare_font_entry), (global_font_list_get), (compare_style),
+	(global_font_list_populate_callback),
+	(eel_gtk_menu_shell_get_num_items),
+	(font_picker_get_selected_style_entry),
+	(font_picker_find_entries_for_font),
+	(font_picker_get_index_for_entry), (eel_font_picker_new),
+	(eel_font_picker_get_selected_font),
+	(eel_font_picker_set_selected_font):
+	* eel/eel-font-picker.h:
+	* eel/eel-gdk-extensions.c: (eel_fill_rectangle),
+	(eel_fill_rectangle_with_color), (eel_rectangle_contains),
+	(eel_rectangle_inset), (eel_interpolate_color), (eel_gradient_new),
+	(eel_gradient_is_gradient), (eel_gradient_is_horizontal),
+	(eel_gradient_strip_trailing_direction_if_any),
+	(eel_gradient_parse_one_color_spec),
+	(eel_gradient_get_start_color_spec),
+	(eel_gradient_get_end_color_spec), (eel_gradient_set_edge_color),
+	(eel_gradient_set_left_color_spec),
+	(eel_gradient_set_top_color_spec),
+	(eel_gradient_set_right_color_spec),
+	(eel_gradient_set_bottom_color_spec),
+	(eel_gdk_color_parse_with_white_default),
+	(eel_parse_rgb_with_white_default), (eel_rgb16_to_rgb),
+	(eel_rgb8_to_rgb), (eel_gdk_color_to_rgb), (eel_gdk_rgb_to_color),
+	(eel_gdk_rgb_to_color_spec), (eel_shift_color_component),
+	(eel_rgb_shift_color), (eel_gdk_color_is_dark),
+	(eel_gdk_choose_foreground_color),
+	(eel_gdk_gc_choose_foreground_color), (eel_stipple_bitmap),
+	(eel_gdk_window_bring_to_front), (eel_gdk_window_focus),
+	(eel_gdk_window_set_wm_protocols), (eel_set_mini_icon),
+	(eel_gdk_window_set_wm_hints_input),
+	(eel_gdk_window_set_invisible_cursor), (eel_gdk_parse_geometry),
+	(eel_gdk_color_as_hex_string), (eel_self_check_parse),
+	(eel_self_check_gdk_extensions):
+	* eel/eel-gdk-extensions.h:
+	* eel/eel-gdk-font-extensions.c: (eel_gdk_font_get_italic),
+	(eel_gdk_font_get_bold), (font_bitmap_get_by_size),
+	(eel_gdk_font_get_larger), (eel_gdk_font_get_smaller),
+	(eel_gdk_font_equal), (eel_gdk_font_get_largest_fitting),
+	(eel_string_ellipsize_start), (font_get_bold), (font_list_fonts),
+	(font_list_table_free_one_node), (font_list_fonts_cached),
+	(eel_gdk_font_get_fixed), (xlfd_string_get_nth),
+	(xlfd_string_replace_nth), (xlfd_string_get_nth_as_int),
+	(xlfd_string_could_be_scalable_non_bitmap),
+	(eel_gdk_font_xlfd_string_new), (font_entry_has_bold_weight_test),
+	(font_entry_has_italic_slant_test),
+	(font_entry_is_scalable_non_bitmap_test),
+	(eel_self_check_ellipsize_start),
+	(eel_self_check_gdk_font_extensions):
+	* eel/eel-gdk-font-extensions.h:
+	* eel/eel-gdk-pixbuf-extensions.c: (eel_gdk_pixbuf_list_ref),
+	(eel_gdk_pixbuf_list_free), (eel_gdk_pixbuf_load),
+	(eel_gdk_pixbuf_load_async), (file_opened_callback),
+	(file_read_callback), (free_pixbuf_load_handle), (load_done),
+	(eel_cancel_gdk_pixbuf_load), (eel_gdk_pixbuf_average_value),
+	(eel_gdk_scale_to_fit_factor), (eel_gdk_pixbuf_scale_to_fit),
+	(eel_gdk_pixbuf_scale_down_to_fit), (eel_gdk_pixbuf_is_valid),
+	(eel_gdk_pixbuf_get_dimensions),
+	(eel_gdk_pixbuf_fill_rectangle_with_color),
+	(eel_gdk_pixbuf_save_to_file), (eel_gdk_pixbuf_ref_if_not_null),
+	(eel_gdk_pixbuf_unref_if_not_null),
+	(eel_gdk_pixbuf_draw_to_drawable), (eel_gdk_pixbuf_draw_to_pixbuf),
+	(eel_gdk_pixbuf_draw_to_pixbuf_alpha),
+	(eel_gdk_pixbuf_new_from_pixbuf_sub_area),
+	(eel_gdk_pixbuf_new_from_existing_buffer), (pixbuf_draw_tiled),
+	(draw_tile_to_pixbuf_callback), (draw_tile_to_drawable_callback),
+	(eel_gdk_pixbuf_draw_to_pixbuf_tiled),
+	(eel_gdk_pixbuf_draw_to_drawable_tiled),
+	(eel_gdk_pixbuf_get_global_buffer),
+	(eel_gdk_pixbuf_get_from_window_safe), (eel_gdk_pixbuf_intersect),
+	(eel_self_check_gdk_pixbuf_extensions):
+	* eel/eel-gdk-pixbuf-extensions.h:
+	* eel/eel-glib-extensions.c: (eel_setenv), (eel_unsetenv),
+	(eel_g_date_new_tm), (eel_strdup_strftime),
+	(eel_g_list_exactly_one_item), (eel_g_list_more_than_one_item),
+	(eel_g_list_equal), (eel_g_list_copy), (eel_g_str_list_equal),
+	(eel_g_str_list_copy), (eel_g_str_list_alphabetize),
+	(eel_g_list_free_deep_custom), (eel_g_list_free_deep),
+	(eel_g_slist_free_deep_custom), (eel_g_slist_free_deep),
+	(eel_g_strv_find), (eel_g_list_safe_for_each),
+	(eel_g_list_sort_merge), (eel_g_list_is_already_sorted),
+	(eel_g_list_sort_custom),
+	(eel_g_lists_sort_and_check_for_intersection),
+	(eel_g_list_partition), (eel_g_ptr_array_new_from_list),
+	(eel_g_ptr_array_sort), (eel_g_ptr_array_search),
+	(eel_get_system_time), (eel_g_hash_table_new_free_at_exit),
+	(eel_g_hash_table_safe_for_each),
+	(eel_g_hash_table_remove_deep_custom),
+	(eel_g_hash_table_remove_deep),
+	(eel_g_hash_table_destroy_deep_custom),
+	(eel_g_hash_table_destroy_deep), (eel_g_string_append_len),
+	(eel_shell_quote), (eel_round), (eel_g_list_from_g_slist),
+	(eel_g_slist_from_g_list),
+	(eel_dumb_down_for_multi_byte_locale_hack), (eel_compare_integer),
+	(check_tm_to_g_date), (eel_test_predicate), (test_strftime),
+	(eel_self_check_glib_extensions):
+	* eel/eel-glib-extensions.h:
+	* eel/eel-glyph.c: (eel_glyph_new), (eel_glyph_free),
+	(glyph_get_width_space_safe), (glyph_get_height_space_safe),
+	(eel_glyph_get_width), (eel_glyph_get_height),
+	(eel_glyph_get_dimensions), (eel_glyph_get_underline_rectangle),
+	(glyph_is_valid), (eel_glyph_draw_to_pixbuf),
+	(eel_glyph_intersect), (eel_glyph_compare):
+	* eel/eel-glyph.h:
+	* eel/eel-gnome-extensions.c:
+	(eel_gnome_canvas_world_to_window_rectangle),
+	(eel_gnome_canvas_world_to_canvas_rectangle),
+	(eel_gnome_canvas_item_get_current_canvas_bounds),
+	(eel_gnome_canvas_item_request_redraw),
+	(eel_gnome_canvas_request_redraw_rectangle),
+	(eel_gnome_canvas_item_get_world_bounds),
+	(eel_gnome_canvas_item_get_canvas_bounds),
+	(eel_gnome_canvas_draw_pixbuf_helper),
+	(eel_gnome_canvas_draw_pixbuf_helper_alpha),
+	(eel_gnome_canvas_draw_pixbuf), (eel_gnome_canvas_fill_rgb),
+	(eel_gnome_dialog_get_button_by_index),
+	(eel_gnome_canvas_item_request_update_deep),
+	(eel_gnome_canvas_request_update_all),
+	(eel_gnome_canvas_set_scroll_region),
+	(eel_gnome_canvas_set_scroll_region_left_justify),
+	(eel_gnome_canvas_set_scroll_region_include_visible_area),
+	(eel_gnome_shell_execute), (eel_gnome_get_terminal_path),
+	(eel_gnome_open_terminal), (icon_selected_callback),
+	(eel_gnome_icon_selector_new),
+	(eel_gnome_stock_set_icon_or_register):
+	* eel/eel-gnome-extensions.h:
+	* eel/eel-graphic-effects.c: (eel_create_spotlight_pixbuf),
+	(eel_create_darkened_pixbuf), (eel_create_colorized_pixbuf),
+	(eel_stretch_frame_image), (eel_embed_image_in_frame),
+	(eel_make_semi_transparent):
+	* eel/eel-graphic-effects.h:
+	* eel/eel-gtk-extensions.c: (finish_button_activation),
+	(eel_gtk_button_auto_click), (eel_gtk_button_set_padding),
+	(eel_gtk_button_set_standard_padding),
+	(eel_gtk_clist_get_first_selected_row),
+	(eel_gtk_clist_get_last_selected_row),
+	(activate_button_on_double_click),
+	(eel_gtk_clist_set_double_click_button),
+	(eel_gtk_signal_connect_free_data_custom),
+	(eel_gtk_signal_connect_free_data), (eel_gtk_window_present),
+	(handle_standard_close_accelerator),
+	(eel_gtk_window_event_is_close_accelerator),
+	(eel_gtk_window_set_up_close_accelerator),
+	(eel_gtk_window_set_initial_geometry),
+	(eel_gtk_window_set_initial_geometry_from_string),
+	(eel_gtk_selection_data_copy_deep),
+	(eel_gtk_selection_data_free_deep), (eel_popup_menu_position_func),
+	(eel_truncate_text_for_menu_item), (eel_pop_up_context_menu),
+	(eel_gtk_menu_append_separator), (eel_gtk_menu_insert_separator),
+	(eel_gtk_menu_set_item_visibility),
+	(eel_gtk_marshal_NONE__POINTER_INT_INT_DOUBLE),
+	(eel_gtk_marshal_NONE__INT_INT_INT),
+	(eel_gtk_marshal_NONE__POINTER_INT_INT_INT),
+	(eel_gtk_marshal_NONE__POINTER_INT_POINTER_POINTER),
+	(eel_gtk_marshal_NONE__POINTER_POINTER_INT_INT_INT),
+	(eel_gtk_marshal_BOOL__INT_POINTER_INT_INT_UINT),
+	(eel_gtk_marshal_NONE__INT_POINTER_INT_INT_UINT),
+	(eel_gtk_marshal_NONE__POINTER_POINTER_POINTER_INT_INT_INT),
+	(eel_gtk_marshal_NONE__POINTER_POINTER_POINTER_POINTER_INT_INT_UINT
+	), (eel_gtk_marshal_NONE__POINTER_INT_INT_DOUBLE_DOUBLE),
+	(eel_gtk_marshal_NONE__DOUBLE),
+	(eel_gtk_marshal_NONE__DOUBLE_DOUBLE_DOUBLE),
+	(eel_gtk_marshal_POINTER__NONE), (eel_gtk_marshal_INT__NONE),
+	(eel_gtk_marshal_POINTER__INT), (eel_gtk_marshal_POINTER__POINTER),
+	(eel_gtk_marshal_INT__POINTER_POINTER),
+	(eel_gtk_marshal_INT__POINTER_INT),
+	(eel_gtk_marshal_POINTER__POINTER_POINTER),
+	(eel_gtk_marshal_POINTER__POINTER_POINTER_POINTER),
+	(eel_gtk_marshal_NONE__POINTER_POINTER_POINTER_POINTER),
+	(eel_gtk_marshal_POINTER__POINTER_INT_INT_POINTER_POINTER),
+	(eel_gtk_marshal_NONE__POINTER_POINTER_POINTER_POINTER_POINTER_POIN
+	TER), (eel_point_in_allocation), (eel_point_in_widget),
+	(eel_gtk_object_list_ref), (eel_gtk_object_list_unref),
+	(eel_gtk_object_list_free), (eel_gtk_object_list_copy),
+	(eel_gtk_style_set_font), (eel_gtk_widget_set_font),
+	(eel_gtk_widget_set_shown), (eel_gtk_widget_set_font_by_name),
+	(eel_gtk_signal_connect_full_while_alive),
+	(eel_gtk_signal_connect_while_realized),
+	(eel_nullify_when_destroyed), (eel_nullify_cancel),
+	(eel_gtk_container_get_first_child),
+	(eel_gtk_container_foreach_deep), (eel_gtk_pixmap_new_empty),
+	(eel_gtk_adjustment_set_value), (eel_gtk_adjustment_clamp_value),
+	(eel_gtk_label_make_bold), (eel_gtk_label_make_larger),
+	(eel_gtk_label_make_smaller),
+	(eel_gtk_widget_set_background_color),
+	(eel_gtk_widget_set_foreground_color),
+	(eel_gtk_widget_find_windowed_ancestor), (eel_gtk_style_shade),
+	(eel_gtk_class_name_make_like_existing_type),
+	(eel_get_window_list_ordered_front_to_back),
+	(eel_gtk_get_system_font), (eel_get_current_event_time),
+	(eel_drag_set_icon_pixbuf):
+	* eel/eel-gtk-extensions.h:
+	* eel/eel-gtk-macros.h:
+	* eel/eel-image-table.c: (eel_image_table_initialize_class),
+	(eel_image_table_initialize), (eel_image_table_destroy),
+	(eel_image_table_expose_event), (eel_image_table_realize),
+	(eel_image_table_unrealize), (eel_image_table_remove),
+	(eel_image_table_child_type),
+	(eel_image_table_set_is_smooth_signal),
+	(image_table_foreach_child_subtract_content),
+	(image_table_clear_dirty_areas), (image_table_peek_clear_gc),
+	(image_table_emit_signal), (image_table_handle_motion),
+	(ancestor_enter_notify_event), (ancestor_leave_notify_event),
+	(ancestor_motion_notify_event), (ancestor_button_press_event),
+	(ancestor_button_release_event), (eel_image_table_new),
+	(eel_image_table_set_is_smooth),
+	(eel_image_table_set_smooth_background_color),
+	(eel_image_table_add_empty_image):
+	* eel/eel-image-table.h:
+	* eel/eel-image-with-background.c: (draw_background_callback),
+	(eel_image_new_with_background):
+	* eel/eel-image-with-background.h:
+	* eel/eel-image.c: (eel_image_initialize_class),
+	(eel_image_initialize), (eel_image_destroy), (eel_image_set_arg),
+	(eel_image_get_arg), (eel_image_size_request),
+	(image_paint_pixbuf_callback), (image_composite_pixbuf_callback),
+	(eel_image_expose_event), (eel_image_set_is_smooth_signal),
+	(image_get_pixbuf_dimensions), (image_get_pixbuf_bounds),
+	(image_get_tile_dimensions), (image_is_smooth), (eel_image_new),
+	(eel_image_set_is_smooth), (eel_image_get_is_smooth),
+	(eel_image_set_tile_pixbuf), (eel_image_get_tile_pixbuf),
+	(eel_image_set_pixbuf), (eel_image_set_pixbuf_from_file_name),
+	(eel_image_get_pixbuf), (eel_image_set_pixbuf_opacity),
+	(eel_image_get_pixbuf_opacity), (eel_image_set_tile_opacity),
+	(eel_image_get_tile_opacity), (eel_image_set_tile_width),
+	(eel_image_get_tile_width), (eel_image_set_tile_height),
+	(eel_image_get_tile_height), (eel_image_set_tile_mode_vertical),
+	(eel_image_get_tile_mode_vertical),
+	(eel_image_set_tile_mode_horizontal),
+	(eel_image_get_tile_mode_horizontal),
+	(eel_image_set_tile_pixbuf_from_file_name),
+	(eel_image_set_background_mode), (eel_image_get_background_mode),
+	(eel_image_set_solid_background_color),
+	(eel_image_get_solid_background_color), (eel_image_new_solid),
+	(eel_image_set_never_smooth):
+	* eel/eel-image.h:
+	* eel/eel-label-with-background.c: (draw_background_callback),
+	(eel_label_new_with_background):
+	* eel/eel-label-with-background.h:
+	* eel/eel-label.c: (eel_label_initialize_class),
+	(eel_label_initialize), (eel_label_destroy), (eel_label_set_arg),
+	(eel_label_get_arg), (eel_label_size_request),
+	(eel_label_size_allocate), (label_paint_pixbuf_callback),
+	(label_composite_text_callback_cached),
+	(label_composite_text_callback),
+	(label_composite_text_and_shadow_callback), (label_paint),
+	(paint_label_smooth), (paint_label_smooth_cached),
+	(eel_label_expose_event), (eel_label_set_is_smooth_signal),
+	(label_get_default_line_wrap_width), (label_get_text_dimensions),
+	(label_get_text_bounds), (label_get_content_dimensions),
+	(label_get_content_bounds), (label_get_tile_dimensions),
+	(label_solid_cache_pixbuf_clear), (label_can_cache_contents),
+	(label_peek_text), (label_smooth_text_ensure),
+	(label_smooth_text_clear), (label_is_smooth), (eel_label_new),
+	(eel_label_set_smooth_font), (eel_label_get_smooth_font),
+	(eel_label_set_smooth_font_size), (eel_label_get_smooth_font_size),
+	(label_force_cached_requisition_flush), (eel_label_set_is_smooth),
+	(eel_label_get_is_smooth), (eel_label_set_tile_pixbuf),
+	(eel_label_get_tile_pixbuf), (eel_label_set_text_opacity),
+	(eel_label_get_text_opacity), (eel_label_set_tile_opacity),
+	(eel_label_get_tile_opacity), (eel_label_set_tile_width),
+	(eel_label_get_tile_width), (eel_label_set_tile_height),
+	(eel_label_get_tile_height), (eel_label_set_tile_mode_vertical),
+	(eel_label_get_tile_mode_vertical),
+	(eel_label_set_tile_mode_horizontal),
+	(eel_label_get_tile_mode_horizontal),
+	(eel_label_set_tile_pixbuf_from_file_name),
+	(eel_label_set_background_mode), (eel_label_get_background_mode),
+	(eel_label_set_solid_background_color),
+	(eel_label_get_solid_background_color),
+	(eel_label_set_smooth_line_wrap_width),
+	(eel_label_get_smooth_line_wrap_width), (eel_label_set_text_color),
+	(eel_label_get_text_color),
+	(eel_label_set_smooth_drop_shadow_offset),
+	(eel_label_get_smooth_drop_shadow_offset),
+	(eel_label_set_smooth_drop_shadow_color),
+	(eel_label_get_smooth_drop_shadow_color), (eel_label_set_justify),
+	(eel_label_get_text_justify), (eel_label_set_text),
+	(eel_label_get_text), (eel_label_set_wrap), (eel_label_get_wrap),
+	(eel_label_new_solid), (eel_label_make_bold),
+	(eel_label_make_larger), (eel_label_make_smaller),
+	(eel_label_set_never_smooth),
+	(eel_label_set_adjust_wrap_on_resize),
+	(eel_label_get_adjust_wrap_on_resize):
+	* eel/eel-label.h:
+	* eel/eel-labeled-image.c: (eel_labeled_image_initialize_class),
+	(eel_labeled_image_initialize), (eel_labeled_image_destroy),
+	(eel_labeled_image_set_arg), (eel_labeled_image_get_arg),
+	(eel_labeled_image_size_request),
+	(eel_labeled_image_size_allocate),
+	(eel_labeled_image_expose_event), (eel_labeled_image_map),
+	(eel_labeled_image_unmap), (eel_labeled_image_add),
+	(eel_labeled_image_remove), (eel_labeled_image_forall),
+	(is_fixed_height), (labeled_image_get_image_dimensions),
+	(labeled_image_get_label_dimensions),
+	(labeled_image_get_image_bounds_fill),
+	(eel_labeled_image_get_image_bounds),
+	(labeled_image_get_label_bounds_fill),
+	(eel_labeled_image_get_label_bounds),
+	(labeled_image_update_alignments),
+	(labeled_image_get_content_dimensions),
+	(labeled_image_get_content_bounds), (labeled_image_ensure_label),
+	(labeled_image_ensure_image), (labeled_image_show_image),
+	(labeled_image_show_label), (eel_labeled_image_new),
+	(eel_labeled_image_new_from_file_name),
+	(eel_labeled_image_set_label_position),
+	(eel_labeled_image_get_label_position),
+	(eel_labeled_image_set_show_label),
+	(eel_labeled_image_get_show_label),
+	(eel_labeled_image_set_show_image),
+	(eel_labeled_image_get_show_image),
+	(eel_labeled_image_set_fixed_image_height),
+	(eel_labeled_image_set_spacing), (eel_labeled_image_get_spacing),
+	(eel_labeled_image_set_x_padding),
+	(eel_labeled_image_get_x_padding),
+	(eel_labeled_image_set_y_padding),
+	(eel_labeled_image_get_y_padding),
+	(eel_labeled_image_set_x_alignment),
+	(eel_labeled_image_get_x_alignment),
+	(eel_labeled_image_set_y_alignment),
+	(eel_labeled_image_get_y_alignment), (eel_labeled_image_set_fill),
+	(eel_labeled_image_get_fill), (eel_labeled_image_button_new),
+	(eel_labeled_image_button_new_from_file_name),
+	(eel_labeled_image_toggle_button_new),
+	(eel_labeled_image_toggle_button_new_from_file_name),
+	(button_leave_callback), (eel_labeled_image_check_button_new),
+	(eel_labeled_image_check_button_new_from_file_name),
+	(eel_labeled_image_set_pixbuf),
+	(eel_labeled_image_set_pixbuf_from_file_name),
+	(eel_labeled_image_set_tile_pixbuf),
+	(eel_labeled_image_set_tile_pixbuf_from_file_name),
+	(eel_labeled_image_get_pixbuf), (eel_labeled_image_set_text),
+	(eel_labeled_image_get_text), (eel_labeled_image_make_bold),
+	(eel_labeled_image_make_larger), (eel_labeled_image_make_smaller),
+	(eel_labeled_image_set_tile_width),
+	(eel_labeled_image_set_tile_height),
+	(eel_labeled_image_set_background_mode),
+	(eel_labeled_image_set_solid_background_color),
+	(eel_labeled_image_set_smooth_drop_shadow_offset),
+	(eel_labeled_image_set_smooth_drop_shadow_color),
+	(eel_labeled_image_set_text_color),
+	(eel_labeled_image_set_label_never_smooth):
+	* eel/eel-labeled-image.h:
+	* eel/eel-lib-self-check-functions.c: (eel_run_lib_self_checks):
+	* eel/eel-lib-self-check-functions.h:
+	* eel/eel-password-dialog.c:
+	(eel_password_dialog_initialize_class),
+	(eel_password_dialog_initialize), (eel_password_dialog_destroy),
+	(dialog_show_callback), (dialog_close_callback),
+	(caption_table_activate_callback), (eel_password_dialog_new),
+	(eel_password_dialog_run_and_block),
+	(eel_password_dialog_set_username),
+	(eel_password_dialog_set_password),
+	(eel_password_dialog_set_readonly_username),
+	(eel_password_dialog_get_username),
+	(eel_password_dialog_get_password),
+	(eel_password_dialog_get_remember),
+	(eel_password_dialog_set_remember),
+	(eel_password_dialog_set_remember_label_text):
+	* eel/eel-password-dialog.h:
+	* eel/eel-radio-button-group.c:
+	(eel_radio_button_group_initialize_class),
+	(eel_radio_button_group_initialize),
+	(eel_radio_button_group_destroy),
+	(radio_button_group_emit_changed_signal),
+	(radio_button_group_free_button_group), (button_toggled),
+	(eel_radio_button_group_new), (eel_radio_button_group_insert),
+	(eel_radio_button_group_get_active_index),
+	(eel_radio_button_group_set_active_index),
+	(eel_radio_button_group_set_entry_pixbuf),
+	(eel_radio_button_group_set_entry_description_text):
+	* eel/eel-radio-button-group.h:
+	* eel/eel-region.c: (eel_region_new), (eel_region_free),
+	(gdk_region_new_from_irect), (eel_region_add_rectangle),
+	(eel_region_subtract_rectangle), (eel_region_set_gc_clip_region):
+	* eel/eel-region.h:
+	* eel/eel-scalable-font-private.h:
+	* eel/eel-scalable-font.c: (eel_scalable_font_initialize_class),
+	(eel_scalable_font_initialize), (eel_scalable_font_destroy),
+	(eel_scalable_font_new), (eel_scalable_font_make_bold),
+	(eel_scalable_font_measure_text), (eel_scalable_font_text_width),
+	(eel_scalable_font_draw_text),
+	(eel_scalable_font_largest_fitting_font_size),
+	(eel_scalable_font_get_default_font),
+	(eel_scalable_font_get_default_bold_font),
+	(eel_scalable_font_get_rsvg_handle),
+	(eel_scalable_font_get_rsvg_context),
+	(eel_self_check_scalable_font):
+	* eel/eel-scalable-font.h:
+	* eel/eel-self-checks.c: (eel_exit_if_self_checks_failed),
+	(eel_report_check_failure), (eel_strdup_boolean),
+	(eel_before_check), (eel_after_check), (eel_check_boolean_result),
+	(eel_check_rectangle_result), (eel_check_dimensions_result),
+	(eel_check_integer_result), (eel_check_string_result),
+	(eel_before_check_function), (eel_after_check_function):
+	* eel/eel-self-checks.h:
+	* eel/eel-smooth-text-layout-cache.c: (cache_index_new),
+	(cache_insert), (cache_remove), (cache_enter), (cache_evict),
+	(cache_lookup), (cache_trim),
+	(eel_smooth_text_layout_cache_render),
+	(eel_smooth_text_layout_cache_new),
+	(eel_smooth_text_layout_cache_initialize_class),
+	(eel_smooth_text_layout_cache_initialize), (free_one_cache_entry),
+	(eel_smooth_text_layout_cache_destroy), (check_one),
+	(eel_self_check_smooth_text_layout_cache):
+	* eel/eel-smooth-text-layout-cache.h:
+	* eel/eel-smooth-text-layout.c:
+	(eel_smooth_text_layout_initialize_class),
+	(eel_smooth_text_layout_initialize),
+	(eel_smooth_text_layout_destroy), (smooth_text_layout_clear_lines),
+	(smooth_text_layout_ensure_lines),
+	(smooth_text_layout_line_list_new),
+	(smooth_text_layout_line_list_free),
+	(smooth_text_layout_line_list_draw_to_pixbuf),
+	(smooth_text_layout_line_list_new_wrapped),
+	(smooth_text_layout_get_empty_line_height),
+	(smooth_text_layout_get_num_empty_lines),
+	(smooth_text_layout_get_max_line_width),
+	(smooth_text_layout_get_total_line_height),
+	(smooth_text_layout_get_line_wrap_width),
+	(eel_smooth_text_layout_new),
+	(eel_smooth_text_layout_draw_to_pixbuf),
+	(eel_smooth_text_layout_draw_to_pixbuf_shadow),
+	(eel_smooth_text_layout_get_dimensions),
+	(eel_smooth_text_layout_get_width),
+	(eel_smooth_text_layout_get_height),
+	(eel_smooth_text_layout_set_wrap),
+	(eel_smooth_text_layout_get_wrap),
+	(eel_smooth_text_layout_set_font),
+	(eel_smooth_text_layout_get_font),
+	(eel_smooth_text_layout_set_font_size),
+	(eel_smooth_text_layout_get_font_size),
+	(eel_smooth_text_layout_set_line_spacing),
+	(eel_smooth_text_layout_get_line_spacing),
+	(eel_smooth_text_layout_set_empty_line_height),
+	(eel_smooth_text_layout_get_empty_line_height),
+	(smooth_text_layout_set_text),
+	(eel_smooth_text_layout_set_line_break_characters),
+	(eel_smooth_text_layout_get_line_break_characters),
+	(eel_smooth_text_layout_set_line_wrap_width),
+	(text_layout_free_row), (eel_text_layout_free),
+	(eel_text_layout_new), (eel_smooth_text_layout_compare):
+	* eel/eel-smooth-text-layout.h:
+	* eel/eel-smooth-widget.c: (preferences_get_is_smooth),
+	(eel_smooth_widget_register),
+	(smooth_widget_get_tile_origin_point),
+	(smooth_widget_get_gtk_background), (smooth_widget_get_background),
+	(smooth_widget_paint_tile_opaque),
+	(smooth_widget_paint_tile_transparent),
+	(smooth_widget_paint_content_opaque),
+	(smooth_widget_paint_content_transparent),
+	(smooth_widget_paint_tile_and_content_transparent),
+	(eel_smooth_widget_paint), (eel_smooth_widget_get_tile_bounds),
+	(eel_smooth_widget_get_preferred_dimensions),
+	(eel_smooth_widget_register_type):
+	* eel/eel-smooth-widget.h:
+	* eel/eel-stock-dialogs.c: (timed_wait_free),
+	(timed_wait_dialog_destroy_callback), (timed_wait_callback),
+	(eel_timed_wait_start_with_duration), (eel_timed_wait_start),
+	(eel_timed_wait_stop), (eel_run_simple_dialog),
+	(find_message_label), (create_message_box),
+	(eel_create_info_dialog), (eel_show_info_dialog),
+	(details_dialog_clicked_callback),
+	(eel_show_info_dialog_with_details), (eel_show_warning_dialog),
+	(eel_show_error_dialog), (eel_show_error_dialog_with_details),
+	(eel_show_yes_no_dialog), (eel_create_question_dialog):
+	* eel/eel-stock-dialogs.h:
+	* eel/eel-string-list.c: (eel_string_list_new),
+	(eel_string_list_new_from_string),
+	(eel_string_list_new_from_string_list),
+	(eel_string_list_new_from_tokens),
+	(eel_string_list_assign_from_string_list), (eel_string_list_free),
+	(eel_string_list_insert), (eel_string_list_nth),
+	(eel_string_list_nth_as_integer), (eel_string_list_modify_nth),
+	(eel_string_list_remove_nth), (eel_string_list_contains),
+	(eel_string_list_find_by_function), (eel_string_list_get_length),
+	(eel_string_list_clear), (eel_string_list_equals),
+	(eel_string_list_as_g_list),
+	(eel_string_list_get_index_for_string),
+	(eel_string_list_as_concatenated_string), (eel_string_list_sort),
+	(eel_string_list_sort_by_function),
+	(eel_string_list_remove_duplicates), (eel_string_list_for_each),
+	(eel_string_list_get_longest_string),
+	(eel_string_list_get_longest_string_length), (str_is_equal),
+	(test_dog), (test_data), (test_true), (test_false),
+	(compare_number), (eel_self_check_string_list):
+	* eel/eel-string-list.h:
+	* eel/eel-string-map.c: (eel_string_map_new),
+	(eel_string_map_free), (eel_string_map_clear),
+	(eel_string_map_lookup), (eel_string_map_add), (map_entry_new),
+	(map_entry_free), (map_entry_list_lookup), (str_is_equal),
+	(eel_self_check_string_map):
+	* eel/eel-string-map.h:
+	* eel/eel-string-picker.c: (eel_string_picker_initialize_class),
+	(eel_string_picker_initialize), (eel_string_picker_destroy),
+	(option_menu_activate_callback), (eel_string_picker_new),
+	(eel_string_picker_set_string_list),
+	(eel_string_picker_get_string_list),
+	(eel_string_picker_get_selected_string),
+	(eel_string_picker_set_selected_string),
+	(eel_string_picker_set_selected_string_index),
+	(eel_string_picker_insert_string), (eel_string_picker_contains),
+	(eel_string_picker_get_index_for_string),
+	(eel_string_picker_clear):
+	* eel/eel-string-picker.h:
+	* eel/eel-string.c: (eel_strlen), (eel_strchr), (eel_strcmp),
+	(eel_strcasecmp), (eel_strcmp_case_breaks_ties), (eel_strcoll),
+	(eel_str_is_empty), (eel_str_is_equal), (eel_istr_is_equal),
+	(eel_strcmp_compare_func), (eel_strcoll_compare_func),
+	(eel_strcasecmp_compare_func), (eel_str_has_prefix),
+	(eel_str_has_suffix), (eel_istr_has_prefix), (eel_istr_has_suffix),
+	(eel_str_get_prefix), (eel_str_get_after_prefix), (eel_str_to_int),
+	(eel_str_strip_chr), (eel_str_strip_trailing_chr),
+	(eel_str_strip_trailing_str), (eel_eat_str_to_int),
+	(eel_str_double_underscores), (eel_str_capitalize),
+	(eel_str_middle_truncate), (eel_str_count_characters),
+	(eel_str_strip_substring_and_after), (eel_str_replace_substring),
+	(eel_str_remove_bracketed_text), (call_str_to_int),
+	(call_eat_str_to_int), (eel_self_check_string):
+	* eel/eel-string.h:
+	* eel/eel-text-caption.c: (eel_text_caption_initialize_class),
+	(eel_text_caption_initialize), (eel_text_caption_destroy),
+	(entry_changed_callback), (entry_key_press_callback),
+	(eel_text_caption_new), (eel_text_caption_get_text),
+	(eel_text_caption_set_text), (eel_text_caption_set_editable),
+	(eel_text_caption_set_expand_tilde):
+	* eel/eel-text-caption.h:
+	* eel/eel-viewport.c: (eel_viewport_initialize_class),
+	(eel_viewport_initialize), (eel_viewport_destroy),
+	(eel_viewport_draw), (eel_viewport_size_allocate),
+	(eel_viewport_expose_event), (eel_viewport_realize),
+	(eel_viewport_paint), (eel_viewport_set_is_smooth_signal),
+	(eel_viewport_new), (eel_viewport_set_is_smooth),
+	(eel_viewport_get_is_smooth), (eel_viewport_set_constrain_width),
+	(eel_viewport_get_constrain_width),
+	(eel_viewport_set_constrain_height),
+	(eel_viewport_get_constrain_height),
+	(eel_viewport_set_never_smooth), (eel_viewport_get_scroll_offset):
+	* eel/eel-viewport.h:
+	* eel/eel-wrap-table.c: (eel_wrap_table_initialize_class),
+	(eel_wrap_table_initialize), (eel_wrap_table_destroy),
+	(eel_wrap_table_set_arg), (eel_wrap_table_get_arg),
+	(eel_wrap_table_size_request), (eel_wrap_table_size_allocate),
+	(eel_wrap_table_expose_event), (eel_wrap_table_map),
+	(eel_wrap_table_unmap), (eel_wrap_table_add),
+	(eel_wrap_table_remove), (eel_wrap_table_forall),
+	(eel_wrap_table_child_type), (wrap_table_layout),
+	(wrap_table_art_irect_max_dimensions),
+	(wrap_table_get_max_child_dimensions),
+	(wrap_table_get_content_dimensions),
+	(wrap_table_get_content_bounds), (wrap_table_get_scroll_offset),
+	(wrap_table_find_child_at_point), (eel_wrap_table_new),
+	(eel_wrap_table_set_x_spacing), (eel_wrap_table_get_x_spacing),
+	(eel_wrap_table_set_y_spacing), (eel_wrap_table_get_y_spacing),
+	(eel_wrap_table_find_child_at_event_point),
+	(eel_wrap_table_set_x_justification),
+	(eel_wrap_table_get_x_justification),
+	(eel_wrap_table_set_y_justification),
+	(eel_wrap_table_get_y_justification),
+	(eel_wrap_table_set_homogeneous), (eel_wrap_table_get_homogeneous),
+	(eel_wrap_table_reorder_child), (eel_wrap_table_get_num_children):
+	* eel/eel-wrap-table.h:
+	* eel/eel-xml-extensions.c: (eel_xml_get_children),
+	(eel_xml_get_root_children),
+	(eel_xml_get_child_by_name_and_property),
+	(eel_xml_get_child_by_name),
+	(eel_xml_get_root_child_by_name_and_property),
+	(eel_xml_get_property_for_children),
+	(eel_xml_get_property_translated), (eel_xml_remove_node):
+	* eel/eel-xml-extensions.h:
+	* test/Makefile.am:
+	* test/test-eel-background.c: (main):
+	* test/test-eel-clickable-image.c: (clicked_callback),
+	(enter_callback), (leave_callback), (clickable_image_new):
+	* test/test-eel-font-manager.c: (font_type_to_string),
+	(font_iterator_callback), (main):
+	* test/test-eel-font-picker.c: (update_font),
+	(font_changed_update_label_callback),
+	(font_changed_update_file_name_callback),
+	(use_defalt_font_callback), (use_defalt_bold_font_callback),
+	(use_defalt_font_update_picker_callback),
+	(use_defalt_bold_font_update_picker_callback),
+	(print_selected_font_callback), (main):
+	* test/test-eel-font-simple.c: (main):
+	* test/test-eel-font.c: (main):
+	* test/test-eel-glyph-simple.c: (glyph_new), (main):
+	* test/test-eel-glyph.c: (glyph_new), (main):
+	* test/test-eel-image-background.c:
+	(window_new_with_eel_background_image),
+	(window_new_with_eel_background_gradient),
+	(window_new_with_solid_background), (main):
+	* test/test-eel-image-scrolled.c: (toggle_smooth_callback),
+	(label_window_new), (label_window_new_scrolled):
+	* test/test-eel-image-simple.c: (toggle_smooth_callback),
+	(image_window_new), (main):
+	* test/test-eel-image-table.c: (labeled_image_new),
+	(image_table_child_enter_callback),
+	(image_table_child_leave_callback),
+	(image_table_child_pressed_callback),
+	(image_table_child_released_callback),
+	(image_table_child_clicked_callback), (image_table_size_allocate),
+	(image_table_new_scrolled):
+	* test/test-eel-image-tile.c:
+	(window_new_with_eel_background_image),
+	(window_new_with_eel_background_gradient), (window_four_new),
+	(main):
+	* test/test-eel-image.c: (icon_get_path), (label_new),
+	(label_enter_event), (label_leave_event), (label_free_data),
+	(image_new), (image_new_from_name), (label_add_prelighting),
+	(header_new), (main):
+	* test/test-eel-label-background.c:
+	(window_new_with_eel_background_image),
+	(window_new_with_eel_background_gradient),
+	(window_new_with_solid_background), (main):
+	* test/test-eel-label-flavorful.c: (increasing_label_window_new),
+	(decreasing_label_window_new), (main):
+	* test/test-eel-label-offset.c: (main):
+	* test/test-eel-label-scrolled.c: (label_window_new),
+	(label_window_new_scrolled), (label_window_new_table):
+	* test/test-eel-label-simple.c: (use_system_font_callback),
+	(use_system_font_bold_callback), (main):
+	* test/test-eel-label-wrapped.c: (create_eel_label),
+	(create_gtk_label_window), (create_eel_label_window), (main):
+	* test/test-eel-label.c: (red_label_color_value_changed_callback),
+	(green_label_color_value_changed_callback),
+	(blue_label_color_value_changed_callback),
+	(alpha_label_color_value_changed_callback),
+	(red_background_color_value_changed_callback),
+	(green_background_color_value_changed_callback),
+	(blue_background_color_value_changed_callback),
+	(alpha_background_color_value_changed_callback),
+	(text_caption_changed_callback), (create_value_scale),
+	(create_color_picker_frame), (create_text_caption_frame),
+	(widget_set_eel_background_image),
+	(widget_set_eel_background_color),
+	(widget_get_eel_background_color), (widget_set_background_reset),
+	(background_changed_callback), (justification_changed_callback),
+	(drop_shadow_offset_changed_callback), (create_background_frame),
+	(create_justification_frame), (create_drop_shadow_offset_frame),
+	(main):
+	* test/test-eel-labeled-image.c: (labeled_image_new),
+	(labeled_image_window_new), (labeled_image_button_window_new),
+	(main):
+	* test/test-eel-password-dialog.c: (authenticate_boink_callback):
+	* test/test-eel-pixbuf-tile.c: (pixbuf_drawing_area_expose_event),
+	(drawable_drawing_area_expose_event):
+	* test/test-eel-smooth-text-layout.c: (main):
+	* test/test-eel-viewport-constraint.c:
+	(widget_set_eel_background_color), (create_eel_label),
+	(summary_view_item_label_new), (create_row), (main):
+	* test/test-eel-widgets.c: (create_pixbuf),
+	(radio_group_load_it_up), (test_radio_group),
+	(test_radio_group_horizontal), (test_caption_table),
+	(test_string_picker), (test_text_caption),
+	(string_picker_changed_callback), (text_caption_changed_callback),
+	(test_radio_changed_callback):
+	* test/test.c: (test_init), (test_gtk_widget_set_background_image),
+	(test_gtk_widget_set_background_color), (test_pixbuf_new_named),
+	(test_image_new), (test_label_new),
+	(test_text_caption_get_text_as_int),
+	(test_pixbuf_draw_rectangle_tiled):
+	* test/test.h:
+
+2001-03-28  Ramiro Estrugo  <ramiro@eazel.com>
+
+	Started ChangeLog

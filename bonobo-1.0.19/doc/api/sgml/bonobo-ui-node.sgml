@@ -1,0 +1,668 @@
+<refentry id="bonobo-bonobo-ui-node">
+<refmeta>
+<refentrytitle>bonobo-ui-node</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>bonobo-ui-node</refname><refpurpose>Simplified XML Node manipulation API</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboUINode">BonoboUINode</link>;
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-new">bonobo_ui_node_new</link>            (const char *name);
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-new-child">bonobo_ui_node_new_child</link>      (<link linkend="BonoboUINode">BonoboUINode</link> *parent,
+                                             const char *name);
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-copy">bonobo_ui_node_copy</link>           (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="gboolean">gboolean</link> recursive);
+void        <link linkend="bonobo-ui-node-free">bonobo_ui_node_free</link>             (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+void        <link linkend="bonobo-ui-node-set-data">bonobo_ui_node_set_data</link>         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="gpointer">gpointer</link> data);
+<link linkend="gpointer">gpointer</link>    <link linkend="bonobo-ui-node-get-data">bonobo_ui_node_get_data</link>         (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+void        <link linkend="bonobo-ui-node-set-attr">bonobo_ui_node_set_attr</link>         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name,
+                                             const char *value);
+char*       <link linkend="bonobo-ui-node-get-attr">bonobo_ui_node_get_attr</link>         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-ui-node-has-attr">bonobo_ui_node_has_attr</link>         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name);
+void        <link linkend="bonobo-ui-node-remove-attr">bonobo_ui_node_remove_attr</link>      (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name);
+void        <link linkend="bonobo-ui-node-add-child">bonobo_ui_node_add_child</link>        (<link linkend="BonoboUINode">BonoboUINode</link> *parent,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *child);
+void        <link linkend="bonobo-ui-node-insert-before">bonobo_ui_node_insert_before</link>    (<link linkend="BonoboUINode">BonoboUINode</link> *sibling,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *prev_sibling);
+void        <link linkend="bonobo-ui-node-unlink">bonobo_ui_node_unlink</link>           (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+void        <link linkend="bonobo-ui-node-replace">bonobo_ui_node_replace</link>          (<link linkend="BonoboUINode">BonoboUINode</link> *old_node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *new_node);
+void        <link linkend="bonobo-ui-node-set-content">bonobo_ui_node_set_content</link>      (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *content);
+char*       <link linkend="bonobo-ui-node-get-content">bonobo_ui_node_get_content</link>      (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-next">bonobo_ui_node_next</link>           (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-prev">bonobo_ui_node_prev</link>           (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-children">bonobo_ui_node_children</link>       (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-parent">bonobo_ui_node_parent</link>         (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+const char* <link linkend="bonobo-ui-node-get-name">bonobo_ui_node_get_name</link>         (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-ui-node-has-name">bonobo_ui_node_has_name</link>         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-ui-node-transparent">bonobo_ui_node_transparent</link>      (<link linkend="BonoboUINode">BonoboUINode</link> *node);
+void        <link linkend="bonobo-ui-node-copy-attrs">bonobo_ui_node_copy_attrs</link>       (<link linkend="BonoboUINode">BonoboUINode</link> *src,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *dest);
+void        <link linkend="bonobo-ui-node-free-string">bonobo_ui_node_free_string</link>      (char *str);
+char*       <link linkend="bonobo-ui-node-to-string">bonobo_ui_node_to_string</link>        (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="gboolean">gboolean</link> recurse);
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-from-string">bonobo_ui_node_from_string</link>    (const char *str);
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-ui-node-from-file">bonobo_ui_node_from_file</link>      (const char *filename);
+void        <link linkend="bonobo-ui-node-strip">bonobo_ui_node_strip</link>            (<link linkend="BonoboUINode">BonoboUINode</link> **node);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  The BonoboUINode API is designed to make XML node manipulation
+simple, and to hide the underlying implementation of the XML tree.
+This is to allow the use of some more efficient internal representation
+than libxml's at some later date.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboUINode">struct BonoboUINode</title>
+<programlisting>struct BonoboUINode;</programlisting>
+<para>
+The BonoboUINode structure is fully opaque to stop any code
+depending on libxml inadvertantly.
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-new">bonobo_ui_node_new ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_new            (const char *name);</programlisting>
+<para>
+Creates a new node with name <parameter>name</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> The name for the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a new node pointer
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-new-child">bonobo_ui_node_new_child ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_new_child      (<link linkend="BonoboUINode">BonoboUINode</link> *parent,
+                                             const char *name);</programlisting>
+<para>
+Create a new node as a child of <parameter>parent</parameter> with name <parameter>name</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> the parent
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the new child
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> pointer to the new child
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-copy">bonobo_ui_node_copy ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_copy           (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="gboolean">gboolean</link> recursive);</programlisting>
+<para>
+Copy an XML node, if <parameter>recursive</parameter> do a deep copy, otherwise just dup the node itself.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><parameter>recursive</parameter>&nbsp;:</entry>
+<entry> whether to dup children too.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a copy of the node
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-free">bonobo_ui_node_free ()</title>
+<programlisting>void        bonobo_ui_node_free             (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+Frees the memory associated with the <parameter>node</parameter> and unlink it from the tree</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> a node.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-set-data">bonobo_ui_node_set_data ()</title>
+<programlisting>void        bonobo_ui_node_set_data         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="gpointer">gpointer</link> data);</programlisting>
+<para>
+Associates some user data with the node pointer</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> user data
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-get-data">bonobo_ui_node_get_data ()</title>
+<programlisting><link linkend="gpointer">gpointer</link>    bonobo_ui_node_get_data         (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+Gets user data associated with <parameter>node</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the user data, see bonobo_ui_node_set_data
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-set-attr">bonobo_ui_node_set_attr ()</title>
+<programlisting>void        bonobo_ui_node_set_attr         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name,
+                                             const char *value);</programlisting>
+<para>
+Set the attribute of <parameter>name</parameter> on <parameter>node</parameter> to <parameter>value</parameter> overriding any
+previous values of that attr.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> The node
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the attr
+</entry></row>
+<row><entry align="right"><parameter>value</parameter>&nbsp;:</entry>
+<entry> the value for the attr
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-get-attr">bonobo_ui_node_get_attr ()</title>
+<programlisting>char*       bonobo_ui_node_get_attr         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name);</programlisting>
+<para>
+Fetch the value of an attr of name <parameter>name</parameter> from <parameter>node</parameter>
+see also: bonobo_ui_node_free_string</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the attr to get
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the attr text.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-has-attr">bonobo_ui_node_has_attr ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_ui_node_has_attr         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name);</programlisting>
+<para>
+Determines whether the <parameter>node</parameter> has an attribute of name <parameter>name</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the attr to detect
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if the attr exists
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-remove-attr">bonobo_ui_node_remove_attr ()</title>
+<programlisting>void        bonobo_ui_node_remove_attr      (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name);</programlisting>
+<para>
+remove any attribute with name <parameter>name</parameter> from <parameter>node</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> name of the attribute
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-add-child">bonobo_ui_node_add_child ()</title>
+<programlisting>void        bonobo_ui_node_add_child        (<link linkend="BonoboUINode">BonoboUINode</link> *parent,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *child);</programlisting>
+<para>
+Add a <parameter>child</parameter> node to the <parameter>parent</parameter> node ( after the other children )</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> the parent
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> the new child
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-insert-before">bonobo_ui_node_insert_before ()</title>
+<programlisting>void        bonobo_ui_node_insert_before    (<link linkend="BonoboUINode">BonoboUINode</link> *sibling,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *prev_sibling);</programlisting>
+<para>
+Insert a <parameter>sibling</parameter> before <parameter>prev_sibling</parameter> in a node list</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sibling</parameter>&nbsp;:</entry>
+<entry> the node to insert
+</entry></row>
+<row><entry align="right"><parameter>prev_sibling</parameter>&nbsp;:</entry>
+<entry> the placeholder for insertion
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-unlink">bonobo_ui_node_unlink ()</title>
+<programlisting>void        bonobo_ui_node_unlink           (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+Unlink <parameter>node</parameter> from its tree, ie. disassociate it with its parent</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-replace">bonobo_ui_node_replace ()</title>
+<programlisting>void        bonobo_ui_node_replace          (<link linkend="BonoboUINode">BonoboUINode</link> *old_node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *new_node);</programlisting>
+<para>
+Replace <parameter>old_node</parameter> with <parameter>new_node</parameter> in the tree. <parameter>old_node</parameter> is
+left unlinked and floating with its children.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>old_node</parameter>&nbsp;:</entry>
+<entry> node to be replaced
+</entry></row>
+<row><entry align="right"><parameter>new_node</parameter>&nbsp;:</entry>
+<entry> node to replace with
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-set-content">bonobo_ui_node_set_content ()</title>
+<programlisting>void        bonobo_ui_node_set_content      (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *content);</programlisting>
+<para>
+Set the textual content of <parameter>node</parameter> to <parameter>content</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><parameter>content</parameter>&nbsp;:</entry>
+<entry> the new content
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-get-content">bonobo_ui_node_get_content ()</title>
+<programlisting>char*       bonobo_ui_node_get_content      (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+see also: bonobo_ui_node_free_string</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the content of <parameter>node</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-next">bonobo_ui_node_next ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_next           (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+accesses the next node.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the node after <parameter>node</parameter> in the list
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-prev">bonobo_ui_node_prev ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_prev           (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+accesses the previous node.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the node before <parameter>node</parameter> in the list
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-children">bonobo_ui_node_children ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_children       (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+accesses the node's children.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the first child of <parameter>node</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-parent">bonobo_ui_node_parent ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_parent         (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+accesses the node's parent.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the parent node of <parameter>node</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-get-name">bonobo_ui_node_get_name ()</title>
+<programlisting>const char* bonobo_ui_node_get_name         (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the name of <parameter>node</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-has-name">bonobo_ui_node_has_name ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_ui_node_has_name         (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             const char *name);</programlisting>
+<para>
+accesses the node's name.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> a name the node might have
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if <parameter>node</parameter> has name == <parameter>name</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-transparent">bonobo_ui_node_transparent ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_ui_node_transparent      (<link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+Determines whether <parameter>node</parameter> is transparent. A node is
+transparent if it has no content and either no attributes
+or a single 'name' attribute.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if transparent
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-copy-attrs">bonobo_ui_node_copy_attrs ()</title>
+<programlisting>void        bonobo_ui_node_copy_attrs       (<link linkend="BonoboUINode">BonoboUINode</link> *src,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *dest);</programlisting>
+<para>
+This function copies all the attributes from <parameter>src</parameter> to <parameter>dest</parameter>
+effectively cloning the <parameter>src</parameter> node as <parameter>dest</parameter></para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>src</parameter>&nbsp;:</entry>
+<entry> the attr source node
+</entry></row>
+<row><entry align="right"><parameter>dest</parameter>&nbsp;:</entry>
+<entry> where to dump the attrs.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-free-string">bonobo_ui_node_free_string ()</title>
+<programlisting>void        bonobo_ui_node_free_string      (char *str);</programlisting>
+<para>
+Frees a string returned by any of the get routines.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>str</parameter>&nbsp;:</entry>
+<entry> the string to free.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-to-string">bonobo_ui_node_to_string ()</title>
+<programlisting>char*       bonobo_ui_node_to_string        (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="gboolean">gboolean</link> recurse);</programlisting>
+<para>
+Convert the Node to its XML string representation
+see also: bonobo_ui_node_free_string</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node tree
+</entry></row>
+<row><entry align="right"><parameter>recurse</parameter>&nbsp;:</entry>
+<entry> whether to dump its children as well
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the string representation or NULL on error
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-from-string">bonobo_ui_node_from_string ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_from_string    (const char *str);</programlisting>
+<para>
+Parses a string into an XML tree</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>str</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the xml tree.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-from-file">bonobo_ui_node_from_file ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_ui_node_from_file      (const char *filename);</programlisting>
+<para>
+Loads and parses the filename into an XML tree</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>filename</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the xml tree.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-node-strip">bonobo_ui_node_strip ()</title>
+<programlisting>void        bonobo_ui_node_strip            (<link linkend="BonoboUINode">BonoboUINode</link> **node);</programlisting>
+<para>
+This function is used to purge unwanted content from
+a set of nodes, and particularly clean up stray Doc and
+NS pointers that cause serious trouble later.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> a pointer to the node's pointer
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="BonoboUIComponent">BonoboUIComponent</link>, <link linkend="bonobo-ui-util">bonobo-ui-util</link>
+</para>
+</refsect1>
+
+</refentry>

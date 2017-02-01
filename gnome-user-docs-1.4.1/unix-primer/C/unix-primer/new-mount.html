@@ -1,0 +1,408 @@
+<HTML
+><HEAD
+><TITLE
+>Mounting and unmounting drives</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.54"><LINK
+REL="HOME"
+TITLE=" If you are new to Linux/UNIX"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Symbolic links"
+HREF="symlinks.html"><LINK
+REL="NEXT"
+TITLE="Drives and devices"
+HREF="devices.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>If you are new to Linux/UNIX</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="symlinks.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="devices.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="NEW-MOUNT"
+>Mounting and unmounting drives</A
+></H1
+><P
+>      As we mentioned earlier, the directories on a UNIX system are
+      organized in a tree, with the top level directory being
+      <TT
+CLASS="FILENAME"
+>/</TT
+>. Unlike some other operating systems such as
+      MS-DOS, there are no special names for files on your floppy disk or
+      CD-ROM: <I
+CLASS="EMPHASIS"
+>all</I
+> the files accessible to your system
+      must appear in the main directory tree starting with
+      <TT
+CLASS="FILENAME"
+>/</TT
+>.
+    </P
+><P
+>      Thus, before you can access files on a floppy diskette or a
+      CD-ROM, you must give to your system a command to incorporate
+      the contents of this diskette into the main directory tree,
+      which is referred to as <I
+CLASS="EMPHASIS"
+>mounting</I
+> the
+      diskette. You can think of it as the software analog of
+      connecting the drive to your system.  Typically the contents of
+      the CD-ROM will appear under the name
+      <TT
+CLASS="FILENAME"
+>/mnt/cdrom</TT
+>; the floppy diskette under
+      <TT
+CLASS="FILENAME"
+>/mnt/floppy</TT
+> (these are called the
+      <I
+CLASS="EMPHASIS"
+>mount points</I
+> and are defined in the special
+      configuration file, <TT
+CLASS="FILENAME"
+>/etc/fstab</TT
+>). Accessing
+      a drive in this fashion doesn't mean that the system will copy
+      all the files from the CD to the directory
+      <TT
+CLASS="FILENAME"
+>/mnt/cdrom</TT
+>. Instead, it means that the
+      directory <TT
+CLASS="FILENAME"
+>/mnt/cdrom</TT
+>
+      <I
+CLASS="EMPHASIS"
+>represents</I
+> the CD-ROM: When a program tries
+      to access, say, a file called
+      <TT
+CLASS="FILENAME"
+>/mnt/cdrom/index.html</TT
+>, the system will look
+      for file <TT
+CLASS="FILENAME"
+>index.html</TT
+> on the CD-ROM.
+    </P
+><P
+>      So, in short: before you can use files on a drive, you must
+      <SPAN
+CLASS="QUOTE"
+>"mount"</SPAN
+> it. Similarly, <I
+CLASS="EMPHASIS"
+>before removing
+      the disk from the drive, you must unmount it.</I
+>
+    </P
+><P
+>      When using GNOME, you usually do not have to worry about
+      mounting and unmounting: GNOME scans the appropriate
+      configuration file and places the icons for all drives on your
+      desktop. Double-clicking on any of these icons automatically
+      mounts the corresponding drive (if it was not already mounted)
+      and starts the file manager in the appropriate directory.
+      Similarly, if you right-click on the drive icon and choose the
+      command <B
+CLASS="GUIMENUITEM"
+>Eject device</B
+> from the pop-up
+      menu, GNOME automatically unmounts it before ejecting. You can
+      also mount/unmount a drive by right-clicking on its icon on the
+      desktop and choosing <B
+CLASS="GUIMENUITEM"
+>Mount device</B
+> or
+      <B
+CLASS="GUIMENUITEM"
+>Unmount device</B
+> from the pop-up menu,
+      or by using the disk mount applet.
+    </P
+><P
+>      Note that you can't unmount a drive if it is being used by some
+      program; for example, if you have a terminal windows open in a
+      directory on the drive you're trying to unmount. So, if you get
+      the error message <SPAN
+CLASS="QUOTE"
+>"Device busy"</SPAN
+> while trying to
+      unmount a drive, make sure that none of your open applications
+      is accessing a file or directory on this drive.
+    </P
+><P
+>      However, GNOME cannot prevent you from ejecting the disk using the
+      physical eject button on the drive itself &#8212; in this case,
+      <I
+CLASS="EMPHASIS"
+>it is your responsibility to unmount the drive</I
+>
+      before doing so. For CD and Zip drives, the system blocks the eject
+      button on the drive while the drive is mounted; for floppy drives this
+      is technically impossible.
+    </P
+><DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="CENTER"
+><B
+>IMPORTANT</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>	If you eject a floppy  disk using the eject button on the drive without
+	first unmounting it, you may lose your data!
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+> Some systems are running special programs such as
+      <TT
+CLASS="APPLICATION"
+>supermount</TT
+> or
+      <TT
+CLASS="APPLICATION"
+>magicdev</TT
+>
+      which automatically mount a drive when a disk is inserted and unmount a
+      drive if it hasn't been used for a specified period of time. In
+      this case, you will probably never need to worry about
+      mounting/unmounting drives yourself; you don't even need to read
+      this section. 
+    </P
+><P
+>      Allowing users to mount and unmount drives carries some security
+      risks, so many multi-user systems are configured so that only
+      root can mount or unmount drives. This is the most probable
+      cause of error messages you may be getting while trying to mount
+      a drive. In this case, discuss this matter with your system
+      administrator.
+    </P
+><P
+>      If the computer is your personal workstation or home computer
+      and you are not worried about security, you can give mount
+      permission to ordinary users. The easiest way to allow this is
+      to use the application
+      <TT
+CLASS="APPLICATION"
+><I
+CLASS="EMPHASIS"
+>linuxconf</I
+></TT
+> (which
+      can only be run by root).  Just select the drive you want to
+      access in the <TT
+CLASS="GUILABEL"
+><B
+>Access local drive</B
+></TT
+> section.
+      In the <TT
+CLASS="GUILABEL"
+><B
+>Options</B
+></TT
+> tab select the
+      <TT
+CLASS="GUILABEL"
+><B
+>User Mountable</B
+></TT
+> option.  Your drive will now
+      be mountable by users.
+    </P
+><P
+>      If <TT
+CLASS="APPLICATION"
+><I
+CLASS="EMPHASIS"
+>linuxconf</I
+></TT
+> is
+      not available, then you must manually edit the file
+      <TT
+CLASS="FILENAME"
+>/etc/fstab</TT
+> to include user access. This is
+      done by adding the <SPAN
+CLASS="QUOTE"
+>"user"</SPAN
+> attribute to the
+      drive. For example:
+    </P
+><P
+>      If your <TT
+CLASS="FILENAME"
+>fstab</TT
+> file contains a line like
+      this:
+    </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/dev/cdrom /mnt/cdrom iso9660 exec,dev,ro,noauto 0 0
+      </PRE
+></TD
+></TR
+></TABLE
+><P
+>      add the word <SPAN
+CLASS="QUOTE"
+>"user"</SPAN
+> to the fourth column:
+    </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/dev/cdrom /mnt/cdrom iso9660 user,exec,dev,ro,noauto 0 0
+    </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="symlinks.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="devices.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Symbolic links</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Drives and devices</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

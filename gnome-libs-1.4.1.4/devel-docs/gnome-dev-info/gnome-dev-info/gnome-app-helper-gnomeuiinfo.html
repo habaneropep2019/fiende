@@ -1,0 +1,1013 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>The GnomeUIInfo structure</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Automatic menu and toolbar creation with GnomeAppHelper"
+HREF="gnome-app-helper.html"><LINK
+REL="PREVIOUS"
+TITLE="A quick example of using GnomeAppHelper"
+HREF="gnome-app-helper-quick-example.html"><LINK
+REL="NEXT"
+TITLE="Convenience macros to fill GnomeUIInfo structures"
+HREF="gnome-app-helper-convenience-macros.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="gnome-app-helper-quick-example.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Automatic menu and toolbar creation with GnomeAppHelper</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="gnome-app-helper-convenience-macros.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GNOME-APP-HELPER-GNOMEUIINFO"
+>The <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structure</A
+></H1
+><P
+>	GnomeAppHelper uses arrays of
+	<SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structures to define the
+	items that compose a menu bar or toolbar.  Each item contains an
+	optional icon and a text label.  Each item has a callback
+	function attached to it that gets invoked when the item is
+	activated.  Also, items may have a hotkey defined for them.
+	Items may have a check-box or be grouped inside a radio group.
+	Also, menu items may specify a subtree which they spawn.
+      </P
+><P
+>	The <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structure is defined as
+	follows.
+      </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	typedef struct {
+	GnomeUIInfoType <TT
+CLASS="STRUCTFIELD"
+><I
+>type</I
+></TT
+> ;
+	gchar *<TT
+CLASS="STRUCTFIELD"
+><I
+>label</I
+></TT
+>;
+	gchar *<TT
+CLASS="STRUCTFIELD"
+><I
+>hint</I
+></TT
+>;
+	gpointer <TT
+CLASS="STRUCTFIELD"
+><I
+>moreinfo</I
+></TT
+>;
+	gpointer <TT
+CLASS="STRUCTFIELD"
+><I
+>user_data</I
+></TT
+>;
+	gpointer <TT
+CLASS="STRUCTFIELD"
+><I
+>unused_data</I
+></TT
+>;
+	GnomeUIPixmapType <TT
+CLASS="STRUCTFIELD"
+><I
+>pixmap_type</I
+></TT
+>;
+	gpointer <TT
+CLASS="STRUCTFIELD"
+><I
+>pixmap_info</I
+></TT
+>;
+	guint <TT
+CLASS="STRUCTFIELD"
+><I
+>accelerator_key</I
+></TT
+>;
+	GdkModifierType <TT
+CLASS="STRUCTFIELD"
+><I
+>ac_mods</I
+></TT
+>;
+	GtkWidget *<TT
+CLASS="STRUCTFIELD"
+><I
+>widget</I
+></TT
+>;
+	} <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+>;
+      </PRE
+></TD
+></TR
+></TABLE
+><P
+>	These are the fields in the <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+>
+	structure.
+      </P
+><DIV
+CLASS="GLOSSLIST"
+><DL
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>type</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field is used to specify the type of item that should
+	      be created.  The rest of the fields in the structure
+	      define the item's attributes.  The
+	      <TT
+CLASS="STRUCTFIELD"
+><I
+>type</I
+></TT
+> field can have the
+	      following values:
+	    </P
+><DIV
+CLASS="GLOSSLIST"
+><DL
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_ITEM</SPAN
+></B
+></DT
+><DD
+><P
+>		    This indicates that a normal item should be
+		    created.  If the item is inside a radio group (see
+		    below), then a radio item will be created, by
+		    default in its inactive state.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_TOGGLEITEM</SPAN
+></B
+></DT
+><DD
+><P
+>		    This indicates that a a toggle item should be
+		    created.  By default it starts in the inactive
+		    state.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_RADIOITEMS</SPAN
+></B
+></DT
+><DD
+><P
+>		    This indicates that a group of radio items should be
+		    created.  The <TT
+CLASS="STRUCTFIELD"
+><I
+>moreinfo</I
+></TT
+>
+		    field must point to an array of items that will be
+		    created as the radio items in the group.  By default
+		    the first item will be the active item in the radio
+		    group.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_SUBTREE</SPAN
+></B
+></DT
+><DD
+><P
+>		    This indicates that the created item should have a
+		    submenu attached to it.  The
+		    <TT
+CLASS="STRUCTFIELD"
+><I
+>moreinfo</I
+></TT
+> field must point
+		    to an array of items that will be put in the
+		    submenu.  This item type is not supported in
+		    toolbars.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_SEPARATOR</SPAN
+></B
+></DT
+><DD
+><P
+>		    This indicates that a separator should be created.
+		    For menus this is a separator line, and for toolbars
+		    it is a blank space.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_HELP</SPAN
+></B
+></DT
+><DD
+><P
+>		    This indicates that help entries should be created.
+		    The <TT
+CLASS="STRUCTFIELD"
+><I
+>moreinfo</I
+></TT
+> field must
+		    point to a string with the application's ID string.
+		    See below for additional information on creating the
+		    help entries.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_JUSTIFY_RIGHT</SPAN
+></B
+></DT
+><DD
+><P
+>		    This indicates that all subsequent items should be
+		    aligned on the right side of the menu they are on.
+		    This only works for menus and only makes sense for
+		    menu bars.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_BUILDER_DATA</SPAN
+></B
+></DT
+><DD
+><P
+>		    This is intended for language bindings and GUI
+		    builders &#8212; it is not needed for normal
+		    programs.  It specifies that all subsequent items
+		    should use a different GnomeUIBuilderData structure
+		    from the one that was in use then the item was
+		    inserted.  The <TT
+CLASS="STRUCTFIELD"
+><I
+>moreinfo</I
+></TT
+>
+		    field should point to the desired GnomeUIBuilderData
+		    structure.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_ENDOFINFO</SPAN
+></B
+></DT
+><DD
+><P
+>		    This is used to indicate the end of an array of
+		    items.  It is very important to include an element
+		    of this type as the last entry in
+		    <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> arrays.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_ITEM_CONFIGURABLE</SPAN
+></B
+></DT
+><DD
+><P
+>		    This is used to indicate that the values for this
+		    menu item should be loaded from a configuration
+		    file.  A description of the format for the
+		    configuration file is given in <A
+HREF="gnome-app-helper-keybindings-config.html"
+>the Section called <I
+>Format information for the configuration of keybindings
+      for standard mens</I
+></A
+>.
+		    These should probably not be used manually.  Each
+		    possible configurable item has a matching
+		    convenience macro (see <A
+HREF="gnome-app-helper-convenience-macros.html"
+>the Section called <I
+>Convenience macros to fill <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structures</I
+></A
+>).
+		  </P
+><P
+>		    However, for completeness, a description of the
+		    programmatic use of this type is given.  When
+		    using this item, most of the data is ignored.  The
+		    exceptions are three fold.  Firstly, the
+		    <TT
+CLASS="STRUCTFIELD"
+><I
+>moreinfo</I
+></TT
+> and
+		    <TT
+CLASS="STRUCTFIELD"
+><I
+>data</I
+></TT
+> fields are treated
+		    exactly as in a
+		    GNOME_APP_UI_ITEM
+		    <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> array
+		    element.  Secondly, the
+		    <TT
+CLASS="STRUCTFIELD"
+><I
+>accelerator_key</I
+></TT
+> field
+		    is an integer cast from an element of the
+		    GNOMEUIInfoConfigurableTypes
+		    enum describing which configurable menu item this
+		    represents.  Finally, if accelerator_key is 0,
+		    i.e. GNOME_APP_CONFIGURABLE_ITEM_NEW, then label
+		    and hint are both used verbatim.
+		  </P
+></DD
+></DL
+></DIV
+><P
+>	      The other fields in the <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+>
+	      structure are used to specify the attributes of the item
+	      being defined.
+	    </P
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>label</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field is used to specify the text label for the item
+	      being created.  The un-translated version of the label
+	      should be specified; GnomeAppHelper calls the translation
+	      routines itself.
+	    </P
+><P
+>	      For menu items it is desirable to have an underlined
+	      letter in the label, so that the user knows that he can
+	      press that letter on the keyboard and activate the
+	      corresponding menu item.  To specify an underlined letter,
+	      put an underscore (_) before it in the label's string.
+	      Examples are, "_File", "_Edit", and "_Copy".
+	    </P
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>hint</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field specifies an optional string that should be
+	      used for the tooltip in toolbar items or for the status
+	      bar hint in menu items.  The un-translated version of the
+	      hint should be specified.  If no hint string is desired,
+	      specify NULL.</P
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>moreinfo</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field is used to specify different things according
+	      to the type of item that is being defined.
+	    </P
+><P
+></P
+><UL
+><LI
+><P
+>		  For normal, radio, and toggle items
+		  (GNOME_APP_UI_ITEM, GNOME_APP_UI_ITEM, and
+		  GNOME_APP_UI_TOGGLEITEM, respectively), this field
+		  should point to the function that should be called
+		  when the item is activated.  The general prototype of
+		  this function is as follows:
+
+		  <DIV
+CLASS="FUNCSYNOPSIS"
+><A
+NAME="AEN1613"
+></A
+><P
+></P
+><CODE
+CLASS="FUNCDEF"
+>void <TT
+CLASS="FUNCTION"
+>callback</TT
+></CODE
+>(GtkWidget *<TT
+CLASS="PARAMETER"
+><I
+>item</I
+></TT
+>, gpointer <TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>);<P
+></P
+></DIV
+>
+
+		  The <TT
+CLASS="PARAMETER"
+><I
+>item</I
+></TT
+> argument is the menu item
+		  or button in the toolbar that was selected, and the
+		  <TT
+CLASS="PARAMETER"
+><I
+>&#62;user_data</I
+></TT
+> argument is the normal
+		  callback's user data.
+		</P
+></LI
+><LI
+><P
+>		  For submenus (subtrees, type
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_SUBTREE</SPAN
+>), this field
+		  should point to another array of
+		  <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structures.  This
+		  array defines the subtree.
+		</P
+></LI
+><LI
+><P
+>		  For items of type
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_RADIOITEMS</SPAN
+>, this field
+		  should point to an array of
+		  <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structures which
+		  defines the items that are to be put in the radio
+		  group.  Within this array, only items of type
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_ITEM</SPAN
+> and
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_BUILDER_DATA</SPAN
+> are
+		  supported.
+		</P
+></LI
+><LI
+><P
+>		  For items of type <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_HELP</SPAN
+>,
+		  this item should point to a string that is the
+		  application's ID name.  GnomeAppHelper will look for
+		  the topic.dat file in the help directory defined by
+		  the application's ID string, read it, and include the
+		  appropriate help topics in the menu.  This type is not
+		  valid for toolbars.
+		</P
+></LI
+><LI
+><P
+>		  For items of type
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_UI_BUILDER_DATA</SPAN
+>, this field
+		  should point to a
+		  <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIBuilderData</SPAN
+> structure.
+		  The information in this structure will be used for all
+		  subsequent items in the array.  This is normally only
+		  needed by language bindings and GUI builders.
+		</P
+></LI
+><LI
+><P
+>		  For all other item types, this field is ignored.  You
+		  should set it to NULL, however, for compatibility with
+		  future extensions to GnomeAppHelper.
+		</P
+></LI
+></UL
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>user_data</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This should point to the data you want to pass to the
+	      callback that will be activated when the menu or toolbar
+	      item is selected.  Frequently you will leave this as NULL
+	      and pass a specific data pointer to all callbacks using
+	      the functions defined below.
+	    </P
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>unused_data</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field is reserved for future expansion, and should be
+	      set to NULL.
+	    </P
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>pixmap_type</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This should be one of the following values.
+	    </P
+><DIV
+CLASS="GLOSSLIST"
+><DL
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_PIXMAP_NONE</SPAN
+></B
+></DT
+><DD
+><P
+>		    Specifies that no icon should be used for this
+		    item.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_PIXMAP_STOCK</SPAN
+></B
+></DT
+><DD
+><P
+>		    Specifies that a stock icon should be used.  The
+		    name or identifier of the icon should be specified
+		    in the <TT
+CLASS="STRUCTFIELD"
+><I
+>pixmap_info</I
+></TT
+> field.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_PIXMAP_DATA</SPAN
+></B
+></DT
+><DD
+><P
+>		    Specifies that an icon created from inline XPM data
+		    should be used.  A pointer to the XPM data must be
+		    specified in the
+		    <TT
+CLASS="STRUCTFIELD"
+><I
+>pixmap_info</I
+></TT
+> field.
+		  </P
+></DD
+><DT
+><B
+><SPAN
+CLASS="SYMBOL"
+>GNOME_APP_PIXMAP_FILENAME</SPAN
+></B
+></DT
+><DD
+><P
+>		    Specifies that an image file should be loaded and
+		    used as an icon.  The file name must be specified in
+		    the <TT
+CLASS="STRUCTFIELD"
+><I
+>pixmap_info</I
+></TT
+> field.
+		  </P
+></DD
+></DL
+></DIV
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>pixmap_info</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field specifies the information used to create the
+	      pixmap for the item's icon.
+	    </P
+><P
+></P
+><UL
+><LI
+><P
+>		  For icons of type
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_PIXMAP_NONE</SPAN
+>, this field can
+		  be set to NULL.
+		</P
+></LI
+><LI
+><P
+>		  For icons of type
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_PIXMAP_STOCK</SPAN
+>, this field
+		  should point to a string with the stock icon's
+		  identifier.  For menu items it is suggested that you
+		  use the <SPAN
+CLASS="SYMBOL"
+>GNOME_STOCK_MENU_*</SPAN
+> symbols.
+		  For toolbars, you should use the
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_STOCK_PIXMAP_*</SPAN
+> symbols.
+		</P
+></LI
+><LI
+><P
+>		  For icons of type
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_PIXMAP_DATA</SPAN
+>, this field
+		  should point to the inline XPM data from which the
+		  icon will be created.
+		</P
+></LI
+><LI
+><P
+>		  For icons of type
+		  <SPAN
+CLASS="SYMBOL"
+>GNOME_APP_PIXMAP_FILENAME</SPAN
+>, this field
+		  should point to a string with the name of the image
+		  file to load.  This image will be used as an icon.
+		</P
+></LI
+></UL
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>accelerator_key</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field is used to specify an optional accelerator key
+	      for the item.  Applications should use the standard
+	      accelerator keys defined in the GNOME User Interface
+	      Guidelines.
+	    </P
+><P
+>	      You should specify the key code of the key you want to use
+	      as an accelerator.  Key codes are listed in the
+	      gdkkeysyms.h include file.
+	    </P
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>ac_mods</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field is used to specify the modifier keys that
+	      should be used in conjunction with the key specified in
+	      the <TT
+CLASS="STRUCTFIELD"
+><I
+>accelerator_key</I
+></TT
+> field for
+	      the item's accelerator.  Applications should use the
+	      standard accelerator keys defined in the GNOME User
+	      Interface Guidelines.
+	    </P
+><P
+>	      The value in this field is a bit mask composed of the
+	      values in the <SPAN
+CLASS="TYPE"
+>GdkModifierType</SPAN
+> enumeration.
+	    </P
+></DD
+><DT
+><B
+><TT
+CLASS="STRUCTFIELD"
+><I
+>widget</I
+></TT
+></B
+></DT
+><DD
+><P
+>	      This field is filled in by the GnomeAppHelper functions.
+	      Once you have called one of the functions that take an
+	      array of <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structures
+	      and turn it into a widget tree, the
+	      <TT
+CLASS="STRUCTFIELD"
+><I
+>widget</I
+></TT
+> fields of the structures
+	      in the array will have pointers to the created widgets.
+	      You can use these pointers to do several operations like
+	      hide and show the items, and make them insensitive.
+	    </P
+></DD
+></DL
+></DIV
+><P
+>	In addition to the plain <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+>
+	structures, GnomeAppHelper provides some macros to make filling
+	these structures easier.  These are most useful for items that
+	require a few parameters and for toolbars, which do not have as
+	many options as menus.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gnome-app-helper-quick-example.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gnome-app-helper-convenience-macros.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>A quick example of using GnomeAppHelper</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="gnome-app-helper.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Convenience macros to fill <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structures</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

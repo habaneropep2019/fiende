@@ -1,0 +1,281 @@
+/* $Id: druid-page.gen_h,v 1.5 2001/04/24 14:39:35 murrayc Exp $ */
+
+
+/* druid-page.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#m4start
+dnl
+dnl DruidPage is so off we need to make special types for it.
+dnl
+define(`GTKMM_PROXY_SIGNAL_EMIT',`dnl
+GTKMM_SECTION(PROXY)
+ifelse($1,void,`dnl
+      DSignalV<CppObjectType,BaseObjectType,$4,&$5> $2;',`dnl
+      DSignalB<CppObjectType,BaseObjectType,$4,&$5> $2;')
+GTKMM_SECTION(CLASS)')
+
+define(`GTKMM_PROXY_IMPL',`dnl
+GTKMM_SECTION(SIMPL)
+    virtual $3 $1_impl();
+GTKMM_SECTION(SIGNAL)
+$3 __NAMESPACE__::__CPPNAME__::$1_impl()
+  {
+    BaseClassType* base=
+      static_cast<BaseClassType*>(
+        gtk_type_parent_class(gtkobject->klass->type));
+    if (base->$2)
+ifelse($3,void,`dnl
+      (base->$2)(gtkobj(),(GtkWidget*)(Gtk::Widget::gtkobj()->parent));
+',`dnl
+      return (base->$2)(gtkobj(),(GtkWidget*)(Gtk::Widget::gtkobj()->parent));
+    gtkmm_set_ignore();
+    return 0;
+')
+  }
+
+GTKMM_SECTION(CLASS)')
+
+define(`GTKMM_PROXY_CALLBACK',`dnl
+GTKMM_SECTION(CINIT)
+    klass->$2=$2_callback;
+GTKMM_SECTION(PRIVATE)
+  static ifelse($4,bool,gboolean,void) $2_callback(GnomeDruidPage *, GtkWidget *);
+GTKMM_SECTION(SIGNAL)
+ifelse($4,bool,gboolean,void) __NAMESPACE__::__CPPNAME__`'_Class::$2_callback(GnomeDruidPage *$8, GtkWidget *druid)
+  {
+    CppObjectType *obj=
+dnl Do not change the line below, both casts are necessary
+      static_cast<CppObjectType *>(static_cast<Gtk::Object *>(
+        gtk_object_get_data_by_id((GtkObject*)$8,Gtk::quark_)));
+
+ifelse($4,void,`dnl
+    if (obj) 
+      obj->$1_impl();
+    else
+      {
+        BaseClassType* base=
+          static_cast<BaseClassType*>(
+            gtk_type_parent_class(((GtkObject*)$8)->klass->type));
+        if (base->$2)
+          (base->$2)($6);
+      }
+',`dnl
+    if (obj) 
+      return obj->$1_impl`'();
+    else
+      {
+        BaseClassType* base=
+          static_cast<BaseClassType*>(
+            gtk_type_parent_class(((GtkObject*)$8)->klass->type));
+        if (base->$2)
+          return (base->$2)($6);
+        gtkmm_set_ignore();
+      }
+    return 0;
+')
+  }
+
+GTKMM_SECTION(CLASS)')
+#m4end
+
+#include <gtk--/bin.h>
+#include <libgnome/gnome-defs.h>
+#include <libgnomeui/gnome-druid-page.h>
+#include <gnome--/imlib.h>
+
+
+CLASS_START(Gnome);
+
+template <class Obj,class gObj,int index,
+        void (*emit_func)(gObj*)>
+class DSignalV
+  {
+    public:
+      typedef DSignalV<Obj,gObj,index,emit_func> Self;
+      typedef SigC::Callback0<void> Callback;
+      typedef SigC::Slot0<void> SlotType;
+      typedef SigC::CallDataObj2<typename SlotType::Func,Self> Data;
+
+    protected:
+      Obj *obj;
+
+    private:
+
+      typedef void RType;
+
+      static void gtk_callback(GtkObject*,GtkWidget*,void *d)
+        {
+          Gtk::ProxyNode *node=(Gtk::ProxyNode*)d;
+          Callback* data=(Callback*)(node->callback_);
+          data->call();
+        }
+
+      static void callback(void* d)
+        {
+          Data* data=(Data*)d;
+          data->obj->emit();
+        }
+
+    public:
+      SlotType slot()
+        {
+          SigC::SlotData* tmp=manage(new SigC::SlotData());
+          Data& data=reinterpret_cast<Data&>(tmp->data_);
+          data.callback=&callback;
+          data.obj=this;
+          SigC::ScopeNode* node=tmp->receiver();
+          obj->register_data(node);
+          return tmp;
+        }
+
+      void emit()
+        {
+          reinterpret_cast<void (*)(gObj*)>
+            (emit_func) (obj->gtkobj());
+        }
+
+      void operator()()
+        {
+           reinterpret_cast<void (*)(gObj*)>
+            (emit_func) (obj->gtkobj());
+        }
+
+      SigC::Connection connect(const SlotType &s)
+        {
+         SigC::SlotData* d=s.data();
+         Gtk::ProxyNode::connect(obj,
+                            obj->signal_names[index],
+                            (GtkSignalFunc)gtk_callback,
+                            d,
+                            true);
+         return d;
+        }
+  };
+
+template <class Obj,class gObj,int index,
+        gboolean (*emit_func)(gObj*)>
+class DSignalB
+  {
+    public:
+      typedef DSignalB<Obj,gObj,index,emit_func> Self;
+      typedef SigC::Callback0<bool> Callback;
+      typedef SigC::Slot0<bool> SlotType;
+      typedef SigC::CallDataObj2<typename SlotType::Func,Self> Data;
+
+    protected:
+      Obj *obj;
+
+    private:
+
+      typedef bool RType;
+
+      static RType gtk_callback(GtkObject*,GtkWidget*,void *d)
+        {
+          Gtk::ProxyNode *node=(Gtk::ProxyNode*)d;
+          Callback* data=(Callback*)(node->callback_);
+          return data->call();
+        }
+
+      static RType callback(void* d)
+        {
+          Data* data=(Data*)d;
+          return data->obj->emit();
+        }
+
+    public:
+      SlotType slot()
+        {
+          SigC::SlotData* tmp=manage(new SigC::SlotData());
+          Data& data=reinterpret_cast<Data&>(tmp->data_);
+          data.callback=&callback;
+          data.obj=this;
+          SigC::ScopeNode* node=tmp->receiver();
+          obj->register_data(node);
+          return tmp;
+        }
+
+      RType emit()
+        {
+          return reinterpret_cast<gboolean (*)(gObj*)>
+            (emit_func) (obj->gtkobj());
+        }
+
+      RType operator()()
+        {
+           return reinterpret_cast<gboolean (*)(gObj*)>
+            (emit_func) (obj->gtkobj());
+        }
+
+      SigC::Connection connect(const SlotType &s)
+        {
+         SigC::SlotData* d=s.data();
+         Gtk::ProxyNode::connect(obj,
+                            obj->signal_names[index],
+                            (GtkSignalFunc)gtk_callback,
+                            d,
+                            true);
+         return d;
+        }
+  };
+
+
+class DruidPage : public Gtk::Bin
+{
+  WRAP_CLASS(DruidPage, GnomeDruidPage,
+             GNOME_DRUID_PAGE, GNOME_IS_DRUID_PAGE,
+             druid_page,
+             Gtk::Bin, GtkBin, GTK_BIN);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  SIGNAL_SPEC("next",    both|marsh, bool next(Gtk::Widget &druid), gnome_druid_page_next);
+  SIGNAL_SPEC("prepare", both,       void prepare(Gtk::Widget &druid), gnome_druid_page_prepare);
+  SIGNAL_SPEC("back",    both|marsh, bool back(Gtk::Widget &druid), gnome_druid_page_back);
+  SIGNAL_SPEC("finish",  both,       void finish(Gtk::Widget &druid), gnome_druid_page_finish);
+  SIGNAL_SPEC("cancel",  both|marsh, bool cancel(Gtk::Widget &druid), gnome_druid_page_cancel);
+
+/* common functions */
+  virtual void set_bg_color (const Gdk_Color &color);
+  virtual void set_title (const Gtk::string &title);
+  virtual void set_title_color (const Gdk_Color &color);
+  virtual void set_logo (const Gdk_Imlib::Image &logo_image);
+  virtual void set_logo_bg_color (const Gdk_Color &color);
+
+ 
+    
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+#include <gnome--/private/druid-page_p.h>
+
+void Gnome::DruidPage::set_bg_color (const Gdk_Color &color) {}
+void Gnome::DruidPage::set_title (const Gtk::string &title) {}
+void Gnome::DruidPage::set_title_color (const Gdk_Color &color) {}
+void Gnome::DruidPage::set_logo (const Gdk_Imlib::Image &logo_image) {}
+void Gnome::DruidPage::set_logo_bg_color (const Gdk_Color &color) {}
+
+DOCUMENTATION_START;
+

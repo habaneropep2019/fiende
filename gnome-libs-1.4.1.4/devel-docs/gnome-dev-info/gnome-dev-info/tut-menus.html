@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Adding menus</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="GNOME Developer's Tutorial."
+HREF="tutorial.html"><LINK
+REL="PREVIOUS"
+TITLE="GNOME Developer's Tutorial."
+HREF="tutorial.html"><LINK
+REL="NEXT"
+TITLE="Internationalization."
+HREF="tut-i18n.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="tutorial.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>GNOME Developer's Tutorial.</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="tut-i18n.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUT-MENUS"
+>Adding menus</A
+></H1
+><P
+><IMG
+SRC="gnome-hello-1-menus.jpg"></P
+><P
+>      	  From the <I
+CLASS="CITETITLE"
+>GNOME Style Guide</I
+>
+      	  </P
+><P
+>      	  <P
+CLASS="LITERALLAYOUT"
+>Menus&nbsp;and&nbsp;MenuBars<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Menubars&nbsp;should&nbsp;be&nbsp;present&nbsp;in&nbsp;every&nbsp;App.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All&nbsp;apps&nbsp;should&nbsp;have&nbsp;a&nbsp;"Help"&nbsp;entry&nbsp;in&nbsp;the&nbsp;Menubar.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All&nbsp;menus&nbsp;need&nbsp;at&nbsp;least&nbsp;one&nbsp;entry.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An&nbsp;About&nbsp;Menu&nbsp;should&nbsp;be&nbsp;available&nbsp;in&nbsp;under&nbsp;the&nbsp;Help&nbsp;Menu&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;should&nbsp;open&nbsp;a&nbsp;small&nbsp;dialog&nbsp;telling&nbsp;at&nbsp;least&nbsp;app&nbsp;name,&nbsp;author,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;version,&nbsp;and&nbsp;date.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A&nbsp;"File"&nbsp;menu&nbsp;should&nbsp;be&nbsp;in&nbsp;every&nbsp;application,&nbsp;and&nbsp;contain&nbsp;at&nbsp;least<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quit.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Menu&nbsp;items&nbsp;that&nbsp;open&nbsp;dialogs&nbsp;should&nbsp;indicate&nbsp;it&nbsp;with&nbsp;an&nbsp;"..."<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Menu&nbsp;items&nbsp;that&nbsp;lead&nbsp;to&nbsp;submenus&nbsp;should&nbsp;indicate&nbsp;it&nbsp;with&nbsp;an<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arrow.&nbsp;The&nbsp;Help&nbsp;Menu&nbsp;should&nbsp;be&nbsp;right&nbsp;justified&nbsp;in&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Menubar.<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;</P
+>
+	  </P
+><P
+>          At the time of the writing of this draft gnome-hello uses the 
+          GtkMenuFactory way of creating menus. It's going to be replaced
+          by the gnome-app-helper in a little time. (when the gnome_app_*
+          have support for i18n, accelerators and right-justified menus). Until
+          then isn't going to be an explanation about "how" do the menus.
+      	  </P
+><P
+>      	  The menu options present in gnome-hello are only the mandatory: 
+          <B
+CLASS="GUIMENUITEM"
+>File/Exit</B
+>, that uses the same quit_cb
+          that we've seen in the previous section, and
+      	  <B
+CLASS="GUIMENUITEM"
+>Help/About...</B
+> that uses the 
+      	  gnome-about widget (see <A
+HREF="libgnomeui.html#GNOME-ABOUT"
+>the Section called <I
+>gnome-about - "About..." Widget</I
+> in the chapter called <I
+>GNOME User Interface library.</I
+></A
+>) written
+      	  by Cesar <TT
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:miquel@df.uba.ar"
+>miquel@df.uba.ar</A
+>&#62;</TT
+>.
+      	  </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void
+about_cb (GtkWidget *widget, void *data)
+{
+  GtkWidget *about;
+  gchar *authors[] = {
+/* Here should be your names */
+          "Mark Galassi",
+          "Horacio J. Peña",
+          NULL
+          };
+
+  about = gnome_about_new ( "The Hello World Gnomified", VERSION,
+                        /* copyright notice */
+                        "(C) 1998 the Free Software Foundation",
+                        authors,
+                        /* another comments */
+                        "GNOME is a civilized software system "
+                          "so we've a \"hello world\" program",
+                        NULL);
+  gtk_widget_show (about);
+
+  return;
+}
+      	  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tut-i18n.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>GNOME Developer's Tutorial.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Internationalization.</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,286 @@
+/* $Id: text.gen_h,v 1.59 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* text.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/editable.h>
+#include <gtk--/adjustment.h>
+#include <gtk/gtktext.h>
+CLASS_START(Gtk);
+
+namespace Text_Helpers {
+class Context
+  {
+      bool is_fore_;
+      bool is_back_;
+      bool is_font_;
+      Gdk_Color fore_;
+      Gdk_Color back_;
+      Gdk_Font  font_;
+    public:
+      GdkColor* gtkfore() const 
+        { return (is_fore_)?const_cast<GdkColor*>(fore_.gdkobj()):0; } 
+      GdkColor* gtkback() const 
+        { return (is_back_)?const_cast<GdkColor*>(back_.gdkobj()):0; } 
+      GdkFont* gtkfont()  const 
+        { return (is_font_)?font_.gdkobj():0; }
+
+      void set_foreground() {is_fore_=false;}
+      void set_background() {is_back_=false;}
+      void set_font()       {is_font_=false; font_=0;}
+      void set_foreground(const Gdk_Color& color)
+        { is_fore_=true;  fore_=color; }
+      void set_background(const Gdk_Color& color)
+        { is_back_=true;  back_=color; }
+      void set_font(const Gdk_Font& color)
+        { is_font_=true;  font_=color; }
+   
+      Context() : is_fore_(0),is_back_(0),is_font_(0) {}
+      Context(const Gdk_Font& font) : is_fore_(0),is_back_(0),is_font_(1) 
+        { font_=font; }
+  };
+};
+
+//: Text widget which allows display and manipulation of arbitrary text.
+//- A {\class Gtk::Text} widget allows one to display any given text and manipulate it
+//- by deleting from one point to another, selecting a region, and various other
+//- functions as outlined below. It is inherited from {Gtk::Editable::}. 
+class Text : public Editable {
+  WRAP_CLASS(Text,GtkText,GTK_TEXT,GTK_IS_TEXT,text,Gtk::Editable,GtkEditable,GTK_EDITABLE);
+public:
+
+  Text( Adjustment &hadj, Adjustment &vadj);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+  Text();
+
+  SIGNAL_SPEC("set_scroll_adjustments",both|fake,
+    void set_scroll_adjustments(Gtk::Adjustment*,Gtk::Adjustment*),
+    void gtk_text_set_scroll_adjustments(GtkText*,GtkAdjustment*,GtkAdjustment*));
+
+
+  // gtk_text_set_editable inherited from editable
+
+  //: Sets whether the {\class Gtk::Text} widget wraps words down to the next line if
+  //: it can't be completed on the current line. 
+  //- {\var word_wrap}: TRUE makes it word wrap, FALSE disables word wrapping.
+  WRAP_METHOD(
+    void gtk_text_set_word_wrap(GtkText*,gint),
+    void set_word_wrap  (bool word_wrap));
+
+  //: Controls how {\class Gtk::Text} handles long lines of continuous text.
+  //- If line wrap is on, the line is broken when it reaches the extent of the
+  //- {\class Gtk::Text} widget viewing area and the rest is displayed on the next line.
+  //- If it is not set, the line continues regardless size of current viewing area.
+  //- Similar to word wrap but it disregards word boundaries. 
+  //-
+  //- {\var line_wrap}: TRUE turns line wrap on, FALSE turns it off.
+  WRAP_METHOD(
+    void gtk_text_set_line_wrap(GtkText*,gint),
+    void set_line_wrap  (bool line_wrap));
+
+  //: Allows you to set GtkAdjustment pointers which in turn allows you to keep track of
+  //: the viewing position of the {\class Gtk::Text} widget. 
+  //- {\var hadj}: The horizontal adjustment.
+  //-
+  //- {\var vadj}: The vertical adjustment.
+  WRAP_METHOD(
+    void gtk_text_set_adjustments(GtkText*,GtkAdjustment*,GtkAdjustment*),
+    void set_adjustments(Gtk::Adjustment *hadj=0,
+		         Gtk::Adjustment *vadj=0));
+
+  //: Allows you to set GtkAdjustment pointers which in turn allows you to keep track of
+  //: the viewing position of the {\class Gtk::Text} widget. 
+  //- {\var hadj}: The horizontal adjustment.
+  //-
+  //- {\var vadj}: The vertical adjustment.
+  WRAP_METHOD(
+    void gtk_text_set_adjustments(GtkText*,GtkAdjustment*,GtkAdjustment*),
+    void set_adjustments(Gtk::Adjustment &hadj,
+		         Gtk::Adjustment &vadj));
+
+  WRAP_MEMBER(value,hadjustment,hadj,Gtk::Adjustment*,GtkAdjustment*);
+  WRAP_MEMBER(value,vadjustment,vadj,Gtk::Adjustment*,GtkAdjustment*);
+  
+  //: Sets the cursor at the given point.
+  //- In this case a point constitutes the number of characters from the extreme upper
+  //- left corner of the {\class Gtk::Text} widget. 
+  //- {\var index}: The number of characters from the upper left corner.
+  WRAP_METHOD(
+    void gtk_text_set_point(GtkText*,guint),
+    void set_point      (guint index));
+
+  //: Gets the current position of the cursor as the number of characters from the
+  //: upper left corner of the {\class Gtk::Text} widget. 
+  //- {\var Returns}: The number of characters from the upper left corner.
+  WRAP_METHOD(
+    guint gtk_text_get_point(GtkText*),
+    guint get_point     () const);
+
+  //: Returns the length of the all the text contained within the
+  //: {\class Gtk::Text} widget; disregards current point position. 
+  //- {\var Returns}: The length of the text.
+  WRAP_METHOD(
+    guint gtk_text_get_length(GtkText*),
+    guint get_length    () const);
+
+  //: Freezes the {\class Gtk::Text} widget which disallows redrawing of the
+  //: widget until it is thawed.
+  //- This is useful if a large number of changes are going to made to
+  //- the text within the widget, reducing the amount of flicker seen by the user. 
+  WRAP_METHOD(void gtk_text_freeze(GtkText*),
+    void freeze         ());
+
+  //: Allows the {\class Gtk::Text} widget to be redrawn again by GTK.
+  WRAP_METHOD(void gtk_text_thaw(GtkText*),
+    void thaw           ());
+
+  // depreciated 
+  //: Inserts given text into the GtkText widget with the given properties as outlined below. 
+  //- {\var font}: The {Gdk::Font::} to use.
+  //-
+  //- {\var fore}: The foreground color to insert with.
+  //-
+  //- {\var back}: The background color to insert with.
+  //-
+  //- {\var chars}: The actual text to be inserted.
+  //-
+  //- {\var length}: The length of the text to be inserted, passing -1 makes it insert all the text.
+  WRAP_METHOD(
+    void gtk_text_insert(GtkText*,GdkFont*,GdkColor*,GdkColor*,const char*,gint),
+    void insert       (const Gdk_Font &font,
+		       const Gdk_Color &fore,
+		       const Gdk_Color &back,
+		       const nstring &chars,
+		       gint length));
+
+  typedef Gtk::Text_Helpers::Context Context;
+  void insert(const Context& gc, const string &text);
+  void insert(const string &text);
+
+  //: Deletes from the current point position backward the given number of characters. 
+  //- {\var nchars}: The number of characters to delete.
+  //-
+  //- {\var Returns}: TRUE if the operation was successful, otherwise returns FALSE.
+  WRAP_METHOD(gint gtk_text_backward_delete(GtkText*,guint),
+    gint backward_delete(guint nchars));
+  //: Deletes from the current point position forward the given number of characters. 
+  //- {\var nchars}: The number of characters to delete.
+  //-
+  //- {\var Returns}: TRUE if the operation was successful, otherwise returns FALSE.
+  WRAP_METHOD(gint gtk_text_forward_delete(GtkText*,guint),
+    gint forward_delete(guint nchars));
+
+  // use this only if you are changing in a local spot.  Global
+  // changes should be done at the style level.
+  void set_context();
+  void set_context(const Context& gc);
+  Context get_context() const;
+
+private:
+  Context gc_;
+};
+
+PRIVATE_START;
+#include <gtk--/private/editable_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+Text::Text()
+  :     Editable((GtkEditable*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gtk_text_set_adjustments (gtkobj(), 0, 0);
+}
+
+Text::Text( Adjustment &hadj,
+		    Adjustment &vadj)
+  :     Editable((GtkEditable*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_adjustments(hadj, vadj);
+}
+
+void Text::insert(const Context& gc, const string& text)
+{
+  gtk_text_insert(gtkobj(), gc.gtkfont(), gc.gtkfore(), gc.gtkback(), text.c_str(), text.length());
+}
+
+void Text::insert(const string& text)
+{
+  gtk_text_insert(gtkobj(), gc_.gtkfont(), gc_.gtkfore(), gc_.gtkback(), text.c_str(), text.length());
+}
+
+void Text::set_context()
+{
+  gc_=Context();
+}
+
+void Text::set_context(const Context& gc)
+{
+  gc_=gc;
+}
+
+Text::Context Text::get_context() const
+{
+  return gc_;
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Text)
+//. name: text_area
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: hadj
+//. type: GtkAdjustment*
+//. get:
+//. set:
+//. desc:
+
+//. name: vadj
+//. type: GtkAdjustment*
+//. get:
+//. set:
+//. desc:
+
+//. name: gc
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: line_wrap_bitmap
+//. type: GdkPixmap*
+//. get:
+//. set:
+//. desc:
+
+//. name: line_arrow_bitmap
+//. type: GdkPixmap*
+//. get:
+//. set:
+//. desc:
+

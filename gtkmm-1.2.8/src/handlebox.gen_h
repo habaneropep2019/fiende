@@ -1,0 +1,146 @@
+/* $Id: handlebox.gen_h,v 1.43 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* handlebox.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/eventbox.h>
+#include <gtk/gtkhandlebox.h>
+CLASS_START(Gtk);
+//: A container which allows the user to reposition it's contents.
+//- The {\class Gtk::HandleBox} widget allows a portion of a window
+//- to be "torn off". It is a bin widget which displays its child and
+//- a handle that the user can drag to tear off a separate window
+//- (the float window) containing the child widget. A thin ghost is
+//- drawn in the original location of the handlebox. By dragging the
+//- separate window back to its original location, it can be reattached.
+//-
+//- When reattaching, the ghost and float window, must be aligned
+//- along one of the edges, the snap edge. This either can be
+//- specified by the application programmer explicitely, or GTK+ will
+//- pick a reasonable default based on the handle position.
+//-
+//- To make detaching and reattaching the handlebox as minimally
+//- confusing as possible to the user, it is important to set the
+//- snap edge so that the snap edge does not move when the
+//- handlebox is deattached. For instance, if the handlebox is
+//- packed at the bottom of a VBox, then when the handlebox is
+//- detached, the bottom edge of the handlebox's allocation will
+//- remain fixed as the height of the handlebox shrinks, so the
+//- snap edge should be set to {\enum GTK_POS_BOTTOM}.
+class HandleBox : public Bin
+{
+  WRAP_CLASS(HandleBox,GtkHandleBox,GTK_HANDLE_BOX,GTK_IS_HANDLE_BOX,handle_box,Gtk::Bin,GtkBin,GTK_BIN);
+public:
+
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  SIGNAL_SPEC("child_attached",noemit|impl|sig,void child_attached(Gtk::Widget*),void child_attached(GtkHandleBox*,GtkWidget*));
+  SIGNAL_SPEC("child_detached",noemit|impl|sig,void child_detached(Gtk::Widget*),void child_detached(GtkHandleBox*,GtkWidget*));
+
+  //: Set how te widget looks.
+  //- type can be one of: {\enum GTK_SHADOW_NONE}, {\enum GTK_SHADOW_IN}, {\enum GTK_SHADOW_OUT},
+  //- {\enum GTK_SHADOW_ETCHED_IN}, {\enum GTK_SHADOW_ETCHED_OUT}.
+  WRAP_METHOD(void gtk_handle_box_set_shadow_type(GtkHandleBox*,GtkShadowType),
+	      void set_shadow_type(GtkShadowType type));
+
+  //: Set the handle's position.
+  //- position can be one of: {\enum GTK_POS_LEFT}, {\enum GTK_POS_RIGHT}, {\enum GTK_POS_TOP},
+  //- {\enum GTK_POS_BOTTOM}.
+  WRAP_METHOD(void gtk_handle_box_set_handle_position(GtkHandleBox*,GtkPositionType),
+	      void set_handle_position(GtkPositionType position));
+
+  WRAP_METHOD(void gtk_handle_box_set_snap_edge(GtkHandleBox*,GtkPositionType),
+	      void set_snap_edge(GtkPositionType edge));
+
+  WRAP_MEMBER(value,shadow_type,shadow_type,GtkShadowType,GtkShadowType);
+  WRAP_MEMBER(value,handle_position,handle_position,GtkPositionType,guint);
+  WRAP_MEMBER(value,snap_edge,snap_edge,GtkPositionType,guint);
+
+  bool is_child_detached()      const { return gtkobj()->child_detached; }
+  bool is_float_window_mapped() const { return gtkobj()->float_window_mapped; }
+  bool is_in_drag()             const { return gtkobj()->in_drag; }
+  bool shrinks_on_detach()      const { return gtkobj()->shrink_on_detach; }
+
+  Gdk_Window get_bin_window()   { return Gdk_Window(gtkobj()->bin_window); }
+  Gdk_Window get_float_window() { return Gdk_Window(gtkobj()->float_window); }
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_HandleBox)
+//. name: bin_window
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc: parent window for children 
+
+//. name: float_window
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: shadow_type
+//. type: GtkShadowType
+//. get:
+//. set:
+//. desc:
+
+//. name: handle_position
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: float_window_mapped
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: child_detached
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: in_drag
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: shrink_on_detach
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

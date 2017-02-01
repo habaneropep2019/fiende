@@ -1,0 +1,808 @@
+<HTML
+><HEAD
+><TITLE
+>The zterm application</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="ZVT Terminal Widget Reference Guide"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Implementation notes"
+HREF="zvtterm-notes.html"><LINK
+REL="PREVIOUS"
+TITLE="Other ideas"
+HREF="x1086.html"><LINK
+REL="NEXT"
+TITLE="Future plans"
+HREF="zvtterm-future.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>ZVT Terminal Widget Reference Guide</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x1086.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="zvtterm-future.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1106"
+>The zterm application</A
+></H1
+><P
+>The complete listing for a simple, but fully functional
+	terminal program is explained in this section.</P
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1109"
+>The annotated application</A
+></H2
+><P
+>First, the pre-amble and headers</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/*  zterm.c - Zed's Virtual Terminal
+ *  Copyright (C) 1998  Michael Zucchi
+ *
+ *  A simple terminal program, based on ZTerm.
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;sys/time.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;string.h&gt;
+#include &lt;pwd.h&gt;
+#include &lt;stdlib.h&gt;
+
+#include &lt;gtk/gtk.h&gt;
+#include &lt;gdk/gdkx.h&gt;
+#include &lt;gdk/gdkprivate.h&gt;
+#include &lt;gdk/gdkkeysyms.h&gt;
+
+#include &lt;zvt/zvtterm.h&gt;
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Yes, you should always remember the license!  Of course,
+	  i'm rather fond of GNU's version ...</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#define FONT "-misc-fixed-medium-r-normal--12-200-75-75-c-100-iso8859-1"
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Here we have the font we're using.  This is the full name
+	  of "fixed".  A nice readable fixed-width, and small font.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>extern char      **environ;		
+static char      **env;
+static char      **env_copy;
+static int         winid_pos;
+static GtkWidget  *window = NULL;
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>A few globals needed elsewhere.  Including the environment
+	  setup.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static void
+child_died_event (ZvtTerm *term)
+{
+	gtk_exit(0);
+}
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>This is later setup as the child_died signal handler.  In
+	  the case of a terminal we just terminate the whole application
+	  when this happens.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static void
+title_changed_event (ZvtTerm *term, VTTITLE_TYPE type, char *newtitle)
+{
+  switch(type) 
+    {
+    case VTTITLE_WINDOW:
+    case VTTITLE_WINDOWICON:
+      gtk_window_set_title (GTK_WINDOW (window), newtitle);
+      break;
+    default:
+      break;
+    }
+}
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Another signal that may be generated by the widget is the
+	  title_changed signal.  This signal is generated when the xterm
+	  escape sequence to set a title is processed.  Here we setup a
+	  simple handler that will change the window title when this
+	  sequence is caught.  By default no action is taken.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static void
+set_hints (GtkWidget *widget)
+{
+        ZvtTerm *term;
+	GdkGeometry hints;
+	GtkWidget *app;
+
+	g_assert (widget != NULL);
+	term = ZVT_TERM (widget);
+
+	app = gtk_widget_get_toplevel(widget);
+	g_assert (app != NULL);
+
+#define PADDING 2
+	hints.base_width = (GTK_WIDGET (term)-&#62;style-&#62;klass-&#62;xthickness * 2) + PADDING;
+	hints.base_height =  (GTK_WIDGET (term)-&#62;style-&#62;klass-&#62;ythickness * 2);
+
+	hints.width_inc = term-&#62;charwidth;
+	hints.height_inc = term-&#62;charheight;
+	hints.min_width = hints.base_width + hints.width_inc;
+	hints.min_height = hints.base_height + hints.height_inc;
+
+	gtk_window_set_geometry_hints(GTK_WINDOW(app),
+				      GTK_WIDGET(term),
+				      &amp;hints,
+				      GDK_HINT_RESIZE_INC|GDK_HINT_MIN_SIZE|GDK_HINT_BASE_SIZE);
+}
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Here we have the same code as explained in <A
+HREF="zvtterm-window-hints.html"
+>the Section called <I
+>Window Hints</I
+></A
+>, for setting appropriate
+	  window-resize hints.</P
+><P
+>The main program follows:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>gint 
+main (gint argc, gchar *argv[])
+{
+  int i, c, cmdindex, scrollbacklines, login_shell;
+  char buffer[60], **p;
+  struct passwd *pw;
+  GtkWidget *term, *hbox, *scrollbar;
+  enum { RIGHT, LEFT } scrollpos = LEFT;
+  
+  login_shell = 0;
+  cmdindex = 0;
+  scrollbacklines = 50;
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>The next section sets up the environment as explained
+	  elsewhere.  We setup the TERM environment and drop the terminal
+	  size environment, and add the COLORTERM value, to enable colour
+	  output for specific applications.</P
+><P
+>We also setup a placeholder for the WINDOWID environment
+	  when it is known later on.  This is used by some X-aware
+	  terminal applications to manipulate the terminal window.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  /* set up terminal environment */
+  env = environ;
+
+  for (p = env; *p; p++);
+    i = p - env;
+  env_copy = (char **) g_malloc (sizeof (char *) * (i + 3));
+  for (i = 0, p = env; *p; p++) {
+    if (strncmp (*p, "TERM=", 5) == 0) {
+      env_copy [i++] = "TERM=xterm";
+    } else if ((strncmp (*p, "COLUMNS=", 8) == 0) ||
+	       (strncmp (*p, "LINES=", 6) == 0)) {
+      continue;
+    } else {
+      env_copy [i++] = *p;
+    }
+  }
+
+  env_copy [i++] = "COLORTERM=zterm";
+  winid_pos = i++;
+  env_copy [winid_pos] = "TEST";
+  env_copy [i] = NULL;
+	  
+  gtk_init(&amp;argc, &amp;argv);
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Process the command line options.  Note the saving of the
+	  position of the '-e' option and the termination of processing
+	  once it has been found.  This is a compatability with the
+	  'xterm' '-e' command line option.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  /* process arguments */
+  while ( (cmdindex==0) &amp;&amp; (c=getopt(argc, argv, "le:s:rh")) != EOF ) {
+    switch(c)  {
+      case 'e':
+      cmdindex = optind-1;	/* index of argv array to pass to exec */
+      break;
+      
+      case 's':
+      scrollbacklines = atoi(optarg);
+      break;
+      
+      case 'l':
+      login_shell = 1;
+      break;
+      
+      case 'r':
+      scrollpos = RIGHT;
+      break;
+      
+      case '?':
+      case 'h':
+      default:
+      fprintf(stderr, "Usage: zterm [-sNN] [-l] [-r] [-e command args]\n");
+      exit(1);
+      break;
+    }
+  }
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Now we are ready to create our application widgets
+	  ...</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  /* Create widgets and set options */
+  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title (GTK_WINDOW (window), "zterm");
+  gtk_window_set_wmclass (GTK_WINDOW (window), "zterm", "zterm");
+  gtk_widget_realize (window);
+  
+  /* create hbox */
+  hbox = gtk_hbox_new (FALSE, 0);
+  gtk_box_set_spacing (GTK_BOX (hbox), 2);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox), 2);
+  gtk_container_add (GTK_CONTAINER (window), hbox);
+  gtk_widget_show (hbox);
+
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Here we create the terminal widget, and setup a number of
+	  options, as covered in <A
+HREF="zvtterm-properties.html"
+>the Section called <I
+>Terminal properties</I
+> in the chapter called <I
+>ZVT Terminal Widget</I
+></A
+>.  We
+	  setup a basic set of options which are much the same as the
+	  defaults (but i also like a blinking cursor!).</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  /* create terminal */
+  term = zvt_term_new_with_size(80,24);
+  zvt_term_set_font_name(ZVT_TERM (term), FONT);
+  zvt_term_set_blink (ZVT_TERM (term), TRUE);
+  zvt_term_set_bell (ZVT_TERM (term), TRUE);
+  zvt_term_set_scrollback(ZVT_TERM (term), scrollbacklines);
+  zvt_term_set_scroll_on_keystroke (ZVT_TERM (term), TRUE);
+  zvt_term_set_scroll_on_output (ZVT_TERM (term), FALSE);
+  zvt_term_set_background (ZVT_TERM (term), NULL, 0, 0);
+  zvt_term_set_wordclass (ZVT_TERM (term), "-A-Za-z0-9/_:.,?+%=");
+
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Attatch the signal handlers we defined above.  We also
+	  attach the destroy signal to the exit handling event - if the
+	  window is closed by the window manager then this catches that
+	  event.  Otherwise the close button doesn't work!</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  gtk_signal_connect (GTK_OBJECT (term),
+		      "child_died",
+		      GTK_SIGNAL_FUNC (child_died_event),
+		      NULL);
+  
+  gtk_signal_connect (GTK_OBJECT (term),
+		      "destroy",
+		      GTK_SIGNAL_FUNC (child_died_event),
+		      NULL);
+
+  gtk_signal_connect (GTK_OBJECT (term),
+		      "title_changed",
+		      GTK_SIGNAL_FUNC (title_changed_event),
+		      NULL);
+	  
+  gtk_signal_connect_after (GTK_OBJECT (term),
+			    "realize",
+			    GTK_SIGNAL_FUNC (set_hints),
+			    term);
+
+  gtk_widget_show (term);
+
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>And here we show how the scrollbar is attached to the term
+	  adjustment designed for this purpose, and how the scrollbar has
+	  its focus disabled.  We also give the user the option for a left
+	  or right scrollbar.</P
+><P
+>Although many perfer the windows/motif
+	  convention of a right-mounted scrollbar, but a left-mounted
+	  scrollbar should be an option if possible, as it is often a much
+	  more practical position to have it in.  Particularly if there
+	  are overlapping windows, or windows partly off-screen.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  /* scrollbar */
+  scrollbar = 
+    gtk_vscrollbar_new (GTK_ADJUSTMENT (ZVT_TERM (term)-&gt;adjustment));
+  GTK_WIDGET_UNSET_FLAGS (scrollbar, GTK_CAN_FOCUS);
+  if (scrollpos == LEFT) {
+    gtk_box_pack_start (GTK_BOX (hbox), scrollbar, FALSE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (hbox), term, 1, 1, 0);
+  } else {
+    gtk_box_pack_start (GTK_BOX (hbox), term, 1, 1, 0);
+    gtk_box_pack_start (GTK_BOX (hbox), scrollbar, FALSE, TRUE, 0);
+  }
+  gtk_widget_show (scrollbar);
+  
+  /* show them all! */
+  gtk_widget_show (window);
+
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>Here we show how the sub-shell is created using
+	  zvt_term_forkpty().  We also give the user the option of logging
+	  the session in utmp/wtmp.  This probably isn't that necessary
+	  for a non-shell application, but might be useful.</P
+><P
+>It also shows how either a shell is executed, or the
+	  command given on the command line is executed.  And how the
+	  login shell arguments are processed.  Again this is not normally
+	  required for a non-shell application.</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  /* fork the shell/program */
+  switch (zvt_term_forkpty(ZVT_TERM (term), ZVT_TERM_DO_UTMP_LOG |  ZVT_TERM_DO_WTMP_LOG)) {
+    case -1:
+    perror("ERROR: unable to fork:");
+    exit(1);
+    break;
+    
+    case 0:
+    if (cmdindex) {
+      environ = env_copy;
+      execvp(argv[cmdindex], &amp;argv[cmdindex]);
+    } else {
+      GString *shell, *name;
+      
+      /* get shell from passwd */
+      pw = getpwuid(getuid());
+      if (pw) {
+	shell = g_string_new(pw-&gt;pw_shell);
+	if (login_shell)
+	  name = g_string_new("-");
+	else
+	  name = g_string_new("");
+	
+	g_string_append(name, strrchr(pw-&gt;pw_shell, '/'));
+      } else {
+	shell = g_string_new("/bin/sh");
+	if (login_shell)
+	  name = g_string_new("-sh");
+	else
+	  name = g_string_new("sh");
+      }
+
+      execle (shell-&gt;str, name-&gt;str, NULL, env_copy);
+      perror ("Could not exec\n");
+      _exit (127);
+    }
+    perror("ERROR: Cannot exec command:");
+    exit(1);
+
+    default:
+    break;
+  }
+	</PRE
+></TD
+></TR
+></TABLE
+><P
+>And thats it!  We're ready to go into the main processing
+	  loop!</P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  /* main loop */
+  gtk_main ();
+  gtk_exit(0);
+  return 0;
+}
+	</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1147"
+>Further examples</A
+></H2
+><P
+>This example is basically the 'zterm' test-application
+	  which is in the source code tree under gnome-libs/zvt/zterm.c.
+	  The gnome-terminal application (in gnome-core/gnome-terminal)
+	  provides a much richer set of features.  It exercises all
+	  configurable options of the terminal emulator as well.</P
+><P
+>Crescendo and xchat are two other examples that use the
+	  widget in different ways.  Crescendo runs a subordinate TinyFuge
+	  mud client, and xchat uses it as a color output device.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x1086.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="zvtterm-future.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Other ideas</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Future plans</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,392 @@
+<refentry id="GnomeDock">
+<refmeta>
+<refentrytitle>GnomeDock</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeDock</refname><refpurpose>A widget supporting movable and detachable widgets.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeDock-struct">GnomeDock</link>;
+enum        <link linkend="GnomeDockPlacement">GnomeDockPlacement</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-dock-new">gnome_dock_new</link>                  (void);
+void        <link linkend="gnome-dock-allow-floating-items">gnome_dock_allow_floating_items</link> (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="gboolean">gboolean</link> enable);
+void        <link linkend="gnome-dock-add-item">gnome_dock_add_item</link>             (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="guint">guint</link> band_num,
+                                             <link linkend="gint">gint</link> position,
+                                             <link linkend="guint">guint</link> offset,
+                                             <link linkend="gboolean">gboolean</link> in_new_band);
+void        <link linkend="gnome-dock-add-floating-item">gnome_dock_add_floating_item</link>    (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *widget,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y,
+                                             <link linkend="GtkOrientation">GtkOrientation</link> orientation);
+void        <link linkend="gnome-dock-set-client-area">gnome_dock_set_client_area</link>      (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-dock-get-client-area">gnome_dock_get_client_area</link>      (<link linkend="GnomeDock">GnomeDock</link> *dock);
+<link linkend="GnomeDockItem">GnomeDockItem</link>* <link linkend="gnome-dock-get-item-by-name">gnome_dock_get_item_by_name</link>  (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> *placement_return,
+                                             <link linkend="guint">guint</link> *num_band_return,
+                                             <link linkend="guint">guint</link> *band_position_return,
+                                             <link linkend="guint">guint</link> *offset_return);
+<link linkend="GnomeDockLayout">GnomeDockLayout</link>* <link linkend="gnome-dock-get-layout">gnome_dock_get_layout</link>      (<link linkend="GnomeDock">GnomeDock</link> *dock);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-add-from-layout">gnome_dock_add_from_layout</link>      (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----GnomeDock
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+<type>GnomeDock</type> is a container widget designed to let users
+move around widgets such as toolbars, menubars and so on.
+</para>
+
+<para>
+Every <type>GnomeDock</type> contains a widget called the "client
+area".  On the four sides of the client area, there are four "dock
+areas", which can contain an arbitrary number of dockable widgets.
+All the dockable widgets should be <type>GnomeDockItem</type>
+widgets; the <type>GnomeDockItem</type> widget can in turn contain
+any kind of widget, and implements the dragging functionality: every
+<type>GnomeDockItem</type> has a handle that users can use to move
+them within the dock, or even move them outside it, so that they
+become "floating items".
+</para>
+
+<para>
+Every "dock area" is implemented by means of zero or more "dock
+bands": a dock band is a horizontal or vertical stripe containing one
+or more dock items, and is implemented by the
+<type>GnomeDockBand</type> widget.  Items are ordered from top to
+bottom in vertical bands, and from left to right in horizontal bands.
+Every dock item in a band is given an offset value that defines the
+distance, in pixels, from the previous item in the same band; if the
+item is first in the band, the offset defines the distance from the
+start of the band.
+</para>
+
+<para>
+As a consequence, the position of an item in the dock can be specified
+by means of the following values: a "placement" specifying what area
+is being used (top, bottom, left, right), a "band number" specifying
+the number of the band within the specified area, a "position" within
+the band and a "offset" from the previous item in the same band.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeDock-struct">struct GnomeDock</title>
+<programlisting>struct GnomeDock;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeDockPlacement">enum GnomeDockPlacement</title>
+<programlisting>typedef enum
+{
+  GNOME_DOCK_TOP,
+  GNOME_DOCK_RIGHT,
+  GNOME_DOCK_BOTTOM,
+  GNOME_DOCK_LEFT,
+  GNOME_DOCK_FLOATING
+} GnomeDockPlacement;
+</programlisting>
+<para>
+This enumeration is used to specify the position of a dock item in the
+dock widget.
+</para>
+
+<para>
+<itemizedlist>
+<listitem><para>GNOME_DOCK_TOP - The horizontal area at the top of the dock widget </para></listitem>
+<listitem><para>GNOME_DOCK_RIGHT - The vertical area on the right side of the dock widget </para></listitem>
+<listitem><para>GNOME_DOCK_BOTTOM - The horizontal area at the bottom of the dock widget </para></listitem>
+<listitem><para>GNOME_DOCK_RIGHT - The vertical area on the right side of the dock widget </para></listitem>
+<listitem><para>GNOME_DOCK_FLOATING - Used for floating (detached) items</para></listitem>
+</itemizedlist>
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-new">gnome_dock_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_dock_new                  (void);</programlisting>
+<para>
+Creates a new <link linkend="GnomeDock">GnomeDock</link> widget.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The new widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-allow-floating-items">gnome_dock_allow_floating_items ()</title>
+<programlisting>void        gnome_dock_allow_floating_items (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="gboolean">gboolean</link> enable);</programlisting>
+<para>
+Enable or disable floating items on <parameter>dock</parameter>, according
+to <parameter>enable</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> A pointer to a <link linkend="GnomeDock">GnomeDock</link> widget
+</entry></row>
+<row><entry align="right"><parameter>enable</parameter>&nbsp;:</entry>
+<entry> Specifies whether floating items are allowed in this dock
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-add-item">gnome_dock_add_item ()</title>
+<programlisting>void        gnome_dock_add_item             (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="guint">guint</link> band_num,
+                                             <link linkend="gint">gint</link> position,
+                                             <link linkend="guint">guint</link> offset,
+                                             <link linkend="gboolean">gboolean</link> in_new_band);</programlisting>
+<para>
+Add <parameter>item</parameter> to <parameter>dock</parameter>.  <parameter>placement</parameter> can be either
+<literal>GNOME_DOCK_TOP</literal>, <literal>GNOME_DOCK_RIGHT</literal>, <literal>GNOME_DOCK_BOTTOM</literal> or
+<literal>GNOME_DOCK_LEFT</literal>, and specifies what area of the dock should
+contain the item.  If <parameter>in_new_band</parameter> is <literal>TRUE</literal>, a new dock band is
+created at the position specified by <parameter>band_num</parameter>; otherwise, the item
+is added to the <parameter>band_num</parameter>'th band.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> A pointer to a <link linkend="GnomeDock">GnomeDock</link> widget
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> The item to add
+</entry></row>
+<row><entry align="right"><parameter>placement</parameter>&nbsp;:</entry>
+<entry> Placement for the new item
+</entry></row>
+<row><entry align="right"><parameter>band_num</parameter>&nbsp;:</entry>
+<entry> Number of the band the new item must be added to
+</entry></row>
+<row><entry align="right"><parameter>position</parameter>&nbsp;:</entry>
+<entry> Position of the item in the specified band
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> Offset (in pixels) from the previous item in the same band
+</entry></row>
+<row><entry align="right"><parameter>in_new_band</parameter>&nbsp;:</entry>
+<entry> Specifies whether a new band must be created for this item
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-add-floating-item">gnome_dock_add_floating_item ()</title>
+<programlisting>void        gnome_dock_add_floating_item    (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *widget,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y,
+                                             <link linkend="GtkOrientation">GtkOrientation</link> orientation);</programlisting>
+<para>
+Add <parameter>item</parameter> to <parameter>dock</parameter> and make it floating at the
+specified (<parameter>x</parameter>, <parameter>y</parameter>) coordinates (relative to the root window of the
+screen).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDock">GnomeDock</link> widget
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry> X-coordinate for the floating item
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry> Y-coordinate for the floating item
+</entry></row>
+<row><entry align="right"><parameter>orientation</parameter>&nbsp;:</entry>
+<entry> Orientation for the new item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-set-client-area">gnome_dock_set_client_area ()</title>
+<programlisting>void        gnome_dock_set_client_area      (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+Specify a widget for the dock's client area.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDock">GnomeDock</link> widget
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> The widget to be used for the client area.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-get-client-area">gnome_dock_get_client_area ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_dock_get_client_area      (<link linkend="GnomeDock">GnomeDock</link> *dock);</programlisting>
+<para>
+Retrieve the widget being used as the client area in
+<parameter>dock</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDock">GnomeDock</link> widget.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The client area widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-get-item-by-name">gnome_dock_get_item_by_name ()</title>
+<programlisting><link linkend="GnomeDockItem">GnomeDockItem</link>* gnome_dock_get_item_by_name  (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> *placement_return,
+                                             <link linkend="guint">guint</link> *num_band_return,
+                                             <link linkend="guint">guint</link> *band_position_return,
+                                             <link linkend="guint">guint</link> *offset_return);</programlisting>
+<para>
+Retrieve the dock item named <parameter>name</parameter>; information about
+its position in the dock is returned via <parameter>placement_return</parameter>,
+<parameter>num_band_return</parameter>, <parameter>band_position_return</parameter> and <parameter>offset_return</parameter>.  If
+the placement is <literal>GNOME_DOCK_FLOATING</literal> *<parameter>num_band_return</parameter>,
+*<parameter>band_position_return</parameter> and *<parameter>offset_return</parameter> are not set.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDock">GnomeDock</link> widget.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> The name of the dock item to retrieve
+</entry></row>
+<row><entry align="right"><parameter>placement_return</parameter>&nbsp;:</entry>
+<entry> A pointer to a variable holding the item's placement
+</entry></row>
+<row><entry align="right"><parameter>num_band_return</parameter>&nbsp;:</entry>
+<entry> A pointer to a variable holding the band number
+</entry></row>
+<row><entry align="right"><parameter>band_position_return</parameter>&nbsp;:</entry>
+<entry> A pointer to a variable holding the position
+of the item within the band
+</entry></row>
+<row><entry align="right"><parameter>offset_return</parameter>&nbsp;:</entry>
+<entry> A pointer to a variable holding the offset of the item
+from the previous item in the same band
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The named <link linkend="GnomeDockItem">GnomeDockItem</link> widget, or <literal>NULL</literal> if no item with
+such name exists.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-get-layout">gnome_dock_get_layout ()</title>
+<programlisting><link linkend="GnomeDockLayout">GnomeDockLayout</link>* gnome_dock_get_layout      (<link linkend="GnomeDock">GnomeDock</link> *dock);</programlisting>
+<para>
+Retrieve the layout of <parameter>dock</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDock">GnomeDock</link> widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <parameter>dock</parameter>'s layout as a <link linkend="GnomeDockLayout">GnomeDockLayout</link> object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-add-from-layout">gnome_dock_add_from_layout ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_add_from_layout      (<link linkend="GnomeDock">GnomeDock</link> *dock,
+                                             <link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout);</programlisting>
+<para>
+Add all the items in <parameter>layout</parameter> to the specified <parameter>dock</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> The <link linkend="GnomeDock">GnomeDock</link> widget
+</entry></row>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the operation succeeds, <literal>FALSE</literal> if it fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="GnomeDockItem">GnomeDockItem</link>
+<link linkend="GnomeDockBand">GnomeDockBand</link>
+<link linkend="GnomeDockLayout">GnomeDockLayout</link>
+</para>
+</refsect1>
+
+</refentry>

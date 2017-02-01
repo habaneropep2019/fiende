@@ -1,0 +1,266 @@
+<sect1 id="goad">
+<title>GOAD (Gnome Object Activation Directory)</title>
+<sect2><title>Author(s)</title>
+<para>Elliot Lee &lt;sopwith@redhat.com&gt;</para>
+</sect2>
+<sect2><title>Description</title>
+<para>
+A set of routines for getting a listing of available CORBA object servers,
+and connecting to new or existing servers using specified parameters.
+</para>
+</sect2>
+<sect2 id="goad-server-list-get">
+<title>goad_server_list_get - get a listing of objects which we know how to bootstrap</title>
+<funcsynopsis><funcdef>GoadServer *<function>goad_server_list_get</function></funcdef>
+<void>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>This function returns an array of GoadServer structures that list the objects that a program can use.</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+GoadServer *servlist = goad_server_list_get();
+/* use servlist */
+goad_server_list_free(servlist);
+</programlisting></sect3>
+</sect2>
+<sect2 id="goad-server-activate">
+<title>goad_server_activate - get a specified server</title>
+<funcsynopsis><funcdef>CORBA_Object <function>goad_server_activate</function></funcdef>
+<paramdef>GoadServer *<parameter>sinfo</parameter></paramdef>
+<paramdef>GoadActivationFlags <parameter>flags</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>
+When passed the address of a GoadServer structure (one retrieved from
+<function>goad_server_list_get</function>), this function will try to
+either connect to an existing server for the object, or start a new one up.
+</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+GoadServer *servlist, *chosen = NULL;
+CORBA_Object dothings;
+int i;
+servlist = goad_server_list_get();
+for(i = 0; servlist[i].repo_id; i++) {
+    if(!strcmp(servlist[i].id, "gnumeric")) {
+	    chosen = &amp;servlist[i];
+	    break;
+    }
+}
+dothings = goad_server_activate(chosen, GOAD_ACTIVATE_SHLIB|GOAD_NO_NS_REGISTER);
+</programlisting>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist>
+<listitem><para>GoadServer *<parameter>sinfo</parameter></para>
+<para>A structure holding information on the server to be started.</para>
+</listitem>
+<listitem><para>GoadActivationFlags <parameter>flags</parameter></para>
+<para>Flags indicating how the application wishes to have the server started.
+Possible values (ANDed together) include:
+<itemizedlist>
+<listitem><para>GOAD_ACTIVATE_SHLIB</para>
+<para>If a new server needs to be created, the application would prefer
+that it be loaded from a shared library into the application's address space.
+</para>
+</listitem>
+<listitem><para>GOAD_ACTIVATE_REMOTE</para>
+<para>If a new server needs to be created, the application would prefer
+that it be started by running a separate program.
+</para></listitem>
+<listitem><para>GOAD_ACTIVATE_EXISTING_ONLY</para>
+<para>
+Do not start a new server for the specified activation - only check if an existing one is running.
+</para></listitem>
+<listitem><para>GOAD_ACTIVATE_NEW_ONLY</para>
+<para>
+Do not check if an existing server is running for the specified activation - only
+start a new one.
+</para></listitem>
+<listitem><para>GOAD_ACTIVATE_NO_NS_REGISTER</para>
+<para>
+Do not register the newly started server with the naming service (only valid
+if the server happens to be activated as a shared library).
+</para></listitem>
+</itemizedlist>
+</para>
+</listitem>
+</itemizedlist>
+</sect3>
+</sect2>
+<sect2 id="goad-server-activate-with-repo-id">
+
+<title>goad_server_activate_with_repo_id - get a server that offers a
+specified interface.</title>
+<funcsynopsis><funcdef>CORBA_Object <function>goad_server_activate_with_repo_id</function></funcdef>
+<paramdef>GoadServer *<parameter>server_list</parameter></paramdef>
+<paramdef>const char *<parameter>repo_id</parameter></paramdef>
+<paramdef>GoadActivationFlags <parameter>flags</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>
+When passed the repository ID of an object, this function will try to
+either connect to an existing server for an object offering that
+interface, or start a new one up.
+</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+CORBA_Object dothings;
+dothings = goad_server_activate_with_repo_id(NULL, "IDL:GNOME/HelpBrowser", 0);
+</programlisting>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist>
+<listitem>
+<para>GoadServer *<parameter>server_list</parameter></para>
+<para>A server listing previously obtained from goad_server_list_get(), or NULL. If NULL is passed, a server list will be obtained, used, and freed inside the routine.</para>
+</listitem>
+<listitem><para>const char *<parameter>repo_id</parameter></para>
+<para>
+The repository ID of the interface that a returned object should have.
+This currently must be the specific interface. In the future the
+Interface Repository may be used to find servers with interfaces that
+inherit from the specified interface - caveat user.
+</para>
+	  </listitem>
+<listitem>
+<para>GoadActivationFlags <parameter>flags</parameter></para>
+<para>
+See the parameter documentation for <function>goad_server_activate</function>
+</para>
+</listitem>
+</itemizedlist>
+</sect3>
+</sect2>
+</sect1>
+<sect1 id="orbitgtk">
+<title>ORBit-Gtk</title>
+<sect2><title>Author(s)</title>
+<para>
+Elliot Lee &lt;sopwith@redhat.com&gt;
+</para>
+</sect2>
+<sect2><title>Description</title>
+<para>
+Routines for making ORBit work nicely with gtk, and
+starting/retrieving the name service object for a GNOME session.
+</para></sect2>
+<sect2 id="gnome-CORBA-init">
+<title>gnome_CORBA_init initialize ORBit and GNOME for use in a program.</title>
+<funcsynopsis><funcdef>CORBA_ORB <function>gnome_CORBA_init</function>
+</funcdef>
+<paramdef>char *<parameter>app_id</parameter></paramdef>
+<paramdef>struct argp *<parameter>app_parser</parameter></paramdef>
+<paramdef>int *<parameter>argc</parameter></paramdef>
+<paramdef>char **<parameter>argv</parameter></paramdef>
+<paramdef>unsigned int <parameter>flags </parameter></paramdef>
+<paramdef>int *<parameter>arg_index</parameter></paramdef>
+<paramdef>CORBA_Environment *<parameter>ev</parameter></paramdef>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>
+This routine initializes gnome (by calling
+<function>gnome_init</function>).  A few items are set up to allow
+ORBit and gtk to interact well, and finally it initializes ORBit and
+returns the CORBA_ORB reference to the new ORB.
+</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+int main(int argc, char *argv)
+{
+	CORBA_ORB my_orb;
+	CORBA_Environment ev;
+
+	CORBA_exception_init(&amp;ev);
+	my_orb = gnome_CORBA_init("myapp", NULL, &amp;argc, &amp;argv, 0, NULL, &amp;ev);
+	if(ev._major != CORBA_NO_EXCEPTION)
+	    exit(1); /* error initializing ORB */
+
+	/* insert killer app code here */
+}
+</programlisting>
+</sect3>
+<sect3><title>Parameters</title>
+<itemizedlist>
+<listitem>
+<para>char *<parameter>app_id</parameter></para>
+<para>An alphanumeric application ID string (the application's name is a good choice).</para>
+</listitem>
+<listitem>
+<para>struct argp *<parameter>app_parser</parameter></para>
+<para>See the (non-existent) argp docs for help.</para>
+</listitem>
+<listitem>
+<para>int *<parameter>argc</parameter></para>
+<para>A pointer to the number of arguments.</para>
+</listitem>
+<listitem>
+<para>char **<parameter>argv</parameter></para>
+<para>The array of argument strings.</para>
+</listitem>
+<listitem>
+<para>unsigned int <parameter>flags</parameter></para>
+<para>See the (non-existent) argp docs for help.</para>
+</listitem>
+<listitem>
+<para>int *<parameter>arg_index</parameter></para>
+<para>See the (non-existent) argp docs for help.</para>
+</listitem>
+<listitem>
+<para>CORBA_Environment *<parameter>ev</parameter></para>
+<para>Pointer to a CORBA exception information structure,
+to allow the ORB initialization functions to signal any errors that occur.</para>
+</listitem>
+</itemizedlist>
+</sect3>
+</sect2>
+<sect2 id="gnome-name-service-get">
+<title>gnome_name_service_get - retrieves an object reference to the root name service context for the current GNOME session</title>
+<funcsynopsis><funcdef>CORBA_Object
+<function>gnome_name_service_get</function></funcdef>
+<void>
+</funcsynopsis>
+<sect3><title>Description</title>
+<para>This routine is used to get access to the top naming context for
+the current GNOME session. If a naming server is not running, one will be started.
+</para>
+<para>
+This function assumes that both gtk and ORBit have been initialized.
+</para>
+</sect3>
+<sect3><title>Usage</title>
+<programlisting>
+CORBA_Object ns;
+
+ns = gnome_name_service_get();
+</programlisting>
+</sect3>
+</sect2>
+</sect1>
+<sect1 id="gnome-plugins">
+<title>gnome-plugins</title>
+<para>
+This API is lying around because someone was nutty enough to write it,
+but most of it (except the two structure definitions, for plugin
+writers & users) is unneeded. Please don't use it for now.
+</para>
+</sect1>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:("gnome-dev-info.sgml" "book" "sect1" "")
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

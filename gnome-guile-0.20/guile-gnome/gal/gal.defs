@@ -1,0 +1,1864 @@
+;;; -*- scheme -*-
+;;; gnome.defs - Export gal libraries to gnome-guile
+;;; 
+;;; Copyright (C) 2000 Ariel Rios ariel@gnu.org
+;;; 
+;;; This program is free software; you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 2, or (at your option)
+;;; any later version.
+;;; 
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;; 
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program; if not, write to the Free Software
+;;; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+;;; 02111-1307, USA.  */
+
+;;(import "gtk-1.2.defs")
+;;(import "../gnome.defs")
+(import "../gdk-pixbuf/gdkpixbuf.defs")
+
+;; gal/e-paned
+
+;; e-paned.h
+
+(define-object EPaned (GtkContainer))
+
+(define-func e_paned_add1            
+  none
+  ((EPaned paned)
+   (GtkWidget child)))
+
+(define-func e_paned_add2            
+  none
+  ((EPaned paned)
+   (GtkWidget child)))
+
+(define-func e_paned_pack1           
+  none
+  ((EPaned paned)
+   (GtkWidget  child)
+   (bool   resize)
+   (bool   shrink)))
+
+(define-func e_paned_pack2           
+  none
+  ((EPaned paned)
+   (GtkWidget child)
+   (bool resize)
+   (bool shrink)))
+
+(define-func e_paned_get_position    
+  int
+  ((EPaned paned)))
+
+(define-func e_paned_set_position    
+  none
+  ((EPaned paned)
+   (int position)))
+
+(define-func e_paned_set_handle_size 
+  none
+  ((EPaned paned)
+   (uint size)))
+
+(define-func e_paned_compute_position 
+  none 
+  ((EPaned paned)
+   (int allocation)
+   (int child1_req)
+   (int child2_req)))
+
+(define-func e_paned_handle_shown    
+  bool
+  ((EPaned paned)))
+
+(define-func e_paned_quantized_size  
+  int
+  ((EPaned  paned)
+   (int size)))
+
+;; e-hpaned.h
+
+(define-object EHPaned (EPaned))
+
+(define-func e_hpaned_new
+  GtkWidget
+  ())
+
+;; e-vpaned.h
+
+(define-object EVPaned (EPaned))
+
+(define-func e_vpaned_new
+  GtkWidget
+  ())
+
+;; gal/e-table ;)
+
+;;e-table-model.h
+
+(define-object ETableModel (GtkObject))
+
+(define-func e_table_model_column_count     
+  int
+  ((ETableModel  e_table_model)))
+
+;;(define-func e_table_model_column_name      
+;;  string
+;;  ((ETableModel  e_table_model)
+;;   (int col)))
+
+(define-func e_table_model_row_count        
+  int
+  ((ETableModel  e_table_model)))
+
+(define-func e_table_model_value_at         
+  none
+  ((ETableModel  e_table_model)
+   (int col)
+   (int row)))
+
+;; FIXME!
+;; We need manual bindings for these funcs
+;; that receive pointer  as arguments
+
+;;(define-func e_table_model_set_value_at     
+;;  none
+;;  ((ETableModel  e_table_model)
+;;   ( int col)
+;;   ( int row)
+;;   (func value)))
+
+(define-func e_table_model_is_cell_editable 
+  bool
+  ((ETableModel e_table_model)
+   (int col)
+   (int row)))
+
+(define-func e_table_model_append_row       
+  none
+  ((ETableModel e_table_model)
+   (ETableModel source)
+   (int row)))
+
+;;(define-func e_table_model_row_sort_group   
+;;  string
+;;  ((ETableModel  e_table_model)
+;;   (int row)))
+
+(define-func e_table_model_has_sort_group   
+  bool
+  ((ETableModel  e_table_model)))
+
+;;(define-func e_table_model_duplicate_value  
+;;  none
+;;  ((ETableModel e_table_model)
+;;   (int col)
+;;   (func value)))
+
+;;(define-func e_table_model_free_value       
+;;  none
+;;  ((ETableModel  e_table_model)
+;;   (int col)
+;;   (func   value)))
+
+(define-func e_table_model_initialize_value 
+  none
+  ((ETableModel e_table_model)
+   (int col)))
+
+;;(define-func e_table_model_value_is_empty   
+;;  bool
+;;  ((ETableModel  e_table_model)
+;;   (int col)
+;;   (func   value)))
+
+;;(define-func e_table_model_value_to_string  
+;;  string
+;;  ((ETableModel  e_table_model)
+;;   (int col)
+;;   (func   value)))
+
+(define-func e_table_model_pre_change       
+  none
+  ((ETableModel e_table_model)))
+
+(define-func e_table_model_changed          
+  none
+  ((ETableModel e_table_model)))
+
+(define-func e_table_model_row_changed      
+  none
+  ((ETableModel e_table_model)
+   (int row)))
+
+(define-func e_table_model_cell_changed     
+  none
+  ((ETableModel  e_table_model)
+   (int col)
+   (int row)))
+
+(define-func e_table_model_row_inserted     
+  none
+  ((ETableModel e_table_model)
+   (int row)))
+
+(define-func e_table_model_row_deleted      
+  none
+  ((ETableModel e_table_model)
+   (int row)))
+
+;; e-table-tooltip.h
+
+(define-object ETableToolTip (GtkWidget))
+
+;; e-cell.h 
+
+(define-object ECell (GtkObject))
+
+(define-object ECellView (ECell))
+
+(define-enum ECellActions
+ (grab E_CELL_GRAB)
+ (ungrab E_CELL_UNGRAB))
+
+(define-enum ECellFlags 
+  (selected E_CELL_SELECTED)
+  (justification E_CELL_JUSTIFICATION)
+  (justify-center E_CELL_JUSTIFY_CENTER)
+  (justify-left E_CELL_JUSTIFY_LEFT)
+  (justify-right E_CELL_JUSTIFY_RIGHT)
+  (justify-fill  E_CELL_JUSTIFY_FILL)
+  (align-left E_CELL_ALIGN_LEFT)
+  (align-right E_CELL_JUSTIFY_RIGHT)
+  (focused E_CELL_FOCUSED)
+  (editing E_CELL_EDITING))
+
+;;(define-func e_cell_new_view  
+;;  ECellView
+;;  ((ECell  ecell)
+;;   (ETableModel  table-model)
+;;   (void *e-table-item-view)))
+
+(define-func e_cell_kill_view 
+  none
+  ((ECellView  ecell_view)))
+
+;;(define-func e_cell_event     
+;;  none
+;;  ((ECellView ecell_view)
+;;   (GdkEvent event)
+;;   (int model_col)
+;;   (int view_col)
+;;   (int row)
+;;   (ECellFlags flags)
+;;   ((cvec ECellActions) actions)))
+
+
+(define-func e_cell_realize   
+  none
+  ((ECellView ecell_view)))
+
+(define-func e_cell_unrealize 
+  none
+  ((ECellView ecell_view)))
+
+;;(define-func e_cell_draw      
+;;  none
+;;  ((ECellView  ecell_view)
+;;   (GdkDrawable dr)
+;;   (int model_col)
+;;   (int view-col)
+;;   (int row)
+;;   (ECellFlags flags)
+;;   (int x1)
+;;   (int y1)
+;;   (int x2)
+;;   (int y2)))
+
+;; (define-func e_cell_print      
+;;  none
+;;  ((ECellView  ecell_view)
+;;   (GnomePrintContext  context)
+;;   (int model_col)
+;;   (int view-col)
+;;   (int row)
+;;   (double width)
+;;   (double height)))
+
+;; (define-func e_cell_print_height 
+;;  double
+;;  ((ECellView  ecell_view)
+;;   (GnomePrintContext  context)
+;;   (int model_col)
+;;   (int view-col)
+;;   (int row)
+;;   (double width)))
+
+(define-func e_cell_max_width 
+  int
+  ((ECellView  ecell_view)
+   (int model_col)
+   (int view_col)))
+
+;;(define-func e_cell_show_tooltip 
+;;  none
+;;  ((ECellView  ecell_view)
+;;   (int model_col)
+;;   (int view-col)
+;;   (int row)
+;;   (ETableTooltip tooltip)))
+
+(define-func e_cell_focus     
+  none
+  ((ECellView  ecell_view)
+   (int model_col)
+   (int view_col)
+   (int row)
+   (int x1)
+   (int y1)
+   (int x2)
+   (int y2)))
+
+(define-func e_cell_unfocus   
+  none
+  ((ECellView  ecell_view)))
+
+(define-func e_cell_height    
+  int
+  ((ECellView  ecell_view)
+   (int model_col)
+   (int view_col)
+   (int row)))
+
+(define-func e_cell_enter_edit 
+  none
+  ((ECellView  ecell_view)
+   (int model_col)
+   (int view_col)
+   (int row)))
+
+;;(define-func e_cell_leave_edit 
+;;  none
+;;  ((ECellView  ecell_view)
+;;   (int model_col)
+;;   (int view_col)
+;;   (int row)
+;;   (void  *edit-context)))
+
+;; e-celltoggle.h
+
+(define-object ECellToggle (ECell))
+
+;;(define-func e_cell_toggle_new 
+;;  ECell
+;;  ((int border)
+;;   (int n_states)
+;;   ((cvec GdkPixbuf) images)))
+
+;;(define-func  e_cell_toggle_construct
+;;  none
+;;  ((ECellToggle etog)
+;;   (int border)
+;;   (int n_states)
+;;   ((cvec GdkPixbuf) images)))
+
+;; e-cell_tree.h
+
+(define-object ECellTree (ECell))
+
+(define-func e_cell_tree_new      
+  ECell
+  ((GdkPixbuf  open_pixbuf)
+   (GdkPixbuf  closed_pixbuf)
+   (bool draw_lines)
+   (ECell  subcell)))
+
+(define-func e_cell_tree_construct 
+  none
+  ((ECellTree  ect)
+   (GdkPixbuf  open_pixbuf)
+   (GdkPixbuf  closed_pixbuf)
+   (bool draw_lines)
+   (ECell  subcell)))
+
+;; e-cell_checkbox.h
+
+(define-object ECellCheckBox (ECellToggle))
+
+(define-func e_cell_checkbox_new
+  ECell
+  ())
+
+;; e-cell_text.h
+
+(define-object ECellText (ECell))
+
+(define-func e_cell_text_new
+  ECell
+  ((string fontname)
+   (GtkJustification justify)))
+
+;; e-table-click-to-add.h
+
+(define-object ETableClickToAdd (GnomeCanvasGroup))
+
+(define-func e_table_click_to_add_commit
+  none
+  ((ETableClickToAdd etct)))
+
+;; e-table-col.h 
+
+(define-enum ETableColArrow 
+  (none E_TABLE_COL_ARROW_NONE)
+  (up E_TABLE_COL_ARROW_UP)
+  (down E_TABLE_COL_ARROW_DOWN))
+
+(define-object ETableCol (GtkObject))
+
+;;(define-func e_table_col_new             
+;;  ETableCol
+;;  ((int col_idx)
+;;   (string  text)
+;;   (double expansion)
+;;   (int min-width)
+;;   (ECell  ecell)
+;;   (GCompareFunc compare)
+;;   (bool resizable)))
+
+;;(define-func e_table_col_new_with_pixbuf 
+;;  ETableCol
+;;  ((int col_idx)
+;;   (GdkPixbuf  pixbuf)
+;;   (double expansion)
+;;   (int min-width)
+;;   (ECell  ecell)
+;;   (GCompareFunc compare)
+;;   (bool resizable)))
+
+(define-func e_table_col_destroy         
+  none
+  ((ETableCol etc)))
+
+(define-func e_table_col_set_arrow       
+  none
+  ((ETableCol col)
+   (ETableColArrow arrow)))
+
+(define-func e_table_col_get_arrow       
+  ETableColArrow
+  ((ETableCol col)))
+
+;; e-table-column-specification.h
+
+(define-object  ETableColumnSpecification (GtkObject))
+
+(define-func e_table_column_specification_new             
+  ETableColumnSpecification
+  ())
+
+;; FIXME!
+;; Darn! We now also need gnome-xml bindings ;)
+
+;;(define-func e_table_column_specification_load_from_node  
+;;  none
+;;  ((ETableColumnSpecification  state)
+;;   (xmlNode              node)))
+
+;;(define-func e_table_column_specification_save_to_node    
+;;  xmlNode
+;;  ((ETableColumnSpecification  state)
+;;   (xmlNode parent)))
+
+;; e-table-specification.h
+
+(define-object ETableSpecification (GtkObject))
+
+(define-func e_table_specification_new               
+  ETableSpecification
+  ())
+
+(define-func e_table_specification_load_from_file    
+  bool
+  ((ETableSpecification  specification)
+   (string  filename)))
+
+(define-func e_table_specification_load_from_string  
+  none
+  ((ETableSpecification  specification)
+   (string xml)))
+
+;;(define-func e_table_specification_load_from_node    
+;;  none
+;;  ((ETableSpecification  specification)
+;;   (xmlNode node)))
+
+(define-func e_table_specification_save_to_file      
+  none
+  ((ETableSpecification  specification)
+   (string filename)))
+
+(define-func e_table_specification_save_to_string    
+  string
+  ((ETableSpecification  specification)))
+
+;;(define-func e_table_specification_save_to_node      
+;;  xmlNode
+;;  ((ETableSpecification specification)
+;;   (xmlDoc doc)))
+
+
+;; e-table-sort-info.h
+
+(define-object ETableSortInfo (GtkObject))
+
+(define-func e_table_sort_info_freeze              
+  none
+  ((ETableSortInfo info)))
+
+(define-func e_table_sort_info_thaw                
+  none
+  ((ETableSortInfo info)))
+
+(define-func e_table_sort_info_grouping_get_count  
+  uint
+  ((ETableSortInfo info)))
+
+(define-func e_table_sort_info_grouping_truncate   
+  none
+  ((ETableSortInfo info)
+   (int length)))
+
+;; FIXME 
+;; Manual Bindings needed for ETableSortColumn!
+
+;;(define-func  e_table_sort_info_grouping_get_nth    
+;;  ETableSortColumn
+;;  ((ETableSortInfo info)
+;;   (int n)))
+
+;;(define-func e_table_sort_info_grouping_set_nth    
+;;  none
+;;  ((ETableSortInfo info)
+;;   (int n)
+;;   (ETableSortColumn column)))
+
+(define-func e_table_sort_info_sorting_get_count   
+  uint
+  ((ETableSortInfo    info)))
+
+(define-func e_table_sort_info_sorting_truncate    
+  none
+  ((ETableSortInfo info)
+   (int length)))
+
+;;(define-func  e_table_sort_info_sorting_get_nth     
+;;  ETableSortColumn
+;;  ((ETableSortInfo info)
+;;   (int n)))
+
+;;(define-func e_table_sort_info_sorting_set_nth     
+;;  none
+;;  ((ETableSortInfo info)
+;;   (int n)
+;;   (ETableSortColumn column)))
+
+(define-func e_table_sort_info_new                 
+  ETableSortInfo
+  ())
+
+;;(define-func e_table_sort_info_load_from_node      
+;;  none
+;;  ((ETableSortInfo info)
+;;   (xmlNode node)))
+
+;;(define-func e_table_sort_info_save_to_node        
+;;  xmlNode
+;;  ((ETableSortInfo info)
+;;   (xmlNode parent)))
+
+;; e-table-state.h
+
+(define-object ETableState (GtkObject))
+
+(define-func e_table_state_new               
+  ETableState
+  ())
+
+(define-func e_table_state_load_from_file    
+  bool
+  ((ETableState state)
+   (string filename)))
+
+(define-func e_table_state_load_from_string  
+  none
+  ((ETableState state)
+   (string xml)))
+
+;; e-table-config-field.h
+
+(define-object ETableConfigField (GtkVBox))
+
+(define-func e_table_config_field_new       
+  ETableConfigField
+  ((ETableSpecification spec)
+   (ETableSortInfo sort_info)
+   (bool grouping)))
+
+(define-func e_table_config_field_construct 
+  ETableConfigField
+  ((ETableConfigField field)
+   (ETableSpecification spec)
+   (ETableSortInfo sort_info)
+   (bool grouping)))
+
+
+;;(define-func e_table_state_load_from_node    
+;;  none
+;;  ((ETableState state)
+;;   (xmlNode  node)))
+
+;; e-table-config.h
+
+(define-object ETableConfig (GnomeDialog))
+
+;;Fixme w/cstring
+(define-func e_table_config_new       
+  GtkWidget
+  ((string header)
+   (ETableSpecification spec)
+   (ETableState state)))
+
+(define-func e_table_config_construct 
+  GtkWidget
+  ((ETableConfig etco)
+   (string header)
+   (ETableSpecification spec)
+   (ETableState state)))
+
+;; e-table-defines.h
+
+(define-enum ETableCursorMode
+  (line E_TABLE_CURSOR_LINE)
+  (simple E_TABLE_CURSOR_SIMPLE))
+
+;; e-table-extras.h
+
+(define-object ETableExtras (GtkObject))
+
+(define-func e_table_extras_new          
+  ETableExtras
+  ())
+
+(define-func e_table_extras_add_cell     
+  none
+  ((ETableExtras extras)
+   (string  id)
+   (ECell cell)))
+
+(define-func e_table_extras_get_cell     
+  ECell
+  ((ETableExtras  extras)
+   (string id)))
+
+;;(define-func e_table_extras_add_compare  
+;;  none
+;;  ((ETableExtras  extras)
+;;   (string id)
+;;   (GCompareFunc  compare)))
+
+;;(define-func  e_table_extras_get_compare  
+;;  GCompareFunc
+;;  ((ETableExtras extras)
+;;   (string id)))
+
+(define-func e_table_extras_add_pixbuf   
+  none
+  ((ETableExtras extras)
+   (string id)
+   (GdkPixbuf pixbuf)))
+
+(define-func e_table_extras_get_pixbuf   
+  GdkPixbuf
+  ((ETableExtras extras)
+   (string id)))
+
+;; e-table-field-chooser-dialog.h
+
+(define-object ETableFieldChooserDialog (GnomeDialog)) 
+
+(define-func e_table_field_chooser_dialog_new
+  GtkWidget
+  ())
+
+;; e-table-field-chooser-item.h
+
+(define-object ETableFieldChooserItem (GnomeCanvasItem))
+
+;; e-table-field-chooser.h
+
+(define-object ETableFieldChooser (GtkVBox))
+
+(define-func e_table_field_chooser_new
+  GtkWidget
+  ())
+
+;; e-table-header.h
+
+(define-object ETableHeader (GtkObject))
+
+(define-func  e_table_header_new        
+  ETableHeader
+  ())
+
+(define-func e_table_header_add_column    
+  none
+  ((ETableHeader eth)
+   (ETableCol tc)
+   (int pos)))
+
+(define-func e_table_header_get_column    
+  ETableCol
+  ((ETableHeader eth)
+   (int column)))
+
+(define-func e_table_header_count         
+  int
+  ((ETableHeader eth)))
+
+(define-func e_table_header_index         
+  int
+  ((ETableHeader eth)
+   (int col)))
+
+(define-func e_table_header_get_index_at  
+  int
+  ((ETableHeader  eth)
+   (int x_offset)))
+
+;;(define-func e_table_header_get_columns   
+;;  (cvec ETableCol)
+;;  ((ETableHeader  eth)))
+
+(define-func e_table_header_selection_ok  
+  bool
+  ((ETableHeader eth)))
+
+(define-func e_table_header_get_selected  
+  int
+  ((ETableHeader eth)))
+
+(define-func e_table_header_total_width   
+  int
+  ((ETableHeader eth)))
+
+(define-func e_table_header_move          
+  none
+  ((ETableHeader  eth)
+   (int source_index)
+   (int target_index)))
+
+(define-func e_table_header_remove        
+  none
+  ((ETableHeader eth)
+   (int idx)))
+
+(define-func e_table_header_set_size      
+  none
+  ((ETableHeader eth)
+   (int idx)
+   (int size)))
+
+(define-func e_table_header_set_selection 
+  none
+  ((ETableHeader eth)
+   (bool allow_selection)))
+
+(define-func e_table_header_col_diff      
+  int
+  ((ETableHeader eth)
+   (int start_col)
+   (int end_col)))
+
+(define-func e_table_header_calc_widths   
+  none
+  ((ETableHeader eth)))
+
+;;(define-func e_table_header_get_selected_indexes 
+;;  list
+;;  ((ETableHeader eth)))
+
+;; e-table-header-item.h
+
+(define-object ETableHeaderItem (GnomeCanvasItem))
+
+;; e-table-group.h
+
+(define-object ETableGroup (GnomeCanvasGroup))
+
+(define-func e_table_group_add         	     
+  none
+  ((ETableGroup etg)
+   (int row)))
+
+(define-func e_table_group_add_all     	     
+  none
+  ((ETableGroup       etg)))
+
+(define-func e_table_group_remove      	     
+  bool
+  ((ETableGroup etg)
+   (int row)))
+
+(define-func e_table_group_get_count   	     
+  int
+  ((ETableGroup etg)))
+
+(define-func e_table_group_increment   	     
+  none
+  ((ETableGroup etg)
+   (int position)
+   (int amount)))
+
+(define-func e_table_group_decrement   	     
+  none
+  ((ETableGroup etg)
+   (int position)
+   (int amount)))
+
+(define-func e_table_group_row_count   	     
+  int
+  ((ETableGroup etg)))
+
+;;(define-func e_table_group_set_focus   	     
+;;  none
+;;  ((ETableGroup etg)
+;;   (EFocus direction)
+;;   (int view_col)))
+
+(define-func e_table_group_set_cursor_row  	     
+  none
+  ((ETableGroup etg)
+   (int row)))
+
+(define-func e_table_group_get_cursor_row        
+  int
+  ((ETableGroup  etg)))
+
+(define-func e_table_group_get_focus   	     
+  bool
+  ((ETableGroup etg)))
+
+(define-func e_table_group_get_focus_column      
+  int
+  ((ETableGroup etg)))
+
+(define-func e_table_group_get_header            
+  ETableHeader
+  ((ETableGroup etg)))
+
+(define-func e_table_group_get_ecol              
+  ETableCol
+  ((ETableGroup etg)))
+
+;;(define-func e_table_group_get_printable         
+;;  EPrintable
+;;  ((ETableGroup etg)))
+
+;;(define-func e_table_group_compute_location      
+;;  none
+;;  ((ETableGroup etg)
+;;   ((cvec int) x)
+;;   ((cvec int) y)
+;;   ((cvec int) row)
+;;   ((cvec int) col)))
+
+(define-func e_table_group_new       
+  ETableGroup
+  ((GnomeCanvasGroup parent)
+   (ETableHeader full_header)
+   (ETableHeader header)
+   (ETableModel model)
+   (ETableSortInfo sort_info)
+   (int n)))
+
+(define-func e_table_group_construct 
+  none
+  ((GnomeCanvasGroup parent)
+   (ETableGroup etg)
+   (ETableHeader full_header)
+   (ETableHeader header)
+   (ETableModel model)))
+
+(define-func e_table_group_cursor_change 
+  none
+  ((ETableGroup etg)
+   (int row)))
+
+(define-func e_table_group_double_click  
+  none
+  ((ETableGroup etg)
+   (int row)
+   (int col)
+   (GdkEvent event)))
+
+(define-func e_table_group_right_click   
+  int
+  ((ETableGroup etg)
+   (int row)
+   (int col)
+   (GdkEvent event)))
+
+(define-func e_table_group_click         
+  int
+  ((ETableGroup etg)
+   (int row)
+   (int col)
+   (GdkEvent event)))
+
+(define-func e_table_group_key_press     
+  int
+  ((ETableGroup etg)
+   (int row)
+   (int col)
+   (GdkEvent event)))
+
+;; e-table-group-container.h
+
+(define-object ETableGroupContainer (ETableGroup))
+
+(define-func e_table_group_container_new       
+  ETableGroup
+  ((GnomeCanvasGroup parent)
+   (ETableHeader full_header)
+   (ETableHeader header)
+   (ETableModel model)
+   (ETableSortInfo sort_info)
+   (int n)))
+
+(define-func e_table_group_container_construct 
+  none
+  ((GnomeCanvasGroup parent)
+   (ETableGroupContainer etgc)
+   (ETableHeader full_header)
+   (ETableHeader header)
+   (ETableModel model)
+   (ETableSortInfo  sort_info)
+   (int n)))
+
+;; e-table-group-leaf.h
+
+(define-object ETableGroupLeaf (ETableGroup))
+
+(define-func e_table_group_leaf_new       
+  ETableGroup
+  ((GnomeCanvasGroup parent)
+   (ETableHeader full_header)
+   (ETableHeader header)
+   (ETableModel model)
+   (ETableSortInfo sort_info)))
+
+;; e-table-item.h
+
+(define-object ETableItem (GnomeCanvasItem))
+
+(define-func e_table_item_set_cursor          
+  none
+  ((ETableItem  eti)
+   (int col)
+   (int row)))
+
+(define-func e_table_item_get_focused_column  
+  int
+  ((ETableItem  eti)))
+
+(define-func e_table_item_is_row_selected  
+  bool
+  ((ETableItem  e_table_item)
+   (int row)))
+
+;;(define-func e_table_item_selected_row_foreach 
+;;  none
+;;  ((ETableItem eti)
+;;   (ETableForeachFunc func)
+;;   (gpointer closure)))
+
+(define-func e_table_item_leave_edit       
+  none
+  ((ETableItem  eti)))
+
+(define-func e_table_item_enter_edit       
+  none
+  ((ETableItem  eti)
+   (int col)
+   (int row)))
+
+(define-func e_table_item_redraw_range     
+  none
+  ((ETableItem  eti)
+   (int start_col)
+   (int start_row)
+   (int end_col)
+   (int end_row)))
+
+;;(define-func e_table_item_get_printable    
+;;  EPrintable
+;;  ((ETableItem eti)))
+
+;;(define-func e_table_item_print_height     
+;;  none
+;;  ((ETableItem eti)
+;;   (GnomePrintContext context)
+;;   (double width)))
+
+;;(define-func e_table_item_compute_location 
+;;  none
+;;  ((ETableItem eti)
+;;   ((cvec int) x)
+;;   ((cvec int) y)
+;;   ((cvec int) row)
+;;   ((cvec int) col)))
+
+;; e-table-one.h
+
+(define-object ETableOne (ETableModel))
+
+(define-func e_table_one_new
+  ETableModel
+  ((ETableModel source)))
+
+(define-func e_table_one_commit
+  none
+  ((ETableOne one)))
+
+;; e-table-scrolled.h
+
+(define-object ETableScrolled (EScrollFrame))
+
+(define-func e_table_scrolled_construct 
+  ETableScrolled
+  ((ETableScrolled ets)
+   (ETableModel etm)
+   (ETableExtras ete)
+   (string spec)
+   (string state)))
+
+(define-func e_table_scrolled_new 
+  GtkWidget
+  ((ETableModel etm)
+   (ETableExtras ete)
+   (string spec)
+   (string state)))
+
+(define-func e_table_scrolled_get_state 
+  string
+  ((ETableScrolled ets)))
+
+(define-func e_table_scrolled_save_state 
+  none
+  ((ETableScrolled ets)
+   (string filename)))
+
+(define-func e_table_scrolled_set_state 
+  none
+  ((ETableScrolled ets)
+   (string state)))
+
+(define-func e_table_scrolled_load_state 
+  none
+  ((ETableScrolled ets)
+   (string filename)))
+
+(define-func e_table_scrolled_set_cursor_row 
+  none
+  ((ETableScrolled ets)
+   (int row)))
+
+(define-func e_table_scrolled_get_cursor_row 
+  int
+  ((ETableScrolled ets)))
+
+;;(define-func e_table_scrolled_get_printable 
+;;  EPrintable
+;;  ((ETableScrolled ets)))
+
+;;e-table-sorted.h
+
+;;(define-func e_table_sorted_new 
+;;  ETableModel
+;;  ((ETableModel etm)
+;;   ( int col)
+;;   (GCompareFunc compare)))
+
+;;(define-func e_table_sorted_resort 
+;;  none
+;;  ((ETableSorted ets)
+;;   (int col)
+;;   (GCompareFunc compare)))
+
+;; e-table-sorter.h
+
+(define-object ETableSorter (GtkObject))
+
+(define-func e_table_sorter_model_to_sorted 
+  int
+  ((ETableSorter sorter)
+   (int row)))
+
+(define-func e_table_sorter_sorted_to_model 
+  int
+  ((ETableSorter sorter)
+   (int row)))
+
+(define-func e_table_sorter_needs_sorting 
+  bool
+  ((ETableSorter sorter)))
+
+;; e-table-subset.h
+
+(define-object ETableSubset (ETableModel))
+
+(define-func e_table_subset_construct 
+  ETableModel
+  ((ETableSubset ets)
+   (ETableModel source)
+   (int nvals)))
+
+;; e-table-subset-variable.h
+
+(define-object ETableSubsetVariable (ETableSubset))
+
+(define-func e_table_subset_variable_new 
+  ETableModel
+  ((ETableModel etm)))
+
+(define-func e_table_subset_variable_construct 
+  ETableModel
+  ((ETableSubsetVariable etssv)
+   (ETableModel source)))
+
+(define-func e_table_subset_variable_add 
+  none
+  ((ETableSubsetVariable ets)
+   (int row)))
+
+(define-func e_table_subset_variable_add_all 
+  none
+  ((ETableSubsetVariable ets)))
+
+(define-func e_table_subset_variable_remove 
+  bool
+  ((ETableSubsetVariable ets)
+   (int row)))
+
+(define-func e_table_subset_variable_increment 
+  none
+  ((ETableSubsetVariable ets)
+   (int position)
+   (int amount)))
+
+(define-func e_table_subset_variable_decrement 
+  none
+  ((ETableSubsetVariable ets)
+   (int position)
+   (int amount)))
+
+(define-func e_table_subset_variable_set_allocation 
+  none
+  ((ETableSubsetVariable ets)
+   (int total)))
+
+;; e-table-tree.h
+
+;; gal/e-text
+
+;; e-text.h
+
+(define-object EText (GnomeCanvasItem))
+
+;; e-text-model.h
+
+(define-object ETextModel (GtkObject))
+
+(define-func e_text_model_new
+  ETextModel
+  ())
+
+(define-func e_text_model_changed
+  none
+  ((ETextModel  model)))
+
+(define-func e_text_model_get_text
+  string
+  ((ETextModel  model)))
+
+(define-func e_text_model_set_text
+  none
+  ((ETextModel  model)
+   (string  text)))
+
+(define-func e_text_model_insert
+  none
+  ((ETextModel  model)
+   (int position)
+   (string  text)))
+
+(define-func e_text_model_insert_length
+  none
+  ((ETextModel  model)
+   (int position)
+   (string  text)
+   (int length)))
+
+(define-func e_text_model_delete
+  none
+  ((ETextModel  model)
+   (int position)
+   (int length)))
+
+;; gal/e-table/e-table-text-model.h
+
+(define-object ETableTextModel (ETextModel))
+
+;; e-entry.h
+
+(define-object EEntry (GtkTable))
+
+(define-func e_entry_construct 
+  EEntry
+  ((EEntry e_entry)))
+
+(define-func e_entry_new
+  GtkWidget
+  ())
+
+;;gal/widgets
+
+;; color-group.c
+
+(define-object ColorGroup (GtkObject))
+
+(define-func color_group_new_named
+  GtkObject
+  ((string name)))
+
+(define-func color_group_set_history_size 
+  none
+  ((ColorGroup cg)
+   (int size)))
+
+(define-func color_group_get_history_size
+  int
+  ((ColorGroup cg)))
+
+(define-func color_group_from_name
+  GtkObject
+  ((string name)))
+
+(define-func color_group_most_recent_color
+  GdkColor
+  ((ColorGroup cg)))
+
+(define-func color_group_oldest_color
+  GdkColor
+  ((ColorGroup cg)))
+
+(define-func color_group_next_color
+  GdkColor
+  ((ColorGroup cg)))
+
+;;(define-func color_group_previous_color
+;;  GdkColor
+;;  ((ColorGroup cg)))
+
+(define-func color_group_add_color
+  none
+  ((ColorGroup cg)
+   (GdkColor color)
+   (bool custom_clear)))
+
+(define-func color_get_current_color
+  GdkColor
+  ((ColorGroup cg)))
+
+;;(define-func color_group_previous_color
+;;  GdkColor
+;;  ((ColorGroup cg)
+;;    (GdkColor color)))
+
+;; color-palette.h
+
+(define-object ColorPalette (GtkVBox))
+
+(define-func color_palette_new 
+  GtkWidget
+  ((string no_color_label)
+   (GdkColor default_color)
+   (string group_name)))
+
+(define-func color_palette_get_current_color 
+  GdkColor
+  ((ColorPalette P)))
+
+(define-func color_palette_get_color_picker
+  GtkWidget
+  ((ColorPalette P)))
+
+;; e_canvas_vbox.h
+(define-object ECanvasVbox (GnomeCanvasGroup))
+
+(define-func e_canvas_vbox_add_item
+  none
+  ((ECanvasVbox e_canvas_vbox)
+   (GnomeCanvasItem  item)))
+
+;; e_canvas.h
+
+(define-object ECanvas (GnomeCanvas))
+
+;; e_colors.h
+
+(define-func e_color_alloc      
+  int
+  ((int red)
+   (int green)
+   (int blue)))
+
+(define-func e_color_alloc_name 
+  none
+  ((string name)
+   (GdkColor color)))
+
+(define-func e_color_alloc_gdk  
+  none
+  ((GdkColor color)))
+
+;; e_cursors.h
+(define-enum  ECursorType
+  (cross E_CURSOR_FAT_CROSS)
+  (cross E_CURSOR_THIN_CROSS)
+  (arrow E_CURSOR_ARROW)
+  (move E_CURSOR_MOVE)
+  (in E_CURSOR_ZOOM_IN)
+  (out E_CURSOR_ZOOM_OUT)
+  (x E_CURSOR_SIZE_X)
+  (y E_CURSOR_SIZE_Y)
+  (tl E_CURSOR_SIZE_TL)
+  (tr E_CURSOR_SIZE_TR)
+  (press E_CURSOR_PRESS)
+  (open E_CURSOR_HAND_OPEN)
+  (closed E_CURSOR_HAND_CLOSED)
+  (cursors E_CURSOR_NUM_CURSORS))
+
+(define-func e_cursors_init      
+  none
+  ())
+
+(define-func e_cursors_shutdown  
+  none
+  ())
+
+;;(define-func  e_cursor_get 
+;;  GdkCursor
+;;  ((ECursorType type)))
+
+;; e-gui-utils.h
+
+;;(define-func  e_popup_menu                   
+;;  none
+;;  ((GtkMenu menu)
+;;   (GdkEventButton event)))
+
+(define-func  e_auto_kill_popup_menu_on_hide 
+  none
+  ((GtkMenu  menu)))
+
+;;(define-func  e_notice                       
+;;  none
+;;  ((GtkWindow  window)
+;;   (string  type)
+;;   (string  format)
+;;   ( ...)))
+
+;;(define-func e_container_foreach_leaf        
+;;  none
+;;  ((GtkContainer  container)
+;;   (GtkCallback   callback)
+;;   (pointer      closure)))
+
+(define-func e_container_focus_nth_entry     
+  none
+  ((GtkContainer container)
+   (int n)))
+
+;;(define-func e_container_change_tab_order    
+;;  int
+;;  ((GtkContainer container)
+;;   (GList widgets)))
+
+;; e-hscrollbar.h
+
+(define-object EHScrollBar (GtkHScrollbar))
+
+(define-func e_hscrollbar_new
+  GtkWidget
+  ((GtkAdjustment adjustment)))
+
+;;  e-popup-menu.h
+
+(define-object EPrintable (GtkObject))
+
+(define-func e_printable_new 
+  EPrintable
+  ())
+
+;;(define-func e_printable_print_page          
+;;  none
+;;  ((EPrintable e-printable)
+;;   (GnomePrintContext  context)
+;;   (double width)
+;;   (double height)
+;;   (bool quantized)))
+
+(define-func e_printable_data_left           
+  bool
+  ((EPrintable e_printable)))
+
+(define-func e_printable_reset               
+  none
+  ((EPrintable e_printable)))
+
+;;(define-func e_printable_height              
+;;  double
+;;  ((EPrintable e-printable)
+;;   (GnomePrintContext  context)
+;;   (double width)
+;;   (double max-height)
+;;   (bool quantized)))
+
+;;(define-func e_printable_will_fit            
+;;  bool
+;;  ((EPrintable e-printable)
+;;   (GnomePrintContext context)
+;;   (double width)
+;;   (double max-height)
+;;   (bool quantized)))
+
+;; e-reflow.h
+
+(define-object EReflow (GnomeCanvasGroup))
+
+(define-func e_reflow_add_item
+  none
+  ((EReflow e_reflow)
+   (GnomeCanvasItem item)))
+
+;; e-reflow_sorted.h
+
+(define-object EReflowSorted (EReflow parent))
+
+(define-func e_reflow_sorted_remove_item  
+  none
+  ((EReflowSorted  sorted)
+   (string  id)))
+
+(define-func e_reflow_sorted_replace_item 
+  none
+  ((EReflowSorted  sorted)
+   (GnomeCanvasItem  item)))
+
+(define-func  e_reflow_sorted_reorder_item 
+  none
+  ((EReflowSorted  e_reflow_sorted)
+   (string id)))
+
+(define-func e_reflow_sorted_get_item     
+  GnomeCanvasItem
+  ((EReflowSorted  e_reflow_sorted)
+   (string id)))
+
+;; e-scroll_frame.h
+
+(define-object EScrollFrame (GtkBin))
+
+(define-func e_scroll_frame_new 
+  GtkWidget
+  ((GtkAdjustment  hadj)
+   (GtkAdjustment  vadj)))
+
+(define-func e_scroll_frame_set_hadjustment 
+  none
+  ((EScrollFrame  sf)
+   (GtkAdjustment  adj)))
+
+(define-func e_scroll_frame_set_vadjustment 
+  none
+  ((EScrollFrame  sf)
+   (GtkAdjustment  adj)))
+
+(define-func e_scroll_frame_get_hadjustment 
+  GtkAdjustment
+  ((EScrollFrame  sf)))
+
+(define-func e_scroll_frame_get_vadjustment 
+  GtkAdjustment
+  ((EScrollFrame  sf)))
+
+(define-func e_scroll_frame_set_policy 
+  none
+  ((EScrollFrame  sf)
+   (GtkPolicyType hsb_policy)
+   (GtkPolicyType vsb_policy)))
+
+;;(define-func e_scroll_frame_set_placement 
+;;  none
+;;  ((EScrollFrame  sf)
+;;   (GtkCornerType frame-placement)))
+
+(define-func e_scroll_frame_set_shadow_type 
+  none
+  ((EScrollFrame  sf)
+   (GtkShadowType shadow_type)))
+
+(define-func e_scroll_frame_set_scrollbar_spacing 
+  none
+  ((EScrollFrame  sf)
+   (uint spacing)))
+
+(define-func e_scroll_frame_add_with_viewport 
+  none
+  ((EScrollFrame  sf)
+   (GtkWidget  child)))
+
+;;e-unicode.h
+
+;; FIXME! 
+;;(define-func  e_utf8_strstrcase 
+;;  string
+;;  ((string haystack)
+;;   (string needle)))
+
+(define-func e_utf8_from_gtk_event_key 
+  string
+  ((GtkWidget  widget)
+   (uint keyval)
+   (string str)))
+
+(define-func e_utf8_from_gtk_string 
+  string
+  ((GtkWidget  widget)
+   (string  string)))
+
+(define-func e_utf8_from_gtk_string_sized 
+  string
+  ((GtkWidget  widget)
+   (string string)
+   (int bytes)))
+
+(define-func e_utf8_to_gtk_string 
+  string
+  ((GtkWidget  widget)
+   (string  string)))
+
+(define-func e_utf8_to_gtk_string_sized 
+  string
+  ((GtkWidget  widget)
+   (string string)
+   (int bytes)))
+
+(define-func e_utf8_gtk_entry_get_text 
+  string
+  ((GtkEntry  entry)))
+
+(define-func e_utf8_gtk_entry_set_text 
+  none
+  ((GtkEntry  entry)
+   (string text)))
+
+(define-func e_utf8_gtk_editable_get_text 
+  string
+  ((GtkEditable  editable)))
+
+(define-func e_utf8_gtk_editable_set_text 
+  none
+  ((GtkEditable  editable)
+   (string text)))
+
+(define-func e_utf8_gtk_editable_get_chars 
+  string
+  ((GtkEditable  editable)
+   (int start)
+   (int end)))
+
+;;(define-func e_utf8_gtk_editable_insert_text 
+;;  none
+;;  ((GtkEditable  editable)
+;;   (string  text)
+;;   (int length)
+;;   (int  position)))
+
+(define-func e_utf8_gtk_menu_item_new_with_label 
+  GtkWidget
+  ((GtkMenu  menu)
+   (string  label)))
+
+;; FIXME!
+
+(define-func e_utf8_gtk_clist_set_text 
+  none
+  ((GtkCList  clist)
+   (int row)
+   (int col)
+   (string text)))
+
+;;(define-func e_utf8_gtk_clist_append 
+;;  int
+;;  ((GtkCList  clist)
+;;   ((cvec string) text)))
+
+(define-func g_unichar_to_utf8 
+  int
+  ((int c)
+   (string outbuf)))
+
+(define-func gdk_keyval_to_unicode 
+  uint
+  ((uint keysym)))
+
+;; e-vscrollbar.h
+
+(define-object EVScrollbar (GtkVScrollbar))
+
+(define-func e_vscrollbar_new
+  GtkWidget
+  ((GtkAdjustment adjustment)))
+
+;;gtk_combo_box.h
+
+
+(define-object GtkComboBox (GtkHBox))
+
+(define-func gtk_combo_box_widget
+  none
+  ((GtkComboBox combo_box)
+   (GtkWidget display_widget)
+   (GtkWidget optional_pop_down_widget)))
+
+(define-func gtk_combo_box_new 
+  GtkWidget
+  ((GtkWidget display_widget)
+   (GtkWidget optional_pop_down_widget)))
+
+(define-func gtk_combo_box_poup_hide
+  none
+  ((GtkComboBox combo_box))) 
+
+(define-func gtk_combo_box_set_display
+  none
+  ((GtkComboBox combo_box)
+   (GtkWidget display_widget)))
+
+;;(define-func gtk_combo_set_arrow_relief
+;;  none
+;;  ((GtkComboBox cc)
+;;   (GtkReliefStyle relief)))
+
+(define-func gtk_combo_set_title
+  none
+  ((GtkComboBox combo)
+   (string title)))
+
+(define-func gtk_combo_box_set_arrow_sensitive
+  none
+  ((GtkComboBox combo)
+   (bool sensitive)))
+
+;; gtk_combo_stack.h
+
+(define-object GtkComboStack (GtkComboBox))
+
+(define-func gtk_combo_stack_new
+  GtkWidget
+  ((string stock_name)
+   (bool is_scrolled)))
+
+(define-func gtk_combo_stack_push_item
+  none
+  ((GtkComboStack combo_stack)
+   (string item)))
+
+(define-func gtk_combo_stack_remove_top
+  none
+  ((GtkComboStack combo_stack)
+   (int item)))
+
+(define-func gtk_combo_stack_pop
+  none
+  ((GtkComboStack combo_stack)
+   (int item)))
+
+(define-func  gtk_combo_stack_clear
+  none
+  ((GtkComboStack combo_stack)))
+
+;; gtk_combo_text.h
+
+(define-object GtkComboText (GtkComboBox))
+
+(define-func gtk_combo_text_new
+  GtkWidget
+  ((bool is_scrolled)))
+
+(define-func gtk_combo_text_set_case_sensitive
+  int
+  ((GtkComboText combo_text)
+   (bool val)))
+
+(define-func gtk_combo_text_select_item 
+  none
+  ((GtkComboText combo_text)
+   (int elem)))
+
+(define-func gtk_combo_text_set_text
+  none
+  ((GtkComboText combo_text)
+   (string text)))
+
+(define-function gtk_combo_text_add_item
+  none
+  ((GtkComboText combo_text)
+   (string item)
+   (string value)))
+
+;; widget_color_combo.h
+
+(define-object ColorCombo (GtkComboBox))
+
+;;(define-func color_combo_new
+;;  GtkWidget
+;;  ((cvec string) icon)
+;;   (string no_color_label)
+;;   (GdkColor default_color)
+;;   (string group_name)))
+
+
+;; widget_pixmap_combo.h
+
+(define-object PixmapCombo (GtkComboBox))
+
+;; FIXME! Need to do soething with PixmapComboElement
+
+;;(define-func pixmap_combo_new 
+;;  GtkWidget
+;;  ((PixmapComboElement elements)
+;;   (int ncols)
+;;   (int nrows)))
+
+(define-func pixmap_combo_select_pixmap
+  none
+  ((PixmapCombo combo)
+   (int index)))
+
+
+(options 
+ (includes "#include <gal/e-paned/e-hpaned.h>"
+	   "#include <gal/e-paned/e-paned.h>"
+	   "#include <gal/e-paned/e-vpaned.h>"
+	   "#include <gal/e-table/e-table.h>"
+	   "#include <gal/e-table/e-table-extras.h>"
+	   "#include <gal/e-table/e-table-scrolled.h>"
+	   "#include <gal/e-table/e-table-one.h>"
+	   "#include <gal/e-table/e-table-config.h>"
+	   "#include <gal/e-table/e-table-config-field.h>"
+	   "#include <gal/e-table/e-table-click-to-add.h>"
+	   "#include <gal/e-table/e-table-group.h>"
+	   "#include <gal/e-table/e-table-group-container.h>"
+	   "#include <gal/e-table/e-cell.h>"
+	   "#include <gal/e-table/e-cell-toggle.h>"
+	   "#include <gal/e-table/e-cell-tree.h>"
+	   "#include <gal/e-table/e-tree-model.h>"
+	   "#include <gal/e-table/e-tree-simple.h>"
+	   "#include <gal/e-text/e-text.h>"
+	   "#include <gal/e-text/e-entry.h>"
+	   "#include <gal/widgets/color-group.h>"
+	   "#include <gal/widgets/color-palette.h>"
+	   "#include <gal/widgets/e-canvas.h>"
+	   "#include <gal/widgets/e-canvas-vbox.h>"
+	   "#include <gal/widgets/e-canvas-utils.h>"
+	   "#include <gal/widgets/e-colors.h>"
+	   "#include <gal/widgets/e-cursors.h>"
+	   "#include <gal/widgets/e-font.h>"
+	   "#include <gal/widgets/e-gui-utils.h>"
+	   "#include <gal/widgets/e-hscrollbar.h>"
+	   "#include <gal/widgets/e-popup-menu.h>"
+	   "#include <gal/widgets/e-printable.h>"
+	   "#include <gal/widgets/e-reflow-sorted.h>"
+	   "#include <gal/widgets/e-reflow.h>"
+	   "#include <gal/widgets/e-scroll-frame.h>"
+	   "#include <gal/widgets/e-unicode.h>"
+	   "#include <gal/widgets/e-vscrollbar.h>"
+	   "#include <gal/widgets/gtk-combo-box.h>"
+	   "#include <gal/widgets/gtk-combo-stack.h>"
+	   "#include <gal/widgets/gtk-combo-text.h>"
+	   "#include <gal/widgets/widget-color-combo.h>"
+	   "#include <gal/widgets/widget-pixmap-combo.h>"
+	   "GtkType epaned_get_type () {  return e_paned_get_type (); }"
+	   "GtkType ehpaned_get_type () {  return e_hpaned_get_type (); }"
+	   "GtkType evpaned_get_type () {  return e_vpaned_get_type (); }"
+	   "GtkType etable_sort_model_get_type () {  return e_table_sort_model_get_type (); }"
+	   "GtkType etable_text_model_get_type () {  return e_table_text_model_get_type (); }"
+	   "GtkType etable_model_get_type () {  return e_table_model_get_type (); }"
+	   "GtkType etable_tool_tip_get_type () {  return e_table_tool_tip_get_type (); }"
+	   "GtkType ecell_get_type () {  return e_cell_get_type (); }"
+	   "GtkType ecell_view_get_type () {  return e_cell_view_get_type (); }"
+	   "GtkType ecell_toggle_get_type () {  return e_cell_toggle_get_type (); }"
+	   "GtkType ecell_tree_get_type () {  return e_cell_tree_get_type (); }"
+	   "GtkType ecell_check_box_get_type () {  return e_cell_check_box_get_type (); }"
+	   "GtkType ecell_text_get_type () {  return e_cell_text_get_type (); }"
+	   "GtkType etable_click_to_add_get_type () {  return e_table_click_to_add_get_type (); }"
+	   "GtkType etable_col_get_type () {  return e_table_col_get_type (); }"
+	   "GtkType etable_column_specification_get_type () {  return e_table_column_specification_get_type (); }"
+	   "GtkType etable_specification_get_type () {  return e_table_specification_get_type (); }"
+	   "GtkType etable_sort_get_type () {  return e_table_sort_get_type (); }"
+	   "GtkType etable_sort_info_get_type () {  return e_table_sort_info_get_type (); }"
+	   "GtkType etable_state_get_type () {  return e_table_state_get_type (); }"
+	   "GtkType etable_config_field_get_type () {  return e_table_config_field_get_type (); }"
+	   "GtkType etable_config_get_type () {  return e_table_config_get_type (); }"
+	   "GtkType etable_extras_get_type () {  return e_table_extras_get_type (); }"
+	   "GtkType etable_field_chooser_item_get_type () {  return e_table_field_chooser_item_get_type (); }"
+	   "GtkType etable_field_chooser_get_type () {  return e_table_field_chooser_get_type (); }"
+	   "GtkType etable_field_chooser_dialog_get_type () {  return e_table_field_chooser_dialog__get_type (); }"
+	   "GtkType etable_header_get_type () {  return e_table_header_get_type (); }"
+	   "GtkType etable_header_item_get_type () {  return e_table_header_item_get_type (); }"
+	   "GtkType etable_group_get_type () {  return e_table_group_get_type (); }"
+	   "GtkType etable_group_container_get_type () {  return e_table_group_container_get_type (); }"
+	   "GtkType etable_group_leaf_get_type () {  return e_table_group_leaf_get_type (); }"
+	   "GtkType etable_item_get_type () {  return e_table_item_get_type (); }"
+	   "GtkType etable_one_get_type () {  return e_table_one_get_type (); }"
+	   "GtkType etable_scrolled_get_type () {  return e_table_scrolled_get_type (); }"
+	   "GtkType etable_sorter_get_type () {  return e_table_sorter_get_type (); }"
+	   "GtkType etable_subset_get_type () {  return e_table_subset_get_type (); }"
+	   "GtkType etable_subset_variable_get_type () {  return e_table_subset_variable_get_type (); }"
+	   "GtkType etext_get_type () {  return e_text_get_type (); }"
+	   "GtkType etext_model_get_type () {  return e_text_model_get_type (); }"
+	   "GtkType eentry_get_type () {  return e_entry_get_type (); }"
+	   "GtkType ecanvas_vbox_get_type () {  return e_canvas_vbox_get_type (); }"
+	   "GtkType ecanvas_get_type () {  return e_canvas_get_type (); }"
+	   "GtkType ehscroll_bar_get_type () {  return e_hscroll_bar_get_type (); }"
+	   "GtkType eprintable_get_type () {  return e_printable_get_type (); }"
+	   "GtkType ereflow_get_type () {  return e_reflow_get_type (); }"
+	   "GtkType ereflow_sorted_get_type () {  return e_reflow_sorted_get_type (); }"
+	   "GtkType escroll_frame_get_type () {  return e_scroll_frame_get_type (); }"
+	   "GtkType evscrollbar_get_type () {  return e_vscrollbar_get_type (); }") 
+ (init-func "gal_init_glue"))
+
+
+
+
+
+

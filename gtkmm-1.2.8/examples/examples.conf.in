@@ -1,0 +1,26 @@
+SHELL = @SHELL@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+CXXFLAGS = @CXXFLAGS@
+CXX = @CXX@
+CXXLD = @CXX@
+SIGC_CFLAGS = @SIGC_CFLAGS@
+SIGC_LIBS = @SIGC_LIBS@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
+LIBTOOL = @LIBTOOL@
+GDKMM_LIB = ../../gdk--/gdk--/libgdkmm.la
+GTKMM_LIB = ../../src/gtk--/libgtkmm.la
+top_builddir = ../..
+
+LIBS = ../../src/gtk--/libgtkmm.la ../../gdk--/gdk--/libgdkmm.la $(GTK_LIBS) $(SIGC_LIBS)
+INCLUDES = -I ../.. -I . -I ../../gdk-- -I ../../src $(CXX_FLAGS) $(SIGC_CFLAGS) $(GTK_CFLAGS)
+
+CXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(INCLUDES)
+CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(CXXFLAGS) $(LDFLAGS) -o $@
+
+# compile and link for simple files
+CXXBUILD =  \
+        $(CXXCOMPILE) -c  $< ; \
+         $(CXXLINK) $@.lo $(LIBS)
+

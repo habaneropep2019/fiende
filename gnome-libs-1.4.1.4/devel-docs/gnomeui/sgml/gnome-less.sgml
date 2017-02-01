@@ -1,0 +1,388 @@
+<refentry id="GnomeLess">
+<refmeta>
+<refentrytitle>GnomeLess</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeLess</refname><refpurpose>Simple file content browser widget.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeLess-struct">GnomeLess</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-less-new">gnome_less_new</link>                  (void);
+void        <link linkend="gnome-less-clear">gnome_less_clear</link>                (<link linkend="GnomeLess">GnomeLess</link> *gl);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-less-show-file">gnome_less_show_file</link>            (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             const <link linkend="gchar">gchar</link> *path);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-less-show-command">gnome_less_show_command</link>         (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             const <link linkend="gchar">gchar</link> *command_line);
+void        <link linkend="gnome-less-show-string">gnome_less_show_string</link>          (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             const <link linkend="gchar">gchar</link> *s);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-less-show-filestream">gnome_less_show_filestream</link>      (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             <link linkend="FILE-CAPS">FILE</link> *f);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-less-show-fd">gnome_less_show_fd</link>              (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             int file_descriptor);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-less-write-file">gnome_less_write_file</link>           (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             const <link linkend="gchar">gchar</link> *path);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-less-write-fd">gnome_less_write_fd</link>             (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             int fd);
+void        <link linkend="gnome-less-set-font">gnome_less_set_font</link>             (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             <link linkend="GdkFont">GdkFont</link> *font);
+void        <link linkend="gnome-less-set-fixed-font">gnome_less_set_fixed_font</link>       (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             <link linkend="gboolean">gboolean</link> fixed);
+void        <link linkend="gnome-less-reshow">gnome_less_reshow</link>               (<link linkend="GnomeLess">GnomeLess</link> *gl);
+void        <link linkend="gnome-less-fixed-font">gnome_less_fixed_font</link>           (<link linkend="GnomeLess">GnomeLess</link> *gl);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBox">GtkBox</link>
+                     +----<link linkend="GtkVBox">GtkVBox</link>
+                           +----GnomeLess
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    This widget implements a graphical "more" command.  It allows the
+    user to view a text file.  There are various possible ways to
+    specify the contents to display: loading the data from a file (by
+    providing a filename) or by loading it from an open C FILE data
+    stream or from the output of a Unix command or from a Unix file
+    descriptor. 
+  </para>
+  <para>
+    The following is a simple example of its use. The code creates a
+    GnomeLess widget, sets a custom font, and fills the widget with
+    the contents of a file.
+  </para>	
+
+<informalexample>
+  <programlisting>
+GtkWidget *gl;
+GdkFont *font;
+
+/* create a new widget */
+gl = <link linkend="gnome-less-new">gnome_less_new</link>();
+
+/* set our custom font */
+font = gdk_font_load("-adobe-helvetica-bold-o-normal-*-*-140-*-*-p-*-iso8859-1");
+<link linkend="gnome-less-set-font">gnome_less_set_font</link>(GNOME_LESS(gl), font);
+
+/* display some text */
+<link linkend="gnome-less-show-file">gnome_less_show_file</link>(GNOME_LESS(gl), "/home/user/file.txt");
+  </programlisting>
+</informalexample>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeLess-struct">struct GnomeLess</title>
+<programlisting>struct GnomeLess;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-new">gnome_less_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_less_new                  (void);</programlisting>
+<para>
+Creates a new GnomeLess widget.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+&amp;GtkWidget pointer to a new GNOME less widget
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-clear">gnome_less_clear ()</title>
+<programlisting>void        gnome_less_clear                (<link linkend="GnomeLess">GnomeLess</link> *gl);</programlisting>
+<para>
+Clears all text from GnomeLess widget <parameter>gl</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-show-file">gnome_less_show_file ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_less_show_file            (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             const <link linkend="gchar">gchar</link> *path);</programlisting>
+<para>
+Displays a file in a GnomeLess widget. Replaces any text already being displayed
+in the widget.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> Pathname of file to be displayed
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+<literal>TRUE</literal> if successful, <literal>FALSE</literal> if not. Error stored in <literal>errno</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-show-command">gnome_less_show_command ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_less_show_command         (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             const <link linkend="gchar">gchar</link> *command_line);</programlisting>
+<para>
+Runs the shell command specified in <parameter>command_line</parameter>, and places the output of that command
+in the GnomeLess widget specified by <parameter>gl</parameter>. Replaces any text already being displayed in the
+widget.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+<row><entry align="right"><parameter>command_line</parameter>&nbsp;:</entry>
+<entry> Command to be executed
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+<literal>TRUE</literal> if successful, <literal>FALSE</literal> if not. Error stored in <literal>errno</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-show-string">gnome_less_show_string ()</title>
+<programlisting>void        gnome_less_show_string          (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             const <link linkend="gchar">gchar</link> *s);</programlisting>
+<para>
+Displays a string in the GnomeLess widget <parameter>gl</parameter>. Replaces any text
+already being displayed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+<row><entry align="right"><parameter>s</parameter>&nbsp;:</entry>
+<entry> String to be displayed
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-show-filestream">gnome_less_show_filestream ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_less_show_filestream      (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             <link linkend="FILE-CAPS">FILE</link> *f);</programlisting>
+<para>
+Reads all of the text from filestream <parameter>f</parameter>, and places it in the GnomeLess widget <parameter>gl</parameter>. Replaces any text
+already being displayed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+<row><entry align="right"><parameter>f</parameter>&nbsp;:</entry>
+<entry> Filestream to be displayed in the widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+<literal>TRUE</literal> if successful, <literal>FALSE</literal> if not. Error stored in <literal>errno</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-show-fd">gnome_less_show_fd ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_less_show_fd              (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             int file_descriptor);</programlisting>
+<para>
+Reads all of the text from file descriptor <parameter>file_descriptor</parameter>, and places it in the GnomeLess widget <parameter>gl</parameter>.
+Replaces any text already being displayed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+<row><entry align="right"><parameter>file_descriptor</parameter>&nbsp;:</entry>
+<entry> Filestream to be displayed in the widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+<literal>TRUE</literal> if successful, <literal>FALSE</literal> if not. Error stored in <literal>errno</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-write-file">gnome_less_write_file ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_less_write_file           (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             const <link linkend="gchar">gchar</link> *path);</programlisting>
+<para>
+Writes the text displayed in the GnomeLess widget <parameter>gl</parameter> to the file specified by <parameter>path</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> Path of file to be written
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if successful, <literal>FALSE</literal> if not. Error stored in <literal>errno</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-write-fd">gnome_less_write_fd ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_less_write_fd             (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             int fd);</programlisting>
+<para>
+Writes the text displayed in the GnomeLess widget <parameter>gl</parameter> to file descriptor <parameter>fd</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+<row><entry align="right"><parameter>fd</parameter>&nbsp;:</entry>
+<entry> File descriptor
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if successful, <literal>FALSE</literal> if not. Error stored in <literal>errno</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-set-font">gnome_less_set_font ()</title>
+<programlisting>void        gnome_less_set_font             (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             <link linkend="GdkFont">GdkFont</link> *font);</programlisting>
+<para>
+Sets the font of the text to be displayed in the GnomeLess widget <parameter>gl</parameter> to <parameter>font</parameter>.
+</para>
+<para>
+Note: This will not affect text already being displayed.
+If you use this function after adding text to the widget, you must show it again
+by using <link linkend="gnome-less-reshow">gnome_less_reshow</link> or one of the gnome_less_show commands.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+<row><entry align="right"><parameter>font</parameter>&nbsp;:</entry>
+<entry> Pointer to GdkFont
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-set-fixed-font">gnome_less_set_fixed_font ()</title>
+<programlisting>void        gnome_less_set_fixed_font       (<link linkend="GnomeLess">GnomeLess</link> *gl,
+                                             <link linkend="gboolean">gboolean</link> fixed);</programlisting>
+<para>
+Specifies whether or not new text should be displayed using a fixed font. Pass TRUE
+in <parameter>fixed</parameter> to use a fixed font, or FALSE to revert to the default GtkText font.
+</para>
+<para>
+Note: This will not affect text already being displayed.
+If you use this function after adding text to the widget, you must show it again
+by using <link linkend="gnome-less-reshow">gnome_less_reshow</link> or one of the gnome_less_show commands.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME Less widget
+</entry></row>
+<row><entry align="right"><parameter>fixed</parameter>&nbsp;:</entry>
+<entry> Whether or not to use a fixed font
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-reshow">gnome_less_reshow ()</title>
+<programlisting>void        gnome_less_reshow               (<link linkend="GnomeLess">GnomeLess</link> *gl);</programlisting>
+<para>
+Re-displays all of the text in the GnomeLess widget <parameter>gl</parameter>. If the font has changed since
+the last show/reshow of text, it will update the current text to the new font.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-less-fixed-font">gnome_less_fixed_font ()</title>
+<programlisting>void        gnome_less_fixed_font           (<link linkend="GnomeLess">GnomeLess</link> *gl);</programlisting>
+<para>
+This function is obsolete. Please use <link linkend="gnome-less-set-fixed-font">gnome_less_set_fixed_font</link> instead.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>gl</parameter>&nbsp;:</entry>
+<entry> Pointer to GnomeLess widget
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

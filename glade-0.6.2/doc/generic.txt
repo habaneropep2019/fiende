@@ -1,0 +1,84 @@
+
+Here are some notes about problems which may be encountered when converting
+Glade to using generic code, i.e. using the GTK Arg mechanism to get & set
+all widget properties.
+
+gtk_type_new():
+	some widgets do not return a valid widget, which usually results
+	in Glade crashing. (These are the widgets you normally have to
+	pass arguments to when creating with _new().
+
+GtkDialog:
+	How to edit the vbox & action_area, and to output code which
+	adds widgets to them but doesn't create them.
+
+GtkFileSelection & GtkColorSelectionDialog:
+	We need to add signal handlers to the OK/Cancel/Help buttons.
+	Sometimes other buttons and widgets are also added to the dialogs -
+	can we handle that?
+
+GtkNotebook:
+	The popup menu items & tab labels of the pages.
+
+GtkImage:
+	Can't change the image type & visual after creation.
+	Also the args to create an image are dynamic - often the result
+	of function calls, e.g. gtk_visual_best_with_depth (xx)
+
+GtkPixmap:
+	Need to pass gdkpixmap and gdkbitmap mask to create the pixmap,
+	so this is awkward to do with Args.
+
+
+Properties which can only be set when a widget is created or before it is
+realized:
+e.g. window - wmclass, wmname
+     image - type & visual (mentioned above)
+     clist/ctree - number of columns
+
+
+GtkToolbar:
+	The normal toolbar buttons are treated specially - need to create a
+	GtkToolbarItem class so we can differentiate these toolbar buttons
+	with button widgets.
+
+GtkPaned:
+	Need to be able to get/set the position of the widget, so we can
+	replace a widget if it is added/deleted. (Also look at
+	gb_widget_replace_child() in gbwidget.c to check it can all be
+	done generically)
+
+
+Drawing the box representing selected widget(s):
+	Viewport currently has special code in editor.c - paint_widget()
+
+	gbclist.c has code to redraw the edges of the clist when it is
+	scolled, otherwise the selection handles mess the display up.
+
+	GnomeCanvas paints itself in an idle function, so we have to do the
+	same or it will paint over the selection.
+
+
+Underlined accelerator keys:
+	When setting focus to a widget, sometimes we have to set focus to
+	the child of a widget, e.g. if we want to set the focus to a GtkCombo
+	we actually have to set the focus to the combo's entry.
+	It would be better if the combo handled this itself.
+
+GtkFixed & GtkLayout:
+	Can the child's position and size be set OK via the standard widget
+	x & y Args? - for a child of a fixed you need to use gtk_fixed_move
+	since the fixed	remembers the positions of all children.
+
+	In a layout, you need to be careful because the allocation.x & y are
+	relative to the window origin, not to the origin of the entire layout,
+	i.e. when the layout is scrolled, the allocations change and may even
+	be negative.
+
+
+GtkTooltips:
+	Tooltips use enter/leave notify events so they only work for widgets
+	which have X windows. I've been using GTK_WIDGET_NO_WINDOW() to test
+	for this. However GtkRadioButton/GtkCheckButton don't normally have a
+	normal X window, but they do have an InputOnly window and tooltips
+	still work. So I had to add a special case to support these.

@@ -1,0 +1,118 @@
+<refentry id="gnomeui-gnome-mdi-session">
+<refmeta>
+<refentrytitle>gnome-mdi-session</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-mdi-session</refname><refpurpose>Routines providing <type>GnomeMDI</type> state saving and restoration</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+<link linkend="GnomeMDIChild">GnomeMDIChild</link>* (<link linkend="GnomeMDIChildCreator">*GnomeMDIChildCreator</link>)      (const <link linkend="gchar">gchar</link>*);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-mdi-restore-state">gnome_mdi_restore_state</link>         (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             const char *section,
+                                             <link linkend="GnomeMDIChildCreator">GnomeMDIChildCreator</link> child_create_func);
+void        <link linkend="gnome-mdi-save-state">gnome_mdi_save_state</link>            (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             const <link linkend="gchar">gchar</link> *section);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    In order to simplify saving the state of MDI and its children, the
+    GnomeMDI interface provides a function that saves its layout and
+    the state of its children (provided by each child through get_config_string
+    virtual function defined in <type>GnomeMDIChild</type> subclasses) and a
+    function that restores a previously saved state, recreating the children
+    from their configuration strings using a function provided by the programmer.
+  </para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeMDIChildCreator">GnomeMDIChildCreator ()</title>
+<programlisting><link linkend="GnomeMDIChild">GnomeMDIChild</link>* (*GnomeMDIChildCreator)      (const <link linkend="gchar">gchar</link>*);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Param1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-restore-state">gnome_mdi_restore_state ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_mdi_restore_state         (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             const char *section,
+                                             <link linkend="GnomeMDIChildCreator">GnomeMDIChildCreator</link> child_create_func);</programlisting>
+<para>
+Restores the MDI state. Children are recreated with <parameter>create_child_func</parameter> that
+restores information about a child from a config string that was provided
+during saving state by the child.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>section</parameter>&nbsp;:</entry>
+<entry> Name of the section to restore MDI state from.
+</entry></row>
+<row><entry align="right"><parameter>child_create_func</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+TRUE if state was successfully restored, FALSE otherwise.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mdi-save-state">gnome_mdi_save_state ()</title>
+<programlisting>void        gnome_mdi_save_state            (<link linkend="GnomeMDI">GnomeMDI</link> *mdi,
+                                             const <link linkend="gchar">gchar</link> *section);</programlisting>
+<para>
+Saves MDI state to the application's config file in section <parameter>section</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mdi</parameter>&nbsp;:</entry>
+<entry> A pointer to a GnomeMDI object.
+</entry></row>
+<row><entry align="right"><parameter>section</parameter>&nbsp;:</entry>
+<entry> Name of the section that the MDI config should be saved to.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

@@ -1,0 +1,715 @@
+2001-06-03  Peter Teichman  <peter@ximian.com>
+
+	* linux-cdrom.c: fix a crash when starting a second gtcd process
+	when the cd is unplayable
+
+	* callbacks.c: check that the cd is playable in play_cb
+
+2001-06-01  Peter Teichman  <peter@ximian.com>
+
+	* gtcd.c, keybindings.c, linux-cdrom.c, prefs.c, tracked.c,
+	cdaudio-client.c: purge c++ style comments
+
+2001-06-01  Christian Rose  <menthos@menthos.com>
+
+	* gtcd.desktop: Updated Swedish translation.
+
+2001-05-31  Peter Teichman  <peter@ximian.com>
+
+	* gtcd.c, keybindings.c, popup.c, prefs.c, prefs.h: fix keybinding
+	support. add a new section in the gtcd config file with newer
+	style keybindings. these store modifiers + keys, instead of just
+	numeric key codes. Patch from 
+	David Hampton <hampton@employees.org>
+
+	* gtcd.c, tcd.c: use sigaction rather than signal for the cd info
+	reloading function. Fixes a segfault. Patch from
+	David Hampton <hampton@employees.org>
+
+	* linux-cdrom.c: be a little more lenient when parsing artist and
+	album information. This fixes a crash when "/" was the first
+	character for an artist/title. Patch from  
+	David Hampton <hampton@employees.org> 
+
+2001-05-29  Peter Teichman  <peter@ximian.com>
+
+	* Makefile.am: remove the explicit gtcd.c rule. it was breaking
+	distcheck.
+
+	* cddb.c: fix some comparisons that should have been assignments
+
+	* cddb_props.c: 
+	  cddb_status.c:
+	  gtcd.c:
+	  gtracked.c:
+	  prefs.c:
+	#include <libgnomeui/gnome-window-icon.h>
+
+	* gtcd.c: define calculate_title() before it is used, remove a
+	reference to an unused variable
+
+	* linux-cdrom.h: make tcd_readtoc, tcd_playtracks return void. the
+	return values were never checked anyway
+
+	* linux-cdrom.c: return nothing in tcd_readtoc and tcd_playtracks,
+	rather than uninitialized variables
+	
+2001-05-29  Peter Teichman  <peter@ximian.com>
+
+	* Recognize data tracks in various places. Patch from 
+	David Hampton <hampton@employees.org>
+
+2001-05-28  Peter Teichman  <peter@ximian.com>
+
+	* callbacks.c (quit_cb): remove the two timeouts while shutting
+	down. this fixes a race condition where the gc was destroyed
+	before the slow timeout ran
+
+	* gtcd.c: Create a corba interface for gtcd, to ensure that only
+	one copy is running at a time
+
+	* gtcd.c, prefs.h, prefs.c: Try much harder to load a font. Patch
+	from David Hampton <hampton@employees.org>
+
+2001-05-26  Peter Teichman  <peter@ximian.com>
+
+	* linux-cdrom.c:
+	Only open the cdrom device temporarily for each action
+
+2001-05-26  Peter Teichman  <peter@ximian.com>
+
+	* callbacks.c:
+	Make the GUI insensitive before exiting
+
+2000-12-28  Tim Gerla  <timg@rrv.net>
+
+	* gtcd.c, prefs.c, prefs.h: Added a squared-law volume control
+	  option, a patch from David Bryant <daveb@acres.com.au>.
+
+2000-12-25  Norbert Warmuth  <nwarmuth@privat.circular.de>
+
+	* linux-cdrom.c (tcd_playtracks): Removed leftover from
+	Stanislav's commit on Dec 19. (duplicate assignment without
+	effect). 
+
+2000-12-19  Stanislav Brabec  <utx@penguin.cz>
+
+	* linux-cdrom.c: Committed fix for bug #33600 from Norbert Warmuth
+	<nwarmuth@privat.circular.de> (tcd/gtcd fails to play some CD's on
+	linux).
+
+2000-08-05  Dan Mueth <d-mueth@uchicago.edu>
+
+	* doc/*: Added C documentation for Erik Jarvi
+	* callbacks.c: Modified help callback to use help browser and	
+	point to new docs instead of old users guide
+
+2000-05-21  Jacob Berkman  <jacob@helixcode.com>
+
+	* gtcd.c (main): set the default icon
+
+	* prefs.c (font_button_cb): 
+	* gtracked.c (edit_window): 
+	* cddb_status.c (cddb_status_dialog): 
+	* cddb_props.c (create_edit_window): use the default icon
+
+Fri May 12 11:44:31 2000  Tim Gerla <timg@rrv.net>
+
+	* gtcd.c: Hopefully fix a phantom crash..
+
+Tue Apr 18 14:28:31 2000  George Lebl <jirka@5z.com>
+
+	* gtcd.c, prefs.c: use gdk_fontset_load for everything, mark all
+	  font strings as translatable and make -iso8859-1 into -*-*.  This
+	  should make it work for other-then-english
+
+Tue Apr 18 13:40:42 2000  George Lebl <jirka@5z.com>
+
+	* gtcd.c: apply a patch that tim approved about 3 months ago and
+	  I forgot to apply it: change cur_goto_id to unsigned long, and
+	  free the gotomenu when redoing it.  This fixes tcd on alpha.
+
+	* gtracked.c: use static buffers instead of dynamic for printing
+	  into the clist.  It was mallocing a constant amount here anyway.
+	  (part of the above patch as well)
+
+2000-04-16  Karl EICHWALDER  <ke@suse.de>
+
+	* gtcd.desktop: Add `de'.
+
+2000-04-02  Jonathan Blandford  <jrb@redhat.com>
+
+	* gtcd.c (setup_time_display): minor packing changes to make it
+	look better.
+	(init_window): change allow_shrink to be false.  Fizes one of my
+	biggest gripes with GNOME of all time.
+	(create_buttons): fixed keyboard handling of buttons.
+
+2000-02-14  Stanislav Brabec <utx@penguin.cz>
+
+	* Makefile.am: Removed obsolette -g.
+
+2000-01-13  Tim Gerla  <timg@means.net>
+
+	* linux-cdrom.h: Include linux/ucdrom.h if it exists.
+
+2000-01-13  Scott D. Heavner  <sdh@po.cwru.edu>
+
+	* linux-cdrom.c (tcd_playtracks): do a bunch more defined() tests
+	so it comiles with linux 2.0.38
+
+	* gtcd.c (launch_gmix): use the mixer_cb instead of forking gmix
+	(let mixer_cb handle that so it's all done in one place)
+
+2000-01-10  Tim Gerla  <timg@means.net>
+
+	* linux-cdrom.c (tcd_playtracks): Patch from Ben Collver to clean up
+	                                  some kernel warnings.
+
+	* gtracked.c (select_row_cb): Erase stuff in entry if it starts with
+	                              "Track".
+
+1999-12-13  Stanislav Brabec <utx@penguin.cz>
+
+	* track_buttons.c: Typo fixed.  Last track fix.
+
+1999-10-04  Stanislav Brabec  <utx@penguin.cz>
+
+	* gtcd.desktop: Alphabetical resort.
+
+1999-10-03  Tim Gerla  <timg@means.net>
+
+	* Warning fixes, bug fix in track scanning code (tcd_find_track)
+
+1999-09-22  Tim Gerla  <timg@means.net>
+
+	* cddb*.c: Patch from Jim Hague <jim.hague@acm.org> to allow
+	  proxy authentication.
+
+1999-09-28  Stanislav Brabec <utx@penguin.cz>
+
+	* gtcd.desktop: Added Czech desktop entry.
+
+1999-09-27  Richard Hult  <rhult@frenzy.hemmet.chalmers.se>
+
+	* gtcd.desktop: Added Swedish desktop entry.
+
+1999-09-26  Lauris Kaplinski <lauris@ariman.ee>
+
+	* gtcd.desktop: Added Estonian translation
+
+1999-09-20  Tim Gerla  <timg@means.net>
+
+	* gtcd.c (calclate_width): Bug fix
+
+1999-09-19  Tim Gerla  <timg@means.net>
+
+	* gtcd.c: Gui resizing fixes
+
+	* callbacks.c (help): Made it work.
+	(quit_cb): More preferences and general logic fixes
+
+	* prefs.c, *.c: Fixed prefbox Cancel logic.
+
+	* gtcd.c (make_changer_buttons): Don't display button if there's
+	only one slot in the drive.
+
+	* gtracked.c (edit_window): Add border around track list
+
+1999-09-18  Scott D. Heavner  <sdh@po.cwru.edu>
+
+	* gtcd.c (launch_gmix): add call to _exit() after successful fork()
+
+1999-09-09  Owen Taylor  <otaylor@redhat.com>
+
+	* gtcd.c: Added --play option that play the CD on startup gtcd 
+	 regardless of the configure window.
+
+	* gtcd.c: Removed some calls to GUI updating functions that were
+	 getting called before the GUI was initialized.
+
+1999-09-05  Tim Gerla  <timg@means.net>
+
+	* cddb_props.c: Fixed bug in number sel.
+	* gtracked.c: I18n fixes
+	* gtcd.c: Crash fix for non-changer systems and no /dev/cdrom
+	* prefs.c: I18n
+
+1999-08-17  Tim Gerla  <timg@means.net>
+
+	* gtcd.c (calculate_title): New function, fix title cropping code.
+
+	* prefs.c: Change default font from "fixed" to "helvetica" so that
+	accents show up.
+
+1999-08-16  Tim Gerla  <timg@means.net>
+
+	* gtcd.c: new seek/search code!
+	* linux-cdrom.c: A few new helper funcs for the new seek/search code.
+	* gtcd.c: formatting
+	* prefs.c: added note about having to restart after changing keybindings
+	* gtracked.c (gtracked_submit): Fixed several GUI problems.
+
+1999-07-11  Raja R Harinath  <harinath@cs.umn.edu>
+
+	Fix compile problems on Solaris. 
+	* linux-cdrom.h (cd_min_sec_frame): New typedef.  Equivalent to 
+	the type used for cdrom_tocentry::cdte_addr.msf.  
+	(CD_FRAMES, CD_SECS): Define if not already defined.
+	* linux-cdrom.c (msf_2_frame): Use cd_min_sec_frame instead of
+	cdrom_msf0.
+	(frame_2_msf): Likewise.
+	(tcd_play_seconds): Likewise.
+	Reported by "Brandon S. Allbery" <allbery@ece.cmu.edu>.
+	
+1999-05-25  Tim Gerla  <timg@means.net>
+
+	* Added patch from AJG to allow --device=/dev/whatever to be passed
+	to the command line.
+
+1999-05-24  James Henstridge  <james@daa.com.au>
+
+	* cddb.c (append_data): I was using the strncat function
+	incorrectly.  This caused buffer overruns for large ammounts of
+	extended data.  It now truncates the data like it was supposed to.
+	It may be a good idea to switch over to dynamically allocated
+	strings for this code, so that we don't loose information in these
+	situations.
+
+1999-05-11  James Henstridge  <james@daa.com.au>
+
+	* prefs.c (load_prefs): set the default cddb host to freedb.
+
+	* cddb_props.c: small change to the logic for changing the default
+	port when switching between cddbp and http mode for lookups -- freedb
+	uses port 888 for cddbp, while cddb.com uses 8880.
+
+	* gtracked.c (gtracked_submit): use gnome_config_get_translated_string
+	to read the description of the submit service, so that translations
+	can be made.
+
+	* gtcd.c (setup_time_display): added a tooltip to the volume slider.
+
+	* cddb.c (tcd_readcddb, tcd_writecddb): now the DTITLE and TTITLEn
+	fields of an entry will be split onto multiple lines if they are too
+	long.  Without this change, CDs with long song titles would get
+	rejected when submited to one of the cddb databases.
+
+1999-05-02  James Henstridge  <james@daa.com.au>
+
+	* gtracked.c (gtracked_submit): was leaking the section names when
+	iterating over the file cddb-submit-methods.
+
+	* gtcd.c (slow_timer): fixed a memory leak.  The return value of
+	gnome_util_home_file was not being freed.  This was causing gtcd to
+	leak one string every second -- not good if you leave gtcd running.
+	Now the malloc/free difference seems to be stable (except when you
+	bring up any dialogs).
+
+1999-04-30  James Henstridge  <james@daa.com.au>
+
+	* gtracked.c (gtracked_submit): coded the dialog used to submit
+	entries to cddb servers.
+
+	* cddb.h (tcd_call_cddb_submit): added function prototype.
+
+	* cddb.c (tcd_readcddb): read the revision number from the cddb file.
+	(tcd_writecddb): write the revision back to the file.
+
+	* linux-cdrom.c (tcd_readdiskinfo): set cd->cddb_rev to zero for
+	unknown discs.
+
+	* linux-cdrom.h (cd_struct): added cddb_rev field to hold the revision
+	of a cddb database file.  We need to worry about this for submission
+	purposes.
+
+1999-04-29  James Henstridge  <james@daa.com.au>
+
+	* gtracked.c: many changes to allow editing the extra information
+	fields for the disc and track.  Now not only does gtcd not destroy
+	this information, it allows you to edit it.  The dialog is about
+	40% larger as a result, but still should fit on a 640x480 screen.
+	I have also added a submit button, for the submit code I have
+	almost finished.
+
+	* cddb.c (tcd_call_cddb_submit): new function to call cddbsubmit.
+
+	* cddb.c (tcd_readcddb): added code to read extended data from the
+	cddbslave database files.  It recognises multiple line data, and
+	handles embedded new lines, tabs and back slashes correctly.
+	The PLAYORDER tag is still ignored, since gtcd doesn't use it (yet).
+	(tcd_writecddb): added code to write the extended data back to
+	cddbslave database files.  It handles breaking long lines and
+	escaping new lines, tabs and back slashes.
+	Now gtcd will preserve all the information in a cddb record.
+
+	* linux-cdrom.c (tcd_readdiskinfo): set the extd members to empty
+	strings when initialising the structure for a disc with no cddbslave
+	database entry.
+
+	* linux-cdrom.h (cd_track, cd_struct): added extended data fields to
+	these structures (the new extd members).
+
+	* cddb.c (tcd_writecddb): modified this function so that it outputs
+	valid cddb data files.  Basically just changed PLAYLIST= to PLAYORDER=
+	and added blank EXTD and EXTTn lines.  I will have to get it so that
+	these fields are read in properly, so that gtcd does not wipe this
+	data if it exists in the file.
+
+1999-04-17  James Henstridge <james@daa.com.au>
+
+	* prefs.[ch]: added some code to load and save http specific cddb
+	settings
+
+	* cddb_props.c: added code for http cddb settings.
+
+1999-03-15  Mark Crichton <crichton@gimp.org>
+	
+	* linux-cdrom.h: Wasnt that, reverted change
+
+1999-03-15  Mark Crichton <crichton@gimp.org>
+	
+	* linux-cdrom.h: Fixed the annoying Illegal Request error popping
+	up on my machine.  CDROMCLOSETRAY is only for the OPTI series of
+	cdroms.  So we now check to see if CONFIG_OPTCD(_MODULE) is defined.
+	If it isn't, we undefine CDROMCLOSETRAY.  Works with Linux 2.2 only.
+
+1999-03-10  Ian Peters  <itp@gnu.org>
+
+	* gtcd.c: (main): Set the display area's background color to black,
+	which makes assorted redraws nicer.
+
+1999-02-26  Changwoo Ryu  <cwryu@adam.kaist.ac.kr>
+
+	* cddb_props.c (create_local_db): Translate N_()'ed strings.
+	(fill_list): Likewise.
+
+1999-02-17  drmike  <drmike@marshank>
+
+        * Makefile.am: Updated to install desktop into $(datadir)/gnome/apps
+
+        Dr Mike <drmike@redhat.com>
+
+1999-02-13  pablo  <pablo@marshank>
+
+        * prefs.c, linux-cdrom.c, cddb_props.c: updated spanish language file,
+        and some i18n corrections
+
+1999-02-11  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c: Fixed sizing for mandrake.
+	* linux-cdrom.[ch]: Fixed malloc brokenness
+
+1999-02-10  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c(reload_info): Fix cddb reload.
+	* gtracked.c: Fix cd changer switching.
+
+1999-02-09  Tim P. Gerla  <timg@means.net>
+
+	* Small fixups. Reload track info every 5 seconds.
+	* gtcd.c: remove ~/.tcd/gtkrc parsing, not needed...
+
+1999-02-08  Tim P. Gerla  <timg@means.net>
+
+	* tcd.c: Ditch isdisk and hopefully fix tcd.
+	* linux-cdrom.c: Various policy changes..will probably break tcd
+	(not gtcd). 
+	* gtcd.c: Remove isdisk
+	* gtcd.c: Changed window size policy. Now it sizes to fit the
+	largest of either album title or artist, or 25 characters,
+	whichever is smaller. Wraps song names like "This is...long
+	song". 
+
+1999-01-28  Tim P. Gerla  <timg@means.net>
+
+	* prefs.c: Added only_use_trkind preference for broken cdrom drives,
+		   lowercased some options. 
+	* linux-cdrom.c: Made only_use_trkind an option.
+
+1999-01-28  Tim P. Gerla  <timg@means.net>
+
+	* prefs.c/gtracked.c: Clicking on Track Editor or Preferences when
+	  a window is already open, closes the respective window.
+
+1999-01-28  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c/linux-cdrom.c: Fixed disc change checking logic. Still a
+	bit messy, but it works. 
+
+1999-01-22  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* tcd.c (main): Make C-l refresh the display.
+
+Sun Dec 27 00:42:53 CST 1998  Tim P. Gerla  <timg@means.net>
+
+	* gtracked.h: GUI changes to the track editor.
+
+1998-12-24  Tim P. Gerla  <timg@means.net>
+
+	* linux-cdrom.c: Various cleanups and fixes.
+
+1998-12-22  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c (slow_timer): SIGUSR2 not 1
+
+1998-12-17  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* cddb_status.c (cddb_status_dialog): Remove exploitable hole.  Do
+	not use /tmp, and fixes a bug that will allow multiple users to
+	use this. 
+
+1998-12-16  Scott D. Heavner  <sdh@po.cwru.edu>
+
+	* cddb.c (tcd_call_cddb_slave): Decrement blen on 1st sprintf.
+	Change some >= to > to account for trailing 0 added by 1st
+	sprintf.  Should probably modify size of buf to allow for disc's
+	with 99 tracks!
+
+1998-12-13  Tim P. Gerla  <timg@means.net>
+
+	* gtracked.c (edit_window): Select a track on open so that the
+	user isn't confused.
+	Also update track editor when disc is changed.
+
+	* cddb_props.c: Various fixes.
+
+	* cddb_status.c (cddb_status_dialog): It works once again.
+
+	* prefs.c: Only one dialog may be open at once. 
+	Also removed key modifiers.
+
+1998-12-11  Tim P. Gerla  <timg@means.net>
+
+	* cddb_status.c: Works now!
+
+	* cddb_props.c (create_cddb_page): Made server and port work.
+
+1998-12-11  Sven Neumann <sven@gimp.org>
+
+	* fixed the color preferences callback: GnomeColorPicker
+	returns 16bit color values. 
+
+1998-12-02  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c: Fixed another silly segfault.
+
+	* cddb_props.[ch]: New toys! Not all features working yet.
+
+1998-11-29  Tim P. Gerla  <timg@means.net>
+
+	* prefs.c (select_row_cb): Fixed (sort of) an uncommon segfault
+
+1998-11-28  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c (setup_colors): Brightened up the dark grey color.
+
+	* linux-cdrom.c (tcd_ejectcd): More breakage dealing with eject
+	controls. 
+
+	* gtcd.c (slow_timer): Fixed some breakage.
+
+Fri Nov 27 20:38:47 CST 1998  Tim P. Gerla  <timg@means.net>                                        
+
+        * cddb.c: Ooops, fixed cddb.
+
+1998-11-26  Tuomas Lukka (lukka@iki.fi)
+
+	* Add include files so _() gets used
+
+1998-11-24  Tuomas Lukka (lukka@iki.fi)
+	
+	* Internationalization updates
+
+1998-11-22  Tuomas Kuosmanen  <tigert@fun112.koivukyla.hoas.fi>
+
+	* updated the icon into a little better one.. Compact Disk is a tough
+	one to draw :) Maybe I should make an entirely different thing...?
+
+1998-11-20  Tuomas Lukka (lukka@iki.fi)
+
+	* put in internalization for the "normal", "trk-e" etc strings.
+
+1998-11-8  Justin Maurer  <justin@openprojects.net>
+
+	* fixed popup.c to popup preferences dialog instead of track editor
+	when preferences is clicked
+
+1998-09-30  Havoc Pennington  <hp@pobox.com>
+
+	* prefs.c (color_set_cb): Use guint not int for args, and 
+	do the function differently since get_i8 no longer takes int* args
+	and it might leave the last 3/4 of the int empty. This callback 
+	function is missing the alpha argument, btw.
+
+1998-09-22  Tim P. Gerla  <timg@means.net>
+
+	* prefs.c, gtcd.c, keybindings.[ch]: New fun properties tab.
+
+1998-09-19  Tim P. Gerla  <timg@means.net>
+
+	* Added a popup menu on the status area. 
+
+1998-09-18  Max Valianskiy <maxcom@maxcom.ml.org>
+
+	* gtracked.c, linux-cdrom.c: now track editor updates track title
+	and artist in main window
+
+1998-09-16  Max Valianskiy <maxcom@maxcom.ml.org>
+
+	* gtracked.c: now track editor automaticly selects next track 
+	in track_list when you press "Enter" in track_entry. 
+
+1998-09-05  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c: Added functionality for the onexit/onstsrt preferences. 
+	also added some keybindings.
+
+1998-09-04  Tim P. Gerla  <timg@means.net>
+
+	* *.c: Fixed some warnings
+	* prefs.c: Rewrite.
+
+1998-09-02  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* callbacks.c: Include <config.h>.
+
+	* prefs.c: Do not define PACKAGE nor VERSION. Include <config.h>.
+
+	* gtcd.c (create_buttons): Remove _() from pixmap name because it
+	is now a picture instead of a word.
+
+Sun Aug 30 21:06:10 1998  Tim P. Gerla	<timg@means.net>
+
+	* cddb.c: Removed many function calls that were replaced by
+	cddbslave. Added code to call cddbslave.
+	
+	* gtcd.c: Added signal handler for SIGUSR1 to reload cddb file.
+
+	* gtracked.c: Removed cddb stuff.
+
+	* linux-cdrom.c: Changed cddb code to reflect changes.
+
+	* socket.[ch]: Removed.
+	
+	* gcddb.[ch]: Removed.
+	
+	* Makefile.am: Changed to reflect other changes.
+
+Sun Aug 30 13:58:45 1998  Tim P. Gerla  <timg@means.net>
+
+	* tcd.c (main): Augustus Gloop work.
+
+	* socket.c (fgetsock): More nonblocking work.
+
+	* linux-cdrom.c: Added some $HOME fixes from Augustus Gloop.
+
+	* gcddb.c (do_cddb): Likewise.
+
+        * Makefile.am: Added and removed some files.
+	
+	* callbacks.[ch]: New files.
+
+	* gtcd_public.h: New File. Contains prototypes and externs for
+	public functions/vars. 
+
+	* gcddb.c: Various fixes.
+
+	* gtcd.c: Many structure changes. Moved most callbacks to callbacks.c.
+
+	* gtracked.c: Various fixes to accomodate changes..
+
+1998-08-28  Tim P. Gerla  <timg@means.net>
+	
+	* gtcd.c: Interface changes...let me know if they are bad or good.
+
+	* socket.c: Added a select to make things a bit more
+	  responsive...Still not quite right.
+
+1998-08-26  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* properties.c, gtracked.c, gtcd.c: More i18n work.
+
+1998-08-25  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c: rearraneged button layout.
+
+	* *.*: Changed all occurances of 'properties' to 'preferences'.
+
+1998-08-24  Tim P. Gerla  <timg@means.net>
+
+	* gtcd.c: Fastforward/rewind buttons now work as a real CD player
+	  would. Click and release to change track, hold to skip seconds. 
+	* linux-cdrom.c: Split tcd_gettime() into two parts.
+
+	* TODO: a few changes.
+
+1998-08-24  Tim P. Gerla  <timg@means.net>
+	
+	* tcd/Makefile.am: Support for above. 
+
+	* tcd/gcddb.c: Changed sprintfs to g_snprintfs.
+
+	* tcd/gtracked.c: Fixed some silly bug that manifested itself when I
+	  enabled changer support.
+
+	* tcd/gtcd.c: Changed sprintfs to g_snprintfs, and removed several
+          superfluous gtk_show_widgets. Fixed changer box packing order.
+	  Also set volume widget to fill&expand.
+
+1998-08-18  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* gabout.c, gtcd.c, gcddb.c: Some i18n work.
+
+1998-08-04  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* gtcd.c (status_configure_event): Fixed the leak that was causing
+	the X server to grow to an infinite size -- the status_db pixmap
+	was being recreated on every configure event but it was never
+	being freed.
+
+	* properties.c (create_status_frame): Fixed erroneous printf format.
+	(help_cb): Made void, as it had no return type.
+	#include <string.h>
+
+	* gcddb.c (do_cddb): Do not pass more than one parameter to
+	tcd_open_cddb_http(). 
+	#include <stdlib.h> and <string.h>
+	(do_cddb): Made void, as the function is not supposed to return
+
+	* gtracked.c: #include <string.h>
+
+	* linux-cdrom.c (tcd_readdiskinfo): Return 0 when the disk is not
+	playable. 
+
+	* cddb.h: Added prototype for tcd_open_cddb_http().
+
+	* gtcd.c (status_changed): Made void, as the function does not
+	return anything.
+
+	* Removed unused variables all over the place to keep gcc happy.
+
+	* gtcd.c: Added prototype for status_changed().
+
+	* properties.h: Added prototype for properties_cb().
+
+	* gtracked.h: Added prototype for edit_window().
+
+	* gtcd.c (make_button_with_pixmap):
+	(make_row3): 
+	(setup_pixmaps): 
+	(status_changed): Fixed memory leaks caused by not freeing the
+	string returned by gnome_pixmap_file().
+
+Mon Aug  3 17:17:08 CEST 1998  Tim P. Gerla  <timg@means.net>
+
+	* gtracked.c: Fixed silly clist bug. Now the tracks won't be
+	corrupted. 
+
+1998-07-02  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* gtcd.desktop: Added Portuguese translation.
+
+Fri Jun 26 16:55:04 1998  Scott D. Heavner  <sdh@po.cwru.edu>
+
+	* gtcd.c (launch_gmix): double click on volume slider launches gmix

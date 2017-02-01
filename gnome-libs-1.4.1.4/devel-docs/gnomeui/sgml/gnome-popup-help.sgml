@@ -1,0 +1,125 @@
+<refentry id="gnomeui-gnome-popup-help">
+<refmeta>
+<refentrytitle>gnome-popup-help</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-popup-help</refname><refpurpose>  A popup-help system for GtkWidgets.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+#define     <link linkend="gnome-widget-add-help">gnome_widget_add_help</link>           (widget, help)
+void        <link linkend="gnome-widget-add-help-with-uidata">gnome_widget_add_help_with_uidata</link>
+                                            (<link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="gchar">gchar</link> *help,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  This will add a popup-menu to a non <link linkend="GTK-WIDGET-NO-WINDOW-CAPS">GTK_WIDGET_NO_WINDOW</link>() widget.  It
+  also has the ability to add "cut", "copy" and "paste" to <link linkend="GtkEditable">GtkEditable</link>
+  widgets if needed.  It is important to not run this on a widget
+  without a window, as doing so can lead to stuck pointer grabs.  This
+  function should be used where possible everywhere else.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-widget-add-help">gnome_widget_add_help()</title>
+<programlisting>#define     gnome_widget_add_help(widget, help)</programlisting>
+<para>
+This is the same as <link linkend="gnome-widget-add-help-with-uidata">gnome_widget_add_help_with_uidata</link>() but without the
+options for the extra menu fields.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry>The widget to add the popup help to.
+</entry></row>
+<row><entry align="right"><parameter>help</parameter>&nbsp;:</entry>
+<entry>The help message text.
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-widget-add-help-with-uidata">gnome_widget_add_help_with_uidata ()</title>
+<programlisting>void        gnome_widget_add_help_with_uidata
+                                            (<link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="gchar">gchar</link> *help,
+                                             <link linkend="GnomeUIInfo">GnomeUIInfo</link> *menuinfo,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+This creates a popup menu on <parameter>widget</parameter> with one entry.  The menu, invoked by
+pressing button three on the widget, will have one entry entitled: "Help with
+this."  Selecting this entry will bring up a tooltip with the help variable
+as its text.  In addition, if the widget is a descendent of <link linkend="GtkEditable">GtkEditable</link>, it
+will add "cut", "copy", and "paste" to the menu.  If <parameter>help</parameter> is NULL, then it
+will &lt;emphasis&gt;just&lt;/emphasis&gt; add the "cut", "copy", and "paste".  Finally,
+if <parameter>menuinfo</parameter> is non-NULL, it will append the menu defined by it on the end of
+the popup menu, with <parameter>user_data</parameter> passed to the callbacks.  This function
+currently only works on non <link linkend="GTK-WIDGET-NO-WINDOW-CAPS">GTK_WIDGET_NO_WINDOW</link>() widgets (ie. it only
+works on widgets with windows.)  If you would actually like a handle to the
+popup menu, call <link linkend="gnome-popup-menu-get">gnome_popup_menu_get</link>() as normal.</para>
+<para>
+This creates a popup menu on <parameter>widget</parameter> with one entry.  The menu,
+invoked by pressing button three on the widget, will have one entry entitled:
+"Help with this."  Selecting this entry will bring up a tooltip with the help
+variable as its text.  In addition, if the widget is a descendent of
+<link linkend="GtkEditable">GtkEditable</link>, it will add "cut", "copy", and "paste" to the menu.  If <parameter>help</parameter>
+is NULL, then it will <emphasis>just</emphasis> add the "cut", "copy", and
+"paste".  Finally, if <parameter>menuinfo</parameter> is non-NULL, it will append the menu defined
+by it on the end of the popup menu, with <parameter>user_data</parameter> passed to the callbacks.
+This function currently only works on non <link linkend="GTK-WIDGET-NO-WINDOW-CAPS">GTK_WIDGET_NO_WINDOW</link>() widgets
+(ie. it only works on widgets with windows.)  If you would actually like a
+handle to the popup menu, call <link linkend="gnome-popup-menu-get">gnome_popup_menu_get</link>() as normal.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> The widget to add the popup help to.
+</entry></row>
+<row><entry align="right"><parameter>help</parameter>&nbsp;:</entry>
+<entry> The help message text.
+</entry></row>
+<row><entry align="right"><parameter>menuinfo</parameter>&nbsp;:</entry>
+<entry> The template for possible additional menu items.
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> The user data to be passed to menu callbacks.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <link linkend="GnomePopupMenu">GnomePopupMenu</link>
+</para>
+</refsect1>
+
+</refentry>

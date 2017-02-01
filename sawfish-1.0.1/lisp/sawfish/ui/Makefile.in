@@ -1,0 +1,109 @@
+# Makefile.in for nokogiri subdirectory
+
+# $Id: Makefile.in,v 1.12 2000/11/29 00:53:52 jsh Exp $
+
+# Copyright (C) 2000 John Harper <john@dcs.warwick.ac.uk>
+
+# This file is part of sawfish.
+
+# sawfish is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# sawfish is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with sawfish; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+include ../../../Makedefs
+
+top_builddir=../../..
+top_srcdir=@top_srcdir@
+srcdir=@srcdir@
+VPATH=@srcdir@:@top_srcdir@
+
+REP_GTK_GNOME=@REP_GTK_GNOME@
+REP_ENVIRON:=$(REP_ENVIRON) REP_LOAD_PATH=$(top_srcdir)/lisp
+
+ifeq ($(REP_GTK_GNOME),yes)
+ GNOME:=
+else
+ GNOME:=gtk/
+endif
+
+SRCS :=	apply.jl		\
+	config.jl		\
+	group.jl		\
+	i18n.jl			\
+	layout.jl		\
+	main.jl			\
+	shell.jl		\
+	slot.jl			\
+	user-level.jl		\
+	wm.jl
+
+W_SRCS := widgets/command.jl	\
+	widgets/event.jl	\
+	widgets/frame-style.jl	\
+	widgets/keymap.jl	\
+	widgets/match-window.jl \
+	widgets/modifier-list.jl \
+	widgets/$(GNOME)workspace-geometry.jl \
+	widgets/$(GNOME)icon.jl
+
+L_SRCS := layouts/keymaps.jl
+
+OBJS := $(SRCS:.jl=.jlc)
+W_OBJS := $(W_SRCS:.jl=.jlc)
+L_OBJS := $(L_SRCS:.jl=.jlc)
+
+ALL_SRCS := $(SRCS) $(W_SRCS) $(L_SRCS)
+ALL_OBJS := $(OBJS) $(W_OBJS) $(L_OBJS)
+
+SUBSTS := -e "s|__nokogiridir__|$(lispdir)|" 
+
+%.jlc : %.jl
+	$(REP_ENVIRON) rep compiler -f compile-batch $<
+
+all : $(ALL_SRCS) $(ALL_OBJS)
+
+%.jl : %.jl.in ./Makefile
+	sed $(SUBSTS) $< >$@
+
+install : all installdirs
+	set -e; for p in $(SRCS) $(OBJS); do \
+	  $(INSTALL_DATA) $$p $(DESTDIR)${lispdir}/sawfish/ui; \
+	done
+	set -e; for p in $(W_SRCS) $(W_OBJS); do \
+	  $(INSTALL_DATA) $$p $(DESTDIR)${lispdir}/sawfish/ui/widgets; \
+	done
+	set -e; for p in $(L_SRCS) $(L_OBJS); do \
+	  $(INSTALL_DATA) $$p $(DESTDIR)${lispdir}/sawfish/ui/layouts; \
+	done
+	$(INSTALL_DATA) monitor.png $(DESTDIR)${lispdir}/..
+	$(INSTALL_SCRIPT) main.jlc $(DESTDIR)${bindir}/sawfish-ui
+
+uninstall :
+	rm -rf $(DESTDIR)${lispdir}/sawfish/ui
+	rm -f $(DESTDIR)${lispdir}/../monitor.png
+	rm -f $(DESTDIR)${bindir}/sawfish-ui
+
+installdirs : $(top_srcdir)/mkinstalldirs
+	$(SHELL) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(lispdir)/sawfish/ui \
+	  $(DESTDIR)$(lispdir)/sawfish/ui/widgets \
+	  $(DESTDIR)$(lispdir)/sawfish/ui/layouts $(DESTDIR)$(bindir)
+
+clean : 
+	rm -f *.jlc *~ core
+	rm -f widgets/*~ widgets/*.jlc
+	rm -f layouts/*~ layouts/*.jlc
+
+realclean distclean : clean
+	rm -f Makefile main.jl
+
+.PHONY: all install uninstall clean realclean distclean

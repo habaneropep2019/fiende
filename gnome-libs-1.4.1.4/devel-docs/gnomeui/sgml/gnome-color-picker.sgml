@@ -1,0 +1,407 @@
+<refentry id="GnomeColorPicker">
+<refmeta>
+<refentrytitle>GnomeColorPicker</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeColorPicker</refname><refpurpose>Widget for selecting colors.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeColorPicker-struct">GnomeColorPicker</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-color-picker-new">gnome_color_picker_new</link>          (void);
+void        <link linkend="gnome-color-picker-set-d">gnome_color_picker_set_d</link>        (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gdouble">gdouble</link> r,
+                                             <link linkend="gdouble">gdouble</link> g,
+                                             <link linkend="gdouble">gdouble</link> b,
+                                             <link linkend="gdouble">gdouble</link> a);
+void        <link linkend="gnome-color-picker-get-d">gnome_color_picker_get_d</link>        (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gdouble">gdouble</link> *r,
+                                             <link linkend="gdouble">gdouble</link> *g,
+                                             <link linkend="gdouble">gdouble</link> *b,
+                                             <link linkend="gdouble">gdouble</link> *a);
+void        <link linkend="gnome-color-picker-set-i8">gnome_color_picker_set_i8</link>       (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="guint8">guint8</link> r,
+                                             <link linkend="guint8">guint8</link> g,
+                                             <link linkend="guint8">guint8</link> b,
+                                             <link linkend="guint8">guint8</link> a);
+void        <link linkend="gnome-color-picker-get-i8">gnome_color_picker_get_i8</link>       (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="guint8">guint8</link> *r,
+                                             <link linkend="guint8">guint8</link> *g,
+                                             <link linkend="guint8">guint8</link> *b,
+                                             <link linkend="guint8">guint8</link> *a);
+void        <link linkend="gnome-color-picker-set-i16">gnome_color_picker_set_i16</link>      (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gushort">gushort</link> r,
+                                             <link linkend="gushort">gushort</link> g,
+                                             <link linkend="gushort">gushort</link> b,
+                                             <link linkend="gushort">gushort</link> a);
+void        <link linkend="gnome-color-picker-get-i16">gnome_color_picker_get_i16</link>      (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gushort">gushort</link> *r,
+                                             <link linkend="gushort">gushort</link> *g,
+                                             <link linkend="gushort">gushort</link> *b,
+                                             <link linkend="gushort">gushort</link> *a);
+void        <link linkend="gnome-color-picker-set-dither">gnome_color_picker_set_dither</link>   (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gboolean">gboolean</link> dither);
+void        <link linkend="gnome-color-picker-set-use-alpha">gnome_color_picker_set_use_alpha</link>
+                                            (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gboolean">gboolean</link> use_alpha);
+void        <link linkend="gnome-color-picker-set-title">gnome_color_picker_set_title</link>    (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             const <link linkend="gchar">gchar</link> *title);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBin">GtkBin</link>
+                     +----<link linkend="GtkButton">GtkButton</link>
+                           +----GnomeColorPicker
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+This widget provides color selection facilities to your application.
+The widget appears as a button which contains a "color swatch" of the
+currently selected color. When the button is pressed, the widget
+presents the user with a color selection dialog where the color can be
+selected. </para>
+
+<para>You can select the color to be displayed in a number of ways:
+floating point values for the red, green and blue channels,
+integers in the range 0 to 65,535, or integers in the range 0 to 255,
+depending on your needs.</para>
+
+<informalexample>
+  <programlisting>
+void color_picked_callback(GtkWidget *w, guint r, guint g, guint b, guint a, gpointer data)
+{
+	g_print("User selected color (rgba): <literal>d</literal> <literal>d</literal> <literal>d</literal> <literal>d</literal>\n", r, g, b, a);
+	/* save colors to configuration file, or use them some other way */
+}
+...
+GtkWidget *cp;
+
+/* create a color picker, set a default color */
+cp = <link linkend="gnome-color-picker-new">gnome_color_picker_new</link>();
+<link linkend="gnome-color-picker-set-i8">gnome_color_picker_set_i8</link>(GNOME_COLOR_PICKER(cp),
+			  255, 0, 0, 0);
+
+/* connect a function to our widget */
+gtk_signal_connect(GTK_OBJECT(cp), "color_set",
+		   GTK_SIGNAL_FUNC(color_picked_callback), NULL);
+...
+/* retrieve color from our widget, someplace else in code */
+gdouble r, g, b, a;
+<link linkend="gnome-color-picker-get-d">gnome_color_picker_get_d</link>(GNOME_COLOR_PICKER(cp),
+			 &amp;r, &amp;g, &amp;b, &amp;a);
+g_print("Color (rgba): %<literal>g</literal> %<literal>g</literal> %<literal>g</literal> %<literal>g</literal>\n", r, g, b, a);
+  </programlisting>
+</informalexample>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeColorPicker-struct">struct GnomeColorPicker</title>
+<programlisting>struct GnomeColorPicker;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-new">gnome_color_picker_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_color_picker_new          (void);</programlisting>
+<para>
+Creates a new GNOME color picker widget. This returns a widget in the form of a small button
+containing a swatch representing the current selected color. When the button is clicked,
+a color-selection dialog will open, allowing the user to select a color. The swatch will be
+updated to reflect the new color when the user finishes.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+Pointer to new GNOME color picker widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-set-d">gnome_color_picker_set_d ()</title>
+<programlisting>void        gnome_color_picker_set_d        (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gdouble">gdouble</link> r,
+                                             <link linkend="gdouble">gdouble</link> g,
+                                             <link linkend="gdouble">gdouble</link> b,
+                                             <link linkend="gdouble">gdouble</link> a);</programlisting>
+<para>
+Set color shown in the color picker widget using floating point values.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry> Red color component, values are in [0.0, 1.0]
+</entry></row>
+<row><entry align="right"><parameter>g</parameter>&nbsp;:</entry>
+<entry> Green color component, values are in [0.0, 1.0]
+</entry></row>
+<row><entry align="right"><parameter>b</parameter>&nbsp;:</entry>
+<entry> Blue color component, values are in [0.0, 1.0]
+</entry></row>
+<row><entry align="right"><parameter>a</parameter>&nbsp;:</entry>
+<entry> Alpha component, values are in [0.0, 1.0]
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-get-d">gnome_color_picker_get_d ()</title>
+<programlisting>void        gnome_color_picker_get_d        (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gdouble">gdouble</link> *r,
+                                             <link linkend="gdouble">gdouble</link> *g,
+                                             <link linkend="gdouble">gdouble</link> *b,
+                                             <link linkend="gdouble">gdouble</link> *a);</programlisting>
+<para>
+Retrieve color currently selected in the color picker widget in the form of floating point values.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry> Output location of red color component, values are in [0.0, 1.0]
+</entry></row>
+<row><entry align="right"><parameter>g</parameter>&nbsp;:</entry>
+<entry> Output location of green color component, values are in [0.0, 1.0]
+</entry></row>
+<row><entry align="right"><parameter>b</parameter>&nbsp;:</entry>
+<entry> Output location of blue color component, values are in [0.0, 1.0]
+</entry></row>
+<row><entry align="right"><parameter>a</parameter>&nbsp;:</entry>
+<entry> Output location of alpha color component, values are in [0.0, 1.0]
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-set-i8">gnome_color_picker_set_i8 ()</title>
+<programlisting>void        gnome_color_picker_set_i8       (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="guint8">guint8</link> r,
+                                             <link linkend="guint8">guint8</link> g,
+                                             <link linkend="guint8">guint8</link> b,
+                                             <link linkend="guint8">guint8</link> a);</programlisting>
+<para>
+Set color shown in the color picker widget using 8-bit integer values.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry> Red color component, values are in [0, 255]
+</entry></row>
+<row><entry align="right"><parameter>g</parameter>&nbsp;:</entry>
+<entry> Green color component, values are in [0, 255]
+</entry></row>
+<row><entry align="right"><parameter>b</parameter>&nbsp;:</entry>
+<entry> Blue color component, values are in [0, 255]
+</entry></row>
+<row><entry align="right"><parameter>a</parameter>&nbsp;:</entry>
+<entry> Alpha component, values are in [0, 255]
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-get-i8">gnome_color_picker_get_i8 ()</title>
+<programlisting>void        gnome_color_picker_get_i8       (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="guint8">guint8</link> *r,
+                                             <link linkend="guint8">guint8</link> *g,
+                                             <link linkend="guint8">guint8</link> *b,
+                                             <link linkend="guint8">guint8</link> *a);</programlisting>
+<para>
+Retrieve color currently selected in the color picker widget in the form of 8-bit integer values.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry> Output location of red color component, values are in [0, 255]
+</entry></row>
+<row><entry align="right"><parameter>g</parameter>&nbsp;:</entry>
+<entry> Output location of green color component, values are in [0, 255]
+</entry></row>
+<row><entry align="right"><parameter>b</parameter>&nbsp;:</entry>
+<entry> Output location of blue color component, values are in [0, 255]
+</entry></row>
+<row><entry align="right"><parameter>a</parameter>&nbsp;:</entry>
+<entry> Output location of alpha color component, values are in [0, 255]
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-set-i16">gnome_color_picker_set_i16 ()</title>
+<programlisting>void        gnome_color_picker_set_i16      (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gushort">gushort</link> r,
+                                             <link linkend="gushort">gushort</link> g,
+                                             <link linkend="gushort">gushort</link> b,
+                                             <link linkend="gushort">gushort</link> a);</programlisting>
+<para>
+Set color shown in the color picker widget using 16-bit integer values.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry> Red color component, values are in [0, 65535]
+</entry></row>
+<row><entry align="right"><parameter>g</parameter>&nbsp;:</entry>
+<entry> Green color component, values are in [0, 65535]
+</entry></row>
+<row><entry align="right"><parameter>b</parameter>&nbsp;:</entry>
+<entry> Blue color component, values are in [0, 65535]
+</entry></row>
+<row><entry align="right"><parameter>a</parameter>&nbsp;:</entry>
+<entry> Alpha component, values are in [0, 65535]
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-get-i16">gnome_color_picker_get_i16 ()</title>
+<programlisting>void        gnome_color_picker_get_i16      (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gushort">gushort</link> *r,
+                                             <link linkend="gushort">gushort</link> *g,
+                                             <link linkend="gushort">gushort</link> *b,
+                                             <link linkend="gushort">gushort</link> *a);</programlisting>
+<para>
+Retrieve color currently selected in the color picker widget in the form of 16-bit integer values.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>r</parameter>&nbsp;:</entry>
+<entry> Output location of red color component, values are in [0, 65535]
+</entry></row>
+<row><entry align="right"><parameter>g</parameter>&nbsp;:</entry>
+<entry> Output location of green color component, values are in [0, 65535]
+</entry></row>
+<row><entry align="right"><parameter>b</parameter>&nbsp;:</entry>
+<entry> Output location of blue color component, values are in [0, 65535]
+</entry></row>
+<row><entry align="right"><parameter>a</parameter>&nbsp;:</entry>
+<entry> Output location of alpha color component, values are in [0, 65535]
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-set-dither">gnome_color_picker_set_dither ()</title>
+<programlisting>void        gnome_color_picker_set_dither   (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gboolean">gboolean</link> dither);</programlisting>
+<para>
+Sets whether the picker should dither the color sample or just paint
+a solid rectangle.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>dither</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if color sample should be dithered, <literal>FALSE</literal> if not.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-set-use-alpha">gnome_color_picker_set_use_alpha ()</title>
+<programlisting>void        gnome_color_picker_set_use_alpha
+                                            (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             <link linkend="gboolean">gboolean</link> use_alpha);</programlisting>
+<para>
+Sets whether or not the picker should use the alpha channel.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>use_alpha</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if color sample should use alpha channel, <literal>FALSE</literal> if not.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-color-picker-set-title">gnome_color_picker_set_title ()</title>
+<programlisting>void        gnome_color_picker_set_title    (<link linkend="GnomeColorPicker">GnomeColorPicker</link> *cp,
+                                             const <link linkend="gchar">gchar</link> *title);</programlisting>
+<para>
+Sets the title for the color selection dialog.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>cp</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME color picker widget.
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> String containing new window title.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

@@ -1,0 +1,130 @@
+/* $Id: dock.gen_h,v 1.8 2000/08/29 18:36:29 kenelson Exp $ */
+
+
+/* dock.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <libgnomeui/gnome-dock.h>
+
+CLASS_START(Gnome);
+
+class DockItem;
+class DockLayout;
+
+
+//: Moveable Container
+//- GnomeDock is a container widget designed to let users move around
+//- widgets such as toolbars, menubars and so on.
+//- 
+//- Every GnomeDock contains a widget called the "client area". On the
+//- four sides of the client area, there are four "dock areas", which can
+//- contain an arbitrary number of dockable widgets. All the dockable
+//- widgets should be GnomeDockItem widgets; the GnomeDockItem
+//- widget can in turn contain any kind of widget, and implements the
+//- dragging functionality: every GnomeDockItem has a handle that users
+//- can use to move them within the dock, or even move them outside it, so
+//- that they become "floating items".
+//- 
+//- Every "dock area" is implemented by means of zero or more "dock
+//- bands": a dock band is a horizontal or vertical stripe containing one or
+//- more dock items, and is implemented by the GnomeDockBand widget.
+//- Items are ordered from top to bottom in vertical bands, and from left to
+//- right in horizontal bands. Every dock item in a band is given an offset
+//- value that defines the distance, in pixels, from the previous item in the
+//- same band; if the item is first in the band, the offset defines the distance
+//- from the start of the band.
+//- 
+//- As a consequence, the position of an item in the dock can be specified
+//- by means of the following values: a "placement" specifying what area is
+//- being used (top, bottom, left, right), a "band number" specifying the
+//- number of the band within the specified area, a "position" within the
+//- band and a "offset" from the previous item in the same band.
+class Dock : public Gtk::Container
+{
+  WRAP_CLASS(Dock, GnomeDock,
+             GNOME_DOCK, GNOME_IS_DOCK,
+             dock,
+             Gtk::Container, GtkContainer, GTK_CONTAINER);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(void gnome_dock_allow_floating_items(GnomeDock*,
+						   gboolean),
+	      void allow_floating_items(bool enable));
+	      
+  WRAP_METHOD(void gnome_dock_add_item(GnomeDock*, 
+                                       GnomeDockItem*, 
+                                       GnomeDockPlacement,
+                                       guint, gint, guint, gboolean),
+  void add_item(Gnome::DockItem &item, GnomeDockPlacement placement,
+		guint band_num,
+		gint position,
+		guint offset,
+		bool in_new_band));
+
+  WRAP_METHOD(void gnome_dock_add_floating_item(GnomeDock*,
+                                                GnomeDockItem*, 
+                                                gint, gint, GtkOrientation),
+  void add_floating_item(Gnome::DockItem &widget,
+			 gint x, gint y, GtkOrientation orientation));
+
+  WRAP_METHOD(void gnome_dock_set_client_area(GnomeDock*,GtkWidget*),
+  void set_client_area(Gtk::Widget &widget));
+
+  WRAP_METHOD(
+    GnomeDockItem* gnome_dock_get_item_by_name (GnomeDock *,
+      const gchar *, GnomeDockPlacement *, guint *, guint *, guint *),
+    Gnome::DockItem* get_item_by_name (const Gtk::string& name,
+                                GnomeDockPlacement& placement_return,
+                                guint& num_band_return,
+                                guint& band_position_return,
+                                guint& offset_return));
+
+  WRAP_METHOD(GtkWidget* gnome_dock_get_client_area (GnomeDock *),
+    Gtk::Widget* get_client_area ());
+
+  WRAP_METHOD(GnomeDockLayout* gnome_dock_get_layout(GnomeDock *),
+    Gnome::DockLayout* get_layout());
+
+  WRAP_METHOD(gboolean gnome_dock_add_from_layout(GnomeDock*,GnomeDockLayout*),
+    bool add_from_layout(Gnome::DockLayout& layout));                      
+
+  SIGNAL_SPEC("layout_changed", both, void layout_changed());
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+#include <gnome--/dock-item.h>
+#include <gnome--/dock-layout.h>
+#include <gnome--/private/dock_p.h>
+
+namespace Gnome
+{
+
+} /* namespace Gnome */
+
+DOCUMENTATION_START;
+

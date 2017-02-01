@@ -1,0 +1,71 @@
+/* $Id: number-entry.gen_h,v 1.7 2001/04/24 14:39:35 murrayc Exp $ */
+
+
+/* number-entry.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <gnome--/entry.h>
+#include <gtk--/entry.h>
+#include <libgnomeui/gnome-number-entry.h>
+
+CLASS_START(Gnome);
+class NumberEntry : public Gtk::HBox
+{
+  WRAP_CLASS(NumberEntry, GnomeNumberEntry,
+             GNOME_NUMBER_ENTRY, GNOME_IS_NUMBER_ENTRY,
+             number_entry,
+             Gtk::HBox, GtkHBox, GTK_HBOX);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  Gnome::Entry* gnome_entry();
+  Gtk::Entry* gtk_entry();
+
+  WRAP_METHOD(void gnome_number_entry_set_title (GnomeNumberEntry*, const gchar*),
+	      void set_title (const Gtk::string &calc_dialog_title));
+
+  WRAP_METHOD(gdouble gnome_number_entry_get_number (GnomeNumberEntry*),
+	      gdouble get_number ());
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+#include <gnome--/private/number-entry_p.h>
+
+Gnome::Entry*
+Gnome::NumberEntry::gnome_entry()
+{
+  return Gtk::wrap(GNOME_ENTRY(gnome_number_entry_gnome_entry(gtkobj())));
+}
+
+Gtk::Entry*
+Gnome::NumberEntry::gtk_entry()
+{
+  return Gtk::wrap(GTK_ENTRY(gnome_number_entry_gtk_entry(gtkobj())));
+}
+
+DOCUMENTATION_START;
+

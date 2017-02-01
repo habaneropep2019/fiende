@@ -1,0 +1,413 @@
+<refentry id="bonobo-bonobo-transient">
+<refmeta>
+<refentrytitle>BonoboTransient</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboTransient</refname><refpurpose>Creates a server that will handle transient objects.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+typedef     <link linkend="BonoboTransient">BonoboTransient</link>;
+typedef     <link linkend="BonoboTransientClass">BonoboTransientClass</link>;
+<link linkend="PortableServer-Servant">PortableServer_Servant</link> (<link linkend="BonoboTransientServantNew">*BonoboTransientServantNew</link>)
+                                            (<link linkend="PortableServer-POA">PortableServer_POA</link>,
+                                             <link linkend="BonoboTransient">BonoboTransient</link>*,
+                                             char *name,
+                                             void *data);
+void        (<link linkend="BonoboTransientServantDestroy">*BonoboTransientServantDestroy</link>)
+                                            (<link linkend="PortableServer-Servant">PortableServer_Servant</link> servant,
+                                             void *data);
+<link linkend="BonoboTransient">BonoboTransient</link>* <link linkend="bonobo-transient-new">bonobo_transient_new</link>       (<link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             <link linkend="BonoboTransientServantNew">BonoboTransientServantNew</link> new_servant,
+                                             <link linkend="BonoboTransientServantDestroy">BonoboTransientServantDestroy</link> destroy_servant,
+                                             void *data);
+<link linkend="BonoboTransient">BonoboTransient</link>* <link linkend="bonobo-transient-construct">bonobo_transient_construct</link> (<link linkend="BonoboTransient">BonoboTransient</link> *transient,
+                                             <link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             <link linkend="BonoboTransientServantNew">BonoboTransientServantNew</link> new_servant,
+                                             <link linkend="BonoboTransientServantDestroy">BonoboTransientServantDestroy</link> destroy_servant,
+                                             <link linkend="gpointer">gpointer</link> data);
+<link linkend="CORBA-Object">CORBA_Object</link> <link linkend="bonobo-transient-create-objref">bonobo_transient_create_objref</link> (<link linkend="BonoboTransient">BonoboTransient</link> *transient,
+                                             const char *iface_name,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+   The <classname>BonoboTransient</classname> is used to create
+   transient objects.  These objects only exist during the lifetime of
+   the method execution of the interface they implement: they are
+   created on demand and destroyed after the method invocation
+   finishes. 
+</para>
+
+<para>
+   Transient objects are an optimization useful when it is possible
+   for a very large set of object to exist but there is no need to
+   have implementations of the servers running all the time, as they
+   can be created on the demand to satisfy the requests of client
+   applications. 
+</para>
+
+<para>
+   For example, consider the case in which a large list of objects
+   needs to be returned to a client application.  For example, an
+   object reference could be returned for every file on a directory.
+   But it would be wasteful to keep one server running for each file.
+   And given that the program has all the information available to
+   create the servers on demand, you want to use this system.
+</para>
+
+<para>
+   This can be used for implementations of the IDL:Bonobo/PropertyBag
+   interface, as there are in theories thousands of keys that could be
+   returned, but the method invocations on each object is short-lived,
+   so it is efficient to just create servers to satisfy an object
+   request on demand, and destroy them when the request is done.
+</para>
+
+<para>
+   To create such object, you first need to create a
+   <classname>BonoboTransient</classname> object, and then for every
+   virtual object that you want to expose to the world, you invoke the
+   <link linkend="bonobo-transient-create-objref">bonobo_transient_create_objref</link>() function to create a new CORBA
+   object reference. 
+</para>
+
+<para>
+   <link linkend="bonobo-transient-new">bonobo_transient_new</link>() will create a new POA inside the POA you
+   specify (you can use CORBA_OBJECT_NIL to get the POA to be created
+   in the default Bonobo POA).  All object references created with
+   <link linkend="bonobo-transient-create-objref">bonobo_transient_create_objref</link>() will live in this new POA. 
+</para>
+
+<para>
+   The <link linkend="bonobo-transient-new">bonobo_transient_new</link>() function takes an argument that
+   specifies the function that will be used to create the temporary
+   CORBA servant that will satisfy an incoming request.  And a
+   function that will be used to destroy the servant when the request
+   processing is done. 
+</para>
+
+<para>
+   The <link linkend="bonobo-transient-create-objref">bonobo_transient_create_objref</link>() function takes a number of
+   arguments:
+</para>
+
+<itemizedlist>
+  <listitem>
+    <para>
+      The name of the object you want to create.  This name will be
+      passed to the servant creation routine when an incoming request
+      for that object comes in.  Your servant creation routine should
+      be able to create a servant from the data you expose as the
+      name (it can be a stringified representation of an in-process
+      pointer for all that we care).
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
+      The interface name implemented by the object named before.  This
+      is the CORBA interface name that your object implements, for
+      example "IDL:Echo/echo:1.0".
+    </para>
+  </listitem>
+</itemizedlist>
+
+<para>
+   Here is an example of how to use BonoboTransient:
+   <example>
+     <title>Using BonoboTransient</title>
+     <programlisting>
+BonoboTransient *my_transient = NULL;
+
+static PortableServer_Servant
+create_servant (PortableServer_POA  poa,
+                BonoboTransient    *bt,
+                char               *name,
+                void               *my_callback_data)
+{
+        MyServant *servant;
+
+	if (!my_validate_name (name))
+        	return NULL;
+
+        servant = g_new0 (MyServant, 1);
+        servant->vepv = <link linkend="my-servant-get-epv">my_servant_get_epv</link>();
+        servant->my_data = g_strdup ("Hello world!");
+        POA_My_Iface__init ((PortableServer_Servant) servant, &amp;ev);
+        return servant;
+}
+
+void
+destroy_servant (PortableServer_Servant servant, void *my_callback_data)
+{
+        CORBA_Environment ev;
+
+        g_free (servant->my_data);
+        CORBA_exception_init (&amp;ev);
+        POA_My_Iface__fini (servant, &amp;ev);
+        CORBA_exception_free (&amp;ev);
+}
+
+CORBA_Object
+impl_Some_Iface (PortableServer_Servant servant, CORBA_Environment *ev)
+{
+	return bonobo_transient_create_objref (
+        	my_transient, "IDL:My/Iface:1.0",
+                "hello",
+                ev);
+}
+
+void
+<link linkend="init-transient">init_transient</link>()
+{
+	my_transient = bonobo_transient_new (
+		CORBA_OBJECT_NIL,
+                create_servant,
+                destroy_servant,
+                NULL);
+}
+
+
+     </programlisting>
+   </example>
+</para>
+ 
+<para>
+   The previous example shows: how the
+   <parameter>my_transient</parameter> object is first created, and what
+   the implementations for the create_servant and destroy_servant look
+   like.  It does not make use of the user pointer, so it passes
+   NULL.  However, in practice, applications will most likely want to
+   pass data here to the new_servant and destroy_servant methods.  
+</para>
+
+<para>
+   The impl_Some_Iface is a method that we assume in the example will
+   be part of the implementation of a CORBA server.  This method will
+   be invoked at some time to get an object reference to one of the
+   transient objects (in this case, we have called our object "hello"
+   and it implements the interface IDL:My/Iface:1.0).
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboTransient">BonoboTransient</title>
+<programlisting>typedef struct {
+	GtkObject parent;
+
+	BonoboTransientPriv *priv;
+} BonoboTransient;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboTransientClass">BonoboTransientClass</title>
+<programlisting>typedef struct {
+	GtkObjectClass parent_class;
+} BonoboTransientClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboTransientServantNew">BonoboTransientServantNew ()</title>
+<programlisting><link linkend="PortableServer-Servant">PortableServer_Servant</link> (*BonoboTransientServantNew)
+                                            (<link linkend="PortableServer-POA">PortableServer_POA</link>,
+                                             <link linkend="BonoboTransient">BonoboTransient</link>*,
+                                             char *name,
+                                             void *data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>Param1</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>Param2</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboTransientServantDestroy">BonoboTransientServantDestroy ()</title>
+<programlisting>void        (*BonoboTransientServantDestroy)
+                                            (<link linkend="PortableServer-Servant">PortableServer_Servant</link> servant,
+                                             void *data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>servant</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-transient-new">bonobo_transient_new ()</title>
+<programlisting><link linkend="BonoboTransient">BonoboTransient</link>* bonobo_transient_new       (<link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             <link linkend="BonoboTransientServantNew">BonoboTransientServantNew</link> new_servant,
+                                             <link linkend="BonoboTransientServantDestroy">BonoboTransientServantDestroy</link> destroy_servant,
+                                             void *data);</programlisting>
+<para>
+<link linkend="bonobo-transient-new">bonobo_transient_new</link>() creates a new CORBA server that creates a
+new POA entry (within the <parameter>parent_poa</parameter> POA).  You can construct
+arbitrary object names inside this space using
+<link linkend="bonobo-transient-create-objref">bonobo_transient_create_objref</link>() and return those to
+client code.
+</para>
+<para>
+The <parameter>new_servant</parameter> function will be invoked by the POA to resolve
+object reference to names you have created using
+<link linkend="bonobo-transient-create-objref">bonobo_transient_create_objref</link>().  The <parameter>new_servant</parameter> function
+should return a PortableServer_Servant that will handle the request.
+</para>
+<para>
+Once the processing is completed, the <parameter>destroy_servant</parameter> will be invoked
+to release any resources allocated during the invocation of <parameter>new_servant</parameter>
+or during the execution of the servant that need to be released.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>poa</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>new_servant</parameter>&nbsp;:</entry>
+<entry> A function pointer used to incarnate servants on demand.
+</entry></row>
+<row><entry align="right"><parameter>destroy_servant</parameter>&nbsp;:</entry>
+<entry> A function pointer used to destroy the on-demand server.
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> data passed to the <parameter>new_servant</parameter> and <parameter>destroy_servant</parameter> functions.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a new BonoboTransient object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-transient-construct">bonobo_transient_construct ()</title>
+<programlisting><link linkend="BonoboTransient">BonoboTransient</link>* bonobo_transient_construct (<link linkend="BonoboTransient">BonoboTransient</link> *transient,
+                                             <link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             <link linkend="BonoboTransientServantNew">BonoboTransientServantNew</link> new_servant,
+                                             <link linkend="BonoboTransientServantDestroy">BonoboTransientServantDestroy</link> destroy_servant,
+                                             <link linkend="gpointer">gpointer</link> data);</programlisting>
+<para>
+This function is only for wrappers and object derivation.  For normal
+use, please see <link linkend="bonobo-transient-new">bonobo_transient_new</link>.
+</para>
+<para>
+This function will return <literal>NULL</literal> on failure; however it is your
+responsibility to destroy the failed object in that case.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>transient</parameter>&nbsp;:</entry>
+<entry> the BonoboTransient to construct
+</entry></row>
+<row><entry align="right"><parameter>poa</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>new_servant</parameter>&nbsp;:</entry>
+<entry> A function pointer used to incarnate servants on demand.
+</entry></row>
+<row><entry align="right"><parameter>destroy_servant</parameter>&nbsp;:</entry>
+<entry> A function pointer used to destroy the on-demand server.
+</entry></row>
+<row><entry align="right"><parameter>data</parameter>&nbsp;:</entry>
+<entry> data passed to the <parameter>new_servant</parameter> and <parameter>destroy_servant</parameter> functions.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="BonoboTransient">BonoboTransient</link> object (the <parameter>transient</parameter>)
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-transient-create-objref">bonobo_transient_create_objref ()</title>
+<programlisting><link linkend="CORBA-Object">CORBA_Object</link> bonobo_transient_create_objref (<link linkend="BonoboTransient">BonoboTransient</link> *transient,
+                                             const char *iface_name,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+</para>
+<para>
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>transient</parameter>&nbsp;:</entry>
+<entry> The BonoboTransient manager where the object reference is rooted.
+</entry></row>
+<row><entry align="right"><parameter>iface_name</parameter>&nbsp;:</entry>
+<entry> The CORBA interface name that the returned object is supposed to implement.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> The name of the object inside the <parameter>transient</parameter> POA's name space.
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> returns possible errors from the <link linkend="PortableServer-POA-create-reference-with-id">PortableServer_POA_create_reference_with_id</link>() call.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a CORBA_Object reference for an object named <parameter>name</parameter> inside
+the <parameter>transient</parameter>'s POA naming space that implements the <parameter>iface_name</parameter> interface
+
+The return value can be CORBA_OBJECT_NIL to indicate an error in the
+incoming arguments.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+  <classname>BonoboPropertyBag</classname>
+</para>
+</refsect1>
+
+</refentry>

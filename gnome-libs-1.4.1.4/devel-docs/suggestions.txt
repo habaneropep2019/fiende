@@ -1,0 +1,217 @@
+http://developer.apple.com/techpubs/mac/HIGuidelines/HIGuidelines-84.html#HEADING84-0
+
+Suggestions for enhancing the user experience in your application:
+
+Menus:
+------
+
+   - The order of the toplevel menus should be: 
+
+	  File, <any MDI child menus>, Edit, View, Game, CUSTOM MENUS,
+	  Settings, Windows, Help
+
+     The Help menu should not be right-justified.
+
+     CUSTOM MENUS is where you should put your application-specific
+     top-level menus, such as Gnumeric's "Insert" menu.  These are all
+     optional except Help.
+
+   - The prescribed order of standard menu items in the "File" menu is
+     the following:
+
+          New Window, SEPARATOR, New, Open, Save, Save As, Revert,
+          SEPARATOR, Print, Print Setup, SEPARATOR, Close, Exit
+
+     The first menu must always be the "File" menu (unless there are
+     no files in your application, for example, in a game you can call
+     this "Game"), and it must always be called "_File". 
+
+     The main reason for this is that it is important for the menu
+     accelerators to be consistent.  Your application is required to
+     have at the very least a "File" menu containing at the very least
+     "Exit".
+
+     The New Window menu item should be a subtree if there are
+     different types of new windows which can be spawned.
+
+     All of these are optional, except Exit.
+
+   - The prescribed order of standard menu items in the "Edit" menu is
+     the following:
+
+          Undo, Redo, SEPARATOR, Cut, Copy, Paste, Clear, Select All,
+          SEPARATOR, Add, SEPARATOR, Find, Find Again, Replace
+
+     The "Add" item should be used to insert new editable items,
+     e.g. a new card in a rolodex app.  If there is more than one type
+     of insertable editable item, "Add" should be a menu subtree.
+
+   - The View
+
+   - The Settings menu should contain:
+	. All toggles (as menu items)
+	. All configuration dialog menu items
+	. The standard "Preferences" menu item
+
+     The order of the items in the Settings menu should be the following:
+
+		Toggles
+		SEPARATOR
+		Configuration dialog menu items
+		Preferences
+
+     It is OK if the only item in Settings is "Preferences".
+
+     Of course, if you have hundreds of toggles, use your best
+     judgment; only put the commonly-toggled ones in the Settings
+     menu, and use a nice Preferences dialog to contain the complete
+     set.
+
+   - The 'Windows' menu should be used by MDI applications to contain
+   a list of the document windows.  It should be structured like this:
+ 
+		MDI window list
+
+   - For standard menu items (Save, Save As, Close, Quit, etc), use
+     the macros defined in gnome-app-helper.h, e.g.
+
+	     GNOMEUIINFO_MENU_EXIT_ITEM(CB, DATA)
+
+     except for New where the define is:
+
+	     GNOMEUIINFO_MENU_NEW_ITEM(LABEL,TIP,CB,DATA)
+
+     Where LABEL is the the text which appears in the menu for this
+     menu item.  You should put LABEL in the form of N_("_New
+     Document"), or whatever is appropriate for your application.  TIP
+     should be the description of this menu item's function,
+     e.g. N_("Create a new document").
+
+     The standard print menu item should immediately print the
+     document without popping up a dialog.  If the user wants a
+     dialog, he will use the print_setup menu item.
+
+   - For some standard toplevel menus (File, Edit, Help, etc), you
+     should use the macros GNOMEUIINFO_*_MENU(tree).
+
+   - For the help menu, you should have this:
+     GNOMEUIINFO_HELP(app_name),
+     GNOMEUIINFO_MENU_ABOUT_ITEM(cb, data),
+     GNOMEUIINFO_END
+
+   - Use the GnomeAppBar in your application, and provide hints for
+     all of your menu items, including submenus.  See balsa and
+     Gnumeric for examples.
+
+   - Ellipsis ("...") should be used on menu items that require the
+     application to prompt the user for extra information before the
+     command can execute.  "Save as..." is one of these because the
+     application needs to ask the user for the filename.  "About" is
+     not because the command *is* to pop up an about box, and it does
+     not need to prompt for information before doing that.
+
+   - Your menu hints should not have a trailing period.  They should be
+     phrased like commands, e.g. "Open a new file".  Do NOT phrase them
+     like a description, e.g. "Opens a new file".
+
+   - All menu text should be internationalized.  Use the N_() macro, e.g.
+     N_("Open new mailbox")
+
+   - You may notice that most of these guidelines seem geared towards
+     "productivity" applications (editors, spreadsheets, ...).  If
+     you're writing a game, most of your menu items won't be
+     appropriate in these menus.  The solution is to create a "Game"
+     menu which contains the game-related menu items.  The contents of
+     the Game menu are as follows:
+
+	 New Game, Pause Game, Restart Game, SEPARATOR, Undo Move,
+	 Redo Move, Hint, SEPARATOR, Scores, End game
+
+     End game should just end the current game -- it shouldn't close
+     the application.  That's the job of File/Exit.
+ 
+Dialogs 
+-------
+
+   - Use GnomePropertyBox widgets for configuring things in your
+     application.  These will allow the user to use their preferred way
+     of configuring the application.
+
+   - If you only want to ask the user a question from a set of
+     options, you can use the gnome-messagebox code.
+
+   - When creating dialog boxes, use a GnomeDialog widget, instead of
+     a GtkWindow.
+
+   - Use the gnome_dialog_set_parent routine if possible, to "bind" your
+     dialog boxes to your main toplevel window (this allows window
+     managers to hide all of your dialog box windows when minimizing
+     your main window for example).
+
+   - For file-input entry widgets, use the GnomeFileEntry widget, this
+     will provide a browse selector (and in the future it will use the
+     enhanced file open dialog box).
+
+   - When you require an entry for typing in an icon name, use the
+     GnomeIconEntry widget. 
+
+   - For text-input that might benefit from a history, use the
+     GnomeEntry widget (this will provide automatic history for you).
+
+   - Use the GnomeAbout dialog.  Be sure to include an email address
+     for reporting bugs and the copyright notice.  About dialogs
+     should:
+	
+	1. Not be modal.
+
+	2. Allow one and only one instance of the dialog to be open at
+	   a time.
+
+	3. If the user selects the About command while a previous
+           about box is open, then it should be gdk_window_raise()d.
+
+General Widget Use
+------------------
+
+   - Use the GnomeApp widget for your toplevel windows.
+
+   - Use the gnome-app-helper.h interface for creating menus and
+     toolbars.  If you use this, the task of creating Baboon-aware
+     applications will be reduced.
+
+   - Use GnomePixmap to load your images.
+
+   - Try to use consistent spacing and padding everywhere.
+     libgnomeui/gnome-uidefs.h has some preset values you should use.
+
+Miscellaneous
+-------------
+
+   - GNOME uses Imlib, so try to provide your images in PNG format.
+     You do not need to care about the color usage, Imlib will dither
+     to a nice palette if necessary.
+
+Internationalization
+--------------------
+
+   - Tag any strings in C statements with _(...) and with N_(...) for
+     static initializers to allow your application messages to be
+     localized.
+
+Session management
+------------------
+
+   - Make your application support session management.
+
+Top Level Windows
+-----------------
+
+   - Make sure you call gtk_window_set_wmclass() on ALL top-level GtkWindows
+     you create. The first string is the name, the second the class. Please
+     ensure you have the class as something like the name of the app, and
+     the name being the type of window it is - like ``filename_dialogue''
+     or ``main_window'' etc.
+     
+     Ensure you make calls like:
+     gtk_window_set_wmclass(GTK_WINDOW(window), ``file_open_dialogue'', 
+                            ``my_ap_name'');

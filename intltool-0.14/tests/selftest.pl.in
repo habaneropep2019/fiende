@@ -1,0 +1,139 @@
+#!@PERL@ -w
+
+#  Selftest for intltool
+#
+#  Copyright (C) 2000 Free Software Foundation.
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License as
+#  published by the Free Software Foundation; either version 2 of the
+#  License, or (at your option) any later version.
+#
+#  This script is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this library; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#  Author(s): Kenneth Christiansen
+
+## Release information
+my $PROGRAM  = "selftest";
+my $VERSION  = "0.1";
+my $result;
+my $case;
+
+## Loaded modules
+use strict;
+
+## Always print as the first thing
+$| = 1;
+
+my $failed = 0;
+
+my $srcdir = $ENV{"srcdir"} || ".";
+
+sub check_extract_result($)
+{
+    my ($testcase) = @_;
+
+    my $result =`diff -u $srcdir/results/$testcase.h cases/$testcase.h`;
+    
+    if ($? == 0 && $result eq "") { 
+        print "[OK]\n"; ## diff was empty, ie. files were equal
+    } else { 
+        print "[FAILED] ($testcase)\n"; 
+        open OUT, ">>errors";
+        print OUT $result;
+        close OUT;
+        $failed = 1;
+    }
+}
+
+sub check_merge_result($)
+{
+    my ($testcase) = @_;
+
+    $testcase =~ s/\.in$//;
+    my $result =`diff -u $srcdir/results/$testcase cases/$testcase`;
+
+    if ($? == 0 && $result eq "") {
+        print "[OK]\n"; ## diff was empty, ie. files were equal
+    } else {
+        print "[FAILED] ($testcase)\n";
+        open OUT, ">>errors";
+        print OUT $result;
+        close OUT;
+        $failed = 1;
+    }
+}
+
+
+## SELFTESTS
+
+## Welcome notice
+
+print "Running self test of the intltool module\n\n";
+unlink "errors";
+
+system("cp $srcdir/cases/*.* cases") if $srcdir ne ".";
+
+print " 1. Extract messages from simple desktop file:                       ";
+$case = "extract1.desktop";
+system("/usr/bin/perl ../intltool-extract --type=gettext/ini --quiet --update cases/$case") == 0 or $failed = 1;
+check_extract_result($case);
+
+print " 2. Merge translations into a Bonobo UI style file:                  ";
+$case = "merge1.xml";
+system("/usr/bin/perl ../intltool-merge -o -p --quiet cases cases/$case.in cases/$case") == 0 or $failed = 1;
+check_merge_result($case);
+
+print " 3. Extract messages from a multi-line XML file:                     ";
+$case = "extract7.xml";
+system("/usr/bin/perl ../intltool-extract --type=gettext/xml --quiet --update cases/$case") == 0 or $failed = 1;
+check_extract_result($case);
+
+print " 4. Merge translations into a multi-line XML file:                   ";
+$case = "merge7.xml";
+system("/usr/bin/perl ../intltool-merge -x -p --quiet cases cases/$case.in cases/$case") == 0 or $failed = 1;
+check_merge_result($case);
+
+print " 5. Extract messages with unusual characters in the XML tag:         ";
+$case = "extract3.xml.in";
+system("/usr/bin/perl ../intltool-extract --type=gettext/xml --quiet --update cases/$case") == 0 or $failed = 1;
+check_extract_result($case);
+
+print " 6. Merge translations into a pong style XML file:                   ";
+$case = "merge4.xml";
+system("/usr/bin/perl ../intltool-merge -x -p --quiet cases cases/$case.in cases/$case") == 0 or $failed = 1;
+check_merge_result($case);
+
+print " 7. Extract messages from a glade style XML file:                    ";
+$case = "extract6.glade";
+system("/usr/bin/perl ../intltool-extract --type=gettext/glade --quiet --update cases/$case") == 0 or $failed = 1;
+check_extract_result($case);
+
+print " 8. Merge translations into a dia sheet style XML file:              ";
+$case = "merge5u.sheet";
+system("/usr/bin/perl ../intltool-merge -x -u --quiet cases cases/$case.in cases/$case") == 0 or $failed = 1;
+check_merge_result($case);
+
+print " 9. Merge translations into a dia sheet style XML file [broken XML]: ";
+$case = "merge5p.sheet";
+system("/usr/bin/perl ../intltool-merge -x -p --quiet cases cases/$case.in cases/$case") == 0 or $failed = 1;
+check_merge_result($case);
+
+print "10. Merge translations that include escaped .po strings:             ";
+$case = "merge6.xml";
+system("/usr/bin/perl ../intltool-merge -x -u --quiet cases cases/$case.in cases/$case") == 0 or $failed = 1;
+check_merge_result($case);
+
+print "11. Merge translations into a .keys file:                            ";
+$case = "merge8.keys";
+system("/usr/bin/perl ../intltool-merge -k -u --quiet cases cases/$case.in cases/$case") == 0 or $failed = 1;
+check_merge_result($case);
+
+exit $failed;

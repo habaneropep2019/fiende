@@ -1,0 +1,1154 @@
+@c -*-Texinfo-*-
+
+@appendix News
+@cindex News
+
+@heading 0.15
+
+@itemize @bullet
+
+@item Parser can now associate lexical location (file name and line
+number) with parsed objects. Added @code{call-with-lexical-origins} and
+@code{lexical-origin} functions. This adds memory overhead but is only
+enabled in interpreted mode, or other times it could be useful (e.g.
+when compiling)
+
+@item The compiler enables line-numbering, and uses the information
+when it prints errors. It also prints errors in a more standard format
+(intended to mimic GCC), and distinguishes warnings from errors 
+
+@item Debugger is much improved, and supports emacs-style emission of
+line number tokens. Use the included @file{rep-debugger.el} elisp code
+to source-debug rep programs in Emacs!
+
+@item New command line option @samp{--debug}. When given, rep starts up
+in the debugger
+
+@item Reformatted backtrace output. Also backtraces only ever include
+evaluated argument lists now. They also include lexical information
+when possible
+
+@item Syntax errors include error description and line number
+
+@item Now supports weak reference objects. New functions
+@code{make-weak-ref}, @code{weak-ref}, @code{weak-ref-set}. A weak
+reference is a pointer to another object. When that object is garbage
+collected, the pointer in the weak reference is set to false.
+
+@item New `error helper' module. When an error is handled, this module
+is called and tries to print a human-understandable message explaining
+why the error may have occurred
+
+@item REPL commands may now be specified by their shortest unique set
+of leading characters, e.g. @samp{,o} instead of @samp{,open}
+
+@item Added an @code{#undefined} value. Returned by @code{%define} and
+the macros using it (@code{defun}, @code{defmacro}, etc@dots{})
+
+@item New function @code{table-size} in module @code{rep.data.tables}
+
+@item @code{thread-suspend} returns true iff the timeout was reached
+(i.e. return false if @code{thread-wake} was used to unsuspend the
+thread)
+
+@item Objects defined using the @code{object} macro now have an
+implicit @code{self} binding -- the object representing their self (or
+their most derived self)
+
+@item Added @var{timeout} parameter to @code{condition-variable-wait}
+and @code{obtain-mutex} functions
+
+@item New @code{rep.threads.message-port} module, implements a simple
+message queue for threads
+
+@item @code{log} function now optionally accepts a second argument, the
+base of the logarithm
+
+@item Use gmp to generate random numbers when possible (if at least
+version 3 of gmp is found) [disabled in librep 0.15.1 -- gmp seems to
+be buggy?]
+
+@item The @code{string-replace} function may now be given a function as
+its @var{template} parameter
+
+@item Bug fixes:
+
+@itemize @minus
+
+@item Signal an error if writes don't write all characters they were
+asked to. Also, some functions could write fewer characters than they
+were supposed to even if no errors occurred
+
+@item Remembered that file sizes may not fit in fixnums
+
+@item Don't preserve trailing slashes in results of canonical-file-name
+(to make the path canonical)
+
+@item Don't signal an error when end of file is encountered immediately
+after reading @samp{#\X} syntax
+
+@item @code{current-thread} and @code{all-threads} will create a thread
+object for the implicit thread if there isn't one already
+
+@item In C subrs that take optional integer arguments, signal an error
+if the given value isn't an integer or undefined (false). Also, accept
+all types of numbers where it makes sense to do so
+
+@item Signal an error if end of file is read while parsing a block
+comment
+
+@item Don't ever return a null object from @code{current-time-string}
+
+@item Catch errors signalled during command line option processing, and
+pass them to the standard error handler
+
+@item Right hand side of @code{letrec} bindings may now have more than
+one form
+
+@item The @code{object} macro now evaluates its @var{base-object}
+parameter exactly once
+
+@item Finally removed @code{define-value}
+
+@item Ignore null lines (or lines which only have comments) in the repl
+
+@item In the compiler, don't expand macros which have have been
+shadowed by local bindings
+
+@item Don't print some compiler errors/warnings twice
+
+@item Fixes for @code{mips-compaq-nonstopux} architecture (Tom Bates)
+
+@item Fixed @code{,reload} and @code{,unload} repl commands not to try
+to remove non-existent structures
+
+@end itemize
+@end itemize
+
+
+@heading 0.14
+
+@itemize @bullet
+
+@item New module @code{rep.util.md5}, has two functions for generating
+MD5 message digests (of files or strings)
+
+@item Changes to the @code{rep.io.sockets} function:
+
+In the @code{socket-server} function the @var{host} and/or @var{port}
+arguments may be false, meaning to listen on all addresses and to
+choose a random unused port.
+
+New functions @code{socket-peer-address} and @code{socket-peer-port},
+these always returns the details of the far end of the connetion.
+@code{socket-address} and @code{socket-port} have been changed to
+always return the details of the local connection point.
+
+@item New function in @code{rep.system} module, @code{crypt}. A wrapper
+for the system's @code{crypt} function (if it has one)
+
+@item New function in @code{rep.threads} mdoule,
+@code{make-suspended-thread}
+
+@item New module @code{rep.net.rpc}, provides a text-stream based RPC
+mechanism for Lisp programs. Similar in some ways to untyped CORBA.
+(This is still in the experimental stage -- its interface may change in
+forthcoming releases)
+
+@item New functions in @code{rep.data} module, @code{list->vector} and
+@code{vector->list}
+
+@item New macro @code{define-special-form}. A combination of
+@code{defvar} and @code{setq} -- it always makes the variable special
+and it always sets it to the given value
+
+@item New module @code{rep.test.framework} implementing @code{assert},
+@code{check} and @code{test} macros. This provides a framework for
+implementing unit tests in Lisp modules (such that running the
+interpreter with the @samp{--check} option will run all tests that have
+been set up to be autoloaded
+
+@item Bug fixes:
+
+@itemize @minus
+
+@item When reading from strings, don't choke on zero bytes
+
+@item When writing into sockets, be aware that the socket is
+in non-blocking mode
+
+@item SDBM and GDBM modules now close any open databases before the
+interpreter exits
+
+@item Fixed the @code{rep_parse_number} function not to require a
+terminating null character in the string when parsing bignums
+
+@item Only define @code{Qrep_lang_interpreter} once
+
+@item Don't assign vm registers to physical registers on 68000
+architectures -- it's been reported to crash
+
+@item When running asynchronous subprocesses, open and initialize the
+pty slave before forking to avoid a race condition with the child
+process
+
+@item Flush symbols from the module cache at another point
+
+@item Fixes for Unixware
+
+@item When compiling non-top-level @code{defvar} forms, add any doc
+string they have to the database
+
+@end itemize
+@end itemize
+
+
+@heading 0.13.5
+
+@itemize @bullet
+
+@item Tar file handling no longer requires GNU tar
+
+@item The @code{defvar} special form can now take only a single
+argument
+
+@item The reader now treats @code{#\return} characters as white space
+
+@item Other miscellaneous bug fixes@dots{}
+
+@end itemize
+
+
+@heading 0.13.4
+
+@itemize @bullet
+
+@item Don't restrict symbols exported from plugin libraries, some need
+to export symbols to work properly (this bug only seemed to appear on
+Solaris systems)
+
+@item Added @code{rep_file_type} and @code{rep_guardian_type} to the
+list of symbols exported from librep
+
+@item Fixed the @code{install-aliases} script (Peter Teichman)
+
+@item New module @code{rep.threads.condition-variable}
+
+@item Added @code{string-split} and @code{string-replace} to the gaol
+
+@end itemize
+
+
+@heading 0.13.3
+
+@itemize @bullet
+
+@item Try to only export public symbols from @file{librep.so} and
+modules
+
+@item When expanding file names translate @samp{/..} to @samp{/}
+
+@item Set an upper bound on the allowed recursion depth when regexp
+matching, prevents the stack from overflowing in pathological cases
+
+@item Added optional second arg to @code{readline} function, a function
+to call to generate completions. The @code{rl-completion-generator}
+method of supplying this function is deprecated
+
+@item Fixed bugs when handling character-case in regexp module (Andrew
+Rodionoff)
+
+@item Added an @code{premature-end-of-stream} error. This is signalled
+instead of @code{end-of-stream} when reading characters in the middle
+of a syntax form. The @code{end-of-stream} error is only signalled when
+the end of the stream is reached before encountering anything other
+than whitespace characters
+
+@item Fixed bug of expanding declarations in the @code{define} macro
+expansion
+
+@end itemize
+
+
+@heading 0.13.2
+
+@itemize @bullet
+
+@item Fix @code{define} so that it tracks bound variables and ignores
+shadowed keywords when traversing code
+
+@item Added checks to compilation process for the kind of missing
+shared-library problems that many people see
+
+@item Fixed the @code{install-aliases} shell script
+
+@item New configure option: @code{--enable-full-name-terminator}
+
+@end itemize
+
+
+@heading 0.13.1
+
+@itemize @bullet
+
+@item Added functions @code{remove-if} and @code{remove-if-not}
+
+@item Various bug-fixes for non-linux or solaris systems (John H.
+Palmieri, Philippe Defert)
+
+@item @code{#f}, @code{#t}, @code{#!optional}, @code{#!key} and
+@code{#!rest} are now uninterned symbols. Keywords are interned in a
+separate obarray
+
+@item Fixed bug of caching regexps even when their string has been
+modified
+
+@item Fixed some bugs in the ftp remote file handler and the
+@code{pwd-prompt} function
+
+@item Fixed @code{define} to ignore @code{structure} and
+@code{define-structure} forms
+
+@end itemize
+
+
+@heading 0.13
+
+@itemize @bullet
+
+@item The end-of-list / boolean-false object is no longer the symbol
+@code{nil}. Instead there is a special object @code{()} fulfulling
+these two roles. For modules importing the @code{rep} module, the
+symbol @code{nil} evaluates to @code{()}. This allows the @code{scheme}
+module to be more compliant with the Scheme standard
+
+@item Parameter list changes:
+
+@itemize @minus
+@item Deprecated @code{&optional} and @code{&rest}, in favour of
+@code{#!optional} and @code{#!rest}.
+
+@item Added keyword parameters. Use @code{#!key} to declare them.
+Keyword syntax is @samp{#:@var{param}}. For example:
+
+@lisp
+((lambda (#!key a b) (list a b)) #:b 2 #:a 1) @result{} (1 2)
+@end lisp
+
+@item @code{#!optional} and @code{#!key} parameters may now have
+default values, syntax is @code{(@var{var} @var{default})}. For
+example:
+
+@lisp
+((lambda (#!optional (a 1)) a)) @result{} 1
+@end lisp
+@end itemize
+
+@item The module namespace is now hierarchical. @samp{.} characters in
+module names denote directory separators, e.g. @samp{foo.bar}
+translates to the file @file{foo/bar}
+
+All module names prefixed with @samp{rep.} are reserved for librep,
+other top-level names should be picked to be as unique as possible
+
+The existing modules have been renamed to fit this scheme (see the file
+@file{TREE} in the distribution for the hierarchy details). However,
+old module names will still work for the time being
+
+@item The @code{rep} module no longer includes the @code{rep.regexp},
+@code{rep.system}, @code{rep.io.files}, @code{rep.io.processes} or
+@code{rep.io.file-handlers} modules. These need to be imported
+explicitly
+
+@item Doc strings are now indexed by module name as well as symbol
+name. The @code{define} macro now takes a doc string as its optional
+third parameter
+
+@item Record constructors may include all lambda-list keywords (e.g.
+keywords and/or default values)
+
+@item Incompatible virtual machine changes, hence bytecode files will
+need to be recompiled. Improvements include:
+
+@itemize @minus
+@item Only heap-allocate variables when absolutely necessary
+
+@item Closure analysis to allow inlining of some types of @code{letrec}
+expressions
+
+@item Added a `safe' virtual machine, which makes no assumptions
+regarding validity of bytecode, so is safe for untrusted code
+@end itemize
+
+@item Added an @code{unscheme} module. Another Scheme implementation,
+but the goal of this one is to integrate cleanly with the librep
+runtime environment, even if this is at the expense of R4RS compliance
+
+For example, in @code{unscheme} code, @code{#f @result{} ()} and
+@code{#t @result{} t}. This allows rep and unscheme functions to call
+each other without needing to convert any data
+
+@item By default, it is now illegal to modify top-level variables that
+have not previously been defined
+
+@item New macro @code{define-structures} to export multiple views of a
+single underlying environment
+
+@item The librep runtime no longer handles the @samp{--help} option
+itself, this should be done by scripts
+
+@item Don't search @code{$LD_LIBRARY_PATH} for plugins, but prepend all
+directories in colon-separated @code{$REP_DL_LOAD_PATH} to
+@code{dl-load-path}. Similarly, the contents of @code{$REP_LOAD_PATH}
+is prepended to @code{rep-load-path}
+
+@item @code{(/ @var{x}) @result{} (/ 1 @var{x})}
+
+@item Extra string-manipulation functions: @code{string-replace},
+@code{string-split} (in the @code{rep.regexp} module)
+
+@item @code{#f} and @code{#t} are now primitive symbols, not special
+objects
+
+@item Special case tail-recursive calls to @code{apply}, to ensure they
+get eliminated
+
+@item The @samp{0x123} and @samp{0123} read syntaxes have been
+deprecated, use @samp{#x123} and @samp{#o123} instead
+
+@item @samp{#| @dots{} |#} comments now nest correctly
+
+@item New modules: @code{rep.i18n.gettext},
+@code{rep.vm.safe-interpreter}, @code{rep.vm.assembler},
+@code{unscheme}, @code{rep.data.objects}, @code{rep.www.quote-url},
+@code{rep.www.fetch-url}, @code{rep.util.ispell},
+@code{rep.util.base64}, @code{rep.util.autoloader},
+@code{rep.io.sockets}, @code{rep.util.time}, @code{rep.net.domain-name}
+
+@item Bug fixes, including:
+
+@itemize @minus
+
+@item Find size of @code{long long} type on AIX, IRIX and Solaris (Dan
+McNichol, Albert Chin-A-Young)
+
+@item Never allow macros to be called as functions
+
+@item Make bitfields unsigned (Albert Chin-A-Young)
+
+@item Fixed bounds-checking when parsing non-base-10 fixnums
+
+@item Thread fixes (and much lower thread-switch latency in many cases)
+
+@item Fixed @code{DEFUN} macro for C++ (Matt Tucker); also fixed header
+files to avoid C++ keywords
+
+@item Make error message for bytecode version mismatches more
+meaningful
+
+@item Fixed: @code{default-boundp}, @code{continuation-callable-p}
+
+@item Only the evaluate the value of @code{defvar} forms if the symbol
+isn't already bound
+
+@item Compile else-less @code{case} expressions correctly; eliminate
+tail-recursion in @code{cond} forms when possible
+
+@item Various fixes in @code{scheme} module
+@end itemize
+@end itemize
+
+
+@heading 0.12.4
+
+@itemize @bullet
+
+@item Support building without GNU MP, @samp{--without-gmp} option to
+configure. Use @code{long long} for non-fixnum integers (promote to
+floats when out of range); no exact rationals. There's also an option
+to disable continuations/threading (@samp{--disable-continuations})
+
+@item Sanitized function inlining:
+
+@itemize @minus
+@item Use @code{(declare (inline @var{names}@dots{}))} to tell the
+compiler that it might be useful to inline the named functions
+
+@item Don't even think about inlining across module/file boundaries
+(for now anyway)
+@end itemize
+
+@item Cleaned up the @code{gaol} module. Interface is essentially:
+@code{gaol-define}, @code{gaol-define-special},
+@code{gaol-define-file-handler}. Added @code{gaol-open} to import
+complete modules. Still supports old interface
+
+@item Be a lot more efficient when printing quoted strings and symbol
+names (for some streams there used to be a system-call per character!)
+Also, when quoting weird symbol names, be more intelligent
+
+@item Removed code to autoload from modules (which didn't really work
+anyway)
+
+@item Be more intelligent about deciding when to flush the module cache
+
+@item Build fixes for IRIX (David Kaelbling)
+
+@item Other miscellaneous bug-fixes and performance tweaks
+
+@end itemize
+
+
+@heading 0.12.3
+
+@itemize @bullet
+
+@item New function @code{thread-join}, waits for a specified thread to
+exit, then returns the value of the last form it evaluated
+
+@item Added a rudimentary profiler (@samp{,profile @var{form}} command
+in repl)
+
+@item Reorganized @code{ring} module, sanitized the interface
+(preserving compatibility with old functions), also added a
+@code{ring->list} function
+
+@item @code{rplaca} and @code{rplacd} (but not @code{setcar} and
+@code{setcdr}) functions now return the cell being modified, not the
+value being stored into it, for compatibility with CL (Karl Hegbloom)
+
+@item @code{unwind-protect}, @code{catch}, @code{condition-case}: these
+special forms are now macros
+
+@item When signalling @code{bad-arg} or @code{missing-arg} errors,
+try to include the function as the first element of the error data
+
+@item @code{load} function now @emph{only} loads files without suffixes
+if @var{no-suffix} arg is non-@code{nil} (prevents picking up
+un-suffixed files by mistake, e.g. from the current directory)
+
+@item Fixed some bugs when reading rationals
+
+@item Fixed bug of @code{gettext} module not redefining @code{_}
+binding in @code{rep} module
+
+@item Fixed bug when building @code{rep-config} script (Mark Hewitt,
+Dan Winship)
+
+@item Fixed bug of @code{rep_INTERN_SPECIAL} macro not looking for
+default values of special variables
+
+@item Fixed interpreted versions of @code{min} and @code{max} when
+operating on non-numeric values
+
+@item If unable to allocate heap space, just print an error and
+terminate the program (the low-memory handling doesn't currently work
+properly)
+
+@item Fixed bug when extracting doc strings from @code{define} forms
+
+@item Fixed bug when compiling structure definitions in non-top-level
+environments
+
+@item Fixed bug of being unable to @code{load} empty files
+
+@item When recursively macro-expanding, dereference identifiers in the
+correct module
+
+@end itemize
+
+
+@heading 0.12.2
+
+@itemize @bullet
+
+@item The tar file-handler now caches the unpacked archive (wins big
+when loading sawfish themes)
+
+@item The @code{gaol} module can now create multiple gaols, each with
+it's own namespace
+
+@item More performance tweaks
+
+@item Miscellaneous bug-fixes (more vm stack smashing, @code{defconst}
+never evaluates its constant)
+
+@end itemize
+
+
+@heading 0.12.1
+
+@itemize @bullet
+
+@item Some virtual machine performance tweaks
+
+@item Fixed nasty stack smashing bug (when using compiler declarations)
+
+@item Some 64-bit cleanups (George Lebl)
+
+@item Fixed non-ANSI C syntax (Sam Falkner)
+
+@end itemize
+
+
+@heading 0.12
+
+@itemize @bullet
+
+@item Added a basic module system.
+
+Modelled after the Scheme48 system, but simpler. At its simplest,
+include a @code{define-structure} form in each file representing a
+module:
+
+@lisp
+(define-structure @var{name} @var{interface} @var{config} @var{body}@dots{})
+@end lisp
+
+@noindent
+The external definitions of this module can then be imported by other
+modules through their @var{config} statements, e.g. @code{(open
+@var{NAMES}@dots{})}. Most modules will open @code{rep} to get the
+standard language definitions.
+
+@code{foo#bar} reads as @code{(structure-ref foo bar)}
+
+The @code{timers}, @code{tables}, @code{sdbm}, @code{gdbm},
+@code{readline}, @code{gettext}, @code{ring}, @code{mutex},
+@code{memoize}, @code{lisp-doc}, @code{disassembler}, @code{compiler},
+@code{date}, @code{cgi-get}, @code{gaol} features are all now modules
+(this is backwards compatible, since modules may be imported using
+@code{require})
+
+See the ``Modules'' section of the manual for more details.
+
+@item The repl now contains meta-commands for inspecting and
+configuring the module system (amongst other things)
+
+@item Added a facility for creating new primitive types:
+@code{make-datum}, @code{datum-ref}, @code{datum-set},
+@code{has-type-p}, @code{define-datum-printer}
+
+@item Added an SRFI 9 compatible @code{define-record-type} macro for
+defining data structures (the @code{records} module)
+
+@item Added fluid variables---a method of creating dynamically scoped
+bindings that fit well with lexically scoped definitions
+(@code{make-fluid}, @code{fluid}, @code{fluid-set}, @code{with-fluids},
+@code{let-fluids})
+
+@item Added a @code{queues} module providing a basic queue type
+
+@item Added stream functions: @code{peek-char}, @code{input-stream-p},
+@code{output-stream-p}
+
+@item Interpreter now also eliminates tail-calls
+
+@item Changed handling of inexact numbers to be compatible with the
+Scheme standard:
+
+@itemize @minus
+@item Many operations now produce inexact outputs if any of their
+inputs are inexact (e.g. @code{min}, @code{max}, @code{floor},
+@code{ceiling}, @code{round}, @code{truncate})
+
+@item @code{eql} and @code{equal} no longer ignore exactness when
+comparing numbers. @code{=}, @code{/=}, @code{<}, @code{>}, @code{<=}
+and @code{>=} @emph{do} ignore inexactness. E.g.
+
+@lisp
+(eql 2 2.) @result{} nil
+(= 2 2.) @result{} t
+@end lisp
+@end itemize
+
+@item Support most of Scheme's read-syntax for numbers (i.e. @samp{#b},
+@samp{#o}, @samp{#d}, @samp{#x} radix prefixes, and @samp{#e},
+@samp{#i} exactness prefixes).
+
+@item Implemented Scheme's @code{string->number} and
+@code{number->string} functions
+
+@item Included a basic R4RS Scheme implementation (module:
+@code{scheme}). Do @kbd{,new foo @key{RET} ,open scheme} to test it in
+the repl, use @code{(open scheme)} instead of @code{(open rep)} to use
+it within modules.
+
+The compiler also knows enough about Scheme to be able to compile it.
+Also, use the @samp{-s} or @samp{--scheme} options to load a file of
+Scheme code.
+
+@item The debugger works better (and can be used to walk the stack
+history somewhat)
+
+@item Last arg of @code{append} and @code{nconc} may be a
+non-proper-list now
+
+@item Implemented the Scheme @code{do} macro for iteration
+
+@item @code{define} supports curried functions. E.g. @code{(define
+((plus a) b) (+ a b))}, then @code{(plus 1)} evaluates to the function
+that adds one to its argument.
+
+@item Many performance improvements:
+
+@itemize @minus
+@item Allocates less memory (so garbage collects less often)
+
+@item Much faster at bytecode-to-bytecode function calling
+
+@item Much reduced VM overhead (when compiled with GCC)
+@end itemize
+
+@item Compiler improvements:
+
+@itemize @minus
+@item Supports the @code{(declare @var{clauses}@dots{})} form. See the
+``Compiler Declarations'' section of the manual for details on the
+actual declarations supported.
+
+@item Is cleverer about detecting when to create new bindings when tail
+recursing, and when the old bindings can just be overwritten
+
+@item Groks the module system, and the language of the module being
+compiled (so that it can compile both rep and Scheme code)
+
+@item Splices bodies of top-level @code{progn} and @code{begin} forms
+themselves into the top-level (for when macros expand into multiple
+definitions)
+
+@item Compiling already defined functions (or whole modules of
+functions) now (mostly) works
+
+@item Coalesce and compile non-defining top-level forms
+@end itemize
+
+@item Many bug fixes (see ChangeLog files for details)
+
+@end itemize
+
+
+@heading 0.11.3
+
+@itemize @bullet
+@item Fixed bug of throwing uninitialized errors when autoloading
+
+@item Fixed bug of interpreting @code{(let () @dots{})} as a named let
+@end itemize
+
+
+@heading 0.11.2
+
+@itemize @bullet
+
+@item Replaced many special forms by macros---@code{let}, @code{let*},
+@code{function}, @code{if}, @code{and}, @code{or}, @code{prog2},
+@code{defmacro}, @code{defun}, @code{defconst}, @code{define-value},
+@code{setq-default}
+
+@item @code{let} now supports Scheme's named-let construct for
+iteration via tail recursion
+
+@item Parse some standard Common Lisp and Scheme syntax: @samp{#|
+@dots{} |#} block comments, @samp{#\@var{c}} or @samp{#\@var{name}}
+characters (where @var{name} may be one of: @code{space},
+@code{newline}, @code{backspace}, @code{tab}, @code{linefeed},
+@code{return}, @code{page}, @code{rubout}), and @samp{#(@dots{})}
+vectors
+
+@item When comparing symbols, compare their names as strings
+
+@item Implemented Scheme's @code{dynamic-wind} function
+
+@item Fixed bug of sometimes evaluating function arguments in the
+environment of the callee not the caller
+
+@item Fixed bug when calculating how long to sleep for when no threads
+are available
+
+@item Fixed bugs in mutex implementation (Damon Anderson)
+
+@item Work around bugs in Tru64 @code{RTLD_GLOBAL}; everything should
+work on Tru64 now (Aron Griffis)
+
+@item Fixed bug of not saving current regexp state across continuations
+
+@end itemize
+
+
+@heading 0.11.1
+
+@itemize @bullet
+@item The compiler now eliminates single-function tail calls (instead
+of leaving it to the virtual machine)
+
+@item Updated to use libtool-1.3.4
+
+@item Miscellaneous bug fixes and minor changes
+@end itemize
+
+
+@heading 0.11
+
+@itemize @bullet
+
+@item Better support for numerical computing. Now supports bignums,
+rational numbers (numerator and denominator are bignums), and floating
+point values as well as the original fixnums. Many new numerical
+functions supporting these types. Promotes and demotes hopefully as
+you'd expect (never demotes an inexact number to an exact number).
+Tries to follow the Scheme numeric system as much as possible
+
+@item Supports @dfn{guardian} objects through the @code{make-guardian}
+function (as described in Dybvig's paper). These are a clean mechanism
+for allowing the programmer to control when arbitrary lisp objects are
+finally deallocated. Also added a new hook: @code{after-gc-hook}
+
+@item The default error handler can now be redefined. If the variable
+@code{error-handler-function} contains a function then it will be
+called to handle the error, with arguments @code{(@var{error}
+@var{data})}.
+
+@item New special form @code{case}, switches on a key value and sets of
+constants
+
+@item New function @code{call/cc} (also available through the alias
+@code{call-with-current-continuation}). Provides scheme-like
+continuation functions. Special variables are now deep-bound to support
+this correctly
+
+@item Supports ``soft'' preemptive threads using continuations and a
+general ``barrier'' mechanism (used either for restricting control
+flow, or for receiving notification when control passes across a
+barrier)
+
+@item Parameter lists in lambda expressions now support improper lists,
+as in scheme. E.g. @code{(lambda (x . y) @dots{})}
+
+@item Implements the scheme @code{define} syntax, with support for
+inner definitions
+
+@item The @code{tables} plugin implements hash tables, with extensible
+hashing and comparison methods; supports both strongly and weakly keyed
+tables
+
+@item Included a GDBM binding; DOC files are now stored in GDBM files
+(SDBM has limits on datum sizes)
+
+@item @code{put} and @code{get} functions now use @code{equal} to
+compare property names
+
+@item Virtual machine / compiler improvements:
+
+@itemize @minus
+@item Variable references and mutations are classified by type: lexical
+bindings use (one-dimensional) lexically addressed instructions, global
+non-special bindings have their own instructions, everything else uses
+the original instructions. Similar classification when creating new
+bindings
+
+@item Eliminate tail-recursive function calls wherever possible in
+compiled code (when the calling function has no dynamic state)
+@end itemize
+
+@noindent
+Compiled lisp code will need to be rebuilt to run on the modified
+virtual machine.
+
+@item When expanding macros, bind @code{macro-environment} to the
+macro environment it was called with. This allows macros to reliably
+expand inner macro uses
+
+@item New hook @code{before-exit-hook}. Called immediately before
+exiting
+
+@item @code{rep-xgettext} now has an option @samp{--c}. This makes it
+output pseudo C code containing the string constants found
+
+@item Fixed misfeature of interpreting filenames
+@file{@var{foo}//@var{bar}} as @file{/@var{bar}}. Contiguous path
+separators are now merged (i.e. @file{@var{foo}/@var{bar}})
+
+@end itemize
+
+
+@heading 0.10
+
+@itemize @bullet
+
+@item Updated support for dumping (freezing) lisp definitions to handle
+lisp-1 nature with closures. Also now generates C code instead of
+assembler for portability; creates a plugin that may be loaded through
+the REP_DUMP_FILE environment variable
+
+@item Plugin @file{.la} files may now contain rep-specific settings:
+@samp{rep_open_globally=yes} and
+@samp{rep_requires='@var{FEATURES}@dots{}'}
+
+@item New function @code{define-value}. A combination of @code{set} and
+@code{defvar}, but without implying dynamic scope
+
+@item @code{load} scans @var{after-load-alist} for plugins as well as
+lisp libraries
+
+@item @code{(if t)} now evaluates to @code{nil} not @code{t}
+
+@item Fix regexp bug in matching simple non-greedy operators (Matt
+Krai)
+
+@item Borrowed guile's bouncing parentheses for readline (Ceri Storey)
+
+@item New C functions @code{rep_load_environment} and
+@code{rep_top_level_exit}
+
+@item @code{defvar} allows symbols to be redefined in protected
+environments if they haven't also been defined by unprotected
+environments
+
+@item Detect GCC's with broken @code{__builtin_return_address}
+functions (George Lebl)
+
+@item Try to use libc @code{gettext} implementation, but only if it
+looks like it's the GNU implementation
+
+@end itemize
+
+
+@heading 0.9
+
+@itemize @bullet
+
+@item Support for using GNU readline (give configure the
+@samp{--with-readline} option)
+
+@item New functions: @code{letrec}, @code{caar}, @dots{}, @code{cddr},
+@code{caaar}, @dots{}, @code{cdddr}, @code{in-hook-p},
+@code{make-variable-special}
+
+@item Changed @code{unless} to have the Common Lisp semantics---return
+@code{nil} when the condition evaluates true, not the value of the
+condition
+
+@item Fixed/added some compiler optimisations
+
+@item Fixed @code{rep-xgettext} script to remove duplicated strings and
+to search exhaustively
+
+@item @code{add-hook} forces the hook variable to be special (in case
+it wasn't declared using @code{defvar})
+
+@end itemize
+
+
+@heading 0.8.1
+
+Fixed some documentation bugs; fixed some build problems
+
+
+@heading 0.8
+
+@itemize @bullet
+
+@item Default scoping is now lexical, only variables declared using
+@code{defvar} are dynamically scoped.
+
+@item There is now only a single namespace for symbols (excepting
+property lists), this means that the @code{fset},
+@code{symbol-function} and @code{fboundp} functions have been removed
+
+This allows all elements in procedure-call forms to be evaluated
+equally (as in scheme), so things like:
+
+@lisp
+((if t + -) 1 2)
+@end lisp
+
+@noindent
+now work. Related to this, function names (i.e. symbols and lambda
+expressions) are no longer dereferenced by any operations taking
+functions as arguments. Only built-in subroutines and closures are
+considered functions.
+
+This means that where before you'd write something like:
+
+@lisp
+(mapcar '+ '(1 2 3))
+@end lisp
+
+@noindent
+this is now illegal; the @code{+} function must be evaluated:
+
+@lisp
+(mapcar + '(1 2 3))
+@end lisp
+
+@item @code{lambda} is now a special form evaluating to a closure (as
+in scheme); this means that the following are exactly equivalent:
+
+@lisp
+(lambda (x) x) @equiv{} (function (lambda (x) x)) @equiv{} #'(lambda (x) x)
+@end lisp
+
+An alternative method of enclosing a lambda expression is to use the
+@code{make-closure} function.
+
+@item @code{gaol} module providing semi-safe environment for untrusted
+code to evaluate in
+
+@item Support for i18n through @code{gettext} module; also support for
+@samp{%1$s} type format specifiers
+
+@item New functions @code{string-equal} and @code{string-lessp}
+
+@end itemize
+
+
+@heading 0.7.1
+
+@itemize @bullet
+
+@item Added @samp{--with-rep-prefix} option to autoconf AM_PATH_REP
+macro
+
+@item Fixed bug when inserting a new timer before an existing timer
+
+@item Fix the malloc tracking code
+
+@item Fix dlmalloc for FreeBSD
+
+@item Use install when installing, not cp
+
+@item Some fixes for compiling with SUN's C compiler on Solaris
+
+@end itemize
+
+
+@heading 0.7
+
+@itemize @bullet
+
+@item Added file handler for read-only access to the contents of tar
+archives, access files like @file{foo.tar.gz#tar/bar}
+
+@item @code{process-id} function now returns pid of lisp interpreter
+when called with zero arguments
+
+@item Added (untested) support for loading dynamic objects via
+@code{shl_load} (HP-UX)
+
+@item Added (untested) support for systems that prefix symbol names in
+dynamic objects with underscores
+
+@item Fix bug when compiling @code{last} function
+
+@item Fix bug of not closing files in the @code{load} function
+
+@end itemize
+
+
+@heading 0.6.2
+
+@itemize @bullet
+
+@item Added @code{autoload-verbose} variable; set it to @code{nil} to
+turn off the messages when autoloading
+
+@item Fix problems when @samp{--prefix} option has a trailing slash
+
+@item Updated libtool files to version 1.3.3
+
+@item Initial (incomplete) support for building under Tru64, from Aron
+Griffis
+
+@end itemize
+
+
+@heading 0.6.1
+
+No new features; minor portability tweaks and build changes. Fix bug of
+trying to load directories as Lisp scripts
+
+
+@heading 0.6
+
+@itemize @bullet
+
+@item Add @code{unsetenv} function
+
+@item @code{system} now uses @code{process-environment}
+
+@item Workaround compiler bug with GCC 2.95 on sparc
+
+@item Fix build problem where libsdbm.la can't be located
+
+@end itemize
+
+
+@heading 0.5
+
+@itemize @bullet
+
+@item New function @code{set-input-handler}, registers an asynchronous
+input handler for a local file
+
+@item Don't abort on receipt of unexpected @code{SIGCHLD} signals
+
+@item Upgrade libtool to version 1.2f
+
+@item The @code{rep} binary by default always loads a script named
+@file{rep}, not named by it's @code{argv[0]} (this breaks under the
+newer libtool)
+
+@end itemize
+
+
+@heading 0.4
+
+@itemize @bullet
+
+@item Sending a rep process a @code{SIGUSR2} prints all debug buffers
+
+@item Added @samp{--with-value-type}, and
+@samp{--with-malloc-alignment} configure options. Also added code to
+automatically detect the first of these options.
+
+@item Fixed some 64-bit problems
+
+@item Removed the difference between static and dynamic strings
+
+@end itemize
+
+
+@heading 0.3
+
+@itemize @bullet
+
+@item New compiler command line option @samp{--write-docs}
+
+@end itemize
+
+
+@heading 0.2
+
+@itemize @bullet
+
+@item The variables @code{error-mode} and @code{interrupt-mode} control
+where errors and user-interrupts (i.e. @code{SIGINT} signals) are
+handled. The three possible values are: @code{top-level}, @code{exit}
+and @code{nil} (denotes the current event loop).
+
+@item Fixed bug where all dynamic types were erroneously @code{symbolp}.
+
+@item @code{SIGINT}, @code{SIGHUP} and @code{SIGTERM} signals should
+now be caught more successfully.
+
+@item Added a new directory to @code{dl-load-path}:
+@samp{@var{libexecdir}/rep/@var{arch}} to contain third-party shared
+libraries.
+
+@end itemize
+
+
+@heading 0.1
+
+First public release.

@@ -1,0 +1,103 @@
+# Note that this is NOT a relocatable package
+%define name     gnome-vfs
+%define ver      1.0.4
+%define  RELEASE 1
+%define  rel     %{?CUSTOM_RELEASE} %{!?CUSTOM_RELEASE:%RELEASE}
+%define  prefix  /usr
+%define  sysconfdir /etc
+
+Summary: The GNOME virtual file-system libraries
+Name: %name
+Version: %ver
+Release: %rel
+Vendor:		CVS
+Distribution:	GNOME
+Copyright: LGPL
+Group: System Environment/Libraries
+Source: ftp://ftp.gnome.org/pub/GNOME/sources/%name/%name-%{ver}.tar.gz
+URL: http://www.gnome.org/
+BuildRoot: /var/tmp/%{name}-root
+Requires: glib >= 1.2.6
+Requires: GConf >= 0.9
+Requires: oaf >= 0.3.0
+Docdir: %{prefix}/doc
+Summary:  GNOME VFS is the GNOME virtual file system.  It is used extensively by Nautilus.
+
+%description
+GNOME VFS is the GNOME virtual file system. It is the foundation of the
+Nautilus file manager. It provides a modular architecture and ships with
+several modules that implement support for file systems, http, ftp and others.
+It provides a URI-based API, a backend supporting asynchronous file operations,
+a MIME type manipulation library and other features.
+
+%package devel
+Summary: Libraries and include files for developing GNOME VFS applications.
+Group: Development/Libraries
+Requires: %name = %{PACKAGE_VERSION}
+Requires: GConf-devel
+Requires: oaf-devel
+
+%description devel
+This package provides the necessary development libraries for writing
+GNOME VFS modules and applications that use the GNOME VFS APIs.
+
+%changelog
+* Tue Feb 22 2000 Ross Golder <rossigee@bigfoot.com>
+- Integrate into source tree
+
+%prep
+%setup -q
+
+%build
+%ifarch alpha
+MYARCH_FLAGS="--host=alpha-redhat-linux"
+%endif
+# Needed for snapshot releases.
+MYCFLAGS="$RPM_OPT_FLAGS"
+if [ ! -f configure ]; then
+	CFLAGS="$MYCFLAGS" ./autogen.sh $MYARCH_FLAGS --enable-more-warnings --prefix=%prefix --localstatedir=/var/lib --sysconfdir=%{sysconfdir}
+else
+	CFLAGS="$MYCFLAGS" ./configure $MYARCH_FLAGS --enable-more-warnings --prefix=%prefix --localstatedir=/var/lib --sysconfdir=%{sysconfdir}
+fi
+make -k
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make -k sysconfdir=$RPM_BUILD_ROOT%{sysconfdir} prefix=$RPM_BUILD_ROOT%{prefix} install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post
+if ! grep %{prefix}/lib /etc/ld.so.conf > /dev/null ; then
+  echo "%{prefix}/lib" >> /etc/ld.so.conf
+fi
+/sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+%files
+%defattr(-, root, root)
+
+%doc AUTHORS COPYING ChangeLog NEWS README
+%config %{sysconfdir}/gnome-vfs-mime-magic
+%config %{sysconfdir}/vfs/modules/*.conf
+%dir %{prefix}/share/application-registry
+%{prefix}/lib/*.0
+%{prefix}/lib/*.sh
+%{prefix}/lib/*.so
+%{prefix}/lib/vfs/extfs/*
+%{prefix}/lib/vfs/modules/*.so
+%{prefix}/man/man5/*.5*
+%{prefix}/share/application-registry/gnome-vfs.applications
+%{prefix}/share/locale/*/LC_MESSAGES/*.mo
+%{prefix}/share/mime-info/*.keys
+%{prefix}/share/mime-info/*.mime
+
+%files devel
+%defattr(-, root, root)
+%{prefix}/include/gnome-vfs-1.0/libgnomevfs/*.h
+%{prefix}/lib/gnome-vfs-1.0/include/*.h
+%{prefix}/lib/*.a
+%{prefix}/lib/*.la
+%{prefix}/bin/gnome-vfs-config

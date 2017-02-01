@@ -1,0 +1,57 @@
+-*- mode: m4 -*-
+AC_PREREQ(2.52)
+
+dnl the gnome-python version number
+m4_define(gnome_python_major_version, 1)
+m4_define(gnome_python_minor_version, 4)
+m4_define(gnome_python_micro_version, 2)
+m4_define(gnome_python_version, gnome_python_major_version.gnome_python_minor_version.gnome_python_micro_version)
+
+dnl required versions of other packages.
+m4_define(glib_required_version, 1.2.8)
+m4_define(gtk_required_version,  1.2.8)
+
+AC_INIT(gnome-python, gnome_python_version,
+	[http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-python])
+AC_CONFIG_SRCDIR([gnome-python.spec])
+AM_CONFIG_HEADER(config.h)
+
+AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+AM_ACLOCAL_INCLUDE(macros)
+
+AC_DISABLE_STATIC
+AC_PROG_LIBTOOL
+
+AM_PATH_PYTHON(1.5.2)
+AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
+
+AM_PATH_GTK(gtk_required_version)
+AM_PATH_GDK_IMLIB
+
+GNOME_INIT(applets capplet)
+
+AM_PATH_LIBGLADE(build_gladegnome=true, build_gladegnome=false, gnome)
+AM_CONDITIONAL(WITH_GLADEGNOME, $build_gladegnome)
+
+AM_CONDITIONAL(WITH_APPLETS, test -n "$GNOME_APPLETS_LIBS")
+AM_CONDITIONAL(WITH_CAPPLET, test -n "$GNOME_CAPPLET_LIBS")
+
+dnl XXX FIX ME when there is a gtkhtml.m4 or gnome-config gtkhtml
+dnl AM_PATH_GTKHTML(build_gtkhtml=true, build_gtkhtml=false)
+AC_ARG_WITH(gtkhtml,    [  --with-gtkhtml          Build with gtkhtml support],
+ build_gtkhtml=yes,
+ build_gtkhtml=no)
+if test "x$build_gtkhtml" != xno; then
+  GTKHTML_LIBS=`$GNOME_CONFIG --libs gtkhtml`
+  AC_SUBST(GTKHTML_LIBS)
+fi
+AM_CONDITIONAL(BUILD_GTKHTML, test "x$build_gtkhtml" != xno)
+
+AM_PATH_GLIB(glib_required_version)
+
+AC_CONFIG_SUBDIRS(pygtk)
+AC_CONFIG_FILES([Makefile macros/Makefile
+pygnome/Makefile pygnome/generate/Makefile pygnome/gnome/Makefile])
+AC_OUTPUT
+
+

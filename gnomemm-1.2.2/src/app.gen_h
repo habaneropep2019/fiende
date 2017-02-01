@@ -1,0 +1,533 @@
+// -*- C++ -*-
+/* $Id: app.gen_h,v 1.80 2001/07/20 22:09:29 murrayc Exp $ */
+
+/***************************************************************
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING 
+****************************************************************
+ This file has been subject to rapid changes.  Don't assume
+ things will still work.
+***************************************************************/
+
+/* app.gen_h, app.h for gnome--
+ * 
+ * Copyright (C) 2000 The Gtk-- Development Team
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gnome--/dock.h>
+#include <gnome--/dialog.h>
+#include <gnome--/stock.h>
+#include <libgnome/gnome-i18n.h>
+#include <libgnomeui/gnome-app.h>
+#include <libgnomeui/gnome-app-util.h>
+#include <gnome--/app-helper.h>
+#include <gnome--/types.h>
+#include <list>
+
+namespace Gtk {
+  class MenuBar;
+  class Toolbar;
+}
+
+CLASS_START(Gnome);
+class DockItem;
+class Dock;
+class App;
+
+namespace App_Helpers {
+
+class Progress
+{
+public:
+  typedef SigC::Slot0<void> Cancel;
+  typedef SigC::Slot0<gdouble> Update;
+
+  void set(gdouble percent);
+  void done();
+
+  Progress(Gnome::App&, const Gtk::string &description, Cancel cancel=0);
+  Progress(Gnome::App&, const Gtk::string &description, guint32 interval,
+           Update percent, Cancel cancel=0);
+
+protected:
+  GnomeAppProgressKey key_;
+};
+
+} // namespace App_Helpers
+
+using std::list; //TODO remove this oneday.
+
+class App : public Gtk::Window
+{
+  WRAP_CLASS(App, GnomeApp,
+             GNOME_APP, GNOME_IS_APP,
+             app,
+             Gtk::Window,GtkWindow,GTK_WINDOW);
+public:
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  App(const Gtk::string &name);
+
+  //: Create an application.
+  //- appname is used to save preferences.
+  //- title is for the App window.
+  App(const Gtk::string &appname,const Gtk::string &title);
+
+/*** From gnome-app.h ***/
+  //: Set the menubar on the top.
+  WRAP_METHOD(
+    void gnome_app_set_menus(GnomeApp*, GtkMenuBar*),
+    void set_menus(Gtk::MenuBar& menubar));
+
+  //: Set the toolbar on the bottom.
+  WRAP_METHOD(
+    void gnome_app_set_toolbar(GnomeApp*, GtkToolbar*),
+    void set_toolbar(Gtk::Toolbar& toolbar));
+
+  WRAP_METHOD(
+    void gnome_app_set_statusbar(GnomeApp*, GtkWidget*),
+    void set_statusbar(Gtk::Widget& statusbar));
+
+  //: Sets the status bar with container.
+  //- uses the given container widget rather than creating a new one.
+  WRAP_METHOD(
+    void gnome_app_set_statusbar_custom(GnomeApp*, GtkWidget*, GtkWidget*),
+    void set_statusbar_custom   (Gtk::Container& container,
+                                 Gtk::Widget&    statusbar));
+
+  //: Set the contents in the middle.
+  WRAP_METHOD(
+    void gnome_app_set_contents(GnomeApp*, GtkWidget*),
+    void set_contents             (Gtk::Widget& contents));
+
+  WRAP_METHOD(
+    void gnome_app_add_toolbar (GnomeApp *app,
+			    GtkToolbar *toolbar,
+			    const gchar *name,
+			    GnomeDockItemBehavior behavior,
+			    GnomeDockPlacement placement,
+			    gint band_num,
+			    gint band_position,
+			    gint offset),
+    void add_toolbar(Gtk::Toolbar& toolbar,
+                     const Gtk::string &name,
+                     GnomeDockItemBehavior behavior,
+                     GnomeDockPlacement placement,
+                     gint band_num,
+                     gint band_position,
+                     gint offset));
+
+  WRAP_METHOD(
+    void gnome_app_add_docked (GnomeApp *app,
+			   GtkWidget *widget,
+			   const gchar *name,
+			   GnomeDockItemBehavior behavior,
+			   GnomeDockPlacement placement,
+			   gint band_num,
+			   gint band_position,
+			   gint offset),
+     void add_docked(Gtk::Widget& widget,
+                     const Gtk::string &name,
+                     GnomeDockItemBehavior behavior,
+                     GnomeDockPlacement placement,
+                     gint band_num,
+                     gint band_position,
+                     gint offset));
+
+  WRAP_METHOD(
+    void gnome_app_add_dock_item(GnomeApp*,GnomeDockItem*,
+                                 GnomeDockPlacement,gint,gint,gint),
+    void add_dock_item          (DockItem &item,
+                                 GnomeDockPlacement placement,
+                                 gint band_num,
+                                 gint band_position,
+                                 gint offset));
+
+  WRAP_METHOD(
+    void gnome_app_enable_layout_config (GnomeApp*, gboolean),
+    void enable_layout_config (gboolean enable));
+  
+  WRAP_METHOD(
+    GnomeDock* gnome_app_get_dock(GnomeApp *app), 
+    Gnome::Dock* get_dock ());
+    
+  WRAP_METHOD(
+    GnomeDockItem* gnome_app_get_dock_item_by_name(GnomeApp *app,
+						                                       const gchar *name), 
+    Gnome::DockItem* get_dock_item_by_name (const Gtk::string &name));
+    
+ 
+   //: Create menus from UI.
+   UI::Array<UI::SubTree>& create_menus(const UI::Array<UI::SubTree> &info);
+
+   //: Insert menu items at the specified path (e.g. "File/Open" or "File/Open Recent/").
+   //- This allocates some memory that will only be release when the app is destroyed,
+   //- even if you call remove_menus() or remove_menu_range(). 
+   UI::Array<UI::Info>& insert_menus(const Gtk::string &path, const UI::Array<UI::Info> &menuinfo);
+
+   // void gnome_app_insert_menus_with_data (GnomeApp *app, const gchar *path, GnomeUIInfo *menuinfo, gpointer data);
+
+
+  WRAP_METHOD(
+    void gnome_app_remove_menus(GnomeApp*, const gchar*, gint items),
+    void remove_menus(const Gtk::string &path, gint items));
+
+  WRAP_METHOD(
+    void gnome_app_remove_menu_range(GnomeApp*, const gchar*, gint, gint),
+    void remove_menu_range(const Gtk::string &path, gint start, gint items));
+
+   //: Adds hints to status bar.
+   //- must be called if create_menus is used after status bar is
+   //- established.
+   void install_menu_hints();
+
+   //: Create toolbar from UI.
+   UI::Array<UI::Info>& create_toolbar(const UI::Array<UI::Info> &info);
+
+
+// These are probably not necessary.
+// Please tell us if you find any example of their use.
+//   static void install_appbar_menu_hints    (const AppBar &app,
+//                                             UIInfoTree &menuinfo);
+//   static void install_statusbar_menu_hints (const Gtk::Statusbar &bar,
+//                                             UIInfoTree &menuinfo);
+
+
+/*** From gnome-app-util.h ***/
+
+  //: Flash a status message on the status bar
+  //-   If there isn't a status bar do nothing.  Intended for 
+  //-   trivial messages.
+  WRAP_METHOD(
+    void gnome_app_flash (GnomeApp*, const gchar*),
+    void flash(const Gtk::string &msg));
+
+
+  // These functions create popup messages of various types attached
+  // to this application.  The result is a managed widget which may
+  // be 0.  (must check)  You do not need to delete them; they will delete
+  // when closed. 
+
+  //: Popup a status message (ok style).
+  WRAP_METHOD(
+    GtkWidget* gnome_app_message(GnomeApp*, const gchar*),
+    Gnome::Dialog* message(const Gtk::string &msg));
+
+  WRAP_METHOD(
+    GtkWidget* gnome_app_error(GnomeApp*, const gchar*),
+    Gnome::Dialog* error(const Gtk::string &msg));
+
+  WRAP_METHOD(
+    GtkWidget* gnome_app_warning(GnomeApp*, const gchar*),
+    Gnome::Dialog* warning(const Gtk::string &msg));
+
+  //: Create a question dialog.
+  Gnome::Dialog* question(const Gtk::string& message, ReplyCallback cb = 0);
+  //: Create a question dialog (modal).
+  Gnome::Dialog* question_modal(const Gtk::string& msg, ReplyCallback cb = 0);
+
+  //: Create a okay/cancel dialog.
+  Gnome::Dialog* ok_cancel(const Gtk::string& msg, ReplyCallback cb = 0);
+  //: Create a okay/cancel dialog (modal).
+  Gnome::Dialog* ok_cancel_modal(const Gtk::string& msg, ReplyCallback cb = 0);
+
+  //: Create a request string dialog.
+  Gnome::Dialog* request_string(const Gtk::string &prompt,StringCallback cb = 0);
+  //: Create a request password dialog.
+  Gnome::Dialog* request_password(const Gtk::string &prompt,StringCallback cb = 0);
+
+  typedef App_Helpers::Progress Progress;
+  //: Create a progress indicator.
+  Progress progress(const Gtk::string &description, Progress::Cancel cancel=0);
+
+  //: Create a progress indicator at intervals.
+  Progress progress(const Gtk::string &description, guint32 interval, 
+                    Progress::Update percent, Progress::Cancel cancel=0);
+
+private:
+  //: add() is not applicable
+  //- Because a App is a compound widget, you would
+  //- only use the set_content() function.
+  void add(Gtk::Widget&);
+  
+  UI::Array<UI::SubTree> menus_;
+  UI::Array<UI::Info> toolbars_;
+
+  //To store dynamically-added UI::Info,
+  //because GNOME does not make its own copy of some data.
+  // e.g. see insert_menus().
+  list< UI::Array<UI::Info> > listUIArray_;
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/window_p.h>
+IMPL_START;
+#include <gnome--/private/app_p.h>
+#include <app-callback.h>
+
+/* app.cc
+ *
+ * Copyright (C) 2000 The Gtk-- Development Team
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/menubar.h>
+#include <gtk--/accelgroup.h>
+#include <gtk--/toolbar.h>
+#include <gtk--/togglebutton.h>
+#include <gnome--/pixmapmenuitem.h>
+#include <gnome--/app.h>
+#include <gnome--/dock-item.h>
+#include <libgnomeui/gnome-stock.h>
+#include <libgnomeui/gnome-uidefs.h>
+#include <libgnome/gnome-i18n.h>
+
+namespace Gnome {
+
+using namespace SigC;
+using namespace Gtk;
+
+App::App(const Gtk::string &appname)
+  : Gtk::Window(GTK_WINDOW(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gnome_app_construct(gtkobj(),
+		      appname.c_str(),
+		      0);
+}
+
+App::App(const Gtk::string &appname, const Gtk::string &title)
+  : Gtk::Window(GTK_WINDOW(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gnome_app_construct(gtkobj(),
+		      appname.c_str(),
+		      title.c_str());
+}
+
+UI::Array<UI::SubTree>&
+App::create_menus(const UI::Array<UI::SubTree> &info)
+{
+  menus_=info; //Copy for use later by install_menu_hints();.
+  gnome_app_create_menus(gtkobj(), menus_.gtkobj());
+    
+  return menus_;
+}
+
+UI::Array<UI::Info>&
+App::insert_menus(const Gtk::string &path, const UI::Array<UI::Info> &menuinfo)
+{
+  //UI::Info must continue to exist while the menu item exists.
+  //because GNOME does not make its own copies of some data.
+  //This memory will not be released when remove_menus() is called.
+
+  //Because Array is created implicitly by converting from list/vector/whatever,
+  //we can not ask the calling code to do its own memory management.
+  //This memory accumulation is unpleasant, 
+  //but we live in hope that the GNOME menu api will be fixed one day.
+  
+  listUIArray_.push_back(menuinfo);
+  UI::Array<UI::Info>& refArray = listUIArray_.back();
+  
+  gnome_app_insert_menus(gtkobj(), path.c_str(), refArray.gtkobj());
+
+  return refArray;
+} 
+
+
+void
+App::install_menu_hints()
+  {
+    gnome_app_install_menu_hints(gtkobj(), menus_.gtkobj());
+  }
+
+UI::Array<UI::Info>&
+App::create_toolbar(const UI::Array<UI::Info> &info)
+  {
+    toolbars_=info;
+    gnome_app_create_toolbar(gtkobj(), toolbars_.gtkobj());
+
+    return toolbars_;
+  }
+
+
+Gnome::Dialog* App::question(const Gtk::string& message, ReplyCallback cb)
+  { 
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_app_question(gtkobj(), message.c_str(),&reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+  
+Gnome::Dialog* App::question_modal(const Gtk::string& msg, ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_app_question_modal(gtkobj(), msg.c_str(),&reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+  
+Gnome::Dialog* App::ok_cancel(const Gtk::string& msg, ReplyCallback cb)
+  { 
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_app_ok_cancel(gtkobj(), msg.c_str(),&reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+  
+Gnome::Dialog* App::ok_cancel_modal(const Gtk::string& msg, ReplyCallback cb)
+  { 
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_app_ok_cancel_modal(gtkobj(), msg.c_str(),&reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+
+Gnome::Dialog* App::request_string(const Gtk::string &prompt, StringCallback cb)
+  { 
+    StringHolder* rh=new StringHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_app_request_string(gtkobj(), prompt.c_str(),
+                               (GnomeStringCallback)&string_reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+ 
+Gnome::Dialog* App::request_password(const Gtk::string &prompt, StringCallback cb)
+  { 
+    StringHolder* rh=new StringHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_app_request_password(gtkobj(), prompt.c_str(),
+                                 (GnomeStringCallback)&string_reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+
+App::Progress App::progress(const Gtk::string &description, Callback cancel=0)
+  {
+    return Progress(*this,  description, cancel);
+  }
+
+App::Progress App::progress(const Gtk::string &description, guint32 interval,
+                    ProgressCallback percent, Callback cancel=0)
+  {
+    return Progress(*this,  description, interval, percent, cancel);
+  }
+
+
+
+/************************************************************/
+
+namespace {
+
+using namespace Gnome::App_Helpers;
+struct ProgressCallbackData
+  {
+    Progress::Cancel cancel;
+    Progress::Update update;
+  };
+
+void progress_cancel(gpointer d)
+  {
+    ProgressCallbackData *data=(ProgressCallbackData*)d;
+    data->cancel.call();
+  }
+
+gdouble progress_update(gpointer d)
+  {
+    ProgressCallbackData *data=(ProgressCallbackData*)d;
+    return data->update.call();
+  }
+
+void progress_destroy(gpointer d)
+  {
+    ProgressCallbackData *data=(ProgressCallbackData*)d;
+    delete data;
+  }
+
+}
+
+namespace App_Helpers {
+
+Progress::Progress(Gnome::App& app, 
+                   const Gtk::string &description, 
+                   Cancel cancel=0)
+  {
+    ProgressCallbackData *data=new ProgressCallbackData();
+    data->cancel=cancel;
+    app.set_data_full("gnomemm-progress",data, &progress_destroy);
+    key_=gnome_app_progress_manual (app.gtkobj(),
+                           description.c_str(),
+                           &progress_cancel,
+                           data); 
+  }
+
+Progress::Progress(Gnome::App& app, 
+                   const Gtk::string &description, 
+                   guint32 interval,
+                   Update percent, 
+                   Cancel cancel=0)
+  {
+    ProgressCallbackData *data=new ProgressCallbackData();
+    data->cancel=cancel;
+    app.set_data_full("gnomemm-progress",data, &progress_destroy);
+    key_=gnome_app_progress_timeout (app.gtkobj(),
+                            description.c_str(),
+                            interval,
+                            &progress_update,
+                            &progress_cancel, data);
+  }
+
+void Progress::set(gdouble percent)
+  { 
+    gnome_app_set_progress(key_,percent);
+  }
+
+void Progress::done()
+  {
+    gnome_app_progress_done(key_);
+  }
+
+} /* namespace App_Helpers */
+
+
+} /* namespace Gnome */

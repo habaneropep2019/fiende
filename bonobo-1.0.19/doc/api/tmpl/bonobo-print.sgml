@@ -1,0 +1,156 @@
+<!-- ##### SECTION Title ##### -->
+BonoboPrint
+
+<!-- ##### SECTION Short_Description ##### -->
+A print interface all embeddables should implement
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This interfaces is implemented by an embeddable ( compound document item ).
+It exposes a simple render method that allows its child to print itself.
+The component renders itself ( or a sub-window of itself ) with the
+specified dimensions to the provided GnomePrintContext.
+</para>
+<para>
+In addition to proxying the render request, the context also converts the
+scribbled on context to a meta file, and returns a stream to the callee
+such that the information can be transfered to the caller. A nice wrapper
+interface is available in #BonoboPrintClient that makes this very simple
+to use.
+</para>
+
+<para>
+First of course, the interface has to be constructed add associated
+with the #BonoboEmbeddable 's #BonoboObject using the
+bonobo_object_add_interface method.
+  <example>
+    <title>Aggregating a new BonoboPrint interface</title>
+    <programlisting>
+HelloBonoboEmbeddable *
+hello_bonobo_embeddable_construct (HelloBonoboEmbeddable *embeddable)
+{
+	BonoboPrint         *print;
+
+	g_return_val_if_fail (HELLO_BONOBO_IS_EMBEDDABLE (embeddable), NULL);
+
+	bonobo_embeddable_construct (BONOBO_EMBEDDABLE (embeddable),
+				     hello_bonobo_view_factory, NULL);
+
+	/* Register the Bonobo::Print interface */
+	print = bonobo_print_new (hello_object_print, embeddable);
+	if (!print) {
+		bonobo_object_unref (BONOBO_OBJECT (embeddable));
+		return NULL;
+	}
+
+	bonobo_object_add_interface (BONOBO_OBJECT (embeddable),
+				     BONOBO_OBJECT (print));
+	return embeddable;
+}
+    </programlisting>
+  </example>
+</para>
+
+<para>
+Having aggregated the print interface to the embeddable, and passed
+in the 'embeddable' itself as the user_data, we can then implement
+the #BonoboPrintRenderFn method and make the interface actually
+useful, in this case we extract the text from the embeddable->text
+pointer, and print 'Value:' with the text under it, and some
+miscellaneous lines:
+  <example>
+    <title>A simple print function</title>
+    <programlisting>
+void
+hello_object_print (GnomePrintContext         *ctx,
+		    double                     width,
+		    double                     height,
+		    const Bonobo_PrintScissor *scissor,
+		    gpointer                   user_data)
+{
+	HelloBonoboEmbeddable *embeddable = user_data;
+	GnomeFont             *font;
+	double                 w, w2, h;
+	const char            *str, *descr;
+
+	str = embeddable->text ? embeddable->text : "No text";
+	descr = "Value:";
+
+	gnome_print_setlinewidth (ctx, 2);
+	font = gnome_font_new ("Helvetica", 12.0);
+	g_return_if_fail (font != NULL);
+	gnome_print_setrgbcolor (ctx, 0.0, 0.0, 0.0);
+	gnome_print_setfont (ctx, font);
+
+	w  = gnome_font_get_width_string (font, descr);
+	w2 = gnome_font_get_width_string (font, str);
+	h  = gnome_font_get_ascender (font) +
+	     gnome_font_get_descender (font);
+
+	gnome_print_moveto (ctx, (width / 2) - (w / 2), (height / 2) + h * 2);
+	gnome_print_show (ctx, descr);
+	gnome_print_moveto (ctx, (width / 2) - (w2 / 2), height / 2 - h);
+	gnome_print_show (ctx, str);
+
+	gtk_object_unref (GTK_OBJECT (font));
+}
+    </programlisting>
+  </example>
+</para>
+
+<para>
+In the above example the Scissor context is not used. In many
+applications it will not, however the scissor context specifies
+how the printed item will be cropped inside the container application,
+this allows the component to adjust its printed output to best fit
+this situation if neccessary.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### TYPEDEF BonoboPrint ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF BonoboPrintClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION bonobo_print_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_print_construct ##### -->
+<para>
+
+</para>
+
+@p: 
+@render: 
+@user_data: 
+@Returns: 
+<!-- # Unused Parameters # -->
+@corba_p: 
+
+
+<!-- ##### FUNCTION bonobo_print_new ##### -->
+<para>
+
+</para>
+
+@render: 
+@user_data: 
+@Returns: 
+
+

@@ -1,0 +1,833 @@
+2001-03-14  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* gnomecard.c: use TRASH icon instead of CLOSE for Delete.
+
+2001-03-04  Gediminas Paulauskas <menesis@delfi.lt>
+
+	* deladdrlist.c, emaillist.c, phonelist.c: added some missing _().
+
+2001-02-05  Russell Steinthal  <rms39@columbia.edu>
+
+	* gnomecard.c: Load previously saved sort column at startup and save when
+	changed
+
+	* Add "Last Name" as sort criterion
+
+	(Patch from james@and.org; fixes Bug #13898)
+
+2000-07-28  Fatih Demir	<kabalak@gmx.net>
+
+	* address-conduit-capplet.desktop & gnomecard.desktop:
+		Added the Turkish desktop entries.
+
+2000-05-25  Tim Mooney     <mooney@dogbert.cc.ndsu.nodak.edu>
+
+	* dialog.c (gnomecard_prop_apply): Use gtk+ accessor to get value as an
+	integer (rather than accessing internal data directly); eliminates
+	compiler warning on some platforms, fixes Bug #12050
+
+2000-05-14  Andreas Hyden  <a.hyden@cyberpoint.se>
+
+	* address-conduit-capplet.desktop: Added Swedish translation.
+
+2000-05-04  Jacob Berkman  <jacob@helixcode.com>
+
+	* gnomecard.c (gnomecard_init): set the default icon
+
+2000-05-02  Jacob Berkman  <jacob@helixcode.com>
+
+	* Makefile.am (panelConduitsdir): put the conduit dentries in the panel's
+	Settings dir since the panel is lame like that
+	(panelConduitsdir): move these files up a directory
+
+	* address-conduit-capplet.desktop (Icon): use the gnomecard icon
+
+2000-03-29  Russell Steinthal  <rms39@columbia.edu>
+
+	* dialog.c: Add version number to about box and update copyright date
+
+2000-03-30  Christopher R. Gabriel  <cgabriel@firenze.linux.it>
+	
+	* address-conduit-capplet.desktop: Added italian translation
+	* gnomecard.desktop: Likewise
+
+2000-03-12  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address_conduit.c: Change conduit name to be more eye pleasing.
+
+2000-03-12  Eskil Heyn Olsen  <deity@eskil.dk>
+
+	* address-conduit-capplet.c (main): Uses new libgpilotdcm.
+
+	* Makefile.am (EXTRA_DIST): juju to make .conduit file.
+
+2000-02-27  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit-capplet.c: Update to new signature of 
+	gnome_pilot_client_get_pilots function
+
+	* address-conduit.[ch]: Mark pilot-deleted records to be ignored
+	during iteration.
+
+2000-02-26  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit.c: Fix "email" bug were all cell and pager phone
+	#'s appea as email address. Thanks to Alan Shutko for the patch.
+
+	* address-conduit-capplet.c: Don't include dummy callback header
+	file which is unecessary now. 
+
+2000-02-21  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* card.c (strtoCardRev): Fix reading REV in short format "YYYYMMDD".
+	It should addjust year by 1900 and month by 1 before storing 
+	in tm structure.
+
+2000-02-16  Alan Shutko  <ats@acm.org>
+ 
+ 	* dialog.c (gnomecard_prop_apply): Update REV property when the
+ 	record is changed.
+ 
+ 	* card.c (strtoCardRev): Should store year-1900 in struct tm.
+ 	(card_rev_str): New function.
+ 	(card_convert_to_vobject): Save REV property if used.
+ 
+2000-02-16  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit-capplet.c, address-conduit.[ch]: Rearange some code.
+	Move the load/save/copy config functions out of the header file and into
+	the capplet. Conduit only needs a specialized load_config function that
+	generates an error if config is not found.
+
+	* address-conduit.c: Add support for REV attribute. Check if it is set
+	and is later than last sync to determine if the record has been Modified.
+	
+2000-02-08  Eskil Heyn Olsen  <deity@eskil.dk>
+
+	* address-conduit.c: Missing symbol gpc fixed.
+
+2000-02-02  Eskil Heyn Olsen  <deity@eskil.dk>
+
+	* address-conduit-capplet.c : Uses the new libgpilotd
+
+2000-01-17  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit-capplet.c, address-conduit.[ch]:
+	Fix setting of categories when transmiting records to pilot.
+	Remove some warnings. Disable debugging output.
+
+2000-01-08  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit.[hc]: Update to use gpilotd_get_pilot_basedir
+	and gnome_pilot_conduit_standard_abs_set_db_open_mode.
+
+	* address-conduit-capplet.c: Added pilotID argument to 
+	gpilotd_conduit_mgmt_new.
+
+2000-01-05  Eskil Heyn Olsen  <deity@eskil.dk>
+
+	* Makefile.am: Applied Colin Walters <levanti@verbum.org> patch
+	for debian compiles.
+
+2000-01-03  Ray Lee <rblee@impulse.net>
+	
+	* card.c (get_CardProperty): Use a separate object, as the macro
+	"has" has side effects.  
+
+1999-12-31  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* card.c: Fix infinite file growth problems, by not adding
+	the same attribute to the vcard property more than once.
+
+	* address-conduit.[ch]: Remove custom \n escaping and always
+	use QUOTED-PRINTABLE when necessary because libversit has been
+	fixed appropriately. Also remove various compiler warnings.
+
+1999-12-17  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit.c: Fix \n escaping again.  Thanks to Patrick Decowski
+	for proding and patch.
+
+1999-12-11  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit.c: Do our own \n escaping. Perhaps in future
+	we'll switch back to using QUOTED-PRINTABLE, but currently gnomecard
+	just doesn't handle it well. The appropriate places are ifdefed.
+
+1999-12-08  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit.c (compare) : fix logic for null
+	entries.
+
+1999-12-04  Eskil Heyn Olsen  <deity@eskil.dk>
+
+	* Makefile.am (libaddress_conduit_la_SOURCES): added
+	address-conduit.h, also added the .desktop to EXTRA_DIST.
+
+1999-12-04  Matthias Warkus  <mawa@iname.com>
+
+	* gnome-gnomecard.png: Added this icon (better than the small XPM).
+
+1999-12-01  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit.c : If local store is empty then force a slow sync.  
+	Store a backup of gcrd file before overwriting it during the sync.  
+	If any address elements contain newlines, set enconding	to 
+	ENC_QUOTED_PRINTABLE. This makes such addresses load with gnomecard ok, 
+	although it might not be displayed perfectly, since gnomecard has a 
+	real limitation for handling newlines in fields	other than comment.
+
+1999-11-21  Vadim Strizhevsky  <vadim@optonline.net>
+
+	* address-conduit* : Added first version gnome-pilot conduit for gnomecard.
+	The initial version reads/writes directly to gcrd file because 
+	current idl is not good enough. In future, when CORBA interface is improved
+	to the GnomCal's level it will be used instead.
+	
+1999-10-22  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* card.c: Added static clauses to new functions.
+
+1999-10-18  Martin Norbäck  <norpan@bigfoot.com>
+
+	* gnomecard.desktop: Added swedish translation
+
+1999-10-17  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: Save window width and height.
+
+1999-10-12  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* card.c: We now support extended attributes and properties. Show
+         property types in card_to_string where needed.
+
+1999-10-10  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: Fixed top window policy. The canvas goes now under a
+	scrolled window.
+	* card.c: added card_to_string to make the PLAIN_TEXT drop and the
+	canvas view more informative.
+	 Also, simplified Martin Baulig's change.
+	* canvas.c: Canvas view is more informative now. Changed almost all 
+	canvas fonts to lucidatypewriter. Beautified.
+	* dialog.c: Beautified setup dialog.
+	* del.c: Elliminated 'erase last' bug.
+	* BUGS file added.
+
+1999-10-03  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* emaillist.c: URL entry was not updated when loading crd data into
+	widgets. fixed.
+
+1999-09-27  Martin Baulig  <martin@home-of-linux.org>
+
+	* card.c (card_create_from_vobject): Check for vObjectValueType ()
+	before calling str_val () to avoid a coredump on empty fields.
+	This fixes bug #1260.
+
+1999-09-20  Eskil Olsen <deity@eskil.dk>
+	
+	* makefile.am: libversit.a -> libversit.la
+
+1999-09-09  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* emaillist.c, deladdrlist.c, phonelist.c: up/down buttons call
+	property_box_changed.
+	* list.c, dialog.c, columnhdrs.c, columnhdrs.h: Property dialog and
+	clist now accept multiple phones and emails. Deleted unnecesary 
+	COLTYPEs.
+	* canvas.c: canvas_update: email text was not being cleaned when 
+	there was no email for the current record. fixed.
+	* gnomecard.desktop: Use "Address Book" instead of "GnomeCard".
+
+1999-09-05  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* emaillist.c, dialog.c: Now for the e-mail addresses (finally
+	multiple e-mail addresses) and moved URL entry to the new "Internet"
+	section.
+	* dialog.c, dialog.h: Birth Date is back!
+
+1999-09-02  Arturo Espinosa <arturo@nuclecu.unam.mx>
+	* deladdrlist.c: Similar interfase for addresses (whee!!).
+	* card.[hc]: We're back to original data structures!
+
+1999-09-01  David Kaelbling <drk@sgi.com>
+
+	* card.c (strtoCardRev): Off by one error fix.
+
+1999-07-15  Herbert Valerio Riedel  <hvr@hvrlab.dhs.org>
+
+	* phonelist.c, list.c, addresslist.c: code/cast cleanup
+	* list.h: added gnomecard_list_remove_card() proto
+
+1999-05-04  Eric S. Raymond  <esr@snark.thyrsus.com>
+
+	* canvas.c card.c card.h cardtypes.h dialog.c dialog.h pairs.h:
+	Added handling of a Categories field, corresponding to the vcard
+	CATEGORIES entity; it is editable (in the Explanatory tab) and is
+	properly read from and saved to gnome-card files.  Someday soon
+	this should be used to capture Palm Pilot address categories.
+
+1999-05-04  Russell Steinthal  <rms39@columbia.edu>
+
+	* dialog.c: Added calls to gnome_config_sync() after existing
+	calls to gnome_config_set_*()- now the config values are actually
+	written to disk, so we have persistent column definitions, search
+	strings, etc.
+
+1999-04-10  Jesse Sightler <jsight@pair.com>
+
+	* gnomecard.gnorba: Fixed minor typos.
+
+1999-04-10  Nuno Ferreira  <nmrf@rnl.ist.utl.pt>
+
+	* help/C/Makefile.am: Make documentation generation work when
+	srcdir != builddir. Stolen from gnome-libs. Can someone check that
+	it still works when srcdir = buildir?
+
+1999-04-03  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c (gnomecard_init): Fixed toolbar not appearing
+	every-other execution.
+	* phonelist.c: Total re-write. The interfase now goes acording to
+	the idea of the program. Similar interfases will be coded for e-mail
+	and delivery addresses.
+
+1999-03-27  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c (gnomecard_set): Now, up to the ten last saves
+	are put in backups until the 'Save' bug is fixed.
+	* dialog.c (gnomecard_save): Tell when there was an error during
+	save.
+	* del.c (gnomecard_delete_current_card): Use g_return_if_fail,
+	call gnomecard_set_changed.
+	* card.c (card_convert_to_vobject): An aptempt to eliminate YA
+	save bug.
+	* gnomecard.c (gnomecard_set_app_title), dialog.c 
+	(gnomecard_append_file): Now the currently opened file is displayed.
+	* gnomecard.c (filemenu), dialog.c (gnomecard_open_default): special
+	menu option to explicitly open the default file, avoiding the need
+	to go to ~/.gnome/ and open GnomeCard.gcrd.
+	* Some interfase fixes.
+
+1999-02-27  Changwoo Ryu  <cwryu@adam.kaist.ac.kr>
+
+	* canvas.c (*_FONTSET): Added Korean fonts to the each fontset
+	strings.
+
+1999-02-26  Sergey Panov  <sipan@mit.edu>
+
+        * canvas.c (gnomecard_canvas_new): Safer way of using fontsets
+        in canvas text items.
+
+1999-02-24  Arturo Espinosa  <arturo@nuclecu.unam.mx>
+
+	* fixed bug http://bugs.gnome.org/db/30/304.html reported by
+	  Maneesh Sahani. Canvas buglet.
+
+1999-02-23  Carsten Schaar  <nhadcasc@fs-maphy.uni-hannover.de>
+
+	* sort.h: Made 'gnomecard_sort_col' declaration extern.
+
+	* gnomecard.c (gnomecard_destroy_cards): Fixed an error, that
+ 	occured, when a translated text was longer than the original one.
+
+1999-02-17  Sergey Panov  <sipan@mit.edu>
+
+        * canvas.c (gnomecard_canvas_new): Instead of giving "font"
+        gnome_canvas_item_new we use gdk_fontset_load to create
+        pointers to GdkFont and feed them to gnome_canvas_item_new
+        using "font_gdk" 
+       
+
+1999-02-14  Sergey Panov  <sipan@mit.edu>
+
+	* gnomecard.c: added bindtextdomain call, so that *.mo 
+	files can be found. Use _() macro for two more dialogs
+
+	* columnhdrs.c: Use _() macro for column_hdrs[i].colname
+
+	* dialog.c: Use _() macro for column_hdrs[i].colname
+	and button labels
+
+	* canvas.c: Use _() macro in canvas. Removed foundry and encoding
+	from the font definitions, so that "cronyx" fonts and other fonts
+	with other then iso8859-1 encoding can be used. (I doubt that fonts
+	should be hardcoded)
+	
+1999-02-09  Tomas Ogren  <stric@ing.umu.se>
+
+	* addresslist.c, phonelist.c: Added _()'s to get radiobtns translated.
+
+1999-02-08  Tomas Ogren  <stric@ing.umu.se>
+
+	* gnomecard.c: Remove the evil gtk_widget_realize call, main problem
+	fixed in gnomelibs.
+
+1999-02-07  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* canvas.c (gnomecard_update_canvas): fixed workphone not being cleared
+	when it whould and a comma appearing in the addresses display.
+	The header boxes now resize depending on the length of the fname.
+	This looks nicer. Canvas bug workarround (fname label is not centered
+	now).
+
+1999-02-07  Tomas Ogren  <stric@ing.umu.se>
+
+	* gnomecard.c: Realize the main window before showing it makes fvwm
+	happier... Also removed a define 'SEC' which isn't used and conflicts
+	with system includes...
+
+1999-02-06  Lauris Kaplinski <lauris@ariman.ee>
+
+	* gnomecard.desktop: Added Estonian translations.
+
+1999-02-06  Changwoo Ryu  <cwryu@adam.kaist.ac.kr>
+
+	* gnomecard.desktop: Added Korean translations.
+
+1999-02-04  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (install-data-local): Replaced
+	$(prefix)/etc/CORBA/servers by $(sysconfdir)/CORBA/servers, as
+	suggested by Phillipe Defert (Philippe.Defert@cern.ch).
+
+1999-01-31  Miguel de Icaza  <miguel@nuclecu.unam.mx>
+
+	* canvas.c (gnomecard_canvas_new): Make the canvas with the
+	display also a drag source for the cards.
+
+	* card.c (card_save): Memory leak fix.
+	(card_load): Leak fix.
+
+	* list.c (drag_data_get): Add drag and drop support for various
+	types: application/x-vcard; text/plain and x-application/x-email
+
+1999-01-31  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	Added help files for default language.
+
+1999-01-31  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	* canvas.c (gnomecard_clear_canvas): Implemented.
+	* gnomecard.c: bug fixes. Changed "Merge" to "Append" until we implement
+    merging.
+	* dialog.c (gnomecard_append_call): call gnomecard_set_changed if append
+ 	  was successful.
+
+1999-01-20  Nat Friedman  <nat@nat.org>
+
+	* dialog.c (gnomecard_edit): Connect the help signal of the
+ 	GnomePropertyBox to gnome_help_pbox_display.
+	(gnomecard_setup): Likewise.
+
+1999-01-20  Arturo Espinosa <arturo@nuclecu.unam.mx>
+
+	Bug fixing. Doesn't SIGSEGV when changing the cols order with an
+        empty file. There is a default filename now used, avoiding SIGSEGV
+	when trying to save in a special case. "New file" was deleted from
+	the toolbar to avoid confusions.
+
+1999-01-17  Nat Friedman  <nat@nat.org>
+
+	* gnomecard.c (gnomecard_init): Don't use the appbar progress meter.
+
+1999-01-08  Nat Friedman  <nat@nat.org>
+
+	* gnomecard.c (gnomecard_init): Create an Appbar.  Install menu
+ 	hints.
+
+	Updated the menus to adhere to the standard.
+
+1998-12-10 Michael Fulbright <drmike@redhat.com>
+
+	* addresslist.c, phonelist.c: fixed _connnect_ functions for changed
+	entries in the form to use gtk_signal_connect(), not
+	gtk_signal_connect_object().  Should fix problems with address and
+	phone edit forms.
+
+1998-12-03 Michael Fulbright <drmike@redhat.com>
+
+	* addresslist.[ch], dialog.c, phonelist.[ch]: fixed bug where if you
+	apply a given card multiple times, you get leaks and other fun memory
+	misbehavior.
+	
+1998-11-30 Michael Fulbright <drmike@redhat.com>
+
+	* gnomecard.c, canvas.c: added scrollbars to the canvas view of
+	the current card. Added comment to end of view.
+	
+1998-11-30 Michael Fulbright <drmike@redhat.com>
+
+	* gnomecard.c: changed so user can arbitrarily resize main app window
+	* list.c: correctly handle selection changes in clist for master
+	card list via kbd input
+
+1998-11-29 Michael Fulbright <drmike@redhat.com>
+
+	* canvas.c: completely initial attempt at having a complete
+	card view presented via a canvas to the right side of the
+	master card listing.
+
+1998-11-29 Michael Fulbright <drmike@redhat.com>
+
+	* changed sorting functions to use ColumnType as argument for
+	column you want to sort by, not the actually sorting function.
+	There are helper functions to map between ColumnType and sorting
+	function.
+
+	* started to rework the canvas display of the currently selected
+	card. Still in early stages.
+
+	* Column display editor is pretty complete, will store
+	user configuration persistantly via gnome_config.
+
+Sat Nov 28 22:58:10 1998  George Lebl  <jirka@5z.com>
+
+	* gnomecard.c: remove right justify stuff
+
+1998-11-26 Michael Fulbright <drmike@redhat.com>
+
+	* many files: Column Header Editor almost working, so you can
+	pick which columns are displayed in the master column list.
+
+1998-11-19  Jonathan Blandford  <jrb@redhat.com>
+
+	* gnomecard.c (main): CORBA added...
+
+1998-11-14 Michael Fulbright <drmike@redhat.com>
+        * dialog.c, gnomecard.c, list.[ch], sort.c: changed
+	gnomecard_rebuild_list() to not require user to pass
+	currently selected card as an argument. Instead we just
+	look in clist structure to determine currently selected
+	card, and restore selection to this card after we rebuild
+	list.
+
+	Also moved majority of code which modifies the card list display
+	into list.c. Next step is to made rest of code independent of
+	the current global variable gnomecard_list.
+
+1998-11-14 Michael Fulbright <drmike@redhat.com>
+        * gnomecard.c, list.[ch]: added functions to create column
+	titles and values based on user configuration of the
+	columns they want shown in the master card list.
+
+	Also added code to handle sorting by column when user clicks
+	column title button at top of clist
+	
+1998-11-13 Michael Fulbright <drmike@redhat.com>
+	* columnhdrs.[ch]: moved code to allow customization of
+	column headers in main card view into these files.
+
+	* other files: modified to use the new columnhdrs functions
+	for building card list. Not complete yet...
+	
+1998-11-12  Michael Fulbright <drmike@redhat.com>
+	* gnomecard.c: removed hpaned for now, had very funky behavior...
+	
+1998-11-11  Michael Fulbright <drmike@redhat.com>
+        * gnomecard.c: fixed gnomecard_list to work with recent clist changes
+
+	* phonelist.[ch]: moved code to handle phone list part fo
+	card edit property box into a separate file. 
+
+	* addresslist.[ch]: moved code to handle address list part fo
+	card edit property box into a separate file. 
+
+1998-11-11  Michael Fulbright <drmike@redhat.com>
+	* dialog.c: beginings of phone number support
+
+	The way the phone number and address types are handled will be
+	changed soon - the current radio button to control the type is
+	a kludge.
+
+1998-11-11  Michael Fulbright <drmike@redhat.com>
+	* sort.c: fixed sorting so it works again
+
+	* dialog.c: changed gnomecard_prop_close to accept ptr to Card
+	struct being editted argument instead of ptr to the GList element
+	containing the card. This is because the order of cards in the
+	gnomecard_crds GList can change after the user edits data and sorting
+	criteria is applied, and the ptr to the GList element containing
+	the card is not necessarily invariant.  Better to just pass a
+	ptr to the Card itself anyways.
+	
+1998-11-10  Michael Fulbright <drmike@redhat.com>
+        * list.c: Changed mechanism for determining relationship between
+	a row in the gnomcard_list clist and the matching Card struct.
+	We assign as row data for each row a ptr to the  Card struct.
+
+	* gnomecard.c, dialog.c, del.c: Fixed so we can delete entries now.
+	Replaced most of the code in del.c with a single function
+	gnomecard_delete_current_card.
+
+	* card.c: fixed card_free() to remove address structures properly
+	
+1998-11-10  Michael Fulbright <drmike@redhat.com>
+	* card.[ch], pairs.h, cardtypes.h: Changed PROP_DELADDR to 
+	PROP_POSTADDR
+
+1998-11-10  Michael Fulbright <drmike@redhat.com>
+        * card.[ch]: Changed how the postal address type is handled.
+	Changed the name of several things to not include 'deladdr' in
+	their name, which I found confusing. These are now 'postaddr'
+	instead.
+	
+	* dialog.c:  I've made the addresses for a person a part of
+	the main card editting property box.  Currently there more address
+	types than I think are required. I want to eventually move to
+	a system where the user can add an arbitrary number of address
+	types beyond the default allowed.
+
+	* gnomecard.c: I've made the dbl-click and right button click
+	menus for an item insensitive if the item is already being
+	editted.
+
+1998-11-07  Michael Fulbright <drmike@redhat.com>
+	* (many files):
+
+	- have removed most of tree view code since now using list view
+	  some routines remain (commented out) until I replace them
+	  with list equivalents
+
+	- noticed in card.c a nasty str_val() macro that depends upon
+	  the a local variable being present! Will have to go through
+	  and change all that (its in alot of places) because that
+	  is just asking for a problem.
+
+	
+1998-11-04  Michael Fulbright <msf@redhat.com>
+	* (many files): I wanted to summarize what I've been doing the
+	past week:
+
+	- moved to a list view instead of the tree view because it
+	  seems most people feel this is the right way to go
+
+	- moved address/phone/email dialogs into the main card edit
+	  dialog.  I think it is best to have as much information
+	  visible as possible so users can quickly find the information
+	  they need.
+
+	This has involved touching alot of the source code, but  
+	I am reusing a great deal of the original code.
+
+1998-10-25  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* del.c: Now you can delete the whole list of email addresses of a
+	contact, his name, his birthday and a whole bunch of those. This
+	needs refining.
+
+1998-10-23  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* card.c: Modified structures to allow identification of every card
+	property through piggybacking. Modifications all over the code to
+	adapt to this.
+	* del.c: Now you can delete individual e-mail entries. Eventualy, it
+	should be possible to delete any item in any card.
+
+1998-10-15  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (sortmenu) Changed GNOME_APP_UI_RADIOITEMS for
+	GNOME_APP_UI_ITEM. This fixes the sort menu not showing.
+		(helpmenu) Eliminated invalid entry.
+	* dialog.c: Various gnomecard_append_file bug fixes. It should work
+	right now.
+
+1998-10-14  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* dialog.c: (gnomecard_edit) Fixed timezone marked as "used"
+	when editting a card.
+
+1998-09-26  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	The code of GnomeCard gets split (finally)!
+        * Makefile.am: included all the new files.
+
+1998-09-25  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (gnomecard_sort_by_fname, gnomecard_init): the column
+	button just toggles the radio_menu_item of "sort by fname" to TRUE so 
+	that the callback for that radio_menu_item executes the sorting.
+	
+1998-09-25  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: broke gnomecard_sort_cards into several functions.
+	(gnomecard_open_file): now sorts the file when loading.
+	(gnomecard_update_tree): now the card is relocated to its sorted 
+		position.
+	(gnomecard_cmp_names): new sorting function.	
+	(gnomecard_cmp_emails): new sorting function.
+
+1998-09-22  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Makefile.am (gnomecard_SOURCES): Added missing cardtypes.h.
+
+1998-09-17  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (gnomecard_cards_blocked): It only checked for the
+	curr_crd. fixed.
+
+1998-08-13  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (gnomecard_sort_cards): Sorting. Click on the left button
+	of the ctree and the cards will be ordered by fname. Ordering by other
+	fields shall come soon.
+
+1998-08-12  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: Save and load with gnome_config the last opened file and
+	open it at startup. Bug fixes.
+
+1998-08-09  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (gnomecard_find_card): oh, yes: the find utility is here.
+		I'm using shell wilcard pattern matching (fnmatch) instead of regexps.
+		BTW: any resemblance with Netscape's find utility is pure coincidence.
+
+1998-08-08  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* card.[hc], gnomecard.c: CardDelAddr now uses an array of DELADDR_MAX
+		char pointers, instead of using named structure members. It was
+		getting pretty heary... how could one arrive to these situations?
+		Where did common sense go?
+	* cardfind.xpm, Makefile.am: new icon for find utility!
+	* gnomecard.c (gnomecard_find_card_call): getting ready for the find 
+		utility	(to regexp or not to regexp?)
+
+1998-08-07  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (gnomecard_init_defaults, gnomecard_setup_apply): 
+		added gnome_config routines.
+												        
+1998-08-07  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (gnomecard_set_node_info): Avoids repeating code and
+		allows updating the tree according to the property changes.
+		(gnomecard_setup_apply): Now the tree is updated.
+
+1998-08-07  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (gnomecard_add_card_sections_to_tree): If there is
+		only one item, phone, e-mail and delivery addresses sections now 
+		show directly its	single item.
+		(gnomecard_setup): Now you can choose to see the e-mail and/or
+		the phone at the side of each card's root.
+
+1998-08-06  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* card.c: fixed multi-line comment saving bug.
+	* gnomecard.c: (gnomecard_add_dellabel): getting ready for
+		handling delivery labels.
+
+1998-08-06  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c (gnomecard_update_tree): node should initially point to
+		the children of the crd->user_data.
+		(main): Now using a hpaned for the app_contents (much nicer).
+		(gnomecard_add_card_sections_to_tree): Phone numbers now show
+			their properties in the same node as the number.
+		(gnomecard_update_tree): e-mail address shown with the
+			formatted name of each card.
+
+1998-08-03  Federico Mena Quintero  <federico@nuclecu.unam.mx>
+
+	* Made the code use GtkCTreeNode instead of GList, for the new ctree.
+
+	* gnomecard.c (gnomecard_update_tree): Use GTK_CTREE_NODE_NEXT,
+	since the nodes are opaque structures now.
+
+1998-08-03  Arturo Espinods Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: gnome_canvas_new now needs no arguments. Corrected.
+
+1998-07-31  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: Several GUI fixes and refinements.
+	* card.c:      Fixed address save bug: should have used
+		VCCityProp instead of VCLocationProp. Changed field name of 
+		locality in CardDelAddr to city.
+
+1998-07-25  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: You can add delivery addresses now.
+
+1998-07-24  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (viewmenu, gnomecard_toggle_.*_view) New menu for hiding
+	and showing the canvas and the tree.
+	FIXME: I can't figure out how ti make gtk+ recalculate the vbox's size.
+
+1998-07-23  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: You can add phone numbers now.
+
+1998-07-22  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+  * gnomecard.c: several bug fixes. Check the workaround at
+  gnomecard_update_tree.
+	(gnomecard_add_email, gnomecard_email_call,
+	 gnomecard_add_card_sections_to_tree) - You can add emails now (finally).
+
+1998-07-19  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+  * gnomecard.c: (gnomecard_spawn_new) Now you can spawn another gnomecard
+	from gnomecard. This will be useful as soon as I implement DND. gnomecard
+  must be in your path.
+
+1998-07-17  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: (gnomecard_update_canvas) I'll add all the wysiwyg
+	displaying functionality here. The card view now updates when
+	the card is being editted and "Apply" is clicked.
+		(gnomecard_destroy_cards) now checks for any blocked cards
+		and shows an error if there are any, then returns FALSE.
+		(gnomecard_cards_blocked) added.
+
+1998-07-16  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* card.c: (card_geopos_str, card_timezn_str, card_bday_str) new 
+		functions to help representing the information in the 
+		interfase.
+	* gnomecard.c: a couple of bug fixes (sigsegvs and functionality).
+		I'm using gnome_canvas for the wysywyg view.
+		Almost all the data of the card is represented in the
+		tree now.
+		New 'First' and 'Last' buttons.
+		The tree view now uses solid lines and the scrollbars
+		appear only if necessary. It also freezes while adding
+		cards when loading.
+	* addrtool.xpm: for future use.
+	* last.xpm, next.xpm: the pixmaps for the corresponding buttons.
+		Should these go with the stock?
+	* org.xpm, exp.xpm: for the corresponding sections in the tree.
+
+Thu Jul 16 18:59:34 EDT 1998 Manish Vachharajani <mvachhar@vger.rutgers.edu>
+
+	* gnomecard.c: make it use the most recent ctree interface
+	
+1998-06-16  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: new funcionality: "Take from Name" button in
+	gnomecard_edit.
+
+1998-06-13  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* card.h, card.c: added a flag in the Card structure to handle
+	                  per-card blocking.
+
+	* gnomecard.h: new GnomeCardSib struct to hold tree's sections for 
+	               each card's user_data.
+	* gnomecard.c: delete and edit now block, thanks to the new flag.
+	               gnomecard_add_card_to_tree created.
+	               Prev & Next now scroll the tree.
+		       Several other GUI functionalities and routines to
+		       make my life easier in future development with 
+		       gnomecard.
+	
+	* various xpms for the tree icons added to the cvs. The tree view
+	  starts getting shape.
+
+1998-06-10  Arturo Espinosa Aldama  <arturo@nuclecu.unam.mx>
+
+	* gnomecard.c: Started with the tree view.
+	* card.h:      Added void* at the end for flexibility.

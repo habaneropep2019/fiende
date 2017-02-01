@@ -1,0 +1,328 @@
+/* $Id: dentry-edit.gen_h,v 1.11 2000/08/29 18:09:01 kenelson Exp $ */
+
+
+/* dentry-edit.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <libgnome/gnome-defs.h>
+#include <libgnome/gnome-dentry.h>
+#include <libgnomeui/gnome-dentry-edit.h>
+
+CLASS_START(Gnome);
+class DesktopEntry : public GnomeDesktopEntry
+{
+public:
+  DesktopEntry(const Gtk::string &name, const Gtk::SArray &exec);
+  DesktopEntry(const DesktopEntry &source);
+  DesktopEntry(const Gtk::string &file,
+		     int flags = 0,
+		     bool unconditional = true);
+  DesktopEntry(const Gtk::string &file);
+
+  ~DesktopEntry();
+
+  void set_name            (const Gtk::string &name);
+  void set_comment         (const Gtk::string &comment);
+  void set_tryexec         (const Gtk::string &tryexec);
+  void set_icon            (const Gtk::string &icon);
+  void set_docpath         (const Gtk::string &docpath);
+  void set_terminal_needed (bool terminal) { gtkobj()->terminal = terminal; }
+  void set_type            (const Gtk::string &type);
+  void set_location        (const Gtk::string &location);
+  void set_geometry        (const Gtk::string &geometry);
+
+  Gtk::string get_geometry        () const { return gtkobj()->geometry; }
+  Gtk::string get_location        () const { return gtkobj()->location; }
+  Gtk::string get_type            () const { return gtkobj()->type; }
+  bool   is_terminal_needed  () const { return gtkobj()->terminal; }
+  Gtk::string get_docpath         () const { return gtkobj()->docpath; }
+  Gtk::string get_icon            () const { return gtkobj()->icon; }
+  Gtk::string get_tryexec         () const { return gtkobj()->tryexec; }
+  Gtk::string get_comment         () const { return gtkobj()->comment; }
+  Gtk::string get_name            () const { return gtkobj()->name; }
+  bool   has_multiple_args   () const { return gtkobj()->multiple_args; }
+  bool   is_kde              () const { return gtkobj()->is_kde; }
+
+  // There are no 'load()' methods - they are wrapped by the ctors
+  void save() const;
+
+  void launch() const;
+  void launch_with_args(const Gtk::SArray &args);
+
+  GnomeDesktopEntry* gtkobj() { return this; }
+  const GnomeDesktopEntry* gtkobj() const { return this; }
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+class DEntryEdit : public Gtk::Object
+{
+  WRAP_CLASS(DEntryEdit, GnomeDEntryEdit,
+             GNOME_DENTRY_EDIT, GNOME_IS_DENTRY_EDIT,
+             dentry_edit,
+             Gtk::Object, GtkObject, GTK_OBJECT);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_METHOD(void gnome_dentry_edit_load_file(GnomeDEntryEdit*, const gchar*),
+	      void load_file (const Gtk::string &path));
+
+  WRAP_METHOD(void gnome_dentry_edit_clear(GnomeDEntryEdit*),
+	      void clear());
+
+  void set_dentry (const DesktopEntry &dentry);
+  DesktopEntry* get_dentry();
+  
+  Gtk::string get_icon() const;
+  Gtk::string get_name() const;
+  
+  SIGNAL_SPEC("changed",      both, void changed());
+  SIGNAL_SPEC("icon_changed", both, void icon_changed());
+  SIGNAL_SPEC("name_changed", both, void name_changed());
+
+
+  Gtk::Widget* get_name_entry    ();
+  Gtk::Widget* get_comment_entry ();
+  Gtk::Widget* get_exec_entry    ();
+  Gtk::Widget* get_tryexec_entry ();
+  Gtk::Widget* get_doc_entry     ();
+  Gtk::Widget* get_icon_entry    ();
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/object_p.h>
+IMPL_START;
+#include <gnome--/private/dentry-edit_p.h>
+
+namespace Gnome {
+
+// We use g_malloc rather than 'new gchar[]' here because the dtor
+// calls gnome_desktop_entry_destroy(), which calls
+// gnome_desktop_entry_free(), which ends up calling g_free on each
+// element of gchar **exec.
+
+DesktopEntry::DesktopEntry(const Gtk::string &namex,
+				       const Gtk::SArray &execx)
+{
+  name = g_strdup(namex.c_str());
+  exec_length = execx.size();
+
+  exec = const_cast<gchar**>((const gchar**)(execx));
+  // Mmm, not sure that works - GL
+
+//   // duplicate all 'execx' elements into 'exec'
+//   //
+//   // We can't use _gtk_string_vector_to_char_ptr_array(), because it
+//   // doesn't duplicate the arrays
+//   //
+//   int i;
+  
+//   for(i = 0; i <= exec_length; ++i)
+//     {
+//       exec[i] = g_strdup(execx[i].c_str());
+//     }
+
+//   exec[i] = 0; // add NULL terminator
+}
+  
+DesktopEntry::DesktopEntry(const Gtk::string &file,
+				       int flags,
+				       bool unconditional)
+{
+  static_cast<GnomeDesktopEntry>(*this) = *(gnome_desktop_entry_load_flags_conditional(file.c_str(),
+										       flags,
+										       unconditional));
+}
+
+
+DesktopEntry::DesktopEntry(const DesktopEntry &source)
+{
+  static_cast<GnomeDesktopEntry>(*this) = *(gnome_desktop_entry_copy(const_cast<GnomeDesktopEntry*>(source.gtkobj())));
+}
+
+
+DesktopEntry::~DesktopEntry()
+{
+  gnome_desktop_entry_destroy(this);
+}
+
+void
+DesktopEntry::set_name(const Gtk::string &namex)
+{
+  g_free(name);
+  name = g_strdup(namex.c_str());
+}
+
+void
+DesktopEntry::set_comment(const Gtk::string &commentx)
+{
+  g_free(comment);
+  comment = g_strdup(commentx.c_str());
+}
+  
+void
+DesktopEntry::set_tryexec(const Gtk::string &tryexecx)
+{
+  g_free(tryexec);
+  tryexec = g_strdup(tryexecx.c_str());
+}
+
+void
+DesktopEntry::set_icon(const Gtk::string &iconx)
+{
+  g_free(icon);
+  icon = g_strdup(iconx.c_str());
+}
+
+void
+DesktopEntry::set_docpath(const Gtk::string &docpathx)
+{
+  g_free(docpath);
+  docpath = g_strdup(docpathx.c_str());
+}
+
+void
+DesktopEntry::set_type(const Gtk::string &typex)
+{
+  g_free(type);
+  type = g_strdup(typex.c_str());
+}
+
+void
+DesktopEntry::set_location(const Gtk::string &locationx)
+{
+  g_free(location);
+  location = g_strdup(locationx.c_str());
+}
+
+void
+DesktopEntry::set_geometry(const Gtk::string &geometryx)
+{
+  g_free(geometry);
+  geometry = g_strdup(geometryx.c_str());
+}
+
+
+
+void
+DesktopEntry::save() const
+{
+  gnome_desktop_entry_save(const_cast<GnomeDesktopEntry*>(gtkobj()));
+}
+
+void
+DesktopEntry::launch() const
+{
+  gnome_desktop_entry_launch(const_cast<GnomeDesktopEntry*>(gtkobj()));
+}
+
+void
+DesktopEntry::launch_with_args(const Gtk::SArray &args)
+{
+  const gchar **tmp = (const gchar**)(args);
+  
+  gnome_desktop_entry_launch_with_args(gtkobj(), args.size(), const_cast<gchar**>(tmp));
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+void
+DEntryEdit::set_dentry(const DesktopEntry &dentry)
+{
+  gnome_dentry_edit_set_dentry(gtkobj(),
+			       const_cast<GnomeDesktopEntry*>(dentry.gtkobj()));
+}
+
+DesktopEntry*
+DEntryEdit::get_dentry()
+{
+  return reinterpret_cast<DesktopEntry*>(gnome_dentry_get_dentry(gtkobj()));
+}
+
+
+Gtk::string
+DEntryEdit::get_icon() const
+{
+  gchar *tmp = gnome_dentry_edit_get_icon(const_cast<GnomeDEntryEdit*>(gtkobj()));
+  Gtk::string s(tmp);
+  g_free(tmp);
+  
+  return s;
+}
+
+Gtk::string
+DEntryEdit::get_name() const
+{
+  gchar *tmp = gnome_dentry_edit_get_name(const_cast<GnomeDEntryEdit*>(gtkobj()));
+  Gtk::string s(tmp);
+  g_free(tmp);
+  
+  return s;
+}
+
+
+Gtk::Widget*
+DEntryEdit::get_name_entry()
+{
+  return Gtk::wrap(gnome_dentry_get_name_entry(gtkobj()));
+}
+  
+Gtk::Widget* 
+DEntryEdit::get_comment_entry()
+{
+  return Gtk::wrap(gnome_dentry_get_comment_entry(gtkobj()));
+}
+
+Gtk::Widget* 
+DEntryEdit::get_exec_entry()
+{
+  return Gtk::wrap(gnome_dentry_get_exec_entry(gtkobj()));
+}
+
+Gtk::Widget* 
+DEntryEdit::get_tryexec_entry()
+{
+  return Gtk::wrap(gnome_dentry_get_tryexec_entry(gtkobj()));
+}
+
+Gtk::Widget* 
+DEntryEdit::get_doc_entry()
+{
+  return Gtk::wrap(gnome_dentry_get_doc_entry(gtkobj()));
+}
+
+Gtk::Widget* 
+DEntryEdit::get_icon_entry()
+{
+  return Gtk::wrap(gnome_dentry_get_icon_entry(gtkobj()));
+}
+
+} /* namespace Gnome */
+
+
+DOCUMENTATION_START;
+

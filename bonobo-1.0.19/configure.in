@@ -1,0 +1,402 @@
+AC_INIT(bonobo/bonobo-object.h)
+
+dnl
+dnl Due to sed scripts being split on 90 line blocks,
+dnl this macro needs to be right at the beginning until
+dnl xml-i18n-tools is fixed to use some other approach.
+dnl
+AM_PROG_XML_I18N_TOOLS
+
+BONOBO_CURRENT=2
+BONOBO_REVISION=0
+BONOBO_AGE=0
+
+AC_SUBST(BONOBO_CURRENT)
+AC_SUBST(BONOBO_REVISION)
+AC_SUBST(BONOBO_AGE)
+
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(bonobo,1.0.19)
+AM_MAINTAINER_MODE
+AM_ACLOCAL_INCLUDE(macros)
+
+GNOME_INIT
+AC_ISC_POSIX
+AC_PROG_CC
+AC_STDC_HEADERS
+AC_PROG_YACC
+AC_ARG_PROGRAM
+AM_PROG_LIBTOOL
+
+GNOME_COMPILE_WARNINGS
+GNOME_X_CHECKS
+
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+
+dnl ====================================
+dnl =
+dnl = Profiling support
+dnl =
+dnl ====================================
+ENABLE_PROFILER=
+AC_ARG_ENABLE(profiler,
+[  --enable-profiler            Enable profiler],
+ENABLE_PROFILER=1)
+#AC_DEFINE(ENABLE_PROFILER))
+
+if test "x$ENABLE_PROFILER" = "x1"
+then
+        PROF_CFLAGS="-g -O -gdwarf-2 -finstrument-functions -D__NO_STRING_INLINES"
+        PROF_LDFLAGS="-L/gnome/PROFILE/lib -lprofiler -lpthread"
+fi
+
+# AC_SUBST(ENABLE_PROFILER)
+AM_CONDITIONAL(ENABLE_PROFILER, test "x$ENABLE_PROFILER" = "x1")
+AC_SUBST(PROF_CFLAGS)
+AC_SUBST(PROF_LDFLAGS)
+dnl ====================================
+dnl = Profiling support
+dnl ====================================
+
+ALL_LINGUAS="az ca da de el en_GB es eu fi fr ga gl hu it ja ko lt nl no pl pt pt_BR ro ru sk sl sv uk wa tr zh_CN zh_TW"
+AM_GNOME_GETTEXT
+# AM_GNOME_GETTEXT above substs $DATADIRNAME
+# this is the directory where the *.{mo,gmo} files are installed
+bonobolocaledir='${prefix}/${DATADIRNAME}/locale'
+AC_SUBST(bonobolocaledir)
+
+dnl ORBit
+AC_MSG_CHECKING(ORBit version)
+orbit_version=`orbit-config --version | awk '{print $2;}'`
+AC_MSG_RESULT($orbit_version)
+orbit_version=`echo $orbit_version | awk -F. '{print $1 * 10000 + $2 * 100 + $3;}'`
+if test 0$orbit_version -lt 000512; then
+	AC_MSG_ERROR(ORBit 0.5.12 or later required)
+fi
+
+dnl libIDL
+AC_MSG_CHECKING(for libIDL >= 0.6.8)
+if gnome-config --libs libIDL > /dev/null 2>&1; then
+	verstxt=`gnome-config --modversion libIDL`
+	vers=`echo "$verstxt" | sed -e "s/^libIDL-//" | \
+		awk -F. '{ printf "%d", $1 * 10000 + $2 * 100 + $3; }'`
+else
+	vers=0
+fi
+
+if test "$vers" -ge 0608; then
+	AC_MSG_RESULT(found $verstxt)
+else
+	AC_MSG_ERROR(not found)
+fi
+
+dnl Test for dladdr
+AC_MSG_CHECKING(for dladdr)
+have_dladdr=false
+AC_TRY_COMPILE([
+#define _GNU_SOURCE
+#include <dlfcn.h>], [
+{
+	Dl_info info;
+	int     a;
+	a = dladdr ("SHLIB_ID", &info);
+}], have_dladdr=true)
+
+if $have_dladdr; then
+	AC_MSG_RESULT(found)
+	AC_DEFINE(HAVE_DLADDR)
+else
+	AC_MSG_RESULT(not found - no auto shlib factory unloads)
+fi
+
+BONOBO_IDL_CFLAGS=`gnome-config --cflags gnome libIDL`
+BONOBO_IDL_LIBS=`gnome-config --libs gnome libIDL`
+AC_SUBST(BONOBO_IDL_CFLAGS)
+AC_SUBST(BONOBO_IDL_LIBS)
+
+
+#######################
+# type alignment test #
+#######################
+
+AC_DEFUN(AC_CHECK_ALIGNOF,
+[changequote(<<, >>)dnl
+dnl The name to #define.
+define(<<AC_TYPE_NAME>>, translit(alignof_$1, [a-z *], [A-Z_P]))dnl
+dnl The cache variable name.
+define(<<AC_CV_NAME>>, translit(ac_cv_alignof_$1, [ *], [_p]))dnl
+changequote([, ])dnl
+AC_MSG_CHECKING(alignment of $1)
+align_save_libs="$LIBS"
+LIBS="$GLIB_LIBS $LIBS"
+align_save_flags="$CFLAGS"
+CFLAGS="`orbit-config --cflags client` $CFLAGS"
+AC_CACHE_VAL(AC_CV_NAME,
+[AC_TRY_RUN([
+#include <stdio.h>
+#include <orb/orbit.h>
+typedef struct {char s1;} CORBA_struct;
+typedef void *CORBA_pointer;
+struct test {char s1; $1 s2;};
+main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%d\n", &(((struct test*)0)->s2));
+  exit(0);
+}], AC_CV_NAME=`cat conftestval`, AC_CV_NAME=0, AC_CV_NAME=0)])dnl
+AC_MSG_RESULT($AC_CV_NAME)
+LIBS="$align_save_libs"
+CFLAGS="$align_save_flags"
+AC_DEFINE_UNQUOTED(AC_TYPE_NAME, $AC_CV_NAME)
+undefine([AC_TYPE_NAME])dnl
+undefine([AC_CV_NAME])dnl
+])
+
+orig_CPPFLAGS=$CPPFLAGS
+CPPFLAGS="$CPPFLAGS $GLIB_CFLAGS"
+AC_CHECK_ALIGNOF(CORBA_short)
+AC_CHECK_ALIGNOF(CORBA_long)
+AC_CHECK_ALIGNOF(CORBA_unsigned_short)
+AC_CHECK_ALIGNOF(CORBA_unsigned_long)
+AC_CHECK_ALIGNOF(CORBA_float)
+AC_CHECK_ALIGNOF(CORBA_double)
+AC_CHECK_ALIGNOF(CORBA_char)
+AC_CHECK_ALIGNOF(CORBA_boolean)
+AC_CHECK_ALIGNOF(CORBA_octet)
+AC_CHECK_ALIGNOF(CORBA_long_double)
+AC_CHECK_ALIGNOF(CORBA_wchar)
+AC_CHECK_ALIGNOF(CORBA_long_long)
+AC_CHECK_ALIGNOF(CORBA_unsigned_long_long)
+AC_CHECK_ALIGNOF(CORBA_struct)
+AC_CHECK_ALIGNOF(CORBA_pointer)
+CPPFLAGS=$orig_CPPFLAGS 
+
+dnl bonobrowser needs libuuid and at least version 0.6.4 of libIDL
+dnl we might also want to check for mmap
+
+dnl build_bonobrowser=false
+
+dnl check for libuuid
+dnl lib_uuid=false
+dnl AC_CHECK_LIB(uuid, uuid_generate, lib_uuid=true, [AC_MSG_WARN([
+	
+dnl You need Theodore Ts'o's uuid library to compile bonobrowser.
+dnl If you're running Redhat, this may be as simple as typing...
+dnl ln -s /lib/libuuid.so.1 /usr/lib/libuuid.so
+dnl ...as root.
+dnl 
+dnl not building bonobrowser
+dnl 	])
+dnl ])
+dnl 
+dnl
+dnl check for libidl
+dnl lib_idl=false
+dnl AM_PATH_LIBIDL(0.6.4, lib_idl=true,[
+dnl	AC_MSG_WARN([
+dnl
+dnl You need libIDL 0.6.4 or higher to compile bonobrowser
+dnl
+dnl not building bonobrowser
+dnl 	])
+dnl ])
+dnl
+dnl if test "x$lib_uuid" = "xtrue" ; then
+dnl 	if test "x$lib_idl" = "xtrue" ; then
+dnl 		build_bonobrowser=true
+dnl 	fi
+dnl fi
+dnl
+dnl BonoboBrowser needs porting to oaf.
+AM_CONDITIONAL(BUILD_BONOBROWSER, false)
+
+
+dnl
+dnl  We need the right version of gnome-libs for the new
+dnl dock sizing logic.
+dnl
+AC_MSG_CHECKING(for gnome-libs >= 1.2.7)
+vers=`gnome-config --modversion gnome | sed -e "s/gnome-libs-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 10000 + $2 * 100 + $3;}'`
+if test "$vers" -ge 10207; then
+	AC_MSG_RESULT(found)
+else
+	AC_MSG_ERROR(not found)
+fi
+
+dnl Check for oaf
+have_oaf=true
+AC_MSG_CHECKING(for Oaf >= 0.6.7)
+vers=`gnome-config --modversion oaf | sed -e "s/oaf-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 10000 + $2 * 100 + $3;}'`
+if test "$vers" -ge 607; then
+	AC_DEFINE(USING_OAF)
+	AC_MSG_RESULT(found)
+else
+	AC_MSG_ERROR(not found)
+fi
+
+dnl
+dnl  We need the right version of libxml for the UI handler
+dnl prior versions have a nasty fatal bug
+dnl
+AC_MSG_CHECKING(for libXml >= 1.8.15)
+vers=`gnome-config --modversion xml | sed -e "s/xml-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 10000 + $2 * 100 + $3;}'`
+if test "$vers" -ge 10815; then
+	AC_MSG_RESULT(found)
+else
+	AC_MSG_ERROR(not found)
+fi
+
+dnl AM_CONDITIONAL(USE_UI_HANDLER, true)
+dnl AC_SUBST(USE_UI_HANDLER)
+dnl AC_DEFINE(USE_UI_HANDLER)
+
+dnl gtk-doc stuff
+
+AC_CHECK_PROG(GTKDOC, gtkdoc-mkdb, true, false)
+AM_CONDITIONAL(HAVE_GTK_DOC, $GTKDOC)
+AC_SUBST(HAVE_GTK_DOC)
+
+dnl Let people disable the gtk-doc stuff.
+AC_ARG_ENABLE(gtk-doc, [  --enable-gtk-doc  Use gtk-doc to build documentation [default=auto]], enable_gtk_doc="$enableval", enable_gtk_doc=auto)
+
+if test x$enable_gtk_doc = xauto ; then
+  if test x$GTKDOC = xtrue ; then
+    enable_gtk_doc=yes
+  else
+    enable_gtk_doc=no
+  fi
+fi
+dnl NOTE: We need to use a separate automake conditional for this
+dnl       to make this work with the tarballs.
+AM_CONDITIONAL(ENABLE_GTK_DOC, test x$enable_gtk_doc = xyes)
+
+AM_PATH_GDK_PIXBUF(0.6.0, ,AC_MSG_ERROR([Need gdk-pixbuf!]))
+
+dnl ******************************
+dnl GnomePrint checking
+dnl ******************************
+AC_MSG_CHECKING(for GnomePrint libraries >= 0.16)
+if gnome-config --libs print > /dev/null 2>&1; then 
+    vers=`gnome-config --modversion print | sed -e "s/gnome-print-//" | \
+        awk 'BEGIN { FS = "."; } { print $1 * 1000 + $2;}'`
+    if test "$vers" -ge 16; then
+        AC_MSG_RESULT(found)
+    else
+        AC_MSG_ERROR(You need at least gnome-print 0.16 for this version of bonobo)
+    fi
+else
+    AC_MSG_ERROR(Did not find gnome-print installed)
+fi
+
+GNOME_PRINT_LIBS="`$GNOME_CONFIG --libs print`"
+AC_SUBST(GNOME_PRINT_LIBS)
+
+have_vfs=false
+dnl AC_MSG_CHECKING(for Gnome Vfs >= 0.4.2.0)
+dnl if gnome-config --libs vfs > /dev/null 2>&1; then
+dnl     vers=`gnome-config --modversion vfs | sed -e "s/gnome-vfs-//" -e 's/cvs$//' | \
+dnl         awk 'BEGIN { FS = "."; } { print $1 * 100000 + $2 * 10000 + $3 * 100 + $4;}'`
+dnl     if test "$vers" -ge 040200; then
+dnl        AC_MSG_RESULT(found)
+dnl 	VFS_LIBS=`gnome-config --libs vfs`
+dnl 	VFS_CFLAGS=`gnome-config --cflags vfs`
+dnl 	have_vfs=true
+dnl     else
+dnl	 AC_MSG_ERROR(not found)
+dnl     fi
+dnl else
+dnl    AC_MSG_ERROR(not found)
+dnl fi
+
+AC_SUBST(VFS_LIBS)
+AC_SUBST(VFS_CFLAGS)
+AM_CONDITIONAL(HAVE_VFS,$have_vfs)
+
+dnl
+dnl For the various bonoboConf.sh scripts generation.
+dnl
+BONOBO_LIBDIR='-L${libdir}'
+BONOBO_INCLUDEDIR="-I${includedir}/gnome-1.0 `$GNOME_CONFIG --cflags gnomeui gdk_pixbuf print oaf xml`"
+BONOBO_LIBS="-lbonobo `$GNOME_CONFIG --libs oaf gtk gnome`"
+BONOBOX_LIBS="$BONOBO_LIBS -lbonobox `$GNOME_CONFIG --libs gnomeui gdk_pixbuf xml`"
+BONOBOX_PRINT_LIBS="$BONOBOX_LIBS -lbonobo-print `$GNOME_CONFIG --libs print`"
+XML_LIBS="`$GNOME_CONFIG --libs xml`"
+
+AC_SUBST(BONOBO_LIBDIR)
+AC_SUBST(BONOBO_INCLUDEDIR)
+AC_SUBST(BONOBO_LIBS)
+AC_SUBST(BONOBOX_LIBS)
+AC_SUBST(BONOBOX_PRINT_LIBS)
+AC_SUBST(XML_LIBS)
+
+dnl
+dnl For building tests within bonobo
+dnl
+BONOBO_TEST_CFLAGS=`$GNOME_CONFIG --cflags oaf glib gtk gnome`
+BONOBO_TEST_LIBS=`$GNOME_CONFIG --libs oaf glib gtk gnome`
+BONOBOX_TEST_CFLAGS=`$GNOME_CONFIG --cflags oaf gnomeui gdk_pixbuf print`
+BONOBOX_TEST_LIBS=`$GNOME_CONFIG --libs oaf gnomeui gdk_pixbuf print`
+
+AC_SUBST(BONOBO_TEST_LIBS)
+AC_SUBST(BONOBO_TEST_CFLAGS)
+AC_SUBST(BONOBOX_TEST_LIBS)
+AC_SUBST(BONOBOX_TEST_CFLAGS)
+
+dnl
+dnl For includes whilst building bonobo
+dnl 
+OAF_CFLAGS=`$GNOME_CONFIG --cflags oaf`
+AC_SUBST(OAF_CFLAGS)
+
+if test "x$with_html_dir" = "x" ; then
+  HTML_DIR='${datadir}/bonobo/html'
+else
+  HTML_DIR=$with_html_dir
+fi
+
+AC_SUBST(HTML_DIR)
+
+AC_CONFIG_SUBDIRS(libefs)
+
+AC_OUTPUT([
+bonobo.spec
+Makefile
+bonobo/Makefile
+storage-modules/Makefile
+monikers/Makefile
+components/Makefile
+components/application-x-gnomine/Makefile
+components/text-plain/Makefile
+components/audio-ulaw/Makefile
+components/audio-ulaw/doc/Makefile
+components/audio-ulaw/doc/C/Makefile
+components/selector/Makefile
+tests/Makefile
+samples/Makefile
+samples/controls/Makefile
+samples/compound-doc/Makefile
+samples/compound-doc/container/Makefile
+samples/compound-doc/bonobo-hello/Makefile
+samples/bonobo-class/Makefile
+gshell/Makefile
+doc/Makefile
+doc/api/Makefile
+doc/dia/Makefile
+idl/Makefile
+macros/Makefile
+po/Makefile.in
+intl/Makefile])
+
+echo "
+
+Configuration:
+
+	Source code location:	${srcdir}
+	Compiler:		${CC} 
+"

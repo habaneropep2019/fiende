@@ -1,0 +1,217 @@
+AC_INIT(gnomine)
+
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(gnome-games, 1.4.0.2)
+AM_MAINTAINER_MODE
+AM_ACLOCAL_INCLUDE(macros)
+GNOME_INIT
+
+SCROLLKEEPER_REQUIRED=0.1.4
+AC_SUBST(SCROLLKEEPER_REQUIRED)
+
+AC_ISC_POSIX
+AC_PROG_CC
+AC_STDC_HEADERS
+AC_ARG_PROGRAM
+AM_PROG_LIBTOOL
+
+## failure of 'AC_PRG_CXX' causes automake to abort
+# see if a C++ compiler exists and works
+AC_REQUIRE([AC_PROG_CXX])dnl
+if test "x$ac_cv_prog_cxx_works" = xno; then
+  AC_MSG_WARN(ifelse([$1], , "No C++ compiler", [$1]))
+fi
+AM_CONDITIONAL(CXX_PRESENT, test "x$ac_cv_prog_cxx_works" != xno)
+
+## this should come after `AC_PROG_CC'
+GNOME_X_CHECKS
+GNOME_CHECK_GUILE
+
+dnl Check for new enough gnome-libs
+CFLAGS_save=$CFLAGS
+LIBS_save=$LIBS
+CFLAGS=`gnome-config --cflags gnomeui`
+LIBS=`gnome-config --libs gnomeui`
+
+AC_CHECK_LIB(gnomeui, gnome_window_icon_set_default_from_file, ,[
+AC_MSG_ERROR(gnome-libs 1.0.59 or higher is required.)])
+
+CFLAGS=$CFLAGS_save
+LIBS=$LIBS_save
+
+## GDK_PIXBUF_CFLAGS=`$GNOME_CONFIG --cflags gdk_pixbuf`
+## GDK_PIXBUF_LIBS=`$GNOME_CONFIG --libs gdk_pixbuf`
+## AC_SUBST(GDK_PIXBUF_CFLAGS)
+## AC_SUBST(GDK_PIXBUF_LIBS)
+## HAS_GDK_PIXBUF='yes'
+## if test "x$GDK_PIXBUF_CFLAGS" = x; then
+##   AC_MSG_WARN(Couldn't find gdk-pixbuf, some games will not be built)
+##   HAS_GDK_PIXBUF='no'
+## fi
+
+## AM_CONDITIONAL(HAS_GDK_PIXBUF, test "$HAS_GDK_PIXBUF" = yes)
+
+## look for some version of curses (keeping AM_'s out of curses.m4)
+AC_CHECK_CURSES
+AM_CONDITIONAL(HAS_CURSES, test "$has_curses" = true)
+
+ALL_LINGUAS="cs da de el en_GB es et fi fr ga gl hu it ja ko lt nl no pl pt pt_BR ro ru sk sl sv tr uk wa zh_CN.GB2312 zh_TW.Big5"
+AM_GNOME_GETTEXT
+
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+
+AM_CONDITIONAL(HAVE_JADE, false)
+
+gnome_cv_use_gnome=yes
+
+## Begin tests for scrollkeeper
+AC_PATH_PROG(SCROLLKEEPER_CONFIG, scrollkeeper-config,no)
+if test x$SCROLLKEEPER_CONFIG = xno; then
+  AC_MSG_ERROR(Couldn't find scrollkeeper-config, please install the scrollkeeper packaga)
+fi
+
+## gnomine checks
+oLIBS="$LIBS"
+LIBS="$LIBS $GTK_LIBS"
+AC_CHECK_FUNCS(gtk_spin_button_set_snap_to_ticks)
+LIBS="$oLIBS"
+
+AC_CHECK_FUNCS(rename)
+
+dnl
+dnl ScottFree check
+dnl
+ZVT_LIBS=`$GNOME_CONFIG --libs zvt`
+AC_SUBST(ZVT_LIBS)
+
+## gnibbles needs gdk_pixbuf
+##AC_MSG_CHECKING([for gdk-pixbuf >= 0.6.0])
+
+##if gnome-config --libs gdk_pixbuf > /dev/null 2>&1; then
+        ##vers=`gnome-config --modversion gdk_pixbuf | sed 's/^gdk-pixbuf-//'`
+        ##major=`echo "$vers" | sed 's/\([[0-9]]*\)\.[[0-9]]*\.[[0-9]]*/\1/'`
+        ##minor=`echo "$vers" | sed 's/[[0-9]]*\.\([[0-9]]*\)\.[[0-9]]*/\1/'`
+##
+        ##if [[ "x$major" = "x" ]] ; then
+                ##gdkpixbuf_ok=false
+        ##elif [[ "x$major" = "x0" ]] ; then
+                ##case "$minor" in
+                        ##[[012345]])
+                                ##gdkpixbuf_ok=false ;;
+                        ##*)
+                                ##gdkpixbuf_ok=true ;;
+                ##esac
+        ##else
+                ##gdkpixbuf_ok=true
+        ##fi
+        ##AC_MSG_RESULT([found ("$vers")])
+##else
+        ##gdkpixbuf_ok=false
+        ##AC_MSG_RESULT([not found])
+##fi
+##
+##if ! $gdkpixbuf_ok ; then
+        ##AC_MSG_WARN([gdk-pixbuf 0.6.0 or later is required to build Gnibbles.])
+##fi
+
+##GDK_PIXBUF_LIBS=`$GNOME_CONFIG --libs gdk_pixbuf`
+##GDK_PIXBUF_INCS=`$GNOME_CONFIG --cflags gdk_pixbuf`
+
+##AC_SUBST(GDK_PIXBUF_LIBS)
+##AC_SUBST(GDK_PIXBUF_INCS)
+
+##AM_CONDITIONAL(GDK_PIXBUF, test $gdkpixbuf_ok)
+
+AC_DEFINE_UNQUOTED(GNOME_ICONDIR, "${prefix}/share/pixmaps")
+
+AC_OUTPUT([
+gnome-games.spec
+Makefile
+po/Makefile.in
+macros/Makefile
+intl/Makefile
+idl/Makefile
+gnomine/Makefile
+gnomine/help/Makefile
+gnomine/help/C/Makefile
+scottfree/Makefile
+same-gnome/Makefile
+same-gnome/help/Makefile
+same-gnome/help/C/Makefile
+same-gnome/help/es/Makefile
+same-gnome/help/ru/Makefile
+mahjongg/Makefile
+mahjongg/help/Makefile
+mahjongg/help/C/Makefile
+mahjongg/help/it/Makefile
+gturing/Makefile
+gturing/help/Makefile
+gturing/help/C/Makefile
+gturing/help/it/Makefile
+aisleriot/Makefile
+aisleriot/docs/Makefile
+aisleriot/docs/C/Makefile
+aisleriot/docs/it/Makefile
+aisleriot/pixmaps/Makefile
+freecell/Makefile
+freecell/src/Makefile
+freecell/gdk-card-image/Makefile
+gnome-stones/Makefile
+gnome-stones/graphics/Makefile
+gnome-stones/objects/Makefile
+gnome-stones/help/Makefile
+gnome-stones/help/C/Makefile
+gnome-stones/help/it/Makefile
+gtali/Makefile
+gtali/pix/Makefile
+gtali/help/Makefile
+gtali/help/C/Makefile
+gtali/help/da/Makefile
+gnobots2/Makefile
+gnobots2/help/Makefile
+gnobots2/help/C/Makefile
+gnobots2/help/es/Makefile
+gnobots2/help/it/Makefile
+gnobots2/help/da/Makefile
+iagno/Makefile
+iagno/sounds/Makefile
+iagno/help/Makefile
+iagno/help/C/Makefile
+iagno/help/it/Makefile
+gataxx/Makefile
+gataxx/sounds/Makefile
+gataxx/help/Makefile
+gataxx/help/C/Makefile
+gataxx/help/es/Makefile
+gataxx/help/it/Makefile
+gnotravex/Makefile
+gnotravex/help/Makefile
+gnotravex/help/C/Makefile
+gnotravex/help/es/Makefile
+gnotski/Makefile
+gnometris/Makefile 
+gnometris/pix/Makefile
+gnibbles/Makefile
+gnibbles/help/Makefile
+gnibbles/help/C/Makefile
+gnibbles/sounds/Makefile
+glines/Makefile
+omf-install/Makefile 
+xbill/Makefile
+xbill/pixmaps/Makefile
+xbill/cursors/Makefile
+])
+## iagno2/Makefile
+## iagno2/reversi-iagno2/Makefile
+## iagno2/plugins/Makefile
+## iagno2/plugins/random/Makefile
+## iagno2/plugins/swedishchef/Makefile
+## iagno2/src/Makefile
+## iagno2/tiles/Makefile
+
+
+
+
+

@@ -1,0 +1,594 @@
+The Bonobo FAQ
+Miguel de Icaza (miguel@helixcode.com)
+
+This is a work in progress.  Please mail me before making any changes
+to this document.
+
+@Q: What is Bonobo?
+
+    Bonobo is a component architecture for creating reusable and
+    distributed software components.  These software components
+    interact with each other through well defined interfaces which are
+    specified in the CORBA Interface Definition Language.
+
+    We distinguish between `Bonobo' the name of the component
+    architecture, and `bonobo' which is the C-based easy to use
+    implemenatation of the Bonobo component architecture.
+
+    The bonobo distribution consists of the following pieces:
+
+	* The Bonobo interface definition files: these establish the
+	  standard interfaces used by Bonobo-based applications.
+
+	* The core Bonobo runtime:  Bonobo contains a rich API for
+          dealing Bonobo Objects (activation for example).
+
+	* The Gtk-Based (and hence C-based) Bonobo framework for
+          creating new Bonobo::Unknown derived interfaces.  These are
+          used to simplify the development of CORBA-servers using the
+          C language binding.
+
+	  Each derivative of a BonoboObject implements an interface
+          derived from IDL:Bonobo/Unknown:1.0.
+
+	* A set of ready-to-use BonoboObjects derivatives that can be
+          used in a variety of situations.  These are considered
+          developer "sugar", although not required, they greatly
+          simplify the development of Bonobo-based applications.
+
+	* A set of "sugar" functions for manipulating client-side
+          objects.  
+
+@Q: What is CORBA?
+
+@Q: What is a component?
+
+    A component is a ( preferably small ), re-usable piece of
+    software, with well defined interfaces and interactions. In this
+    context these interfaces are described in IDL and the interactions
+    via. CORBA.
+
+@Q: Is it possible to use Bonobo components in my favorite language?
+
+    You will need your favorite language to support CORBA.   
+
+    There are various CORBA implementations with a different degree of
+    completness that you can use:
+
+	Owen Taylor has written Perl bindings for CORBA using ORBit.
+	FIXME has written Python binding for CORBA.
+	Dan Barlow has written Common Lisp bindings for CORBA.
+	C++ has piles of language bindings.
+
+    You need your CORBA implementation to at least let you invoke
+    methods on other CORBA objects as well as allowing you to
+    implement CORBA objects.  Bonobo uses in various places callback
+    mechanisms and these require the later functionality.  For
+    instance, there is an old Emacs Lisp implementation that did not
+    allow you to create CORBA object servers.
+
+@Q: Are there other implementations of Bonobo?
+
+    There is a work in progress to implement Bonobo in other
+    languages, although most languages will want to reuse parts of the
+    core runtime to avoid duplicating a large piece of code that is
+    better kept centralized and reused.
+
+    FIXME: include a detailed list of the things that are conveniently
+    not wrapped.
+
+@Q: Is it possible to implement Bonobo components in language X?
+
+    Yes.  
+
+    First of all, it is important that your language has CORBA
+    bindings, or that a suitable CORBA implementation is available for
+    you.  You want if possible to get a CORBA 2.2 implementation, but
+    this is not required.
+
+    It does not matter what language you are using, you can implement
+    Bonobo Components by implementing the interface that your
+    component wants to support.
+
+    Depending on your language, you will want to wrap some bits from
+    Bonobo (for instance, the core runtime) or you will want to
+    provide an alternate implementation or no implementation at all.
+
+@Q: What is ORBit?
+
+    ORBit is a CORBA implementation with a C mapping of the CORBA 2.2
+    specification mostly written by Elliot Lee and Dick Porter.
+
+    You can find more about ORBit here:
+    http://www.labs.redhat.com/orbit
+
+    ORBit is designed to be a small CORBA implementation that can be
+    embedded in most applications on the desktop.  It also happens to
+    be one of the fastest CORBA implementations in existance.  It
+    supports a number of CORBA features:
+
+	C Language mapping.
+	A full POA implementation.
+	The Dynamic Invocation Interface.
+	The Dynamic Skeleton Interface.
+	CORBA Any values.
+	Typecodes.
+
+    And it comes with a number of libraries that implement a few of
+    the CORBA services (Cos)
+
+@Q: I am interested in CORBA, where can I learn more?
+
+    CORBA is a standard published by the Object Management Group, you
+    can download various of their specifications from their web site
+    at http://www.omg.org
+    
+    FIXME: include pointers to relevant documents.
+
+@Q: What can I do with `bonobo'?
+
+@Q: What is an OAFID?
+
+    The OAFID is a unique identifier for a specific object
+    implementation and it is used to resolve uniquely.  This ID is
+    used to activate CORBA servers implementations.  
+
+    For example, this OAFID represents the Gnumeric workbook factory
+    object:
+
+OAFIID:GNOME_Gnumeric_WorkbookFactory
+
+@Q: What is a Factory?
+
+    A factory is an object that makes other objects. eg. a Gnumeric
+    factory might make Workbook objects.
+
+@Q: Where does the OAFID come from?
+
+@Q: What is a Control?
+
+	A Control is a 'componentized' version of a Widget. ie. A
+Control is a (single view) Graphical component.
+
+	In the Gtk+ implementation a Control contains a GtkWidget, it
+also has associated 'properties', providing an easy way to customize
+basic features of the control without creating an idl interface.
+
+	A control is often used inside a BonoboWidget, which acts as a
+container of Controls. The BonoboWidget is a normal GtkWidget that can
+be inserted into a GtkContainer.
+
+@Q: What is a PropertyBag, What is a Property?
+
+	
+@Q: What are the activation methods in Bonobo?
+
+	The prefered method of activating objects is trough the
+	"bonobo_get_object" function.  This one does moniker based
+	activation.  Like this:
+
+	For example this activates gnumeric and returns a
+	GNOME::Gnumeric::Worbook CORBA object reference:
+
+	bonobo_get_object ("OAFIID:GNOME_Gnumeric_Workbook", "GNOME/Gnumeric/Workbook");
+
+	The following launches an image handler:
+	
+	bonobo_get_object ("file:image.jpeg", "Bonobo/Control")
+
+@Q: Does Bonobo support in-proc components?
+
+	Yes, this depends on how you setup your component, however
+currently there are very few in-proc gnome components, due to
+various debugging problems.
+
+@Q: How can I embed a simple control in my application?
+
+	The following example shows how to embed the HTML Editor
+	component in a window:
+
+@BEGIN_EXAMPLE:
+Sources:
+	embed-control/embed-control.c
+Makefile:
+	embed-control/Makefile
+@END_EXAMPLE
+
+@Q: What is that long string of identifiers.
+
+@Q: Can you show me a simple Bonobo component?
+
+@Q: How can I write user interfaces with Glade?
+
+@Q: I want to pack a widget using Bonobo.
+
+@Q: What are properties?
+
+@Q: How can I use properties?
+
+@Q: Can I write GUI-less Bonobo components?
+
+	Yes, you can.  Bonobo is in no way tied to the X11
+	environment, although it fully supports it.
+
+	The C implementation of Bonobo uses GtkObjects as its base
+	class, and hence you need to link against the Gtk+ libraries
+	(do not worry, this is taken care of for you by the
+	gnome-config scripts), and you do need to call the
+	gtk_type_init() function at the beginning of your program.
+
+	
+@Q: How can I write a configure script that detects Bonobo?
+
+	The most simple test just probes for the existance of Bonobo
+	in the system using shell:
+
+	if gnome-config --libs bonobo > /dev/null 2>&1; then
+		echo Bonobo is installed
+	else
+		echo Bonobo is not installed
+	fi
+
+	You can do more elaborate tests and check against a specific
+	version, for instance:
+
+	if gnome-config --libs bonobo > /dev/null 2>&1; then
+		version=`gnome-config --modversion bonobo | \
+		sed -e "s/bonobo//" |	\
+		awk 'BEGIN { FS = "." } { printf "%d", $1 * 1000 + $2;
+	}'`
+		echo Bonobo found.
+		if test "$version" -ge 20; then
+			echo bonobo version is at least 20
+		else
+			echo bonobo version is not at least 20
+		fi
+	fi
+	
+@Q: How do I compile and link a sample Bonobo application?
+
+	If your source file is in the file component.c, you can
+	compile it by using the following command line:
+
+		cc `gnome-config --cflags bonobo` -c component.c
+
+	To link, you use the command line:
+
+		cc `gnome-config --libs bonobo` component.o
+
+	You would replace `bonobo' for `bonobox' if you are using the
+	GUI/Gtk+ features of Bonobo and include `bonobo_print' if you
+	are using any of the printing facilities for components.
+
+@Q: Where can I find examples of Bonobo use?
+
+	There are various sample programs in the Bonobo distribution
+	and they are mostly intended to either excercise a part of
+	Bonobo or to show how a specific feature in Bonobo is
+	implemented.  
+
+	You can find the sample programs in bonobo/samples;  A few
+	simple components are in bonobo/components;  There are various
+	other test programs shipped with Bonobo as well (like gshell)
+
+	For more advanced uses of Bonobo, you might want to look into
+	Gnumeric, Nautilus or Evolution.
+
+@Q: I noticed the lack of an IDispatch-like interface in Bonobo, how
+    do you cope with this problem?
+
+	CORBA provides a better solution to IDispatch at the CORBA
+	level which obviates the need to have something like that.
+
+	CORBA supports a mechanism on the client side called the
+	Dynamic Invocation Interface (DII) which allows programmers to
+	build their own CORBA request to a server.
+
+	On the server side CORBA supports the Dynamic Skeleton (or
+	Server? FIXME) Interface which allows applications to decode
+	arbitrary incoming CORBA requests.
+
+	Scripting languages would typically implement some sort of
+	support for DII and DSI.  This enables scripting languages to
+	talk to an arbitrary CORBA server or to implement any kind of
+	CORBA interface.
+
+	Some CORBA bindings for scripting languages (like Owen
+	Taylor's ORBit support for Perl) use the ORBs internals, as
+	they are sometime easier to use than DII/DSI.
+
+@Q: Can I write components in any language?
+
+	You can write components in any language that has a CORBA
+	binding or a CORBA implementation.  The only requirement is
+	that your components implement one or more of the Bonobo
+	interfaces.
+
+	The runtime for your language might want to reuse some of the
+	C implementation features (like object activation, moniker
+	activation and a few other utility functions).
+
+@Q: Is Bonobo tied to the Gtk toolkit?
+
+	No, it is not.  The `bonobo' implementation is tied to Gtk+,
+	but another binding for another language and another toolkit
+	should be simple to write.
+
+@Q: Is Bonobo tied to the ORBit implementation?
+
+	We do not believe that Bonobo is tied to ORBit in any aspect,
+	and there is even an implementation of Bonobo written in Java
+	by Cactus (Gergo Erdi) called Monkeybeans that uses the
+	Java ORB.
+
+@Q: What is a Moniker?
+
+	Monikers are used to name objects, they effectively implement
+an object naming space. The naming space is extremely abstract.
+
+	Read doc/Monikers for a more in-depth explanation.
+
+@Q: Why are you so excited about Monikers?
+
+	Please read the bonobo/doc/Monikers document while I prepare
+	the full answer.
+
+@Q: How can I write my own moniker?
+
+@Q: Show me some examples.
+
+@Q: What is the POA?
+
+@Q: Should I use the Bonobo "base classes"?
+
+@Q: The memory management issues seem complex.  What are the differences?
+
+@Q: What does OAF do?
+
+@Q: What is a name server?
+
+@Q: Why would I want to use a Name Server?
+
+@Q: I have my own needs for a name server, can I use it instead of yours?
+
+@Q: Where are component properties stored?
+
+@Q: What are the component properties?
+
+@Q: What kind of authentication system does Bonobo use for its objects?
+
+	Every CORBA object created by ORBit currently has an long and
+	unique id created from a random sequence.  To contact this
+	object it is necessary to have the full object reference in
+	order to dispatch a request to it (typically the object
+	reference is obtained from the name server, or you can get it
+	in a stringified version as an IOR). 
+
+	In the past, we used a cookie system that was attached to the
+	object profile list (in a fully CORBA standard way) and this
+	was used to authenticate the client and the server.
+
+@Q: I notice that a port is open in my computer for every application
+	that creates CORBA object is that insecure?
+
+	That port is created by ORBit to accept CORBA requests.
+	Before any request is processed by the ORB, the connection is
+	authenticated (either by the use of the cookie mechanism, or
+	because the IOR encodes a valid object reference). 
+
+	There are no known holes or exploits known on the incoming
+	request handler in ORBit and if you know of anyone, we would
+	love to fix that problem.
+
+@Q: Are communications between components in Bonobo encrypted?
+
+	We depend on the ORBit layer to do any kind of encryption of
+	the data.  The current version of ORBit does not use SSL or
+	any other secure transports, although patches for it are
+	available.
+
+	FIXME: where are these patches available from?
+
+	The next version of ORBit (ORBit2) will use OpenSSL to provide
+	encryption services.
+
+@Q: If communications are not encrypted, why do you support them?
+
+	We guaranttee that communications on the destkop are going to
+	be secure, as nobody on the network will be able to sniff on
+	your connections.  When you go over the network, then traffic
+	is not encrypted and it might be subject to sniffing.
+
+@Q: What is the problem with the standard C++ CORBA binding?
+
+@Q: What naming scheme should I use for my CORBA interfaces ?
+
+	If you are a GNOME/ project you need to register your
+GNOME/MyProject/ namespace, see bonobo/doc/NAMESPACE to see how
+these are allocated.
+
+	Otherwise, you should use a Java like namespacing scheme
+based on the DNS.
+
+	module Com {
+		module MyCompany {
+			module MyProduct {
+				interface MyInterface {
+				};
+			};
+		};
+	};
+
+@Q: How should I create unique OAFIIDs for components ?
+
+	There are two ways to do this. Firstly, those projects with a
+defined namespace that implement new interfaces. To create an OAFIID
+simply take your namespace, and with delimiting '_' create an IID
+within your own defined space eg.
+
+	OAFIID:GNOME_Evolution_Calendar_iTip_Factory
+	OAFIID:Com_MyCompany_MyProduct_Control
+
+	A suffix of the main function of the instance eg. _Control,
+_Factory, _Embeddable etc. is encouraged for clarity.
+
+	The second method for generating OAFIIDs is appropriate for
+small components that implement no new interfaces, and hence need no
+special namespace co-ordination. Namespace the initial portion as a
+category grouping eg.
+
+OAFIID:GNOME_Panel_Applet_yetanotherclock:
+
+	and add a UUID generated from the uuidgen application at the
+end to garentee uniqueness.
+
+@Q: What should I call my oaf / UI / IDL file ?
+
+	The name of your oaf file should be based on your portion
+of the namespace, eg.
+
+	GNOME_Evolution_Calendar.oaf
+	Com_MyCompany_MyProduct.oaf
+
+	This ensures that there will be no conflicts installing
+oaf files into a common directory.
+
+@Q: How should I name my CORBA methods ?
+
+	CORBA methods should be named using mixed caps, following a
+convention similar to that of Java convention. ie. method names should
+be verbs or verb phrases in mixed case with the first leter lowercase
+and the first letter of any further words capitalized.
+
+interface MyInterface {
+
+	long  getLength ();
+	void  setLength (in long l);
+
+	/* the ByName qualifier is a useful disambiguator */
+	long  getValueByName (in string name);
+
+	/* Factory methods should be named createWhatever */
+	Bonobo::Unknown createObject ();
+
+	/* Methods that test boolean conditions */
+	boolean isDirty ();
+	boolean hasLongLegs ();
+
+	/* Mutator methods */	
+	string toString ();
+	double toDouble ();
+
+	/* Signals */
+	oneway void notifyRename ();
+
+	/* Calculate a number of types */
+	long countObjects (in Type t);
+};
+
+	With acroyms we fully capitalize eg. getURI, with abbreviations
+and contractions we capitalize the first letter eg. setDoc setId.
+cf. http://java.sun.com/docs/books/jls/html/6.doc.html#11186
+
+@Q: How should I name attributes and structure members ?
+
+	Again, use a Java-like convention eg.
+
+	struct MyStructure {
+		string theName;
+		long   heightInInches;
+	};
+
+@Q: Why when I do a gtk_widget_show_all does my Control not show up ?
+
+	The gtk_widget_show_all should not propagate over the plug /
+socket boundary, you need to ensure that you do a gtk_widget_show on
+your control. You can of course do shows / hides on the BonoboWidget
+( the server side ) to show or hide the control.
+
+	This also means that as a component author, you are protected
+from people messing with your internal show / hide logic.
+
+@Q: Support Transactions?
+@Q: A GUI for defining component properties?
+
+CORBA:
+
+	Is CORBA slow?
+
+	Is CORBA bloated?
+
+	I heard CORBA is unstable.
+
+	What is better?  COM or CORBA?
+
+	
+	Why not use the XX binding/The C binding is ugly.
+
+	I do not want to check for errors.
+
+	What is wrong with:
+		check_connection(server_handle);
+		do_remote_op (server_handle);
+
+	MEmorymanagement of CORBA object references.
+
+	Is there a CORBA implementation for language XXX?
+
+General:
+
+	What is reference counting?
+
+Tips and Hints:
+
+	Designing interfaces: local vs remote.  Just enough encapsulation.
+
+@Q: Aren't Monikers just a re-implementation of the GNOME VFS?  Why not use the GNOME VFS?
+
+	For a storage backend you can always use something like
+	bonobo_storage_new ("gnome-vfs") and get away with life.
+	
+	The main difference between the gnome-vfs, and monikers is
+	that monikers are used to implement an object-based name
+	space, while the gnome-vfs is a fine abstraction for naming
+	files and directories.  The moniker space goes well beyond
+	this.
+	
+	When Ettore, Nat and I designed the GNOME VFS in Paris Ettore
+	had a grander vision than Nat and I had.  Nat and I wanted
+	exactly what the GNOME VFS is: an asyncronous, pluggable
+	virtual file system implementation.  Ettore wanted something
+	more general, something that would implement an object name
+	space.  And some of the design decisions in the core of the
+	gnome-vfs reflect some of this thinking, but the API and the
+	infrastructure was limited to handling files.
+	
+	Various months later, we finally understood completely the
+	moniker system, and we realized that monikers were an object
+	naming space, and that if done correctly monikers would be
+	able to implement Ettore's initial vision for having an
+	object-based naming space.
+
+@Q: When I run my program loads of daemons start and don't stop, why ?
+
+	When you activate a Bonobo server the oaf daemon starts, this
+parses all your oafinfo files and then can respond to activation
+requests and queries.
+
+	The first access latency in this case is relatively high, the
+second access is extremely quick, consequently it is advantageous to
+leave the oafd process running on a GNOME system. Eventualy many of
+the GNOME desktop services will be using oaf regularly, making
+unloading it wasteful.
+
+	Most people are happy to have many daemons running on their
+machine - kswapd for example, or perhaps umpteen idle copies of
+mingetty - these are left running for performance reasons, and have a
+negligable impact on system performance.
+
+	Finally, patches are welcome to add a _user configurable_
+timeout and die option for those that begrudge the couple of Mb (
+including all dependant shlibs ) to oafd. The command oaf-slay can be
+used to kill all oaf servers at any time and one can profitably look
+for memory savings elsewhere.
+

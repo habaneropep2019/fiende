@@ -1,0 +1,98 @@
+#!/bin/sh
+
+# The user can specify his prefered WM by setting the WINDOW_MANAGER
+# environment variable.
+#
+# If this is not set, we search a list of known windowmanagers and use
+# the first one that is found in the users's PATH
+#
+
+# sm-client-id value
+SMID=
+# default-wm value
+DEFWM=
+
+#read in the arguments
+GET=
+for n in "$@" ; do
+  case "$GET" in
+    smid)
+      SMID=$n
+      GET=
+      ;;
+    defwm)
+      DEFWM=$n
+      GET=
+      ;;
+    *)
+      case "$n" in
+        --sm-client-id)
+          GET=smid
+          ;;
+        --default-wm)
+          GET=defwm
+          ;;
+      esac
+      ;;
+  esac
+done
+
+# WINDOW_MANAGER overrides all
+
+OLDIFS=$IFS
+IFS=":"
+if [ -z "$WINDOW_MANAGER" ] ; then
+  if [ -z "$DEFWM" -o "x$DEFWM" = "xgnome-wm" ]; then
+    for wm in sawfish sawmill enlightenment icewm wmaker fvwm2 qvwm fvwm twm kwm ; do
+      for dir in $PATH ; do
+	if [ -x "$dir/$wm" ] ; then
+	  WINDOW_MANAGER="$dir/$wm"
+    	  break 2
+	fi
+      done
+    done
+  else
+    WINDOW_MANAGER=$DEFWM
+  fi
+fi
+IFS=$OLDIFS
+
+# If no window manager can be found, we default to xterm
+
+if [ -z "$WINDOW_MANAGER" ] ; then
+  echo "WARNING: No window manager can be found."
+  WINDOW_MANAGER=xterm
+fi
+
+# Now create options OPT1 and OPT2 based on the windowmanager used
+OPT1=
+OPT2=
+if [ ! -z "$SMID" ] ; then
+  case `basename $WINDOW_MANAGER` in
+    sawfish|sawmill)
+      OPT1=--sm-client-id=$SMID
+      ;;
+    enlightenment|twm)
+      OPT1=-clientId
+      OPT2=$SMID
+      ;;
+    #FIXME: add all other windowmanagers here with their proper options
+  esac
+fi
+
+# Store the selected WM so the wm-properties-capplet can find it
+
+if [ ! -d $HOME/.gnome ] ; then
+  mkdir $HOME/.gnome
+  chmod 700 $HOME/.gnome
+fi
+
+rm -f $HOME/.gnome/default.wm
+cat > $HOME/.gnome/default.wm <<EOF
+[Default]
+WM=$WINDOW_MANAGER
+EOF
+
+exec $WINDOW_MANAGER $OPT1 $OPT2
+
+echo "ERROR: No window manager could run!"

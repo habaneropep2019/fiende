@@ -1,0 +1,138 @@
+Name:		 bonobo
+Summary:	 Library for compound documents in GNOME
+Version: 	 @VERSION@
+Release: 	 1_gpp
+License: 	 GPL
+Group:		 System Environment/Libraries
+Source: 	 ftp://ftp.gnome.org/pub/GNOME/stable/sources/%{name}/%{name}-%{version}.tar.gz
+URL: 		 http://www.gnome.org/
+BuildRoot:	 /var/tmp/%{name}-%{version}-root
+Requires:	 gnome-libs >= 1.2.7
+Requires:	 ORBit >= 0.5.7
+Requires:	 oaf >= 0.6.2
+Requires:	 libxml >= 1.8.10
+BuildRequires:   gdk-pixbuf-devel >= 0.6.0
+BuildRequires:   ORBit-devel >= 0.5.7
+BuildRequires:   gtk+-devel >= 1.2.0
+BuildRequires:   gnome-libs-devel >= 1.2.7
+BuildRequires:   oaf-devel >= 0.6.2
+BuildRequires:   libxml-devel >= 1.8.10
+BuildRequires:   gnome-print-devel >= 0.16
+
+%description
+Bonobo is a library that provides the necessary framework for GNOME
+applications to deal with compound documents, i.e. those with a
+spreadsheet and graphic embedded in a word-processing document.
+
+%package devel
+Summary:	Libraries and include files for the Bonobo document model
+Group:		Development/Libraries
+Requires:	%name = %{version}
+
+%description devel
+This package provides the necessary development libraries and include
+files to allow you to develop programs using the Bonobo document model.
+
+%prep
+%setup -q
+
+%build
+
+LC_ALL=""
+LINGUAS=""
+LANG=""
+export LC_ALL LINGUAS LANG
+
+CFLAGS="$RPM_OPT_FLAGS" ./configure $MYARCH_FLAGS --prefix=%{_prefix} \
+    --sysconfdir=%{_sysconfdir} --libdir=%{_libdir} \
+    --includedir=%{_includedir} --bindir=%{_bindir} \
+    --datadir=%{_datadir}
+
+if [ "$SMP" != "" ]; then
+    (make "MAKE=make -k -j $SMP"; exit 0)
+    make
+else
+    make -k
+fi
+
+%install
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+make -k prefix=$RPM_BUILD_ROOT/%{_prefix} \
+    sysconfdir=$RPM_BUILD_ROOT/%{_sysconfdir} \
+    libdir=$RPM_BUILD_ROOT/%{_libdir} \
+    includedir=$RPM_BUILD_ROOT/%{_includedir} \
+    bindir=$RPM_BUILD_ROOT/%{_bindir} \
+    datadir=$RPM_BUILD_ROOT/%{_datadir} install
+
+
+%clean
+[ -n "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+%post -p /sbin/ldconfig
+  
+%postun -p /sbin/ldconfig
+
+%files
+%defattr(-, root, root)
+%{_bindir}/*
+%{_libdir}/pkgconfig/*
+%dir %{_libdir}/bonobo
+%dir %{_libdir}/bonobo/monikers
+%{_libdir}/bonobo/monikers/*.so.*
+%{_libdir}/*.so.*
+%doc AUTHORS COPYING COPYING.LIB ChangeLog NEWS README
+%{_datadir}/bonobo
+%{_datadir}/idl/*
+%{_datadir}/locale/*/*/*
+#{_datadir}/mime-info/*.keys
+%{_datadir}/oaf/*
+%{_datadir}/gnome/ui
+
+%files devel
+
+%defattr(-, root, root)
+%{_includedir}/*
+%{_libdir}/*a
+%{_libdir}/*.so
+%{_libdir}/*.sh
+%{_libdir}/bonobo/plugin
+%{_libdir}/bonobo/monikers/*.so
+%{_libdir}/bonobo/monikers/*a
+
+
+%changelog
+* Thu May 24 2001 Gregory Leblanc <gleblanc@localhost.localdomain>
+- removed unnecessary %defines
+- lots of work on %files
+- made %setup quiet
+- fixed %post
+- replaced copyright with license
+- reformatted BuildRequires
+
+* Wed Feb 21 2001 Gregory Leblanc <gleblanc@cu-portland.edu>
+- fixed macros and hard-coded paths.  Should be very portable now.
+
+* Wed Oct 18 2000 Eskil Heyn Olsen <eskil@eazel.com>
+- Added requirements to the base package
+- Added bonobo-ui-extract to the file list of the base pacakge
+
+* Tue Feb 22 2000 Jens Finke <jens.finke@informatik.uni-oldenburg.de>
+- Added bonobo.h to the file list of devel package.
+
+* Wed Nov 10 1999 Alexander Skwar <ASkwar@DigitalProjects.com>
+- Updated to version 0.5
+- fixed spec file
+- Un-quiet things
+- stripped binaries
+- unsetted language environment variables
+
+* Sat Oct 2 1999 Gregory McLean <gregm@comstar.net>
+- Updated the spec for version 0.4
+- Updated the files section.
+
+* Sun Aug 1 1999 Gregory McLean <gregm@comstar.net>
+- Some updates. sysconfdir stuff, quiet down the prep/configure stage.
+
+* Sat May 1 1999 Erik Walthinsen <omega@cse.ogi.edu>
+- created spec file

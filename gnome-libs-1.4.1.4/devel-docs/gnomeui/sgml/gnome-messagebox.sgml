@@ -1,0 +1,299 @@
+<refentry id="GnomeMessageBox">
+<refmeta>
+<refentrytitle>GnomeMessageBox</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeMessageBox</refname><refpurpose>Message box display routines</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeMessageBox-struct">GnomeMessageBox</link>;
+#define     <link linkend="GNOME-MESSAGE-BOX-INFO-CAPS">GNOME_MESSAGE_BOX_INFO</link>
+#define     <link linkend="GNOME-MESSAGE-BOX-WARNING-CAPS">GNOME_MESSAGE_BOX_WARNING</link>
+#define     <link linkend="GNOME-MESSAGE-BOX-ERROR-CAPS">GNOME_MESSAGE_BOX_ERROR</link>
+#define     <link linkend="GNOME-MESSAGE-BOX-QUESTION-CAPS">GNOME_MESSAGE_BOX_QUESTION</link>
+#define     <link linkend="GNOME-MESSAGE-BOX-GENERIC-CAPS">GNOME_MESSAGE_BOX_GENERIC</link>
+struct      <link linkend="GnomeMessageBoxButton">GnomeMessageBoxButton</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-message-box-new">gnome_message_box_new</link>           (const <link linkend="gchar">gchar</link> *message,
+                                             const <link linkend="gchar">gchar</link> *messagebox_type,
+                                             ...);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-message-box-newv">gnome_message_box_newv</link>          (const <link linkend="gchar">gchar</link> *message,
+                                             const <link linkend="gchar">gchar</link> *messagebox_type,
+                                             const <link linkend="gchar">gchar</link> **buttons);
+void        <link linkend="gnome-message-box-set-modal">gnome_message_box_set_modal</link>     (<link linkend="GnomeMessageBox">GnomeMessageBox</link> *messagebox);
+void        <link linkend="gnome-message-box-set-default">gnome_message_box_set_default</link>   (<link linkend="GnomeMessageBox">GnomeMessageBox</link> *messagebox,
+                                             <link linkend="gint">gint</link> button);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBin">GtkBin</link>
+                     +----<link linkend="GtkWindow">GtkWindow</link>
+                           +----<link linkend="GnomeDialog">GnomeDialog</link>
+                                 +----GnomeMessageBox
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    The <link linkend="GnomeMessageBox">GnomeMessageBox</link> widget creates dialog boxes (of type
+    <link linkend="GnomeDialog">GnomeDialog</link>) that contain a severity level (indicated by an icon
+    and a title), a message to be displayed and a list of buttons that
+    will be in the dialog.  
+  </para>
+
+  <para>
+    The programmer will use strings desired for each button.  If the
+    strings are any of the GNOME_STOCK macros, then instead of
+    creating a button with the text, the button will be a GNOME stock
+    button with a stock icon.
+  </para>
+  
+  <para>
+    The list of known types for message boxes are:
+    <literal>GNOME_MESSAGE_BOX_INFO</literal>, <literal>GNOME_MESSAGE_BOX_WARNING</literal>,
+    <literal>GNOME_MESSAGE_BOX_ERROR</literal>, <literal>GNOME_MESSAGE_BOX_QUESTION</literal> and
+    <literal>GNOME_MESSAGE_BOX_GENERIC</literal>.  
+  </para>
+
+  <para>
+    Here is an example that informs the user of an error:
+
+    <programlisting>
+      GtkWidget *error_dialog;
+      int ret;
+      
+      error_dialog = gnome_message_box_new (
+              "Wrong password",
+              GNOME_MESSAGE_BOX_ERROR,
+              "Retry", "Ignore",
+              NULL);
+      ret = gnome_dialog_run (GNOME_DIALOG (error_dialog));
+      switch (ret){
+             case 0:
+                    <link linkend="do-retry">do_retry</link>();
+                    break;
+             case 1:
+                    <link linkend="do-ignore">do_ignore</link>()
+                    break;
+             default:
+                    /* User closed dialog with window manager,
+                     * assume "ignore"
+                     */
+                    <link linkend="do-ignore">do_ignore</link>();
+                    break;
+      }
+    </programlisting>
+
+    This other example uses stock buttons:
+
+    <programlisting>
+      GtkWidget *yes_no_dialog;
+      int ret;
+      
+      yes_no_dialog = gnome_message_box_new (
+              "Do you want to make a chocolate cake?",
+              GNOME_MESSAGE_BOX_QUESTION,
+              GNOME_STOCK_BUTTON_YES,
+              GNOME_STOCK_BUTTON_NO,
+              NULL);
+      ret = gnome_dialog_run (GNOME_DIALOG (yes_no_dialog));
+      switch (ret){
+             case 0:
+                    <link linkend="make-chocolate-cake">make_chocolate_cake</link>();
+                    break;
+             case 1:
+                    /* User does not desire chocolate cake *./
+                    break;
+             default:
+                    /*
+		     * User closed dialog with window manager,
+                     * assume he is not into chocolate cake.
+                     */
+                    <link linkend="do-ignore">do_ignore</link>();
+                    break;
+      }
+    </programlisting>
+  </para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeMessageBox-struct">struct GnomeMessageBox</title>
+<programlisting>struct GnomeMessageBox;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MESSAGE-BOX-INFO-CAPS">GNOME_MESSAGE_BOX_INFO</title>
+<programlisting>#define GNOME_MESSAGE_BOX_INFO      "info"
+</programlisting>
+  <para>
+    Use this macro for displaying an informational message.
+  </para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MESSAGE-BOX-WARNING-CAPS">GNOME_MESSAGE_BOX_WARNING</title>
+<programlisting>#define GNOME_MESSAGE_BOX_WARNING   "warning"
+</programlisting>
+  <para>
+    Use this macro for displaying a warning message.
+  </para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MESSAGE-BOX-ERROR-CAPS">GNOME_MESSAGE_BOX_ERROR</title>
+<programlisting>#define GNOME_MESSAGE_BOX_ERROR     "error"
+</programlisting>
+  <para>
+    Use this macro for displaying an error message.
+  </para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MESSAGE-BOX-QUESTION-CAPS">GNOME_MESSAGE_BOX_QUESTION</title>
+<programlisting>#define GNOME_MESSAGE_BOX_QUESTION  "question"
+</programlisting>
+  <para>
+    Use this macro when you want to query the user for information. 
+  </para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-MESSAGE-BOX-GENERIC-CAPS">GNOME_MESSAGE_BOX_GENERIC</title>
+<programlisting>#define GNOME_MESSAGE_BOX_GENERIC   "generic"
+</programlisting>
+<para>
+    Use this macro if none of the other message box types apply.
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeMessageBoxButton">struct GnomeMessageBoxButton</title>
+<programlisting>struct GnomeMessageBoxButton;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-message-box-new">gnome_message_box_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_message_box_new           (const <link linkend="gchar">gchar</link> *message,
+                                             const <link linkend="gchar">gchar</link> *messagebox_type,
+                                             ...);</programlisting>
+<para>
+Creates a dialog box of type <parameter>message_box_type</parameter> with <parameter>message</parameter>.  A number
+of buttons are inserted on it.  You can use the GNOME stock identifiers
+to create gnome-stock-buttons.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>message</parameter>&nbsp;:</entry>
+<entry> The message to be displayed.
+</entry></row>
+<row><entry align="right"><parameter>messagebox_type</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry> A NULL terminated list of strings to use in each button.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a widget that has the dialog box.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-message-box-newv">gnome_message_box_newv ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_message_box_newv          (const <link linkend="gchar">gchar</link> *message,
+                                             const <link linkend="gchar">gchar</link> *messagebox_type,
+                                             const <link linkend="gchar">gchar</link> **buttons);</programlisting>
+<para>
+Creates a dialog box of type <parameter>message_box_type</parameter> with <parameter>message</parameter>.  A number
+of buttons are inserted on it, the messages come from the <parameter>buttons</parameter> array.
+You can use the GNOME stock identifiers to create gnome-stock-buttons.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>message</parameter>&nbsp;:</entry>
+<entry> The message to be displayed.
+</entry></row>
+<row><entry align="right"><parameter>messagebox_type</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>buttons</parameter>&nbsp;:</entry>
+<entry> a NULL terminated array with the buttons to insert.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a widget that has the dialog box.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-message-box-set-modal">gnome_message_box_set_modal ()</title>
+<programlisting>void        gnome_message_box_set_modal     (<link linkend="GnomeMessageBox">GnomeMessageBox</link> *messagebox);</programlisting>
+<para>
+Deprecated. Use <function><link linkend="gtk-window-set-modal">gtk_window_set_modal</link>()</function>.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>messagebox</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-message-box-set-default">gnome_message_box_set_default ()</title>
+<programlisting>void        gnome_message_box_set_default   (<link linkend="GnomeMessageBox">GnomeMessageBox</link> *messagebox,
+                                             <link linkend="gint">gint</link> button);</programlisting>
+<para>
+Deprecated. Use <function><link linkend="gnome-dialog-set-modal">gnome_dialog_set_modal</link>()</function>.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>messagebox</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>button</parameter>&nbsp;:</entry>
+<entry>
+<!--
+Local variables:
+mode: sgml
+sgml-parent-document: ("../gnomeui-docs.sgml" "book" "sect1" "")
+End:
+-->
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+  <para>
+    <link linkend="GnomeDialog">GnomeDialog</link>
+  </para>
+</refsect1>
+
+</refentry>

@@ -1,0 +1,552 @@
+<refentry id="bonobo-bonobo-widget">
+<refmeta>
+<refentrytitle>BonoboWidget</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboWidget</refname><refpurpose>Simplified embedding of widgets in Bonobo.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboWidget-struct">BonoboWidget</link>;
+typedef     <link linkend="BonoboWidgetClass">BonoboWidgetClass</link>;
+<link linkend="BonoboObjectClient">BonoboObjectClient</link>* <link linkend="bonobo-widget-get-server">bonobo_widget_get_server</link>
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);
+<link linkend="BonoboWidget">BonoboWidget</link>* <link linkend="bonobo-widget-construct-control">bonobo_widget_construct_control</link>
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw,
+                                             const char *moniker,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);
+<link linkend="BonoboWidget">BonoboWidget</link>* <link linkend="bonobo-widget-construct-control-from-objref">bonobo_widget_construct_control_from_objref</link>
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw,
+                                             <link linkend="Bonobo-Control">Bonobo_Control</link> control,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-widget-new-control">bonobo_widget_new_control</link>       (const char *moniker,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-widget-new-control-from-objref">bonobo_widget_new_control_from_objref</link>
+                                            (<link linkend="Bonobo-Control">Bonobo_Control</link> control,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);
+<link linkend="BonoboControlFrame">BonoboControlFrame</link>* <link linkend="bonobo-widget-get-control-frame">bonobo_widget_get_control_frame</link>
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-widget-new-subdoc">bonobo_widget_new_subdoc</link>        (const char *moniker,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);
+<link linkend="BonoboItemContainer">BonoboItemContainer</link>* <link linkend="bonobo-widget-get-container">bonobo_widget_get_container</link>
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);
+<link linkend="BonoboClientSite">BonoboClientSite</link>* <link linkend="bonobo-widget-get-client-site">bonobo_widget_get_client_site</link>
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);
+<link linkend="BonoboViewFrame">BonoboViewFrame</link>* <link linkend="bonobo-widget-get-view-frame">bonobo_widget_get_view_frame</link>
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);
+<link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> <link linkend="bonobo-widget-get-uih">bonobo_widget_get_uih</link>    (<link linkend="BonoboWidget">BonoboWidget</link> *bw);
+<link linkend="Bonobo-Unknown">Bonobo_Unknown</link> <link linkend="bonobo-widget-get-objref">bonobo_widget_get_objref</link>     (<link linkend="BonoboWidget">BonoboWidget</link> *bw);
+void        <link linkend="bonobo-widget-set-property">bonobo_widget_set_property</link>      (<link linkend="BonoboWidget">BonoboWidget</link> *control,
+                                             const char *first_prop,
+                                             ...);
+void        <link linkend="bonobo-widget-get-property">bonobo_widget_get_property</link>      (<link linkend="BonoboWidget">BonoboWidget</link> *control,
+                                             const char *first_prop,
+                                             ...);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  Bonobo component embedding for hydrocephalic imbeciles.
+</para>
+
+<para>
+  Pure cane sugar.
+</para>
+
+<para>
+  This purpose of BonoboWidget is to make container-side use of Bonobo
+  as easy as pie.  This widget has two functions:
+  <orderedlist>
+    <listitem>
+      <para>
+        Provide a simple wrapper for embedding a single-view
+        subdocument.  In this case, BonoboWidget handles creating the
+        embeddable, binding it to a local BonoboClientSite, creating a
+        view for it, and displaying the view.  You can use the
+        accessor functions (bonobo_widget_get_view_frame, etc) to get
+        at the actual Bonobo objects which underlie the whole process.
+      </para>
+
+      <para>
+        In order to do this, just call:
+        <informalexample>
+          <programlisting>
+	bw = bonobo_widget_new_subdoc ("id of subdoc embeddable", top_level_uihandler);
+          </programlisting>
+        </informalexample>
+
+        And then insert the 'bw' widget into the widget tree of your application like so:
+        <informalexample>
+          <programlisting>
+	gtk_container_add (some_container, bw);
+          </programlisting>
+        </informalexample>
+      </para>
+        
+      <para>
+        You are free to make the UIContainer argument to
+        <link linkend="bonobo-widget-new-subdoc">bonobo_widget_new_subdoc</link>() be CORBA_OBJECT_NIL.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        Provide a simple wrapper for embedding Controls.  Embedding
+        controls is already really easy, but BonoboWidget reduces the
+        work from about 5 lines to 1.  To embed a given control, just
+        do:
+        <informalexample>
+          <programlisting>
+       bw = bonobo_widget_new_control ("id for control");
+       gtk_container_add (some_container, bw);
+          </programlisting>
+        </informalexample>
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        To provide an extremely simple wrapper for using Monikers. In
+      fact all BonoboWidget use uses the OAFIID: moniker to activate
+      its sub-components. However monikers (<link linkend="bonobo-moniker-util">bonobo-moniker-util</link>) are
+      far more powerful than this:
+        <informalexample>
+          <programlisting>
+	         bw = bonobo_widget_new_control ("file:/demo/a.jpeg");
+          </programlisting>
+        </informalexample>
+	will launch an application that can render a jpeg as a control,
+      usualy the Eye Of Gnome (EOG), and embed it as a control.
+      </para>
+    </listitem>
+  </orderedlist>
+</para>
+
+<para>
+   There are also functions for fetching and setting values in the
+   Control PropertyBag, but the use of these functions is
+   discouraged. 
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboWidget-struct">struct BonoboWidget</title>
+<programlisting>struct BonoboWidget;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboWidgetClass">BonoboWidgetClass</title>
+<programlisting>typedef struct {
+	GtkBinClass	 bin_class;
+} BonoboWidgetClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-get-server">bonobo_widget_get_server ()</title>
+<programlisting><link linkend="BonoboObjectClient">BonoboObjectClient</link>* bonobo_widget_get_server
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboObjectClient (a wrapper for the CORBA object
+reference) to the object that this BonoboWidget is wrapping. 
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-construct-control">bonobo_widget_construct_control ()</title>
+<programlisting><link linkend="BonoboWidget">BonoboWidget</link>* bonobo_widget_construct_control
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw,
+                                             const char *moniker,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);</programlisting>
+<para>
+This is a constructor function.  Only usable for wrapping and
+derivation of new objects.  For normal use, please refer to
+<link linkend="bonobo-widget-new-control">bonobo_widget_new_control</link>.
+</para>
+<para>
+This function will unref the passed in <parameter>bw</parameter> in case it cannot launch
+the component and return <literal>NULL</literal> in such a case.  Otherwise it returns
+the <parameter>bw</parameter> itself.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry> A BonoboWidget to construct
+</entry></row>
+<row><entry align="right"><parameter>moniker</parameter>&nbsp;:</entry>
+<entry> A Moniker describing the object to be activated 
+</entry></row>
+<row><entry align="right"><parameter>uic</parameter>&nbsp;:</entry>
+<entry> Bonobo_UIContainer for the launched object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A <link linkend="BonoboWidget">BonoboWidget</link> or <literal>NULL</literal>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-construct-control-from-objref">bonobo_widget_construct_control_from_objref ()</title>
+<programlisting><link linkend="BonoboWidget">BonoboWidget</link>* bonobo_widget_construct_control_from_objref
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw,
+                                             <link linkend="Bonobo-Control">Bonobo_Control</link> control,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);</programlisting>
+<para>
+This is a constructor function.  Only usable for wrapping and
+derivation of new objects.  For normal use, please refer to
+<link linkend="bonobo-widget-new-control-from-objref">bonobo_widget_new_control_from_objref</link>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry> A BonoboWidget to construct
+</entry></row>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A CORBA Object reference to an IDL:Bonobo/Control:1.0
+</entry></row>
+<row><entry align="right"><parameter>uic</parameter>&nbsp;:</entry>
+<entry> Bonobo_UIContainer for the launched object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A <link linkend="BonoboWidget">BonoboWidget</link> (the <parameter>bw</parameter>)
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-new-control">bonobo_widget_new_control ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_widget_new_control       (const char *moniker,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);</programlisting>
+<para>
+This function is a simple wrapper for easily embedding controls
+into applications.  It will launch the component identified by <parameter>id</parameter>
+and will return it as a GtkWidget.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>moniker</parameter>&nbsp;:</entry>
+<entry> A Moniker describing the object to be activated 
+</entry></row>
+<row><entry align="right"><parameter>uic</parameter>&nbsp;:</entry>
+<entry> Bonobo_UIContainer for the launched object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A <link linkend="GtkWidget">GtkWidget</link> that is bound to the Bonobo Control. 
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-new-control-from-objref">bonobo_widget_new_control_from_objref ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_widget_new_control_from_objref
+                                            (<link linkend="Bonobo-Control">Bonobo_Control</link> control,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);</programlisting>
+<para>
+This function is a simple wrapper for easily embedding controls
+into applications.  This function is used when you have already
+a CORBA object reference to an IDL:Bonobo/Control:1.0 (the
+<parameter>control</parameter>) argument.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A CORBA Object reference to an IDL:Bonobo/Control:1.0
+</entry></row>
+<row><entry align="right"><parameter>uic</parameter>&nbsp;:</entry>
+<entry> Bonobo_UIContainer for the launched object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the <parameter>control</parameter> wrapped as a <link linkend="GtkWidget">GtkWidget</link>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-get-control-frame">bonobo_widget_get_control_frame ()</title>
+<programlisting><link linkend="BonoboControlFrame">BonoboControlFrame</link>* bonobo_widget_get_control_frame
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);</programlisting>
+<para>
+Every IDL:Bonobo/Control:1.0 needs to be placed inside an
+IDL:Bonobo/ControlFrame:1.0.  This returns the BonoboControlFrame
+object that wraps the Control in the <parameter>bonobo_widget</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboControlFrame associated with the <parameter>bonobo_widget</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-new-subdoc">bonobo_widget_new_subdoc ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_widget_new_subdoc        (const char *moniker,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uic);</programlisting>
+<para>
+This function is a simple wrapper for easily embedding documents
+into applications.  It will launch the component identified by <parameter>id</parameter>
+and will return it as a GtkWidget.
+</para>
+<para>
+This will launch a single view of the embeddable activated by <parameter>moniker</parameter>.
+</para>
+<para>
+FIXME: this function should really be using <link linkend="bonobo-get-object">bonobo_get_object</link>() instead
+of <link linkend="bonobo-activate-object">bonobo_activate_object</link>() to launch the object.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>moniker</parameter>&nbsp;:</entry>
+<entry> A moniker description of the Object to be activated.
+</entry></row>
+<row><entry align="right"><parameter>uic</parameter>&nbsp;:</entry>
+<entry> Bonobo_UIContainer for the launched object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A <link linkend="GtkWidget">GtkWidget</link> that is bound to the Bonobo Control. 
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-get-container">bonobo_widget_get_container ()</title>
+<programlisting><link linkend="BonoboItemContainer">BonoboItemContainer</link>* bonobo_widget_get_container
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);</programlisting>
+<para>
+This operation is only valid for BonoboWidgets that were created
+by the <link linkend="bonobo-widget-new-subdoc">bonobo_widget_new_subdoc</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the BonoboItemContainer associated with this <parameter>bonobo_widget</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-get-client-site">bonobo_widget_get_client_site ()</title>
+<programlisting><link linkend="BonoboClientSite">BonoboClientSite</link>* bonobo_widget_get_client_site
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);</programlisting>
+<para>
+This operation is only valid for BonoboWidgets that were created
+by the <link linkend="bonobo-widget-new-subdoc">bonobo_widget_new_subdoc</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the <link linkend="BonoboClientSite">BonoboClientSite</link> associated with this <parameter>bonobo_widget</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-get-view-frame">bonobo_widget_get_view_frame ()</title>
+<programlisting><link linkend="BonoboViewFrame">BonoboViewFrame</link>* bonobo_widget_get_view_frame
+                                            (<link linkend="BonoboWidget">BonoboWidget</link> *bw);</programlisting>
+<para>
+This operation is only valid for BonoboWidgets that were created
+by the <link linkend="bonobo-widget-new-subdoc">bonobo_widget_new_subdoc</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The <link linkend="BonoboViewFrame">BonoboViewFrame</link> associated with this <parameter>bonobo_widget</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-get-uih">bonobo_widget_get_uih ()</title>
+<programlisting><link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> bonobo_widget_get_uih    (<link linkend="BonoboWidget">BonoboWidget</link> *bw);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the CORBA object reference to the Bonobo_UIContainer
+associated with the <parameter>bonobo_widget</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-get-objref">bonobo_widget_get_objref ()</title>
+<programlisting><link linkend="Bonobo-Unknown">Bonobo_Unknown</link> bonobo_widget_get_objref     (<link linkend="BonoboWidget">BonoboWidget</link> *bw);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bw</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-set-property">bonobo_widget_set_property ()</title>
+<programlisting>void        bonobo_widget_set_property      (<link linkend="BonoboWidget">BonoboWidget</link> *control,
+                                             const char *first_prop,
+                                             ...);</programlisting>
+<para>
+This is a utility function used to set a number of properties
+in the Bonobo Control in <parameter>control</parameter>.
+</para>
+<para>
+This function takes a variable list of arguments that must be NULL
+terminated.  Arguments come in tuples: a string (for the argument
+name) and the data type that is to be transfered.  The
+implementation of the actual setting of the PropertyBag values is
+done by the <link linkend="bonobo-property-bag-client-setv">bonobo_property_bag_client_setv</link>() function).
+</para>
+<para>
+FIXME: This function is error prone because it depends on the
+client and the server to agree on the data types to be sent.  If
+the server arguments change the data type, this routine will not
+be able to cope gracefully with this condition.
+</para>
+<para>
+This only works for BonoboWidgets that represent controls (ie,
+that were returned by <link linkend="bonobo-widget-new-control-from-objref">bonobo_widget_new_control_from_objref</link>() or
+<link linkend="bonobo-widget-new-control">bonobo_widget_new_control</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboWidget">BonoboWidget</link> that represents an IDL:Bonobo/Control:1.0
+</entry></row>
+<row><entry align="right"><parameter>first_prop</parameter>&nbsp;:</entry>
+<entry> first property name to set.
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-widget-get-property">bonobo_widget_get_property ()</title>
+<programlisting>void        bonobo_widget_get_property      (<link linkend="BonoboWidget">BonoboWidget</link> *control,
+                                             const char *first_prop,
+                                             ...);</programlisting>
+<para>
+This is a utility function used to get a number of properties
+in the Bonobo Control in <parameter>control</parameter>.
+</para>
+<para>
+This function takes a variable list of arguments that must be NULL
+terminated.  Arguments come in tuples: a string (for the argument
+name) and a pointer where the data will be stored.  The
+implementation of the actual setting of the PropertyBag values is
+done by the <link linkend="bonobo-property-bag-client-setv">bonobo_property_bag_client_setv</link>() function).
+</para>
+<para>
+FIXME: This function is error prone because it depends on the
+client and the server to agree on the data types to be sent.  If
+the server arguments change the data type, this routine will not
+be able to cope gracefully with this condition.
+</para>
+<para>
+This only works for BonoboWidgets that represent controls (ie,
+that were returned by <link linkend="bonobo-widget-new-control-from-objref">bonobo_widget_new_control_from_objref</link>() or
+<link linkend="bonobo-widget-new-control">bonobo_widget_new_control</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>control</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboWidget">BonoboWidget</link> that represents an IDL:Bonobo/Control:1.0
+</entry></row>
+<row><entry align="right"><parameter>first_prop</parameter>&nbsp;:</entry>
+<entry> first property name to set.
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+   Object activation happens with <link linkend="bonobo-get-object">bonobo_get_object</link>().
+</para>
+
+<para>
+   <link linkend="BonoboControl">BonoboControl</link>, <link linkend="BonoboControlFrame">BonoboControlFrame</link>, <link linkend="BonoboObject">BonoboObject</link>, <link linkend="BonoboView">BonoboView</link>,
+   <link linkend="BonoboEmbeddable">BonoboEmbeddable</link>, <link linkend="BonoboUIContainer">BonoboUIContainer</link>, <link linkend="BonoboItemContainer">BonoboItemContainer</link>. 
+</para>
+</refsect1>
+
+</refentry>

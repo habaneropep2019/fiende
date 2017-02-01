@@ -1,0 +1,464 @@
+<refentry id="GnomeApp">
+<refmeta>
+<refentrytitle>GnomeApp</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeApp</refname><refpurpose>The toplevel GNOME container</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeApp-struct">GnomeApp</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-app-new">gnome_app_new</link>                   (<link linkend="gchar">gchar</link> *appname,
+                                             char *title);
+void        <link linkend="gnome-app-construct">gnome_app_construct</link>             (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *appname,
+                                             char *title);
+#define     <link linkend="GNOME-APP-MENUBAR-NAME-CAPS">GNOME_APP_MENUBAR_NAME</link>
+#define     <link linkend="GNOME-APP-TOOLBAR-NAME-CAPS">GNOME_APP_TOOLBAR_NAME</link>
+void        <link linkend="gnome-app-set-menus">gnome_app_set_menus</link>             (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkMenuBar">GtkMenuBar</link> *menubar);
+void        <link linkend="gnome-app-set-toolbar">gnome_app_set_toolbar</link>           (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkToolbar">GtkToolbar</link> *toolbar);
+void        <link linkend="gnome-app-set-statusbar">gnome_app_set_statusbar</link>         (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkWidget">GtkWidget</link> *statusbar);
+void        <link linkend="gnome-app-set-contents">gnome_app_set_contents</link>          (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkWidget">GtkWidget</link> *contents);
+void        <link linkend="gnome-app-add-toolbar">gnome_app_add_toolbar</link>           (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkToolbar">GtkToolbar</link> *toolbar,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link> behavior,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="gint">gint</link> band_num,
+                                             <link linkend="gint">gint</link> band_position,
+                                             <link linkend="gint">gint</link> offset);
+void        <link linkend="gnome-app-add-docked">gnome_app_add_docked</link>            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link> behavior,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="gint">gint</link> band_num,
+                                             <link linkend="gint">gint</link> band_position,
+                                             <link linkend="gint">gint</link> offset);
+void        <link linkend="gnome-app-add-dock-item">gnome_app_add_dock_item</link>         (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="gint">gint</link> band_num,
+                                             <link linkend="gint">gint</link> band_position,
+                                             <link linkend="gint">gint</link> offset);
+void        <link linkend="gnome-app-enable-layout-config">gnome_app_enable_layout_config</link>  (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gboolean">gboolean</link> enable);
+<link linkend="GnomeDock">GnomeDock</link>*  <link linkend="gnome-app-get-dock">gnome_app_get_dock</link>              (<link linkend="GnomeApp">GnomeApp</link> *app);
+<link linkend="GnomeDockItem">GnomeDockItem</link>* <link linkend="gnome-app-get-dock-item-by-name">gnome_app_get_dock_item_by_name</link>
+                                            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             const <link linkend="gchar">gchar</link> *name);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBin">GtkBin</link>
+                     +----<link linkend="GtkWindow">GtkWindow</link>
+                           +----GnomeApp
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+
+<para>Toplevel GNOME applications would normally use one
+<type>GnomeApp</type> widget as their toplevel window.  You can create
+as many <type>GnomeApp</type> widgets as you want, for example, some
+people use one GnomeApp per document their application loads.</para>
+
+<para>Once you have created one instance of this widget, you would add
+your main application view information to this window by using
+<link linkend="gnome-app-set-contents">gnome_app_set_contents</link>() routine.</para>
+
+<para> The <type>GnomeApp</type> has support for including a menubar,
+one or more toolbars and a statusbar for your application. It also
+takes care of intalling the accelerators for you when used in
+conjuction with the gnome-app-helper routines.  The toolbars are
+inserted into <type>GnomeDock</type> widgets.</para>
+
+<para>The <filename>gnome-app-helper</filename> module provides
+various helper routines to simplify the configuration of your menus
+and toolbars, but you can create those yourself and use the
+<link linkend="gnome-app-set-menus">gnome_app_set_menus</link>(), <link linkend="gnome-app-add-toolbar">gnome_app_add_toolbar</link>(),
+<link linkend="gnome-app-set-toolbar">gnome_app_set_toolbar</link>(), <link linkend="gnome-app-add-dock-item">gnome_app_add_dock_item</link>(),
+and <link linkend="gnome-app-add-docked">gnome_app_add_docked</link>().</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeApp-struct">struct GnomeApp</title>
+<programlisting>struct GnomeApp;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-new">gnome_app_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_app_new                   (<link linkend="gchar">gchar</link> *appname,
+                                             char *title);</programlisting>
+<para>
+Create a new (empty) application window.  You must specify the
+application's name (used internally as an identifier).
+<parameter>title</parameter> can be left as NULL, in which case the window's title will
+not be set.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>appname</parameter>&nbsp;:</entry>
+<entry> Name of program, using in file names and paths.
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> Window title for application.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Pointer to new GNOME app object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-construct">gnome_app_construct ()</title>
+<programlisting>void        gnome_app_construct             (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gchar">gchar</link> *appname,
+                                             char *title);</programlisting>
+<para>
+Constructor for language bindings; you don't normally need this.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to newly-created GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>appname</parameter>&nbsp;:</entry>
+<entry> Name of program, using in file names and paths.
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> Window title for application.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOME-APP-MENUBAR-NAME-CAPS">GNOME_APP_MENUBAR_NAME</title>
+<programlisting>#define GNOME_APP_MENUBAR_NAME "Menubar"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-APP-TOOLBAR-NAME-CAPS">GNOME_APP_TOOLBAR_NAME</title>
+<programlisting>#define GNOME_APP_TOOLBAR_NAME "Toolbar"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-set-menus">gnome_app_set_menus ()</title>
+<programlisting>void        gnome_app_set_menus             (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkMenuBar">GtkMenuBar</link> *menubar);</programlisting>
+<para>
+Sets the menu bar of the application window.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>menubar</parameter>&nbsp;:</entry>
+<entry> Menu bar widget for main app window.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-set-toolbar">gnome_app_set_toolbar ()</title>
+<programlisting>void        gnome_app_set_toolbar           (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkToolbar">GtkToolbar</link> *toolbar);</programlisting>
+<para>
+Sets the main toolbar of the application window.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>toolbar</parameter>&nbsp;:</entry>
+<entry> Toolbar widget for main app window.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-set-statusbar">gnome_app_set_statusbar ()</title>
+<programlisting>void        gnome_app_set_statusbar         (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkWidget">GtkWidget</link> *statusbar);</programlisting>
+<para>
+Sets the status bar of the application window.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object
+</entry></row>
+<row><entry align="right"><parameter>statusbar</parameter>&nbsp;:</entry>
+<entry> Statusbar widget for main app window
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-set-contents">gnome_app_set_contents ()</title>
+<programlisting>void        gnome_app_set_contents          (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkWidget">GtkWidget</link> *contents);</programlisting>
+<para>
+Sets the content area of the GNOME app's main window.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Pointer to GNOME app object.
+</entry></row>
+<row><entry align="right"><parameter>contents</parameter>&nbsp;:</entry>
+<entry> Widget to be application content area.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-add-toolbar">gnome_app_add_toolbar ()</title>
+<programlisting>void        gnome_app_add_toolbar           (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkToolbar">GtkToolbar</link> *toolbar,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link> behavior,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="gint">gint</link> band_num,
+                                             <link linkend="gint">gint</link> band_position,
+                                             <link linkend="gint">gint</link> offset);</programlisting>
+<para>
+Create a new &amp;GnomeDockItem widget containing <parameter>toolbar</parameter>, and add it
+to <parameter>app</parameter>'s dock with the specified layout information.  Notice that,
+if automatic layout configuration is enabled, the layout is
+overridden by the saved configuration, if any.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A &amp;GnomeApp widget
+</entry></row>
+<row><entry align="right"><parameter>toolbar</parameter>&nbsp;:</entry>
+<entry> Toolbar to be added to <parameter>app</parameter>'s dock
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Name for the dock item that will contain <parameter>toolbar</parameter>
+</entry></row>
+<row><entry align="right"><parameter>behavior</parameter>&nbsp;:</entry>
+<entry> Behavior for the new dock item
+</entry></row>
+<row><entry align="right"><parameter>placement</parameter>&nbsp;:</entry>
+<entry> Placement for the new dock item
+</entry></row>
+<row><entry align="right"><parameter>band_num</parameter>&nbsp;:</entry>
+<entry> Number of the band where the dock item should be placed
+</entry></row>
+<row><entry align="right"><parameter>band_position</parameter>&nbsp;:</entry>
+<entry> Position of the new dock item in band <parameter>band_num</parameter>
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> Offset from the previous dock item in the band; if there is
+no previous item, offset from the beginning of the band.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-add-docked">gnome_app_add_docked ()</title>
+<programlisting>void        gnome_app_add_docked            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             const <link linkend="gchar">gchar</link> *name,
+                                             <link linkend="GnomeDockItemBehavior">GnomeDockItemBehavior</link> behavior,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="gint">gint</link> band_num,
+                                             <link linkend="gint">gint</link> band_position,
+                                             <link linkend="gint">gint</link> offset);</programlisting>
+<para>
+Add <parameter>widget</parameter> as a dock item according to the specified layout
+information.  Notice that, if automatic layout configuration is
+enabled, the layout is overridden by the saved configuration, if
+any.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A &amp;GnomeApp widget
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> Widget to be added to the &amp;GnomeApp
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Name for the new dock item
+</entry></row>
+<row><entry align="right"><parameter>behavior</parameter>&nbsp;:</entry>
+<entry> Behavior for the new dock item
+</entry></row>
+<row><entry align="right"><parameter>placement</parameter>&nbsp;:</entry>
+<entry> Placement for the new dock item
+</entry></row>
+<row><entry align="right"><parameter>band_num</parameter>&nbsp;:</entry>
+<entry> Number of the band where the dock item should be placed
+</entry></row>
+<row><entry align="right"><parameter>band_position</parameter>&nbsp;:</entry>
+<entry> Position of the new dock item in band <parameter>band_num</parameter>
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> Offset from the previous dock item in the band; if there is
+no previous item, offset from the beginning of the band.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-add-dock-item">gnome_app_add_dock_item ()</title>
+<programlisting>void        gnome_app_add_dock_item         (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="gint">gint</link> band_num,
+                                             <link linkend="gint">gint</link> band_position,
+                                             <link linkend="gint">gint</link> offset);</programlisting>
+<para>
+Add <parameter>item</parameter> according to the specified layout information.  Notice
+that, if automatic layout configuration is enabled, the layout is
+overridden by the saved configuration, if any.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A &amp;GnomeApp widget
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> Dock item to be added to <parameter>app</parameter>'s dock.
+</entry></row>
+<row><entry align="right"><parameter>placement</parameter>&nbsp;:</entry>
+<entry> Placement for the dock item
+</entry></row>
+<row><entry align="right"><parameter>band_num</parameter>&nbsp;:</entry>
+<entry> Number of the band where the dock item should be placed
+</entry></row>
+<row><entry align="right"><parameter>band_position</parameter>&nbsp;:</entry>
+<entry> Position of the dock item in band <parameter>band_num</parameter>
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> Offset from the previous dock item in the band; if there is
+no previous item, offset from the beginning of the band.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-enable-layout-config">gnome_app_enable_layout_config ()</title>
+<programlisting>void        gnome_app_enable_layout_config  (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             <link linkend="gboolean">gboolean</link> enable);</programlisting>
+<para>
+Specify whether <parameter>app</parameter> should automatically save the dock's
+layout configuration via gnome-config whenever it changes or not.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A &amp;GnomeApp widget
+</entry></row>
+<row><entry align="right"><parameter>enable</parameter>&nbsp;:</entry>
+<entry> Boolean specifying whether automatic configuration saving
+is enabled
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-get-dock">gnome_app_get_dock ()</title>
+<programlisting><link linkend="GnomeDock">GnomeDock</link>*  gnome_app_get_dock              (<link linkend="GnomeApp">GnomeApp</link> *app);</programlisting>
+<para>
+Retrieves the &amp;GnomeDock widget contained in the &amp;GnomeApp.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A &amp;GnomeApp widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The &amp;GnomeDock widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-app-get-dock-item-by-name">gnome_app_get_dock_item_by_name ()</title>
+<programlisting><link linkend="GnomeDockItem">GnomeDockItem</link>* gnome_app_get_dock_item_by_name
+                                            (<link linkend="GnomeApp">GnomeApp</link> *app,
+                                             const <link linkend="gchar">gchar</link> *name);</programlisting>
+<para>
+Retrieve the dock item whose name matches <parameter>name</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> A &amp;GnomeApp widget
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Name of the dock item to retrieve
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The retrieved dock item.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

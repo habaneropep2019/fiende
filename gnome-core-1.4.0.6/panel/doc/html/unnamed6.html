@@ -1,0 +1,352 @@
+<HTML
+><HEAD
+><TITLE
+>Advanced Menu Stuff</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The GNOME Panel Libraries"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="The Art of Applet Writing"
+HREF="unnamed1.html"><LINK
+REL="PREVIOUS"
+TITLE="The Applet's Context Menu"
+HREF="unnamed5.html"><LINK
+REL="NEXT"
+TITLE="Session Saving"
+HREF="unnamed10.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The GNOME Panel Libraries</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed5.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed10.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="UNNAMED6"
+>Advanced Menu Stuff</A
+></H1
+><P
+>	  It is also possible to have submenus, remove menus and use 
+	  gnome-stock icons on the menus.
+	</P
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="UNNAMED7"
+>Submenus</A
+></H2
+><P
+>	    To do submenus, you have to first call 
+	    applet_widget_register_callback_dir,
+	    which only takes the callback name and the menu text. The callback
+	     name should end with '/'.  The callback name works as a 
+	     &quot;path&quot; for the submenus.
+	   </P
+><P
+>	     So to add a submenu &quot;Foo&quot; and in item &quot;Bar&quot;
+	     (into the submenu &quot;Foo&quot;) you would do:
+
+	     <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN64"
+></A
+><P
+><B
+>Example 5. Adding a Submenu</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>applet_widget_register_callback_dir (APPLET_WIDGET (applet),
+                                     "foo",
+                                     _("Foo"));
+applet_widget_register_callback (APPLET_WIDGET (applet),
+                                 "foo/bar",
+                                 _("Bar"),
+                                 bar_callback,
+                                 NULL);
+	       </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+	   </P
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="UNNAMED8"
+>Deleting</A
+></H2
+><P
+>	    To delete a menu item, just call applet_widget_unregister_callback
+	    or applet_widget_unregister_callback_dir, with the proper callback
+	    name.
+          </P
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="UNNAMED9"
+>Stock Icons</A
+></H2
+><P
+>	    You use the _stock derivatives of the callback functions and pass
+	     an extra argument with the GNOME_STOCK_MENU_* type. For example
+	     to add an about menu item:
+
+	     <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN73"
+></A
+><P
+><B
+>Example 6. Adding Items with Stock Pixmaps</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>applet_widget_register_stock_callback(APPLET_WIDGET(applet),
+                                      "about",
+                                      GNOME_STOCK_MENU_ABOUT,
+                                      _("About..."),
+                                      about_cb,
+                                      NULL);
+	       </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+	  </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed5.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed10.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>The Applet's Context Menu</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Session Saving</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

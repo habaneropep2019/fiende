@@ -1,0 +1,278 @@
+/* $Id: pixmap.gen_h,v 1.67 2001/07/15 13:33:38 murrayc Exp $ */
+
+
+/* pixmap.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/misc.h>
+#include <gtk/gtkpixmap.h>
+#include <gtk--/base.h>
+CLASS_START(Gtk);
+//: A widget displaying a graphical image or icon.
+//- The {\class Gtk::Pixmap} widget displays a graphical image or icon.
+//-
+//- The pixels in a {\class Gtk::Pixmap} cannot be manipulated by the application
+//- after creation, since under the X Window system the pixel data is stored on
+//- the X server and so is not available to the client application. If you want
+//- to create graphical images which can be manipulated by the application, look
+//- at {\class Gtk::Image} and {\class Gdk::RGB}.
+class Pixmap : public Misc {
+  WRAP_CLASS(Pixmap,GtkPixmap,GTK_PIXMAP,GTK_IS_PIXMAP,pixmap,Gtk::Misc,GtkMisc,GTK_MISC);
+public:
+
+  //: Construct an empty pixmap.
+  //- Note that default constructor puts Pixmap objects to invalid
+  //- state and you should not show it or add it to containers
+  //- before you've set() the pixmap and mask for it.
+  Pixmap();
+
+  //: Load a pixmap form file.
+  Pixmap(const nstring &xpmfilename);
+
+  //: Create a pixmap from data.
+  //- data must live until Pixmap is realized
+  Pixmap(const gchar * const *data);
+
+  //: Create using specified {pixmap} and {mask}.
+  Pixmap(const Gdk_Pixmap &pixmap,
+	     const Gdk_Bitmap &mask);
+
+  WRAP_DTOR;
+
+  //: Set the {pixmap} and border {mask}.
+  WRAP_METHOD( 
+    void gtk_pixmap_set(GtkPixmap*,GdkPixmap*,GdkBitmap*),
+    void set(const Gdk_Pixmap &pixmap,
+	   const Gdk_Bitmap &mask));
+
+  void set(const gchar * const *data);
+  void set(const string &xpmfilename);
+
+  //: Get the {pixmap} and border {mask}.
+  //- works only following realization.
+  void get(Gdk_Pixmap &pixmap,
+	   Gdk_Bitmap &mask) const;
+
+  //: (Gtk 1.1) Build an special pixmap for insensitive states.
+  //- Setting this switch will cause Gtk to build a greyed out
+  //- version on the specified {pixmap}.
+  WRAP_METHOD(void gtk_pixmap_set_build_insensitive(GtkPixmap*, bool),
+	      void set_build_insensitive(bool build));
+  
+
+protected:
+  virtual void realize_impl();
+  void load_xpm();
+  void unset();
+
+  // These are not caches.
+  nstring xpm_file_name_;
+  const gchar * const *data_;
+};
+
+PRIVATE_START;
+#include <gtk--/private/misc_p.h>
+IMPL_START;
+#include <sys/stat.h>
+//#include <unistd.h>
+namespace Gtk
+{
+
+
+Pixmap::Pixmap() :
+  Misc((GtkMisc*)(gtk_object_new(get_type(),0))),
+  xpm_file_name_(0), data_(0)
+{
+  initialize_class();
+  gtkobj()->pixmap = 0;
+  gtkobj()->mask = 0;
+}
+
+Pixmap::Pixmap(const nstring &xpmfilename)
+  : Misc((GtkMisc*)(gtk_object_new(get_type(),0))),
+    xpm_file_name_(xpmfilename), data_(0)
+{
+  initialize_class();
+
+
+  struct stat dummyBuf;
+  
+  if(!xpmfilename.null() // if there's actually a filename
+     && stat(xpmfilename.gc_str(), &dummyBuf) == -1) // but the file doesn't exist
+    {
+      Gdk_Pixmap::warn_about_xpm_file_problem(xpmfilename); // whine
+      xpm_file_name_ = ""; // forget that pixmap file
+    }
+  gtkobj()->pixmap = 0;
+  gtkobj()->mask = 0;
+}
+
+Pixmap::Pixmap(const char * const *xpmdata)
+  : Misc((GtkMisc*)(gtk_object_new(get_type(),0))),
+    xpm_file_name_(0),data_(xpmdata)
+{
+  initialize_class();
+  gtkobj()->pixmap = 0;
+  gtkobj()->mask = 0;
+}
+
+Pixmap::Pixmap(const Gdk_Pixmap &val, const Gdk_Bitmap &mask)
+  :     Misc((GtkMisc*)(gtk_object_new(get_type(),0))),
+        xpm_file_name_(0),data_(0)
+{
+  initialize_class();
+  GtkPixmap *pixmap;
+
+  g_return_if_fail (val.connected());
+  pixmap = (GtkPixmap*)gtkobject;
+
+  gtk_pixmap_set (pixmap, val, mask);
+
+}
+
+void Pixmap::realize_impl()
+{
+  Misc::realize_impl();
+
+
+  if (gtkobj()->pixmap) return;  // is the pixmap is already created, bail.
+
+  load_xpm();
+}
+
+
+void Pixmap::load_xpm()
+{
+  Gdk_Bitmap bitmap;
+  GtkWidget *widget=Widget::gtkobj();
+
+  while (widget&&!widget->window)
+    widget=widget->parent;
+
+  g_return_if_fail (Widget::gtkobj()->style!=0);
+  g_return_if_fail (widget!=0);
+
+  Gdk_Window gdkwin=Gdk_Window(widget->window);
+  GtkStyle *style=Widget::gtkobj()->style;
+  Gdk_Pixmap pm = Gdk_Pixmap((GdkPixmap*)0);
+
+  if (xpm_file_name_.length()) {
+    pm.create_from_xpm(gdkwin,bitmap,
+                       Gdk_Color(&style->bg[GTK_STATE_NORMAL]),
+                       xpm_file_name_);
+
+    // We don't need to pm anymore since create_from_xpm will default
+    // to the internal default pixmap - note that this can happen only
+    // in the unlikely case a .xpm gets deleted between the Gtk_Pixmap
+    // construction and the actual realization of the widget - GL
+
+  } 
+  else 
+  {
+    if (!data_) 
+      data_ = Gdk_Pixmap::defaultPixmap;
+    pm.create_from_xpm_d(gdkwin,bitmap,Gdk_Color(&style->bg[GTK_STATE_NORMAL]),data_);
+  }
+
+  gtk_pixmap_set (gtkobj(), pm, bitmap);
+}
+
+Pixmap::Pixmap(GtkPixmap *castitem)
+  :     Misc(GTK_MISC(castitem)),
+        xpm_file_name_(0),data_(0)
+{
+  initialize_class();
+}
+
+void Pixmap::unset()
+{
+  if (gtkobj()->pixmap)
+    gdk_pixmap_unref (gtkobj()->pixmap);
+  if (gtkobj()->pixmap_insensitive)
+    gdk_pixmap_unref (gtkobj()->pixmap_insensitive);
+  if (gtkobj()->mask)
+    gdk_bitmap_unref (gtkobj()->mask);
+
+  gtkobj()->pixmap = 0;
+  gtkobj()->pixmap_insensitive = 0;
+  gtkobj()->mask = 0;
+}
+
+void Pixmap::set(const gchar * const *data)
+{
+  data_=data;
+  xpm_file_name_="";
+  if (is_realized())
+    load_xpm();
+  else
+    unset();
+}
+
+void Pixmap::set(const string &xpmfilename)
+{
+  data_=0;
+  xpm_file_name_=xpmfilename;
+  if (is_realized())
+    load_xpm();
+  else
+    unset();
+}
+
+
+void
+Pixmap::get(Gdk_Pixmap &pixmap, Gdk_Bitmap &mask) const
+{ 
+  GdkPixmap *pix;
+  GdkBitmap *bit;
+  gtk_pixmap_get(const_cast<GtkPixmap*>(gtkobj()),&pix,&bit);
+  pixmap=Gdk_Pixmap(pix);
+  mask=Gdk_Bitmap(bit);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Pixmap)
+//. name: pixmap
+//. type: Gdk_Pixmap
+//. get: {get()}
+//. set: {set()}
+//. desc: Pixmap to be displayed normally.
+
+//. name: mask
+//. type: Gdk_Bitmap
+//. get: {get()}
+//. set: {set()}
+//. desc: Mask defining outlines of pixmap.
+
+//. name: pixmap_insensitive
+//. type: Gdk_Pixmap
+//. get:
+//. set:
+//. desc: (Gtk 1.1) The pixmap used when the widget is in the insensitive
+//.  state.  This is a cache and is not directly setable.
+
+//. name: build_insensitive
+//. type: bool
+//. get:
+//. set: {build_insensitive()}
+//. desc: (Gtk 1.1) Specifies that Gtk is to create a greyed out version
+//. of {pixmap} to use in insensitive states.
+

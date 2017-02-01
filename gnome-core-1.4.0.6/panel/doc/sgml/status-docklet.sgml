@@ -1,0 +1,255 @@
+<refentry id="StatusDocklet">
+<refmeta>
+<refentrytitle>StatusDocklet</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>PANEL Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>StatusDocklet</refname><refpurpose>Simple way to embed a small window in the panel</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;status-docklet.h&gt;
+
+
+struct      <link linkend="StatusDocklet-struct">StatusDocklet</link>;
+<link linkend="GtkObject">GtkObject</link>*  <link linkend="status-docklet-new">status_docklet_new</link>              (void);
+<link linkend="GtkObject">GtkObject</link>*  <link linkend="status-docklet-new-full">status_docklet_new_full</link>         (int maximum_retries,
+                                             <link linkend="gboolean">gboolean</link> handle_restarts);
+void        <link linkend="status-docklet-run">status_docklet_run</link>              (<link linkend="StatusDocklet">StatusDocklet</link> *docklet);
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----StatusDocklet
+</synopsis>
+
+</refsect1>
+
+
+<refsect1>
+<title>Signal Prototypes</title>
+<synopsis>
+
+&quot;<link linkend="StatusDocklet-build-plug">build-plug</link>&quot;
+            void        user_function      (<link linkend="StatusDocklet">StatusDocklet</link> *statusdocklet,
+                                            <link linkend="gpointer">gpointer</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> user_data);
+</synopsis>
+</refsect1>
+
+
+<refsect1>
+<title>Description</title>
+<para>
+Some apps want to embed a very small icon or widget in the panel to display
+the status of the app.  This can be done without the operational overhead of
+an applet.  The status docklet will embed a 22 by 22 window inside the panel.
+This is not a separate applet and thus is minimally intrusive to the user and
+is meant for very temporary status displays for which a full applet would not
+be appropriate.
+</para>
+
+<para>
+The way <link linkend="StatusDocklet">StatusDocklet</link> works is a little different from how the <link linkend="AppletWidget">AppletWidget</link>
+works.  Firstly, <link linkend="StatusDocklet">StatusDocklet</link> object is not a widget, it is just an abstract
+GTK+ object.  You create a new <link linkend="StatusDocklet">StatusDocklet</link> object with <link linkend="status-docklet-new">status_docklet_new</link>
+or <link linkend="status-docklet-new">status_docklet_new</link> and then bind the "build_plug" signal which is emitted
+when the panel was contacted and a widget must be built.  After binding the
+"build_plug" signal, you call <link linkend="status-docklet-run">status_docklet_run</link> to actually start trying to
+contacting the panel.  <link linkend="StatusDocklet">StatusDocklet</link> is safe to use without a panel.  By
+default it will try to locate a panel for 15 minutes and after that it will
+give up.  It will also handle panel restarts by default.  If it does, your
+widget will be destroyed and "build_plug" will be emitted again when the new
+panel starts.  Even though the panel will never restart by itself, the user
+might not run session management and thus might restart panel by hand, or due
+to a bug, the panel might crash and restart itself.
+</para>
+
+<para>
+Note that you should use <link linkend="gnome-CORBA-init">gnome_CORBA_init</link> rather then <link linkend="gnome-init">gnome_init</link> when you
+want to use the status docklet as corba has to be initialized for the status
+docklet to work.
+</para>
+
+<para>
+Here is a short example of how to use the status docklet
+
+  <example>
+    <title>Sample usage of the StatusDocklet object</title>
+    <programlisting>
+/* this can be a global since you probably only need one status window
+   for your app */
+GtkObject *status;
+
+...
+
+static void
+build_our_plug(StatusDocklet *docklet, GtkWidget *plug, gpointer data)
+{
+        GtkWidget *label;
+	/* an extremely simple status, you probably want an icon */
+	label = gtk_label_new("#");
+	gtk_widget_show(label);
+
+	/* add the status to the plug */
+	gtk_container_add(GTK_CONTAINER(plug), label);
+}
+
+...
+
+/* in your main function you would do something like */
+status = <link linkend="status-docklet-new">status_docklet_new</link>();
+
+/* connect our widget building function */
+gtk_signal_connect(GTK_OBJECT(status), "build_plug",
+                   GTK_SIGNAL_FUNC(build_our_plug),
+		   NULL);
+
+/* "run" the docklet */
+status_docklet_run(STATUS_DOCKLET(status));
+
+...
+    </programlisting>
+  </example>
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="StatusDocklet-struct">struct StatusDocklet</title>
+<programlisting>struct StatusDocklet {
+	GtkWidget		*plug; /* a pointer to the current GtkPlug
+					  holding the docklet */
+	
+};
+</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="struct">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row>
+<entry><link linkend="GtkWidget">GtkWidget</link> *<structfield>plug</structfield></entry>
+<entry> The <link linkend="GtkPlug">GtkPlug</link> widget that's embedded inside the panel
+
+</entry>
+</row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="status-docklet-new">status_docklet_new ()</title>
+<programlisting><link linkend="GtkObject">GtkObject</link>*  status_docklet_new              (void);</programlisting>
+<para>
+Creates a new status docklet object with the default
+parameters.  By default the docklet object will try to contact a panel
+<literal>STATUS_DOCKLET_DEFAULT_RETRIES</literal> times (20).  It will try to find a
+panel every 15 seconds.  You need to bind the build_plug signal
+in which you build your own widget and add it to the provided container.
+By default the docklet object will handle a panel restart, in which case
+your widget will be destroyed and when the panel is contacted again the
+build_plug signal will be emitted again.  You also must call the
+<link linkend="status-docklet-run">status_docklet_run</link> function after you bind the build_plug signal.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> new status docklet object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="status-docklet-new-full">status_docklet_new_full ()</title>
+<programlisting><link linkend="GtkObject">GtkObject</link>*  status_docklet_new_full         (int maximum_retries,
+                                             <link linkend="gboolean">gboolean</link> handle_restarts);</programlisting>
+<para>
+Creates a neew status docklet object with the specified
+parameters.  See the description of <link linkend="status-docklet-new">status_docklet_new</link> for details.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>maximum_retries</parameter>&nbsp;:</entry>
+<entry>  Maximum number of times to try to contact panel
+</entry></row>
+<row><entry align="right"><parameter>handle_restarts</parameter>&nbsp;:</entry>
+<entry>  If you handle panel restarts
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  a new docklet object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="status-docklet-run">status_docklet_run ()</title>
+<programlisting>void        status_docklet_run              (<link linkend="StatusDocklet">StatusDocklet</link> *docklet);</programlisting>
+<para>
+Search for the panel and add the plug if it finds it.  This
+function is also called internally from the timeout.  If called externally
+more times, a panel lookup will be forced and one try will be wasted.  You
+need to call this function at least once after binding the build_plug
+signal to tell the status docklet to start looking for the panel.
+If the status docklet handles restarts you don't have to call this
+function ever again.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>docklet</parameter>&nbsp;:</entry>
+<entry> <link linkend="StatusDocklet">StatusDocklet</link> to run
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+<refsect1>
+<title>Signals</title>
+<refsect2><title><anchor id="StatusDocklet-build-plug">The &quot;build-plug&quot; signal</title>
+<programlisting>void        user_function                  (<link linkend="StatusDocklet">StatusDocklet</link> *statusdocklet,
+                                            <link linkend="gpointer">gpointer</link> arg1,
+                                            <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+This signal is emitted when you actually need to build the widget that
+you want to place inside the status docklet.  It should be 22 by 22, and
+if it is larger it will be cropped.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>statusdocklet</parameter>&nbsp;:</entry>
+<entry>the object which received the signal.
+</entry></row>
+<row><entry align="right"><parameter>arg1</parameter>&nbsp;:</entry>
+<entry>
+
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>user data set when the signal handler was connected.</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+</refsect1>
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="AppletWidget">AppletWidget</link>, <link linkend="GtkPlug">GtkPlug</link>
+</para>
+</refsect1>
+
+</refentry>

@@ -1,0 +1,304 @@
+<refentry id="libart-Core-Construction-APIs">
+<refmeta>
+<refentrytitle>Core Construction APIs</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBART Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Core Construction APIs</refname><refpurpose>Core construction API.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="ArtPoint">ArtPoint</link>;
+enum        <link linkend="ArtPathcode">ArtPathcode</link>;
+struct      <link linkend="ArtVpath">ArtVpath</link>;
+struct      <link linkend="ArtBpath">ArtBpath</link>;
+void        <link linkend="art-vpath-add-point">art_vpath_add_point</link>             (<link linkend="ArtVpath">ArtVpath</link> **p_vpath,
+                                             int *pn_points,
+                                             int *pn_points_max,
+                                             <link linkend="ArtPathcode">ArtPathcode</link> code,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y);
+<link linkend="ArtVpath">ArtVpath</link>*   <link linkend="art-bez-path-to-vec">art_bez_path_to_vec</link>             (const <link linkend="ArtBpath">ArtBpath</link> *bez,
+                                             <link linkend="double">double</link> flatness);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+This section details the API for the construction of 
+user-visible data structure, namely: <link linkend="ArtVpath">ArtVpath</link>
+and <link linkend="ArtBpath">ArtBpath</link>.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="ArtPoint">struct ArtPoint</title>
+<programlisting>struct ArtPoint {
+  /*&lt; public &gt;*/
+  double x, y;
+};
+</programlisting>
+<para>
+This structure is used here and there in the API: there is no general rule
+about its use. It simply represents a point with its x and y coordinates 
+in the libart 2D space.
+</para>
+<para>
+The libart 2D space is not a direct cartesian 2D space: it is an indirect cartesian
+space (that is, its direction is the invert of the standard trigonometric direction).
+The 2D space used by libart is inspired by the X coordinate space:
+	<figure>
+	  <title>LibArt's 2D space</title>
+	  <graphic fileref="art-2d-space.png" scale="50"></graphic>
+	</figure>
+
+</para><informaltable pgwide="1" frame="none" role="struct">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row>
+<entry><link linkend="double">double</link> <structfield>x</structfield></entry>
+<entry>the x coordinate of the point.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>y</structfield></entry>
+<entry>the y cordinate of the point.
+
+</entry>
+</row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ArtPathcode">enum ArtPathcode</title>
+<programlisting>typedef enum {
+  ART_MOVETO,
+  ART_MOVETO_OPEN,
+  ART_CURVETO,
+  ART_LINETO,
+  ART_END
+} ArtPathcode;
+</programlisting>
+<para>
+This enum contains the list of the possible drawing commands understood
+by <link linkend="ArtVpath">ArtVpath</link> and <link linkend="ArtBpath">ArtBpath</link>.
+These commands are described <link linkend="sample-non-display">there</link>.
+They can be summarized by the folowing figure:
+	<figure>
+	  <title>Drawing commands</title>
+	  <graphic fileref="art-drawing-commands.png" scale="50"></graphic>
+	</figure>
+</para><informaltable pgwide="1" frame="none" role="enum">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row>
+<entry><literal>ART_MOVETO</literal></entry>
+<entry>move to a given point, without drawing pixels.
+</entry>
+</row>
+<row>
+<entry><literal>ART_MOVETO_OPEN</literal></entry>
+<entry>move to a given point, without drawing pixels. Do not close the vector path at the end.
+</entry>
+</row>
+<row>
+<entry><literal>ART_CURVETO</literal></entry>
+<entry>move to a given point along a given bezier path while drawing pixels.
+</entry>
+</row>
+<row>
+<entry><literal>ART_LINETO</literal></entry>
+<entry>move to a given point along a staright line while drawing pixels.
+</entry>
+</row>
+<row>
+<entry><literal>ART_END</literal></entry>
+<entry>the end of the vector path.
+
+</entry>
+</row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ArtVpath">struct ArtVpath</title>
+<programlisting>struct ArtVpath {
+  ArtPathcode code;
+  double x;
+  double y;
+};
+</programlisting>
+<para>
+A vector path is an array of <function>ArtVpath</function> (short for vector path) data structures. 
+Each of those describes a
+given vector along the vector path. <function>ArtVpath</function>s can contain <function>ART_MOVETO</function>,
+<function>ART_MOVETO_OPEN</function>, <function>ART_LINETO</function> and <function>ART_END</function>
+commands. Of course, the <parameter>x</parameter> and <parameter>y</parameter> members of this data structure have no meaning when <parameter>code</parameter> is 
+<function>ART_END</function>.
+</para><informaltable pgwide="1" frame="none" role="struct">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row>
+<entry><link linkend="ArtPathcode">ArtPathcode</link> <structfield>code</structfield></entry>
+<entry>the drawing command to execute for this vector.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>x</structfield></entry>
+<entry>the x coordinate of the associated control point.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>y</structfield></entry>
+<entry>the y coordinate of the associated control point.
+
+</entry>
+</row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ArtBpath">struct ArtBpath</title>
+<programlisting>struct ArtBpath {
+  /*&lt; public &gt;*/
+  ArtPathcode code;
+  double x1;
+  double y1;
+  double x2;
+  double y2;
+  double x3;
+  double y3;
+};
+</programlisting>
+<para>
+A vector path can also be an array of <function>ArtBpath</function> (short for bézier path) data structures. 
+Bézier paths can hold all the possible drawing commands present in an <parameter>ArtPathCode</parameter>. XXX: is this true ?
+</para><informaltable pgwide="1" frame="none" role="struct">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row>
+<entry><link linkend="ArtPathcode">ArtPathcode</link> <structfield>code</structfield></entry>
+<entry>the drawing command to execute for this vector.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>x1</structfield></entry>
+<entry>the x coordinate of the first control point of the bézier path.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>y1</structfield></entry>
+<entry>the y coordinate of the first control point of the bézier path.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>x2</structfield></entry>
+<entry>the x coordinate of the second control point of the bézier path.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>y2</structfield></entry>
+<entry>the xy coordinate of the second control point of the bézier path.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>x3</structfield></entry>
+<entry>the x coordinate of the end point of the bézier path.
+</entry>
+</row>
+<row>
+<entry><link linkend="double">double</link> <structfield>y3</structfield></entry>
+<entry>the y coordinate of the end point of the bézier path.
+
+</entry>
+</row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-vpath-add-point">art_vpath_add_point ()</title>
+<programlisting>void        art_vpath_add_point             (<link linkend="ArtVpath">ArtVpath</link> **p_vpath,
+                                             int *pn_points,
+                                             int *pn_points_max,
+                                             <link linkend="ArtPathcode">ArtPathcode</link> code,
+                                             <link linkend="double">double</link> x,
+                                             <link linkend="double">double</link> y);</programlisting>
+<para>
+Adds a new point to *<parameter>p_vpath</parameter>, reallocating and updating *<parameter>p_vpath</parameter>
+and *<parameter>pn_points_max</parameter> as necessary. *<parameter>pn_points</parameter> is incremented.
+</para>
+<para>
+This routine always adds the point after all points already in the
+vpath. Thus, it should be called in the order the points are
+desired.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>p_vpath</parameter>&nbsp;:</entry>
+<entry> Where the pointer to the <link linkend="ArtVpath">ArtVpath</link> structure is stored.
+</entry></row>
+<row><entry align="right"><parameter>pn_points</parameter>&nbsp;:</entry>
+<entry> Pointer to the number of points in *<parameter>p_vpath</parameter>.
+</entry></row>
+<row><entry align="right"><parameter>pn_points_max</parameter>&nbsp;:</entry>
+<entry> Pointer to the number of points allocated.
+</entry></row>
+<row><entry align="right"><parameter>code</parameter>&nbsp;:</entry>
+<entry> The pathcode for the new point.
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry> The X coordinate of the new point.
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry> The Y coordinate of the new point.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="art-bez-path-to-vec">art_bez_path_to_vec ()</title>
+<programlisting><link linkend="ArtVpath">ArtVpath</link>*   art_bez_path_to_vec             (const <link linkend="ArtBpath">ArtBpath</link> *bez,
+                                             <link linkend="double">double</link> flatness);</programlisting>
+<para>
+Creates a vector path closely approximating the bezier path defined by
+<parameter>bez</parameter>. The <parameter>flatness</parameter> argument controls the amount of subdivision. In
+general, the resulting vpath deviates by at most <parameter>flatness</parameter> pixels
+from the "ideal" path described by <parameter>bez</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bez</parameter>&nbsp;:</entry>
+<entry> Bezier path.
+</entry></row>
+<row><entry align="right"><parameter>flatness</parameter>&nbsp;:</entry>
+<entry> Flatness control.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> Newly allocated vpath.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

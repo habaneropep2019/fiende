@@ -1,0 +1,600 @@
+#  Configure.in
+#
+#  This file tests for various compiler features needed to configure 
+#  the gtk-- package.  Original skeleton was provided by Stephan Kulow.
+#  All tests were written by Tero Pulkkinen, Mirko Streckenbach, and 
+#  Karl Nelson.
+#
+#  NOTE! IF YOU DO CHANGES HERE, CHECK IF YOU NEED TO MODIFY gtk--.m4 TOO!!!
+#
+#  Copyright 1998 Stephan Kulow 
+#  Copyright 1999 Gtk-- Development Team
+#
+AC_INIT(gtk--config.h.in)
+
+#########################################################################
+#  Version and initialization
+#########################################################################
+GTKMM_MAJOR_VERSION=1
+GTKMM_MINOR_VERSION=2
+GTKMM_MICRO_VERSION=8
+
+#
+# +1 : ? : +1  == new interface that does not break old one
+# +1 : ? : 0   == new interface that breaks old one
+#  ? : ? : 0   == no new interfaces, but breaks apps
+#  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
+#                 better
+# CURRENT : REVISION : AGE
+LIBGTKMM_SO_VERSION=2:4:2
+LIBGDKMM_SO_VERSION=2:2:1
+
+GTKMM_VERSION=$GTKMM_MAJOR_VERSION.$GTKMM_MINOR_VERSION.$GTKMM_MICRO_VERSION
+GTKMM_RELEASE=$GTKMM_MAJOR_VERSION.$GTKMM_MINOR_VERSION
+AC_DEFINE_UNQUOTED(GTKMM_MAJOR_VERSION, $GTKMM_MAJOR_VERSION)
+AC_DEFINE_UNQUOTED(GTKMM_MINOR_VERSION, $GTKMM_MINOR_VERSION)
+AC_DEFINE_UNQUOTED(GTKMM_MICRO_VERSION, $GTKMM_MICRO_VERSION)
+AC_SUBST(GTKMM_VERSION)
+AC_SUBST(GTKMM_RELEASE)
+AC_SUBST(LIBGTKMM_SO_VERSION)
+AC_SUBST(LIBGDKMM_SO_VERSION)
+
+AC_CONFIG_AUX_DIR(scripts)
+
+dnl For automake.
+VERSION=$GTKMM_VERSION
+PACKAGE=gtkmm
+
+dnl Initialize automake stuff
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+
+dnl Specify a configuration file
+AM_CONFIG_HEADER(config.h gdk--config.h gtk--config.h)
+AM_MAINTAINER_MODE
+AM_ACLOCAL_INCLUDE(macros)
+
+#########################################################################
+#  Configure arguments 
+#########################################################################
+AC_ARG_ENABLE(voodoo,
+[  --enable-voodoo    Use Voodoo Fried Chicken spell to compile Gtk-- (use this only when everything else fails)],
+	ac_voodoo=yes
+	AC_MSG_RESULT("Enabling Voodoo Fried Chicken spell")
+)
+
+AC_ARG_ENABLE(extra-crispy,
+[  --enable-extra-crispy    Roast the chicken extra-crispy (see voodoo option)],
+	if test "$ac_voodoo" = "yes"; then
+		AC_MSG_RESULT("Extra-crispy on")
+	else
+		AC_MSG_ERROR("Extra-crispy option can be used only with Voodoo")
+	fi
+)
+
+AC_ARG_ENABLE(vegetarian,
+[  --enable-vegetarian    The chicken will be a Tofu chicken (see voodoo option)],
+	if test "$ac_voodoo" = "yes"; then
+		AC_MSG_RESULT("Using Tofu Chicken")
+	else
+		AC_MSG_ERROR("Vegetarian option can be used only with Voodoo")
+	fi
+
+)
+
+
+#########################################################################
+#  Environment Checks
+#########################################################################
+AC_PROG_CC
+AC_PROG_CPP
+AM_PROG_LEX
+AC_PROG_YACC
+AC_PROG_MAKE_SET
+
+AC_CANONICAL_HOST
+
+dnl AM_ENABLE_SHARED(yes)
+dnl AM_ENABLE_STATIC(no)
+
+AM_DISABLE_STATIC
+dnl libtool does all checks with $CC, not with $CXX
+dnl maybe this should be fixed in libtool, not here
+AM_PROG_LIBTOOL
+
+dnl On FreeBSD 3.0 (and perhaps some other systems) GNU m4 is
+dnl called `gm4' where `m4' is the system's own m4.
+AC_CHECK_PROGS(M4, gm4 m4, m4)
+AC_CHECK_PROGS(SGML2HTML, sgml2html, sgml2html)
+
+if test "$M4" = "m4"; then
+  AC_MSG_CHECKING(whether m4 is GNU m4)
+  if $M4 --version </dev/null 2>/dev/null | grep '^GNU m4 ' >/dev/null ; then
+	  AC_MSG_RESULT(yes)
+  else
+	  AC_MSG_RESULT(no)
+	  if test "$host_vendor" = "sun"; then
+		  AC_MSG_ERROR("SUN m4 does not work for building Gtk--. Please install GNU m4")
+	  fi
+  fi
+fi
+
+dnl Check that this is GNU m4 - if not, exit with error if this is a SUN
+dnl
+
+dnl We need Perl to build the docs
+dnl
+AC_CHECK_PROGS(PERL, perl5 perl, no)
+if test "$PERL" = "no"; then
+	AC_MSG_WARN([Perl5 is not installed : docs won't build])
+fi
+
+dnl Check for GNU make (stolen from gtk+/configure.in)
+dnl 
+AC_MSG_CHECKING(whether make is GNU Make)
+if $ac_make --version 2>/dev/null | grep '^GNU Make ' >/dev/null ; then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+	if test "$host_vendor" = "sun" ; then
+		AC_MSG_ERROR("SUN make does not work for building Gtk--. Please install GNU make")
+	fi
+fi
+
+dnl dnl am_path_gtk must be before ac_lang_cplusplus
+dnl AC_PATH_PROG(GTK_CONFIG, gtk-config, no)
+dnl
+dnl AC_MSG_CHECKING(If you have gtk+ installed)
+dnl if test "$GTK_CONFIG" = "no" ; then
+dnl   AC_MSG_RESULT([no])
+dnl   AC_MSG_ERROR([Gtk+ has not been installed properly])
+dnl fi 
+dnl AC_MSG_RESULT([yes])
+dnl
+dnl dnl now pick up the gtk's paths, just like set by am_path_gtk
+dnl GTK_CFLAGS=`gtk-config --cflags`
+dnl GTK_LIBS=`gtk-config --libs`
+dnl AC_SUBST(GTK_CFLAGS)
+dnl AC_SUBST(GTK_LIBS)
+
+dnl I've disabled the test above, because the path to gtk-config
+dnl can't be set on the command line, which is bad if you have
+dnl gtk+-1.0 and gtk+-1.1 installed with different prefixes.
+dnl I asked on the mailing list, what the problems with AM_PATH_GTK
+dnl were and got no reply, so I changed it back.
+dnl If you have a problem with AM_PATH_GTK, mail me and we'll try
+dnl to fix it. Please don't enable the broken stuff above again.
+dnl mirko 98/12/3
+
+GTK_RELEASE="1.1"
+AC_SUBST(GTK_RELEASE)
+
+dnl we now require 1.2 gtk+ - 1.1 is not allowed because it doesnt work.
+AM_PATH_GTK(1.2.7,,exit)
+
+dnl these gen_h stuffs are here because we want more than one
+dnl makefile have access to this variable.
+dnl unfortunately placing these to here still leaves us two more
+dnl places at src/gtk--/Makefile.am where each of these files must
+dnl be listed
+GEN_H_FILES=`(cd $srcdir/src ; ls *.gen_h | grep -v '\(arg.gen_h\)\|\(rc.gen_h\)' | xargs echo )`
+#GNOME_GEN_H_FILES=`cd $srcdir/gnome-- ; ls *.gen_h | xargs echo`
+AC_SUBST(GEN_H_FILES)
+AC_SUBST(GNOME_GEN_H_FILES)
+
+
+dnl GNOME_INIT_HOOK executes $1 as soon as gnome-config is found, even
+dnl if --without-gnome was given on the command line
+dnl hack: only execute GNOME_INIT_HOOK if $with_gnome != no
+dnl Mar20: fixed gnomemm_prefix to use prefix, instead of gnome_prefix.
+dnl I sure hope it doesnt break anything.
+
+dnl Had to add these two lines below because 'prefix' and
+dnl 'exec_prefix' will be set to NONE at this point unless the user
+dnl specified them with a --prefix/--exec_prefix option.
+dnl - GL
+
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
+
+#GNOME_INIT_HOOK(gnome_ok=yes,nofail)
+#if test "$gnome_ok" = yes; then
+#
+#   CPPFLAGS="$CPPFLAGS `$GNOME_CONFIG --cflags gnomeui`"
+#
+#   # These go into the Makefiles
+#   #
+#   #
+#   gnome_prefix=`gnome-config --prefix`
+#
+#   # This is where gnomemmConf will be installed : it must be in the
+#   # same prefix as Gnome itself
+#   gnome_libdir='${gnome_prefix}/lib'
+#
+#   # And this is where libgnomemm.(a|so) will be installed
+#   #
+#   gnomemm_prefix='${prefix}'
+#   gnomemm_libdir='${gnomemm_prefix}/lib'
+#   gnomemm_includedir='${gnomemm_prefix}/include'
+#
+#   # These go into gnomemmConf.sh (actually they go into the Makefiles
+#   # too because automake isn't too subtle, but they aren't used)
+#   #
+#   GNOMEMM_LIBDIR="-L$prefix/lib $GNOME_LIBDIR"
+#   GNOMEMM_INCLUDEDIR="-I$prefix/lib/$PACKAGE/include -I$prefix/include $GNOME_INCLUDEDIR"
+#   GNOMEMM_LIBS="-lgnomemm -lgtkmm -lgdkmm"
+#
+#fi
+
+#AM_CONDITIONAL(GNOMEMM, test x$gnome_ok = xyes)
+
+#AC_SUBST(GNOME_LA_FILES)
+#AC_SUBST(gnome_prefix)
+#AC_SUBST(gnome_libdir)
+#AC_SUBST(gnomemm_prefix)
+#AC_SUBST(gnomemm_libdir)
+#AC_SUBST(gnomemm_includedir)
+#AC_SUBST(GNOMEMM_LIBS)
+#AC_SUBST(GNOMEMM_LIBDIR)
+#AC_SUBST(GNOMEMM_INCLUDEDIR)
+
+AC_MSG_CHECKING(if html documentation and manual pages are generated)
+AC_ARG_ENABLE(docs,
+[  --enable-docs[=PKGS]    Turn on document generation [default=no]],
+[case "${enableval}" in
+  yes) ac_docgen=yes ;;
+   no) ac_docgen=no ;;
+    *) AC_MSG_ERROR(bad value ${enableval} for --enable-docs) ;;
+esac],[ ac_docgen=no ])
+AM_CONDITIONAL(GTKMM_GENDOCS, test x$ac_docgen = xyes)
+AM_CONDITIONAL(GDKMM_GENDOCS, test x$ac_docgen = xyes) 
+AC_MSG_RESULT([$ac_docgen])
+
+
+
+dnl C++ compiler feature check start here
+dnl moved the c++ compiler alittle to make the basename check work right..
+AC_PROG_CXX
+AC_LANG_CPLUSPLUS
+GNOME_CXX_WARNINGS
+
+AM_PATH_SIGC(0.8.5,,
+[AC_MSG_ERROR(
+[Libsigc++ is required to compile Gtk--. If libsigc++ was installed
+but no found to be sane,  most likely you have not placed the 
+/usr/local/lib path in the library config file and run ldconfig.])])
+
+
+
+#######################################################################
+# C++ compiler feature check start here
+#######################################################################
+
+dnl SUN & gcc/egcs need '-fpermissive' flag
+dnl
+if test "$host_vendor" = "sun" -a \( "$CXX" = "g++" -o "$CXX" = "egcs" \) ; then
+ 	CXXFLAGS="$CXXFLAGS -fpermissive"
+fi
+
+AC_MSG_CHECKING(if C++ compiler supports namespaces (required) )
+AC_TRY_COMPILE(
+[
+namespace Foo { struct A {}; }
+using namespace Foo;
+],[
+A a;
+],[
+ ac_namespaces=yes
+dnl AC_DEFINE(GTKMM_CXX_NAMESPACES)
+],[
+ config_error=yes
+ ac_namespaces=no
+])
+AC_MSG_RESULT([$ac_namespaces]) 
+
+
+if test "x$ac_namespaces" = xyes ; then
+AC_MSG_CHECKING(if C++ compiler uses std namespace )
+AC_TRY_COMPILE(
+[
+#include <iostream>
+namespace std{}
+using namespace std;
+],[
+cout << "test" << endl;
+],[
+ ac_std_namespace=yes
+ AC_DEFINE(GTKMM_CXX_STD_NAMESPACE)
+],[
+ ac_std_namespace=maybe
+])
+if test "x$ac_std_namespace" = xmaybe ; then
+AC_TRY_COMPILE(
+[
+#include <iostream.h>
+namespace std{}
+using namespace std;
+],[
+cout << "test" << endl;
+],[
+ ac_std_namespace=yes
+ AC_DEFINE(GTKMM_CXX_STD_NAMESPACE)
+],[
+ ac_std_namespace=no
+])
+fi
+AC_MSG_RESULT([$ac_std_namespace]) 
+fi
+
+
+AC_MSG_CHECKING(if C++ compiler supports bool (required))
+AC_TRY_COMPILE(
+[
+],[
+   bool b=true;
+   bool b1=false;
+],[
+  ac_bool=yes
+],[
+  config_error=yes
+  AC_WARN(bool type is not supported by your compiler)
+]) 
+AC_MSG_RESULT([$ac_bool])
+
+
+dnl unused at the moment, disabled
+dnl kenelson, 2/7/2000
+dnl AC_MSG_CHECKING(if C++ compiler supports mutable)
+dnl AC_TRY_COMPILE(
+dnl [
+dnl class k { 	
+dnl   mutable char *c;
+dnl public:
+dnl    void foo() const { c=0; }
+dnl };
+dnl ],[
+dnl ],[
+dnl   ac_mutable=yes
+dnl   AC_DEFINE(GTKMM_CXX_HAVE_MUTABLE)
+dnl ],[
+dnl   ac_mutable=no
+dnl ]) 
+dnl AC_MSG_RESULT([$ac_mutable])
+
+AC_MSG_CHECKING([if C++ compiler supports const_cast<> (required)])
+AC_TRY_COMPILE(
+[
+   class foo;
+],[
+   const foo *c=0;
+   foo *c1=const_cast<foo*>(c);
+],[
+  ac_const_cast=yes
+],[
+  AC_WARN(C++ compiler const_cast<> does not work)
+  config_error=yes
+]) 
+AC_MSG_RESULT([$ac_const_cast])
+
+
+
+AC_MSG_CHECKING(if C++ compiler requires const_cast<> for C decl)
+AC_TRY_COMPILE(
+[
+extern "C"  { void foo(int *f) {return;} };
+void foo2(const int* f) { foo(f);}
+],[
+   const int *i;   foo2(i);
+],[
+  ac_const_cast_required=no
+],[
+  ac_const_cast_required=yes
+])
+AC_MSG_RESULT([$ac_const_cast_required])
+
+AC_MSG_CHECKING(if C++ environment has working string class (required))
+AC_TRY_LINK(
+[
+#include <string>
+namespace std{}
+using namespace std;
+  class foo {
+  public:
+    void f(const string &s);
+  };
+  void foo::f(const string &s) {
+    f(s.c_str());
+  }
+],[
+   foo f1;
+   f1.f("test");
+],[
+  gtkmm_string_ok=yes
+],[
+  gtkmm_string_ok=no
+  config_error=yes 
+  AC_WARN(C++ compilers string support does not work)
+])
+AC_MSG_RESULT([$gtkmm_string_ok])
+
+AC_DEFUN([toupper],[translit([$1],[abcdefghijklmnopqrstuvwxyz],[ABCDEFGHIJKLMNOPQRSTUVWXYZ])])
+
+dnl GTKMM_USING_STD_NAME(foo) tests the C++ for the presence of foo in
+dnl   namespace std.
+dnl
+dnl   If foo is in namespace std, GTKMM_USING_STD_FOO is #defined to
+dnl      using std::foo .
+dnl
+dnl   The line `#define GTKMM_USING_STD_FOO ' (with trailing space )
+dnl      must appear in acconfig.h
+dnl 
+dnl   This macro assumes foo is in standard header <foo> .
+
+AC_DEFUN(
+  [GTKMM_USING_STD_NAME],
+  [
+    AC_MSG_CHECKING(if C++ environment has $1 in std.)
+    AC_TRY_LINK(
+    [
+    #include <$1>
+
+    using std::$1;
+
+    ],[
+      ;
+    ],[
+      gtkmm_$1_in_std=yes
+      AC_DEFINE(toupper(GTKMM_USING_STD_$1),[using std::$1;])
+    ],[
+      gtkmm_$1_in_std=no
+      AC_DEFINE(toupper(GTKMM_USING_STD_$1),)
+    ])
+    AC_MSG_RESULT([$gtkmm_$1_in_std])
+  ])
+
+dnl GTKMM_USING_STD_NAME_IN_HEADER(foo,bar) tests the C++ for the
+dnl   presence of foo in namespace std.
+dnl
+dnl   If foo is in namespace std, GTKMM_USING_STD_FOO is #defined to
+dnl      using std::foo .
+dnl
+dnl   The line `#define GTKMM_USING_STD_FOO ' (with trailing space )
+dnl      must appear in acconfig.h
+dnl 
+dnl   This macro assumes foo is in standard header <bar> .
+
+AC_DEFUN(
+  [GTKMM_USING_STD_NAME_IN_HEADER],
+  [
+    AC_MSG_CHECKING(if C++ environment has $1 in std.)
+    AC_TRY_LINK(
+    [
+    #include <$2>
+
+    using std::$1;
+
+    ],[
+      ;
+    ],[
+      gtkmm_$1_in_std=yes
+      AC_DEFINE(toupper(GTKMM_USING_STD_$1),[using std::$1;])
+    ],[
+      gtkmm_$1_in_std=no
+      AC_DEFINE(toupper(GTKMM_USING_STD_$1),)
+    ])
+    AC_MSG_RESULT([$gtkmm_$1_in_std])
+  ])
+
+GTKMM_USING_STD_NAME([string])
+GTKMM_USING_STD_NAME([map])
+
+GTKMM_USING_STD_NAME_IN_HEADER([bidirectional_iterator_tag],[iterator])
+GTKMM_USING_STD_NAME_IN_HEADER([forward_iterator_tag],[iterator])
+GTKMM_USING_STD_NAME_IN_HEADER([input_iterator_tag],[iterator])
+
+
+AC_MSG_CHECKING(if C++ compiler has HP ambiguous template bug)
+AC_TRY_COMPILE(
+[
+struct S
+  {
+     S(int) {};
+     template <class T>
+     S(const T& t) {typename T::foo j;};
+  };
+
+struct P {typedef int foo; };
+
+],[
+    int i;
+    P p;
+    S s1(i);
+    S s2(p);
+],[
+  ac_cxx_ambiguous_templates=no
+],[
+  ac_cxx_ambiguous_templates=yes
+  AC_DEFINE(GTKMM_CXX_AMBIGUOUS_TEMPLATES)
+])
+AC_MSG_RESULT([$ac_cxx_ambiguous_templates])
+
+
+
+AC_MSG_CHECKING(if C++ compiler has gcc anonymous union bug)
+AC_TRY_RUN([
+struct Bob;
+struct Fred
+  {
+   Bob *b;
+   Bob *emit()       {return b;}
+   Bob *operator()() {return b;}
+  };
+
+struct Bob
+  {
+   int i;
+   int j;
+   union {
+     Bob *self;
+     Fred fred;
+   };
+   Bob():self(this) {}
+  };
+
+int main(int argc,char **argv)
+  {
+   Bob bob;
+   return bob.fred.emit()==bob.fred();
+  }
+],[
+  ac_gcc_au_bug=yes
+  AC_DEFINE(GTKMM_CXX_GAUB)
+],[
+  ac_gcc_au_bug=no
+],[
+  echo $ac_n "cross compiling; assumed OK... $ac_c"
+  ac_gcc_au_bug=no
+])
+AC_MSG_RESULT([$ac_gcc_au_bug])
+if test "x$ac_gcc_au_bug" = xyes ; then
+  echo "Warning: Your compiler contains a very serious bug which affects"
+  echo "anonymous unions.  This prevents anonymous unions from being used in"
+  echo "proxies.  Without anonymous unions, the memory footprint of gtk--"
+  echo "will be orders of magnitude larger.  Consider upgrading to gcc 2.95."
+fi
+
+
+  
+AC_MSG_CHECKING(if C++ environment provides all required features)
+if test "x$config_error" = xyes ; then
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Your compiler is not powerful enough to compile gtk--. If it should be, see config.log for more information of why it failed.])
+fi
+AC_MSG_RESULT([yes])
+
+AC_OUTPUT([Makefile \
+        gtkmm-config \
+        gtk--.spec \
+
+        gdk--/Makefile \
+        gdk--/gdk--/Makefile \
+        gdk--/tests/Makefile \
+
+	src/Makefile \
+	src/build_sources/Makefile \
+	src/gtkmmproc/Makefile \
+	src/gtk--/Makefile \
+	src/gtk--/private/Makefile \
+
+	examples/Makefile \
+	examples/testgtk--/Makefile \
+	examples/examples.conf \
+
+	docgen/Makefile \
+	docs/Makefile  \
+	docs/gtk/Makefile \
+	docs/gdk/Makefile \
+        scripts/Makefile 
+
+])
+
+chmod +x gtkmm-config

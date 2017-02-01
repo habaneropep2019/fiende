@@ -1,0 +1,641 @@
+<!doctype book PUBLIC "-//Davenport//DTD DocBook V3.0//EN" [
+<!entity docownerFirst	"Robert">
+<!entity docownerLast	"Gasch">
+<!entity docownermail	"r.gasch@chello.nl">
+<!entity faqversion	"0.02">
+<!entity today		"12DEC1999">
+<!entity todaylong	"Dec. 12, 1999">
+<!entity wwwfaq		"http://212.187.12.197/Gtk--FAQ/">
+<!entity wwwgtk		"http://www.gtk.org">
+<!entity wwwgtkmm	"http://gtkmm.sourceforge.net">
+<!entity wwwgtkthemes	"http://gtk.themes.org">
+<!entity wwwgtkbuffet	"http://metalab.unc.edu/pub/Linux/X11/apps/">
+<!entity wwwimlib	"http://www.labs.redhat.com/imlib">
+<!entity wwwgnome	"http://www.gnome.org">
+<!entity wwwgimp	"http://www.gimp.org">
+<!entity wwwgcc		"http://www.gni.ai.mit.edu/software/gcc/gcc.html">
+<!entity wwwegcs	"http://egcs.cygnus.com">
+<!entity wwwdocbook	"http://www.oasis-open.org/docbook">
+<!entity wwwdocbooktut	"http://nis-www.lanl.gov/~rosalia/mydocs/docbook-intro.html">
+<!entity wwwgnu		"http://www.gnu.org">
+<!entity wwwgnuGPL	"http://www.gnu.org/copyleft/gpl.html">
+]>
+
+<book id="Index">
+  <bookinfo>
+    <title><ulink url="&wwwgtkmm">Gtk--</ulink> (gtkmm) Frequently Asked Questions</title>
+    <titleabbrev>gtkmm FAQ</titleabbrev>
+    <edition>v&faqversion</edition>
+    <date>&todaylong</date>
+    <authorgroup>
+      <author>
+	<firstname>&docownerFirst</firstname>
+	<surname>&docownerLast</surname>
+	<authorblurb>
+	  <para><email>&docownermail</email></para>
+	  <para><email>&wwwfaq</email></para>
+	</authorblurb>
+      </author>
+    </authorgroup>
+    <date>Nov. 5, 1999</date>
+    <abstract>
+      <para>This document aims to answer any questions you might have about 
+	gtkmm, the C++ wrapper for the GTK+ C library. This FAQ is available 
+	from &wwwfaq .
+      </para>
+      <para>The FAQ maintainer is currently off working.  The gtkmm
+        maintainer accepts patchs to maintain this document in his
+        absence.  The author appreciates your comments and suggestions 
+        concerning 
+	this document, except on the question <emphasis/Why use C++/
+	(try former maintainer glaurent@worldnet.fr for this one). 
+        The author can be reached at &docownermail .  Robert's site is 
+        currently offline so this may not be the latest version.
+      </para>
+      <para>Last modified:  <emphasis/August 2000/
+      <para>Version History:
+      <itemizedlist>
+	<listitem><para>0.01 15OCT1999 - first proper SGML version</para></listitem>
+	<listitem><para>0.02 12DEC1999 - consistency changes, added VariousProblems section</para></listitem>
+	<listitem><para>0.03 20AUG2000 - Updated in Robert's absence.</para></listitem>
+      </itemizedlist>
+      </para>
+    </abstract>
+  </bookinfo>
+
+
+
+  <chapter id="GeneralInfo">
+    <title>General Information about gtkmm</title>
+      
+    <sect1>
+      <title>What is GTK+?</title>
+      <para>GTK+ is the widget toolkit written in C originally developed for 
+	the GIMP (www.gimp.org) and now used as a general windowing toolkit 
+	which serves as the foundation the GNOME project as well as many 
+	stand-alone applications. GTK+ is the foundation gtkmm is built on. 
+	If you want to work with gtkmm, taking a look at the materials 
+	provided at the documentation and FAQ provided at 
+	<ulink url="&wwwgtk">&wwwgtk</ulink> is probably a good idea.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>What is Gtk-- (gtkmm)?</title>
+      <para>Gtk-- is a C++ wrapper for GTK+. That is, it creates language
+	bindings that let you use GTK+ from C++. This includes support for
+	C++ features such as inheritance, polymorphism and other powerful
+	methods/techniques which C++ programmers expects to have at their
+	disposal.  Gtk-- is named as such becaukse GTK+ already has a +
+        in the name.  However as -- does not translate well for search engines
+        the package generally goes by the name gtkmm.
+      </para>
+      <para>
+	gtkmm allows you to write C++ code that can uses the GTK+ widget set
+	through the gtkmm interface, thus allowing to to work with C++ objects
+	rather than the plain Gkt+ C widgets.
+      </para>
+      <para>
+	gtkmm's first version was written by Elliot Lee. gtkmm is maintained by
+      </para>
+      <itemizedlist>
+	<listitem><para>Karl Nelson (kenelson@ece.ucdavis.edu)</para></listitem>
+      </itemizedlist>
+      <para>Other contributors include
+      </para>
+      <itemizedlist>
+	<listitem><para>Tero Pulkinnen (terop@modeemi.cs.tut.fi)</para></listitem>
+	<listitem><para>Guillaume Laurent (glaurent@worldnet.fr)</para></listitem>
+	<listitem><para>Todd Dukes</para></listitem>
+	<listitem><para>Phil Dawes (tdukes@ibmoto.com)</para></listitem>
+	<listitem><para>Havoc Pennington (hp@redhat.com)</para></listitem>
+	<listitem><para>many others, see the AUTHORS file for details</para></listitem>
+      </itemizedlist>
+    </sect1>
+
+    <sect1>
+      <title>Why use C++ ? It's too complicated, slow and bloated ... </title>
+      <para> From time to time we get comments like the one above. Often 
+	these comments are accompanied by some expert analysis: "I know,
+	I've tried it and it sucked. Look at all those huge Windows apps,
+	compared to slim and fast Linux apps written in C."
+      </para>
+      <para>But of course. How come we never thought about it
+	before? Thanks for setting us straight on this. If it weren't
+	for geniuses like yourself who can fully grasp all the
+	subtleties of a language by just "trying it", (or, even more
+	impressive, by reading about it on Usenet and slashdot.org),
+	the whole Open Source community would be doomed. Thank you so
+	much, really. And since the future of mankind certainly depends
+	on the thriving of Open Source software, today you just saved
+	humanity. The whole gtkmm team shall chant your name and deeds
+	for as long as we live, and so shall our children, and the
+	children of our children. We hope that gives you a warm feeling
+	deep inside.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>What systems does it run under?</title>
+      <para>gtkmm should run under any UNIX type system with the proper 
+	compilers and libraries installed. The GNU C++ compiler (g++) 
+	together with the GNU toolset (such as found on Linux and *BSD 
+	systems) comprise it's default build build environment.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>How is it distributed?</title>
+      <para>gtkmm is distributed under the GNU Library General Public
+	Licence. The GPL is distributed with gtkmm (see the file COPYING)
+	or can alternativeley be found at 
+	<ulink url="&wwwgnuGPL">&wwwgnuGPL</ulink>.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>How complete is it?</title>
+      <para>As of version 1.2.x, gtkmm handles most if not all the 
+	functionality offered of the GTK+ 1.2.x series. This means that 
+	you should be able to do anything with gtkmm that's supported by GTK+.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>Does gtkmm support all the C++ goodies like inheritance, polymorphism, etc?</title>
+      <para>Yes. gtkmm objects are normal C++ objects which implement the GTK+
+	inheritance model through C++ inheritance. You can do with the gtkmm
+	widgets everything that you can do with any other C++ class.
+        You can not however through exceptions within gtkmm as those exceptions
+        can propogate through C code, resulting in unexpected excution and
+        memory leaks.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>What applications have been written in gtkmm?</title>
+      <para>Check out the list of applications on the 
+	<ulink url="&wwwgtkmm/extra.html">Extra</ulink>
+	page from the gtkmm site.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>Is there a gtkmm mailing list?</title>
+      <para>Yes. See the <ulink url="&wwwgtkmm/mailinglist.html">subscription page</ulink>
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>Where can I get help with gtkmm problems?</title>
+      <para>Your best bet is probably the gtkmm mailing-list. You can try the
+	main GTK+ mailing-list too (gtk-list@redhat.com), some of the
+	gtkmm maintainers read it. However, if you post on gtk-list,
+	please add '[gtkmm]' in the subject of your message to make it
+	easier to spot.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>What documentation is there for gtkmm?</title>
+      <para> There is a largely complete tutorial and a wealth of running
+        examples available at <ulink url="&wwwgtkmm/documentation.html">documentation page</ulink>
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>How can I make sense of GTK+ documentation if I'm using gtkmm?</title>
+      <para>It's pretty easy. If you have the following GTK+ code
+      </para>
+      <simplelist>
+	<member>GtkWidget *w = gtk_widget_new ();</member>
+	<member>gtk_widget_realize (w);</member>
+	<member>gtk_widget_set_usize (w, width, height);</member>
+	<member>gtk_widget_destroy (w);</member>
+      </simplelist>
+      <para>
+      it becomes the following gtkmm code.
+      </para>
+      <simplelist>
+	<member>Gtk::Widget *w = manage(new Gtk::Widget());</member>
+	<member>w->realize ();</member>
+	<member>w->set_usize (width, height);</member>
+	<member>w->destroy ();</member>
+      </simplelist>
+      <para>
+	You might want to take a look at some of examples that have also
+	been translated into gtkmm and compare them to their GTK+
+	counterparts.
+      </para>
+      <para>
+	Derivation of widgets follows C++ rules and every signal
+	has a _impl that you can overide as usual. Thus you always
+	have the choice of deriving or connecting. Most programs
+	use both. For a button to call something when pressed
+	you will likely just use signals. For the main window most
+	likely you will derive. As a general rule conversion from GTK+ 
+	to gtk-- uses
+      </para>
+      <informaltable frame="all">
+	<para>Gtk vs gtkmm resource consumption comparison</para>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+		<entry>gtk+</entry>
+		<entry>gtkmm</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+                <entry>GtkFoo*</entry>
+		<entry>Gtk::Foo</entry>
+	    </row>
+	    <row>
+		<entry>gtk_foo_method(GtkFoo* f,args)</entry>
+		<entry>f.method(args);</entry>
+	    </row>
+	    <row>
+		<entry>GdkFoo*</entry>
+		<entry>Gdk_Foo</entry>
+	    </row>
+	    <row>
+		<entry>gchar *</entry>
+		<entry>string&</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+      <para>
+      Things to note: Most gdkmm types are handles and not objects themselves.
+        (Don't new them, use type.create();)  They CAN point to a NULL object.
+        These are properties inherited from X.)
+      </para>
+    </sect1>
+
+  </chapter>
+
+
+
+  <chapter id="GettingGtkmm">
+    <title>Getting, configuring and running gtkmm</title>
+      
+    <sect1>
+      <title>What do I need to run gtkmm?</title>
+      <para>gtkmm (as of version 1.0.x) requires:
+      </para> 
+      <itemizedlist>
+	<listitem><para>Glib and GTK+ (1.2.x)</para></listitem>
+	<listitem><para>C++ compiler supporting most ANSI C++ features</para></listitem>
+	<listitem><para>optionally, GNOME and gdk_imlib</para></listitem>
+	<listitem><para>on some systems (IRIX, ??) you may have to install GNU make</para></listitem>
+      </itemizedlist>
+      <para>The configure script tests for all these dependencies
+      </para> 
+    </sect1>
+
+    <sect1>
+      <title>Where can I get gtkmm?</title>
+      <para> 
+	You can get gtkmm from <ulink url="&wwwgtkmm/download.html">sourceforge site</ulink>.
+      </para> 
+    </sect1>
+
+    <sect1>
+      <title>Where can I get current CVS snapshots of gtkmm?</title>
+      <para>Current CVS snapshots of all Gnome software can be found at
+	<ulink url="ftp://ftp.jimpick.com/pub/gnome/snap/">ftp://ftp.jimpick.com/pub/gnome/snap/</ulink> 
+	where they are updated daily.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>How do I configure/compile gtkmm?</title>
+      <para>Typically it should be enough to say
+      </para>
+      <simplelist>
+	  <member><command>cd gtkmm-1.0.x/</command></member>
+	  <member><command>./configure</command></member>
+	  <member><command>make</command></member>
+	  <member><command>make install</command></member>
+      </simplelist>
+    </sect1>
+
+    <sect1>
+      <title>Something breaks duing 'make'. Where should I look first?</title>
+      <para>First of all, check the GTK+ FAQ. Since gtkmm is built on top of
+	GTK+, they share some common dependencies, such as a proper
+	version of Perl and a fully functional (GNU style) make.
+	If you've managed to successfully compile GTK+, you know that the
+	basic parts of your C compile environment are OK and you can start to
+	focus on the C++ side of things.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>My application complains that it can't find libgtkmm.so.</title>
+      <para>Since this is the single most asked question about running Gtk 
+	programs, we'll answer it here, even though it is in the GTK+ FAQ.
+	Make sure the /usr/local/lib (the default install dir for gtkmm)
+	is properly configured in your /etc/ldconf or that it is in your
+	LD_LIBRARY_PATH environment variable.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>How fat or skinny of wrapper is gtkmm?</title>
+      <para>It's pretty skinny. Looking at some of the tutorial examples, after
+	strippig the (dynamic) executables, we get the following sizes (on
+	a RH 6.0 system, using egcs 2.91.66, not using any Gtk themes):
+      </para>
+      <informaltable frame="all">
+	<para>Gtk vs gtkmm resource consumption comparison</para>
+	<tgroup cols="5">
+	  <thead>
+	    <row>
+		<entry>Example</entry>
+		<entry>Gtk+ File Size</entry>
+		<entry>Gtk+ Memory</entry>
+		<entry>gtkmm File Size</entry>
+		<entry>gtkmm Memory</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	 	<entry>buttons</entry>
+	 	<entry>6256</entry>
+	 	<entry>1844</entry>
+	 	<entry>30996</entry>
+	 	<entry>2820</entry>
+	    </row>
+	    <row>
+	 	<entry>clist</entry>
+	 	<entry>7720</entry>
+	 	<entry>1900</entry>
+	 	<entry>32012</entry>
+	 	<entry>2840</entry>
+	    </row>
+	    <row>
+	 	<entry>filesel</entry>
+	 	<entry>5496</entry>
+	 	<entry>2076</entry>
+	 	<entry>27820</entry>
+	 	<entry>3052</entry>
+	    </row>
+	    <row>
+	 	<entry>progressbar</entry>
+	 	<entry>9844</entry>
+	 	<entry>1916</entry>
+	 	<entry>34056</entry>
+	 	<entry>2932</entry>
+	    </row>
+	    <row>
+	 	<entry>rulers</entry>
+	 	<entry>6632</entry>
+	 	<entry>1812</entry>
+	 	<entry>24300</entry>
+	 	<entry>2740</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+      <para>where GTK+File is the file size and GTK+Mem the resident memory 
+	size of the GTK+ executables; and gtkmmFile and gtkmmMem the 
+	respective sizes of the gtkmm executables. 
+      </para>
+      <para>C++ executables are necessarily larger than C executables since 
+	they require all sorts of info in order to properly link (dynamic)
+	class structures at run time. All Unices today are clever enough to 
+	actually load in memory only what is needed. Therefore, a large 
+	executable and large dynamic libraries do not necessarily mean large 
+	memory consumption.
+      </para>
+    </sect1>
+
+    <sect1>
+      <title>How can I build a static executable (libgtkmm.a seems to be missing)?</title>
+      <para>Reconfigure gtkmm by doing a
+      </para>
+      <simplelist>
+	  <member><command>cd gtkmm-1.0.x/</command></member>
+	  <member><command>./configure --enable-static</command></member>
+	  <member><command>make</command></member>
+	  <member><command>make install</command></member>
+      </simplelist>
+    </sect1>
+
+  <chapter id="BuildingFromCVS">
+    <title>Building gtkmm from CVS</title>
+      
+    <sect1>
+      <title>About CVS in general</title>
+	<para>There are excellent sources of information and tutorials 
+	available, both on the 
+	  <ulink url="http://developer.gnome.org">Gnome Developer's website</ulink>
+	In fact, if you got to this FAQ, 
+	you've probably passed by the 
+	  <ulink url="http://developer.gnome.org/tools/cvs.html">CVS tutorial</ulink>
+	There's also
+	documentation at the following addresses:
+      </para>
+        <simplelist>
+	  <member><ulink url="http://www.cyclic.com/cvs/doc-blandy-text.html">Introduction to CVS</ulink></member>
+	  <member><ulink url="http://www.loria.fr/~molli/cvs/doc/cvs_toc.html">CVS manual</ulink></member>
+        </simplelist>
+    </sect1>
+
+    <sect1>
+      <title>Getting it from CVS</title>
+	<para>Once you have checked out the code, you need to run the
+	autoconf/automake scripts to generate the configure script and
+	makefiles. It's fairly simple (assuming you've logged into the 
+	CVS server).
+	</para>
+        <simplelist>
+          <member><command>cvs checkout</command></member>
+	  <member><command>cd <filename>target</filename></command></member>
+	  <member><command>./autogen.sh</command></member>
+	</simplelist>
+	<para>If there are any arguments you want to supply to the 
+	configure script, add them as arguments to the autogen.sh command. 
+	Or simply erase the config.cache file and run 
+	<command>./configure</command> with the proper args.
+	</para>
+    </sect1>
+
+    <sect1>
+      <title>Problems building from CVS</title>
+	<para>Sometimes, depending on what other packages you've 
+	installed or compiled or upgraded, you may run into problems 
+	during the autogen.sh script. Some symptoms of these problems 
+	look like:
+	</para>
+
+<para>
+<command>./autogen.sh</command>
+<literallayout>
+[...snip...]
+Running aclocal  -I macros ...
+aclocal: configure.in: 13: macro `AM_PROG_LIBTOOL' not found in library
+aclocal: configure.in: 19: macro `AM_PATH_GTK' not found in library
+aclocal: configure.in: 19: macro `AM_PATH_GTK' not found in library
+[...snip...]
+</literallayout>
+</para>
+
+	<para>
+	This is caused when the aclocal program cannot find all the required
+	m4 macro files.  In this case, we have installed or upgraded software
+	packages into the /usr/local directory hierarchy.  However, aclocal is
+	only looking in the standard /usr/share/aclocal directory and the
+	local <filename>./macros</filename> directory.  We need to tell aclocal to look in the
+	/usr/local/share/aclocal directory for user-installed files:
+	</para>
+        <simplelist>
+	  <member><command>export ACLOCAL_FLAGS='-I /usr/local/share/aclocal'</command></member>
+	  <member><command>./autogen.sh</command></member>
+        </simplelist>
+	<para>
+	This should lead to a successful install.
+	</para>
+    </sect1>
+
+
+    <sect1>
+      <title>More problems building from CVS</title>
+	<para> However, after trying the above ACLOCAL_FLAGS trick, you might 
+	run into further problems, as shown below:
+	</para>
+<para>
+<command>./autogen.sh</command>
+<literallayout>
+[...snip...]
+aclocal: /usr/local/share/aclocal/glib.m4: 8: duplicated macro
+`AM_PATH_GLIB'
+[...snip...]
+aclocal: configure.in: 13: macro `AM_PROG_LIBTOOL' not found in library
+aclocal: configure.in: 19: macro `AM_PATH_GTK' not found in library
+aclocal: configure.in: 19: macro `AM_PATH_GTK' not found in library
+[...snip...]
+</literallayout>
+</para>
+
+	<para>
+	This is caused when there is something wrong with the m4 macros. In
+	this case, the "duplicated macro" is the first warning that something
+	has gone awry. If we look at the <filename>/usr/share/aclocal</filename> 
+	directory, we find the files:
+	</para>
+
+<para>
+<command>% ls /usr/share/aclocal</command>
+<literallayout>
+ccstdc.m4   gimp.m4    lcmessage.m4   missing.m4   protos.m4   strtod.m4
+cond.m4     glib.m4    lex.m4         mktime.m4    ptrdiff.m4  termios.m4
+dmalloc.m4  guile.m4   libmikmod.m4   multi.m4     qthreads.m4  winsz.m4
+error.m4    header.m4  lispdir.m4     obstack.m4   regex.m4
+gettext.m4  init.m4    maintainer.m4  progtest.m4  sanity.m4
+</literallayout>
+</para>
+
+	<para>
+	while in <filename>/usr/local/share/aclocal</filename> we find:
+	</para>
+
+<para>
+<command>% ls /usr/local/share/aclocal</command>
+<literallayout>
+audiofile.m4  glib.m4   gtk.m4    libIDL.m4  libglade.m4  sigc++.m4
+esd.m4        gtk--.m4  imlib.m4  libart.m4  libtool.m4
+</literallayout>
+</para>
+
+	<para>
+	Clearly, the glib.m4 file is duplicated. We must get rid of the
+	duplication, in favor of the new(er) libraries installed in
+	/usr/local. So a simple:
+	</para>
+        <simplelist>
+	  <member><command>mv /usr/share/aclocal/glib.m4 /usr/share/aclocal/glib.m4.old </command></member>
+        </simplelist>
+	<para>
+	and rerun the <command>autogen.sh</command> leads to a successful build.
+	</para>
+
+	<para>
+	Thanks to Michael Meeks, Morten Welinder, and Miguel Icaza for the
+	hints, tips, tricks, and suggestions described in the above FAQ.
+	</para>
+
+	<para>
+	The problems described above are not a dramatization or re-enactment
+	of events. The problems were real. The solutions are real.  Really.
+	</para>
+    </sect1>
+
+  </chapter>
+
+
+  <chapter id="VariousProblems">
+    <title>Various gtkmm problems, oddities and hints</title>
+
+    <sect1>
+      <title>Why doesn't my drawing area accept keypresses?</title>
+      <para>It is not exactly what you would guess. There are two reasons 
+	a widget can't get keypresses. Widgets without windows don't get 
+	many of the events by default. But a drawing area does have a window 
+	so this isn't the problem. Keypresses only go to windows which have 
+	focus. Focus can be gotten by tabbing to the window or by setting 
+	<command>Gtk::Widget::grab_focus()</command>. In order for this to 
+	happen the can focus flag must be set in widget. Since a drawing 
+	area is a primitive widget which may or may not be focusable, it is 
+	up to the user to call 
+	<command>Gtk::Widget::set_flags(GTK_CAN_FOCUS)</command> 
+	in their constructor.
+      </para> 
+    </sect1>
+
+    <sect1>
+      <title>How can I access the Gtk+ data from a gtkmm object?</title>
+      <para>Sometimes you may try to access a piece of Gtk+ functionality 
+	which is not supported through gtkmm (the gtkmm authors are busy 
+	people, as such gtkmm is quite complete but not perfect). In such 
+	a case you can call <command>Gtk::Widget::gtkobj()</command> which 
+	will return to you the plain C Gtk+ data structure your gtkmm object 
+	wraps. You can then operate directly on this C object as you would 
+	in any Gtk+ program. 
+      </para> 
+    </sect1>
+
+    <sect1>
+      <title>Can I use C++ exceptions with gtkmm?</title>
+      <para>Yes, it is possible but it is not a very good idea.
+        The official answer, is 
+	that since plain C doesn't know what a C++ exception is, you can 
+	use exceptions in your gtkmm code as long as there are no C functions 
+	in your call stack between the thrower and the catcher. This basically 
+	means that you have to catch your exception locally.   
+      </para> 
+      <para>Another (the unofficial) answer is that you can recompile glib 
+	and Gtk+ (and any other libraries you use) using the -fexceptions flag 
+	which will make them exceptions-aware. You can do this as follows: 
+      </para>
+      <simplelist>
+	  <member><command>export CFLAGS='-fexceptions'</command></member>
+	  <member><command>./configure</command></member>
+	  <member><command>make</command></member>
+	  <member><command>make install</command></member>
+      </simplelist>
+      <para>However, the caveat here is that the <command>-fexceptions</command> 
+	is a GNU gcc specific flag which is not portable to other compilers. 
+	Also, you can't really expect all your users to recompile all their 
+	libraries just to use your program.  Worse, propogation of those
+        exceptions will break the flow of Gtk+ and thus result in memory leaks.
+        As such, in the current state 
+	of gtkmm, exceptions are of limited use. Currently, no reasonable 
+	solution has been found for this problem. 
+      </para>
+    </sect1>
+
+  </chapter>
+
+</book>

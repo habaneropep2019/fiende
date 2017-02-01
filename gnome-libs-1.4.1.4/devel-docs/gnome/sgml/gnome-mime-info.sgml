@@ -1,0 +1,343 @@
+<refentry id="gnome-gnome-mime-info">
+<refmeta>
+<refentrytitle>gnome-mime-info</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-mime-info</refname><refpurpose>Routines to get information bound to a MIME type.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+const char* <link linkend="gnome-mime-get-value">gnome_mime_get_value</link>            (const char *mime_type,
+                                             char *key);
+<link linkend="GList">GList</link>*      <link linkend="gnome-mime-get-keys">gnome_mime_get_keys</link>             (const char *mime_type);
+const char* <link linkend="gnome-mime-program">gnome_mime_program</link>              (const char *mime_type);
+const char* <link linkend="gnome-mime-description">gnome_mime_description</link>          (const char *mime_type);
+const char* <link linkend="gnome-mime-nametemplate">gnome_mime_nametemplate</link>         (const char *mime_type);
+const char* <link linkend="gnome-mime-test">gnome_mime_test</link>                 (const char *mime_type);
+const char* <link linkend="gnome-mime-composetyped">gnome_mime_composetyped</link>         (const char *mime_type);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-mime-copiousoutput">gnome_mime_copiousoutput</link>        (const char *mime_type,
+                                             char *key);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-mime-needsterminal">gnome_mime_needsterminal</link>        (const char *mime_type,
+                                             char *key);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The routines in the <filename>gnome-mime-info</filename> allow
+retrieval of information that has been bound to a given MIME type.
+There are a number of standard keys used in GNOME to provide default
+actions and behaviour.</para>
+
+<para>
+To add keys to a MIME type, it is necessary to install a file with the
+extension <filename>.keys</filename> in the
+<filename>$gnome/share/mime-info</filename> directory or in the
+<filename>~/.gnome/mime-info directory</filename> directory.  The
+former is for system-provided MIME information and the latter is to
+enable the user to extend the actions as provided by the system.
+</para>
+
+<para>
+The file <filename>$gnome/share/mime-info/gnome.keys</filename> is
+special, as it contains the defaults for gnome, and is read first.  In
+addition, the file <filename>~/.gnome/mime-info/user.keys</filename> is
+read last.  This will guarantee that there is a way to set system
+defaults, and there is a way for the user to override them.  There is
+currently no way to tell anything about the order of the other files in
+those directories, nor is there any way to override system defaults yet.
+</para>
+
+<para>
+The <filename>.keys</filename> files have the following format:</para>
+
+<example>
+  <title>Format of a .keys file</title>
+  <programlisting>
+mime-type-match:
+	[\[LANG\]]key=value
+  </programlisting>
+</example>
+
+<para>
+Above, the <structfield>key</structfield> is the key that is being
+defined, and <structfield>value</structfield> is the value we bind to
+it.  The optional <structfield>[LANG]</structfield> represents a
+language in which this definition is valid.  If this part is
+specified, then the definition will only be valid if LANG matches the
+setting of the environment variable LANG.  The LANG setting is used to
+provide keys which can be displayed to the user in a localized way.
+</para>
+
+<para>
+This is an example to bind the key <emphasis>open</emphasis> to all of
+the MIME types matching <emphasis>image/*</emphasis> and the
+<emphasis>icon-filename</emphasis> key is bound to the
+<filename>/opt/gimp/share/xcf.png</filename> value:</para>
+
+<example>
+  <title>Sample gimp.keys file</title>
+  <programlisting>
+image/*:
+	open=gimp <literal>f</literal>
+
+image/x-xcf:
+        icon-filename=/opt/gimp/share/xcf.png
+  </programlisting>
+</example>
+
+<para>This will make the GIMP the handler for the open action.  Files of
+type xcf would use the filename pointed to in the icon-filename key.</para>
+
+<para><literal>f</literal> gets interpolated with the file name or the list of file names that
+matched this MIME type.</para>
+
+<para>As you can see from the example above, a
+<filename>.keys</filename> file does not need to provide all of the
+values, it can just provide or override some of the actions.</para>
+
+<para>User defined bindings in <filename>.keys</filename> file will take
+precedence over system installed files.</para>
+
+<para>The following keys are currently used in the GNOME
+desktop:</para>
+
+<itemizedlist>
+  <listitem><para><emphasis>open</emphasis>: Open the file with this
+    command.</para></listitem>
+
+
+  <listitem><para><emphasis>icon-filename</emphasis>: The filename
+    with the icon that should be used to represent files of this type.</para>
+  </listitem>
+
+  <listitem><para><emphasis>view</emphasis>: Command to view the file
+    contents.</para></listitem>
+
+  <listitem><para><emphasis>ascii-view</emphasis>: A command that
+   should be used to do an ascii-rendering of the file.  Used as a
+   fallback by the filemanager if a <emphasis>view</emphasis> action
+   does not exist.</para></listitem>
+
+  <listitem><para><emphasis>fm-open</emphasis>:file-manager open.  If
+   present, the file manager will use this action instead of the value
+   in open to perform this action (the filemanager for example will
+   open archive files as if they were directories by using the VFS).</para>
+  </listitem>
+
+  <listitem><para><emphasis>fm-view</emphasis>: file-manager view.  If
+    present, invoking the view opertion on the file manager will use
+    the value defined here instead of the value in "view".
+  </para></listitem>
+
+  <listitem><para><emphasis>fm-ascii-view</emphasis>:Fallback
+    operation for the file manager as well.</para>
+  </listitem>
+
+</itemizedlist>
+
+<para>Those keys are also queried on the metadata (except in the cases
+where the lookup would be too expensive). </para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="gnome-mime-get-value">gnome_mime_get_value ()</title>
+<programlisting>const char* gnome_mime_get_value            (const char *mime_type,
+                                             char *key);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>key</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-get-keys">gnome_mime_get_keys ()</title>
+<programlisting><link linkend="GList">GList</link>*      gnome_mime_get_keys             (const char *mime_type);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry> the mime type to lookup.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a GList that contains private strings with all of the keys
+associated with the <parameter>mime_type</parameter>.  
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-program">gnome_mime_program ()</title>
+<programlisting>const char* gnome_mime_program              (const char *mime_type);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry> the mime_type 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the program intended to be loaded for this given mime-type
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-description">gnome_mime_description ()</title>
+<programlisting>const char* gnome_mime_description          (const char *mime_type);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry> the mime type
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the description for this mime-type
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-nametemplate">gnome_mime_nametemplate ()</title>
+<programlisting>const char* gnome_mime_nametemplate         (const char *mime_type);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-test">gnome_mime_test ()</title>
+<programlisting>const char* gnome_mime_test                 (const char *mime_type);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry> the mime type
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the command to be executed on the file before considering
+the file to match this mime_type.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-composetyped">gnome_mime_composetyped ()</title>
+<programlisting>const char* gnome_mime_composetyped         (const char *mime_type);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry> the mime type
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the command to be executed to compose a message of
+the given mime_type
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-copiousoutput">gnome_mime_copiousoutput ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_mime_copiousoutput        (const char *mime_type,
+                                             char *key);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry> the mime type
+</entry></row>
+<row><entry align="right"><parameter>key</parameter>&nbsp;:</entry>
+<entry> the key which stores the flags for a command
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a boolean value, whether the mime_type open
+command will produce lots of output
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-mime-needsterminal">gnome_mime_needsterminal ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_mime_needsterminal        (const char *mime_type,
+                                             char *key);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>mime_type</parameter>&nbsp;:</entry>
+<entry> the mime type
+</entry></row>
+<row><entry align="right"><parameter>key</parameter>&nbsp;:</entry>
+<entry> the key which stores the flags for a command
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a boolean value, whether the mime_type open
+command will required a terminal.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

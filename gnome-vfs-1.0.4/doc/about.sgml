@@ -1,0 +1,100 @@
+<chapter id="about">
+  <title>Introduction to GnomeVFS</title>
+
+  <sect1>
+    <title>Uses and Purpose</title>
+    <para>
+      GnomeVFS is a filesystem abstraction library allowing applications
+      plugable transparent access to a variety of "real" filesystems, from
+      WebDAV to digital cameras, to the local filesystem. It also contains
+      a number of other convenient file utilities such as a comphrehensive
+      MIME database / Application registry, and a copy engine. Use of GnomeVFS
+      ensures that an application or component will be usable by Nautilus
+      or other GnomeVFS applications for handling the display of data from
+      various URIs, as well 
+    </para>
+    <sect2>
+      <title>User's Perspective</title>
+      <para>
+	From a user's perspective GnomeVFS enabled applications provide consistent
+	access to their data, whether it be stored on remote servers or on their
+	local harddisk, or even a peripheral device such as a Rio or a digital
+	camera. Rather than having to work around the distinction between storage
+	you can work off of and storage you can only "download" from or "upload" to,
+	GnomeVFS allows users to store their documents and data wherever it is
+	most convenient.
+      </para>
+    </sect2>
+    <sect2>
+      <title>Developer's Perspective</title>
+      <para>
+	Besides providing transparent access to data methods that you might
+	otherwise have to implement, GnomeVFS provides a number of convenience
+	libraries for processing URIs, detecting the MIME type of files, and
+	even figuring out which applications or components to launch to view
+	a file or what icon to use. Writing a GnomeVFS module may also be an
+	appropriate solution to some data access problems as it allows the
+	developer to implement a relatively small number of functions to gain
+	general filesystem semantics (and of course, writing a GnomeVFS module
+	benefits other applications too!).
+      </para>
+    </sect2>
+  </sect1>
+  <sect1>
+    <title>A Gentle Programming Primer</title>
+    <para>
+      Using GnomeVFS in an existing application, or writing a new application
+      with it, is actually very simple since GnomeVFS tries to mimic POSIX
+      file access syntax and semantics. That means that most "standard unix calls" 
+      have a GnomeVFS equivalent that operates in a fairly similar manner. There are
+      a few differences to keep in mind. 
+
+      <itemizedlist>
+	
+	<listitem>
+	  <para>
+	    The most obvious is probably that all I/O operations return a <type>GnomeVFSResult</type>
+	    indicating the success or failure of the operation. More on this later.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    The types may be slightly different (but still parallel), for example rather than using an 
+	    <type>int</type> for a file-descriptor, GnomeVFS uses <type>GnomeVFSHandle</type>, a handle
+	    to a particular URI.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Most operations come in Handle (think file descriptor) and URI form. The URI form may be
+	    more convenient if you do not want to track handles, etc, but just be aware that both are
+	    at your disposal and may be used interchangably. For example <function>gnome_vfs_open</function>
+	    and <function>gnome_vfs_open_uri</function>.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </para>
+    <para>
+      By way of example, consider the basic read command:
+      <programlisting>
+	ssize_t read (int fd, void *buf, size_t count);
+      </programlisting>
+    </para>
+    <para>
+      The GnomeVFS equivalent is very similar, but you will notice slightly different data types. The
+      consistent returning of a GnomeVFSResult also necessitated moving the return value of read into
+      a pass-back-value pointer <variable>bytes_read</variable>:
+      <programlisting>
+	GnomeVFSResult gnome_vfs_read (GnomeVFSHandle *handle,
+	                               gpointer buffer,
+                                       GnomeVFSFileSize bytes,
+                                       GnomeVFSFileSize *bytes_read);
+      </programlisting>
+    </para>
+      <sect2>
+	<title>Conversion of a Sample Code Block</title>
+	<para>
+	</para>
+      </sect2>
+  </sect1>
+</chapter>

@@ -1,0 +1,411 @@
+/* $Id: dialog.gen_h,v 1.53 2001/08/03 20:00:29 murrayc Exp $ */
+
+/* dialog.gen_h, dialog.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/window.h>
+#include <gnome--/types.h>
+#include <libgnomeui/gnome-dialog.h>
+#include <libgnomeui/gnome-dialog-util.h>
+
+namespace Gtk {
+class Editable;
+class VBox;
+class Button;
+}
+
+CLASS_START(Gnome);
+//: Create popup windows.
+//- Unlike GnomeDialog in C, Gnome::Dialog does not self-destruct when
+//- run() or run_and_close() returns, so you can use it again.
+//- Just delete it later, like any other Window.
+
+class Dialog : public Gtk::Window
+{
+  WRAP_CLASS(Dialog, GnomeDialog,
+             GNOME_DIALOG, GNOME_IS_DIALOG,
+             dialog,
+             Gtk::Window, GtkWindow, GTK_WINDOW);
+public:
+  typedef SigC::Slot0<void> Callback;
+  
+  Dialog();
+  Dialog(const Gtk::string &title,
+	       const Gtk::SArray &buttons);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+public:
+
+  WRAP_MEMBER(value,vbox, vbox, Gtk::VBox*, GtkWidget*);
+
+  //: returns the button indexed by number.
+  Gtk::Button* get_button(gint number) const;
+
+  //: connects a callback to a button.
+  //- This is short for dialog.get_button(number)->clicked.connect(s)
+  void connect(gint number, const Callback& s);
+
+  WRAP_METHOD(
+    void gnome_dialog_set_parent(GnomeDialog*,GtkWindow*),
+    void set_parent (Gtk::Window &parent));
+
+
+  //: Make the dialog modal until a button is clicked. 
+  //- returns button number or -1 for none.
+  WRAP_METHOD(gint gnome_dialog_run (GnomeDialog*),
+    gint run ());
+
+  WRAP_METHOD(gint gnome_dialog_run_and_close (GnomeDialog*),
+    gint run_and_close ());
+
+  //: Set the default button
+  WRAP_METHOD(void gnome_dialog_set_default (GnomeDialog*, gint),
+    void set_default (gint button));
+
+  //: Set button sensitivity
+  WRAP_METHOD(void gnome_dialog_set_sensitive (GnomeDialog*, gint , gboolean),
+    void set_sensitive (gint button, gboolean setting));
+
+  //: Accelerator for a button
+  WRAP_METHOD(void gnome_dialog_set_accelerator(GnomeDialog*,gint,
+      const guchar , guint8),
+    void set_accelerator(gint button, 
+                         const guchar accelerator_key, 
+                         guint8 accelerator_mods));
+
+  //: Close the dialog, either by hiding or destroying
+  WRAP_METHOD(void gnome_dialog_close (GnomeDialog*),
+    void cause_close ());
+
+  //: Whether the dialog does delete_self() or just hide() on close.
+  //- For Gnome-- this is set in the constructor.
+  //- It is very unlikely that you would want to set this to false,
+  //- because it could free the memory used by member variables,
+  //- or leave your pointers pointing to freed memory.
+  WRAP_METHOD(void gnome_dialog_close_hides (GnomeDialog* , gboolean),
+    void close_hides (gboolean just_hide = true));
+
+  //: Whether any button click should trigger a close.
+  WRAP_METHOD(void gnome_dialog_set_close (GnomeDialog* , gboolean),
+	      void set_close (gboolean click_closes));
+
+  //: Use a stock button name to get stock features, or just use your own text.
+  //-  e.g. GNOME_STOCK_BUTTON_OK: See gnome-stock.h
+  WRAP_METHOD(void gnome_dialog_append_button(GnomeDialog*, 
+       const gchar*),
+     void append_button (const Gtk::string &name));
+     
+  WRAP_METHOD(void gnome_dialog_append_button_with_pixmap (GnomeDialog*, 
+       const gchar*, const gchar*),
+     void append_button (const Gtk::string &name, const Gtk::string &pixmap));
+
+
+  // Will wrap those only if there's a request for it - GL
+  // gnome_dialog_append_buttons()
+  // gnome_dialog_append_buttonsv()
+  // gnome_dialog_append_buttons_with_pixmaps()
+
+  //: Whether pushing return in this editable should
+  //:  activate the default button.
+  WRAP_METHOD(void gnome_dialog_editable_enters(GnomeDialog*,GtkEditable*),
+    void editable_enters(Gtk::Editable& e));
+
+  //: gint is the button number.
+  SIGNAL_SPEC("clicked", both,
+    void clicked(gint));
+
+  //: 
+  //- For Gtk+, the return value of the close handler allows or blocks
+  //-  the close; for gtk--, it is basically irrelevant (just override the
+  //-  default close_impl to block the close)
+  SIGNAL_SPEC("close", both|marsh, 
+    gboolean close());
+
+};
+
+
+// Stock dialogs
+namespace Dialogs {
+// these produce popup dialogs of various types. 
+// ones with a parent are best done using Gnome::App::dialogname
+// 
+// We are going to reverse the argument from the way they are in gnome.
+// (as we overload).  Parent is really the most important argument.
+//
+// All are managed and will automatically free when finished. (?)
+
+  
+//: Create a ok message dialog.
+//- Use this when you have a message which must be acknoledged by the
+//- user.  If you are just placing a status try {Gnome::App::flash()}
+Dialog* ok(const Gtk::string &msg);
+Dialog* ok(Gtk::Window& parent,const Gtk::string &msg);
+
+//: Create a fatal error dialog.
+//- This should represent a fatal error which the program will likely
+//- save and quit.  It contains a ok button.
+Dialog* error(const Gtk::string &msg);
+Dialog* error(Gtk::Window& parent,const Gtk::string &msg);
+
+//: Create a warning dialog.
+//- This is more sever than an ok dialog but not fatal.
+Dialog* warning(const Gtk::string &msg);
+Dialog* warning(Gtk::Window& parent,const Gtk::string &msg);
+
+//: Create a yes/no question dialog.
+Dialog* question(const Gtk::string& msg,
+                 ReplyCallback callback = 0);
+Dialog* question(Gtk::Window &parent,
+                 const Gtk::string &msg,
+                 ReplyCallback callback=0);
+  
+//: Create a yes/no question dialog (modal).
+Dialog* question_modal(const Gtk::string &msg,
+                       ReplyCallback callback=0);
+Dialog* question_modal(Gtk::Window &parent,
+                       const Gtk::string &msg,
+                       ReplyCallback callback=0);
+  
+//: Create a ok/cancel dialog (modal).
+Dialog* ok_cancel(const Gtk::string &msg,
+                  ReplyCallback callback=0);
+Dialog* ok_cancel(Gtk::Window &parent,
+                  const Gtk::string &msg,
+                  ReplyCallback callback=0);
+
+Dialog* ok_cancel_modal(const Gtk::string &msg,
+                        ReplyCallback callback=0);
+Dialog* ok_cancel_modal(Gtk::Window &parent,
+                        const Gtk::string &msg,
+                        ReplyCallback callback=0);
+								 
+Dialog* request(bool hidden,
+                const Gtk::string &prompt,
+                const Gtk::string &default_text,
+                const guint16 max_length,
+                StringCallback cb=0);
+
+Dialog* request(Gtk::Window& parent,
+                bool hidden,
+                const Gtk::string &prompt,
+                const Gtk::string &default_text,
+                const guint16 max_length,
+                StringCallback cb=0);
+
+} /* namespace Dialogs */  
+
+PRIVATE_START;
+#include <gtk--/private/window_p.h>
+
+IMPL_START;
+#include <gnome--/private/dialog_p.h>
+#include <gnome--/app-callback.h>
+/* dialog.cc
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+#include <gtk--/editable.h>
+#include <gtk--/box.h>
+#include <gtk--/button.h>
+
+namespace Gnome
+{
+  using namespace SigC;
+  using namespace Gtk;
+
+Dialog::Dialog()
+  : Gtk::Window(GTK_WINDOW(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  
+  //Prevent automatic gtkobj destruction upon dialog close.
+  //It's not suitable for C++.
+  close_hides();
+}
+
+//: This constructor is really quite useless.
+Dialog::Dialog(const Gtk::string &title,
+               const Gtk::SArray &buttons)
+  : Gtk::Window(GTK_WINDOW(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  
+  const gchar **buttons_ = (const gchar**)buttons;
+  gnome_dialog_constructv(gtkobj(), title.c_str(), buttons_);
+
+  //Prevent automatic gtkobj destruction upon dialog close.
+  //It's not suitable for C++.
+  close_hides();
+}
+
+Gtk::Button* Dialog::get_button(gint number) const
+  {
+    return Gtk::wrap((GtkButton*)(g_list_nth (gtkobj()->buttons, number)->data));
+  }
+
+void Dialog::connect(gint number, const Callback& s)
+  {
+    Gtk::Button *b=get_button(number);
+    if (b) 
+       b->clicked.connect(s);
+  }
+
+/********************************************************************/
+
+namespace Dialogs {
+
+
+Dialog* ok(const Gtk::string &msg)
+  { return wrap((GnomeDialog*)gnome_ok_dialog(msg.c_str())); }
+Dialog* ok(Gtk::Window& parent,const Gtk::string &msg)
+  { return wrap((GnomeDialog*)gnome_ok_dialog_parented(msg.c_str(),parent.gtkobj())); }
+
+Dialog* warning(const Gtk::string &msg)
+  { return wrap((GnomeDialog*)gnome_warning_dialog(msg.c_str())); }
+Dialog* warning(Gtk::Window& parent,const Gtk::string &msg)
+  { return wrap((GnomeDialog*)gnome_warning_dialog_parented(msg.c_str(),parent.gtkobj())); }
+
+Dialog* error(const Gtk::string &msg)
+  { return wrap((GnomeDialog*)gnome_error_dialog(msg.c_str())); }
+Dialog* error(Gtk::Window& parent,const Gtk::string &msg)
+  { return wrap((GnomeDialog*)gnome_error_dialog_parented(msg.c_str(),parent.gtkobj())); }
+
+
+Dialog* question(const Gtk::string &msg,ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_question_dialog(msg.c_str(),&reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+Dialog* question(Gtk::Window& parent,const Gtk::string &msg,ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_question_dialog_parented(msg.c_str(),
+        &reply_call,rh,parent.gtkobj()));
+    add_reply(w,rh);
+    return w;
+  }
+
+Dialog* question_modal(const Gtk::string &msg,ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_question_dialog_modal(msg.c_str(),&reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+Dialog* question_modal(Gtk::Window& parent,const Gtk::string &msg,ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_question_dialog_modal_parented(msg.c_str(),
+        &reply_call,rh,parent.gtkobj()));
+    add_reply(w,rh);
+    return w;
+  }
+
+
+Dialog* ok_cancel(const Gtk::string &msg,ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_ok_cancel_dialog(msg.c_str(),&reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+Dialog* ok_cancel(Gtk::Window& parent,const Gtk::string &msg,ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_ok_cancel_dialog_parented(msg.c_str(),
+        &reply_call,rh,parent.gtkobj()));
+    add_reply(w,rh);
+    return w;
+  }
+
+Dialog* ok_cancel_modal(const Gtk::string &msg,ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_ok_cancel_dialog_modal(msg.c_str(),&reply_call,rh));
+    add_reply(w,rh);
+    return w;
+  }
+Dialog* ok_cancel_modal(Gtk::Window& parent,const Gtk::string &msg,ReplyCallback cb)
+  {
+    ReplyHolder* rh=new ReplyHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_ok_cancel_dialog_modal_parented(msg.c_str(),
+        &reply_call,rh,parent.gtkobj()));
+    add_reply(w,rh);
+    return w;
+  }
+
+Dialog* request(bool hidden,
+                const Gtk::string& prompt,
+                const Gtk::string& initial,
+                guint16 max,
+                StringCallback cb)
+  {
+    StringHolder* rh=new StringHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_request_dialog(hidden,prompt.c_str(),initial.c_str(),max,
+                           (GnomeStringCallback)&string_reply_call,rh,0));
+    add_reply(w,rh);
+    return w;
+  }
+Dialog* request(Gtk::Window& parent,
+                bool hidden,
+                const Gtk::string& prompt,
+                const Gtk::string& initial,
+                guint16 max,
+                StringCallback cb)
+  {
+    StringHolder* rh=new StringHolder(cb);
+    Gnome::Dialog* w=wrap((GnomeDialog*)
+      gnome_request_dialog(hidden,prompt.c_str(),initial.c_str(),max,
+                           (GnomeStringCallback)&string_reply_call,rh,parent.gtkobj()));
+    add_reply(w,rh);
+    return w;
+  }
+
+} /* namespace Dialogs */
+} /* namespace Gnome */

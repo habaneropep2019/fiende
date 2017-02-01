@@ -1,0 +1,109 @@
+/* $Id: file-entry.gen_h,v 1.9 2000/08/30 18:13:36 kenelson Exp $ */
+
+
+/* file-entry.gen_h
+ * 
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <libgnomeui/gnome-file-entry.h>
+
+CLASS_START(Gnome);
+class FileEntry : public Gtk::HBox
+{
+  WRAP_CLASS(FileEntry, GnomeFileEntry,
+             GNOME_FILE_ENTRY, GNOME_IS_FILE_ENTRY,
+             file_entry,
+             Gtk::HBox, GtkHBox, GTK_HBOX);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  FileEntry(const Gtk::string &history_id,
+		  const Gtk::string &browse_dialog_title);
+
+  Gtk::Widget* gnome_entry();
+  Gtk::Widget* gtk_entry();
+
+  WRAP_METHOD(void gnome_file_entry_set_title (GnomeFileEntry*, const gchar*),
+	      void set_title (const Gtk::string &browse_dialog_title));
+
+  WRAP_METHOD(void gnome_file_entry_set_default_path(GnomeFileEntry*, const gchar*),
+	      void set_default_path(const Gtk::string &path));
+
+  WRAP_METHOD(void gnome_file_entry_set_directory(GnomeFileEntry*, gboolean),
+	      void set_directory(bool directory_entry));
+
+  Gtk::string get_full_path(bool file_must_exist) const;
+
+  WRAP_METHOD(void gnome_file_entry_set_modal (GnomeFileEntry*, gboolean),
+	      void set_modal (bool is_modal));
+
+  SIGNAL_SPEC("browse_clicked", both, void browse_clicked());
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+#include <gnome--/private/file-entry_p.h>
+
+namespace Gnome {
+
+FileEntry::FileEntry(const Gtk::string &history_id,
+				 const Gtk::string &browse_dialog_title)
+  : Gtk::HBox(GTK_HBOX(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gnome_file_entry_construct(gtkobj(),
+			     history_id.c_str(),
+			     browse_dialog_title.c_str());
+}
+
+
+Gtk::Widget*
+FileEntry::gnome_entry()
+{
+  return Gtk::wrap(gnome_file_entry_gnome_entry(gtkobj()));
+}
+
+Gtk::Widget*
+FileEntry::gtk_entry()
+{
+  return Gtk::wrap(gnome_file_entry_gtk_entry(gtkobj()));
+}
+
+Gtk::string
+FileEntry::get_full_path(bool file_must_exist) const
+{
+  gchar *tmp = gnome_file_entry_get_full_path(const_cast<GnomeFileEntry*>(gtkobj()),
+					     file_must_exist);
+  Gtk::string s(tmp);
+
+  g_free(tmp);
+  
+  return s;
+}
+
+} /* namespace Gnome */ 
+
+DOCUMENTATION_START;
+

@@ -1,0 +1,151 @@
+/*
+ * bonobo-embeddable.idl: handles embeddable components
+ *
+ *   An Embeddable is an object that can be used inside
+ * an office productivity application; it is part of a
+ * compound document. Mostly people will want to implement
+ * the Control interface for their application first.
+ *
+ * Copyright (C) 1999, 2000  Helix Code, Inc.
+ *
+ * Authors:
+ *	Miguel de Icaza (miguel@helixcode.com)
+ *	Nat Friedman    (nat@helixcode.com)
+ */
+
+#ifndef BONOBO_EMBEDDABLE_IDL
+#define BONOBO_EMBEDDABLE_IDL
+
+#include "Bonobo_Unknown.idl"
+#include "Bonobo_Control.idl"
+#include "Bonobo_Canvas.idl"
+#include "Bonobo_ClientSite.idl"
+#include "Bonobo_Advise.idl"
+
+module Bonobo {
+
+interface View : Control {
+
+	/**
+	 * setZoomFactor:
+	 * @zoom: zoom factor
+	 *
+	 * Requests that the view be running at zoom factor
+	 */
+	void setZoomFactor (in double zoom);
+};
+
+interface ViewFrame : ControlFrame {
+
+	/**
+	 * getClientSite:
+	 *
+	 * Returns: The Bonobo::ClientSite interface associated
+	 * with this ViewFrame.
+	 */
+	ClientSite getClientSite ();
+
+};
+
+/* Similar to IOleObject */
+interface Embeddable : Bonobo::Unknown {
+
+	/**
+	 * setClientSite:
+	 * @clientSite: the client site for this Object
+	 *
+	 * Sets the client site for this object
+	 */
+	void setClientSite (in ClientSite clientSite);
+
+	/**
+	 * getClientSite:
+	 * 
+	 * Returns the current client site
+	 */
+	ClientSite getClientSite ();
+
+	/**
+	 * setHostName:
+	 * @name: Text
+	 * @appname: name of the container application
+	 *
+	 * Sets the text that should be displayed on the window title
+	 * when this object is opened in a separate window for editing
+	 */
+	void setHostName (in string name, in string appname);
+
+	/**
+	 * setURI:
+	 * @uri: the uri that this component represents.
+	 */
+	void setURI (in string uri);
+
+	/**
+	 * close:
+	 * @mode: Save mode.
+	 *
+	 * Close the Bonobo Object
+	 */
+	exception UserCancelledSave {};
+
+	enum CloseMode {
+		SAVE_IF_DIRTY,
+		NO_SAVE,
+		PROMPT_SAVE
+	};
+
+	void close (in CloseMode mode)
+		raises (UserCancelledSave);
+
+	/**
+	 * advise:
+	 * @advise: Where can the object inform of state changes
+	 *
+	 * Sets the object AdviseSink to @advise.  This is used
+	 * to allow the Object to notify its container of any state
+	 * changes like:
+	 * close, save, rename, lik source change events.
+	 */
+	void advise (in AdviseSink advise);
+
+	/**
+	 * unadvise:
+	 * 
+	 * Informs the object that the AdviseSink set with ::advise
+	 * is no longer valid
+	 */
+	void unadvise ();
+
+	/**
+	 * getMiscStatus:
+	 * @type: type
+	 */
+	long getMiscStatus (in long type);
+
+	/**
+	 * createView:
+	 * @frame: the View frame containing this view.
+	 *
+	 * This returns a new View object.
+	 * 
+	 * BonoboObjects should be able to produce as many views
+	 * of the same data as requested.
+	 */
+	View createView (in ViewFrame frame) ;
+
+	/**
+	 * createCanvasItem:
+	 * @aa: Whether the item should be an AA-item or not
+	 * @proxy: The Proxy used to notify of requested updates.
+	 *
+	 * Returns a Bonobo::Canvas::Component interface, or
+	 * CORBA_OBJECT_NIL if this object does not support the
+	 * Canvas::Component interface.
+	 */
+	Canvas::Component createCanvasItem (in boolean                aa,
+					    in Canvas::ComponentProxy proxy);
+};
+};
+
+#endif /* BONOBO_EMBEDDABLE_IDL */

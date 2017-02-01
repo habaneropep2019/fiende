@@ -1,0 +1,111 @@
+module CORBA {
+
+	interface DynAny {
+		exception Invalid{};
+		exception InvalidValue{};
+		exception TypeMismatch{};
+		exception InvalidSeq{};
+
+		typedef sequence<octet> OctetSeq;
+		TypeCode type();
+
+		void assign(in DynAny dyn_any) raises(Invalid);
+		void from_any(in any value) raises(Invalid);
+		any to_any() raises(Invalid);
+
+		void destroy();
+
+		DynAny copy();
+
+		void insert_boolean(in boolean value) raises(InvalidValue);
+		void insert_octet(in octet value) raises(InvalidValue);
+		void insert_char(in char value) raises(InvalidValue);
+		void insert_short(in short value) raises(InvalidValue);
+		void insert_ushort(in unsigned short value) raises(InvalidValue);
+		void insert_long(in long value) raises(InvalidValue);
+		void insert_ulong(in unsigned long value) raises(InvalidValue);
+		void insert_float(in float value) raises(InvalidValue);
+		void insert_double(in double value) raises(InvalidValue);
+		void insert_string(in string value) raises(InvalidValue);
+		void insert_reference(in Object value) raises(InvalidValue);
+		void insert_typecode(in TypeCode value) raises(InvalidValue);
+		void insert_longlong(in long long value) raises(InvalidValue);
+		void insert_ulonglong(in unsigned long long value) raises(InvalidValue);
+		void insert_longdouble(in double value) raises(InvalidValue);
+		void insert_wchar(in char value) raises(InvalidValue);
+		void insert_wstring(in string value) raises(InvalidValue);
+		void insert_any(in any value) raises(InvalidValue);
+
+		boolean get_boolean() raises(TypeMismatch);
+		octet get_octet() raises(TypeMismatch);
+		char get_char() raises(TypeMismatch);
+		short get_short() raises(TypeMismatch);
+		unsigned short get_ushort() raises(TypeMismatch);
+		long get_long() raises(TypeMismatch);
+		unsigned long get_ulong() raises(TypeMismatch);
+		float get_float() raises(TypeMismatch);
+		double get_double() raises(TypeMismatch);
+		string get_string() raises(TypeMismatch);
+		Object get_reference() raises(TypeMismatch);
+		TypeCode get_typecode() raises(TypeMismatch);
+		long long get_longlong() raises(TypeMismatch);
+		unsigned long long get_ulonglong() raises(TypeMismatch);
+		double get_longdouble() raises(TypeMismatch);
+		char get_wchar() raises(TypeMismatch);
+		string get_wstring() raises(TypeMismatch);
+		any get_any() raises(TypeMismatch);
+
+		DynAny current_component();
+		boolean next();
+		boolean seek(in long index);
+		void rewind();
+	};
+
+	interface DynFixed: DynAny {
+		OctetSeq get_value();
+		void set_value(in OctetSeq val) raises(InvalidValue);
+	};
+
+	interface DynEnum: DynAny {
+		attribute string value_as_string;
+		attribute unsigned long value_as_ulong;
+	};
+
+	typedef string FieldName;
+
+	struct NameValuePair {
+		FieldName id;
+		any value;
+	};
+
+	typedef sequence<NameValuePair> NameValuePairSeq;
+
+	interface DynStruct: DynAny {
+		FieldName current_member_name();
+		TCKind current_member_kind();
+		NameValuePairSeq get_members();
+		void set_members(in NameValuePairSeq value) raises(InvalidSeq);
+	};
+
+	interface DynUnion: DynAny {
+		attribute boolean set_as_default;
+		DynAny discriminator();
+		TCKind discriminator_kind();
+		DynAny member();
+		attribute FieldName member_name;
+		TCKind member_kind();
+	};
+
+	typedef sequence<any> AnySeq;
+
+	interface DynSequence: DynAny {
+		attribute unsigned long length;
+		AnySeq get_elements();
+		void set_elements(in AnySeq value) raises(InvalidSeq);
+	};
+
+	interface DynArray: DynAny {
+		AnySeq get_elements();
+		void set_elements(in AnySeq value) raises(InvalidSeq);
+	};
+};

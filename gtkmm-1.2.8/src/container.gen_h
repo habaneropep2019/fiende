@@ -1,0 +1,220 @@
+/* $Id: container.gen_h,v 1.116 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* container.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <gtk/gtkcontainer.h>
+/* we'll include gtkfeatures because we dont want to include the whole
+   gtk/gtk.h - this file is used by almost ALL our widgets, so dependencies
+   in minimum - adding things here will increase compile times ALOT */
+#include <gtk/gtkfeatures.h>
+
+CLASS_START(Gtk);
+class Adjustment;
+class Label;
+
+//: Abstract container class.
+//- This is the abstract container from which all gtk+ widgets which hold
+//- other items derive from.  It mainly houses virtual functions 
+//- used for inserting and removing children.  Containers in gtk+ 
+//- may hold one item or many items depending on the implementation.
+//- 
+//- This interface is used for all single item holding containers.
+//- Multi-item containers provide their own unique interface as their
+//- items are generally more complex.  The methods of the derived 
+//- classes should be prefered over these.
+class Container;
+class Container : public Widget
+{
+  WRAP_CLASS(Container,GtkContainer,GTK_CONTAINER,GTK_IS_CONTAINER,container,Gtk::Widget,GtkWidget,GTK_WIDGET);
+
+private:
+  // This one is no longer needed use add(Gtk_Widget&) instead
+  void add(Widget*);
+
+public:
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+/* Application-level methods */
+
+  // Deprecated method?
+  WRAP_METHOD(
+    void gtk_container_set_border_width(GtkContainer*,guint),
+    void set_border_width(guint width));
+
+  //: Add a single item to container at unspecified location.
+  //- Adds an item to the list or item slot for the container.
+  //- The meaning of this operation varies from one container to 
+  //- the next.  
+  //-
+  //- For single item containers, this means replace the current contents
+  //- with the specified widget.
+  //-
+  //- For multi item containers, this inserts without a location 
+  //- (should be avoided)
+  //-
+  //- Ownership follows gtk+ rules (reference counting).  Reference insertions
+  //- and insertion of unmanaged pointers will not confer ownership.
+  //- A managed pointer will be referenced and thus unless referenced
+  //- externally will be deleted with the container. 
+#m4 GTKMM_CHECK(g_return_if_fail(p1!=0);)
+  SIGNAL_SPEC("add",vfunc|impl,void add(Gtk::Widget&),void gtk_container_add(GtkContainer*,GtkWidget*));
+
+  
+  //: Remove an item from container.
+  //- Removes an item if found in the container.
+#m4 GTKMM_CHECK(g_return_if_fail(p1!=0);)
+  SIGNAL_SPEC("remove",vfunc|impl,void remove(Gtk::Widget&),void gtk_container_remove(GtkContainer*,GtkWidget*));
+
+  //: Set the resizing policy of the container.
+  WRAP_METHOD(
+    void gtk_container_set_resize_mode(GtkContainer*,GtkResizeMode),
+    void set_resize_mode(GtkResizeMode resize_mode));
+
+  //: Request contained widgets check their size.
+  SIGNAL_SPEC("check_resize",both,void check_resize(),gtk_container_check_resize);
+
+  //: Operate on contained items.
+  //- This is largely an internal used mainly for things like
+  //- creating duplicates of internal lists and other such
+  //- operations.  The result is lossy as it only gets the 
+  //- the main child and not its external pieces.
+  //-
+  //- For example notebook pages contain a page, a label, and 
+  //- a menu item.  But this only operates on the pages.
+  typedef SigC::Slot1<void, Gtk::Widget&> ForeachCallback;
+  void foreach(const ForeachCallback&);
+
+  //: (internal) Operate on contained items (see {foreach()}).
+  WRAP_METHOD(
+    void gtk_container_foreach(GtkContainer*,GtkCallback,gpointer),
+    void foreach_(GtkCallback callback,gpointer data));
+
+  //: (internal) Operate on contained items (see {foreach()}).
+  WRAP_METHOD(
+    void gtk_container_foreach_full(GtkContainer*,GtkCallback,
+           GtkCallbackMarshal,gpointer,GtkDestroyNotify),
+    void foreach_full_(GtkCallback callback,GtkCallbackMarshal marshal,
+           gpointer data,GtkDestroyNotify notify));
+
+ 
+  // Gtk_container_childern returned allocated object (bad) 
+  //Gtk_Container_List children();
+  //GList* gtk_container_children            (GtkContainer     *container);
+
+  SIGNAL_SPEC("focus",both,gint focus(GtkDirectionType),gtk_container_focus);
+
+
+/* Widget-level methods */
+
+  //: Sets the focus on a child.
+  SIGNAL_SPEC("set_focus_child",vfunc|impl,void set_focus_child(Gtk::Widget*),void gtk_container_set_focus_child(GtkContainer*,GtkWidget*));
+  //: Sets the focus on a child.
+  WRAP_METHOD(
+    void gtk_container_set_focus_child(GtkContainer*,GtkWidget*),
+    void set_focus_child(Gtk::Widget&));
+
+  WRAP_METHOD(
+    void gtk_container_set_focus_vadjustment(GtkContainer*,GtkAdjustment*),
+    void   set_focus_vadjustment(Gtk::Adjustment &adjustment));
+
+  WRAP_METHOD(
+    void gtk_container_set_focus_hadjustment(GtkContainer*,GtkAdjustment*),
+    void set_focus_hadjustment(Gtk::Adjustment &adjustment));
+
+  WRAP_METHOD(
+    void gtk_container_register_toplevel(GtkContainer*),
+    void register_toplevel());
+
+  WRAP_METHOD(
+    void gtk_container_unregister_toplevel(GtkContainer*),
+    void unregister_toplevel());
+
+  //GList * gtk_container_get_toplevels        (void);
+
+  WRAP_METHOD(
+    void gtk_container_resize_children(GtkContainer*),
+    void resize_children());
+  
+  SIGNAL_SPEC("child_type",vfunc|impl,GtkType child_type(),gtk_container_child_type);
+
+protected:
+  WRAP_CTOR_DEFAULT;
+};
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+IMPL_START;
+#include <gtk--/adjustment.h>
+
+namespace {
+
+void foreach_callback_(GtkWidget* w, gpointer data)
+  {
+    Gtk::Container::ForeachCallback *s=(Gtk::Container::ForeachCallback*)data;
+    if (!w) return;
+    s->call(*Gtk::wrap(w));
+  }
+
+}
+
+void Gtk::Container::foreach(const ForeachCallback& s)
+  {
+     gtk_container_foreach(gtkobj(),
+                           &foreach_callback_,
+                           (void*)(&s));
+  }
+
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Container)
+//. name: focus_child
+//. type: Gtk::Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: border_width
+//. type: guint:16
+//. get:
+//. set:
+//. desc:
+
+//. name: need_resize
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: resize_mode
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: resize_widgets
+//. type: GSList*
+//. get:
+//. set:
+//. desc: The list of children that requested a resize
+//.    
+

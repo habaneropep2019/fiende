@@ -1,0 +1,329 @@
+\input texinfo  @c -*-Texinfo-*-
+@setfilename librep.info
+@settitle librep Manual
+@footnotestyle end
+
+@set EDITION 1.2
+@set VERSION 0.13
+@set UPDATED 8 September 2000
+@set UPDATE-MONTH September 2000
+
+@ifinfo
+@dircategory Programming Languages
+@direntry
+* librep: (librep).		A flexible Lisp environment
+@end direntry
+
+This is Edition @value{EDITION}, last updated @value{UPDATED},
+of @cite{The librep Manual}, for librep, Version @value{VERSION}.
+
+Copyright 1999--2000 John Harper.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual).
+@end ignore
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+@end ifinfo
+
+@titlepage
+@title librep
+@subtitle A LISP extension language
+@subtitle Edition @value{EDITION}
+@subtitle @value{UPDATE-MONTH}
+@author John Harper
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 1999--2000 John Harper.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+@end titlepage
+
+@node Top, Copying, (dir), (dir)
+
+@ifinfo
+This document describes @code{librep}, a simple, but powerful, Lisp
+dialect intended both as an embedded extension language, and as a
+stand-alone programming language.
+
+This is Edition @value{EDITION} of its documentation,
+last updated @value{UPDATED} for librep version @value{VERSION}.
+@end ifinfo
+
+@menu
+* Copying::                     Distribution conditions
+* Introduction::                Brief introduction to librep
+
+* Invocation::                  How to start the interpreter
+* The language::                The Lisp dialect implemented
+* The REPL::                    The interactive environment
+* librep Internals::		Embedding librep in other programs
+
+* Reporting bugs::              How to contact the maintainers
+
+* News::                        History of user-visible changes
+
+* Function index::              Menu of all documented functions
+* Variable index::              All variables which have been mentioned
+* Concept index::               Main index, references to all sections
+@end menu
+
+
+@node Copying, Introduction, Top, Top
+@chapter Copying
+@cindex Copying
+@cindex Distribution conditions
+@cindex Licence
+
+@code{librep} is distributed under the terms of the GNU General Public
+License, this basically means that you can give it to anyone for any
+price as long as full source code is included; you also have the right
+to distribute modified copies in the same way. For the actual legalese
+see the file @file{COPYING} in the distribution (or
+@pxref{(emacs)Copying}).
+
+In case it isn't obvious, scripts written to use librep are not
+considered derived works, and therefore may be licensed however the
+author wishes. However, the ability of scripts to dynamically load
+external libraries may complicate this situation.
+
+The distribution includes the following code from other packages:
+
+@itemize @bullet
+@item
+Henry Spencer's @code{regexp} implementation, with many modifications.
+This is distributed under the terms of his copyright, see the file
+@file{src/README.regexp} in the distribution.
+
+@item
+The public domain @code{sdbm} database library by Ozan Yigit.
+
+@item
+The backquote package from Emacs version 19, written by Rick Sladkey.
+
+@item
+The GNU @code{gettext} implementation for internationalized message
+catalogues.
+@end itemize
+
+Be aware that there is absolutely NO WARRANTY for this program, you use
+it at your own risk. Obviously I hope there are no bugs, but I make no
+promises regarding the reliability of this software.
+
+
+@node Introduction, Invocation, Copying, Top
+@chapter Introduction
+@cindex Introduction
+
+@code{librep} is a dialect of Lisp, designed to be used both as an
+extension language for applications and as a general purpose
+programming language. It was originally written to be mostly-compatible
+with Emacs Lisp, but has subsequently diverged markedly. Its aim is to
+combine the best features of Scheme and Common Lisp and provide an
+environment that is comfortable for implementing both small and large
+scale systems. It tries to be a ``pragmatic'' programming language.
+
+The author has used @code{librep} in its various forms in many projects
+since 1993. This includes two large programs which use it as an
+extension language, and many stand-alone programs.
+
+@code{rep} stands for ``Read, Eval, Print'', the three main components of
+any Lisp system.
+
+Some of the features of @code{librep} are:
+
+@itemize @bullet
+@item Lexically scoped (with special variables from CL)
+
+@item Clean module system
+
+@item Tail-call elimination
+
+@item Compiles to byte-code
+
+@item First-class continuations
+
+@item Uses GNU MP for fast bignums/rationals
+
+@item Most Emacs Lisp functions, with others inspired by
+Common Lisp and various Scheme implementations
+
+@item Mostly-Perl-like regular expressions
+
+@item Spawn and control subprocesses
+
+@item Dynamically loads shared libraries (a.k.a. ``plugins'')
+
+@item Extensible type, I/O, and file handling
+@end itemize
+
+
+@node Invocation, The language, Introduction, Top
+@chapter Invocation
+@cindex Invocation
+
+The @code{rep} program may be used to launch the stand-alone
+@code{librep} environment:
+
+@example
+usage: rep [@var{rep-options}@dots{}] [@var{script} [@var{script-options}@dots{]}]
+@end example
+
+@noindent
+Where @var{rep-options} may be any of the following:
+
+@table @samp
+@item --init @var{file}
+Use @var{file} to boot the Lisp system from, instead of @file{init.jl}.
+
+@item --version
+Print the current version number and exit
+
+@item --batch
+Tell the interpreter that it is running non-interactively, this reduces
+the number of messages output to the console
+
+@item --interp
+Interpreted mode. Never load compiled Lisp files: this can be useful
+when using the debugger.
+
+@item --no-rc
+Don't load the user's @file{~/.reprc} script, or the
+@file{site-init.jl} script
+
+@item -f @var{function}
+Invoke the Lisp function @var{function} (with no arguments)
+
+@item -l @var{script}
+Try to load the Lisp file @var{script}, this is equivalent to evaluating
+the form @samp{(load "@var{script}")}.
+
+@item -q
+Terminate the Lisp process and exit.
+@end table
+
+@vindex command-line-args
+If @var{script} is given, it names the Lisp file to load, equivalent to
+the @samp{-l} option, except that @samp{--batch-mode} is implied. Any
+@var{script-options} will be made available to the script (in the
+@code{command-line-args} variable).
+
+After any arguments have been processed a banner message will be
+displayed before entering an interactive read-eval-print loop, unless
+@samp{--batch-mode} was specified, in which case the interpreter exits.
+
+The read-eval-print loop simply reads complete Lisp forms (@pxref{The
+Lisp Reader}), evaluates them, before printing the result back to the
+console; this continues ad infinitum, or until you force an EOF (i.e.
+enter @kbd{C-d}).
+
+
+@subsubheading Implicitly Interpreting @code{rep} Scripts
+@cindex Implicitly Interpreting @code{rep} scripts
+@cindex Executing @code{rep} scripts
+@cindex Scripts, executing implicitly
+
+The @code{rep} interpreter also supports automatic invocation of
+scripts, using the oeprating system's support for @samp{#!} interpreter
+invocation (i.e. if the first line of an executable text file contains
+@samp{#! @var{prog}}, the program @var{prog} is used to execute the
+script.
+
+However there is a problem with this method, in that the @code{PATH}
+environment variable is not searched for the location of the
+interpreter, and thus the full file name of the interpreter program
+must be hard-coded into the script. To work around this problem
+@code{rep} supports a slightly different method of invocation.
+
+If the first two characters of a loaded Lisp file are @samp{#!}, then
+everything is treated as a comment until the first occurrence of the
+string @samp{!#}. This allows the first part of the script to be
+executed as a shell script invoking the @code{rep} interpreter.
+
+What this means, is that you want to put something like the following
+at the start of any scripts you want to execute implicitly (and
+@kbd{chmod +x} the file as well):
+
+@example
+#!/bin/sh
+exec rep "$0" "$@@"
+!#
+
+;; Lisp code follows@dots{}
+@end example
+
+
+@node The language, The REPL, Invocation, Top
+@include lang.texi
+
+
+@node The REPL, librep Internals, The language, Top
+@include repl.texi
+
+@node librep Internals, Reporting bugs, The REPL, Top
+@include interface.texi
+
+
+@node Reporting bugs, News, librep Internals, Top
+@chapter Reporting bugs
+@cindex Reporting bugs
+@cindex Bugs, reporting
+
+If the @code{librep} interpreter crashes it's probably a bug (unless
+you're using the @code{rep-gtk} binding, in which case creating invalid
+GTK widget hierarchies can easily crash the Lisp system). If the
+interpreter hangs such that sending it interrupt signals doesn't fix
+the problem, that's probably also a bug.
+
+To help me fix any bugs found please try to collect as much meaningful
+information as possible. This will hopefully include stack backtraces
+(of both the C and Lisp stacks if possible), what features are loaded,
+what you did immediately before triggering the bug, a description of
+your the system, etc@dots{}
+
+Please send any bug reports to the mailing list:
+@email{librep-list@@lists.sourceforge.net}. Alternatively, the author
+may be contacted at: @email{jsh@@users.sourceforge.net}.
+
+
+@node News, Function index, Reporting bugs, Top
+
+@include news.texi
+
+
+@node Function index, Variable index, News, Top
+@unnumbered Function index
+
+@printindex fn
+
+
+@node Variable index, Concept index, Function index, Top
+@unnumbered Variable index
+
+@printindex vr
+
+
+@node Concept index, , Variable index, Top
+@unnumbered Concept index
+
+@printindex cp
+
+@contents
+@bye

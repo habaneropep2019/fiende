@@ -1,0 +1,57 @@
+/* $Id: data.gen_h,v 1.27 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* data.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/object.h>
+#include <gtk/gtkdata.h>
+CLASS_START(Gtk);
+//: Abstract base class for objects containing data.
+//- The {\class Gtk:Data} object is a very simple object intended to be used as a base class
+//- for objects which contain data (i.e. the 'Model' in the object-oriented
+//- Model/View/Controller framework).
+//-
+//- Currently it is not very useful since all it provides is a "disconnect" signal.
+//- This signal could be emitted by a {\class Gtk::Data} subclass to notify any
+//- 'Views' that they should disconnect from the {\class Gtk::Data} (the 'Model'),
+//- possibly just before the {\class Gtk::Data} is destroyed.
+class Data : public Object {
+  WRAP_CLASS(Data,GtkData,GTK_DATA,GTK_IS_DATA,data,Gtk::Object,GtkObject,GTK_OBJECT);
+public:
+
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+  //: Emitted to notify any views on the {\class Gtk::Data} object to disconnect
+  //: from it, possibly because the {\class Gtk::Data} object is about to be destroyed.
+  SIGNAL_SPEC("disconnect",both,void disconnect());
+
+protected:
+  WRAP_CTOR_DEFAULT;
+};
+
+PRIVATE_START;
+#include <gtk--/private/object_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+}
+
+DOCUMENTATION_START;
+

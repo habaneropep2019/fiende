@@ -1,0 +1,46 @@
+<July 6> This feature will wait until we get a full-featured ORB that
+talks over the network. I don't think anyone (especially myself) has
+enough knowledge to implement it on the first go-round. -ECL
+
+-----------------------------------------------------------------------
+
+Fast way to avoid marshalling at all for calls to stuff in the same
+address space:
+
+typedef struct CORBA_Object_struct *CORBA_Object;
+struct CORBA_Object_struct {
+	void (*release)(CORBA_Object _handle, CORBA_Environment &ev);
+};
+
+#define CORBA_Object_release(_handle, evptr) _handle->release(_handle, evptr)
+
+You would do this for all subclasses of an object, too:
+
+typedef struct example_struct *example;
+struct example_struct {
+	void (*op1)(CORBA_Object _handle, int inparam, CORBA_Environment &ev);
+};
+
+#define example_op1(_handle, inparam, evptr) \
+	_handle->release(_handle, inparam, evptr)
+
+That is all.
+
+-----------------
+Multiple inheritance makes this not-work.
+
+However, we can still have our fun.
+
+gulong CORBA_Object_class_id;
+typedef struct CORBA_Object_struct *CORBA_Object;
+struct CORBA_Object_struct {
+	gpointer *func_lookup_table;
+};
+typedef struct CORBA_Object_methods *CORBA_Object_methods
+struct CORBA_Object_methods {
+	void (*release)(CORBA_Object _handle, CORBA_Environment &ev);
+};
+
+
+#define CORBA_Object_release(_handle, evptr) \
+((CORBA_Object_methods)_handle->func_lookup_table[CORBA_Object_class_id])->release(_handle, evptr)

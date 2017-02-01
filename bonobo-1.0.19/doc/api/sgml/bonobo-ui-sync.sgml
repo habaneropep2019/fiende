@@ -1,0 +1,597 @@
+<refentry id="bonobo-bonobo-ui-sync">
+<refmeta>
+<refentrytitle>BonoboUISync</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboUISync</refname><refpurpose>A Synchronizer object to keep a widget tree in sync with an XML tree.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+void        (<link linkend="BonoboUISyncStateFn">*BonoboUISyncStateFn</link>)          (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);
+<link linkend="GtkWidget">GtkWidget</link>*  (<link linkend="BonoboUISyncBuildFn">*BonoboUISyncBuildFn</link>)          (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             int *pos,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);
+<link linkend="BonoboUISync">BonoboUISync</link>* <link linkend="bonobo-ui-sync-construct">bonobo_ui_sync_construct</link>      (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUIEngine">BonoboUIEngine</link> *engine,
+                                             <link linkend="gboolean">gboolean</link> is_recursive,
+                                             <link linkend="gboolean">gboolean</link> has_widgets);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-ui-sync-is-recursive">bonobo_ui_sync_is_recursive</link>     (<link linkend="BonoboUISync">BonoboUISync</link> *sync);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-ui-sync-has-widgets">bonobo_ui_sync_has_widgets</link>      (<link linkend="BonoboUISync">BonoboUISync</link> *sync);
+void        <link linkend="bonobo-ui-sync-remove-root">bonobo_ui_sync_remove_root</link>      (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *root);
+void        <link linkend="bonobo-ui-sync-update-root">bonobo_ui_sync_update_root</link>      (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *root);
+void        <link linkend="bonobo-ui-sync-state">bonobo_ui_sync_state</link>            (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);
+void        <link linkend="bonobo-ui-sync-state-placeholder">bonobo_ui_sync_state_placeholder</link>
+                                            (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-ui-sync-build">bonobo_ui_sync_build</link>            (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             int *pos,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-ui-sync-build-placeholder">bonobo_ui_sync_build_placeholder</link>
+                                            (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             int *pos,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-ui-sync-ignore-widget">bonobo_ui_sync_ignore_widget</link>    (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);
+<link linkend="GList">GList</link>*      <link linkend="bonobo-ui-sync-get-widgets">bonobo_ui_sync_get_widgets</link>      (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node);
+void        <link linkend="bonobo-ui-sync-stamp-root">bonobo_ui_sync_stamp_root</link>       (<link linkend="BonoboUISync">BonoboUISync</link> *sync);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-ui-sync-can-handle">bonobo_ui_sync_can_handle</link>       (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-ui-sync-get-attached">bonobo_ui_sync_get_attached</link>     (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node);
+void        <link linkend="bonobo-ui-sync-state-update">bonobo_ui_sync_state_update</link>     (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             const char *new_state);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-ui-sync-do-show-hide">bonobo_ui_sync_do_show_hide</link>     (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The BonoboUISynchronizer is used internaly by the <link linkend="BonoboUIEngine">BonoboUIEngine</link>. Writing
+one is a very advanced topic, and should only be attempted by carefuly study
+of the code. No normal user should need to write his own synchronizer.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboUISyncStateFn">BonoboUISyncStateFn ()</title>
+<programlisting>void        (*BonoboUISyncStateFn)          (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>cmd_node</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboUISyncBuildFn">BonoboUISyncBuildFn ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  (*BonoboUISyncBuildFn)          (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             int *pos,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>cmd_node</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>pos</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-construct">bonobo_ui_sync_construct ()</title>
+<programlisting><link linkend="BonoboUISync">BonoboUISync</link>* bonobo_ui_sync_construct      (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUIEngine">BonoboUIEngine</link> *engine,
+                                             <link linkend="gboolean">gboolean</link> is_recursive,
+                                             <link linkend="gboolean">gboolean</link> has_widgets);</programlisting>
+<para>
+Used to construct a new synchronizer object</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer
+</entry></row>
+<row><entry align="right"><parameter>engine</parameter>&nbsp;:</entry>
+<entry> the associated engine
+</entry></row>
+<row><entry align="right"><parameter>is_recursive</parameter>&nbsp;:</entry>
+<entry> whether it deals with its children recursively
+</entry></row>
+<row><entry align="right"><parameter>has_widgets</parameter>&nbsp;:</entry>
+<entry> whether it has associated widgets.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the new object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-is-recursive">bonobo_ui_sync_is_recursive ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_ui_sync_is_recursive     (<link linkend="BonoboUISync">BonoboUISync</link> *sync);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> whether this deals with its children recursively
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-has-widgets">bonobo_ui_sync_has_widgets ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_ui_sync_has_widgets      (<link linkend="BonoboUISync">BonoboUISync</link> *sync);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> whether this deals with widgets
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-remove-root">bonobo_ui_sync_remove_root ()</title>
+<programlisting>void        bonobo_ui_sync_remove_root      (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *root);</programlisting>
+<para>
+This is called when a 'root' or toplevel node is
+removed that this synchronizer deals with. eg. in
+the toolbar case, this might trigger hiding an
+associated dock item.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>root</parameter>&nbsp;:</entry>
+<entry> the toplevel node to be removed.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-update-root">bonobo_ui_sync_update_root ()</title>
+<programlisting>void        bonobo_ui_sync_update_root      (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *root);</programlisting>
+<para>
+This flags the fact that a toplevel node has changed
+and is used primarily by non-recursive handlers, such
+as the keybinding sync method.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>root</parameter>&nbsp;:</entry>
+<entry> the toplevel node
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-state">bonobo_ui_sync_state ()</title>
+<programlisting>void        bonobo_ui_sync_state            (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);</programlisting>
+<para>
+This method is used to synchronize the state of a <parameter>node</parameter>
+with that of a <parameter>widget</parameter>, by ensuring the pertainant
+attributes are reflected in the widget view.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node 
+</entry></row>
+<row><entry align="right"><parameter>cmd_node</parameter>&nbsp;:</entry>
+<entry> the associated command node 
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the widget 
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> the parent of <parameter>node</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-state-placeholder">bonobo_ui_sync_state_placeholder ()</title>
+<programlisting>void        bonobo_ui_sync_state_placeholder
+                                            (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);</programlisting>
+<para>
+This synchronizes the state of a placeholder, there is
+a default implementation for this method.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node 
+</entry></row>
+<row><entry align="right"><parameter>cmd_node</parameter>&nbsp;:</entry>
+<entry> the associated command node 
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the widget 
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> the parent of <parameter>node</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-build">bonobo_ui_sync_build ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_ui_sync_build            (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             int *pos,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);</programlisting>
+<para>
+This function causes a child widget to be build that matches
+<parameter>node</parameter>'s attributes. This should then be inserted by into
+<parameter>parent</parameter>'s associated widget at position <parameter>pos</parameter> in the container.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node 
+</entry></row>
+<row><entry align="right"><parameter>cmd_node</parameter>&nbsp;:</entry>
+<entry> the associated command node 
+</entry></row>
+<row><entry align="right"><parameter>pos</parameter>&nbsp;:</entry>
+<entry> the position in the parent container to insert at
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> the parent of <parameter>node</parameter> 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the freshly built widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-build-placeholder">bonobo_ui_sync_build_placeholder ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_ui_sync_build_placeholder
+                                            (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             int *pos,
+                                             <link linkend="GtkWidget">GtkWidget</link> *parent);</programlisting>
+<para>
+As for <link linkend="bonobo-ui-sync-build">bonobo_ui_sync_build</link> but for placeholders</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node 
+</entry></row>
+<row><entry align="right"><parameter>cmd_node</parameter>&nbsp;:</entry>
+<entry> the associated command node 
+</entry></row>
+<row><entry align="right"><parameter>pos</parameter>&nbsp;:</entry>
+<entry> position in the parent to insert the built widget
+</entry></row>
+<row><entry align="right"><parameter>parent</parameter>&nbsp;:</entry>
+<entry> the parent of <parameter>node</parameter> 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the freshly built widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-ignore-widget">bonobo_ui_sync_ignore_widget ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_ui_sync_ignore_widget    (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the widget 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if this widget should be ignored in a container
+this is the case for eg. menu tearoffs items, and toolbar popout items.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-get-widgets">bonobo_ui_sync_get_widgets ()</title>
+<programlisting><link linkend="GList">GList</link>*      bonobo_ui_sync_get_widgets      (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+This method is used to obtain a sensibly ordered list
+of child widgets of the container associated with <parameter>node</parameter>.
+Essentialy this does something like gtk_container_children
+but preserving the visible order of the widgets in the list.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> An ordered list of child widgets of <parameter>node</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-stamp-root">bonobo_ui_sync_stamp_root ()</title>
+<programlisting>void        bonobo_ui_sync_stamp_root       (<link linkend="BonoboUISync">BonoboUISync</link> *sync);</programlisting>
+<para>
+This asks the synchronizer to stamp all its associated
+root widget containers into the XML tree.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-can-handle">bonobo_ui_sync_can_handle ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_ui_sync_can_handle       (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+This is used to determine which, of multiple synchronizers
+can be used to deal with a specific node type. Each synchronizer
+deals with different types of node.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if the synchronizer can deal with this node type
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-get-attached">bonobo_ui_sync_get_attached ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_ui_sync_get_attached     (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node);</programlisting>
+<para>
+This is used to get an 'attached' widget - some
+widgets have associated widgets that are coupled
+in strange ways - eg. GtkMenuItem &lt;-&gt; GtkMenuShell
+It is neccessary to store the GtkContainer item of
+these couples in the XML tree, since then we can
+do things more genericaly and cleanly.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the widget 
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> an assoicated widget or NULL if none exists.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-state-update">bonobo_ui_sync_state_update ()</title>
+<programlisting>void        bonobo_ui_sync_state_update     (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             const char *new_state);</programlisting>
+<para>
+This is used to synchronize state with a stateful widget,
+eg. when a "state" attribute is set, this is not reflected
+in the normal 'state-sync' process, but occurs later with
+a set of state_updates to avoid re-enterancy problems.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the widget 
+</entry></row>
+<row><entry align="right"><parameter>new_state</parameter>&nbsp;:</entry>
+<entry> the new state
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-ui-sync-do-show-hide">bonobo_ui_sync_do_show_hide ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_ui_sync_do_show_hide     (<link linkend="BonoboUISync">BonoboUISync</link> *sync,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="BonoboUINode">BonoboUINode</link> *cmd_node,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+This is a helper function that applies the hidden attribute
+from either the <parameter>node</parameter> or fallback to the <parameter>cmd_node</parameter> to the
+<parameter>widget</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sync</parameter>&nbsp;:</entry>
+<entry> the synchronizer 
+</entry></row>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the node 
+</entry></row>
+<row><entry align="right"><parameter>cmd_node</parameter>&nbsp;:</entry>
+<entry> the associated command node 
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the widget 
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if the widget's hidden / shown state changed,
+this is needed to work around some nasty dock sizing bugs.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

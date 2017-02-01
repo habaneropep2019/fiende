@@ -1,0 +1,1473 @@
+<HTML
+><HEAD
+><TITLE
+>Query and Activation</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.59"><LINK
+REL="HOME"
+TITLE="The liboaf Library"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="API Reference"
+HREF="api-reference.html"><LINK
+REL="PREVIOUS"
+TITLE="Initialization"
+HREF="liboaf-initialization.html"><LINK
+REL="NEXT"
+TITLE="Utilities"
+HREF="liboaf-utilities.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The liboaf Library</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="liboaf-initialization.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="api-reference.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="liboaf-utilities.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="LIBOAF-QUERY-AND-ACTIVATION"
+>Query and Activation</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN532"
+></A
+><H2
+>Name</H2
+>Query and Activation&nbsp;--&nbsp;Querying for components and Activating them</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN535"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;liboaf/liboaf.h&gt;
+
+
+typedef     <A
+HREF="liboaf-query-and-activation.html#OAF-IMPLEMENTATIONID"
+>OAF_ImplementationID</A
+>;
+typedef     <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+>;
+struct      <A
+HREF="liboaf-query-and-activation.html#OAF-SERVERINFO"
+>OAF_ServerInfo</A
+>;
+typedef     <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+>;
+<GTKDOCLINK
+HREF="OAF-SERVERINFOLIST"
+>OAF_ServerInfoList</GTKDOCLINK
+>* <A
+HREF="liboaf-query-and-activation.html#OAF-QUERY"
+>oaf_query</A
+>               (const char *requirements,
+                                             char *const *selection_order,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);
+<GTKDOCLINK
+HREF="CORBA-OBJECT"
+>CORBA_Object</GTKDOCLINK
+> <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATE"
+>oaf_activate</A
+>                   (const char *requirements,
+                                             char *const *selection_order,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+> flags,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+> *ret_aid,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);
+<GTKDOCLINK
+HREF="CORBA-OBJECT"
+>CORBA_Object</GTKDOCLINK
+> <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATE-FROM-ID"
+>oaf_activate_from_id</A
+>           (const <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+> aid,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+> flags,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+> *ret_aid,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);
+typedef     <A
+HREF="liboaf-query-and-activation.html#OAFACTIVATIONCALLBACK"
+>OAFActivationCallback</A
+>;
+void        <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATE-ASYNC"
+>oaf_activate_async</A
+>              (const char *requirements,
+                                             char *const *selection_order,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+> flags,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAFACTIVATIONCALLBACK"
+>OAFActivationCallback</A
+> callback,
+                                             <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);
+void        <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATE-FROM-ID-ASYNC"
+>oaf_activate_from_id_async</A
+>      (const <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+> aid,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+> flags,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAFACTIVATIONCALLBACK"
+>OAFActivationCallback</A
+> callback,
+                                             <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN568"
+></A
+><H2
+>Description</H2
+><P
+>This section describes how you can query for components
+and activate them.</P
+><P
+>Two set of functions are described: synchronous and 
+asynchronous ones. The asynchronous version of the functions
+allow you to avoid blocking your application while the CORBA
+servers are started.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN572"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN574"
+></A
+><H3
+><A
+NAME="OAF-IMPLEMENTATIONID"
+></A
+>OAF_ImplementationID</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   typedef CORBA_char *OAF_ImplementationID;</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN579"
+></A
+><H3
+><A
+NAME="OAF-ACTIVATIONID"
+></A
+>OAF_ActivationID</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   typedef CORBA_char *OAF_ActivationID;</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN584"
+></A
+><H3
+><A
+NAME="OAF-SERVERINFO"
+></A
+>struct OAF_ServerInfo</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   typedef struct
+   {
+      OAF_ImplementationID iid;
+      CORBA_char *server_type;
+      CORBA_char *location_info;
+      CORBA_char *username;
+      CORBA_char *hostname;
+      CORBA_char *domain;
+      CORBA_sequence_OAF_Property props;
+   }
+   OAF_ServerInfo;</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN589"
+></A
+><H3
+><A
+NAME="OAF-ACTIVATIONFLAGS"
+></A
+>OAF_ActivationFlags</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   typedef CORBA_long OAF_ActivationFlags;
+#define OAF_FLAG_NO_LOCAL 1          /* no shared libraries */
+#define OAF_FLAG_PRIVATE 2           /* start a new server and don't register it */
+#define OAF_FLAG_EXISTING_ONLY 4     /* don't start the server if not started */</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN594"
+></A
+><H3
+><A
+NAME="OAF-QUERY"
+></A
+>oaf_query ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="OAF-SERVERINFOLIST"
+>OAF_ServerInfoList</GTKDOCLINK
+>* oaf_query               (const char *requirements,
+                                             char *const *selection_order,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Executes the <TT
+CLASS="PARAMETER"
+><I
+>requirements</I
+></TT
+> query on the OAF daemon.
+The result is sorted according to <TT
+CLASS="PARAMETER"
+><I
+>selection_order</I
+></TT
+>. 
+<TT
+CLASS="PARAMETER"
+><I
+>selection_order</I
+></TT
+> can safely be NULL as well as <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>.
+The returned list has to be freed with CORBA_free.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN606"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>requirements</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> query string.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>selection_order</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> sort criterion for returned list.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a <TT
+CLASS="LITERAL"
+>CORBA_Environment</TT
+> structure which will contain 
+the CORBA exception status of the operation.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the list of servers matching the requirements.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN628"
+></A
+><H3
+><A
+NAME="OAF-ACTIVATE"
+></A
+>oaf_activate ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="CORBA-OBJECT"
+>CORBA_Object</GTKDOCLINK
+> oaf_activate                   (const char *requirements,
+                                             char *const *selection_order,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+> flags,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+> *ret_aid,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Activates a given object. <TT
+CLASS="PARAMETER"
+><I
+>ret_aid</I
+></TT
+> can be safely NULLed as well
+as <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>selection_order</I
+></TT
+>. <TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+> can be set to zero if you do 
+not what to use.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN642"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>requirements</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> query string.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>selection_order</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> sort criterion for returned list.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> how to activate the object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ret_aid</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> AID of the activated object.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> <TT
+CLASS="LITERAL"
+>CORBA_Environment</TT
+> structure which will contain 
+the CORBA exception status of the operation. </TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the CORBA object reference of the activated object.
+This value can be CORBA_OBJECT_NIL: you are supposed 
+to check <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> for success.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN673"
+></A
+><H3
+><A
+NAME="OAF-ACTIVATE-FROM-ID"
+></A
+>oaf_activate_from_id ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="CORBA-OBJECT"
+>CORBA_Object</GTKDOCLINK
+> oaf_activate_from_id           (const <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+> aid,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+> flags,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+> *ret_aid,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Activates the server corresponding to <TT
+CLASS="PARAMETER"
+><I
+>aid</I
+></TT
+>. <TT
+CLASS="PARAMETER"
+><I
+>ret_aid</I
+></TT
+> can be safely 
+NULLed as well as <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>. <TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+> can be zero if you do not know what 
+to do.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN688"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>aid</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> AID or IID of the object to activate.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> activation flag.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ret_aid</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> AID of the activated server.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> <TT
+CLASS="LITERAL"
+>CORBA_Environment</TT
+> structure which will contain 
+the CORBA exception status of the operation. </TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a CORBA object reference to the newly activated 
+server. Do not forget to check <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> for failure!!</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN715"
+></A
+><H3
+><A
+NAME="OAFACTIVATIONCALLBACK"
+></A
+>OAFActivationCallback</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>typedef void (*OAFActivationCallback) (CORBA_Object   activated_object, 
+				       const char    *error_reason, 
+				       gpointer       user_data);&#13;</PRE
+></TD
+></TR
+></TABLE
+><P
+>This is the signature of the function which you must pass
+as a callback to the asynchrounous activation functions.</P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN720"
+></A
+><H3
+><A
+NAME="OAF-ACTIVATE-ASYNC"
+></A
+>oaf_activate_async ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        oaf_activate_async              (const char *requirements,
+                                             char *const *selection_order,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+> flags,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAFACTIVATIONCALLBACK"
+>OAFActivationCallback</A
+> callback,
+                                             <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This function will asynchronously try to activate a component 
+given the <TT
+CLASS="PARAMETER"
+><I
+>requirements</I
+></TT
+> query string. When the component is 
+activated or when the activation fails, it will call <TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+> 
+with the given <TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+> data as parameter.
+callback will be called with a CORBA_OBJECT_NIL object if the 
+activation fails. If the activation fails, the callback will be 
+given a human-readable string containing a description of the 
+error. In case of sucess, the error string value is undefined.</P
+><P
+><TT
+CLASS="PARAMETER"
+><I
+>selection_order</I
+></TT
+> can be safely NULLed as well as <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> and 
+<TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>. <TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+> can be set to 0 if you do not know what to 
+use.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN738"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>requirements</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the OAF query string.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>selection_order</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> preference array.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> activation flags.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> callback function.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> data to be poassed to the callback function.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> exception structure.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN767"
+></A
+><H3
+><A
+NAME="OAF-ACTIVATE-FROM-ID-ASYNC"
+></A
+>oaf_activate_from_id_async ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        oaf_activate_from_id_async      (const <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONID"
+>OAF_ActivationID</A
+> aid,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAF-ACTIVATIONFLAGS"
+>OAF_ActivationFlags</A
+> flags,
+                                             <A
+HREF="liboaf-query-and-activation.html#OAFACTIVATIONCALLBACK"
+>OAFActivationCallback</A
+> callback,
+                                             <GTKDOCLINK
+HREF="GPOINTER"
+>gpointer</GTKDOCLINK
+> user_data,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This function will asynchronously try to activate a component 
+with the given <TT
+CLASS="PARAMETER"
+><I
+>aid</I
+></TT
+>. When the component is 
+activated or when the activation fails, it will call <TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+> 
+with the given <TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+> data as parameter.
+callback will be called with a CORBA_OBJECT_NIL object if the 
+activation fails. If the activation fails, the callback will be 
+given a human-readable string containing a description of the 
+error. In case of sucess, the error string value is undefined.</P
+><P
+><TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+> can be 0 if you do not know what to set it to and 
+<TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> can be safely set to NULL.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN784"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>aid</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the AID or IID of the component to activate.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>flags</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> activation flags.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> callback function.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>user_data</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> data to be poassed to the callback function.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> exception structure.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="liboaf-initialization.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="api-reference.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="liboaf-utilities.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Initialization</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Utilities</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

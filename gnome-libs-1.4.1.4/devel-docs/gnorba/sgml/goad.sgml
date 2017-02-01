@@ -1,0 +1,370 @@
+<refentry id="gnorba-goad">
+<refmeta>
+<refentrytitle>goad</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNORBA Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>goad</refname><refpurpose>GNOME Object Activation Directory</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+const char* <link linkend="goad-server-activation-id">goad_server_activation_id</link>       (void);
+int         <link linkend="goad-server-register">goad_server_register</link>            (<link linkend="CORBA-Object">CORBA_Object</link> name_server,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> server,
+                                             const char *name,
+                                             const char *kind,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+int         <link linkend="goad-server-unregister">goad_server_unregister</link>          (<link linkend="CORBA-Object">CORBA_Object</link> name_server,
+                                             const char *name,
+                                             const char *kind,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+enum        <link linkend="GoadServerType">GoadServerType</link>;
+enum        <link linkend="GoadActivationFlags">GoadActivationFlags</link>;
+struct      <link linkend="GoadServer">GoadServer</link>;
+struct      <link linkend="GoadServerList">GoadServerList</link>;
+<link linkend="GoadServerList">GoadServerList</link>* <link linkend="goad-server-list-get">goad_server_list_get</link>        (void);
+void        <link linkend="goad-server-list-free">goad_server_list_free</link>           (<link linkend="GoadServerList">GoadServerList</link> *server_list);
+<link linkend="CORBA-Object">CORBA_Object</link> <link linkend="goad-server-activate">goad_server_activate</link>           (<link linkend="GoadServer">GoadServer</link> *sinfo,
+                                             <link linkend="GoadActivationFlags">GoadActivationFlags</link> flags,
+                                             const char **params);
+<link linkend="CORBA-Object">CORBA_Object</link> <link linkend="goad-server-activate-with-repo-id">goad_server_activate_with_repo_id</link>
+                                            (<link linkend="GoadServerList">GoadServerList</link> *server_list,
+                                             const char *repo_id,
+                                             <link linkend="GoadActivationFlags">GoadActivationFlags</link> flags,
+                                             const char **params);
+<link linkend="CORBA-Object">CORBA_Object</link> <link linkend="goad-server-activate-with-id">goad_server_activate_with_id</link>   (<link linkend="GoadServerList">GoadServerList</link> *server_list,
+                                             const char *server_id,
+                                             <link linkend="GoadActivationFlags">GoadActivationFlags</link> flags,
+                                             const char **params);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+GOAD is the GNOME Object Activation Directory. It keeps track of the
+CORBA object implementations available on the system, and allows
+applications to activate these implementations or access currently
+running ones.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="goad-server-activation-id">goad_server_activation_id ()</title>
+<programlisting>const char* goad_server_activation_id       (void);</programlisting>
+<para>
+When an application that implements a GOAD-registered object is
+started, it should call this function to check if it was started to create one of those
+objects.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the GOAD ID that the program was executed to make available.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="goad-server-register">goad_server_register ()</title>
+<programlisting>int         goad_server_register            (<link linkend="CORBA-Object">CORBA_Object</link> name_server,
+                                             <link linkend="CORBA-Object">CORBA_Object</link> server,
+                                             const char *name,
+                                             const char *kind,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+Registers <parameter>server</parameter> in the <parameter>name_server</parameter> with <parameter>name</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>name_server</parameter>&nbsp;:</entry>
+<entry> points to a running name_server
+</entry></row>
+<row><entry align="right"><parameter>server</parameter>&nbsp;:</entry>
+<entry> the server object we want to register.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> The GOAD id of the server that is being registered
+</entry></row>
+<row><entry align="right"><parameter>kind</parameter>&nbsp;:</entry>
+<entry> "object" for now.
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> CORBA_Environment to return errors
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>zero upon success, non-zero if registration failed or another registration for this name already exists.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="goad-server-unregister">goad_server_unregister ()</title>
+<programlisting>int         goad_server_unregister          (<link linkend="CORBA-Object">CORBA_Object</link> name_server,
+                                             const char *name,
+                                             const char *kind,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+Removes the registration of <parameter>server</parameter> in the <parameter>name_server</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>name_server</parameter>&nbsp;:</entry>
+<entry> points to a running name_server
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> The GOAD ID of the server we want to remove from the name server registration.
+</entry></row>
+<row><entry align="right"><parameter>kind</parameter>&nbsp;:</entry>
+<entry> "object" for normal use.
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> CORBA_Environment to return errors
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>zero upon success, non-zero on error.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GoadServerType">enum GoadServerType</title>
+<programlisting>typedef enum {
+	GOAD_SERVER_SHLIB = 1,
+	GOAD_SERVER_EXE = 2,
+	GOAD_SERVER_RELAY = 3,
+	GOAD_SERVER_FACTORY = 4
+} GoadServerType;
+</programlisting>
+<para>
+<itemizedlist>
+<listitem><para>GOAD_SERVER_SHLIB - implementation is in a shared library plugin</para></listitem>
+<listitem><para>GOAD_SERVER_EXE - implementation is in a separate program</para></listitem>
+<listitem><para>GOAD_SERVER_RELAY - implementation is accessable via a relay object (not yet implemented)</para></listitem>
+<listitem><para>GOAD_SERVER_FACTORY - implementation is started by talking to a GNOME::GenericFactory object</para></listitem>
+</itemizedlist>
+</para></refsect2>
+<refsect2>
+<title><anchor id="GoadActivationFlags">enum GoadActivationFlags</title>
+<programlisting>typedef enum {
+	/* these two are mutually exclusive */
+	GOAD_ACTIVATE_SHLIB = 1 &lt;&lt; 0, 	/* prefer shlib activation */
+	GOAD_ACTIVATE_REMOTE = 1 &lt;&lt; 1, 	/* prefer remote activation */
+
+	/* these two are mutually exclusive */
+	GOAD_ACTIVATE_EXISTING_ONLY = 1 &lt;&lt; 2, /* Only do lookup in name
+					       * service for currently running
+					       * version.
+					       */
+	GOAD_ACTIVATE_NEW_ONLY = 1 &lt;&lt; 3,      /* No lookup in name service. */
+	GOAD_ACTIVATE_ASYNC = 1 &lt;&lt; 4 /* Just make sure that the object is running */
+} GoadActivationFlags;
+</programlisting>
+<para>
+<itemizedlist>
+<listitem><para>GOAD_ACTIVATE_SHLIB - indicates activation from a shared library plugin is preferred</para></listitem>
+<listitem><para>GOAD_ACTIVATE_REMOTE - indicates activation from an executable or factory is preferred</para></listitem>
+<listitem><para>GOAD_ACTIVATE_EXISTING_ONLY - Don't create a new object, simply access the currently running implementation if available.</para></listitem>
+<listitem><para>GOAD_ACTIVATE_NEW_ONLY - Don't look for a currently running implementation, just create a new one (mutually exclusive with GOAD_ACTIVATE_EXISTING_ONLY)</para></listitem>
+<listitem><para>GOAD_ACTIVATE_ASYNC - just start the object implementation, but don't worry about getting a reference to it.</para></listitem>
+</itemizedlist>
+</para></refsect2>
+<refsect2>
+<title><anchor id="GoadServer">struct GoadServer</title>
+<programlisting>typedef struct {
+	GoadServerType type;
+        GoadActivationFlags flags; /* only GOAD_ACTIVATE_NEW_ONLY
+				      currently parsed in */
+	char     **repo_id;
+	char     *server_id;
+	char     *description;
+
+        /*
+	 * Executable/shlib path, relayer IOR, whatever.
+	 * This field may disappear at any time. You have been warned ;-)
+	 */
+	char     *location_info;
+} GoadServer;
+</programlisting>
+<para>
+<itemizedlist>
+<listitem><para>'type' - The GoadServerType of the implementation being listed</para></listitem>
+<listitem><para>'flags' - The bitwise OR of all the GoadActivationFlags that are enforced for this GoadServer</para></listitem>
+<listitem><para>'repo_id' - An array of strings giving all the interfaces supported by this implementation</para></listitem>
+<listitem><para>'server_id' - The GOAD ID of this implementation. A GOAD ID is a unique global identifier of a particular object implementation.</para></listitem>
+<listitem><para>'description' - A human-readable description of this object, if applicable</para></listitem>
+<listitem><para>'location_info' - Information on how to activate the object. The meaning varies depending on the 'type'</para></listitem>
+</itemizedlist>
+</para></refsect2>
+<refsect2>
+<title><anchor id="GoadServerList">struct GoadServerList</title>
+<programlisting>typedef struct {
+  GoadServer *list;
+  GHashTable *by_goad_id;
+} GoadServerList;
+</programlisting>
+<para>
+'list' is an array of GoadServer structures. 'by_goad_id' is a hash
+table with the GOAD ID of each implementation as the key, and the
+GoadServer structure for that implementation as the value.
+</para></refsect2>
+<refsect2>
+<title><anchor id="goad-server-list-get">goad_server_list_get ()</title>
+<programlisting><link linkend="GoadServerList">GoadServerList</link>* goad_server_list_get        (void);</programlisting>
+<para>
+Returns an array listing all the servers available
+for activation.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a newly created server list.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="goad-server-list-free">goad_server_list_free ()</title>
+<programlisting>void        goad_server_list_free           (<link linkend="GoadServerList">GoadServerList</link> *server_list);</programlisting>
+<para>
+Frees up all the memory associated with <parameter>server_list</parameter>
+(which should have been received from <link linkend="goad-server-list-get">goad_server_list_get</link>())
+</para>
+<para>
+Side effects: Invalidates the memory pointed to by
+'server_list'.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>server_list</parameter>&nbsp;:</entry>
+<entry> a GoadServerList structure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="goad-server-activate">goad_server_activate ()</title>
+<programlisting><link linkend="CORBA-Object">CORBA_Object</link> goad_server_activate           (<link linkend="GoadServer">GoadServer</link> *sinfo,
+                                             <link linkend="GoadActivationFlags">GoadActivationFlags</link> flags,
+                                             const char **params);</programlisting>
+<para>
+Activates a CORBA server specified by 'sinfo', using the 'flags'
+hints on how to activate that server.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>sinfo</parameter>&nbsp;:</entry>
+<entry> information on the server to be "activated"
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> information on how the application wants the server to be activated.
+</entry></row>
+<row><entry align="right"><parameter>params</parameter>&nbsp;:</entry>
+<entry> Pass NULL here for normal applications.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a CORBA_Object that points to this server, or CORBA_OBJECT_NIL
+if the activation failed.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="goad-server-activate-with-repo-id">goad_server_activate_with_repo_id ()</title>
+<programlisting><link linkend="CORBA-Object">CORBA_Object</link> goad_server_activate_with_repo_id
+                                            (<link linkend="GoadServerList">GoadServerList</link> *server_list,
+                                             const char *repo_id,
+                                             <link linkend="GoadActivationFlags">GoadActivationFlags</link> flags,
+                                             const char **params);</programlisting>
+<para>
+Activates a CORBA server specified by 'repo_id', using the 'flags'
+hints on how to activate that server.  Picks the first one on the
+list that meets criteria.
+</para>
+<para>
+This is done by possibly making three passes through the list, the
+first pass checking for existing objects only, the second pass
+taking into account any activation method preferences, and the last
+pass just doing "best we can get" service.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>server_list</parameter>&nbsp;:</entry>
+<entry> a server listing returned by goad_server_list_get.
+If NULL, we will call the function ourself and use that.
+</entry></row>
+<row><entry align="right"><parameter>repo_id</parameter>&nbsp;:</entry>
+<entry> the repository ID of the interface that we want to activate a server for.
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> information on how the application wants the server to be activated.
+</entry></row>
+<row><entry align="right"><parameter>params</parameter>&nbsp;:</entry>
+<entry> NULL for normal applications.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the activated object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="goad-server-activate-with-id">goad_server_activate_with_id ()</title>
+<programlisting><link linkend="CORBA-Object">CORBA_Object</link> goad_server_activate_with_id   (<link linkend="GoadServerList">GoadServerList</link> *server_list,
+                                             const char *server_id,
+                                             <link linkend="GoadActivationFlags">GoadActivationFlags</link> flags,
+                                             const char **params);</programlisting>
+<para>
+Activates a CORBA server specified by 'repo_id', using
+the 'flags' hints on how to activate that server.
+Picks the first one on the list that matches.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>server_list</parameter>&nbsp;:</entry>
+<entry> a server listing returned by goad_server_list_get.
+If NULL, we will call that function ourself and use that.
+</entry></row>
+<row><entry align="right"><parameter>server_id</parameter>&nbsp;:</entry>
+<entry> the GOAD ID of the server that we want to activate.
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> information on how the application wants the server to be activated.
+</entry></row>
+<row><entry align="right"><parameter>params</parameter>&nbsp;:</entry>
+<entry> NULL for now.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the newly activated object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

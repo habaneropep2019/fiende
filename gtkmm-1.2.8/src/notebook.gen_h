@@ -1,0 +1,513 @@
+/* $Id: notebook.gen_h,v 1.88 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* notebook.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gtk--/label.h>
+#include <gtk/gtknotebook.h>
+
+CLASS_START(Gtk);
+
+class Notebook;
+
+#m4 GTKMM_CONVERSION(GtkNotebookPage*,Gtk::Notebook_Helpers::Page*,`($1)((void*)($3))',`($2)((void*)($3))')
+
+namespace Notebook_Helpers
+{
+/*********************************************************************
+***** Page Properties
+*********************************************************************/
+  // we will have to muck a good bit to get this to work.
+  // output type
+  class Page : protected GtkNotebookPage
+    {
+      private:
+        Page& operator=(const Page&);
+        Page(const Page&);
+      protected:
+        Page(void* do_not_derive_this);
+
+        // This is the key to wrapping this type
+        GtkNotebook* parent()
+          {return GTK_NOTEBOOK(gtkobj()->child->parent);}
+
+      public:
+        GtkNotebookPage* gtkobj() {return (this);}
+
+        Widget* get_child();
+        Widget* get_tab();
+        Widget* get_menu();
+        string get_tab_text();
+ 
+        void set_tab (Widget* tab=0);
+        void set_tab (Widget& tab);
+        void set_tab_text(const nstring& str=0);
+        void set_menu(Widget* menu=0);
+        void set_menu(Widget& menu);
+
+        bool get_expand();
+        bool get_fill();  
+        GtkPackType get_pack();
+        void set_tab_packing(bool expand,bool fill,GtkPackType pack_type);
+    };
+
+  // input type (Factory)
+  class PageList;
+  class Element
+    {
+        friend class PageList;
+        Widget   *child_;
+        Widget   *tab_;
+        Widget   *menu_;
+     public:
+        Element(Widget* child,Widget* tab,Widget* menu)
+            : child_(child),tab_(tab),menu_(menu) 
+          {}
+        Element(Widget& child,Widget& tab,Widget& menu)
+            : child_(&child),tab_(&tab),menu_(&menu) 
+          {}
+        Element(Widget& child)
+            : child_(&child),tab_(0),menu_(0) 
+          {}
+    };
+ 
+  // Just a widget without a tab
+  typedef Element WidgetElem;
+
+  struct TabElem : public Element
+    {
+        TabElem(Widget& child,Widget& tab)
+            : Element(&child,&tab,0)
+          {}
+        TabElem(Widget& child,const string& s)
+            : Element(&child,manage( new Label(s)),0)
+          {}
+    }; 
+ 
+  struct MenuElem : public Element
+    {
+        MenuElem(Widget& child,Widget& menu)
+            : Element(&child,0,&menu)
+          {}
+    };
+
+/*********************************************************************
+***** List properties
+*********************************************************************/
+#m4 include(list.m4)
+  // This still needs some work.
+  GP_LIST(PageList,Notebook,Page)
+  GP_LIST_CONTAINER_REMOVE(get_child)
+        // Non-standard
+        void reorder(iterator loc,iterator page);
+  GP_LIST_FIND(get_child)
+  GP_LIST_VECTOR()
+  GP_LIST_END()
+};
+
+//: A container which shows only one of it's children at a time, normally `subwindows'.
+//- The {\class Gtk::Notebook} widget is a {\class Gtk::Container} whose children are
+//- pages that can be accessed through bookmarks. The pages are displayed all at the same
+//- place.
+class Notebook : public Container {
+  WRAP_CLASS(Notebook,GtkNotebook,GTK_NOTEBOOK,GTK_IS_NOTEBOOK,notebook,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+
+  typedef Notebook_Helpers::Page     Page;
+  typedef Notebook_Helpers::Element  Element;
+  typedef Notebook_Helpers::PageList PageList;
+
+  WRAP_CTOR_CAST;
+  WRAP_CTOR_DEFAULT;
+  WRAP_DTOR;
+
+//  WRAP_METHOD(
+//    void gtk_notebook_remove_page(GtkNotepad*,gint page_number),
+//    void remove_page       (gint page_num));
+
+/* Page controls */
+  //: Returns the page number of the current page.
+  //- Returns: The page number.
+  WRAP_METHOD(
+    gint gtk_notebook_get_current_page   (GtkNotebook *notebook),
+    gint get_current_page_num() const);
+
+  //: Returns the content of the page number page_num, or NULL if page_num is out of bounds.
+  //- page_num: The page number.
+  //- Returns: The content of the page.
+  WRAP_METHOD(
+    GtkWidget* gtk_notebook_get_nth_page(GtkNotebook*,gint),
+    Gtk::Widget* get_nth_page(gint page_number));
+
+  //: Returns the page number of child in notebook.
+  //- child: The child.
+  //- Returns: The page number, or -1 if child is not in notebook.
+  WRAP_METHOD(
+    gint gtk_notebook_page_num (GtkNotebook *notebook,fixmegtkconst GtkWidget*),
+    gint page_num(const Gtk::Widget &child));
+
+  //: Switches to the page number page_num.
+  //- Negative values stand for the last page; too large values are ignored.
+  //-
+  //- page_num: The page number.
+  WRAP_METHOD(
+    void gtk_notebook_set_page(GtkNotebook*,gint),
+    void set_page           (gint page_number));
+
+  //: Switches to the next page. Nothing happens if the current page is the last page.
+  WRAP_METHOD(
+    void gtk_notebook_next_page(GtkNotebook*),
+    void next_page          ());
+
+  //: Switches to the previous page. Nothing happens if the current page is the first page.
+  WRAP_METHOD(
+    void gtk_notebook_prev_page(GtkNotebook*),
+    void prev_page          ());
+
+
+  Page* get_current() const;
+  // deprecated (use notebook.get_current().child()
+  Gtk::Widget* get_current_child();
+
+
+/* Style */
+  WRAP_MEMBER(value,tab_pos,tab_pos,GtkPositionType,guint);
+  WRAP_MEMBER(value,show_tabs,show_tabs,bool,gint);
+  WRAP_MEMBER(value,show_border,show_border,bool,gint);
+
+  //: Sets whether to show the border of the notebook or not. Bookmarks are in the border.
+  WRAP_METHOD(
+    void gtk_notebook_set_show_border(GtkNotebook*,gint),
+    void set_show_border(bool show_border));
+
+  //: Sets whether to show the bookmarks or not.
+  WRAP_METHOD(
+    void gtk_notebook_set_show_tabs(GtkNotebook*,gint),
+    void set_show_tabs  (bool show_tabs));
+
+  //: pos is one of {\enum GTK_POS_LEFT}, {\enum GTK_POS_RIGHT}, {\enum GTK_POS_TOP},
+  //: {\enum GTK_POS_BOTTOM}.
+  WRAP_METHOD(
+    void gtk_notebook_set_tab_pos(GtkNotebook*,GtkPositionType),
+    void set_tab_pos    (GtkPositionType pos));
+
+  //: Sets whether the tabs must have all the same size or not.
+  WRAP_METHOD(
+    void gtk_notebook_set_homogeneous_tabs(GtkNotebook*,gint),
+    void set_homogeneous_tabs        (bool homogeneous));
+
+  //: Sets whether there should be a border around the bookmarks or not.
+  WRAP_METHOD(
+    void gtk_notebook_set_tab_border(GtkNotebook*,gint),
+    void set_tab_border (gint border_width));
+
+  //: Sets whether the tabs should have a horizontal border.
+  WRAP_METHOD(
+    void gtk_notebook_set_tab_hborder(GtkNotebook*,guint),
+    void set_tab_hborder             (guint tab_hborder));
+
+  //: Sets whether the tabs should have a vertical border.
+  WRAP_METHOD(
+    void gtk_notebook_set_tab_vborder(GtkNotebook*,guint),
+    void set_tab_vborder             (guint tab_vborder));
+
+  //: Sets whether the bookmarks area may be scrollable or not if there are too many bookmarks to fit in the allocated area.
+  WRAP_METHOD(
+    void gtk_notebook_set_scrollable(GtkNotebook*,gint),
+    void set_scrollable (bool scrollable));
+
+
+/* Popup */
+  //: Enables the popup menu.
+  //- If the user clicks with the right mouse button on the bookmarks, a menu with all the pages will be popped up.
+  WRAP_METHOD(
+    void gtk_notebook_popup_enable(GtkNotebook*),
+    void popup_enable   ());
+
+  //: Disables the popup menu.
+  WRAP_METHOD(
+    void gtk_notebook_popup_disable(GtkNotebook*),
+    void popup_disable  ());
+
+#m4start
+GTKMM_SECTION(USR)
+          void operator ()(Gtk::Notebook_Helpers::Page* p) {emit(p,(guint)-1);}
+          void emit(Gtk::Notebook_Helpers::Page* p) {emit(p,(guint)-1);}
+#m4end
+  SIGNAL_SPEC("switch_page",both|fake,void switch_page(Gtk::Notebook_Helpers::Page*,guint),void gtkmm_notebook_switch_page(GtkNotebook*,GtkNotebookPage*,guint));
+
+  //: (deprecated)
+  WRAP_METHOD(
+    void gtk_notebook_prepend_page(GtkNotebook*,GtkWidget*,GtkWidget*),
+    void prepend_page  (Gtk::Widget&, Gtk::Widget&));
+
+  //: (deprecated)
+  WRAP_METHOD(
+    void gtk_notebook_append_page(GtkNotebook*,GtkWidget*,GtkWidget*),
+    void append_page  (Gtk::Widget&, Gtk::Widget&));
+
+  PageList& pages()
+    {return reinterpret_cast<PageList&>(widget_self); }
+  const PageList& pages() const
+    {return reinterpret_cast<const PageList&>(widget_self); }
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+class Page;
+IMPL_START;
+namespace Gtk
+{
+
+Notebook::Page* Notebook::get_current() const
+{
+   return reinterpret_cast<Notebook::Page*>(gtkobj()->cur_page);
+}
+
+Widget* 
+Notebook::get_current_child()
+{
+  GtkNotebookPage* page = gtkobj()->cur_page;
+  return wrap(GTK_WIDGET(page->child));
+}
+
+/*********************************************************************
+***** Page Properties
+*********************************************************************/
+
+Widget* Notebook_Helpers::Page::get_child() {return wrap(gtkobj()->child);}
+bool Notebook_Helpers::Page::get_expand()       {return gtkobj()->expand;}
+bool Notebook_Helpers::Page::get_fill()         {return gtkobj()->fill;}
+GtkPackType Notebook_Helpers::Page::get_pack()  {return GtkPackType(gtkobj()->pack);}
+Widget* Notebook_Helpers::Page::get_tab()   
+{
+  if (gtkobj()->default_tab) return 0;
+  return wrap(gtkobj()->tab_label);
+}
+Widget* Notebook_Helpers::Page::get_menu()  
+{
+  if (gtkobj()->default_menu) return 0;
+  return wrap(gtkobj()->menu_label);
+}
+
+void Notebook_Helpers::Page::set_tab (Widget* tab)
+{
+  gtk_notebook_set_tab_label(parent(),gtkobj()->child,(tab?tab->gtkobj():0));
+}
+
+void Notebook_Helpers::Page::set_tab (Widget& tab)
+{
+  gtk_notebook_set_tab_label(parent(),gtkobj()->child,tab.gtkobj());
+}
+
+string Notebook_Helpers::Page::get_tab_text()
+{
+  GtkWidget* w=gtk_notebook_get_tab_label(parent(),gtkobj()->child);
+  char *s=0;
+  if (w&& GTK_IS_LABEL (w))
+    s=GTK_LABEL(w)->label;
+  if (s) return s;
+  return "";
+}
+
+void Notebook_Helpers::Page::set_tab_text(const nstring& str)
+{
+  gtk_notebook_set_tab_label_text(parent(),gtkobj()->child,str.gc_str());
+}
+
+void Notebook_Helpers::Page::set_menu(Widget* menu)
+{
+  gtk_notebook_set_menu_label(parent(),gtkobj()->child,(menu?menu->gtkobj():0));
+}
+
+void Notebook_Helpers::Page::set_menu(Widget& menu)
+{
+  gtk_notebook_set_menu_label(parent(),gtkobj()->child,menu.gtkobj());
+}
+
+void Notebook_Helpers::Page::set_tab_packing(bool expand,bool fill,GtkPackType pack_type)
+{
+  gtk_notebook_set_tab_label_packing(parent(),gtkobj()->child,expand,fill,pack_type);
+}
+
+/*********************************************************************
+***** List properties
+*********************************************************************/
+typedef Notebook_Helpers::PageList::iterator page_iterator;
+
+page_iterator Notebook_Helpers::PageList::insert(page_iterator position,const Element& e)
+{
+  int pos;
+
+  // locate the items desired position
+  if (!position.node)
+    pos=-1;
+  else
+    pos=g_list_position(glist(),position.node);
+   
+  // give item to gtk+
+  gtk_notebook_insert_page_menu(
+                             parent_->gtkobj(),
+                             ((e.child_)?e.child_->gtkobj():0),
+                             ((e.tab_)?e.tab_->gtkobj():0),
+                             ((e.menu_)?e.menu_->gtkobj():0),
+                             pos);
+
+  // return the right iterator
+  if (pos==0)
+    return begin();
+  if (!position.node)
+    return --end();
+  return --position;
+}
+
+void Notebook_Helpers::PageList::reorder(page_iterator pos,page_iterator page)
+{
+  int position=g_list_position(glist(),pos.node);
+  gtk_notebook_reorder_child(parent_->gtkobj(),(*page)->gtkobj()->child,position);
+}
+
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_NoteBook)
+//. name: cur_page
+//. type: GtkNotebookPage*
+//. get:
+//. set:
+//. desc:
+
+//. name: children
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: first_tab
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: focus_tab
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: menu
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: panel
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: timer
+//. type: guint32
+//. get:
+//. set:
+//. desc:
+
+//. name: tab_hborder
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: tab_vborder
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: show_tabs
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: homogeneous
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: show_border
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: tab_pos
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: scrollable
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: in_child
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: click_child
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: button
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: need_timer
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: child_has_focus
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: have_visible_child
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

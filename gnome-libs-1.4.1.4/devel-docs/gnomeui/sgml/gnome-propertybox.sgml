@@ -1,0 +1,314 @@
+<refentry id="GnomePropertyBox">
+<refmeta>
+<refentrytitle>GnomePropertyBox</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomePropertyBox</refname><refpurpose>
+Standarized dialog box for handling configuration</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomePropertyBox-struct">GnomePropertyBox</link>;
+#define     <link linkend="GNOME-PROPERTY-BOX-DIRTY-CAPS">GNOME_PROPERTY_BOX_DIRTY</link>
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-property-box-new">gnome_property_box_new</link>          (void);
+void        <link linkend="gnome-property-box-changed">gnome_property_box_changed</link>      (<link linkend="GnomePropertyBox">GnomePropertyBox</link> *property_box);
+void        <link linkend="gnome-property-box-set-state">gnome_property_box_set_state</link>    (<link linkend="GnomePropertyBox">GnomePropertyBox</link> *property_box,
+                                             <link linkend="gboolean">gboolean</link> state);
+<link linkend="gint">gint</link>        <link linkend="gnome-property-box-append-page">gnome_property_box_append_page</link>  (<link linkend="GnomePropertyBox">GnomePropertyBox</link> *property_box,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="GtkWidget">GtkWidget</link> *tab_label);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBin">GtkBin</link>
+                     +----<link linkend="GtkWindow">GtkWindow</link>
+                           +----<link linkend="GnomeDialog">GnomeDialog</link>
+                                 +----GnomePropertyBox
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    The <type>GnomePropertyBox</type> widget simplifies coding a
+    consistent dialog box for configuring properties of any kind.
+  </para>
+  
+  <para>
+    The <type>GnomePropertyBox</type> is a toplevel widget (it will
+    create its own window), inside it contains a <type>GtkNotebook</type>
+    which is used to hold the various property pages.
+  </para>
+  
+  <para>
+    The box will include ok, cancel, apply and help buttons (the
+    actual buttons depends on the settings the user has, for example,
+    apply can be hidden).  The ok and apply buttons will start up in
+    non-sensitive state, the programmer needs to configure the widgets
+    inserted into the property box to inform the widget of any state
+    changes to enable the ok and apply buttons.  This is done by
+    calling the <link linkend="gnome-property-box-changed">gnome_property_box_changed</link>() function.
+  </para>
+
+  <para>
+    To use this widget, you create the widget using
+    <link linkend="gnome-property-box-new">gnome_property_box_new</link>() and then you call
+    <link linkend="gnome-property-box-append-page">gnome_property_box_append_page</link>() for each property page you want
+    in the property box.
+  </para>
+
+  <para>
+    The widget emits two signals: "apply" and "help".  To make a
+    functional dialog box you will want to connect to at least the
+    "apply" signal. Your function will be invoked once for each page
+    and one more time at the end, passing a special value of -1 for
+    the page number.
+  </para>
+
+  <para>Here is a sample callback routine layout
+
+    <example>
+      <title>Sample callback for the "apply" signal</title>
+      <programlisting>
+void
+dialog_apply_callback (GnomePropertyBox *property_box, gint page_num)
+{
+        switch (page_num){
+	case 0:
+	        apply_changes_page_0 (property_box);
+		break;
+	case 1:
+	        apply_changes_page_1 (property_box);
+		break;
+	default:
+	}
+}
+      </programlisting>
+    </example>
+  </para>
+
+  <para>Some people just check for the last condition like this:
+    <example>
+      <title>Sample callback for the "apply" signal</title>
+      <programlisting>
+void
+dialog_apply_callback (GnomePropertyBox *property_box, gint page_num)
+{
+        if (page_num != -1)
+                return;
+
+        apply_all_changes (property_box);
+}
+      </programlisting>
+    </example>
+  </para>
+  
+  <para>
+    A fully finished program should also hook up to the "help" signal
+    to provide context sensitive help in the dialog box.  This signal
+    also receives the page number in which the help is invoked, so you
+    can provide different help nodes for each page if you desire to do
+    so.
+  </para>
+
+  <para>
+    The GNOME libraries include a number of helper routines that will
+    help you provide help in your application.  Here is a sample piece
+    of code:
+
+    <example>
+      <title>Sample callback for the "help" signal</title>
+      <programlisting>
+void
+dialog_help_callback (GnomePropertyBox *property_box, gint page_num)
+{
+        GnomeHelpMenuEntry help_entry_page_0 = { "application-id", "page-0-help" };
+	GnomeHelpMenuEntry help_entry_page_1 = { "application-id", "page-1-help" };
+
+	switch (page_num){
+	case 0:
+	       gnome_help_display (0, help_entry_page_0);
+	       break;
+
+	case 1:
+	       gnome_help_display (0, help_entry_page_1);
+	       break;
+        }
+}
+      </programlisting>
+    </example>
+
+    The value "0" in the example above is ignored by the
+    gnome_help_display routines.  This is done so that you can use a
+    hack to connect to help in simpler situations without having to
+    provide a full callback (like in this example).
+  </para>
+
+  <para>
+    You can actually save some time if you use the
+    <link linkend="gnome-help-pbox-display">gnome_help_pbox_display</link>() routine.  This routine is designed to
+    work side-by-side with the <type>GnomePropertyBox</type> object.
+    It works like this:
+
+    <example>
+      <title>Connecting the "help" signal using the
+	<link linkend="gnome-help-pbox-display">gnome_help_pbox_display</link>() routine</title>
+      <programlisting>
+void
+property_dialog_do_connections (GnomePropertyBox *property_box)
+{
+        static GnomeHelpMenuEntry help_entry = { "application-id", "base-name" };
+
+	gtk_signal_connect (GTK_OBJECT (property_box), "help",
+	                    GTK_SIGNAL_FUNC(gnome_help_pbox_display), &amp;help_entry);
+}
+      </programlisting>
+    </example>
+
+    This will use the "base-name" as a template to create the
+    fully-qualified name of the help file using the page number as
+    part of the filename component (the result is in the form
+    "base-name-$pagenum.html", where $pagenum is substituted with the
+    page number).
+  </para>
+
+  <para>
+    See the documentation for <link linkend="gnome-help-pbox-display">gnome_help_pbox_display</link>() for more information
+  </para>
+
+<!-- Documentation author, Miguel de Icaza -->
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomePropertyBox-struct">struct GnomePropertyBox</title>
+<programlisting>struct GnomePropertyBox;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GNOME-PROPERTY-BOX-DIRTY-CAPS">GNOME_PROPERTY_BOX_DIRTY</title>
+<programlisting>#define GNOME_PROPERTY_BOX_DIRTY	"gnome_property_box_dirty"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-box-new">gnome_property_box_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_property_box_new          (void);</programlisting>
+<para>
+Creates a new GnomePropertyBox widget.  The PropertyBox widget
+is useful for making consistent configuration dialog boxes.
+</para>
+<para>
+When a setting has been made to a property in the PropertyBox
+your program needs to invoke the gnome_property_box_changed to signal
+a change (this will enable the Ok/Apply buttons).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a newly created GnomePropertyBox widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-box-changed">gnome_property_box_changed ()</title>
+<programlisting>void        gnome_property_box_changed      (<link linkend="GnomePropertyBox">GnomePropertyBox</link> *property_box);</programlisting>
+<para>
+When a setting has changed, the code needs to invoke this routine
+to make the Ok/Apply buttons sensitive.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>property_box</parameter>&nbsp;:</entry>
+<entry> The GnomePropertyBox that contains the changed data
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-box-set-state">gnome_property_box_set_state ()</title>
+<programlisting>void        gnome_property_box_set_state    (<link linkend="GnomePropertyBox">GnomePropertyBox</link> *property_box,
+                                             <link linkend="gboolean">gboolean</link> state);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>property_box</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>state</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-property-box-append-page">gnome_property_box_append_page ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_property_box_append_page  (<link linkend="GnomePropertyBox">GnomePropertyBox</link> *property_box,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="GtkWidget">GtkWidget</link> *tab_label);</programlisting>
+<para>
+Appends a new page to the GnomePropertyBox.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>property_box</parameter>&nbsp;:</entry>
+<entry> The property box where we are inserting a new page
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry>        The widget that is being inserted
+</entry></row>
+<row><entry align="right"><parameter>tab_label</parameter>&nbsp;:</entry>
+<entry>    The widget used as the label for this confiugration page
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the assigned index of the page inside the GnomePropertyBox or
+-1 if one of the arguments is invalid.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="gnome-help-pbox-display">gnome_help_pbox_display</link>(), <link linkend="gnome-help-display">gnome_help_display</link>(), <link linkend="GnomeDialog">GnomeDialog</link>
+</para>
+</refsect1>
+
+</refentry>

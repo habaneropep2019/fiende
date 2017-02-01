@@ -1,0 +1,670 @@
+<HTML
+><HEAD
+><TITLE
+>bonobo-property-bag-xml</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Bonobo API Reference Manual"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Properties"
+HREF="bonobo-properties.html"><LINK
+REL="PREVIOUS"
+TITLE="bonobo-arg"
+HREF="bonobo-bonobo-arg.html"><LINK
+REL="NEXT"
+TITLE="BonoboTransient"
+HREF="bonobo-bonobo-transient.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>Bonobo API Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="bonobo-bonobo-arg.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="bonobo-properties.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="bonobo-bonobo-transient.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="BONOBO-BONOBO-PROPERTY-BAG-XML"
+>bonobo-property-bag-xml</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN5128"
+></A
+><H2
+>Name</H2
+>bonobo-property-bag-xml&nbsp;--&nbsp;BonoboArg XML persistance logic</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN5131"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;
+
+<A
+HREF="bonobo-bonobo-ui-node.html#BONOBOUINODE"
+>BonoboUINode</A
+>* <A
+HREF="bonobo-bonobo-property-bag-xml.html#BONOBO-PROPERTY-BAG-XML-ENCODE-ANY"
+>bonobo_property_bag_xml_encode_any</A
+>
+                                            (<A
+HREF="bonobo-bonobo-ui-node.html#BONOBOUINODE"
+>BonoboUINode</A
+> *opt_parent,
+                                             const <GTKDOCLINK
+HREF="CORBA-ANY"
+>CORBA_any</GTKDOCLINK
+> *any,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);
+<GTKDOCLINK
+HREF="CORBA-ANY"
+>CORBA_any</GTKDOCLINK
+>*  <A
+HREF="bonobo-bonobo-property-bag-xml.html#BONOBO-PROPERTY-BAG-XML-DECODE-ANY"
+>bonobo_property_bag_xml_decode_any</A
+>
+                                            (<A
+HREF="bonobo-bonobo-ui-node.html#BONOBOUINODE"
+>BonoboUINode</A
+> *node,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);&#13;</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN5143"
+></A
+><H2
+>Description</H2
+><P
+>This API is really super simple. It is designed in conjuction
+with the <A
+HREF="bonobo-bonobo-ui-node.html#BONOBOUINODE"
+>BonoboUINode</A
+> API to allow you to serialize a <A
+HREF="bonobo-bonobo-arg.html#BONOBOARG"
+>BonoboArg</A
+>
+( in fact a CORBA_any ) to an XML format, and obviously the
+converse.</P
+><P
+>Here is a code sample to produce an XML string from a
+CORBA_any or BonoboArg:
+   <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN5149"
+></A
+><P
+><B
+>Example 1. Converting Any to XML</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>char *
+convert_arg_to_xml (BonoboArg *bonobo_arg)
+{
+	CORBA_Environment ev;
+	BonoboUINode     *node;
+	char             *value;
+
+	CORBA_exception_init (&amp;ev);
+
+	node = bonobo_property_bag_xml_encode_any (NULL, bonobo_arg, &amp;ev);
+	if (!node)
+		return NULL;
+
+	value = bonobo_property_bag_xml_decode_any (node, &amp;ev);
+	bonobo_ui_node_free (node);
+
+	CORBA_exception_free (&amp;ev);
+
+	return value;
+}
+     </PRE
+></TD
+></TR
+></TABLE
+></DIV
+></P
+><P
+>Here is the converse sample to produce a BonoboArg from an XML string:
+   <DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN5153"
+></A
+><P
+><B
+>Example 2. Converting XML to an Any</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>BonoboArg *
+convert_xml_to_arg (const char *xml)
+{
+	CORBA_Environment ev;
+	BonoboUINode     *node;
+	BonoboArg        *value;
+
+	CORBA_exception_init (&amp;ev);
+
+	node = bonobo_ui_node_from_string (xml);
+	if (!node)
+		return NULL;
+
+	value = bonobo_property_bag_xml_decode_any (node, &amp;ev);
+
+	bonobo_ui_node_free (node);
+	CORBA_exception_free (&amp;ev);
+
+	return value;
+}
+     </PRE
+></TD
+></TR
+></TABLE
+></DIV
+></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN5156"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN5158"
+></A
+><H3
+><A
+NAME="BONOBO-PROPERTY-BAG-XML-ENCODE-ANY"
+></A
+>bonobo_property_bag_xml_encode_any ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><A
+HREF="bonobo-bonobo-ui-node.html#BONOBOUINODE"
+>BonoboUINode</A
+>* bonobo_property_bag_xml_encode_any
+                                            (<A
+HREF="bonobo-bonobo-ui-node.html#BONOBOUINODE"
+>BonoboUINode</A
+> *opt_parent,
+                                             const <GTKDOCLINK
+HREF="CORBA-ANY"
+>CORBA_any</GTKDOCLINK
+> *any,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This routine encodes <TT
+CLASS="PARAMETER"
+><I
+>any</I
+></TT
+> into an XML tree using the
+<A
+HREF="bonobo-bonobo-ui-node.html#BONOBOUINODE"
+>BonoboUINode</A
+> XML abstraction. <TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+> is used for flagging
+any non-fatal exceptions during the process. On exception
+NULL will be returned. opt_parent should be NULL, and is
+used internally for recursive tree construction.</P
+><P
+>Both type and content data are dumped in a non-standard, but
+trivial format.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN5172"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>opt_parent</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> optional parent, should be NULL</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>any</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the Any to serialize</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a corba exception environment</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the XML tree representing the Any</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN5193"
+></A
+><H3
+><A
+NAME="BONOBO-PROPERTY-BAG-XML-DECODE-ANY"
+></A
+>bonobo_property_bag_xml_decode_any ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="CORBA-ANY"
+>CORBA_any</GTKDOCLINK
+>*  bonobo_property_bag_xml_decode_any
+                                            (<A
+HREF="bonobo-bonobo-ui-node.html#BONOBOUINODE"
+>BonoboUINode</A
+> *node,
+                                             <GTKDOCLINK
+HREF="CORBA-ENVIRONMENT"
+>CORBA_Environment</GTKDOCLINK
+> *ev);</PRE
+></TD
+></TR
+></TABLE
+><P
+>This routine is the converse of bonobo_property_bag_xml_encode_any.
+It hydrates a serialized CORBA_any.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN5202"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>node</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the parsed XML representation of an any</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ev</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> a corba exception environment</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the CORBA_any or NULL on error</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="bonobo-bonobo-arg.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="bonobo-properties.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="bonobo-bonobo-transient.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>bonobo-arg</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>BonoboTransient</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

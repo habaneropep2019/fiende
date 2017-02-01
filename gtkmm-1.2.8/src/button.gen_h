@@ -1,0 +1,151 @@
+/* $Id: button.gen_h,v 1.55 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* box.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/bin.h>
+#include <gtk/gtkbutton.h>
+
+CLASS_START(Gtk);
+  //: Toplevel Button
+  //- The button widget is a rectangular clickable widget. You can
+  //- decorate it with images, text, or whatever you like.
+class Button : public Bin {
+  WRAP_CLASS(Button,GtkButton,GTK_BUTTON,GTK_IS_BUTTON,button,Gtk::Bin,GtkBin,GTK_BIN);
+public:
+  //: Create an empty button.
+  //- With an empty button, you can {Gtk_Button::add()} a widget
+  //- such as a {Gtk::Pixmap::} or {Gtk::Box::}.
+  //-
+  //- If you just wish to add a {Gtk::Label::},
+  //- you may want to
+  //- use the {Button(const string &label)} ctor 
+  //- directly instead.
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Simple Push Button with label.
+  //- Create a button with the given label inside. You won't be able
+  //- to add a widget in this button since it already has a {\class Gtk_Label}
+  //- in it.
+  explicit Button(const string &label,gfloat x=0.5,gfloat y=0.5);
+
+  //: Set the button's relief style.
+  //- This effects how the button looks. GtkReliefStyle can be one of {\enum GTK_RELIEF_NORMAL},
+  //- {\enum GTK_RELIEF_HALF}, or {\enum GTK_RELIEF_NONE}.
+  //- {\example
+  //- //This program shows the differences in button styles.
+  //- 
+  //- #include <gtk--/button.h>
+  //- #include <gtk--/window.h>
+  //- #include <gtk--/box.h>
+  //- #include <gtk--/main.h>
+  //- 
+  //- //This custom window will contain 3 buttons, one of
+  //- //each style.
+  //- class custom_window : public Gtk::Window
+  //- {
+  //-   Gtk::Button normal, half, none;
+  //-   Gtk::HBox some_hbox;
+  //-   public:
+  //-     custom_window();
+  //- };
+  //- 
+  //- //The constructor. Creates the window adds the buttons,
+  //- //and sets their style.
+  //- custom_window::custom_window()
+  //- : Gtk::Window(GTK_WINDOW_TOPLEVEL), some_hbox(true, 2),
+  //-   normal("Normal"), half("Half"), none("None")
+  //- {
+  //-   normal.set_relief(GTK_RELIEF_NORMAL);
+  //-   half.set_relief(GTK_RELIEF_HALF);
+  //-   none.set_relief(GTK_RELIEF_NONE);
+  //-   some_hbox.pack_start(normal, true, true, 0);
+  //-   some_hbox.pack_start(half, true, true, 0);
+  //-   some_hbox.pack_start(none, true, true, 0);
+  //-   add(some_hbox);
+  //-   show_all();
+  //- }
+  //- 
+  //- int main(int argc, char *argv[])
+  //- {
+  //-   Gtk::Main main_runner(argc, argv);
+  //-   custom_window some_window;
+  //-   main_runner.run();
+  //- }
+  //- }
+  WRAP_METHOD(
+    void gtk_button_set_relief(GtkButton*,GtkReliefStyle),
+    void           set_relief(GtkReliefStyle newstyle));
+
+  //: Return the button's relief style. (see {Gtk_Button::set_relief()})
+  WRAP_METHOD(
+    GtkReliefStyle gtk_button_get_relief(GtkButton*),
+    GtkReliefStyle get_relief() const);
+
+  //: Emited on button press.
+  //- Triggered when the button is pressed (e.g. the mouse button is
+  //- still down, it hasn't been released yet, see next signal)
+  SIGNAL_SPEC("pressed",both,void pressed(),gtk_button_pressed);
+
+  //: Triggered when the user has released the mouse button
+  SIGNAL_SPEC("released",both,void released(),gtk_button_released);
+
+  //: Emitted on button press and release.
+  //- Triggered when the user has pressed and released the mouse button
+  //- This is the signal you most likely want to connect.
+  SIGNAL_SPEC("clicked",both,void clicked(),gtk_button_clicked);
+
+  //: Triggered when the mouse cursor enters the button
+  SIGNAL_SPEC("enter",both,void enter(),gtk_button_enter);
+
+  //: Triggered when the mouse cursor leaves the button
+  SIGNAL_SPEC("leave",both,void leave(),gtk_button_leave);
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+#include <gtk/gtklabel.h>
+#include <gtk/gtkmisc.h>
+namespace Gtk
+{
+
+Button::Button(const string &label,gfloat x,gfloat y)
+  : Bin((GtkBin*)(gtk_object_new(get_type(),0)))
+
+{
+  initialize_class();
+  add_label(label,x,y);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Button)
+//. name: relief
+//. type: guint:2
+//. get: {get_relief()}
+//. set: {set_relief()}
+//. desc: Can be set to one of the following values :
+//.  {\enum GTK_RELIEF_NORMAL}, {\enum GTK_RELIEF_HALF}, {\enum GTK_RELIEF_NONE}
+

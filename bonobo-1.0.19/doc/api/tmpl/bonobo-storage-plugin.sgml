@@ -1,0 +1,135 @@
+<!-- ##### SECTION Title ##### -->
+bonobo-storage-plugin
+
+<!-- ##### SECTION Short_Description ##### -->
+The interface for pluggable bonobo storage modules
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+This header is only needed by #BonoboStorage and #BonoboStream
+implementation plugins. Essentialy these are shared library
+modules that implement only 1 public function
+<function>init_storage_plugin</function>. It is unlikely that
+most Bonobo users will wish to implement a storage or stream
+plugin.
+</para>
+
+<para>
+The init function fills out a StoragePlugin structure,
+most importantly it fills in a version string that defines
+the plugin ABI version built against, this is defined by
+the version of bonobo-storage-plugin.h you build against.
+  <example>
+     <title>Sample Storage plugin init function</title>
+     <programlisting>
+gint 
+init_storage_plugin (StoragePlugin *plugin)
+{
+	g_return_val_if_fail (plugin != NULL, -1);
+
+	plugin->name = "fs";
+	plugin->description = "Native Filesystem Driver";
+	plugin->version = BONOBO_STORAGE_VERSION;
+	
+	plugin->storage_open = bonobo_storage_fs_open; 
+	plugin->stream_open = bonobo_stream_fs_open; 
+
+	return 0;
+}
+     </programlisting>
+  </example>
+  The callbacks for opening streams and storages are registered
+and these are used by the <function>bonobo_storage_open</function>
+and <function>bonobo_stream_open</function> functions when your
+plugin name is passed to these.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#BonoboStorage, #BonoboStream
+</para>
+
+<!-- ##### MACRO BONOBO_STORAGE_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT StoragePlugin ##### -->
+<para>
+
+</para>
+
+@filename: 
+@name: 
+@description: 
+@version: 
+@storage_open: 
+@stream_open: 
+@handle: 
+
+<!-- ##### USER_FUNCTION StoragePluginInitFn ##### -->
+<para>
+
+</para>
+
+@plugin: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION BonoboStorageOpenFn ##### -->
+<para>
+
+</para>
+
+@path: 
+@flags: 
+@mode: 
+@ev: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION BonoboStreamOpenFn ##### -->
+<para>
+
+</para>
+
+@path: 
+@flags: 
+@mode: 
+@ev: 
+@Returns: 
+
+
+<!-- ##### VARIABLE storage_plugin_list ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION init_storage_plugin ##### -->
+<para>
+
+</para>
+
+@plugin: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_storage_load_plugins ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION bonobo_storage_plugin_find ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+

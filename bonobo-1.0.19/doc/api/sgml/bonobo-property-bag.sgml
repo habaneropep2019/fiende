@@ -1,0 +1,819 @@
+<refentry id="bonobo-bonobo-property-bag">
+<refmeta>
+<refentrytitle>BonoboPropertyBag</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboPropertyBag</refname><refpurpose>Implements a generic property storage interface</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboPropertyBag">BonoboPropertyBag</link>;
+enum        <link linkend="BonoboPropertyFlags">BonoboPropertyFlags</link>;
+void        (<link linkend="BonoboPropertyGetFn">*BonoboPropertyGetFn</link>)          (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *bag,
+                                             <link linkend="BonoboArg">BonoboArg</link> *arg,
+                                             <link linkend="guint">guint</link> arg_id,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+void        (<link linkend="BonoboPropertySetFn">*BonoboPropertySetFn</link>)          (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *bag,
+                                             const <link linkend="BonoboArg">BonoboArg</link> *arg,
+                                             <link linkend="guint">guint</link> arg_id,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+typedef     <link linkend="BonoboPropertyBagClass">BonoboPropertyBagClass</link>;
+<link linkend="GtkType">GtkType</link>     <link linkend="bonobo-property-bag-get-type">bonobo_property_bag_get_type</link>    (void);
+<link linkend="BonoboPropertyBag">BonoboPropertyBag</link>* <link linkend="bonobo-property-bag-new">bonobo_property_bag_new</link>  (<link linkend="BonoboPropertyGetFn">BonoboPropertyGetFn</link> get_prop,
+                                             <link linkend="BonoboPropertySetFn">BonoboPropertySetFn</link> set_prop,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+<link linkend="BonoboPropertyBag">BonoboPropertyBag</link>* <link linkend="bonobo-property-bag-new-full">bonobo_property_bag_new_full</link>
+                                            (<link linkend="BonoboPropertyGetFn">BonoboPropertyGetFn</link> get_prop,
+                                             <link linkend="BonoboPropertySetFn">BonoboPropertySetFn</link> set_prop,
+                                             <link linkend="BonoboEventSource">BonoboEventSource</link> *event_source,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+void        <link linkend="bonobo-property-bag-add">bonobo_property_bag_add</link>         (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             int idx,
+                                             <link linkend="BonoboArgType">BonoboArgType</link> type,
+                                             <link linkend="BonoboArg">BonoboArg</link> *default_value,
+                                             const char *docstring,
+                                             <link linkend="BonoboPropertyFlags">BonoboPropertyFlags</link> flags);
+void        <link linkend="bonobo-property-bag-add-full">bonobo_property_bag_add_full</link>    (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             int idx,
+                                             <link linkend="BonoboArgType">BonoboArgType</link> type,
+                                             <link linkend="BonoboArg">BonoboArg</link> *default_value,
+                                             const char *docstring,
+                                             <link linkend="BonoboPropertyFlags">BonoboPropertyFlags</link> flags,
+                                             <link linkend="BonoboPropertyGetFn">BonoboPropertyGetFn</link> get_prop,
+                                             <link linkend="BonoboPropertySetFn">BonoboPropertySetFn</link> set_prop,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+void        <link linkend="bonobo-property-bag-add-gtk-args">bonobo_property_bag_add_gtk_args</link>
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             <link linkend="GtkObject">GtkObject</link> *object);
+<link linkend="BonoboPropertyBag">BonoboPropertyBag</link>* <link linkend="bonobo-property-bag-construct">bonobo_property_bag_construct</link>
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             <link linkend="BonoboPropertyGetFn">BonoboPropertyGetFn</link> get_prop,
+                                             <link linkend="BonoboPropertySetFn">BonoboPropertySetFn</link> set_prop,
+                                             <link linkend="BonoboEventSource">BonoboEventSource</link> *event_source,
+                                             <link linkend="gpointer">gpointer</link> user_data);
+void        <link linkend="bonobo-property-bag-set-value">bonobo_property_bag_set_value</link>   (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             const <link linkend="BonoboArg">BonoboArg</link> *value,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+<link linkend="BonoboArg">BonoboArg</link>*  <link linkend="bonobo-property-bag-get-value">bonobo_property_bag_get_value</link>   (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+<link linkend="BonoboArg">BonoboArg</link>*  <link linkend="bonobo-property-bag-get-default">bonobo_property_bag_get_default</link> (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+const char* <link linkend="bonobo-property-bag-get-docstring">bonobo_property_bag_get_docstring</link>
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+const <link linkend="BonoboPropertyFlags">BonoboPropertyFlags</link> <link linkend="bonobo-property-bag-get-flags">bonobo_property_bag_get_flags</link>
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+<link linkend="BonoboArgType">BonoboArgType</link> <link linkend="bonobo-property-bag-get-property-type">bonobo_property_bag_get_property_type</link>
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-property-bag-has-property">bonobo_property_bag_has_property</link>
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name);
+void        <link linkend="bonobo-property-bag-notify-listeners">bonobo_property_bag_notify_listeners</link>
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             const <link linkend="BonoboArg">BonoboArg</link> *new_value,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+<link linkend="GList">GList</link>*      <link linkend="bonobo-property-bag-get-prop-list">bonobo_property_bag_get_prop_list</link>
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The PropertyBag is used for many things, particularly for
+the customization of controls. The important thing to
+remember about the BonoboPropertyBag implementation is that
+no live data is stored in the bag. ie. the Model for the 
+properties is your code.
+</para>
+
+<para>
+Consequently when someone requests a properties value,
+or sets a property the callbacks you supply at bag
+construction time are called, and the code therein must
+supply the property. Similarly, when a property changes
+value inside your object you need to notify the property
+bag's listeners that it has changed with a call to
+<function>bonobo_property_bag_notify_listeners</function>.
+</para>
+
+<para>
+Here is a simple example use of the property bag:
+  <example>
+     <title>Callbacks</title>
+     <programlisting>
+enum {
+	PROP_RUNNING,
+	PROP_COLOUR
+} MyArgs;
+
+static void
+get_prop (BonoboPropertyBag *bag,
+	  BonoboArg         *arg,
+	  guint              arg_id,
+	  CORBA_Environment *ev,
+	  gpointer           user_data)
+{
+	GtkObject *clock = user_data;
+
+	switch (arg_id) {
+
+	case PROP_RUNNING:
+		BONOBO_ARG_SET_BOOLEAN (arg, clock->is_running);
+		break;
+
+	case PROP_COLOUR:
+		BONOBO_ARG_SET_STRING (arg, clock->color);
+		break;
+
+	default:
+		bonobo_exception_set (ev, ex_Bonobo_PropertyBag_NotFound);
+		break;
+	}
+}
+
+static void
+set_prop (BonoboPropertyBag *bag,
+	  const BonoboArg   *arg,
+	  guint              arg_id,
+	  CORBA_Environment *ev,
+	  gpointer           user_data)
+{
+	GtkClock *clock = user_data;
+
+	switch (arg_id) {
+
+	case PROP_RUNNING: {
+		guint i = BONOBO_ARG_GET_BOOLEAN (arg);
+
+		if (i)
+			gtk_clock_start (clock);
+		else
+			gtk_clock_stop (clock);
+		break;
+	}
+
+	case PROP_COLOUR:
+		gtk_clock_set_color (clock, BONOBO_ARG_GET_STRING (arg));
+
+	default:
+		bonobo_exception_set (ev, ex_Bonobo_PropertyBag_NotFound);
+		break;
+	}
+}
+     </programlisting>
+  </example>
+</para>
+<para>
+Then to instantiate the property bag interface and associate it with
+a control perhaps we do:
+  <example>
+     <title></title>
+     <programlisting>
+	BonoboPropertyBag *pb;
+
+	pb = bonobo_property_bag_new (get_prop, set_prop, clock);
+	bonobo_control_set_properties (control, pb);
+
+	bonobo_property_bag_add (pb, "running", PROP_RUNNING,
+				 BONOBO_ARG_BOOLEAN, NULL,
+				 _("Whether or not the clock is running"),
+				 0);
+
+	bonobo_property_bag_add (pb, "colour", PROP_COLOUR,
+				 BONOBO_ARG_STRING, NULL,
+				 _("The colour of the clock face"),
+				 0);
+
+	bonobo_object_unref (BONOBO_OBJECT (pb));
+     </programlisting>
+  </example>
+And finally we need to notify listeners of changes in various properties
+so we could perhaps do:
+  <example>
+     <title></title>
+     <programlisting>
+static void
+signal_handler (GtkClock *clock, BonoboPropertyBag *pb)
+{
+	BonoboArg *arg = bonobo_arg_new (TC_string);
+
+	BONOBO_ARG_SET_STRING (arg, gtk_clock_get_color (clock));
+
+	bonobo_property_bag_notify_listeners (
+		pb, "colour", arg, NULL);
+
+	bonobo_arg_release (arg);
+}
+...
+	gtk_signal_connect (GTK_OBJECT (clock), "color_changed",
+			    GTK_SIGNAL_FUNC (signal_handler), pb);
+     </programlisting>
+  </example>
+  See also <link linkend="BonoboArg">BonoboArg</link>.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboPropertyBag">struct BonoboPropertyBag</title>
+<programlisting>struct BonoboPropertyBag {
+	BonoboXObject             parent;
+	BonoboPropertyBagPrivate *priv;
+	BonoboEventSource        *es;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboPropertyFlags">enum BonoboPropertyFlags</title>
+<programlisting>typedef enum {
+	BONOBO_PROPERTY_UNSTORED        = 1,
+	BONOBO_PROPERTY_READABLE        = 2,
+	BONOBO_PROPERTY_WRITEABLE       = 4,
+	BONOBO_PROPERTY_USE_DEFAULT_OPT = 8,
+	BONOBO_PROPERTY_NO_LISTENING    = 16
+} BonoboPropertyFlags;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboPropertyGetFn">BonoboPropertyGetFn ()</title>
+<programlisting>void        (*BonoboPropertyGetFn)          (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *bag,
+                                             <link linkend="BonoboArg">BonoboArg</link> *arg,
+                                             <link linkend="guint">guint</link> arg_id,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bag</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>arg</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>arg_id</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboPropertySetFn">BonoboPropertySetFn ()</title>
+<programlisting>void        (*BonoboPropertySetFn)          (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *bag,
+                                             const <link linkend="BonoboArg">BonoboArg</link> *arg,
+                                             <link linkend="guint">guint</link> arg_id,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>bag</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>arg</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>arg_id</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="BonoboPropertyBagClass">BonoboPropertyBagClass</title>
+<programlisting>typedef struct {
+	BonoboXObjectClass        parent;
+
+	POA_Bonobo_PropertyBag__epv epv;
+} BonoboPropertyBagClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-get-type">bonobo_property_bag_get_type ()</title>
+<programlisting><link linkend="GtkType">GtkType</link>     bonobo_property_bag_get_type    (void);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-new">bonobo_property_bag_new ()</title>
+<programlisting><link linkend="BonoboPropertyBag">BonoboPropertyBag</link>* bonobo_property_bag_new  (<link linkend="BonoboPropertyGetFn">BonoboPropertyGetFn</link> get_prop,
+                                             <link linkend="BonoboPropertySetFn">BonoboPropertySetFn</link> set_prop,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Creates a new property bag with the specified callbacks.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>get_prop</parameter>&nbsp;:</entry>
+<entry> the property get callback
+</entry></row>
+<row><entry align="right"><parameter>set_prop</parameter>&nbsp;:</entry>
+<entry> the property set callback
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> user data for the callbacks
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A new <link linkend="BonoboPropertyBag">BonoboPropertyBag</link> object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-new-full">bonobo_property_bag_new_full ()</title>
+<programlisting><link linkend="BonoboPropertyBag">BonoboPropertyBag</link>* bonobo_property_bag_new_full
+                                            (<link linkend="BonoboPropertyGetFn">BonoboPropertyGetFn</link> get_prop,
+                                             <link linkend="BonoboPropertySetFn">BonoboPropertySetFn</link> set_prop,
+                                             <link linkend="BonoboEventSource">BonoboEventSource</link> *event_source,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Creates a new property bag with the specified callbacks.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>get_prop</parameter>&nbsp;:</entry>
+<entry> the property get callback
+</entry></row>
+<row><entry align="right"><parameter>set_prop</parameter>&nbsp;:</entry>
+<entry> the property set callback
+</entry></row>
+<row><entry align="right"><parameter>event_source</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> user data for the callbacks
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A new <link linkend="BonoboPropertyBag">BonoboPropertyBag</link> object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-add">bonobo_property_bag_add ()</title>
+<programlisting>void        bonobo_property_bag_add         (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             int idx,
+                                             <link linkend="BonoboArgType">BonoboArgType</link> type,
+                                             <link linkend="BonoboArg">BonoboArg</link> *default_value,
+                                             const char *docstring,
+                                             <link linkend="BonoboPropertyFlags">BonoboPropertyFlags</link> flags);</programlisting>
+<para>
+Adds a property to the property bag.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> property bag to add to
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> name of new property
+</entry></row>
+<row><entry align="right"><parameter>idx</parameter>&nbsp;:</entry>
+<entry> integer index for fast callback switch statement
+this value is opaque to the implementation, and is not used
+for keying properties.
+</entry></row>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> the CORBA type eg. TC_long
+</entry></row>
+<row><entry align="right"><parameter>default_value</parameter>&nbsp;:</entry>
+<entry> the default value or NULL
+</entry></row>
+<row><entry align="right"><parameter>docstring</parameter>&nbsp;:</entry>
+<entry> the translated documentation string
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> various flags
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-add-full">bonobo_property_bag_add_full ()</title>
+<programlisting>void        bonobo_property_bag_add_full    (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             int idx,
+                                             <link linkend="BonoboArgType">BonoboArgType</link> type,
+                                             <link linkend="BonoboArg">BonoboArg</link> *default_value,
+                                             const char *docstring,
+                                             <link linkend="BonoboPropertyFlags">BonoboPropertyFlags</link> flags,
+                                             <link linkend="BonoboPropertyGetFn">BonoboPropertyGetFn</link> get_prop,
+                                             <link linkend="BonoboPropertySetFn">BonoboPropertySetFn</link> set_prop,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+This adds a property to <parameter>pb</parameter> at the full tilt of complexity.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> property bag to add to
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> name of new property
+</entry></row>
+<row><entry align="right"><parameter>idx</parameter>&nbsp;:</entry>
+<entry> integer index for fast callback switch statement - NB.
+this value is opaque to the implementation, and is not used
+for keying properties.
+</entry></row>
+<row><entry align="right"><parameter>type</parameter>&nbsp;:</entry>
+<entry> the CORBA type eg. TC_long
+</entry></row>
+<row><entry align="right"><parameter>default_value</parameter>&nbsp;:</entry>
+<entry> the default value or NULL
+</entry></row>
+<row><entry align="right"><parameter>docstring</parameter>&nbsp;:</entry>
+<entry> the translated documentation string
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> various flags
+</entry></row>
+<row><entry align="right"><parameter>get_prop</parameter>&nbsp;:</entry>
+<entry> a per property get callback
+</entry></row>
+<row><entry align="right"><parameter>set_prop</parameter>&nbsp;:</entry>
+<entry> a per property set callback
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> user data for the callbacks
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-add-gtk-args">bonobo_property_bag_add_gtk_args ()</title>
+<programlisting>void        bonobo_property_bag_add_gtk_args
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             <link linkend="GtkObject">GtkObject</link> *object);</programlisting>
+<para>
+Transfers GtkArgs from the object to the property bag,
+and maps between the two objects property systems.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> destination property bag
+</entry></row>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> a generic Gtk Object
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-construct">bonobo_property_bag_construct ()</title>
+<programlisting><link linkend="BonoboPropertyBag">BonoboPropertyBag</link>* bonobo_property_bag_construct
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             <link linkend="BonoboPropertyGetFn">BonoboPropertyGetFn</link> get_prop,
+                                             <link linkend="BonoboPropertySetFn">BonoboPropertySetFn</link> set_prop,
+                                             <link linkend="BonoboEventSource">BonoboEventSource</link> *event_source,
+                                             <link linkend="gpointer">gpointer</link> user_data);</programlisting>
+<para>
+Constructor, only for use in wrappers and object derivation, please
+refer to the <link linkend="bonobo-property-bag-new">bonobo_property_bag_new</link> for normal use.
+</para>
+<para>
+This function returns <parameter>pb</parameter>, or <literal>NULL</literal> in case of error.  If it returns <literal>NULL</literal>,
+the passed in <parameter>pb</parameter> is unrefed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> <link linkend="BonoboPropertyBag">BonoboPropertyBag</link> to construct
+</entry></row>
+<row><entry align="right"><parameter>get_prop</parameter>&nbsp;:</entry>
+<entry> the property get callback
+</entry></row>
+<row><entry align="right"><parameter>set_prop</parameter>&nbsp;:</entry>
+<entry> the property set callback
+</entry></row>
+<row><entry align="right"><parameter>event_source</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>user_data</parameter>&nbsp;:</entry>
+<entry> user data for the callbacks
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  <link linkend="BonoboPropertyBag">BonoboPropertyBag</link> pointer or <literal>NULL</literal>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-set-value">bonobo_property_bag_set_value ()</title>
+<programlisting>void        bonobo_property_bag_set_value   (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             const <link linkend="BonoboArg">BonoboArg</link> *value,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+This method sets the value of the property with <parameter>name</parameter>
+to <parameter>value</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> the property bag
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the property
+</entry></row>
+<row><entry align="right"><parameter>value</parameter>&nbsp;:</entry>
+<entry> the new value to set to 
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry> optional CORBA exception environment or NULL
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-get-value">bonobo_property_bag_get_value ()</title>
+<programlisting><link linkend="BonoboArg">BonoboArg</link>*  bonobo_property_bag_get_value   (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> the property bag
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the property
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry> optional CORBA exception environment or NULL
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the value of the property with name <parameter>name</parameter> or NULL
+on exception.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-get-default">bonobo_property_bag_get_default ()</title>
+<programlisting><link linkend="BonoboArg">BonoboArg</link>*  bonobo_property_bag_get_default (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> the property bag
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the property
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> TRUE if the bag has a property of this name
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-get-docstring">bonobo_property_bag_get_docstring ()</title>
+<programlisting>const char* bonobo_property_bag_get_docstring
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> the property bag
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the property
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry> optional CORBA exception environment or NULL
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the documentation string for this property.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-get-flags">bonobo_property_bag_get_flags ()</title>
+<programlisting>const <link linkend="BonoboPropertyFlags">BonoboPropertyFlags</link> bonobo_property_bag_get_flags
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-get-property-type">bonobo_property_bag_get_property_type ()</title>
+<programlisting><link linkend="BonoboArgType">BonoboArgType</link> bonobo_property_bag_get_property_type
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> the property bag
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the property
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry> optional CORBA exception environment or NULL
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the type of the property with name <parameter>name</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-has-property">bonobo_property_bag_has_property ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_property_bag_has_property
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-notify-listeners">bonobo_property_bag_notify_listeners ()</title>
+<programlisting>void        bonobo_property_bag_notify_listeners
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb,
+                                             const char *name,
+                                             const <link linkend="BonoboArg">BonoboArg</link> *new_value,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+This function is used by the implementation of the property
+proper, to signal to the property bag that the value of the
+property has changed.
+NB. There is no need to call this when you do a set_value.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> the property bag
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> the name of the property that changed value
+</entry></row>
+<row><entry align="right"><parameter>new_value</parameter>&nbsp;:</entry>
+<entry> the new value
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry> optional CORBA exception environment or NULL
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-get-prop-list">bonobo_property_bag_get_prop_list ()</title>
+<programlisting><link linkend="GList">GList</link>*      bonobo_property_bag_get_prop_list
+                                            (<link linkend="BonoboPropertyBag">BonoboPropertyBag</link> *pb);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>pb</parameter>&nbsp;:</entry>
+<entry> A <link linkend="BonoboPropertyBag">BonoboPropertyBag</link>.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a <link linkend="GList">GList</link> of <link linkend="BonoboProperty">BonoboProperty</link> structures.  This function is
+private and should only be used internally, or in a PropertyBag
+persistence implementation.  You should not touch the
+<link linkend="BonoboProperty">BonoboProperty</link> structure unless you know what you're doing.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

@@ -1,0 +1,170 @@
+dnl Process this file with autoconf to produce configure.
+AC_INIT(guile-gtk.c)
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(guile-gtk, 0.20)
+
+##
+## NOTE: before changing anything here, please read README.gnome-guile
+##
+
+AC_PROG_CC
+AM_PROG_LIBTOOL
+AC_PROG_CPP
+
+AC_ARG_ENABLE(debug,
+            [  --enable-debug          compile with -g for debugging symbols],
+            [ CFLAGS="-g $CFLAGS" ])
+
+AC_CHECK_PROG(HAVE_PKG_CONFIG, pkg-config, yes, no)
+
+if test $HAVE_PKG_CONFIG = no; then
+
+     GTKCONF_GTK_2_0='#f'
+     AM_PATH_GTK(1.2.0,,AC_ERROR(need at least Gtk+ version 1.2), gthread)
+     # XXX - gtk_config_*_version leaks from AM_PATH_GTK.
+
+     gtk_major_version=$gtk_config_major_version
+     gtk_minor_version=$gtk_config_minor_version
+     gtk_micro_version=$gtk_config_micro_version
+
+else
+
+     GNOME_COMMON_INIT
+     GNOME_PLATFORM_GNOME_2(no)
+ 
+     if test $platform_gnome_2 = yes ; then
+        GNOME_PKGCONFIG_CHECK_MODULES(GTK, gtk+-2.0:1.3.1 gthread-2.0:1.3.1)
+        gtk_version=`$PKG_CONFIG --modversion gtk+-2.0`
+        GTKCONF_GTK_2_0='#t'
+        AC_DEFINE(GTK_2_0)
+     else
+        GNOME_PKGCONFIG_CHECK_MODULES(GTK, gtk+:1.2.6 gthread:1.2.6)
+        gtk_version=`$PKG_CONFIG --modversion gtk+`
+        GTKCONF_GTK_2_0='#f'
+     fi
+
+     gtk_major_version=`echo $gtk_version | sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+     gtk_minor_version=`echo $gtk_version | sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+     gtk_micro_version=`echo $gtk_version | sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+
+fi
+
+AC_SUBST(GTKCONF_GTK_2_0)
+AC_SUBST(GTK_CFLAGS)
+AC_SUBST(GTK_LIBS)
+
+if test ! $gtk_major_version = 1 ||
+    test $gtk_minor_version -lt 2 ||
+    test $gtk_minor_version -gt 3; then
+  AC_MSG_ERROR([This package needs either gtk-1.2 or gtk-1.3 but we \
+found gtk-$gtk_major_version.$gtk_minor_version])
+else
+  echo "building for gtk-$gtk_major_version.$gtk_minor_version"
+  GTK_VERSION=$gtk_major_version.$gtk_minor_version
+fi
+
+
+myprefix="$prefix"
+myexec_prefix="$exec_prefix"
+test "x$myprefix" = xNONE && myprefix=$ac_default_prefix
+test "x$myexec_prefix" = xNONE && myexec_prefix=$myprefix
+
+AC_SUBST(myprefix)
+AC_SUBST(myexec_prefix)
+
+GUILE_GTK_VERSION=guile-gtk-$GTK_VERSION
+LIBGUILEGTK_VERSION=libguilegtk-$GTK_VERSION.la
+GUILEGTK_LIB="-L$myexec_prefix/lib -lguilegtk-$GTK_VERSION"
+AC_SUBST(GUILE_GTK_VERSION)
+AC_SUBST(LIBGUILEGTK_VERSION)
+AC_SUBST(GUILEGTK_LIB)
+AC_SUBST(GTK_VERSION)
+
+GNOME_CHECK_GUILE(fail)
+
+AC_CACHE_CHECK([for thread_create in GThreadFunctions],
+	       ac_cv_struct_thread_create,
+               [saved_CFLAGS="$CFLAGS"
+		saved_LIBS="$LIBS"
+		CFLAGS="$CFLAGS $GTK_CFLAGS"
+		LIBS="$LIB $GTK_LIBS"
+		AC_TRY_COMPILE([#include <glib.h>],
+                               [GThreadFunctions g; g.thread_create;],
+			       ac_cv_struct_thread_create=yes,
+			       ac_cv_struct_thread_create=no)
+		CFLAGS="$saved_CFLAGS"
+		LIBS="$saved_LIBS"])
+if test $ac_cv_struct_thread_create = yes; then
+  AC_DEFINE(HAVE_THREAD_CREATE)
+fi
+
+saved_LIBS="$LIBS"
+
+# Check for bleeding edge Guile functions
+LIBS="$GUILE_LIBS $LIBS"
+AC_CHECK_FUNCS(scm_internal_cwdr scm_done_malloc scm_reverse_x scm_puts scm_fdes_to_port lt_dlopen scm_simple_format)
+
+AC_CACHE_CHECK(for two argument scm_eval_x,
+ac_cv_func_scm_eval_x_two_args,
+AC_TRY_COMPILE([#include <libguile.h>],[scm_eval_x (SCM_BOOL_F, SCM_BOOL_F);],
+ac_cv_func_scm_eval_x_two_args=yes,
+ac_cv_func_scm_eval_x_two_args=no))
+if test "$ac_cv_func_scm_eval_x_two_args" = "yes"; then
+  AC_DEFINE(SCM_EVAL_X_TWO_ARGS, 1,
+	    [define if scm_eval_x takes two arguments])
+fi
+
+
+# Check for cutting edge Gtk functions
+LIBS="$GTK_LIBS $saved_LIBS"
+AC_CHECK_FUNCS(gtk_widget_peek_colormap gtk_type_get_info gtk_signal_set_class_function_full)
+
+LIBS="$saved_LIBS"
+
+if test "$ac_cv_func_lt_dlopen" = "yes"; then
+   USING_LTDL=yes
+   USING_LTDL_SCM="#t"
+   LIBGUILEDLOPENHELPER=""
+else
+   USING_LTDL=no
+   USING_LTDL_SCM="#f"
+   LIBGUILEDLOPENHELPER="libguiledlopenhelper.la"
+fi
+AC_SUBST(USING_LTDL)
+AC_SUBST(USING_LTDL_SCM)
+AC_SUBST(LIBGUILEDLOPENHELPER)
+
+if test "$USING_LTDL" = "no"; then
+   AC_MSG_CHECKING(whether libtool wins)
+   if grep -q '^deplibs_check_method' ./libtool; then
+      if grep -q '^deplibs_check_method="unknown"' ./libtool ; then
+         LIBTOOL_IS_WINNING="#f"
+	 AC_MSG_RESULT(no)
+      else
+	 LIBTOOL_IS_WINNING="#t"
+	 AC_MSG_RESULT(yes)
+      fi
+   else
+      LIBTOOL_IS_WINNING="#f"
+      AC_MSG_RESULT(no)
+   fi
+else
+   LIBTOOL_IS_WINNING="'notused"
+fi
+AC_SUBST(LIBTOOL_IS_WINNING)
+
+AUTOBUILD_FLAGS=""
+
+AC_MSG_CHECKING(whether gnome-config.h sucks)
+AC_EGREP_CPP(path,
+[
+gnome_config_private_has_section(frobnicated)
+],
+[AC_MSG_RESULT(yes)
+AUTOBUILD_FLAGS=gnome-config-typo],
+AC_MSG_RESULT(no))
+
+AC_SUBST(AUTOBUILD_FLAGS)
+
+AC_OUTPUT(Makefile
+          gtk/config.scm)

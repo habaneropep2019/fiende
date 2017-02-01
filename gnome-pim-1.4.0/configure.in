@@ -1,0 +1,127 @@
+AC_INIT(gncal)
+
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(gnome-pim, 1.4.0)
+AM_PROG_LIBTOOL
+
+AM_MAINTAINER_MODE
+
+AM_ACLOCAL_INCLUDE(macros)
+
+GNOME_INIT(capplet applets)
+
+AC_ISC_POSIX
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_CPP
+AC_STDC_HEADERS
+AC_ARG_PROGRAM
+dnl AM_PROG_LIBTOOL
+AM_PROG_LEX
+AC_PROG_YACC
+dnl AC_DECL_YYTEXT
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+GNOME_X_CHECKS
+GNOME_XML_CHECK
+GNOME_COMPILE_WARNINGS
+GNOME_PILOT_CHECK
+
+dnl Check for new enough gnome-libs
+CFLAGS_save=$CFLAGS
+LIBS_save=$LIBS
+CFLAGS=`gnome-config --cflags gnomeui`
+LIBS=`gnome-config --libs gnomeui`
+
+AC_CHECK_LIB(gnomeui, gnome_window_icon_set_default_from_file, ,[
+AC_MSG_ERROR(gnome-libs 1.0.59 or higher is required.)])
+
+CFLAGS=$CFLAGS_save
+LIBS=$LIBS_save
+
+AC_DEFINE_UNQUOTED(GNOME_ICONDIR, "${prefix}/share/pixmaps")
+
+PROGRAMS_GNCAL="gncal"
+AC_SUBST(PROGRAMS_GNCAL)
+
+dnl Checks for header files.
+AC_CHECK_HEADERS(langinfo.h)
+
+dnl This determines, if struct tm containes tm_gmtoff field
+dnl or we should use extern long int timezone.
+dnl Actually this should go into acinclude.m4
+AC_DEFUN(GC_TIMEZONE,
+[AC_REQUIRE([AC_STRUCT_TM])dnl
+AC_CACHE_CHECK([for tm_gmtoff in struct tm], ac_cv_struct_tm_gmtoff,
+[AC_TRY_COMPILE([#include <sys/types.h>
+#include <$ac_cv_struct_tm>], [struct tm tm; tm.tm_gmtoff;],
+  ac_cv_struct_tm_gmtoff=yes, ac_cv_struct_tm_gmtoff=no)])
+if test "$ac_cv_struct_tm_gmtoff" = yes; then
+  AC_DEFINE(HAVE_TM_GMTOFF)
+else
+  AC_CACHE_CHECK(for timezone, ac_cv_var_timezone,
+[AC_TRY_LINK(
+changequote(<<, >>)dnl
+<<#include <time.h>
+extern long int timezone;>>,
+changequote([, ])dnl
+[long int l = timezone;], ac_cv_var_timezone=yes, ac_cv_var_timezone=no)])
+  if test $ac_cv_var_timezone = yes; then
+    AC_DEFINE(HAVE_TIMEZONE)
+  fi
+fi
+])
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_STRUCT_ST_RDEV
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_STRUCT_TIMEZONE
+
+GC_TIMEZONE
+
+AC_TYPE_UID_T
+
+dnl Checks for library functions.
+AC_FUNC_ALLOCA
+AC_FUNC_MMAP
+AC_TYPE_SIGNAL
+AC_FUNC_STRFTIME
+AC_CHECK_FUNCS(getcwd gettimeofday getwd putenv strdup strtoul uname)
+
+ifdef([GNOME_CONDUIT_CHECK], [ GNOME_CONDUIT_CHECK ])
+
+dnl for now, we ought to do a libpisock check on our own.. until we only
+dnl use the standard conduit stuff
+
+dnl AC_SUBST(GNOME_CONDUIT_LIBS)
+
+ALL_LINGUAS="az ca cs cy da de el en_GB es et fi fr ga gd gl gv hu it ja ko kw lt nl no pl pt pt_BR ru sk sl sv tr uk wa zh_CN.GB2312 zh_TW.Big5"
+dnl AM_GNU_GETTEXT
+AM_GNOME_GETTEXT
+
+AC_SUBST(CAPPLET_LIBS)
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+
+AC_OUTPUT([
+gnome-pim.spec
+Makefile
+po/Makefile.in
+idl/Makefile
+macros/Makefile
+gncal/Makefile
+gncal/doc/Makefile
+gncal/doc/C/Makefile
+gnomecard/Makefile
+gnomecard/help/Makefile
+gnomecard/help/C/Makefile
+libversit/Makefile])

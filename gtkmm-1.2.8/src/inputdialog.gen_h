@@ -1,0 +1,129 @@
+/* $Id: inputdialog.gen_h,v 1.39 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* inputdialog.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/dialog.h>
+#include <gtk--/optionmenu.h>
+#include <gtk--/item.h>
+#include <gtk--/list.h>
+#include <gtk--/button.h>
+#include <gtk/gtkinputdialog.h>
+CLASS_START(Gtk);
+//: Configure devices for the XInput extension.
+//- {\class Gtk::InputDialog} displays a dialog which allows the user to
+//- configure XInput extension devices. For each device, they can control
+//- the mode of the device (disabled, screen-relative, or
+//- window-relative), the mapping of axes to coordinates, and the mapping
+//- of the devices macro keys to key press events.
+//-
+//- {\class Gtk::InputDialog} contains two buttons to which the
+//- application can connect; one for closing the dialog, and one for
+//- saving the changes. No actions are bound to these by default. The
+//- changes that the user makes take effect immediately.
+class InputDialog : public Dialog
+{
+  WRAP_CLASS(InputDialog,GtkInputDialog,GTK_INPUT_DIALOG,GTK_IS_INPUT_DIALOG,input_dialog,Gtk::Dialog,GtkDialog,GTK_DIALOG);
+public:
+
+  //: This signal is emitted when the user changes the mode of a device
+  //: from {\enum GDK_MODE_DISABLED} to a {\enum GDK_MODE_SCREEN} or
+  //: {\enum GDK_MODE_WINDOW}.
+  SIGNAL_SPEC("enable_device",both,void enable_device(guint32));
+  //: This signal is emitted when the user changes the mode of a device
+  //: from a {\enum GDK_MODE_SCREEN} or {\enum GDK_MODE_WINDOW} to
+  //: {\enum GDK_MODE_ENABLED}.
+  SIGNAL_SPEC("disable_device",both,void disable_device(guint32));
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+//  Gtk_List* get_axis_list()             { return &axis_list_; }
+//  Gtk_Item** get_axis_items()           { return axis_items_; }
+
+  WRAP_MEMBER(value,mode_optionmenu,mode_optionmenu,Gtk::OptionMenu*,GtkWidget*);
+  WRAP_MEMBER(value,close_button,close_button,Gtk::Button*,GtkWidget*);
+  WRAP_MEMBER(value,save_button,save_button,Gtk::Button*,GtkWidget*);
+
+  //const Gtk_List* get_axis_list() const             { return &axis_list_; }
+  //const Gtk_Item* const * get_axis_items() const     { return axis_items_; }
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/dialog_p.h>
+IMPL_START;
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_InputDialog)
+//. name: axis_list
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: axis_listbox
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: mode_optionmenu
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: close_button
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: save_button
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: axis_items[GDK_AXIS_LAST]
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: current_device
+//. type: guint32
+//. get:
+//. set:
+//. desc:
+
+//. name: keys_list
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: keys_listbox
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+

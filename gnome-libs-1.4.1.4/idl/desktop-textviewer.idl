@@ -1,0 +1,68 @@
+#ifndef __DESKTOP_TEXTVIEWER_IDL__
+#define __DESKTOP_TEXTVIEWER_IDL__
+
+#if defined(__ORBIT_IDL__)
+%{
+#pragma include_defs libgnorba/gnome-unknown.h
+#pragma include_defs libgnorba/gnome-factory.h
+%}
+#pragma inhibit push
+#endif
+
+#include "gnome-unknown.idl"
+#include "gnome-factory.idl"
+
+#if defined(__ORBIT_IDL__)
+#pragma inhibit pop
+#endif
+
+module Desktop {
+	enum SEEKFROM {
+		SEEK_START,
+		SEEK_CURRENT,
+		SEEK_END
+	};
+
+	struct Range {
+		long begin;
+		long end;
+	};
+
+	typedef long SearchOption;
+	const SearchOption REG_REGEX = 1;
+	const SearchOption REG_ICASE = 2;
+	const SearchOption REG_NOSUB = 4;
+	const SearchOption REG_NEWLINE = 8;
+	const SearchOption SEARCH_REVERSE = 16;
+
+	interface TextViewerFactory : GNOME::GenericFactory {
+		exception NotFound {};
+
+		Object open (in string path) raises (NotFound);
+		Object open_existing (in string path) raises (NotFound);
+	};
+
+	interface TextViewer : GNOME::Unknown {
+		exception SaveError {};
+		exception OutOfRange {};
+		exception NotFound {};
+
+		readonly attribute string path;
+		readonly attribute unsigned long position;
+		attribute Range selection;
+
+		void scroll_pos     (in long          offset,
+		                     in SEEKFROM      whence) raises (OutOfRange);
+		void scroll_line    (in unsigned long line);
+		long search         (in string        regexp,
+		                     in SEEKFROM      whence,
+		                     in SearchOption  flags) raises (NotFound);
+
+		GNOME::stringlist get_text (in Range what);
+		void save () raises (SaveError);
+		void save_as (in string path) raises (SaveError);
+		void close ();
+	};
+};
+
+#endif /* __DESKTOP_TEXTVIEWER_IDL__ */

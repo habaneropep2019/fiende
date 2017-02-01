@@ -1,0 +1,119 @@
+/* $Id: scrollbar.gen_h,v 1.38 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* scrollbar.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/range.h>
+#include <gtk/gtkscrollbar.h>
+#include <gtk/gtkhscrollbar.h>
+#include <gtk/gtkvscrollbar.h>
+
+CLASS_START(Gtk);
+
+//: Base class for {Gtk::HScrollbar::} and {Gtk::VScrollbar::}.
+//- The {\class Gtk::Scrollbar} widget is an abstract base class for {Gtk::HScrollbar::}
+//- and {Gtk::VScrollbar::}. It is not very useful in itself.
+class Scrollbar : public Range {
+  WRAP_CLASS(Scrollbar,GtkScrollbar,GTK_SCROLLBAR,GTK_IS_SCROLLBAR,scrollbar,Gtk::Range,GtkRange,GTK_RANGE);
+public:
+  WRAP_CTOR_CAST;
+protected:
+  WRAP_CTOR_DEFAULT;
+  WRAP_DTOR;
+};
+
+//: A vertical scrollbar.
+//- The {\class Gtk::VScrollbar} widget is a widget arranged vertically creating a scroll bar.
+//- See {Gtk::Scrollbar::} for details on scrollbars. {Gtk::Adjustment::}
+//- pointers may be added to handle the adjustment of the scrollbars or it may be
+//- left NULL in which case one will be created you. See {Gtk::Adjustment::} for details.
+class VScrollbar : public Scrollbar {
+  WRAP_CLASS(VScrollbar,GtkVScrollbar,GTK_VSCROLLBAR,GTK_IS_VSCROLLBAR,vscrollbar,Gtk::Scrollbar,GtkScrollbar,GTK_SCROLLBAR);
+public:
+  explicit VScrollbar( Adjustment &gtkadjustment);
+  VScrollbar();
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+};
+
+
+//: A horizontal scrollbar.
+//- The {\class Gtk::HScrollbar} widget is a widget arranged horizontally creating a scroll bar.
+//- See {Gtk::Scrollbar::} for details on scrollbars. {Gtk::Adjustment::}
+//- pointers may be added to handle the adjustment of the scrollbars or it may be
+//- left NULL in which case one will be created you. See {Gtk::Adjustment::} for details.
+class HScrollbar : public Scrollbar {
+  WRAP_CLASS(HScrollbar,GtkHScrollbar,GTK_HSCROLLBAR,GTK_IS_HSCROLLBAR,hscrollbar,Gtk::Scrollbar,GtkScrollbar,GTK_SCROLLBAR);
+public:
+  explicit HScrollbar( Adjustment &gtkadjustment);
+  HScrollbar();
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/range_p.h>
+IMPL_START;
+#include <gtk--/adjustment.h>
+namespace Gtk
+{
+
+VScrollbar::VScrollbar( Adjustment &adjustment)
+  :     Scrollbar((GtkScrollbar*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_adjustment(adjustment);
+}
+
+VScrollbar::VScrollbar()
+  :     Scrollbar((GtkScrollbar*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  Adjustment *adjustment = manage(new Adjustment(0.0, 0.0, 0.0,
+						  0.0, 0.0, 0.0));
+  // The adjustment will be destroyed along with the object
+  set_adjustment(*adjustment);
+}
+
+
+HScrollbar::HScrollbar()
+  :     Scrollbar((GtkScrollbar*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  Adjustment *adjustment = manage(new Adjustment(0.0, 0.0, 0.0,
+						  0.0, 0.0, 0.0));
+
+  // The adjustment will be destroyed along with the object
+  set_adjustment(*adjustment);
+}
+
+HScrollbar::HScrollbar( Adjustment &adjustment)
+  :     Scrollbar((GtkScrollbar*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_adjustment(adjustment);
+}
+
+
+
+}
+
+DOCUMENTATION_START;
+

@@ -1,0 +1,256 @@
+<refentry id="gnome-gnome-triggers">
+<refmeta>
+<refentrytitle>gnome-triggers</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-triggers</refname><refpurpose>
+Hierarchical signal mechanism for application events.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+enum        <link linkend="GnomeTriggerType">GnomeTriggerType</link>;
+void        (<link linkend="GnomeTriggerActionFunction">*GnomeTriggerActionFunction</link>)   (char *msg,
+                                             char *level,
+                                             char *supinfo[]);
+struct      <link linkend="GnomeTrigger">GnomeTrigger</link>;
+void        <link linkend="gnome-triggers-init">gnome_triggers_init</link>             (void);
+<link linkend="gint">gint</link>        <link linkend="gnome-triggers-readfile">gnome_triggers_readfile</link>         (const char *infilename);
+void        <link linkend="gnome-triggers-add-trigger">gnome_triggers_add_trigger</link>      (<link linkend="GnomeTrigger">GnomeTrigger</link> *nt,
+                                             ...);
+void        <link linkend="gnome-triggers-vadd-trigger">gnome_triggers_vadd_trigger</link>     (<link linkend="GnomeTrigger">GnomeTrigger</link> *nt,
+                                             char *supinfo[]);
+void        <link linkend="gnome-triggers-do">gnome_triggers_do</link>               (const char *msg,
+                                             const char *level,
+                                             ...);
+void        <link linkend="gnome-triggers-vdo">gnome_triggers_vdo</link>              (const char *msg,
+                                             const char *level,
+                                             const char *supinfo[]);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The GNOME triggers API was intended to provide a general way for the
+application to tell GNOME about "interesting events".  Most of it is
+presently deprecated - at the present time, the application writer
+should only use gnome_triggers_do and gnome_triggers_vdo for the purpose
+of firing application sound events (in conjunction with .soundlist files).
+</para>
+
+<para>
+Please see the "GNOME configuration files" white paper for more information
+on .soundlist files.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeTriggerType">enum GnomeTriggerType</title>
+<programlisting>typedef enum {
+	GTRIG_NONE,
+	GTRIG_FUNCTION,
+	GTRIG_COMMAND,
+	GTRIG_MEDIAPLAY
+}  GnomeTriggerType;
+</programlisting>
+<para>
+Deprecated.
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeTriggerActionFunction">GnomeTriggerActionFunction ()</title>
+<programlisting>void        (*GnomeTriggerActionFunction)   (char *msg,
+                                             char *level,
+                                             char *supinfo[]);</programlisting>
+<para>
+Deprecated.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>msg</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>level</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>supinfo</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GnomeTrigger">struct GnomeTrigger</title>
+<programlisting>struct GnomeTrigger {
+	GnomeTriggerType type;
+	union {
+		/*
+		 * These will be passed the same info as
+		 * gnome_triggers_do got
+		 */
+		GnomeTriggerActionFunction function;
+		gchar *command;
+		struct {
+			gchar *file;
+			int cache_id;
+		} media;
+	} u;
+        gchar *level;
+};
+</programlisting>
+<para>
+Deprecated.
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-triggers-init">gnome_triggers_init ()</title>
+<programlisting>void        gnome_triggers_init             (void);</programlisting>
+<para>
+Deprecated.
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-triggers-readfile">gnome_triggers_readfile ()</title>
+<programlisting><link linkend="gint">gint</link>        gnome_triggers_readfile         (const char *infilename);</programlisting>
+<para>
+The file should be of the format:
+</para>
+<para>
+level section type params
+</para>
+<para>
+Where 'level' indicates the message severity at which this trigger
+should be activated, 'section' is a colon-separated list indicating
+which part of the "message classification tree" this trigger will
+be activated for, 'type' is either "command" (run the command
+specified in 'params') or 'play' (play the esd sound sample named
+'params').</para>
+<para>
+Deprecated.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>infilename</parameter>&nbsp;:</entry>
+<entry> A file listing triggers to install in the currently
+running program.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>0 on success.  1 otherwise.
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-triggers-add-trigger">gnome_triggers_add_trigger ()</title>
+<programlisting>void        gnome_triggers_add_trigger      (<link linkend="GnomeTrigger">GnomeTrigger</link> *nt,
+                                             ...);</programlisting>
+<para>
+Similar to <link linkend="gnome-triggers-readfile">gnome_triggers_readfile</link>(), but gets the trigger information
+from the file 'nt' structure and the varargs, instead of from a file.</para>
+<para>
+Deprecated.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>nt</parameter>&nbsp;:</entry>
+<entry> Information on the new trigger to be added.
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry> the 'section' to add the trigger under (see <link linkend="gnome-triggers-readfile">gnome_triggers_readfile</link>())
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-triggers-vadd-trigger">gnome_triggers_vadd_trigger ()</title>
+<programlisting>void        gnome_triggers_vadd_trigger     (<link linkend="GnomeTrigger">GnomeTrigger</link> *nt,
+                                             char *supinfo[]);</programlisting>
+<para>
+Similar to <link linkend="gnome-triggers-readfile">gnome_triggers_readfile</link>(), but gets the trigger information
+from the file 'nt' structure and 'supinfo', instead of from a file.</para>
+<para>
+Deprecated.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>nt</parameter>&nbsp;:</entry>
+<entry> Information on the new trigger to be added.
+</entry></row>
+<row><entry align="right"><parameter>supinfo</parameter>&nbsp;:</entry>
+<entry> the 'section' to add the trigger under (see <link linkend="gnome-triggers-readfile">gnome_triggers_readfile</link>())
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-triggers-do">gnome_triggers_do ()</title>
+<programlisting>void        gnome_triggers_do               (const char *msg,
+                                             const char *level,
+                                             ...);</programlisting>
+<para>
+Notifies GNOME about an event happening, so GNOME can do cool things.</para>
+<para>
+This function tells the GNOME framework that an event has occurred inside 
+the application that GNOME might be interested in.
+Currently this is just used to trigger user-configurable sound events.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>msg</parameter>&nbsp;:</entry>
+<entry> The human-readable message describing the event. (Can be NULL).
+</entry></row>
+<row><entry align="right"><parameter>level</parameter>&nbsp;:</entry>
+<entry> The level of severity of the event, or NULL.
+</entry></row>
+<row><entry align="right"><parameter>...</parameter>&nbsp;:</entry>
+<entry> The classification of the event.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-triggers-vdo">gnome_triggers_vdo ()</title>
+<programlisting>void        gnome_triggers_vdo              (const char *msg,
+                                             const char *level,
+                                             const char *supinfo[]);</programlisting>
+<para>
+Notifies GNOME about an event happening, so GNOME can do cool things.</para>
+<para>
+This function is the same as gnome_triggers_do, except the supinfo is
+passed as an array of strings, rather than as a variable number of
+arguments.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>msg</parameter>&nbsp;:</entry>
+<entry> The human-readable message describing the event. (Can be NULL).
+</entry></row>
+<row><entry align="right"><parameter>level</parameter>&nbsp;:</entry>
+<entry> The level of severity of the event, or NULL.
+</entry></row>
+<row><entry align="right"><parameter>supinfo</parameter>&nbsp;:</entry>
+<entry> The classification of the event (NULL terminated array).
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

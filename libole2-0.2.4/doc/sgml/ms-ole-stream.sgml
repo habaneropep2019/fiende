@@ -1,0 +1,167 @@
+<refentry id="libole2-MsOleStream" revision="9 Jun 2000">
+<refmeta>
+<refentrytitle>MsOleStream</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBOLE2 Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>MsOleStream</refname><refpurpose></refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;libole2/libole2.h&gt;
+
+
+struct      <link linkend="MsOleStream">MsOleStream</link>;
+<link linkend="MsOleErr">MsOleErr</link>    <link linkend="ms-ole-stream-open">ms_ole_stream_open</link>              (<link linkend="MsOleStream">MsOleStream</link> **const stream,
+                                             <link linkend="MsOle">MsOle</link> *fs,
+                                             const char *dirpath,
+                                             const char *name,
+                                             char mode);
+<link linkend="MsOleErr">MsOleErr</link>    <link linkend="ms-ole-stream-close">ms_ole_stream_close</link>             (<link linkend="MsOleStream">MsOleStream</link> **const stream);
+<link linkend="MsOleErr">MsOleErr</link>    <link linkend="ms-ole-stream-duplicate">ms_ole_stream_duplicate</link>         (<link linkend="MsOleStream">MsOleStream</link> **const stream_copy,
+                                             const <link linkend="MsOleStream">MsOleStream</link> *const stream);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="MsOleStream">struct MsOleStream</title>
+<programlisting>struct MsOleStream
+{
+	MsOlePos size;
+
+	gint		(*read_copy)	(MsOleStream *stream,
+					 guint8 *ptr,
+					 MsOlePos length);
+
+	guint8 *	(*read_ptr)	(MsOleStream *stream,
+					 MsOlePos length);
+
+	MsOleSPos	(*lseek)	(MsOleStream *stream,
+					 MsOleSPos bytes,
+					 MsOleSeek type);
+
+	MsOlePos	(*tell)		(MsOleStream *stream);
+
+	MsOlePos	(*write)	(MsOleStream *stream,
+					 guint8 *ptr,
+					 MsOlePos length);
+
+
+	/**
+	 * PRIVATE (do not use)
+	 **/
+	enum {
+		MsOleSmallBlock,
+		MsOleLargeBlock
+	} type;
+	MsOle		*file;
+	void		*pps;		/* Straight PPS */
+	GArray		*blocks;	/* A list of the blocks in the file
+					   if NULL: no file */
+	MsOlePos	 position;	/* Current offset into file.
+					   Points to the next byte to read */
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-stream-open">ms_ole_stream_open ()</title>
+<programlisting><link linkend="MsOleErr">MsOleErr</link>    ms_ole_stream_open              (<link linkend="MsOleStream">MsOleStream</link> **const stream,
+                                             <link linkend="MsOle">MsOle</link> *fs,
+                                             const char *dirpath,
+                                             const char *name,
+                                             char mode);</programlisting>
+<para>
+Opens the stream in <parameter>dirpath</parameter> with the name <parameter>name</parameter> and creates the stream
+object <parameter>stream</parameter>. If <parameter>mode</parameter> is '<literal>r</literal>' it opens read only, and if it is '<literal>w</literal>'
+it opens for write only.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>stream</parameter>&nbsp;:</entry>
+<entry> stream object.
+</entry></row>
+<row><entry align="right"><parameter>fs</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><parameter>dirpath</parameter>&nbsp;:</entry>
+<entry> directory of the stream.
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> stream name.
+</entry></row>
+<row><entry align="right"><parameter>mode</parameter>&nbsp;:</entry>
+<entry> mode of opening stream.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="MsOleErr">MsOleErr</link> code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-stream-close">ms_ole_stream_close ()</title>
+<programlisting><link linkend="MsOleErr">MsOleErr</link>    ms_ole_stream_close             (<link linkend="MsOleStream">MsOleStream</link> **const stream);</programlisting>
+<para>
+Closes the <parameter>stream</parameter>.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>stream</parameter>&nbsp;:</entry>
+<entry> stream object to be closed.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="MsOleErr">MsOleErr</link> code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-stream-duplicate">ms_ole_stream_duplicate ()</title>
+<programlisting><link linkend="MsOleErr">MsOleErr</link>    ms_ole_stream_duplicate         (<link linkend="MsOleStream">MsOleStream</link> **const stream_copy,
+                                             const <link linkend="MsOleStream">MsOleStream</link> *const stream);</programlisting>
+<para>
+Duplicates the stream object <parameter>stream</parameter>.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>stream_copy</parameter>&nbsp;:</entry>
+<entry> stream object copy.
+</entry></row>
+<row><entry align="right"><parameter>stream</parameter>&nbsp;:</entry>
+<entry> stream object to be duplicated.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a <link linkend="MsOleErr">MsOleErr</link> code.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

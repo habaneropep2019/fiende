@@ -1,0 +1,230 @@
+/* $Id: combo.gen_h,v 1.51 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* combo.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <gtk--/entry.h>
+#include <gtk--/button.h>
+#include <gtk--/scrolledwindow.h>
+#include <gtk--/window.h>
+#include <gtk--/list.h>
+#include <gtk--/item.h>
+#include <gtk/gtkcombo.h>
+CLASS_START(Gtk);
+
+//: Combo widget
+//- A combo is a compound widget which crosses a text entry area and a pull
+//- down list.  It may allow text entry or it may just allow list
+//- values depending on the settings.  
+//-
+//- Access members allow altering of the widget components.
+class Combo : public HBox
+{
+  WRAP_CLASS(Combo,GtkCombo,GTK_COMBO,GTK_IS_COMBO,combo,Gtk::HBox,GtkHBox,GTK_HBOX);
+public:
+
+  WRAP_CTOR_CAST;
+  WRAP_CTOR_DEFAULT;
+  WRAP_DTOR;
+
+  WRAP_MEMBER(value,value_in_list,value_in_list,bool,guint);
+  WRAP_MEMBER(value,ok_if_empty,ok_if_empty,bool,guint);
+  WRAP_MEMBER(value,use_arrows,use_arrows,bool,guint);
+  WRAP_MEMBER(value,use_arrows_always,use_arrows_always,bool,guint);
+  WRAP_MEMBER(value,case_sensitive,case_sensitive,bool,guint);
+
+  //: Allow direct text entry.
+  //- Whether the text in the entry must be or not be in the list.
+  //- 
+  //- value: Set to true if the value must be in list. 
+  //- 
+  //- empty: Set to true if the text area is allowed to be empty.
+  WRAP_METHOD(
+    void gtk_combo_set_value_in_list(GtkCombo*,gint,gint),
+    void set_value_in_list(bool value, bool empty));
+
+  //: Set arrows keys to change value.
+  //- Up and down will scroll through the list items.  
+  //- Useful when there is a small list of value that the
+  //- list must have.  
+  //-
+  //- arrows_on: true indicates the arrow keys scroll.
+  WRAP_METHOD(
+    void gtk_combo_set_use_arrows(GtkCombo*,gint), 
+    void set_use_arrows(bool arrows_on)); 
+
+  //: Set arrows keys to change if value not in list.
+  //- Up and down will scroll through the list items but only
+  //- change the current value if the text does not match a list item..  
+  //- Useful when there is a small list of value that the
+  //- list must have.  
+  //-
+  //- arrows_always: true indicates the value will change.
+  WRAP_METHOD(
+    void gtk_combo_set_use_arrows_always(GtkCombo*,gint), 
+    void set_use_arrows_always(bool arrows_always));
+
+  //: Sets list case sensitive.
+  //- Determines if the list items and text comparisons for
+  //- {set_use_arrows_always()} should be case sensitive.
+  WRAP_METHOD(
+    void gtk_combo_set_case_sensitive(GtkCombo*,gint), 
+    void set_case_sensitive(bool val));
+
+  //: Set the current entry string.
+  //- Call this function on an item if it isn't a label or you
+  //- want it to have a different value to be displayed in the entry.
+  WRAP_METHOD(
+    void gtk_combo_set_item_string(GtkCombo*,GtkItem*,const gchar*),
+    void set_item_string(Gtk::Item& item, const nstring &item_value=0));
+
+  //: Insert a list of items.
+  void set_popdown_strings(const SArray &strings);
+
+  //: Disables the activation of the combo.
+  //- ???? 
+  //- This does not appear to be possible to undo.  This seems
+  //- like a bug or a private method! 
+  WRAP_METHOD(
+    void gtk_combo_disable_activate(GtkCombo*),
+    void disable_activate());
+
+  // Allow access to parts of the combo.
+  WRAP_MEMBER(value,entry,entry,Gtk::Entry*,GtkWidget*);
+  WRAP_MEMBER(value,button,button,Gtk::Button*,GtkWidget*);
+  WRAP_MEMBER(value,popup,popup,Gtk::ScrolledWindow*,GtkWidget*);
+  WRAP_MEMBER(value,popwin,popwin,Gtk::Window*,GtkWidget*);
+  WRAP_MEMBER(value,list,list,Gtk::List*,GtkWidget*);
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+#include <gtk--/listitem.h>
+namespace Gtk
+{
+
+void 
+Combo::set_popdown_strings(const SArray& strings)
+{
+  List* item_list=get_list();
+  const char** str=strings;
+  int i,size=strings.size();
+  ListItem *item;
+
+  item_list->clear_items(0,-1);
+  for (i=0;i<size;i++)
+     {
+      item=manage(new ListItem(str[i]));
+      item->show();
+      item_list->add(*item);
+     }
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Combo)
+//. name: entry
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: button
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: popup
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: popwin
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: list
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: entry_change_id
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: list_change_id
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: value_in_list
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: ok_if_empty
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: case_sensitive
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: use_arrows
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: use_arrows_always
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: current_button
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: activate_id
+//. type: guint
+//. get:
+//. set:
+//. desc:
+

@@ -1,0 +1,354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>A quick example of using GnomeAppHelper</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome Developers' Information"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Automatic menu and toolbar creation with GnomeAppHelper"
+HREF="gnome-app-helper.html"><LINK
+REL="PREVIOUS"
+TITLE="Automatic menu and toolbar creation with GnomeAppHelper"
+HREF="gnome-app-helper.html"><LINK
+REL="NEXT"
+TITLE="The GnomeUIInfo structure"
+HREF="gnome-app-helper-gnomeuiinfo.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Developers' Information</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="gnome-app-helper.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Automatic menu and toolbar creation with GnomeAppHelper</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="gnome-app-helper-gnomeuiinfo.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GNOME-APP-HELPER-QUICK-EXAMPLE"
+>A quick example of using GnomeAppHelper</A
+></H1
+><P
+>	This section presents a simple example of creating a menu bar
+	for an application window.  The menu bar would serve for a
+	hypotetical text editing application.  The purpose of this
+	example is to give you a general idea of how GnomeAppHelper
+	works.
+      </P
+><P
+>	GnomeAppHelper uses a hierarchy of arrays to define menus and
+	tool bars.  Here we will define a simple menu bar with three
+	submenus, called File, Edit, and Help.  We will use the stock
+	icon mechanism to provide standard icons for the menu items, and
+	we will provide hot keys for the most common functions.
+      </P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1481"
+></A
+><P
+><B
+>Example 1. Creating a simple menu bar</B
+></P
+><P
+>	  Here we define a simple menu bar for Edit-o-matic, our text
+	  editing application.
+	</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  #include &#60;gnome.h&#62;
+
+	  /* Definition of the File menu */
+
+	  static GnomeUIInfo file_menu[] = {
+	  { GNOME_APP_UI_ITEM, N_("_New document"), N_("Create a new blank document"), file_new_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_NEW, 'n', GDK_CONTROL_MASK, NULL },
+	  { GNOME_APP_UI_ITEM, N_("_Open document..."), N_("Open an existing document"), file_open_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_OPEN, 'o', GDK_CONTROL_MASK, NULL },
+	  { GNOME_APP_UI_ITEM, N_("_Save document"), N_("Save the current document"), file_save_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_SAVE, 's', GDK_CONTROL_MASK, NULL },
+	  { GNOME_APP_UI_ITEM, N_("Save document _as..."), N_("Save the current document with a new name"),
+	  file_save_as_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_SAVE_AS, 0, 0, NULL },
+
+	  GNOMEUIINFO_SEPARATOR,
+
+	  { GNOME_APP_UI_ITEM, N_("_Print document..."), N_("Print the current document"), file_print_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_NEW, 'p', GDK_CONTROL_MASK, NULL },
+
+	  GNOMEUIINFO_SEPARATOR,
+
+	  { GNOME_APP_UI_ITEM, N_("_Close this document"), N_("Close the current document"), file_close_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_NEW, 'w', GDK_CONTROL_MASK, NULL },
+	  { GNOME_APP_UI_ITEM, N_("E_xit"), N_("Exit the program"), file_exit_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_NEW, 'q', GDK_CONTROL_MASK, NULL }
+
+	  GNOMEUIINFO_END
+	  };
+
+	  /* Definition of the Edit menu */
+
+	  static GnomeUIInfo edit_menu[] = {
+	  { GNOME_APP_UI_ITEM, N_("_Undo"), N_("Undo the last operation"), edit_undo_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_UNDO, 'z', GDK_CONTROL_MASK, NULL },
+
+	  GNOMEUIINFO_SEPARATOR,
+
+	  { GNOME_APP_UI_ITEM, N_("Cu_t"), N_("Cut the selection to the clipboard"), edit_cut_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_UNDO, 'x', GDK_CONTROL_MASK, NULL },
+	  { GNOME_APP_UI_ITEM, N_("_Copy"), N_("Copy the selection to the clipboard"), edit_copy_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_UNDO, 'c', GDK_CONTROL_MASK, NULL },
+	  { GNOME_APP_UI_ITEM, N_("_Paste"), N_("Paste the contents from the clipboard"), edit_paste_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_UNDO, 'v', GDK_CONTROL_MASK, NULL },
+
+	  GNOMEUIINFO_END
+	  };
+
+	  /* Definition of the Help menu */
+
+	  static GnomeUIInfo help_menu[] = {
+	  { GNOME_APP_UI_ITEM, N_("_About Edit-o-matic"), N_("Information about Edit-o-matic"),
+	  help_about_callback, NULL, NULL,
+	  GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ABOUT, 0, 0, NULL },
+
+	  GNOMEUIINFO_SEPARATOR,
+
+	  GNOMEUIINFO_HELP ("edit-o-matic"),
+
+	  GNOMEUIINFO_END
+	  };
+
+	  /* Definition of the main menu */
+
+	  static GnomeUIInfo main_menu[] = {
+	  GNOMEUIINFO_SUBTREE (N_("_File"), file_menu),
+	  GNOMEUIINFO_SUBTREE (N_("_Edit"), edit_menu),
+	  GNOMEUIINFO_SUBTREE (N_("_Help"), help_menu),
+	  GNOMEUIINFO_END
+	  };
+	</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>	In the example above, you can see the most general form of
+	defining arrays of GnomeUIInfo structures to construct a menu
+	hierarchy.  Each structure in the array contains information
+	about the type of item to be created, its label, hint, and
+	pixmap, its associated callback, and keyboard accelerators.
+      </P
+><P
+>	You can see that text labels are marked with the N_() macro.
+	This macro is used by the internationalization programs to
+	detech which strings to mark for translation.
+      </P
+><P
+>	The last item in GnomeUIInfo arrays marks termination of the
+	array.  Finally, the <SPAN
+CLASS="SYMBOL"
+>main_menu</SPAN
+> array ties all
+	the submenus together to form the main menu bar.
+      </P
+><P
+>	The following sections explain GnomeUIInfo structures in
+	detail.  You do not need to remember all the details to use
+	GnomeAppHelper; it also provides convenient macros to make
+	creating simple items easier, as we shall see.
+      </P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN1490"
+></A
+><P
+><B
+>Example 2. Inserting the menu bar in an application window</B
+></P
+><P
+>	  Now that we have the <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+>
+	  arrays that define the menus in the application, we need to
+	  call one of the GnomeAppHelper functions that take in such an
+	  array and create the actual widgets for the menus.
+	</P
+><P
+>	  Here, we create a new application window and create its menu
+	  bar from the information defined in the
+	  <SPAN
+CLASS="SYMBOL"
+>main_menu</SPAN
+> array we described above.
+	</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  /* This function creates an application window for our hypotetical
+	  * text editor and creates a menu bar for it.  The window's title is
+	  * set to the specified string.
+	  */
+	  
+	  GtkWidget *
+	  create_editor_main_window (char *window_title)
+	  {
+	  GtkWidget *app;
+
+	  /* Create the application window */
+
+	  app = gnome_app_new ("edit-o-matic", title);
+
+	  /* Create the menus and insert them in the application window */
+
+	  gnome_app_create_menus (GNOME_APP (app), main_menu);
+
+	  return app;
+	  }
+	</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>	The <TT
+CLASS="FUNCTION"
+>gnome_app_create_menus()</TT
+> function is
+	the simplest way to create a menu bar's widgets out of a
+	<SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> array.  There are other
+	functions to create menus and toolbars, as we will see below.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gnome-app-helper.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gnome-app-helper-gnomeuiinfo.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Automatic menu and toolbar creation with GnomeAppHelper</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="gnome-app-helper.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The <SPAN
+CLASS="STRUCTNAME"
+>GnomeUIInfo</SPAN
+> structure</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,113 @@
+.TH MEDUSA-SEARCHD 8 "February 9, 2001" Eazel
+.SH NAME
+medusa-searchd \- daemon to perform medusa file system searches
+.SH SYNOPSIS
+.B medusa-searchd
+[
+.B \-d
+\(bv
+.B \-\-debug
+]
+[
+.B \-n
+.I indexname
+\(bv
+.B \-\-named-index
+.I indexname
+]
+.SH DESCRIPTION
+.BR medusa-searchd ,
+which is normally run automatically from an init script
+or crontab,
+puts itself into the background
+and begins listening on the local socket
+.BR /tmp/medusa-search-server .
+It must be run as root.
+.LP
+This seems to be the protocol:
+.TP
+C:
+.B "gimme cookie"
+\et
+.I uid
+\et
+.I pid
+\en
+.TP
+S:
+.B "writing new cookie"
+\en
+.LP
+If the
+response for the server is, instead,
+``\fBIndex Error\fP'' or ``\fBtimeout error\fP''
+(with that capitalization),
+then the session has failed and is closed.
+.LP
+Otherwise the client then tries to open the file
+.BI /tmp/medusa-cookies/ uid_pid
+and reads a single
+.BR int ,
+encoded in the local binary format, from it.
+The ASCII representation of that
+.B int
+is the
+.IR cookie .
+.TP
+C:
+.I uid
+space
+.I pid
+space
+.I cookie
+\et
+.I search-uri
+.LP
+where
+.I search-uri
+is as documented in
+.BR medusa-search-uri (7).
+It does not seem to be terminated by a newline.
+.TP
+S:
+.B Search URI OK
+\en
+.LP
+If the server instead responds,
+``\fBWhole Database Matches\fP'',
+``\fBQuery returned no results\fP'',
+``\fBSearch URI obsoletes index\fP'',
+or
+``\fBSearch URI syntax error\fP''
+then the session is over.
+.LP
+Otherwise, the server sends a series of matching patchnames,
+each terminated by a newline.
+After the last the server sends
+.TP
+S:
+.B End
+\en
+.LP
+and closes the connection.
+.SH OPTIONS
+.TP
+.BI "\-\-named-index " "indexname"
+Use socket
+.BI /tmp/medusa-search-server- indexname
+and index files
+.BI "/usr//var/medusa-" indextype-indexname
+rather than the normal versions without the
+``\fB\-\fP\fIindexname\fP''
+suffix.
+.TP
+.B \-\-debug
+Stops
+.B medusa-searchd
+from going into the background,
+and causes it to send a
+.SM SIGINT
+signal to itself when printing warning messages.
+.SH SEE ALSO
+.BR medusa-search-uri (7),
+.BR medusa-indexd (8)

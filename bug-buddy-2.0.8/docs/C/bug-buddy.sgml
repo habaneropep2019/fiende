@@ -1,0 +1,609 @@
+<!DOCTYPE article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+<!ENTITY version "1.90"> 
+]>
+
+<article id="index">
+ <artheader> 
+  <title>Bug Buddy Manual</title>
+  <copyright>
+   <year>2001</year>
+   <holder>Jacob Berkman</holder>
+  </copyright>
+  <copyright>
+   <year>2001</year>
+   <holder>Telsa Gwynne</holder>
+  </copyright>
+ <!-- translators: uncomment this:
+   <copyright>
+    <year>2001</year>
+    <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
+   </copyright>
+    -->
+
+  <legalnotice id="legalnotice">
+   <para>Permission is granted to copy, distribute and/or modify this
+    document under the terms of the <ulink type="help"
+    url="gnome-help:fdl"><citetitle>GNU Free Documentation
+    License</citetitle></ulink>, Version 1.1 or any later version
+    published by the Free Software Foundation with no Invariant
+    Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy
+    of the license can be found <ulink type="help"
+    url="gnome-help:fdl">here</ulink>.</para>
+
+   <para>Many of the names used by companies to distinguish their
+    products and services are claimed as trademarks. Where those names
+    appear in any GNOME documentation, and those trademarks are made
+    aware to the members of the GNOME Documentation Project, the names
+    have been printed in caps or initial caps.</para>
+  </legalnotice>
+
+  <releaseinfo> 
+    Manual version 0.3: added licence of program (GPL): rewrote docs
+    substantially because the program has changed a great deal.
+  </releaseinfo>
+ </artheader>
+
+ <sect1 id="intro">
+  <title>Introduction</title> 
+
+  <para>
+    <application>Bug Buddy</application> is a tool which
+    will guide you through making a bug report as painlessly as possible.
+    You can alter things at any stage, and then either send, save, or
+    abandon the resulting report. This document describes
+    version &version; of <application>Bug Buddy</application>: note that
+    it has changed substantially in appearance from earlier versions.
+  </para>
+
+  <note>
+   <title>Big Bug Buddy Changes</title>
+   <para>
+     <application>Bug Buddy</application> has undergone major changes 
+     recently. 
+   </para>
+   <para>
+     The Gnome bugtracking system is moving from the email-based 
+     <ulink url="http://bugs.gnome.org/" type="http">debbugs 
+     installation</ulink> which it originally used to the web-based
+     <ulink url="http://bugzilla.gnome.org/" type="http">bugzilla 
+     installation</ulink>. This is to help deal with bugs more efficiently.
+     This means <application>Bug Buddy</application> has been substantially 
+     rewritten to deal with the bugzilla system. It looks very similar in 
+     appearance and structure, but be aware that it now talks to bugzillas. 
+     Reports will only go to the old debbugs system for GNOME if bugzilla 
+     doesn't have a category for the bug. 
+   </para>
+   <para>
+     This also means that <application>Bug Buddy</application> has currently
+     lost the ability to send bugs to the KDE and Debian bug-trackers
+     directly. Note that you can still save reports for those into a file 
+     and then mail the file to those trackers yourself.
+   </para>
+  </note>
+
+  <para>
+    <application>Bug Buddy</application> can be started in a variety
+    of ways:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+      Open the <guimenu>main GNOME menu</guimenu> and select
+      <menuchoice>
+       <guimenu>Programs</guimenu>
+       <guisubmenu>Utilities</guisubmenu>
+       <guimenuitem>Bug Report Tool</guimenuitem>
+      </menuchoice>
+      .
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+      Run <command>bug-buddy</command> at the prompt in a terminal such
+      as <application>gnome-terminal</application> or
+      <application>xterm</application>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+      If you are using the <application>GNOME file manager</application>,
+      gmc, you can double-click your mouse on a core file to start it.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+      When a GNOME program experiences a bad crash, a <guilabel>crash
+      dialogue box</guilabel> is displayed. If <application>Bug Buddy</application>
+      is present on the system, then one of the options in the dialogue
+      box will be to make a bug-report. Selecting that will lead you
+      to a further dialogue box giving you details of the program which
+      crashed. Continuing at this stage will invoke <application>Bug Buddy
+      </application>.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+    <application>Bug Buddy</application> is a very structured program.
+    At any stage you can continue forward or head backwards to correct
+    earlier details, or you can click the <guibutton>Help button</guibutton>
+    to bring up this document. 
+  </para>
+
+  <para>
+    The aim of all this is to be able to collect all the information
+    which a developer will need to reproduce the same problem and be
+    able to fix it. Some of the information generated may look a bit
+    off-putting, but don't delete it. It will be useful.
+  </para>
+ </sect1>
+
+ <sect1 id="contact-info">
+  <title>Contact Information</title>
+
+  <para>
+    <application>Bug Buddy</application> first asks for these pieces
+    of information, in order to be able to send the report correctly.
+    It makes very good guesses so you should be able to skip straight
+    ahead. 
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Your name</term>
+    <listitem>
+     <para>
+       Bug Buddy works this out itself, but if you want to change it you
+       can do this here.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Email address</term>
+    <listitem>
+     <para>
+       Please enter a valid email address for you here.  This is so developers
+       can request more information from you, or inform you of a fix for your bug.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Full path of sendmail</term>
+    <listitem>
+     <para>
+       This allows you to check that Bug Buddy is looking in the right
+       place when it tries to send email. You will almost certainly not
+       need to change this. 
+     </para>
+    </listitem>
+   </varlistentry>
+
+  </variablelist>
+
+ </sect1>
+
+ <sect1 id="debug-info">
+  <title>Debugging Information</title>
+  <para>
+    Bug Buddy asks you to choose between three options: 
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Debug nothing</term>
+    <listitem>
+     <para>
+       This is the default option. If you did not start
+       <application>Bug Buddy</application> following a crash, and
+       do not have a core file you want debugged, pick this.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Debug core file</term>
+    <listitem>
+     <para>
+       If <application>Bug Buddy</application> began because you 
+       double-clicked on a file named <filename>core</filename> in the
+       file manager, select this. Also select this if you have a core file
+       which you know was created as a result of the bug you are reporting.
+       An extra box will appear where you can tell it where the core file
+       lives.
+     </para>
+    </listitem>
+   </varlistentry>
+      
+   <varlistentry>
+    <term>Debug crashed application</term>
+    <listitem>
+     <para>
+       If <application>Bug Buddy</application> began because you said
+       yes to "Report a bug" in a dialogue box telling you something had
+       crashed, select this. If you do so, you will be prompted for
+       two things. These should be filled in ready for you. If they 
+       are not:
+     </para>
+     
+     <itemizedlist>
+      <listitem>
+       <para>
+         <guilabel>Binary</guilabel>: In this box you must type the
+         name of the program as you would type it at the command-line.
+         For example, if the <application>Control Center</application>
+         crashed, you would need to type <command>gnomecc</command> here.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+         <guilabel>Process ID</guilabel>: In this box you must type
+         the process ID or <acronym>PID</acronym>. This will probably
+         be available from the original dialogue box where you selected
+         "Report a bug". If you have closed that window, you can find it
+         by starting the <application>Gnome System Monitor</application> 
+         through selecting
+          <menuchoice>
+           <guimenu>Programs</guimenu>
+           <guisubmenu>Utilities</guisubmenu>
+           <guimenuitem>System Monitor</guimenuitem>
+          </menuchoice>
+         or typing <command>gtop</command> at the command line. You
+         will find the PID in the left-hand column and the command
+         in the right hand column (you may need to scroll right for this
+         column to be visible).
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+
+ <sect1 id="description">
+  <title>Bug Description</title>
+  <para>
+    The <guilabel>Short subject for the bug report</guilabel> section
+    will be used as the "Subject" header of the emailed bug report,
+    which will turn into a "Summary" line in Bugzilla. Good subject
+    lines are specific and do not just say "Bug" or "It crashed". 
+    "Crash when I try to save" or "Forgets my preferences" are much 
+    better. Hackers will read these summaries when looking for something 
+    they can fix, and clear one-sentence summaries will catch their attention. 
+    You must fill this in. If you do not, <application>Bug Buddy</application>
+    will tell you to.
+  </para>
+
+  <note>
+   <title>Something You Don't Need to Include</title>
+   <para>
+     One thing you do not need to include is the package name, because
+     you are going to select that next.
+   </para>
+  </note>
+
+  <para>
+    The <guilabel>Full description of the bug</guilabel> section is where
+    you describe what you did, what happened, and what you expected to
+    happen. You must fill this in, too, or
+    <application>Bug Buddy</application> will tell you to. Good things to 
+    include:
+  </para>
+   
+  <itemizedlist>
+   <listitem>
+    <para>
+      Exact copies of any error messages;
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      Your window manager name and version (especially if the bug involves 
+      moving things around the screen or mouse focus problems);
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      If you can make it happen in one way, and not in another way,
+      include that. If there are two ways to do something (a menu
+      selection and a typed command, for example), and only one triggers
+      the bug, definitely include that;
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      Why you think it is a bug. What should have happened instead?
+      Whilst this is obvious for some things, ("It shouldn't crash when
+      I try to save the file") it is not obvious for others. Give a
+      better way for the program to behave. ("If it can't save the file, 
+      it should tell me so that I don't keep editing it without realising 
+      I am wasting my effort".)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+      Sometimes screenshots can help demonstrate bugs. Please do not send one
+      in a Bug Buddy report! But if you have one, mention that you have it,
+      so that a bug-fixer who would like to see it can email you about it.
+    </para>
+   </listitem>
+  </itemizedlist>
+ 
+  <para>
+    If you have any suggestions on what caused it or how to fix it,
+    wonderful. If not, don't worry. Just explain what happened. If
+    a developer needs more information, s/he can mail you back for
+    it. 
+  </para>
+
+  <para>
+    If you have a (short!) text-file which contains information of use
+    you can include it here, too. If you have a small HTML file which
+    crashes your editor, or two sets of options for a program where one
+    works and the other doesn't, these are the sort of things to include
+    here. Just put the name of the file into the <guilabel>Include a 
+    text file</guilabel> box at the bottom. 
+  </para>
+ </sect1>
+
+ <sect1 id="updating">
+  <title>Updating Product Listing</title>
+  <para>
+    If this is the first time you have run Bug Buddy, you will see
+    will see this page. It also appears if it has been two weeks since
+    the last update. Otherwise it will not appear. 
+  </para>
+  <para>
+    A dialogue box telling you <application>Bug Buddy</application> wants   
+    to update its list of information will appear and gives you the option
+    to proceed or to say no. It will save this information by default into
+    your <filename class=directory>.gnome/Bug Buddy.d/</filename> directory.
+    To get this information, it needs to talk to bugzilla, so your net
+    connection will have to be up. 
+  </para>
+ </sect1>
+
+ <sect1 id="product">
+  <title>Product</title>
+  <para>
+    This page gives you a list of products, from which you can select,
+    and a button to pick the bug-tracker to use. If you select a new
+    bug-tracker, any highlighted product will become unhighlighted 
+    again.
+  </para>
+
+  <para> 
+    The choices currently are to select <guilabel>All</guilabel> systems,
+    or to select <guilabel>Gnome's</guilabel> system. The most sensible
+    one to choose is Gnome's. 
+  </para>
+ </sect1>
+     
+ <sect1 id="component">
+  <title>Component</title>
+  <para>
+    There are three sections to fill in here:
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Component</term>
+    <listitem>
+     <para>
+       The product selected will have one or more components to it.
+       If there is only one component (typically a general component),
+       click on it. If there are several components, select the most
+       likely-looking one.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Version</term>
+    <listitem>
+     <para>
+       This is the version number for the program or package you're
+       reporting a bug in. It may already be filled in. If not, find
+       out through the package's <guilabel>About</guilabel> box and
+       fill it in here.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Severity</term>
+    <listitem>
+     <para>
+       This is the severity of the bug, as you feel it. There are several
+       choices in decreasing order:
+     </para>
+     <orderedlist>
+      <listitem>
+        <para>
+          An enhancement bug is a request for enhancement rather than
+          a bug describing a problem. "It would be nice if.."
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         A trivial bug is precisely that: trivial. It is typically a
+         cosmetic problem such as misspelt words or misaligned text.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         A minor bug involves either a minor loss of function, or a
+         larger problem but one which has an easy workaround.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         A normal bug is the typical sort of bug. This is the default,
+         and probably won't need increasing.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         A major bug involves a major loss of function.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         A critical bug is one which involves a crash, a severe memory
+         leak, or loss of data.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         A blocker bug is rare and usually assigned as a blocker by a
+         developer. It is a bug which stops other things being fixed
+         and which must be fixed before other bugs can be closed.
+        </para>
+       </listitem>
+      </orderedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+    When all three sections are filled in, the <guibutton>Next</guibutton>
+    will become un-greyed out, and you can continue. 
+  </para>
+ </sect1>
+
+ <sect1 id="submit-report">
+  <title>Submitting the Report</title>
+  <para>
+    Once you have finished your report, you can review the report and
+    decide what to do with it. You will probably want to submit it to 
+    the bug-tracking system, but if you want to send it elsewhere for
+    some reason, you can. You can choose from:
+  </para>
+  <variablelist>
+   <varlistentry>
+    <term>Submit bug report</term>
+    <listitem>
+     <para>
+      Selecting this and clicking on <guibutton>Next</guibutton>
+      will email the bug report to the bug tracker. You can send
+      yourself a copy by clicking the relevant checkbox here. If
+      you are submitting the report to an independent bug tracker,
+      you will need to fill in the submission address yourself. 
+     </para>
+     <note>
+      <title>bugs.gnome.org and bugzilla.gnome.org</title>
+      <para>
+        Even though the report should end up at bugzilla, you will see
+        that the address is for bugs.gnome.org. This is fine. Don't change
+        it. It's the staging-post which forwards reports on to bugzilla. 
+        If bugzilla has no category for it, then bugs.gnome.org will keep
+        it. 
+      </para>
+     </note>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Only send report to yourself</term>
+    <listitem>
+     <para>
+       This will send the bug report to you. If you changed the
+       email address at the start, then it will use the new
+       address.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Save report to file</term>
+    <listitem>
+     <para>
+       Selecting this will produce a box for you to give the
+       name of a file to save the bug report to. If the file already
+       exists, it will ask you whether to overwrite the file or not.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+
+
+ <sect1 id="summary">
+  <title>Summary</title>
+  <para>
+    <application>Bug Buddy</application> will tell you what it has
+    done with your bug report. That's it.
+  </para>
+  <para>
+    Thank you for reporting your bug.
+  </para>
+ </sect1>
+
+ <sect1 id="bugs">
+  <title>Known bugs and limitations</title>
+
+  <para>
+    <application>Bug Buddy</application> has very few bugs or limitations.
+    Currently known:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+      There is an applet called <application>Tick-A-Stat</application>
+      which can be set to look for core files and timestamp them with
+      their origin and date. <application>Bug Buddy</application> cannot
+      read files which <application>Tick-A-Stat</application> has done
+      this to. 
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ 
+ <sect1 id="authors">
+  <title>Authors</title>
+
+  <para>
+    <application>Bug Buddy</application> was written by Jacob Berkman
+    <email>jacob@bug-buddy.org</email>. To find more information
+    about it, please visit 
+    <ulink type="http" url="http://bug-buddy.org/">
+    Bug Buddy's home on the web</ulink>.
+  </para>
+
+  <para>
+     Please send all comments, suggestions, and bug reports to the new
+     <ulink url="http://bugzilla.gnome.org/" type="http">GNOME bug
+     tracking database</ulink>. The product is of course bug-buddy.
+  </para>
+  
+  <para>
+    This guide was written by Telsa Gwynne 
+    <email>telsa@linuxchix.org</email>. Please send all comments
+    and suggestions regarding it to the GNOME Documentation Project 
+    at <email>docs@gnome.org</email>. Some parts of this document
+    (the definitions of bug severity) are directly lifted from 
+    the new Gnome bugtracker mentioned above.
+  </para>
+
+  <!-- For translations: uncomment this:
+   <para> Latin translation was done by ME
+     <email>MYNAME@MYADDRESS</email>. Please send all comments
+     and suggestions regarding this translation to SOMEWHERE.
+   </para> 
+     -->
+ </sect1>
+
+ <sect1 id="license">
+  <title>License</title>
+  <para>
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the <ulink type="help" url="gnome-help:gpl">
+    <citetitle>GNU General Public License</citetitle></ulink> as published
+    by the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+  </para>
+ </sect1>
+
+</article>

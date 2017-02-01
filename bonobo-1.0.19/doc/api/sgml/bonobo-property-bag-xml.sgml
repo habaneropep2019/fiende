@@ -1,0 +1,168 @@
+<refentry id="bonobo-bonobo-property-bag-xml">
+<refmeta>
+<refentrytitle>bonobo-property-bag-xml</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>bonobo-property-bag-xml</refname><refpurpose>BonoboArg XML persistance logic</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+<link linkend="BonoboUINode">BonoboUINode</link>* <link linkend="bonobo-property-bag-xml-encode-any">bonobo_property_bag_xml_encode_any</link>
+                                            (<link linkend="BonoboUINode">BonoboUINode</link> *opt_parent,
+                                             const <link linkend="CORBA-any">CORBA_any</link> *any,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+<link linkend="CORBA-any">CORBA_any</link>*  <link linkend="bonobo-property-bag-xml-decode-any">bonobo_property_bag_xml_decode_any</link>
+                                            (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+This API is really super simple. It is designed in conjuction
+with the <link linkend="BonoboUINode">BonoboUINode</link> API to allow you to serialize a <link linkend="BonoboArg">BonoboArg</link>
+( in fact a CORBA_any ) to an XML format, and obviously the
+converse.
+</para>
+
+<para>
+Here is a code sample to produce an XML string from a
+CORBA_any or BonoboArg:
+   <example>
+     <title>Converting Any to XML</title>
+     <programlisting>
+char *
+convert_arg_to_xml (BonoboArg *bonobo_arg)
+{
+	CORBA_Environment ev;
+	BonoboUINode     *node;
+	char             *value;
+
+	CORBA_exception_init (&amp;ev);
+
+	node = bonobo_property_bag_xml_encode_any (NULL, bonobo_arg, &amp;ev);
+	if (!node)
+		return NULL;
+
+	value = bonobo_property_bag_xml_decode_any (node, &amp;ev);
+	bonobo_ui_node_free (node);
+
+	CORBA_exception_free (&amp;ev);
+
+	return value;
+}
+     </programlisting>
+   </example>
+</para>
+
+<para>
+Here is the converse sample to produce a BonoboArg from an XML string:
+   <example>
+     <title>Converting XML to an Any</title>
+     <programlisting>
+BonoboArg *
+convert_xml_to_arg (const char *xml)
+{
+	CORBA_Environment ev;
+	BonoboUINode     *node;
+	BonoboArg        *value;
+
+	CORBA_exception_init (&amp;ev);
+
+	node = bonobo_ui_node_from_string (xml);
+	if (!node)
+		return NULL;
+
+	value = bonobo_property_bag_xml_decode_any (node, &amp;ev);
+
+	bonobo_ui_node_free (node);
+	CORBA_exception_free (&amp;ev);
+
+	return value;
+}
+     </programlisting>
+   </example>
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="bonobo-property-bag-xml-encode-any">bonobo_property_bag_xml_encode_any ()</title>
+<programlisting><link linkend="BonoboUINode">BonoboUINode</link>* bonobo_property_bag_xml_encode_any
+                                            (<link linkend="BonoboUINode">BonoboUINode</link> *opt_parent,
+                                             const <link linkend="CORBA-any">CORBA_any</link> *any,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+This routine encodes <parameter>any</parameter> into an XML tree using the
+<link linkend="BonoboUINode">BonoboUINode</link> XML abstraction. <parameter>ev</parameter> is used for flagging
+any non-fatal exceptions during the process. On exception
+NULL will be returned. opt_parent should be NULL, and is
+used internally for recursive tree construction.
+</para>
+<para>
+Both type and content data are dumped in a non-standard, but
+trivial format.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>opt_parent</parameter>&nbsp;:</entry>
+<entry> optional parent, should be NULL
+</entry></row>
+<row><entry align="right"><parameter>any</parameter>&nbsp;:</entry>
+<entry> the Any to serialize
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> a corba exception environment
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the XML tree representing the Any
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-property-bag-xml-decode-any">bonobo_property_bag_xml_decode_any ()</title>
+<programlisting><link linkend="CORBA-any">CORBA_any</link>*  bonobo_property_bag_xml_decode_any
+                                            (<link linkend="BonoboUINode">BonoboUINode</link> *node,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *ev);</programlisting>
+<para>
+This routine is the converse of bonobo_property_bag_xml_encode_any.
+It hydrates a serialized CORBA_any.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>node</parameter>&nbsp;:</entry>
+<entry> the parsed XML representation of an any
+</entry></row>
+<row><entry align="right"><parameter>ev</parameter>&nbsp;:</entry>
+<entry> a corba exception environment
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the CORBA_any or NULL on error
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

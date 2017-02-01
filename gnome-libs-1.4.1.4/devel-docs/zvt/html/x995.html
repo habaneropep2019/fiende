@@ -1,0 +1,375 @@
+<HTML
+><HEAD
+><TITLE
+>Embedding applications</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="ZVT Terminal Widget Reference Guide"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Implementation notes"
+HREF="zvtterm-notes.html"><LINK
+REL="PREVIOUS"
+TITLE="When not to use a ZvtTerm"
+HREF="x987.html"><LINK
+REL="NEXT"
+TITLE="As a color output device"
+HREF="x1035.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>ZVT Terminal Widget Reference Guide</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x987.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="x1035.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN995"
+>Embedding applications</A
+></H1
+><P
+>One may wish to embed an existing curses or simple text-based application
+	within a prettier frame-work, and/or add extra macro or session
+	functionality to simplify its use.</P
+><P
+>One such example of this is
+	the Crescendo application, which embeds the TinyFuge mud client
+	into a gnome-aware GUI application and provides some
+	point-and-click functionality.</P
+><P
+>This is very easy to do using the
+	ZvtTerm widget.  All you have to do is instantiate the widget, and
+	then execute the controlled program in the appropriate
+	environment.  The
+	 and
+	
+	functions are used for this purpose.
+      </P
+><P
+>Further information can be found in <A
+HREF="zvtterm-input-output.html"
+>the Section called <I
+>Terminal input and output</I
+></A
+>
+	about how to interact with the subordinate application. </P
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1004"
+>Creating an appropriate widget</A
+></H2
+><P
+>	  Typically applications such
+	  as these are designed to run in a 80x24 character-mode terminal,
+	  you should use zvt_term_new_with_size() to create the initial
+	  80x24 terminal.</P
+><P
+>You may also need to force the application window not to
+	  be resized, if the embedded application cannot handle it.
+	  This can be done using the normal GDK/GTK+ window hints
+	  mechanism.</P
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1008"
+>Creating an appropriate execution environment</A
+></H2
+><P
+>The  function should be
+	  used to create the child process required to execute the
+	  program in.  It works just like fork(2) with some additional
+	  features.</P
+><P
+>This will setup the pseudo tty (pty) for the
+	  subordinate program, and register the login session if required.
+	  ZvtTerm uses a secure set-uid helper application to register
+	  the session, so applications need not (and should not!) be run
+	  as a privileged user to register login sessions.</P
+><P
+>The environment must also be setup appropriately if any
+	  curses/nurses or similar application is to be run within the
+	  terminal.  The following environmental variables should be modified/set
+	  as shown:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>TERM</TT
+></DT
+><DD
+><P
+>Should be set to xterm, as the ZvtTerm widget
+		tries to emulate an xterm.  vt100 or vt220 may also work if xterm
+		is not understood by the application.
+              </P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>COLORTERM</TT
+></DT
+><DD
+><P
+>Can be set to anything, including the name of the
+		application.  Although it may be appropriate to set it
+		to the value "zterm".  This will enable color rendering
+		in a modern color-capable curses, like ncurses.
+              </P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>COLUMNS</TT
+> &amp; <TT
+CLASS="ENVAR"
+>ROWS</TT
+></DT
+><DD
+><P
+>These variables should be removed from the
+		environment passed to the child process.  However it may
+		be necessary to initialize it to the size of the
+		terminal, if it will not change.  The terminal size is
+		always set properly on the pseudo-tty.
+              </P
+></DD
+></DL
+></DIV
+><P
+>These should only be set in the child process (that
+	  which received a 0 return value from zvt_term_forkpty()).  The
+	  program should then be executed using execle(2), execpe(2) or
+	  similar.  If these environment variables are not set, the
+	  terminal will still function, but any embedded application may
+	  not properly display.
+        </P
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1032"
+>Setting up an exit handler</A
+></H2
+><P
+>The widget will generate a "child_died" signal when the
+	  child process terminates.  This signal should be caught if you
+	  wish to detect when the subordinate process exits.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x987.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="zvtterm-notes.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="x1035.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>When not to use a ZvtTerm</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>As a color output device</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,510 @@
+<refentry id="GnomeDockBand">
+<refmeta>
+<refentrytitle>GnomeDockBand</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeDockBand</refname><refpurpose>A widget implementing dock bands.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeDockBand-struct">GnomeDockBand</link>;
+struct      <link linkend="GnomeDockBandChild">GnomeDockBandChild</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-dock-band-new">gnome_dock_band_new</link>             (void);
+void        <link linkend="gnome-dock-band-set-orientation">gnome_dock_band_set_orientation</link> (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkOrientation">GtkOrientation</link> orientation);
+<link linkend="GtkOrientation">GtkOrientation</link> <link linkend="gnome-dock-band-get-orientation">gnome_dock_band_get_orientation</link>
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-band-insert">gnome_dock_band_insert</link>          (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="guint">guint</link> offset,
+                                             <link linkend="gint">gint</link> position);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-band-prepend">gnome_dock_band_prepend</link>         (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="guint">guint</link> offset);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-band-append">gnome_dock_band_append</link>          (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="guint">guint</link> offset);
+void        <link linkend="gnome-dock-band-set-child-offset">gnome_dock_band_set_child_offset</link>
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="guint">guint</link> offset);
+<link linkend="guint">guint</link>       <link linkend="gnome-dock-band-get-child-offset">gnome_dock_band_get_child_offset</link>
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child);
+void        <link linkend="gnome-dock-band-move-child">gnome_dock_band_move_child</link>      (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GList">GList</link> *old_child,
+                                             <link linkend="guint">guint</link> new_num);
+<link linkend="guint">guint</link>       <link linkend="gnome-dock-band-get-num-children">gnome_dock_band_get_num_children</link>
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band);
+void        <link linkend="gnome-dock-band-drag-begin">gnome_dock_band_drag_begin</link>      (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-band-drag-to">gnome_dock_band_drag_to</link>         (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y);
+void        <link linkend="gnome-dock-band-drag-end">gnome_dock_band_drag_end</link>        (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item);
+<link linkend="GnomeDockItem">GnomeDockItem</link>* <link linkend="gnome-dock-band-get-item-by-name">gnome_dock_band_get_item_by_name</link>
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             const char *name,
+                                             <link linkend="guint">guint</link> *position_return,
+                                             <link linkend="guint">guint</link> *offset_return);
+void        <link linkend="gnome-dock-band-layout-add">gnome_dock_band_layout_add</link>      (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="guint">guint</link> band_num);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----GnomeDockBand
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+<type>GnomeDockBand</type> is a widget implementing a "dock band", i.e. a
+horizontal or vertical stripe containing dockable widgets.
+</para>
+
+<para>
+The application programmer does not normally need to use
+<type>GnomeDockBand</type>s directly; they are mostly used by the
+<type>GnomeDock</type> widget to implement its functionality.  For an
+explanation of the way dock bands are used within a dock, check out
+the documentation for the <type>GnomeDock</type> widget.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeDockBand-struct">struct GnomeDockBand</title>
+<programlisting>struct GnomeDockBand;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeDockBandChild">struct GnomeDockBandChild</title>
+<programlisting>struct GnomeDockBandChild
+{
+  GtkWidget *widget;
+
+  /* Maximum (requested) offset from the previous child.  */
+  guint offset;
+
+  /* Actual offset.  */
+  guint real_offset;
+
+  guint drag_offset;
+
+  GtkAllocation drag_allocation;
+
+  guint prev_space, foll_space;
+  guint drag_prev_space, drag_foll_space;
+
+  guint max_space_requisition;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-new">gnome_dock_band_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_dock_band_new             (void);</programlisting>
+<para>
+Create a new GnomeDockBand widget.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The new GnomeDockBand widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-set-orientation">gnome_dock_band_set_orientation ()</title>
+<programlisting>void        gnome_dock_band_set_orientation (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkOrientation">GtkOrientation</link> orientation);</programlisting>
+<para>
+Set the orientation for <parameter>band</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><parameter>orientation</parameter>&nbsp;:</entry>
+<entry> New orientation for <parameter>band</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-get-orientation">gnome_dock_band_get_orientation ()</title>
+<programlisting><link linkend="GtkOrientation">GtkOrientation</link> gnome_dock_band_get_orientation
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band);</programlisting>
+<para>
+Retrieve the orientation of the specified <parameter>band</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The orientation of <parameter>band</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-insert">gnome_dock_band_insert ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_band_insert          (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="guint">guint</link> offset,
+                                             <link linkend="gint">gint</link> position);</programlisting>
+<para>
+Add <parameter>child</parameter> to <parameter>band</parameter> at the specified <parameter>position</parameter>, with
+the specified <parameter>offset</parameter> from the previous item (or from the beginning
+of the band, if this is the first item).</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> The widget to be added to <parameter>band</parameter>
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> Offset from the previous item
+</entry></row>
+<row><entry align="right"><parameter>position</parameter>&nbsp;:</entry>
+<entry> Position within the <parameter>band</parameter>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if successful, <literal>FALSE</literal> if the operation fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-prepend">gnome_dock_band_prepend ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_band_prepend         (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="guint">guint</link> offset);</programlisting>
+<para>
+Add <parameter>child</parameter> to <parameter>band</parameter> with the specified <parameter>offset</parameter> as the
+first element.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> A widget to be added to <parameter>band</parameter>
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> Offset (in pixels) from the beginning of the band
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if successful, <literal>FALSE</literal> if the operation fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-append">gnome_dock_band_append ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_band_append          (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="guint">guint</link> offset);</programlisting>
+<para>
+Add <parameter>child</parameter> to <parameter>band</parameter> with the specified <parameter>offset</parameter> as the
+last element.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> A widget to be added to <parameter>band</parameter>
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> Offset (in pixels) from the last item of the band
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if successful, <literal>FALSE</literal> if the operation fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-set-child-offset">gnome_dock_band_set_child_offset ()</title>
+<programlisting>void        gnome_dock_band_set_child_offset
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child,
+                                             <link linkend="guint">guint</link> offset);</programlisting>
+<para>
+Set the offset for the specified <parameter>child</parameter> of <parameter>band</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> Child of <parameter>band</parameter> whose offset must be changed
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> New offset value for <parameter>child</parameter>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-get-child-offset">gnome_dock_band_get_child_offset ()</title>
+<programlisting><link linkend="guint">guint</link>       gnome_dock_band_get_child_offset
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GtkWidget">GtkWidget</link> *child);</programlisting>
+<para>
+Retrieve the offset of <parameter>child</parameter> in <parameter>band</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><parameter>child</parameter>&nbsp;:</entry>
+<entry> Child of <parameter>band</parameter> whose offset must be retrieved
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The offset of <parameter>child</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-move-child">gnome_dock_band_move_child ()</title>
+<programlisting>void        gnome_dock_band_move_child      (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GList">GList</link> *old_child,
+                                             <link linkend="guint">guint</link> new_num);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>old_child</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>new_num</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-get-num-children">gnome_dock_band_get_num_children ()</title>
+<programlisting><link linkend="guint">guint</link>       gnome_dock_band_get_num_children
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band);</programlisting>
+<para>
+Retrieve the number of children in <parameter>band</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The number of children in <parameter>band</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-drag-begin">gnome_dock_band_drag_begin ()</title>
+<programlisting>void        gnome_dock_band_drag_begin      (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-drag-to">gnome_dock_band_drag_to ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_band_drag_to         (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-drag-end">gnome_dock_band_drag_end ()</title>
+<programlisting>void        gnome_dock_band_drag_end        (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-get-item-by-name">gnome_dock_band_get_item_by_name ()</title>
+<programlisting><link linkend="GnomeDockItem">GnomeDockItem</link>* gnome_dock_band_get_item_by_name
+                                            (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             const char *name,
+                                             <link linkend="guint">guint</link> *position_return,
+                                             <link linkend="guint">guint</link> *offset_return);</programlisting>
+<para>
+Retrieve a named item from <parameter>band</parameter>, and return its
+position and offset in *<parameter>position_return</parameter> and <parameter>offset_return</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry> A GnomeDockBand widget
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Name of the child to be retrieved
+</entry></row>
+<row><entry align="right"><parameter>position_return</parameter>&nbsp;:</entry>
+<entry> Pointer to a variable holding the position of
+the named child
+</entry></row>
+<row><entry align="right"><parameter>offset_return</parameter>&nbsp;:</entry>
+<entry>  Pointer to a variable holding the offset of the
+named child
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The child whose name is <parameter>name</parameter>, or <literal>NULL</literal> if no child
+of <parameter>band</parameter> has such name.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-band-layout-add">gnome_dock_band_layout_add ()</title>
+<programlisting>void        gnome_dock_band_layout_add      (<link linkend="GnomeDockBand">GnomeDockBand</link> *band,
+                                             <link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="guint">guint</link> band_num);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>band</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>placement</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>band_num</parameter>&nbsp;:</entry>
+<entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="GnomeDock">GnomeDock</link>
+<link linkend="GnomeDockItem">GnomeDockItem</link>
+<link linkend="GnomeDockLayout">GnomeDockLayout</link>
+</para>
+</refsect1>
+
+</refentry>

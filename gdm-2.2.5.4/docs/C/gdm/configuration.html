@@ -1,0 +1,346 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>The Configuration Directory</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Gnome Display Manager Reference Manual"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="The Greeter"
+HREF="x89.html"><LINK
+REL="NEXT"
+TITLE="The Configuration File - gdm.conf"
+HREF="x156.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Gnome Display Manager Reference Manual</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x89.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x156.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="CONFIGURATION"
+>The Configuration Directory</A
+></H1
+><P
+> 
+      This chapter will cover the structure of the configuration
+      directory and the format of the configuration file.  However you 
+      can use the <TT
+CLASS="FILENAME"
+>gdmconfig</TT
+> binary to configure
+      GDM from a graphical environment.  The terms from this chapter
+      could however still come in handy.  If you want to run the
+      configurator from the GNOME menu, it should be installed under
+      the <TT
+CLASS="FILENAME"
+>System</TT
+> submenu.
+    </P
+><P
+> 
+      The configuration files for GDM are located in the
+      <TT
+CLASS="FILENAME"
+>etc/gdm/</TT
+> directory.
+    </P
+><P
+>      This is a listing of the config directory contents:
+    </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="SCREEN"
+>	Init/
+	PostSession/
+	PreSession/
+	Sessions/
+	gdm.conf
+    </PRE
+></TD
+></TR
+></TABLE
+><P
+> 
+      <TT
+CLASS="FILENAME"
+>gdm.conf</TT
+> is the main GDM configuration file. The
+      options will be described later in this chapter.
+    </P
+><P
+>      <TT
+CLASS="FILENAME"
+>gdm.conf</TT
+> is configuration file for both <TT
+CLASS="FILENAME"
+>      gdm</TT
+>, <TT
+CLASS="FILENAME"
+>gdmlogin</TT
+>, and <TT
+CLASS="FILENAME"
+>gdmchooser</TT
+> since a
+      lot of parameters overlap.
+    </P
+><P
+> 
+      The remaining configuration is done by dropping scripts in the
+      subdirectories of the <TT
+CLASS="FILENAME"
+>etc/gdm</TT
+> folder. This
+      approach makes it easy for package management systems to install
+      window managers and different session types without requiring
+      the sysadmin to edit files.
+    </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN129"
+>The Script Directories</A
+></H1
+><P
+>	In this section we will explain the <TT
+CLASS="FILENAME"
+>Init</TT
+>,
+	<TT
+CLASS="FILENAME"
+>PreRoot</TT
+> and <TT
+CLASS="FILENAME"
+>PostRoot</TT
+> directories as
+	they are very similar.
+      </P
+><P
+>	When the X server has been successfully started, GDM will try
+	to run the script called
+	<TT
+CLASS="FILENAME"
+>Init/&#60;displayname&#62;</TT
+>. I.e. <TT
+CLASS="FILENAME"
+>Init/:0</TT
+>
+	for the first local display.  If this file is not found, GDM
+	will attempt to to run <TT
+CLASS="FILENAME"
+>Init/Default</TT
+>. The
+	script will be run as root and GDM blocks until it
+	terminates. Use the <TT
+CLASS="FILENAME"
+>Init/*</TT
+> script for
+	programs that are supposed to run alongside with the GDM login
+	window. xconsole for instance.  Commands to set the background
+	etc. goes in this file too.
+      </P
+><P
+> 
+	It is up to the sysadmin to decide whether clients started by
+	the Init script should be killed before starting the user
+	session. This is controlled with the KillInitClients option in
+	<TT
+CLASS="FILENAME"
+>gdm.conf</TT
+>.
+      </P
+><P
+>	When the user has been successfully authenticated, GDM tries
+	to run the PreSession script. Similar to the Init-scripts,
+	<TT
+CLASS="FILENAME"
+>PreSession/&#60;displayname&#62;</TT
+> will be
+	executed, if this file doesn't exist, GDM will attempt to run
+	<TT
+CLASS="FILENAME"
+>PreSession/Default</TT
+>. The script will be
+	run as root and GDM blocks until it terminates. Use this
+	script for local session management or accounting stuff. The
+	$USER environment variable contains the login of the
+	authenticated user. The script should return 0 on success. Any
+	other value will cause GDM to terminate the current login
+	process.
+      </P
+><P
+>	Then the session script is run. Session scripts are located in
+	the <TT
+CLASS="FILENAME"
+>etc/gdm/Session</TT
+> directory. Which one
+	GDM runs, depends on the session the user chose in the
+	Sessions-menu in the greeter. If no session is selected and
+	the user has no last session stored in his
+	<TT
+CLASS="FILENAME"
+>~/.gnome/gdm</TT
+> file, the system will choose
+	or first script found or -- if
+	<TT
+CLASS="FILENAME"
+>Sessions/Default</TT
+> exists -- this will be
+	run. For instance you can create a symlink from
+	<TT
+CLASS="FILENAME"
+>Gnome</TT
+> to <TT
+CLASS="FILENAME"
+>Default</TT
+> to
+	make Gnome the default desktop environment.
+      </P
+><P
+> 
+	When the user terminates his session, the PostSession script
+	will be run. Operation is similar to Init and PreSession. That
+	is, GDM will attempt to execute the script
+	<TT
+CLASS="FILENAME"
+>PostSession/&#60;displayname&#62;</TT
+> and if
+	that doesn't exist <TT
+CLASS="FILENAME"
+>PostSession/Default</TT
+>
+	will be run. Again the script will be run with root
+	priviledges, the slave daemon will block and the $USER
+	environment variable will contain the name of the user who
+	just logged out.
+      </P
+><P
+>	Note that the PostSession script will be run even when the
+	display fails to respond due to an I/O error or similar. Thus,
+	there is no guarantee that X applications will work during
+	script execution.
+      </P
+><P
+> 
+	Neither of the Init, PreSession or PostSession scripts are
+	necessary and can be left out. At least one session script is
+	required for proper operation.
+      </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x89.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x156.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The Greeter</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The Configuration File - <TT
+CLASS="FILENAME"
+>gdm.conf</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

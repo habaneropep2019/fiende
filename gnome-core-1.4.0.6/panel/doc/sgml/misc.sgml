@@ -1,0 +1,116 @@
+<refentry id="panel-Miscellaneous">
+<refmeta>
+<refentrytitle>Miscellaneous</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>PANEL Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Miscellaneous</refname><refpurpose>Other miscellaneous functions</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;applet-widget.h&gt;
+
+
+int         <link linkend="applet-widget-get-applet-count">applet_widget_get_applet_count</link>  (void);
+void        <link linkend="applet-widget-sync-config">applet_widget_sync_config</link>       (<link linkend="AppletWidget">AppletWidget</link> *applet);
+void        <link linkend="applet-widget-queue-resize">applet_widget_queue_resize</link>      (<link linkend="AppletWidget">AppletWidget</link> *applet);
+void        <link linkend="applet-widget-panel-quit">applet_widget_panel_quit</link>        (void);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="applet-widget-get-applet-count">applet_widget_get_applet_count ()</title>
+<programlisting>int         applet_widget_get_applet_count  (void);</programlisting>
+<para>
+Gets the number of applets loaded in this this process.  If
+this is a shared lib applet it will return the total number of shared lib
+applets loaded.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  The number of applets loaded.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-sync-config">applet_widget_sync_config ()</title>
+<programlisting>void        applet_widget_sync_config       (<link linkend="AppletWidget">AppletWidget</link> *applet);</programlisting>
+<para>
+Tell the panel to save our session here (just saves, no
+shutdown).  This should be done when you change some of your config and want
+the panel to save it's config, you should NOT call this in the session_save
+handler as it will result in a locked panel, as it will actually trigger
+another session_save signal for you.  However it also asks for a complete
+panel save, so you should not do this too often, and only when the user
+has changed some preferences and you want to sync them to disk. 
+Theoretically you don't even need to do that if you don't mind loosing
+settings on a panel crash or when the user kills the session without
+logging out properly, since the panel will always save your session when
+it exists.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> <link linkend="AppletWidget">AppletWidget</link> to work on.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-queue-resize">applet_widget_queue_resize ()</title>
+<programlisting>void        applet_widget_queue_resize      (<link linkend="AppletWidget">AppletWidget</link> *applet);</programlisting>
+<para>
+For shared library applets this calls <link linkend="gtk-widget-queue-resize">gtk_widget_queue_resize</link>
+on the internal panel eventbox, for external applets this just calls this on
+the <link linkend="AppletWidget">AppletWidget</link> itself, but in both cases it forces a resize of the socket
+on the panel</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> <link linkend="AppletWidget">AppletWidget</link> to work on
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-panel-quit">applet_widget_panel_quit ()</title>
+<programlisting>void        applet_widget_panel_quit        (void);</programlisting>
+<para>
+Trigger 'Log out' on the panel.  This shouldn't be
+used in normal applets, as it is not normal for applets to trigger
+a logout.</para>
+<para>
+
+</para></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

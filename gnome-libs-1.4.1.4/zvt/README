@@ -1,0 +1,138 @@
+
+ ZVT - Zed's Virtual Terminal
+ Copyright (C) Michael Zucchi, 1998
+ 
+Notes
+-----
+
+This is a quick read-me to cover this work-in-progress release
+of 'zterm' - "yet another virtual terminal" program.
+
+My original goal was to write a small-as-possible, fast and
+efficient X term type program, which would also provide equivalent
+functionality (if not semantically identical).  Some of the
+extra features may bloat this a little, and X itself bloats
+it a lot (especially at run-time :(  but it should still
+come in pretty light-weight (currently the stripped binary
+is under 40K!  It also seems to benchmark with extrememly low
+CPU times on large amounts of scrolling/screen output).
+
+One thing I've tried to do was detach the 'vt' terminal emulation
+code from the rendering code.  Something similar to Curses.
+But I've used a rotating linked list 'buffer' to emulate
+scrolling and other functions, so it actually runs
+very fast.  It reads as much data as the terminal client
+wants to send, processes it all in the off screen buffer, and
+then renders this onto the screen.  It also uses some of the
+characteristics of the off-screen buffer to try to optimize
+the on-screen update as well (using scrolling where possible
+for example).  It has also been completely written from
+scratch, so does not have any hang-overs from old code
+(although no doubt it has its own plethora of bugs).
+
+Sometimes it seems to over-generate X traffic (by trying to optimize
+line updates to small segments), but on the whole it seems to work
+pretty well.
+
+On top of the base terminal emulation, it has the usual select/paste,
+font setting, and so on.
+
+The base vt emulation library has been used to implement
+a new gtk widget 'ZvtTerm'.  Refer to zterm.c for a simple
+example of using this widget.
+
+Installation
+------------
+
+Since this is now part of the Gnome CVS tree, refer to
+the gnome-libs building instructions.
+
+A simple test client 'zterm' which is not installed by
+default is compiled in this directory.
+
+Command line arguments
+----------------------
+
+There are currently some rudimentary command-line arguments
+to zterm which can be used to control its behavior.
+
+ -e command [ args ... ]
+
+Execute command 'command', passing it the remainder of the command
+line (i.e. the -e command must be the last one on the command line).
+This behaves identical to the Xterm -e command.
+
+ -s <number>
+
+Set the scrollback lines to <number>.  This is the number of lines
+stored in the scrollback buffer.
+
+Current Features
+----------------
+
+ Xterm emulation.  Should use the Xterm or Xterm_colour termcap for
+the zvtterm widget.  However, not all X term stuff is in there (like
+setting the title, for example), and not all the vt100 stuff is there
+either (like reporting terminal type).  I've crashed it dumping a huge
+binary file to it, but most of the core vt100 escape sequences are
+implemented.  (all the curses programs I have seem to work as
+expected - emacs/vi/mc).
+
+ Mouse blanking.  The Amiga has a neat little commodity (hmm, perhaps
+a Gnome window manager or Panel could include something like
+commodities? ...) which would blank the mouse when a key was pressed,
+and un-blank it when the mouse was moved.  Anyway, zvt does this
+too because I think its neat.
+
+ Blinking cursor.  Yeah kinda wanky, but it is nice to have.
+
+ Selection and pasting.  These work as expected.  The selection
+works almost, but not quite like the Xterm selection algorithm.
+Actually it tries to be a little smarter - tabs should be able
+to be selected/pasted too.  Still a few bugs with selection end-points
+and the rendering of selections.  The widget doesn't follow the
+pointer for one.
+
+ Scroll-back buffer.  Again, works as you'd expect.  Currently
+no optimization is done on the re-rendering of a scroll-back
+'scroll', but it works OK on fast machines.  The zterm example
+program doesn't set one up, but the widget keeps track of
+scrolled lines.
+
+ Jump scroll.  After I saw gemvt in action I immediately thought
+"this needs jump scroll", but I didn't see how it could be done
+with the code as it stood (being based on the Linux VC code it
+was designed to work directly on the display medium).  So I began
+to experiment with a vt emulator based on optimized off-screen
+buffer -> on-screen display update - and this is what I came up with.
+Anyway, the result is a very fast, very responsive terminal that
+will still generate an accurate screen and scroll-back buffer.
+
+Licensing
+---------
+
+ zterm, and the zvtterm widget is Free Software, and has been
+released under the GNU LGPL.  
+
+ Refer to the file "COPYING" accompanying this file.
+
+Known Bugs
+----------
+
+ Refer to the file "BUGS" accompanying this file.
+ Also see the file "TODO" for other information.
+
+Contacting the Author
+---------------------
+
+I can be reached at: zucchi@zedzone.mmc.com.au
+
+Bug reports/ideas welcome.
+
+Since I work full time (system designer/developer/systems administrator),
+and my gf gets annoyed when I spend so much time doing
+this kinda stuff, updates may take a while :)
+
+Zed was my 'coding handle' on the Amiga, hence the name 'zterm', and
+'zvtterm widget'.
+

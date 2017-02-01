@@ -1,0 +1,230 @@
+/* $Id: menu.gen_h,v 1.62 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* menu.h
+ * 
+ * Copyright (C) 1998-2000 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk/gtkmenu.h>
+#include <gtk--/menushell.h>
+#include <gtk--/menuitem.h>
+
+CLASS_START(Gtk);
+
+class AccelGroup;
+
+//: A drop down menu widget.
+//- A {\class Gtk::Menu} is a {\class Gtk::MenuShell} that implements a drop
+//- down menu consisting of a list of {\class Gtk::MenuItem} objects which
+//- can be navigated and activated by the user to perform application functions.
+//-
+//- A {\class Gtk::Menu} is most commonly dropped down by activating a
+//- {\class Gtk::MenuItem} in a {\class Gtk::MenuBar} or popped up by activating
+//- a {\class Gtk::MenuItem} in another {\class Gtk::Menu}.
+//-
+//- A {\class Gtk::Menu} can also be popped up by activating a
+//- {\class Gtk::OptionMenu}. Other composite widgets such as the
+//- {\class Gtk::Notebook} can pop up a {\class Gtk::Menu} as well.
+//-
+//- Applications can display a {\class Gtk::Menu} as a popup menu by calling
+//- the {menu_popup()} function.
+class Menu : public MenuShell {
+  
+  WRAP_CLASS(Menu,GtkMenu,GTK_MENU,GTK_IS_MENU,menu,Gtk::MenuShell,GtkMenuShell,GTK_MENU_SHELL);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+/* append, prepend, and insert are defined in MenuShell */
+
+/* Note: GtkMenuPositionFunc is not very good for us */
+
+  //: Display the menu on screen
+  // When there is a parent menu 
+  WRAP_METHOD(void gtk_menu_popup (GtkMenu*,GtkWidget*,GtkWidget*,
+				   GtkMenuPositionFunc,gpointer,guint,guint32),
+	      void popup          (Gtk::MenuShell &parent_menu_shell,
+				   Gtk::MenuItem &parent_menu_item,
+				   GtkMenuPositionFunc func,
+				   gpointer data,
+				   guint button,
+				   guint32 activate_time));
+  // When there isn't
+  void popup                      (GtkMenuPositionFunc func,
+				   gpointer data,
+				   guint button,
+				   guint32 activate_time);
+
+  //: popup a floating menu
+  void popup                      (guint button,
+				   guint32 activate_time);
+
+  //: Hides the menu away
+  WRAP_METHOD(void gtk_menu_popdown(GtkMenu*),
+	      void popdown());
+
+  //- Keep track of the last menu item selected, for the purposes
+  //- of the option menu
+  WRAP_METHOD(GtkWidget* gtk_menu_get_active(GtkMenu*),
+	      Gtk::MenuItem* get_active() const);
+
+  WRAP_METHOD(void gtk_menu_set_active(GtkMenu*,gint),
+	      void set_active(gint index));
+
+  //- Position the menu according to it's position function. This wraps
+  //- a function called by gtkmenuitem.c when a menu-item changes
+  //- its allocation. You most likely don't need to care about it.
+  WRAP_METHOD(void gtk_menu_reposition(GtkMenu*),
+	      void reposition());
+
+  // The accel group may or may not be there
+  WRAP_METHOD(void gtk_menu_set_accel_group(GtkMenu*,GtkAccelGroup*),
+	      void set_accel_group(Gtk::AccelGroup *accel_group=0));
+  WRAP_METHOD(void gtk_menu_set_accel_group(GtkMenu*,GtkAccelGroup*),
+	      void set_accel_group(Gtk::AccelGroup &accel_group));
+
+  WRAP_MEMBER(value,accel_group,accel_group,Gtk::AccelGroup*,GtkAccelGroup*);
+
+#if GTK_VERSION_GT_MICRO(1,2,0)
+  AccelGroup* get_uline_accel_group     () const;
+  AccelGroup* ensure_uline_accel_group () const;
+#endif
+ 
+  WRAP_METHOD(void gtk_menu_set_tearoff_state (GtkMenu*,bool),
+	      void set_tearoff_state (bool torn_off));
+
+  bool is_torn_off() const { return gtkobj()->torn_off; }
+
+  //- Sets the window manager title for the window that
+  //- appears when a menu is torn off
+  WRAP_METHOD(void gtk_menu_set_title(GtkMenu*,const char*),
+	      void set_title(const nstring &title));
+
+  void reorder_child(const Gtk::MenuItem &child, gint position);
+ 
+protected: 
+  //- Attach the menu to a widget. {\var detacher} is a function which takes
+  //- the attached GtkWidget* and GtkMenu*
+  //- ({\b NOTE! NOT the Gtk_Widget and Gtk_Menu!})
+  //- This is mostly used by other widgets like {\class Gtk_MenuItem} or
+  //- {\class Gtk_NoteBook}. You probably don't need to care about it.
+  WRAP_METHOD(void gtk_menu_attach_to_widget(GtkMenu*,GtkWidget*,GtkMenuDetachFunc),
+	      void attach_to_widget(Gtk::Widget &widget, GtkMenuDetachFunc detacher));
+
+public:
+  WRAP_METHOD(
+	      GtkWidget* gtk_menu_get_attach_widget(GtkMenu*),
+	      Gtk::Widget* get_attach_widget() const);
+
+  //- Detach the menu from the widget it was attached to
+  //- (calls the passed {\var detacher} function)
+  WRAP_METHOD(void gtk_menu_detach(GtkMenu*),
+	      void detach());
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/menushell_p.h>
+IMPL_START;
+#include <gtk/gtkdnd.h>
+#include <gtk--/accelgroup.h>
+
+namespace Gtk
+{
+
+void 
+Menu::popup                        (GtkMenuPositionFunc func,
+				      gpointer data,
+				      guint button,
+				      guint32 activate_time)
+  {
+    gtk_menu_popup(gtkobj(), 0, 0,
+		   func, data, button, activate_time);
+  }
+
+void
+Menu::popup                        ( guint button,
+                                      guint32 activate_time)
+  {
+    gtk_menu_popup(gtkobj(), 0, 0, 0, 0, button, activate_time);
+  }
+
+
+#if GTK_VERSION_GT_MICRO(1,2,0)
+AccelGroup*
+Menu::get_uline_accel_group() const
+  {
+    return wrap((GtkAccelGroup*)(gtk_menu_get_uline_accel_group(const_cast<GtkMenu*>(gtkobj()))));
+  }
+
+AccelGroup*
+Menu::ensure_uline_accel_group() const
+  {
+    return wrap((GtkAccelGroup*)(
+				 gtk_menu_ensure_uline_accel_group(const_cast<GtkMenu*>(gtkobj()))
+				 ));
+  }
+#endif
+
+void
+Menu::reorder_child(const MenuItem &child, gint position)
+  {
+    gtk_menu_reorder_child(gtkobj(),
+			   const_cast<GtkWidget*>(GTK_WIDGET(child.gtkobj())),
+			   position);
+  }
+
+} /* namespace Gtk */
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Menu)
+//. name: parent_menu_item
+//. type: Gtk_Widget*
+//. get: none
+//. set: {popup()}
+//. desc:
+
+//. name: accel_group
+//. type: GtkAccelGroup*
+//. get:
+//. set: {set_accel_group()}
+//. desc:
+
+//. name: position_func
+//. type: GtkMenuPositionFunc
+//. get: none
+//. set: {popup()}
+//. desc: A function taking a GtkMenu* ({\b NOTE! NOT a Gtk_Menu!}),
+//. pointers to x and y gint coordinates and a pointer to some user
+//. data. The function should set x and y to where the menu will be
+//. positioned on the screen
+
+//. name: position_func_data
+//. type: gpointer
+//. get: none
+//. set: {popup()}
+//. desc: user data which will be passed to {position_func}
+
+//. name: torn_off
+//. type: bool
+//. get: none
+//. set: {set_tearoff_state()}
+//. desc: Whether the menu is torn off (detached) or not.
+

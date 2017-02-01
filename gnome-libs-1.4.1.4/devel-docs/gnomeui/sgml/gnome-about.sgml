@@ -1,0 +1,193 @@
+<refentry id="GnomeAbout">
+<refmeta>
+<refentrytitle>GnomeAbout</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeAbout</refname><refpurpose>Simple way to provide an About box for your application.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeAbout-struct">GnomeAbout</link>;
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="gnome-about-new">gnome_about_new</link>                 (const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> *version,
+                                             const <link linkend="gchar">gchar</link> *copyright,
+                                             const <link linkend="gchar">gchar</link> **authors,
+                                             const <link linkend="gchar">gchar</link> *comments,
+                                             const <link linkend="gchar">gchar</link> *logo);
+void        <link linkend="gnome-about-construct">gnome_about_construct</link>           (<link linkend="GnomeAbout">GnomeAbout</link> *about,
+                                             const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> *version,
+                                             const <link linkend="gchar">gchar</link> *copyright,
+                                             const <link linkend="gchar">gchar</link> **authors,
+                                             const <link linkend="gchar">gchar</link> *comments,
+                                             const <link linkend="gchar">gchar</link> *logo);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----<link linkend="GtkWidget">GtkWidget</link>
+         +----<link linkend="GtkContainer">GtkContainer</link>
+               +----<link linkend="GtkBin">GtkBin</link>
+                     +----<link linkend="GtkWindow">GtkWindow</link>
+                           +----<link linkend="GnomeDialog">GnomeDialog</link>
+                                 +----GnomeAbout
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+A standard way of providing a small about box for your application.
+You provide the name of your application, version, copyright, a list
+of authors and some comments about your application.  It also allows
+the programmer to provide a logo to be displayed.
+</para>
+
+<para>The following is a simple example of its use, note that the descriptive
+text is surrounded by the <link linkend="gettext-macro">_</link>(). This
+will have the text translated to the the user's language at runtime.</para>
+
+<informalexample>
+ <programlisting>
+const gchar *authors[] = {
+   "Wanda the sexy fish",
+   NULL
+  };
+gtk_widget_show (gnome_about_new ("Gnome Wizit", VERSION,
+                 "Copyright 1999 Gnome Programming Inc.",
+                  (const gchar **) authors,
+                 _("The gnome wizit is the most fabulous thing ever "
+                   "written for the GNOME desktop environment. You must "
+                   "use this everyday."),
+                   NULL));
+ </programlisting>
+</informalexample>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeAbout-struct">struct GnomeAbout</title>
+<programlisting>struct GnomeAbout;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-about-new">gnome_about_new ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  gnome_about_new                 (const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> *version,
+                                             const <link linkend="gchar">gchar</link> *copyright,
+                                             const <link linkend="gchar">gchar</link> **authors,
+                                             const <link linkend="gchar">gchar</link> *comments,
+                                             const <link linkend="gchar">gchar</link> *logo);</programlisting>
+<para>
+Creates a new GNOME About dialog.  <parameter>title</parameter>, <parameter>version</parameter>,
+<parameter>copyright</parameter>, and <parameter>authors</parameter> are displayed first, in that order.
+<parameter>comments</parameter> is typically the location for multiple lines of text, if
+necessary.  (Separate with "\n".)  <parameter>logo</parameter> is the filename of a
+optional pixmap to be displayed in the dialog, typically a product or
+company logo of some sort; set to <literal>NULL</literal> if no logo file is available.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> Name of app.
+</entry></row>
+<row><entry align="right"><parameter>version</parameter>&nbsp;:</entry>
+<entry> version number
+</entry></row>
+<row><entry align="right"><parameter>copyright</parameter>&nbsp;:</entry>
+<entry> copyright string
+</entry></row>
+<row><entry align="right"><parameter>authors</parameter>&nbsp;:</entry>
+<entry> <literal>NULL</literal> terminated list of authors
+</entry></row>
+<row><entry align="right"><parameter>comments</parameter>&nbsp;:</entry>
+<entry> Other comments
+</entry></row>
+<row><entry align="right"><parameter>logo</parameter>&nbsp;:</entry>
+<entry> a logo pixmap file.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+&amp;GtkWidget pointer to new dialog
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-about-construct">gnome_about_construct ()</title>
+<programlisting>void        gnome_about_construct           (<link linkend="GnomeAbout">GnomeAbout</link> *about,
+                                             const <link linkend="gchar">gchar</link> *title,
+                                             const <link linkend="gchar">gchar</link> *version,
+                                             const <link linkend="gchar">gchar</link> *copyright,
+                                             const <link linkend="gchar">gchar</link> **authors,
+                                             const <link linkend="gchar">gchar</link> *comments,
+                                             const <link linkend="gchar">gchar</link> *logo);</programlisting>
+<para>
+Constructs a new GNOME About dialog, given an object
+<parameter>about</parameter> newly created via the Gtk type system.  <parameter>title</parameter>, <parameter>version</parameter>,
+<parameter>copyright</parameter>, and <parameter>authors</parameter> are displayed first, in that order.
+<parameter>comments</parameter> is typically the location for multiple lines of text, if
+necessary.  (Separate with "\n".)  <parameter>logo</parameter> is the filename of a
+optional pixmap to be displayed in the dialog, typically a product or
+company logo of some sort; set to <literal>NULL</literal> if no logo file is available.
+</para>
+<para>
+Note:
+Only for use by bindings to languages other than C; don't use
+in applications.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>about</parameter>&nbsp;:</entry>
+<entry> Pointer to new GNOME about object
+</entry></row>
+<row><entry align="right"><parameter>title</parameter>&nbsp;:</entry>
+<entry> Name of app.
+</entry></row>
+<row><entry align="right"><parameter>version</parameter>&nbsp;:</entry>
+<entry> version number
+</entry></row>
+<row><entry align="right"><parameter>copyright</parameter>&nbsp;:</entry>
+<entry> copyright string
+</entry></row>
+<row><entry align="right"><parameter>authors</parameter>&nbsp;:</entry>
+<entry> <literal>NULL</literal> terminated list of authors
+</entry></row>
+<row><entry align="right"><parameter>comments</parameter>&nbsp;:</entry>
+<entry> Other comments
+</entry></row>
+<row><entry align="right"><parameter>logo</parameter>&nbsp;:</entry>
+<entry> a logo pixmap file.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

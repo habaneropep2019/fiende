@@ -1,0 +1,171 @@
+<refentry id="gnome-gnome-history">
+<refmeta>
+<refentrytitle>gnome-history</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-history</refname><refpurpose>Keeping track of recently used documents.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeHistoryEntry">GnomeHistoryEntry</link>;
+void        <link linkend="gnome-history-recently-used">gnome_history_recently_used</link>     (char *filename,
+                                             char *filetype,
+                                             char *creator,
+                                             char *desc);
+<link linkend="GList">GList</link>*      <link linkend="gnome-history-get-recently-used">gnome_history_get_recently_used</link> (void);
+void        <link linkend="gnome-history-free-recently-used-list">gnome_history_free_recently_used_list</link>
+                                            (<link linkend="GList">GList</link> *alist);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+These functions provide ways to store and retrieve a list of
+recently used documents.  Applications need to call the
+<link linkend="gnome-history-recently-used">gnome_history_recently_used</link>() routine with the proper arguments to
+register a file as having been recently used.  The creator field
+should be an action in the format supported by the "open" MIME type
+action (for example "program <literal>f</literal>", or "program") to re-open the
+document.</para>
+
+<para>In the following example, the file
+<filename>sales.gnumeric</filename> will be added to the history
+of visited documents, the MIME type of the file is
+"application/x-gnumeric" and the program that will open this file is
+"gnumeric".  Finally, note that the descriptive information is
+surrounded by the <link linkend="gettext-macro">_</link>() macro to have this item translated to the user's
+language at runtime.</para>
+
+<informalexample>
+  <programlisting>
+gnome_history_recently_used ("sales.gnumeric", 
+                             "application/x-gnumeric",
+                             "gnumeric",
+                             _("Load spreadsheet"));
+  </programlisting>
+</informalexample>
+
+<para>The following example would keep track of recent talks with a
+user:</para>
+
+<informalexample>
+  <programlisting>
+void record_talk (char *user)
+{
+    char *message = g_strdup_printf (_("Talk to <literal>s</literal>", user);
+
+    gnome_history_recently_used (user, "x-protocol/x-talk",
+                                 "gtalk", message);
+    g_free (message);
+}
+  </programlisting>
+</informalexample>
+
+<para>To retrieve items from the history, you use the
+<link linkend="gnome-history-get-recently-used">gnome_history_get_recently_used</link>() function which returns a GList that
+contains <structname>GnomeHistoryEntry</structname> structures.  To
+release this list, call the
+<link linkend="gnome-history-free-recently-used-list">gnome_history_free_recently_used_list</link>().</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeHistoryEntry">struct GnomeHistoryEntry</title>
+<programlisting>struct GnomeHistoryEntry
+{
+	char *filename;		/* Name of the visited file. */
+	char *filetype;		/* MIME type of the visited file.  */
+	char *creator;		/* What program created the file.  */
+	char *desc;		/* Description of what choosing this
+				   item would do.  This is some
+				   explanatory text that might be
+				   presented to the user.  */
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-history-recently-used">gnome_history_recently_used ()</title>
+<programlisting>void        gnome_history_recently_used     (char *filename,
+                                             char *filetype,
+                                             char *creator,
+                                             char *desc);</programlisting>
+<para>
+This routine is used to keep track of recently used file within the
+GNOME desktop.  <parameter>filename</parameter> is the file that was recently used or
+just created.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>filename</parameter>&nbsp;:</entry>
+<entry> the file name that was recently used.
+</entry></row>
+<row><entry align="right"><parameter>filetype</parameter>&nbsp;:</entry>
+<entry> the mime-type of the file used.
+</entry></row>
+<row><entry align="right"><parameter>creator</parameter>&nbsp;:</entry>
+<entry> application that created this.
+</entry></row>
+<row><entry align="right"><parameter>desc</parameter>&nbsp;:</entry>
+<entry> textual description of the application creator
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-history-get-recently-used">gnome_history_get_recently_used ()</title>
+<programlisting><link linkend="GList">GList</link>*      gnome_history_get_recently_used (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a GList with GnomeHistoryEntry structures with
+all of the recently used documents.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-history-free-recently-used-list">gnome_history_free_recently_used_list ()</title>
+<programlisting>void        gnome_history_free_recently_used_list
+                                            (<link linkend="GList">GList</link> *alist);</programlisting>
+<para>
+Releases the list of recently used documents</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>alist</parameter>&nbsp;:</entry>
+<entry> a list with the recently used documents
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

@@ -1,0 +1,199 @@
+<refentry id="gnomeui-gnome-icon-text">
+<refmeta>
+<refentrytitle>gnome-icon-text</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-icon-text</refname><refpurpose>Text wrapping functions for icon captions.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeIconTextInfoRow">GnomeIconTextInfoRow</link>;
+struct      <link linkend="GnomeIconTextInfo">GnomeIconTextInfo</link>;
+<link linkend="GnomeIconTextInfo">GnomeIconTextInfo</link>* <link linkend="gnome-icon-layout-text">gnome_icon_layout_text</link>   (<link linkend="GdkFont">GdkFont</link> *font,
+                                             char *text,
+                                             char *separators,
+                                             int max_width,
+                                             int confine);
+void        <link linkend="gnome-icon-paint-text">gnome_icon_paint_text</link>           (<link linkend="GnomeIconTextInfo">GnomeIconTextInfo</link> *ti,
+                                             <link linkend="GdkDrawable">GdkDrawable</link> *drawable,
+                                             <link linkend="GdkGC">GdkGC</link> *gc,
+                                             int x,
+                                             int y,
+                                             <link linkend="GtkJustification">GtkJustification</link> just);
+void        <link linkend="gnome-icon-text-info-free">gnome_icon_text_info_free</link>       (<link linkend="GnomeIconTextInfo">GnomeIconTextInfo</link> *ti);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+  <para>
+    This module implements a generic and simple interface for wrapping
+    text and painting it to a drawable.  It is used by the
+    <structname>GnomeIconTextItem</structname> object to perform word
+    wrapping for icon text captions.
+  </para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeIconTextInfoRow">struct GnomeIconTextInfoRow</title>
+<programlisting>typedef struct {
+	char *text;
+	int width;
+	GdkWChar *text_wc;	/* text in wide characters */
+	int text_length;	/* number of characters */
+} GnomeIconTextInfoRow;
+</programlisting>
+  <para>
+    This structure defines a row of text in the list of wrapped text
+    rows of the <structname>GnomeIconTextInfo</structname> structure.
+    The <structfield>text</structfield> field contains the text that
+    fits in that row, and <structfield>width</structfield> contains
+    the width in pixels of that text, calculated with respect to the
+    font that was used to format the text.
+  </para></refsect2>
+<refsect2>
+<title><anchor id="GnomeIconTextInfo">struct GnomeIconTextInfo</title>
+<programlisting>typedef struct {
+	GList *rows;
+	GdkFont *font;
+	int width;
+	int height;
+	int baseline_skip;
+} GnomeIconTextInfo;
+</programlisting>
+  <para>
+    This structure contains the information about a wrapped text
+    string.  The <structfield>rows</structfield> field is a list of
+    <structname>GnomeIconTextInfoRow</structname> structures with the
+    final rows of text.  The <structfield>width</structfield>,
+    <structfield>height</structfield>, and
+    <structfield>baseline_skip</structfield> fields contain the total
+    width, total height, and baseline height of the text in pixels,
+    respectively.
+  </para></refsect2>
+<refsect2>
+<title><anchor id="gnome-icon-layout-text">gnome_icon_layout_text ()</title>
+<programlisting><link linkend="GnomeIconTextInfo">GnomeIconTextInfo</link>* gnome_icon_layout_text   (<link linkend="GdkFont">GdkFont</link> *font,
+                                             char *text,
+                                             char *separators,
+                                             int max_width,
+                                             int confine);</programlisting>
+<para>
+Creates a new &amp;GnomeIconTextInfo structure by wrapping the specified
+text.  If non-NULL, the <parameter>separators</parameter> argument defines a set of characters
+to be used as word delimiters for performing word wrapping.  If it is
+NULL, then only spaces will be used as word delimiters.
+</para>
+<para>
+The <parameter>max_width</parameter> argument is used to specify the width at which word
+wrapping will be performed.  If there is a very long word that does not
+fit in a single line, the <parameter>confine</parameter> argument can be used to specify
+whether the word should be unconditionally split to fit or whether
+the maximum width should be increased as necessary.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>font</parameter>&nbsp;:</entry>
+<entry>       Name of the font that will be used to render the text.
+</entry></row>
+<row><entry align="right"><parameter>text</parameter>&nbsp;:</entry>
+<entry>       Text to be formatted.
+</entry></row>
+<row><entry align="right"><parameter>separators</parameter>&nbsp;:</entry>
+<entry> Separators used for word wrapping, can be NULL.
+</entry></row>
+<row><entry align="right"><parameter>max_width</parameter>&nbsp;:</entry>
+<entry>  Width in pixels to be used for word wrapping.
+</entry></row>
+<row><entry align="right"><parameter>confine</parameter>&nbsp;:</entry>
+<entry>    Whether it is mandatory to wrap at <parameter>max_width</parameter>.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> A newly-created &amp;GnomeIconTextInfo structure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-icon-paint-text">gnome_icon_paint_text ()</title>
+<programlisting>void        gnome_icon_paint_text           (<link linkend="GnomeIconTextInfo">GnomeIconTextInfo</link> *ti,
+                                             <link linkend="GdkDrawable">GdkDrawable</link> *drawable,
+                                             <link linkend="GdkGC">GdkGC</link> *gc,
+                                             int x,
+                                             int y,
+                                             <link linkend="GtkJustification">GtkJustification</link> just);</programlisting>
+<para>
+Paints the formatted text in the icon text info structure onto a drawable.
+This is just a sample implementation; applications can choose to use other
+rendering functions.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>ti</parameter>&nbsp;:</entry>
+<entry>       An icon text info structure.
+</entry></row>
+<row><entry align="right"><parameter>drawable</parameter>&nbsp;:</entry>
+<entry> Target drawable.
+</entry></row>
+<row><entry align="right"><parameter>gc</parameter>&nbsp;:</entry>
+<entry>       GC used to render the string.
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>        Left coordinate for text.
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry>        Upper coordinate for text.
+</entry></row>
+<row><entry align="right"><parameter>just</parameter>&nbsp;:</entry>
+<entry>     Justification for text.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-icon-text-info-free">gnome_icon_text_info_free ()</title>
+<programlisting>void        gnome_icon_text_info_free       (<link linkend="GnomeIconTextInfo">GnomeIconTextInfo</link> *ti);</programlisting>
+<para>
+Frees a &amp;GnomeIconTextInfo structure.  You should call this instead of
+freeing the structure yourself.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>ti</parameter>&nbsp;:</entry>
+<entry> An icon text info structure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+  <para>
+    <link linkend="GnomeIconTextItem">GnomeIconTextItem</link>
+  </para>
+</refsect1>
+
+</refentry>

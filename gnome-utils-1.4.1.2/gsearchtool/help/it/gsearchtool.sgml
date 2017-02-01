@@ -1,0 +1,508 @@
+<!DOCTYPE article PUBLIC "-//GNOME//DTD DocBook PNG Variant V1.1//EN"[
+]>
+
+<article id="index" lang="it">
+
+
+  <artheader> 
+  <title>Manuale del Cerca File di GNOME</title>
+    <copyright>
+      <year>2000</year>
+      <holder>Alexander Kirillov</holder>
+    </copyright>
+
+	<copyright>
+      <year>2000</year>
+      <holder>Giovanni Bortolozzo (traduzione in italiano)</holder>
+    </copyright>
+
+    <legalnotice id="legalnotice">
+      <para>
+        Permission is granted to copy, distribute and/or modify this
+        document under the terms of the <ulink type="help"
+        url="gnome-help:fdl"><citetitle>GNU Free Documentation
+        License</citetitle></ulink>, Version 1.1 or any later version
+        published by the Free Software Foundation with no Invariant
+        Sections, no Front-Cover Texts, and no Back-Cover Texts. You
+        may obtain a copy of the <citetitle>GNU Free Documentation
+        License</citetitle> from the Free Software Foundation by
+        visiting <ulink type="http" url="http://www.fsf.org">their Web
+        site</ulink> or by writing to: Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+      </para>
+
+   <para>
+    Many of the names used by companies to distinguish their products and
+    services are claimed as trademarks. Where those names appear in any
+    GNOME documentation, and those trademarks are made aware to the members
+    of the GNOME Documentation Project, the names have been printed in caps
+    or initial caps.
+   </para>
+    </legalnotice>
+  </artheader>
+
+  <sect1 id="intro">
+    <title>Introduzione</title> 
+
+    <para>
+       Il <application>Cerca File di GNOME</application> è un'utilità
+       per cercare i file nel proprio sistema. Può effettuare molti
+       tipi di ricerca: per nome di file, per data di modifica, per
+       contenuto del file, ecc. È incluso nel pacchetto
+       <filename>gnome-utils</filename>, che fa parte dell'ambiente
+       desktop GNOME. Questo documento descrive la versione 1.2
+       dell'applicazione <application>Cerca File di
+       GNOME</application>.
+    </para>
+
+    <para> Il programma può essere avviato selezionando
+	  <guimenuitem>Cerca file</guimenuitem> nel sottomenu
+	  <guimenu>Utilità</guimenu> del <guimenu>Menu
+	  principale</guimenu>, oppure lanciando il comando
+	  <command>gsearchtool</command> da riga di comando.  </para>
+
+    <para>
+      Si noti che il <application>Cerca File di GNOME</application> è
+      semplicemente un'interfaccia ai comandi UNIX
+      <command>find</command>, <command>grep</command> e
+      <command>locate</command>. Questi comandi sono estremamente
+      potenti, ma non molto facili da usare, specie per un nuovo
+      utente. Il <application>Cerca File di GNOME</application>
+      fornisce un'interfaccia semplice per gli usi più comuni di
+      questi comandi. Se si debbono effettuare alcuni tipi di ricerca
+      che non sono gestiti dal <application>Cerca File di
+      GNOME</application>, è probabile che li si debba fare da riga di
+      comando utilizzando <command>find</command> e
+      <command>grep</command> con le opzioni appropriate. In questo
+      caso si dovrebbero leggere le pagine info di questi comandi, ad
+      esempio utilizzando la <application>Guida di
+      GNOME</application>.
+    </para>
+    </sect1>
+
+  <sect1 id="usage"> 
+    <title>Uso</title>
+    <para>
+    Il <application>Cerca File di GNOME</application> mette a
+    disposizione due tipi di ricerca: la <emphasis>Ricerca
+    completa</emphasis> e la <emphasis>Ricerca veloce</emphasis>. La
+    ricerca completa è affidabile e fornisce molte possibilità, ma può
+    essere lenta. La ricerca veloce usa una tecnica speciale per
+    velocizzare la ricerca; è molto più veloce ma può cercare i file
+    solo in base al nome e non è così accurata come la ricerca
+    completa. Questa sezione descrive la modalità di ricerca completa;
+    la ricerca veloce è descritta nel<xref linkend="locate">.
+    </para>
+
+<figure id="mainwin">
+ <title>Finestra principale di ricerca</title>
+ <screenshot>
+  <screeninfo>Finestra principale di ricerca</screeninfo>
+  <graphic format="png"  fileref="figures/mainwin.png" srccredit="borto">
+  </graphic>
+ </screenshot>
+</figure>
+
+    <para> Per avviare una ricerca, si deve dare al <application>Cerca
+      File di GNOME</application> il criterio di ricerca e la
+      directory da cui partire.  </para>
+
+   <para> Per default, la ricerca parte nella directory di lavoro
+      corrente; se il <application>Cerca File di GNOME</application>
+      è stato avviato da menu, allora la directory di lavoro corrente
+      sarà la propria home directory. Si può modificare la directory
+      di partenza inserendo un percorso valido nel campo
+      <guilabel>Comincia nella directory</guilabel>, oppure scegliendo
+      una directory usando il pulsante
+      <guibutton>Sfoglia...</guibutton>. Per esempio, per cercare
+      attraverso tutti i file nel proprio sistema si inserisca
+      <filename>/</filename> in questo campo (attenzione: questa
+      operazione durerà <emphasis>molto</emphasis> tempo).  </para>
+
+   <para> Per default, il <application>Cerca File di
+      GNOME</application> cerca inoltre attraverso tutte le
+      sottodirectory della directory specificata; si può disabilitare
+      questo comportamento attivando l'opzione <guilabel>Non cercare
+      nelle sottodirectory</guilabel>. Per un controllo più fine si
+      può abilitare l'opzione <guilabel>Non cercare nei filesystem
+      montati</guilabel>, che escluderà dalla ricerca le
+      sottodirectory che sono fisicamente presenti (montate) su
+      dischi o partizioni diverse da quella della directory di
+      partenza &mdash; si veda <xref linkend="criteria"> per i
+      dettagli. 
+    </para>
+
+   <para> Il solo criterio di ricerca mostrato per default è per
+      <guilabel>Nome file</guilabel>. In questo campo si possono usare
+      i caratteri jolly <keysym>*</keysym> (corrisponde a qualsiasi
+      sequenza di simboli, compreso quella vuota) e <keysym>?</keysym>
+      (corrisponde a un qualsiasi simbolo). Per esempio, per trovare i
+      file con estensione <filename>txt</filename>, si inserisca
+      <userinput>*.txt</userinput> in questo campo; per trovare tutti
+      i file che cominciano con la lettera D, si inserisca
+      <userinput>D*</userinput> (attenzione: i nomi dei file sono
+      sensibili alle maiuscole/minuscole!). Si possono anche
+      specificare criteri di ricerca più complicati &mdash; si veda
+      <xref linkend="criteria">.
+   </para>
+   
+   <para>
+      Dopo aver specificato il criterio di ricerca e la directory di
+      partenza, si prema <guibutton>Cerca</guibutton>. Ci metterà un
+      po' di tempo (quanto tempo dipende dalla dimensione della
+      directory e dalla velocità del sistema), dopo il quale sarà
+      mostrata una finestra contenente la lista di tutti i file che
+      corrispondono al proprio criterio (potrebbe essere vuota), tipo
+      quella mostrata in <xref linkend="results">. Se la ricerca ci
+      mette troppo tempo, la si può bloccare premendo il pulsante
+      <guibutton>Interrompi</guibutton>. 
+   </para>
+
+<figure id="results">
+ <title>Finestra dei risultati della ricerca</title>
+ <screenshot>
+  <screeninfo>Finestra dei risultati della ricerca</screeninfo>
+  <graphic format="png"  fileref="figures/results.png" srccredit="borto">
+  </graphic>
+ </screenshot>
+</figure>
+
+   <para> Nella finestra dei risultati della ricerca, cliccando due
+      volte su un qualsiasi file lo si può aprire. Si otterrà lo
+      stesso effetto che cliccando due volte sullo stesso file in un
+      File Manager &mdash; cioè, il file è aperto usando l'azione
+      predefinita per questo tipo di file. Premendo sul pulsante
+      <guibutton>Salva</guibutton> si può anche salvare su disco la
+      lista dei file trovati. Verrà chiesto di specificare il nome del
+      file nel quale salvare la lista; la lista sarà salvata in
+      normale formato testo.
+    </para> 
+    </sect1>
+      
+  <sect1 id="criteria">
+    <title>Criteri di ricerca</title> 
+
+    <para> Oltre alla semplice ricerca per nome di file descritta in
+      precedenza, il <application>Cerca File di GNOME</application>
+      permette di specificare altri criteri. Per farlo, si dovrà
+      selezionare nella lista a scomparsa (presente a sinistra del
+      pulsante <guibutton>Aggiungi</guibutton>) il tipo di criterio
+      appropriato, e di seguito premere su
+      <guibutton>Aggiungi</guibutton>. Ciò aggiungerà il criterio a
+      quelli già esistenti. Il <application>Cerca File di
+      GNOME</application> cercherà i file che corrispondono a 
+      <emphasis>tutti</emphasis> i criteri specificati. Per esempio, la
+      <xref linkend="sample"> mostra la ricerca di tutti i file con
+      estensione <filename>txt</filename> modificati negli ultimi 7
+      giorni e che contengono al loro interno la parola GNOME.
+    </para>
+ 
+    <figure id="sample">
+     <title>Sessione d'esempio del Cerca File</title>
+     <screenshot>
+      <screeninfo>Sessione d'esempio del Cerca File</screeninfo>
+      <graphic format="png" fileref="figures/gsearch.png" srccredit="borto">
+      </graphic>
+    </screenshot>
+   </figure>
+
+    <para>
+      È possibile rimuovere uno qualsiasi dei criteri aggiunti in
+      precedenza premendo sul pulsante <guibutton>Rimuovi</guibutton>
+      a fianco del criterio. È anche possibile disabilitare
+      temporaneamente un criterio disattivando l'opzione
+      <guibutton>Abilita</guibutton> al suo fianco.
+    </para>
+
+    <para> 
+      Di seguito un elenco di tutti i possibili tipi di criterio:
+      <itemizedlist>
+	<listitem><para> 
+	    <emphasis>Nome file</emphasis>  &mdash; cerca per nome di
+	    file. Come al solito, è possibile usare nella ricerca i
+	    caratteri jolly * e ?. Si ricordi inoltre che i nomi dei file
+	    in UNIX sono sensibili alle maiuscole/minuscole.
+	</para></listitem>
+
+	<listitem>
+          <para> <emphasis>Non cercare nelle sottodirectory</emphasis>
+           &mdash; se è selezionata questa opzione, il
+           <application>Cerca File di GNOME</application> non cercherà
+           i file nelle sottodirectory della directory di partenza.
+	  </para>
+	</listitem>
+
+	<listitem><para> 
+	    <emphasis>Proprietario del file</emphasis>  &mdash; cerca
+	    secondo il nome dell'utente che possiede il file.
+	</para></listitem>
+
+	<listitem><para> 
+	    <emphasis>Gruppo del file</emphasis>  &mdash; cerca secondo il
+	    nome del gruppo proprietario del file.
+	</para></listitem>
+
+	<listitem><para> 
+	    <emphasis>Data/ora dell'ultima modifica</emphasis>  &mdash;
+	    cerca i file che sono stati modificati durante gli ultimi N
+	    giorni (per essere più precisi, durante le ultime N*24 ore). 
+	</para></listitem>
+
+	<listitem><para> <emphasis>Non cercare nei filesystem
+	  montati</emphasis> &mdash; se è selezionata questa opzione il 
+	  <application>Cerca File di GNOME</application> cercherà
+	  solamente nelle sottodirectory che sono montate nello stesso
+	  dispositivo (disco) della directory di partenza. Per esempio, se
+	  la directory di partenza è <filename>/</filename> ed è montata
+	  su <filename>/dev/hda</filename> (il primo disco fisso), e ha
+	  una sottodirectory <filename>/home</filename> che è montata su
+	  <filename>/dev/hdb</filename> (il secondo disco fisso), allora
+	  non sarà fatta la ricerca dentro a
+	  <filename>/home</filename>. Questa opzione può essere utile per
+	  escludere dalla ricerca file su supporti removibili (CD-ROM,
+	  floppy). 
+	  </para></listitem>
+
+	<listitem>
+	  <para> <emphasis>File vuoto</emphasis> &mdash; questo criterio
+	    è verificato solo se il file è vuoto. Usato principalmente
+	    dagli amministratori di sistema per la manutenzione del
+	    sistema. 
+	  </para></listitem>
+
+	<listitem><para> 
+	  <emphasis>Utente o gruppo non valido</emphasis> &mdash; cerca i
+	  file il cui proprietario o gruppo non è valido nel
+	  sistema. Questa opzione può essere utile quando si cercano file
+	  appartenenti ad utenti che sono stati rimossi dal sistema. Usata
+	  principalmente dagli amministratori di sistema per la manutenzione del
+	    sistema.
+	</para></listitem>
+
+	<listitem>
+	  <para> 
+	    <emphasis>Nomi dei file eccetto</emphasis> &mdash;
+	    corrisponde a tutti i file eccetto quelli il cui nome è qui
+	    specificato. Come prima, si possono usare i caratteri
+	    jolly. Per esempio, se in questo campo si specifica
+	    <filename>*~</filename>, il <application>Cerca File di
+	    GNOME</application> escluderà dalla ricerca tutti i file il
+	    cui nome finisce con tilde (~).
+	  </para>
+	</listitem>
+
+	<listitem>
+      <para> <emphasis>Ricerca semplice di sottostringa</emphasis>
+        &mdash; corrisponde a tutti i file che
+        <emphasis>contengono</emphasis> la sottostringa
+        specificata. Poiché questa opzione implica la lettura del
+        contenuto di ogni file, può rallentare notevolmente la
+        ricerca. Nota: in questa opzione non si possono usare
+        caratteri jolly.  </para></listitem>
+
+	<listitem><para> <emphasis>Ricerca espressione regolare</emphasis>
+	  &mdash; corrisponde a tutti i file che
+	  <emphasis>contengono</emphasis> l'espressione regolare
+	  specificata. Poiché questa opzione implica la lettura del
+	  contenuto di ogni file, può rallentare notevolmente la ricerca.
+	  </para></listitem>
+
+	<listitem>
+	  <para> <emphasis>Ricerca espressione regolare estesa</emphasis>
+	    &mdash; corrisponde a tutti i file che
+	    <emphasis>contengono</emphasis> l'espressione regolare estesa
+	    specificata. Poiché questa opzione implica la lettura del
+	    contenuto di ogni file, può rallentare notevolmente la
+	    ricerca.
+          </para>
+	</listitem>
+
+      </itemizedlist>
+
+      Per quanti non hanno familiarità con la nozione di espressione
+      regolare, diremo semplicemente che è una sintassi estremamente
+      flessibile e potente per il pattern matching (ricerca di
+      occorrenze di modelli di stringhe). Diversamente dalla semplice
+      corrispondenza tramite i caratteri jolly, permette l'utilizzo di
+      operazioni logiche (and, or, not), elenchi di simboli da
+      cercare, controllo che la stringa sia all'inizio della riga e
+      molto altro. Una descrizione dettagliata delle espressioni
+      regolari e delle espressioni regolari estese può essere trovata
+      nella <ulink type="man" url="man:grep">pagina di manuale</ulink>
+      di <application>grep</application>. I nuovi utenti probabilmente
+      le troveranno troppo complicate da usare, ma per gli utenti con
+      più esperienza, le espressioni regolari possono essere molto
+      utili.
+    </para>
+  </sect1>
+
+  <sect1 id="locate">
+    <title>Modalità di ricerca veloce</title>
+    <para> 
+      Questa sezione descrive la modalità di ricerca veloce del
+    <application>Cerca File di GNOME</application>. Per usare questa
+    modalità. si passi alla finestra <guilabel>Ricerca veloce
+    (locate)</guilabel>, mostrata in <xref linkend="locatewin">. 
+      </para>
+
+    <figure id="locatewin">
+     <title>Finestra Ricerca veloce</title>
+     <screenshot>
+      <screeninfo>Finestra Ricerca veloce</screeninfo>
+      <graphic format="png" fileref="figures/locate.png" srccredit="borto">
+      </graphic>
+    </screenshot>
+   </figure>
+
+    <para> Nella modalità di ricerca veloce, il <application>Cerca
+      File di GNOME</application> non fa realmente la ricerca di un
+      file nel disco &mdash; piuttosto usa un database speciale
+      contenente i nomi di tutti i file nel sistema. Ciò rende la
+      ricerca molto più veloce. Comunque, significa anche che la sola
+      ricerca che si può fare è per nome di file. Inoltre, questa
+      ricerca non troverà i file che sono stati aggiunti al sistema
+      dopo l'ultimo aggiornamento del database (nella maggior parte
+      dei sistemi è aggiornato ogni giorno, solitamente di notte
+      &mdash; si veda nel seguito per maggiori informazioni).
+    </para>
+    <para> Per cercare un file usando la modalità di ricerca veloce,
+      si inserisca semplicemente una sottostringa del nome del file
+      nel campo <guilabel>Trova il file</guilabel>. Per esempio, per
+      trovare tutti i file i cui nomi contengano la stringa
+      <quote>searchtool</quote>, si inserisca
+      <userinput>searchtool</userinput> in questo campo. In questo
+      modo si troveranno anche tutti i file che contengono la stringa 
+      <quote>searchtool</quote> nel loro percorso &mdash; in
+      particolare, tutti i file in <filename
+      class="directory">/usr/share/help/gsearchtool</filename>.
+    </para>
+    <para> Per restringere la ricerca ad una sottodirectory, si può
+      usare il nome della directory assieme con i caratteri jolly. Per
+      esempio, per fare una ricerca veloce di tutti i file con
+      estensione <filename>txt</filename> nella directory <filename
+      class="directory">/home/user</filename>, si inserisca <userinput>
+      /home/user/*.txt</userinput> nel campo <guilabel>Trova il
+      file</guilabel>. 
+    </para>
+
+    <para>La modalità di ricerca veloce è in realtà un'interfaccia al
+      comando <command>locate</command>, quindi se sono necessarie
+      informazioni più dettagliate si faccia riferimento
+      all'appropriata <ulink type="man" url="man:locate">pagina di
+      manuale</ulink>.  
+    </para>
+    <sect2 id="locatedb">
+      <title>Il database di locate</title>
+      <para>
+	Questa sezione discute l'aggiornamento del database utilizzato per
+	la ricerca veloce. A meno che non si sia un amministratore di
+	sistema o semplicemente curiosi, non è essenziale leggerla.
+      </para>
+      <para>
+	Nella maggior parte dei sistemi, il database utilizzato per il
+	comando <command>locate</command> (e quindi per la modalità di
+	ricerca veloce del <application>Cerca File di
+	GNOME</application>), è aggiornato ogni giorno, solitamente di
+	notte. Ciò viene fatto da un job di <command>cron</command>
+	&mdash; si veda la <ulink type="man"
+	url="man:cron">pagina di manuale</ulink> di
+	<command>cron</command> se non si ha familiarità con questo
+	comando. Si noti che se il proprio computer solitamente viene 
+	spento di notte, il database non viene aggiornato. In questo caso,
+	si dovrebbe cambiare l'orario di aggiornamento predefinito
+	modificando manualmente <filename>/etc/crontab</filename> oppure
+	utilizzando uno strumento grafico come
+	<application>cromagnon</application>. Questa operazione necessità
+	dei privilegi dell'amministratore di sistema (root).
+      </para>
+
+      <para>È anche possibile dare il comando <quote>Aggiorna adesso
+      il database</quote> lanciando il comando
+      <command>updatedb</command>. Anche questa operazione richiede i
+      privilegi dell'amministratore di sistema (root). Senza alcuna
+      opzione, ricrea l'intero database, per tutti i file nel proprio
+      sistema. Inoltre possiede molte opzioni da riga di comando per
+      regolare il funzionamento (per esempio, è possibile istruirlo
+      per saltare alcune directory). Per maggiori informazioni si
+      legga la <ulink type="man" url="man:updatedb">pagina di
+      manuale</ulink> di <command>updatedb</command>.
+      </para>
+    </sect2>
+
+
+    </sect1>
+
+  <sect1 id="authors">
+    <title>Autori</title>
+     <para>
+      <application>Cerca File di GNOME</application> è stata scritta
+      da George Lebl (<email>jirka@5z.com</email>). Si invii qualsiasi
+      commento, suggerimento e notifica di errore al <ulink
+      url="http://bugs.gnome.org" type="http">GNOME bug tracking
+      database</ulink> (le istruzioni su come notificare un errore
+      possono essere trovate <ulink
+      url="http://bugs.gnome.org/Reporting.html" type="http">
+      on-line</ulink>). Se si sta utilizzando GNOME 1.1 o successivo,
+      per notificare un errore si può usare il programma
+      <application>bug-buddy</application>
+      (<command>bug-buddy</command>), disponibile nel sottomenu
+      <guisubmenu>Utilità</guisubmenu> del menu
+      <guimenu>Programmi</guimenu>.
+    </para>
+    <para>
+      Questo manuale è stato scritto da Alexander Kirillov
+      (<email>kirillov@math.sunysb.edu</email>). Inviare tutti i
+      commenti e suggerimenti su questo manuale al <ulink type="http"
+      url="http://developer.gnome.org/projects/gdp/">GNOME
+      Documentation Project</ulink> inviando un email a
+      <email>docs@gnome.org</email>. I propri commenti possono essere
+      aggiunti anche online usando la <ulink type="http"
+      url="http://developer.gnome.org/projects/gdp/doctable/">GNOME
+      Documentation Status Table</ulink>.
+  </para>
+
+  <para>
+   Traduzione italiana a cura di Giovanni Bortolozzo
+   (<email>borto@pluto.linux.it</email>), al quale va inviato 
+   qualsiasi commento, suggerimento e correzioni su questa traduzione. 
+  </para>
+    </sect1>
+
+ <!-- ============= Application License ============================= -->
+
+ <sect1 id="license">
+  <title>Licenza</title>
+  <para>
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the  <ulink type="help" url="gnome-help:gpl">
+    <citetitle>GNU General Public License</citetitle></ulink> as
+   published by the Free Software Foundation; 
+   either version 2 of the License, or (at your option) any later
+   version.
+  </para>
+  <para>
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   <citetitle>GNU General Public License</citetitle> for more details.
+  </para>
+  <para>
+   A copy of the <citetitle>GNU General Public License</citetitle> is
+   included as an appendix to the <citetitle>GNOME Users
+   Guide</citetitle>.  You may also obtain a copy of the
+   <citetitle>GNU General Public License</citetitle> from the Free
+   Software Foundation by visiting <ulink type="http"
+   url="http://www.fsf.org">their Web site</ulink> or by writing to
+   <address>
+    Free Software Foundation, Inc.
+    <street>59 Temple Place</street> - Suite 330
+    <city>Boston</city>, <state>MA</state> <postcode>02111-1307</postcode>
+    <country>USA</country>
+   </address>
+  </para>
+ </sect1>
+</article>
+
+
+
+

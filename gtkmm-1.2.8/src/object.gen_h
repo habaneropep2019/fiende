@@ -1,0 +1,404 @@
+/* $Id: object.gen_h,v 1.83 2001/07/15 13:33:38 murrayc Exp $ */
+
+
+/* object.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+/* this file is critical for our compile times, no #includes to this
+   header, please */
+#include <gtk--/base.h>
+#include <gtk/gtkobject.h>
+
+void gtkmm_object_destroy(GtkObject* o);
+CLASS_START(Gtk);
+
+class ArgBase;
+
+class Widget;
+
+//: The base class of the whole hierarchy
+//- {\class Gtk::Object} is the root of the gtkmm type hierarchy. It serves a similar roles
+//- as java's Object class. It is used by the type-casting system to represent the base
+//- composite type.
+//-
+//- Objects have arguments that are name/typed-value pairs. They may be readable or
+//- writable (or both or neither). The special handlers in every object are responsible for
+//- setting and getting these parameters. If the handler for a given argument must be
+//- called before the object may be used, be sure the {\enum GTK_ARG_CONSTRUCT} or
+//- {\enum GTK_ARG_CONSTRUCT_ONLY} flags are set; otherwise they are set only when the user
+//- does so.
+//-
+//- Object also store a simpler association table, sometimes called the object_data. This
+//- is just an efficient mapping from a fixed set of strings to a gpointer. This can be
+//- used as arbitrary extra members. Notice that each new field name allocates a new quark,
+//- so it is probably best only to use this for fields with fixed names.
+//-
+//- The primary difference between object_data and arguments is that the object defines
+//- two functions which set and get each type of argument. The object just has a table to
+//- store its object data in: it does not receive notice when data changes.
+class Object : public Base 
+{
+  WRAP_CLASS(Object,GtkObject,GTK_OBJECT,GTK_IS_OBJECT,object,Gtk::Base,GtkBase,GTK_BASE);
+private:
+  friend class Gtk::Widget;
+  //WRAP_METHOD(void gtk_object_destroy(GtkObject *object),void destroy_());
+
+public:
+	
+  guint* signals() { return GTK_OBJECT_SIGNALS (gtkobj()); }
+  gint nsignals() { return GTK_OBJECT_NSIGNALS (gtkobj()); } 
+	
+  guint type() { return GTK_OBJECT_TYPE (gtkobj()); }
+
+  //: destroy object
+  //- This can be used to tell toplevel widgets that they should
+  //- die if they are managed().  You should never connect a slot
+  //- which references "this" because destroy is called during 
+  //- dtor.
+  SIGNAL_SPEC("destroy",sig|emit,void destroy(),gtkmm_object_destroy);
+  void destroy_();
+
+  //: For convenience, every object offers a generic user data pointer. This function sets it.
+  WRAP_METHOD(void gtk_object_set_user_data(GtkObject*,gpointer),
+	      void set_user_data(gpointer data));
+  //: Get the object's user data pointer.
+  //- This is intended to be a pointer for your convenience in writing applications.
+  WRAP_METHOD(gpointer gtk_object_get_user_data(GtkObject*),
+	      gpointer get_user_data() const);
+
+  //: Each object carries around a table of associations from strings to pointers. This function lets you set an association.
+  //- If the object already had an association with that name, the old association will be destroyed.
+  //- key: Name of the key.
+  //-
+  //- data: Data to associate with that key.
+  WRAP_METHOD(void gtk_object_set_data(GtkObject*,const gchar *,gpointer),
+	      void set_data(const string &key,
+			    gpointer     data));
+  //: Get a named field from the object's table of associations (the object_data).
+  //- key: Name of the key for that association.
+  //-
+  //- Returns: The data if found, or NULL if no such data exists.
+  WRAP_METHOD(gpointer gtk_object_get_data(GtkObject*,const gchar*),
+	      gpointer get_data(const string &key) const);
+  //: Just like {get_data()} except that it takes a GQuark instead of a string, so it is slightly faster.
+  //- Use {data_try_key()} and {data_force_id()} to get an id from a string.
+  WRAP_METHOD(gpointer gtk_object_get_data_by_id(GtkObject*,GQuark),
+	      gpointer get_data_by_id           (GQuark data_id) const);
+
+  // These are really dangerous.  Do we really need them?
+  //      vector<Gtk_ArgBase*>* getv(guint n_args);
+  //      void setv                 (const vector<Gtk_ArgBase*> &args);
+
+  //      static void add_arg_type  (const string &arg_name,
+  //    			     GtkType	 arg_type,
+  //    			     guint		 arg_flags,
+  //    			     guint		 arg_id);
+
+  //: Like {set_data()} except it adds notification for when the association is destroyed,
+  //: either by {remove_data()} or when the object is destroyed.
+  //- key: Name of the key.
+  //-
+  //- data: Data to associate with that key.
+  //-
+  //- destroy: Function to call when the association is destroyed.
+  WRAP_METHOD(void gtk_object_set_data_full(GtkObject*,const gchar*,
+					    gpointer,GtkDestroyNotify),
+	      void set_data_full  (const string &key,
+				   gpointer data,
+				   GtkDestroyNotify destroy));
+
+  //: Just like {set_data()} except that it takes a GQuark instead of a string, so it is slightly faster.
+  //- Use {data_try_key()} and {data_force_id()} to get an id from a string.
+  //-
+  //- data_id: Quark of the key.
+  //-
+  //- data: Data to associate with that key.
+  WRAP_METHOD(void gtk_object_set_data_by_id(GtkObject*,GQuark,gpointer),
+	      void set_data_by_id   (GQuark data_id,
+				     gpointer	  data));
+
+  //: Just like {set_data_full()} except that it takes a GQuark instead of a string, so it is slightly faster.
+  //- Use {data_try_key()} and {data_force_id()} to get an id from a string.
+  //-
+  //- data_id: Quark of the key.
+  //-
+  //- data: Data to associate with that key.
+  //-
+  //- destroy: Function to call when the association is destroyed.
+  WRAP_METHOD(void gtk_object_set_data_by_id_full(GtkObject*,GQuark,
+						  gpointer,GtkDestroyNotify),
+	      void set_data_by_id_full  (GQuark	  data_id,
+					 gpointer	  data,
+					 GtkDestroyNotify destroy));
+
+  //: Remove a specified datum from the object's data associations (the object_data).
+  //- Subsequent calls to {get_data()} will return NULL.
+  //-
+  //- If you specified a destroy handler with {set_data_full()}, it will be invoked.
+  //-
+  //- key: Name of the key for that association.
+  WRAP_METHOD(void gtk_object_remove_data(GtkObject*,const gchar*),
+	      void remove_data                  (const string &key));
+  //: Remove a specified datum from the object's data associations (the object_data), without
+  //: invoking the association's destroy handler.
+  //- Just like {remove_data()} except that any destroy handler will be ignored. Therefore this
+  //- only affects data set using {set_data_full()}.
+  //-
+  //- key: Name of the key for that association.
+  WRAP_METHOD(void gtk_object_remove_no_notify(GtkObject*,const gchar*),
+	      void remove_no_notify             (const string &key));
+  //: Just like {remove_data()} except that it takes a GQuark instead of a string, so it is slightly faster.
+  //- Remove a specified datum from the object's data associations. Subsequent calls to
+  //- {get_data()} will return NULL.
+  //-
+  //- Use {data_try_key()} and {data_force_id()} to get an id from a string.
+  //-
+  //- data_id: Quark of the key.
+  WRAP_METHOD(void gtk_object_remove_data_by_id(GtkObject*,GQuark),
+	      void remove_data_by_id            (GQuark data_id));
+  //: Just like {remove_no_notify()} except that it takes a GQuark instead of a string, so it is slightly faster.
+  //- Use {data_try_key()} and {data_force_id()} to get an id from a string.
+  //-
+  //- data_id: Quark of the key.
+  WRAP_METHOD(void gtk_object_remove_no_notify_by_id(GtkObject*,GQuark),
+	      void remove_no_notify_by_id       (GQuark data_id));
+
+#ifdef SIGC_CXX_FRIEND_TEMPLATES
+  //    protected:
+#endif
+  // This binds the C++ object to C  (internal function!)
+  virtual void set_dynamic();
+
+protected:
+  GtkObject *gtkobject;
+
+  // hooks for libsigc++
+  virtual void reference(); 
+  virtual void unreference();
+
+  // flag to indicate we have a reference.
+  bool referenced_;
+  bool destroyed_;
+
+  //void global_dtor();
+
+  static void destroy_notify_(gpointer s);
+
+
+  //: Adds a weak reference callback to an object.
+  //- Weak references are a mechanism to safely keep a pointer to an object without
+  //- using the reference counting mechansim. They use a callback function to
+  //- receive notice that the object is about to be freed (aka finalized). This
+  //- happens after the destroy callback has been run.
+  //-
+  //- notify: Callback to invoke before the object is freed.
+  //- data: Extra data to pass to notify.
+  WRAP_METHOD(
+	      void gtk_object_weakref(GtkObject*,GtkDestroyNotify,gpointer),
+	      void weakref (GtkDestroyNotify notify,
+			    gpointer         data));
+
+  //: Removes a weak reference callback to an object.
+  //- notify: Callback to search for.
+  //- data: Data to search for.
+  WRAP_METHOD(
+	      void gtk_object_weakunref(GtkObject*,GtkDestroyNotify,gpointer),
+	      void weakunref (GtkDestroyNotify notify,
+			      gpointer         data));
+
+  static void gtkmm_sigsegv(const char *name);
+
+protected:
+  void set_type(GtkType type);
+	
+};
+
+// internal for automatic conversions
+inline GtkObject* unwrap(Gtk::Object*o) { return o?o->gtkobj():0; }
+
+
+PRIVATE_START;
+#include <gtk--/private/base_p.h>
+IMPL_START;
+#include <stdio.h>
+#include <stdarg.h>
+#include <gtk--/main.h>
+
+#ifdef SIGC_CXX_NAMESPACES
+using namespace SigC;
+#endif
+
+/*
+static gint gtkmm_object_destroy_callback(GtkObject *o)
+{
+  gtk_object_destroy(o);
+  return 0;
+}
+*/
+
+void gtkmm_object_destroy(GtkObject *o)
+{
+  Gtk::wrap(o)->destroy_();
+}
+
+namespace Gtk
+{
+
+void Object::destroy_()
+{
+  if (!destroyed_&&!GTK_OBJECT_DESTROYED(gtkobject)) 
+//    gtk_idle_add_priority(gtk_main_level(),
+//                        GtkFunction(&gtkmm_object_destroy_callback),
+//		        gtkobj());
+    gtk_object_destroy(gtkobject);
+  destroyed_=true;
+}
+
+void Object::gtkmm_sigsegv(const char *pos) {
+    char c[10240];
+    sprintf(c,"gtkmm_sigsegv(%s): assertion failed inside gtk--. Please make a stack dump with gdb and send it to gtkmm-main@sourceforge.net\n", pos);
+    g_warning(c);
+    char *f=0;
+    *f=0; // sigsegv.
+  };
+
+Object::Object(GtkObject *castitem)
+  {
+    initialize_class();
+    gtkobject = castitem;
+    referenced_=true;
+    destroyed_=false;
+
+    if (!gtkobject) {
+      g_warning("Do NOT call constructors with 0 argument! use default constructor instead, if such thing exists!\n");
+      g_warning("castitem == 0 bug; not again!!! Flaming death...");
+      gtkmm_sigsegv("Gtk::Object::Object(castitem)");
+    }
+
+    // THIS WORKS, DO NOT CHANGE!!!
+    gtk_object_ref(gtkobject);
+    gtk_object_sink(gtkobject);
+
+    if (!gtk_object_get_data_by_id(gtkobject,quark_)) 
+      gtk_object_set_data_by_id_full(gtkobject,quark_,(gpointer)this,&destroy_notify_);
+    else 
+      g_warning("This object already has a wrapper.  Danger, danger!\n");
+ 
+  }
+
+Object::~Object()
+  {
+    // DON'T TOUCH THIS! (order is important, and objects change transparently)
+
+    // remove our hook.
+    GtkObject *object=gtkobject;
+    gtkobject=0; 
+    if (object)
+      {
+        gtk_object_remove_no_notify_by_id(object,quark_);
+        if (!GTK_OBJECT_DESTROYED(object))
+          gtk_object_destroy(object);
+        if (referenced_) 
+          gtk_object_unref(object);
+      }
+  }
+
+void 
+Object::reference() 
+  {
+    gtk_object_ref(gtkobject); 
+  }
+
+void 
+Object::unreference() 
+  {
+    gtk_object_unref(gtkobject);
+  }
+
+  // This should indicate that this was a C++ wrapper generated
+  // by the translating API and not directly.  
+  // It must:
+  //   remove the reference to the object so that object lifetime is not 
+  //     increased
+void Object::set_dynamic() 
+  {
+    if (!referenced_) return;
+
+    // tell libsigc that the object is disposable
+    ObjectScoped::set_dynamic();
+    ObjectScoped::set_sink();
+
+    // remove our reference
+    if (gtkobject->ref_count==1)
+      {
+	// Cowardly refuse to remove last reference make floating instead
+	gtkobject->flags|=GTK_FLOATING;
+      }
+    else
+      gtk_object_unref(gtkobject);
+
+    referenced_=0;
+  }
+
+void Object::destroy_notify_(gpointer p) 
+  {
+    Object* o=(Object*)p;
+    if (!o->referenced_)
+      delete o;
+    else 
+      o->gtkobject=0;
+  }
+
+void Object::set_type(GtkType type)
+  {
+   if (gtkobject)
+     gtkobject->klass=(GtkObjectClass*)gtk_type_class(type);
+  }
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(gtkobject)
+//. name: flags
+//. type: guint32
+//. get:
+//. set:
+//. desc: 32 bits of flags. GtkObject only uses 4 of these bits and
+//. GtkWidget uses the rest. This is done because structs are
+//. aligned on 4 or 8 byte boundaries. If a new bitfield were
+//. used in GtkWidget much space would be wasted.
+//.    
+
+//. name: ref_count
+//. type: guint
+//. get:
+//. set:
+//. desc: reference count.
+//. refer to the file docs/refcounting.txt on this issue.
+//.    
+
+//. name: object_data
+//. type: GData*
+//. get:
+//. set:
+//. desc: A list of keyed data pointers, used for e.g. the list of signal
+//. handlers or an object's user_data.
+//.    
+

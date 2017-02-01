@@ -1,0 +1,173 @@
+dnl  Process this file with autoconf to produce a configure script.
+dnl  Copyright (C) 1998 John Harper <john@dcs.warwick.ac.uk>
+dnl  $Id: configure.in,v 1.33 2000/12/04 18:41:15 jsh Exp $
+dnl
+dnl  This file is part of Jade.
+dnl
+dnl  Jade is free software; you can redistribute it and/or modify it
+dnl  under the terms of the GNU General Public License as published by
+dnl  the Free Software Foundation; either version 2, or (at your option)
+dnl  any later version.
+dnl
+dnl  Jade is distributed in the hope that it will be useful, but
+dnl  WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl  GNU General Public License for more details.
+dnl
+dnl  You should have received a copy of the GNU General Public License
+dnl  along with Jade; see the file COPYING.  If not, write to
+dnl  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+AC_REVISION($Revision: 1.33 $)
+
+AC_INIT(rep-gtk.h)
+AC_CONFIG_HEADER(config.h)
+
+dnl Release versioning info
+version="0.15"
+
+OUT="gtk/types.la gtk/gtk.la"
+AC_SUBST(OUT)
+
+dnl Find the system type; this isn't crucial
+AC_CANONICAL_HOST
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_GCC_TRADITIONAL
+
+dnl If using GCC and it doesn't look as though the cflags have been
+dnl set explicitly, add some warning options. Turn off implicit-int
+dnl warnings since the X11 includes on Solaris generate a lot of these
+if test "x${GCC}" = "xyes" -a "x$CFLAGS" = "x-g -O2"; then
+  CFLAGS="${CFLAGS} -Wall -Wmissing-prototypes -Wno-implicit-int"
+fi
+
+dnl Check for librep
+AM_PATH_REP(0.13)
+
+dnl Check for glib
+AM_PATH_GLIB
+
+dnl Check for GTK
+AM_PATH_GTK(1.2.0,,AC_ERROR(need at least Gtk+ version 1.2))
+
+dnl Check for libgnome
+AC_MSG_CHECKING([for GNOME libs])
+AC_ARG_WITH(gnome,
+ [  --with-gnome            Build GNOME wrappers
+  --without-gnome         Don't wrap GNOME], [], [with_gnome=maybe])
+if test "$with_gnome" != "no"; then
+  GNOME_VERSION="`gnome-config --version`"
+  if test $? -eq 0; then
+    GNOME_LIBS="`gnome-config --libs gnome`"
+    GNOMEUI_LIBS="`gnome-config --libs gnomeui`"
+    GNOME_CFLAGS="`gnome-config --cflags gnomeui`"
+    AC_MSG_RESULT([$GNOME_VERSION])
+    OUT="$OUT gnome/lib.la gnome/ui.la gnome/canvas.la"
+    with_gnome=yes
+  elif test "$with_gnome" = "yes"; then
+    AC_MSG_ERROR([can't run gnome-config]);
+  else
+    with_gnome=no
+  fi
+fi
+AC_SUBST(GNOME_VERSION)
+AC_SUBST(GNOME_LIBS)
+AC_SUBST(GNOMEUI_LIBS)
+AC_SUBST(GNOME_CFLAGS)
+
+dnl Check for libglade
+AC_ARG_WITH(libglade,
+ [  --with-libglade         Build libglade wrappers (dynamic GUI builder)
+  --without-libglade      Don't wrap libglade], [], [with_libglade=yes])
+if test "$with_libglade" = "yes"; then
+  AM_PATH_LIBGLADE([OUT="$OUT gtk/libglade.la"])
+fi
+
+if test "$with_libglade" = "yes" -a "$with_gnome" = "yes"; then
+  AC_MSG_CHECKING([for libglade GNOME support])
+  if $LIBGLADE_CONFIG --check gnome; then
+    AC_MSG_RESULT(yes)
+    GNOME_LIBGLADE_CFLAGS=`$LIBGLADE_CONFIG --cflags gnome`
+    GNOME_LIBGLADE_LIBS=`$LIBGLADE_CONFIG --libs gnome`
+    AC_SUBST(GNOME_LIBGLADE_LIBS)
+    AC_SUBST(GNOME_LIBGLADE_CFLAGS)
+    AC_MSG_CHECKING([whether <glade/glade-xml.h> has "txtdomain" field])
+    _cppflags=${CPPFLAGS}
+    CPPFLAGS="${CPPFLAGS} ${LIBGLADE_CFLAGS}"
+    AC_EGREP_HEADER([char \*txtdomain;], [glade/glade-xml.h],
+		    [AC_MSG_RESULT(yes)
+		     AC_DEFINE(LIBGLADE_XML_TXTDOMAIN,1)],
+		    [AC_MSG_RESULT(no)])
+    CPPFLAGS="${_cppflags}"
+    OUT="$OUT gnome/libglade.la"
+  else
+    AC_MSG_ERROR([libglade wasn't compiled with GNOME support])
+  fi
+fi
+
+AC_ARG_WITH(gdk-pixbuf,
+ [  --with-gdk-pixbuf	  Build gdk-pixbuf wrappers],
+ [], [with_gdk_pixbuf=maybe])
+if test "$with_gdk_pixbuf" != "no"; then
+  AM_PATH_GDK_PIXBUF(,
+    [with_gdk_pixbuf="yes"; OUT="$OUT gtk/gdk-pixbuf.la"],
+    [with_gdk_pixbuf=no])
+fi
+
+if test "$with_gdk_pixbuf" = "yes" -a "$with_gnome" = "yes"; then
+  AC_MSG_CHECKING([for GNOME canvas pixbuf support])
+  AC_ARG_WITH(gnome-canvas-pixbuf,
+   [  --with-gnome-canvas-pixbuf
+  --without-gnome-canvas-pixbuf],
+   [], [with_gnome_canvas_pixbuf=maybe])
+  if test "$with_gnome_canvas_pixbuf" != "no"; then
+    GNOME_CANVAS_PIXBUF_VERSION="`gnome-config --modversion gnomecanvaspixbuf`"
+    if test $? -eq 0; then
+      GNOME_CANVAS_PIXBUF_LIBS="`gnome-config --libs gnomecanvaspixbuf`"
+      GNOME_CANVAS_PIXBUF_CFLAGS="`gnome-config --cflags gnomecanvaspixbuf`"
+      AC_MSG_RESULT([$GNOME_CANVAS_PIXBUF_VERSION])
+      OUT="$OUT gnome/canvas-pixbuf.la"
+    elif test "$with_gnome_canvas_pixbuf" = "yes"; then
+      AC_MSG_ERROR([can't run gnome-config]);
+    fi
+  fi
+fi
+AC_SUBST(GNOME_CANVAS_PIXBUF_VERSION)
+AC_SUBST(GNOME_CANVAS_PIXBUF_LIBS)
+AC_SUBST(GNOME_CANVAS_PIXBUF_CFLAGS)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+dnl Check for cutting edge Gtk functions
+saved_LIBS="$LIBS"
+LIBS="$GTK_LIBS $saved_LIBS"
+AC_CHECK_FUNCS(gdk_color_copy gtk_widget_peek_colormap gtk_type_get_info gtk_signal_set_class_function_full)
+LIBS="$saved_LIBS"
+
+dnl locale checks
+AC_CHECK_FUNCS(setlocale)
+AC_CHECK_HEADERS(locale.h)
+
+dnl Nonstandard exported symbols
+AC_SUBST(version)
+AC_SUBST(repexecdir)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(CFLAGS)
+AC_SUBST(LIBS)
+
+AC_DEFINE_UNQUOTED(REP_GTK_VERSION, "${version}")
+
+AC_OUTPUT(Makefile rep-gtk.spec)
+
+dnl Local variables:
+dnl major-mode: sh-mode
+dnl End:

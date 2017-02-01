@@ -1,0 +1,94 @@
+/*
+ * bonobo-ui.idl: Handles some User Interface issues for components
+ *
+ * Copyright (C) 2000  Helix Code, Inc.
+ *
+ * Author:
+ *	Michael Meeks (michael@helixcode.com)
+ */
+
+#ifndef BONOBO_UI_IDL
+#define BONOBO_UI_IDL
+
+#include "Bonobo_Unknown.idl"
+
+module Bonobo {
+	interface UIContainer;
+
+	interface UIComponent : Bonobo::Unknown {
+
+		void setContainer   (in UIContainer container);
+		void unsetContainer ();
+
+		readonly attribute string name;
+
+		enum EventType {
+			STATE_CHANGED,
+			OTHER
+		};
+
+		/*
+		 * Returns an XML description of all available verbs.
+		 */
+		string      describeVerbs ();
+
+		/*
+		 * Allows a remote user to execute a verb by name.
+		 */
+		oneway void execVerb      (in string   cname);
+
+		/*
+		 * Allows a remote user to flag an event
+		 */
+		oneway void uiEvent       (in string    id,
+					   in EventType type,
+					   in string    state);
+	};
+
+	interface UIContainer : Bonobo::Unknown {
+		exception MalFormedXML {};
+		exception InvalidPath {};
+
+		/* FIXME: broken, should use set/get object instead */
+		void    registerComponent   (in string component_name,
+					      in Bonobo::UIComponent component);
+
+		void    deregisterComponent (in string component_name);
+
+		oneway void     freeze      ();
+		oneway void     thaw        ();
+
+		void    setNode             (in string path, in string xml,
+					     in string component_name)
+			raises (MalFormedXML, InvalidPath);
+
+		string  getNode             (in string path,
+					     in boolean nodeOnly)
+			raises (InvalidPath);
+
+		void    removeNode          (in string path,
+					     in string by_component_name)
+			raises (InvalidPath);
+
+		boolean exists              (in string path);
+
+		/*
+		 *  Currently the object should be a Bonobo::Control interface
+		 * but this should be probably be changed to a Moniker interface
+		 * in due course.
+		 * 
+		 *   The control's property bag will have the following
+		 * properties set on it in various circumstances:
+		 *
+		 *  bonobo:ui:vertical	boolean
+		 */
+		void            setObject   (in string path,
+					     in Bonobo::Unknown control)
+			raises (InvalidPath);
+
+		Bonobo::Unknown getObject   (in string path)
+			raises (InvalidPath);
+	};
+};
+
+#endif /* BONOBO_UI_IDL */

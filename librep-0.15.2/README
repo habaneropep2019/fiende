@@ -1,0 +1,139 @@
+[ this is -*-Text-*- ]
+
+This is librep, a Lisp system for UNIX. It contains a Lisp interpreter,
+byte-code compiler and virtual machine. Applications may use the Lisp
+interpreter as an extension language, or it may be used for stand-alone
+scripts.
+
+The Lisp dialect was originally inspired by Emacs Lisp, but with the
+worst features removed. It also borrows many ideas from Scheme.
+
+It is known to compile on at least Solaris/sparc and Linux/ix86; it is
+released under the terms of the GNU GPL, copyright John Harper
+<jsh@pixelslut.com>
+
+For more details see:
+
+	http://librep.sourceforge.net/
+
+To compile this you'll need GNU make, the GNU MP library (see below)
+and GNU dbm installed. Basically, just do:
+
+	$ ./configure
+	$ make
+	$ make install
+
+
+Notes
+=====
+
+64-bit systems
+--------------
+
+If you're on a 64-bit architecture you may want to look at the
+`--with-value-type' configure option. This is an implicitly signed
+integer type (i.e. `int', `long', etc) that is wide enough to store an
+arbitrary pointer without losing any bits.
+
+It should be detected automatically by the configure script, but if not
+there are two most likely required settings:
+
+ 1. For a machine with 64-bit pointers and longs, but only 32-bit ints
+    the following could be done:
+
+	$ ./configure --with-value-type=long
+
+ 2. For a machine with both int and long 32-bits, but with 64-bit
+    pointers and long long ints, then:
+
+	$ ./configure --with-value-type="long long"
+
+If this option is set incorrectly (i.e. to an integer type that is too
+small) a run-time assertion will be triggered when the interpreter
+initialises itself.
+
+Also, if this option is set to anything but int, long, or long long,
+then the src/rep_config.h file will need to be edited for the constant
+suffix and printf conversion of the chosen type.
+
+
+libgmp
+------
+
+rep uses GNU MP for it's bignum/rational implementation; you can find
+it at any GNU mirror. GMP versions 2 and 3 are both known to work
+(though version 3 is recommended)
+
+
+shared libraries
+----------------
+
+rep includes plugins providing language bindings for several libraries.
+Because these plugins are implemented as shared objects that are loaded
+at runtime, the libraries they wrap must also be shared libraries on
+most systems. This means that the installed libgdm must be shared, and
+if compiling with readline support, so must libreadline
+
+
+cut-down version
+----------------
+
+The configure script accepts the following options to build restricted
+versions of librep. The resulting library is binary-compatible with the
+normal version.
+
+  --without-gmp
+
+    Don't use GNU MP for bignums. Use `long long' as biggest integer
+    type (if available, else just `long'). Also, there is no support
+    for exact rationals, thus (/ 1 2) => 0.5 not 1/2
+
+  --disable-continuations
+
+    Don't include support for call/cc or multi-threading. This may be
+    useful for machines with non-linear stacks (old crays?)
+
+
+obscure configure options
+-------------------------
+
+  --enable-dballoc
+
+    Trace all memory allocations. Not for general use
+
+  --disable-dbsyms
+
+    When printing C stack backtraces, don't try to output symbolic
+    addresses
+
+  --enable-gprof
+
+    Compile with flags enabling profiling. Also needs --enable-static
+    to be given. Use the `srep' target in the src directory to build a
+    statically linked interpreter (since gprof doesn't profile shared
+    libraries)
+
+  --with-malloc-alignment=BYTES
+
+    The minimum alignment of memory returned from malloc (). Defaults
+    to the machine's word size. It's unlikely this will ever need to be
+    specified explicitly
+
+  --with-stack-direction=DIRECTION
+
+    Direction of stack growth. -1 for downwards (grows from higher
+    addresses to lower addresses), +1 for upwards. If not given, will
+    try to infer this automatically (though it has been known to fail)
+
+  --enable-full-name-terminator=CHARACTER
+
+    If the GECOS fields in your password file contain extra information
+    after the user's full name, this option allows the separator
+    character to be given, letting rep's user-full-name function return
+    the correct information.
+
+    E.g. some systems have GECOS as a comma-separated list of values,
+    the first of which is the full name. For this case:
+
+	--enable-full-name-terminator=,
+

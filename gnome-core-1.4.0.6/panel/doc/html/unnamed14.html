@@ -1,0 +1,436 @@
+<HTML
+><HEAD
+><TITLE
+>Multiple Applet Support</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The GNOME Panel Libraries"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="The Art of Applet Writing"
+HREF="unnamed1.html"><LINK
+REL="PREVIOUS"
+TITLE="Rebinding Events"
+HREF="unnamed13.html"><LINK
+REL="NEXT"
+TITLE="Shared Library Applets"
+HREF="unnamed15.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The GNOME Panel Libraries</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed13.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed15.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="UNNAMED14"
+>Multiple Applet Support</A
+></H1
+><P
+>        Having one process per applet might be ok, but when you have many 
+	applets it can be quite a hit on the memory.  There is an easy way to
+	multiple applets from one process, even different types of applets.
+      </P
+><P
+>	For a simple example let's modify our  original hello applet to make 
+	it possible to have multiple instances of it from just one executable. 
+	We will create a factory corba service that can create new instances of
+	the applet.
+
+	<DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN138"
+></A
+><P
+><B
+>Example 14. Industrialization of hello_applet</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;config.h&gt;
+#include &lt;applet-widget.h&gt;
+
+
+/*when we get a command to start a new widget*/
+static GtkWidget *
+applet_start_new_applet(const gchar *goad_id, const gchar **params, gint nparams)
+{
+        GtkWidget *applet;
+        GtkWidget *label;
+
+        /*if we weren't asked to start hello_applet, just return*/
+        if(strcmp(goad_id, quot;hello_appletquot;)!=0) return NULL;
+
+        /*now we do the same exact thing as we do in the main function for
+          creating the applet*/
+
+        /* create a new applet_widget */
+        applet = applet_widget_new(quot;hello_appletquot;);
+        if (!applet)
+                g_error(quot;Can't create applet!\nquot;);
+
+        /* create the widget we are going to put on the applet */
+        label = gtk_label_new(_(quot;Hello There!quot;));
+        gtk_widget_show(label);
+
+        /* add the widget to the applet-widget, and thereby actually
+           putting it quot;ontoquot; the panel */
+        applet_widget_add (APPLET_WIDGET (applet), label);
+        gtk_widget_show (applet);
+
+        /* return the applet widget from this function */
+        return applet;
+}
+
+int
+main(int argc, char **argv)
+{
+        GtkWidget *applet;
+        GtkWidget *label;
+        gchar *goad_id;
+
+        /* Initialize the i18n stuff */
+        bindtextdomain (PACKAGE, GNOMELOCALEDIR);
+        textdomain (PACKAGE);
+
+        /* intialize, this will basically set up the applet, corba and
+           call gnome_init */
+        applet_widget_init(quot;hello_appletquot;, NULL, argc, argv, NULL, 0, NULL);
+
+        /*make new factory and get us the goad_id that was used to start us*/
+        applet_factory_new(quot;hello_applet_factoryquot;, NULL, applet_start_new_applet);
+        goad_id = (gchar *)goad_server_activation_id();
+
+        /*if the goad_id was hello_applet, we create a new instance of
+          our applet, otherwise don't do anything*/
+        if(goad_id &#38;&#38; strcmp(goad_id, quot;hello_appletquot;)==0) {
+                /* create a new applet_widget */
+                applet = applet_widget_new(quot;hello_appletquot;);
+                if (!applet)
+                        g_error(quot;Can't create applet!\nquot;);
+
+                /* create the widget we are going to put on the applet */
+                label = gtk_label_new(_(quot;Hello There!quot;));
+                gtk_widget_show(label);
+
+                /* add the widget to the applet-widget, and thereby actually
+                   putting it quot;ontoquot; the panel */
+                applet_widget_add (APPLET_WIDGET (applet), label);
+                gtk_widget_show (applet);
+
+        }
+
+        /* special corba main loop */
+        applet_widget_gtk_main ();
+
+        return 0;
+}
+	  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+      </P
+><P
+>        What you will notice is that what we do is just make a factory service
+	with applet_factory_new, to which we pass a function pointer to a 
+	function that just creates new applets for us.
+      </P
+><P
+>        Now we need to create a .gnorba and .desktop files for an applet of 
+	this type. The .desktop file is the exact same as for normal applets. 
+	The .gnorba file however must now describe the factory as well.
+
+	<DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN143"
+></A
+><P
+><B
+>Example 15. Industrialization of hello.gnorba</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#D8F8D8"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>[hello_applet_factory]
+type=exe
+repo_id=IDL:GNOME/GenericFactory:1.0
+description=Hello Applet
+location_info=hello_applet
+
+[hello_applet]
+type=factory
+repo_id=IDL:GNOME/Applet:1.0
+description=Hello Applet
+location_info=hello_applet_factory
+	  </PRE
+></TD
+></TR
+></TABLE
+></DIV
+>
+      </P
+><P
+>        Sometimes you may want to have two applets that have very similiar
+	functionality, but that appear to the user as two different applets,
+	and you want to manage them from the same process. This is extremely 
+	simple. Just take the above example and add more types into the
+	.gnorba file, then wherever we check the goad_id, just add another
+	&quot;else if&quot; to check for another goad_id. Then in your 
+	desktops on the Exec line, you would have in one .desktop:
+
+	<TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>Exec=hello_version_1_applet
+        </PRE
+></TD
+></TR
+></TABLE
+>
+
+	and in a second:
+
+	<TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>Exec=hello_version_2_applet
+	</PRE
+></TD
+></TR
+></TABLE
+>
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="unnamed13.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="index.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="unnamed1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="unnamed15.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Rebinding Events</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Shared Library Applets</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

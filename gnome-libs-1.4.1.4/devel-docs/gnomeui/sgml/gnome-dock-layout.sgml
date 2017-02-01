@@ -1,0 +1,390 @@
+<refentry id="GnomeDockLayout">
+<refmeta>
+<refentrytitle>GnomeDockLayout</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOMEUI Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>GnomeDockLayout</refname><refpurpose>A widget for saving and retrieving the layout of a
+<type>GnomeDock</type> widget.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeDockLayout-struct">GnomeDockLayout</link>;
+struct      <link linkend="GnomeDockLayoutItem">GnomeDockLayoutItem</link>;
+<link linkend="GnomeDockLayout">GnomeDockLayout</link>* <link linkend="gnome-dock-layout-new">gnome_dock_layout_new</link>      (void);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-layout-add-item">gnome_dock_layout_add_item</link>      (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="gint">gint</link> band_num,
+                                             <link linkend="gint">gint</link> band_position,
+                                             <link linkend="gint">gint</link> offset);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-layout-add-floating-item">gnome_dock_layout_add_floating_item</link>
+                                            (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y,
+                                             <link linkend="GtkOrientation">GtkOrientation</link> orientation);
+<link linkend="GnomeDockLayoutItem">GnomeDockLayoutItem</link>* <link linkend="gnome-dock-layout-get-item">gnome_dock_layout_get_item</link>
+                                            (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item);
+<link linkend="GnomeDockLayoutItem">GnomeDockLayoutItem</link>* <link linkend="gnome-dock-layout-get-item-by-name">gnome_dock_layout_get_item_by_name</link>
+                                            (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             const <link linkend="gchar">gchar</link> *name);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-layout-remove-item">gnome_dock_layout_remove_item</link>   (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-layout-remove-item-by-name">gnome_dock_layout_remove_item_by_name</link>
+                                            (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             const <link linkend="gchar">gchar</link> *name);
+<link linkend="gchar">gchar</link>*      <link linkend="gnome-dock-layout-create-string">gnome_dock_layout_create_string</link> (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-layout-parse-string">gnome_dock_layout_parse_string</link>  (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             const <link linkend="gchar">gchar</link> *string);
+<link linkend="gboolean">gboolean</link>    <link linkend="gnome-dock-layout-add-to-dock">gnome_dock_layout_add_to_dock</link>   (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDock">GnomeDock</link> *dock);
+
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Object Hierarchy</title>
+<synopsis>
+
+  <link linkend="GtkObject">GtkObject</link>
+   +----GnomeDockLayout
+</synopsis>
+
+</refsect1>
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The <type>GnomeDockLayout</type> widget is meant to make it simple for
+programmers to handle the layout of a <type>GnomeDock</type> widget.
+</para>
+
+<para>
+<type>GnomeDockLayout</type> can contain an arbitrary number of
+<type>GnomeDockItem</type> widgets, each of them with its own
+placement information.  It is possible to "extract" a layout from an
+existing <type>GnomeDock</type> widget, as well as adding the items
+present in a <type>GnomeDockLayout</type> to it.  Moreover,
+<type>GnomeDockLayout</type> is able to create a layout configuration
+string that can be later used to re-construct the layout on a brand
+new <type>GnomeDockLayout</type> widget.
+</para>
+
+<para>
+As a consequence, <type>GnomeDockLayout</type> is very useful to save
+and retrieve <type>GnomeDock</type> configurations into files.  For
+example, <type>GnomeApp</type> uses <type>GnomeDockLayout</type> to
+create a default layout configuration, override it with the
+user-specific configuration file, and finally apply it to it
+<type>GnomeDock</type>.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeDockLayout-struct">struct GnomeDockLayout</title>
+<programlisting>struct GnomeDockLayout;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="GnomeDockLayoutItem">struct GnomeDockLayoutItem</title>
+<programlisting>struct GnomeDockLayoutItem
+{
+  GnomeDockItem *item;
+
+  GnomeDockPlacement placement;
+
+  union
+  {
+    struct
+    {
+      gint x;
+      gint y;
+      GtkOrientation orientation;
+    } floating;
+
+    struct
+    {
+      gint band_num;
+      gint band_position;
+      gint offset;
+    } docked;
+
+  } position;
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-new">gnome_dock_layout_new ()</title>
+<programlisting><link linkend="GnomeDockLayout">GnomeDockLayout</link>* gnome_dock_layout_new      (void);</programlisting>
+<para>
+Create a new <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The new <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-add-item">gnome_dock_layout_add_item ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_layout_add_item      (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="GnomeDockPlacement">GnomeDockPlacement</link> placement,
+                                             <link linkend="gint">gint</link> band_num,
+                                             <link linkend="gint">gint</link> band_position,
+                                             <link linkend="gint">gint</link> offset);</programlisting>
+<para>
+Add <parameter>item</parameter> to <parameter>layout</parameter> with the specified parameters.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> The dock item to be added to <parameter>layout</parameter>
+</entry></row>
+<row><entry align="right"><parameter>placement</parameter>&nbsp;:</entry>
+<entry> Placement of <parameter>item</parameter> in <parameter>layout</parameter>
+</entry></row>
+<row><entry align="right"><parameter>band_num</parameter>&nbsp;:</entry>
+<entry> Band number
+</entry></row>
+<row><entry align="right"><parameter>band_position</parameter>&nbsp;:</entry>
+<entry> Position within the band
+</entry></row>
+<row><entry align="right"><parameter>offset</parameter>&nbsp;:</entry>
+<entry> Distance from the previous element in the band
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the operation succeeds, <literal>FALSE</literal> if it fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-add-floating-item">gnome_dock_layout_add_floating_item ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_layout_add_floating_item
+                                            (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item,
+                                             <link linkend="gint">gint</link> x,
+                                             <link linkend="gint">gint</link> y,
+                                             <link linkend="GtkOrientation">GtkOrientation</link> orientation);</programlisting>
+<para>
+Add <parameter>item</parameter> to <parameter>layout</parameter> as a floating item with the
+specified (<parameter>x</parameter>, <parameter>y</parameter>) position and <parameter>orientation</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> The dock item to be added to <parameter>layout</parameter>
+</entry></row>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry> X-coordinate for the floating item
+</entry></row>
+<row><entry align="right"><parameter>y</parameter>&nbsp;:</entry>
+<entry> Y-coordinate for the floating item
+</entry></row>
+<row><entry align="right"><parameter>orientation</parameter>&nbsp;:</entry>
+<entry> Orientation for the floating item
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the operation succeeds, <literal>FALSE</literal> if it fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-get-item">gnome_dock_layout_get_item ()</title>
+<programlisting><link linkend="GnomeDockLayoutItem">GnomeDockLayoutItem</link>* gnome_dock_layout_get_item
+                                            (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item);</programlisting>
+<para>
+Retrieve a layout item.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> The <link linkend="GnomeDockItem">GnomeDockItem</link> to be retrieved
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The retrieved <link linkend="GnomeDockLayoutItem">GnomeDockLayoutItem</link> widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-get-item-by-name">gnome_dock_layout_get_item_by_name ()</title>
+<programlisting><link linkend="GnomeDockLayoutItem">GnomeDockLayoutItem</link>* gnome_dock_layout_get_item_by_name
+                                            (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             const <link linkend="gchar">gchar</link> *name);</programlisting>
+<para>
+Retrieve the dock item named <parameter>name</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Name of the item to be retrieved
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The named <link linkend="GnomeDockLayoutItem">GnomeDockLayoutItem</link> widget.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-remove-item">gnome_dock_layout_remove_item ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_layout_remove_item   (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDockItem">GnomeDockItem</link> *item);</programlisting>
+<para>
+Remove the specified <parameter>item</parameter> from <parameter>layout</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><parameter>item</parameter>&nbsp;:</entry>
+<entry> The <link linkend="GnomeDockItem">GnomeDockItem</link> to be removed
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the operation succeeds, <literal>FALSE</literal> if it fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-remove-item-by-name">gnome_dock_layout_remove_item_by_name ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_layout_remove_item_by_name
+                                            (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             const <link linkend="gchar">gchar</link> *name);</programlisting>
+<para>
+Remove the item named <parameter>name</parameter> from <parameter>layout</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><parameter>name</parameter>&nbsp;:</entry>
+<entry> Name of the <link linkend="GnomeDockItem">GnomeDockItem</link> to be removed
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the operation succeeds, <literal>FALSE</literal> if it fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-create-string">gnome_dock_layout_create_string ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      gnome_dock_layout_create_string (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout);</programlisting>
+<para>
+Generate a string describing the layout in <parameter>layout</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The (malloced) layout string for <parameter>layout</parameter>.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-parse-string">gnome_dock_layout_parse_string ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_layout_parse_string  (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             const <link linkend="gchar">gchar</link> *string);</programlisting>
+<para>
+Parse the layout string <parameter>string</parameter>, and move around the
+items in <parameter>layout</parameter> accordingly.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><parameter>string</parameter>&nbsp;:</entry>
+<entry> A layout string to be parsed
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the operation succeeds, <literal>FALSE</literal> if it fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-dock-layout-add-to-dock">gnome_dock_layout_add_to_dock ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    gnome_dock_layout_add_to_dock   (<link linkend="GnomeDockLayout">GnomeDockLayout</link> *layout,
+                                             <link linkend="GnomeDock">GnomeDock</link> *dock);</programlisting>
+<para>
+Add all the items in <parameter>layout</parameter> to the specified <parameter>dock</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>layout</parameter>&nbsp;:</entry>
+<entry> A <link linkend="GnomeDockLayout">GnomeDockLayout</link> widget
+</entry></row>
+<row><entry align="right"><parameter>dock</parameter>&nbsp;:</entry>
+<entry> The <link linkend="GnomeDock">GnomeDock</link> widget the layout items must be added to
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>TRUE</literal> if the operation succeeds, <literal>FALSE</literal> if it fails.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="GnomeDock">GnomeDock</link>
+<link linkend="GnomeDockItem">GnomeDockItem</link>
+<link linkend="GnomeDockBand">GnomeDockBand</link>
+</para>
+</refsect1>
+
+</refentry>

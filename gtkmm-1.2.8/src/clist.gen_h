@@ -1,0 +1,2243 @@
+/* $Id: clist.gen_h,v 1.153 2001/08/16 17:56:49 murrayc Exp $ */
+
+/* clist.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+/**********************************************************************
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+***********************************************************************
+  This wrapper is new to the kit.  The old one was so out of date
+  as to not be useful.  This wrapper has not been time tested
+  like the others, please be sure to report unexpected crashes, strange
+  behavior and unusable methods.        
+***********************************************************************
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+**********************************************************************/
+/* the following things are broken and not fixable until  
+  next binary version.  row__ and number__ should be mutable.
+  The non-const versions of get_row and get_number should
+  be removed.  All the things taking a row iterator really
+  should just take a row or row iterator.  push_front and 
+  push_back need to return iterators for autosort case. 
+*/
+
+
+#include <gtk--/container.h>
+#include <gtk/gtkclist.h>
+CLASS_START(Gtk);
+
+class CList;
+namespace CList_Helpers {
+
+class Freeze
+  {
+    CList *clist_;
+    public:
+      Freeze(CList& clist);
+      ~Freeze();
+  };
+
+/*********************************************************************/
+class Row;
+class CellIterator;
+class Cell 
+  {
+    protected:
+      friend class CList;
+      friend class Row;
+
+      GtkCList    *parent_;
+      GtkCListRow *row__;
+      gint         number__;
+      gint         column_;
+
+      GtkCell* get_cell();
+      GtkCell* get_cell() const;
+      GtkCListRow* get_row();
+      GtkCListRow* get_row() const;
+      gint get_row_num();
+      gint get_row_num() const;
+
+      Cell(GtkCList *,GtkCListRow *,gint);
+      Cell(GtkCList *,gint,gint);
+      Cell();
+
+      void redraw();
+
+    public:
+      GtkCellType get_type() const;
+      Gtk::Style* get_style() const;
+      nstring get_text() const;
+      guint8 get_spacing() const;
+      Gdk_Pixmap get_pixmap() const;
+      Gdk_Bitmap get_mask() const;
+
+      //: Removes all cell contents
+      void clear();
+  
+      //: Sets the style of the cell
+      void set_style(Gtk::Style&);
+
+      //: Sets the spacing between pixmap and text.
+      void set_spacing(guint8);
+
+      //: Sets the text of the cell
+      void set_text(nstring);
+
+      //: Sets the pixmap of the cell
+      void set_pixmap(const Gdk_Pixmap& pixmap,const Gdk_Bitmap& mask=0);
+
+      void set_shift(gint vertical,gint horizontal);
+
+      void select();
+      void unselect();
+      void moveto(gfloat row_align=0.5,gfloat col_align=0.5);
+
+  };
+
+class CellIterator: private Cell
+  {
+    private:
+      friend class Row;
+      CellIterator(GtkCList* parent, GtkCListRow* row, gint column)
+        : Cell(parent,row,column) 
+        {}
+
+    public:
+      CellIterator()
+        : Cell() 
+        {}
+
+      typedef bidirectional_iterator_tag iterator_category;
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
+
+      typedef Cell  value_type;
+      typedef Cell* pointer;
+      typedef Cell& reference;
+      typedef CellIterator Self;
+
+      Self&  operator++();
+      Self&  operator--();
+      Self   operator++(int) {Self t=*this; Self::operator++(); return t;}
+      Self   operator--(int) {Self t=*this; Self::operator--(); return t;}
+
+      reference operator*()  const;
+      pointer operator -> () const;
+
+      bool operator ==(const Self& cell) const {return column_==cell.column_;}
+      bool operator !=(const Self& cell) const {return column_!=cell.column_;}
+  };
+
+/*********************************************************************/
+
+// Types 
+class ColumnVector;
+class ColumnIterator;
+class Column 
+  {
+    protected:
+      friend class ColumnVector;
+      GtkCList* parent_;
+      gint column_;
+
+      Column(GtkCList* parent,gint number);
+      Column();
+
+    public:
+
+      void set_active();
+      void set_passive();
+
+      void set_title(const string& title);
+      string get_title();
+
+      void set_widget(Gtk::Widget* widget=0);
+      void set_widget(Gtk::Widget& widget);
+      Gtk::Widget* get_widget();
+      void set_justification(GtkJustification);
+      void set_visiblity(bool);
+      void set_resizable(bool);
+      void set_auto_resize(bool);
+      gint get_optimal_width();
+
+      void set_width(gint);
+      void set_min_width(gint);
+      void set_max_width(gint);
+      void moveto(gfloat row_align=0.5,gfloat col_align=0.5);
+  };
+
+class SelectionList;
+class RowList;
+class RowIterator;
+class Row
+  {
+    public:
+      typedef Cell                               value_type;
+      typedef value_type &                       reference;
+      typedef const value_type &                 const_reference;
+
+      typedef CellIterator                       iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t                             difference_type;
+      typedef size_t                             size_type;
+
+    protected:
+      friend class SelectionList;
+      friend class RowList;
+
+      GtkCList*    parent_;
+      GtkCListRow* row__;    // cache of row node   (0 if not set)
+      gint         number__; // cache of row number (-1 if not set)
+
+      GtkCListRow* get_row();
+      GtkCListRow* get_row() const;
+
+      Row(GtkCList*,GtkCListRow*);
+      Row(GtkCList*,gint);
+      Row();
+
+      iterator begin_() const 
+        { return iterator(parent_,get_row(),0); }
+      iterator end_() const   
+        { return iterator(parent_,get_row(),parent_->columns); }
+
+      Row& operator = (const Row& r)
+        { parent_=r.parent_; row__=r.row__; number__=r.number__; return *this; }
+
+    public:
+      Row(const Row& r)
+        : parent_(r.parent_), row__(r.row__), number__(r.number__)
+        {}
+
+      ~Row() {}
+
+      gint get_row_num();
+      gint get_row_num() const;
+
+      GtkVisibility is_visible();
+
+      Gtk::Style* get_style() const;
+      gpointer get_data() const; 
+      bool get_selectable() const; 
+      void moveto(gfloat row_align=0.5,gfloat col_align=0.5);
+
+      void set_style(Gtk::Style&);
+      void set_data(gpointer); 
+      void set_data(gpointer,GtkDestroyNotify); 
+      void set_selectable(bool selectable); 
+      void set_foreground(const Gdk_Color& color); 
+      void set_background(const Gdk_Color& color); 
+
+      void focus();
+      void select(gint column=-1);
+      void unselect(gint column=-1);
+
+      // we want the row to look like a pointer for consistancy
+      Row& operator *()              { return *this; }
+      const Row& operator *() const  { return *this; }
+      Row* operator ->()             { return this; }
+      const Row* operator ->() const { return this; }
+
+
+      /*** Cell Vector operations ***/
+
+      iterator begin()
+        {return begin_();}
+      iterator end()
+        {return end_();}
+
+      const_iterator begin() const
+        { return const_iterator(begin_()); }
+      const_iterator end() const
+        { return const_iterator(end_()); }
+
+      reverse_iterator rbegin()
+        { return reverse_iterator(end_()); }
+      reverse_iterator rend()
+        { return reverse_iterator(begin_()); }
+
+      const_reverse_iterator rbegin() const
+        { return const_reverse_iterator(reverse_iterator(end_())); }
+      const_reverse_iterator rend() const
+        { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      size_type size(void) const
+        { return size_type(parent_->columns); }
+      size_type max_size(void) 
+        { return size_type(parent_->columns); }
+      bool empty(void) 
+        { return false; }
+
+      value_type operator[](size_type l) const
+        { return Cell(parent_, get_row(), l); }
+
+  };
+
+
+// Iterators
+class ColumnIterator: private Column
+  {
+    private:
+      friend class ColumnVector;
+      ColumnIterator(GtkCList* parent,gint number)
+        : Column(parent,number) 
+        {}
+
+    public:
+      ColumnIterator()
+        : Column()
+        {}
+
+      typedef bidirectional_iterator_tag iterator_category;
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
+
+      typedef Column  value_type;
+      typedef Column* pointer;
+      typedef Column& reference;
+      typedef ColumnIterator Self;
+
+      Self&  operator++();
+      Self&  operator--();
+      Self   operator++(int) {Self t=*this; Self::operator++(); return t;}
+      Self   operator--(int) {Self t=*this; Self::operator--(); return t;}
+
+      reference operator*() const;
+      pointer operator -> () const;
+
+      bool operator ==(const Self& col) const {return column_==col.column_;}
+      bool operator !=(const Self& col) const {return column_!=col.column_;}
+
+  };
+
+class RowIterator: protected Row
+  {
+    protected:
+      friend class RowList;
+      GList* node_;
+ 
+      RowIterator(GtkCList*,GList*);
+      RowIterator(GtkCList*,gint);
+    public:
+
+      typedef bidirectional_iterator_tag iterator_category;
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
+
+      typedef Row  value_type;
+      typedef Row* pointer;
+      typedef Row& reference;
+
+      typedef RowIterator Self;
+
+      RowIterator();
+      RowIterator(const Self& s)
+        : Row(s), node_(s.node_) {}
+
+      Self& operator= (const Self& s)
+        { Row::operator=(s); node_=s.node_; return *this; }
+
+      Self&  operator++();
+      Self&  operator--();
+      Self   operator++(int) {Self t=*this; Self::operator++(); return t;}
+      Self   operator--(int) {Self t=*this; Self::operator--(); return t;}
+
+      reference operator*()  const;
+      pointer operator -> () const;
+
+      bool operator ==(const Self& row) const {return node_==row.node_;}
+      bool operator !=(const Self& row) const {return node_!=row.node_;}
+
+    protected:
+      GList* get_node() const;
+      GtkCListRow* get_row() const;
+      gint get_row_num() const;
+  };
+
+class SelectionIterator: protected Row
+  {
+    private:
+      friend class SelectionList;
+      GList* node_;
+
+      SelectionIterator(GtkCList* parent,GList* node)
+        : Row(parent,0), node_(node)
+        {}
+
+    public:
+      typedef bidirectional_iterator_tag iterator_category;
+      typedef size_t size_type;
+      typedef ptrdiff_t difference_type;
+
+      typedef Row  value_type;
+      typedef Row* pointer;
+      typedef Row& reference;
+
+      typedef SelectionIterator Self;
+
+      SelectionIterator()
+        {}
+
+      SelectionIterator(const Self& s)
+        : Row(s), node_(s.node_) {}
+
+      Self& operator= (const Self& s)
+        { Row::operator=(s); node_=s.node_; return *this; }
+
+      reference operator*()  const;
+      pointer operator -> () const;
+
+      Self&  operator++();
+      Self&  operator--();
+      Self   operator++(int) {Self t=*this; Self::operator++(); return t;}
+      Self   operator--(int) {Self t=*this; Self::operator--(); return t;}
+
+      bool operator ==(const Self& row) const {return node_==row.node_;}
+      bool operator !=(const Self& row) const {return node_!=row.node_;}
+  };
+
+// Containers
+
+class ColumnVector 
+  {
+    public:
+      typedef Column                             value_type;
+      typedef value_type &                       reference;
+      typedef const value_type &                 const_reference;
+
+      typedef ColumnIterator                     iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t                             difference_type;
+      typedef size_t                             size_type;
+
+    private:
+      friend class CList;
+      Gtk::CList *parent_; // this will be shared with the other lists.
+
+      iterator begin_() const;
+      iterator end_() const;
+
+    public:
+
+      iterator begin()
+        {return begin_();}
+      iterator end()
+        {return end_();}
+
+      const_iterator begin() const
+        { return const_iterator(begin_()); }
+      const_iterator end() const
+        { return const_iterator(end_()); }
+
+      reverse_iterator rbegin()
+        { return reverse_iterator(end_()); }
+      reverse_iterator rend()
+        { return reverse_iterator(begin_()); }
+
+      const_reverse_iterator rbegin() const
+        { return const_reverse_iterator(reverse_iterator(end_())); }
+      const_reverse_iterator rend() const
+        { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      value_type front() const     { return *begin(); }
+      value_type back() const      { return *(--end()); }
+
+      value_type operator[](size_type l) const;
+
+      size_type size(void) const;
+      size_type max_size(void) const; 
+      bool empty(void) 
+        { return false; }
+
+      // This has not insert, erase, remove, or clear methods
+      // It is not changable
+
+  };
+
+class SelectionList
+  {
+    public:
+      typedef Row                                value_type;
+      typedef value_type &                       reference;
+      typedef const value_type &                 const_reference;
+
+      typedef SelectionIterator                  iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t                             difference_type;
+      typedef size_t                             size_type;
+
+    private:
+      friend class CList;
+      Gtk::CList *parent_; // this will be shared with the other lists.
+
+      iterator begin_() const;
+      iterator end_() const;
+
+      GList*& glist() const;
+
+    public:
+      iterator begin()
+        {return begin_();}
+      iterator end()
+        {return end_();}
+
+      const_iterator begin() const
+        { return const_iterator(begin_()); }
+      const_iterator end() const
+        { return const_iterator(end_()); }
+
+      reverse_iterator rbegin()
+        { return reverse_iterator(end_()); }
+      reverse_iterator rend()
+        { return reverse_iterator(begin_()); }
+
+      const_reverse_iterator rbegin() const
+        { return const_reverse_iterator(reverse_iterator(end_())); }
+      const_reverse_iterator rend() const
+        { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      value_type front() const     { return *begin(); }
+      value_type back() const      { return *(--end()); }
+
+      // This is order n. (use at own risk)
+      value_type operator[](size_type l) const;
+
+      size_type size(void) const;
+      size_type max_size(void) const { return size_type(-1); }
+      bool empty(void) { return glist() == 0; }
+
+      void all();
+      void clear();
+      void undo();
+
+      // this has no insert method, items can only be removed
+  };
+
+class RowList 
+  {
+    public:
+      typedef Row                                value_type;
+      typedef value_type &                       reference;
+      typedef const value_type &                 const_reference;
+
+      typedef RowIterator                        iterator;
+      typedef G_List_ConstIterator<iterator>     const_iterator;
+      typedef G_List_ReverseIterator<iterator>   reverse_iterator;
+      typedef G_List_ConstIterator<reverse_iterator>   const_reverse_iterator;
+
+      typedef size_t                             difference_type;
+      typedef size_t                             size_type;
+
+    private:
+      friend class CList;
+      Gtk::CList * parent_; // this will be shared with the other lists.
+
+      iterator begin_() const;
+      iterator end_() const;
+
+      GList*& glist() const;
+
+    public:
+      iterator begin()
+        {return begin_();}
+      iterator end()
+        {return end_();}
+
+      const_iterator begin() const
+        { return const_iterator(begin_()); }
+      const_iterator end() const
+        { return const_iterator(end_()); }
+
+      reverse_iterator rbegin()
+        { return reverse_iterator(end_()); }
+      reverse_iterator rend()
+        { return reverse_iterator(begin_()); }
+
+      const_reverse_iterator rbegin() const
+        { return const_reverse_iterator(reverse_iterator(end_())); }
+      const_reverse_iterator rend() const
+        { return const_reverse_iterator(reverse_iterator(begin_())); }
+
+      value_type front() const     { return *begin(); }
+      value_type back() const      { return *(--end()); }
+
+      // This is order n. (use at own risk)
+      value_type operator[](size_type l) const;
+
+      size_type size(void) const;
+      size_type max_size(void) const { return size_type(-1); }
+      bool empty(void) { return glist() == 0; }
+
+      iterator insert(iterator position, const Gtk::SArray& e);
+      iterator insert(const_reference position, const Gtk::SArray& e);
+
+      void push_front(const Gtk::SArray& e);
+      void push_back(const Gtk::SArray& e);
+      void pop_front()                  { erase(begin()); }
+      void pop_back()                   { erase(--end()); }
+
+      void clear();
+
+      iterator erase(iterator);
+      void erase(iterator start, iterator stop);
+      void remove(const_reference);
+
+      void swap(iterator, iterator);
+      void move(iterator, iterator);
+      void swap(const_reference, const_reference);
+      void move(const_reference, const_reference);
+
+      // returns end if no rows have the specified data.
+      // FIXME this is not the right solution to the problem
+      // as it doesn't handle cases of multiple data.
+      iterator find_data(gpointer);
+  };
+}
+
+
+class Adjustment;
+class Style;
+
+//: A multi-columned scrolling list widget.
+//- The GtkCList widget is a very useful multi-columned scrolling list. It can
+//- display data in nicely aligned vertical columns, with titles at the top of the list.
+class CList : public Container
+{
+  WRAP_CLASS(CList,GtkCList,GTK_CLIST,GTK_IS_CLIST,clist,
+             Gtk::Container,GtkContainer,GTK_CONTAINER);
+
+public:
+  // import our helper names
+  typedef Gtk::CList_Helpers::Freeze Freeze;
+
+  typedef Gtk::CList_Helpers::Cell Cell;
+  typedef Gtk::CList_Helpers::CellIterator CellIterator;
+
+  typedef Gtk::CList_Helpers::Column Column;
+  typedef Gtk::CList_Helpers::ColumnVector ColumnVector;
+
+  typedef Gtk::CList_Helpers::Row Row;
+  typedef Gtk::CList_Helpers::RowIterator RowIterator;
+  typedef Gtk::CList_Helpers::RowList RowList;
+
+  typedef Gtk::CList_Helpers::SelectionIterator  SelectionIterator ;
+  typedef Gtk::CList_Helpers::SelectionList SelectionList;
+
+
+  CList(int columns, const gchar * titles[] = 0);
+  CList(const SArray &titles);
+  WRAP_DTOR;
+
+
+/* Adjustment functions */
+
+  //: Set adjustments of clist.
+  WRAP_METHOD(
+    void gtk_clist_set_hadjustment(GtkCList*,GtkAdjustment*),
+    void           set_hadjustment(Gtk::Adjustment *adjustment=0));
+  WRAP_METHOD(
+    void gtk_clist_set_vadjustment(GtkCList*,GtkAdjustment*),
+    void           set_vadjustment(Gtk::Adjustment *adjustment=0));
+  WRAP_METHOD(
+    void gtk_clist_set_hadjustment(GtkCList*,GtkAdjustment*),
+    void           set_hadjustment(Gtk::Adjustment &adjustment));
+  WRAP_METHOD(
+    void gtk_clist_set_vadjustment(GtkCList*,GtkAdjustment*),
+    void           set_vadjustment(Gtk::Adjustment &adjustment));
+
+  //: Get adjustments of clist.
+  WRAP_MEMBER(value,hadjustment,hadjustment,Gtk::Adjustment*,GtkAdjustment*); 
+  WRAP_MEMBER(value,vadjustment,vadjustment,Gtk::Adjustment*,GtkAdjustment*); 
+
+
+/* global clist changes */
+
+  //: Set the border style of the clist, valid choices are:
+  //- {\enum GTK_SHADOW_NONE}, {\enum GTK_SHADOW_IN},
+  //- {\enum GTK_SHADOW_OUT}, {\enum GTK_SHADOW_ETCHED_IN}, or
+  //- {\enum GTK_SHADOW_ETCHED_OUT}.
+  WRAP_METHOD(
+    void gtk_clist_set_shadow_type(GtkCList*,GtkShadowType),
+    void           set_shadow_type(GtkShadowType type));
+
+  //: Set the clist's selection mode.
+  //- mode can be one of: {\enum GTK_SELECTION_SINGLE},
+  //- {\enum GTK_SELECTION_BROWSE}, or {\enum GTK_SELECTION_MULTIPLE},
+  //- {\enum GTK_SELECTION_EXTENDED}.
+  WRAP_METHOD(
+    void gtk_clist_set_selection_mode(GtkCList*,GtkSelectionMode),
+    void           set_selection_mode(GtkSelectionMode mode));
+
+  WRAP_MEMBER(value,selection_mode,selection_mode,
+                    GtkSelectionMode,GtkSelectionMode);
+
+  //: Enable clists reorder ability.
+  WRAP_METHOD(
+    void gtk_clist_set_reorderable(GtkCList*,gboolean),
+    void           set_reorderable(bool reorderable));
+  WRAP_METHOD(
+    void gtk_clist_set_use_drag_icons(GtkCList*,gboolean),
+    void           set_use_drag_icons(bool use_icons));
+  WRAP_METHOD(
+    void gtk_clist_set_button_actions(GtkCList*,guint,guint8),
+    void           set_button_actions(guint button, guint8 button_actions));
+
+  //: Freeze all visual updates of the list.
+  //- Thaw the list after you
+  //- have made a number of changes and the updates will occur in a more
+  //- efficient manner than if you made them on an unfrozen list.
+  WRAP_METHOD(
+    void gtk_clist_freeze(GtkCList*),
+    void           freeze());
+
+  //: Thaw the list (see also {freeze}).
+  WRAP_METHOD(
+   void gtk_clist_thaw(GtkCList*),
+   void           thaw());
+
+  //: Show the column title buttons.
+  WRAP_METHOD(
+    void gtk_clist_column_titles_show(GtkCList*),
+    void           column_titles_show());
+
+  //: Hide the column title buttons.
+  WRAP_METHOD(
+    void gtk_clist_column_titles_hide (GtkCList*),
+    void           column_titles_hide());
+
+  //: Set all column titles to be a active.
+  //- The column titles will respond to button presses, prelight, and grab keyboard focus.
+  WRAP_METHOD(
+    void gtk_clist_column_titles_active(GtkCList*),
+    void           column_titles_active());
+
+  //: Set all column titles to be passive.
+  //- Passive titles act as just a title and do not respond to 
+  //- focus and button presses.
+  WRAP_METHOD(
+    void gtk_clist_column_titles_passive (GtkCList*),
+    void           column_titles_passive());
+
+  WRAP_METHOD(
+    gint gtk_clist_columns_autosize(GtkCList*),
+    gint           columns_autosize());
+
+  //: Change the height of the rows.
+  //- The default is the height of the current font.
+  WRAP_METHOD(
+    void gtk_clist_set_row_height (GtkCList*,guint),
+    void           set_row_height(guint height));
+
+  WRAP_MEMBER(value,row_height,row_height,gint,gint);
+
+
+/********************** Sort operations **************************/
+
+  //: Sets a compare function different to the default.
+  WRAP_METHOD(
+    void gtk_clist_set_compare_func(GtkCList*,GtkCListCompareFunc),
+    void           set_compare_func(GtkCListCompareFunc cmp_func));
+
+  //: The column to sort by.
+  WRAP_METHOD(
+    void gtk_clist_set_sort_column(GtkCList*,gint),
+    void           set_sort_column(gint column));
+
+  //: How to sort : ascending or descending.
+  WRAP_METHOD(
+    void gtk_clist_set_sort_type (GtkCList*,GtkSortType),
+    void           set_sort_type (GtkSortType sort_type));
+
+  //: Sort the list with the current compare function.
+  WRAP_METHOD(
+    void gtk_clist_sort(GtkCList*),
+    void           sort());
+
+  //: Automatically sort upon insertion.
+  WRAP_METHOD(
+    void gtk_clist_set_auto_sort(GtkCList*,gboolean),
+    void           set_auto_sort(bool auto_sort));
+
+/********************** Resource **************************/
+  RowList& rows()             
+    {
+      return reinterpret_cast<RowList&>(clist_self);
+      //pointer to ref cast works because 
+      //Gtk::CList* parent_ is only member data of RowList.
+      //TODO: Add a RowList constructor instead. 
+    }
+  const RowList& rows() const 
+    {
+      return reinterpret_cast<const RowList&>(clist_self);
+      //pointer to ref cast works because 
+      //Gtk::CList* parent_ is only member data of RowList.
+      //TODO: Add a RowList constructor instead. 
+    }
+  Row row(int r) { return rows()[r]; }
+  const Row row(int r) const { return rows()[r]; }
+
+  SelectionList& selection()       
+    {
+      return reinterpret_cast<SelectionList&>(clist_self);
+      //pointer to ref cast works because 
+      //Gtk::CList* parent_ is only member data of SelectionList.
+      //TODO: Add a SelectionList constructor instead. 
+    }
+  const SelectionList& selection() const 
+    {
+      return reinterpret_cast<const SelectionList&>(clist_self);
+      //pointer to ref cast works because 
+      //Gtk::CList* parent_ is only member data of SelectionList.
+      //TODO: Add a SelectionList constructor instead.
+    }
+
+  ColumnVector& columns()       
+    {
+      return reinterpret_cast<ColumnVector&>(clist_self);
+      //pointer to ref cast works because 
+      //Gtk::CList* parent_ is only member data of ColumnVector.
+      //TODO: Add a ColumnVector constructor instead. 
+    }
+  const ColumnVector& columns() const 
+    {
+      return reinterpret_cast<const ColumnVector&>(clist_self);
+      //pointer to ref cast works because 
+      //Gtk::CList* parent_ is only member data of ColumnVector.
+      //TODO: Add a ColumnVector constructor instead. 
+    }
+  Column column(int c) { return columns()[c]; }
+  const Column column(int c) const { return columns()[c]; }
+
+  Cell cell(gint row, gint column);
+  const Cell cell(gint row, gint column) const;
+
+/********************** Selection operations **************************/
+
+  //: Select a row.
+  //- obsolete: Use clist.row(row).select().
+#m4start
+GTKMM_SECTION(USR)
+         void operator ()(gint row, gint column=-1)
+             {emit(row,column);}
+         void emit(gint row, gint column=-1);
+#m4end
+  SIGNAL_SPEC("select_row",both|translate, void select_row(gint,gint,GdkEvent*));
+
+ //: Unselect a row.
+ //- obsolete: Use clist.row(row).unselect().
+#m4start
+GTKMM_SECTION(USR)
+           void operator ()(gint row, gint column=-1)
+             {emit(row,column);}
+           void emit(gint row, gint column=-1);
+#m4end
+  SIGNAL_SPEC("unselect_row",both|translate, void unselect_row(gint,gint,GdkEvent*));
+
+
+  //: Return the row column corresponding to the x and y coordinates.
+  //- <P> reference and pointer style available.
+  WRAP_METHOD(
+    gint gtk_clist_get_selection_info(GtkCList*,gint,gint,gint*,gint*),
+    gint           get_selection_info(gint x, gint y, 
+                                      gint *row, gint *column) const);
+
+  //: Select all rows.
+  //- This method only works in multi or extended mode.
+  //-
+  //- obsolete: Use clist.selection().all().
+  SIGNAL_SPEC("select_all",          both, 
+    void select_all(),gtk_clist_select_all);
+
+  //- obsolete: Use clist.selection().clear().
+  SIGNAL_SPEC("unselect_all",        both, 
+    void unselect_all(),gtk_clist_unselect_all);
+
+  //: Undo the last select/unselect operation.
+  //- obsolete: Use clist.selection().undo().
+  SIGNAL_SPEC("undo_selection",      both, 
+    void undo_selection(), gtk_clist_undo_selection);
+
+/********************** Col operations **************************/
+
+  //: Set a column title to be activate.
+  //- The column responds to button presses, prelights, and grabs keyboard focus.
+  //-
+  //- obsolete: Use clist.column(column).set_active().
+  WRAP_METHOD(
+    void gtk_clist_column_title_active(GtkCList*,gint),
+    void           column_title_active(gint column));
+
+  //: Set a column title to be passive.
+  //- obsolete: Use clist.column(column).set_passive().
+  WRAP_METHOD(
+    void gtk_clist_column_title_passive(GtkCList*,gint),
+    void           column_title_passive(gint column));
+
+  //: Set the title in the column title button.
+  //- obsolete: Use clist.column(column).set_title(title).
+  WRAP_METHOD(
+    void gtk_clist_set_column_title(GtkCList*,gint,const gchar*),
+    void           set_column_title(gint column, const string &title));
+
+  //: Returns the title of column. Returns an empty string if title is not set.
+  //- obsolete: Use clist.column(column).get_title().
+  WRAP_METHOD(
+    gchar *gtk_clist_get_column_title(GtkCList *,gint),
+    string           get_column_title(gint column) const);
+
+  //: Set a widget instead of a title for the column title button.
+  //- obsolete: Use clist.column(column).set_widget(widgth).
+  WRAP_METHOD(
+    void gtk_clist_set_column_widget(GtkCList*,gint,GtkWidget*),
+    void           set_column_widget(gint column,Gtk::Widget &widget));
+
+  //: Returns the column widget.
+  //- obsolete: Use clist.column(column).get_widget().
+  WRAP_METHOD(
+    GtkWidget* gtk_clist_get_column_widget(GtkCList*,gint),
+    Gtk::Widget* get_column_widget(gint column) const);
+
+
+  //: Set the justification on a column.
+  //- valid choices are:
+  //- {\enum GTK_JUSTIFY_LEFT}, {\enum GTK_JUSTIFY_RIGHT},
+  //- {\enum GTK_JUSTIFY_CENTER}, or{\enum GTK_JUSTIFY_FILL}.
+  //-
+  //- obsolete: Use clist.column(column).set_justification(justify).
+  WRAP_METHOD(
+    void gtk_clist_set_column_justification(GtkCList*,gint,GtkJustification),
+    void           set_column_justification(gint column, GtkJustification justification));
+
+  //: Set visibility of a column.
+  //- obsolete: Use clist.column(column).set_visiblity(on).
+  WRAP_METHOD(
+    void gtk_clist_set_column_visibility(GtkCList*,gint,gboolean),
+    void           set_column_visibility(gint column, bool visible));
+
+  //: Enable/disable column resize operations by mouse.
+  //- obsolete: Use clist.column(column).set_resizable(on).
+  WRAP_METHOD(
+    void gtk_clist_set_column_resizeable(GtkCList*,gint,gboolean),
+    void           set_column_resizeable(gint column, bool resizeable));
+
+  //: Resize column automatically to its optimal width.
+  //- obsolete: Use clist.column(column).set_auto_resize(on).
+  WRAP_METHOD(
+    void gtk_clist_set_column_auto_resize(GtkCList*,gint,gboolean),
+    void           set_column_auto_resize(gint column, bool auto_resize));
+
+  //: Return the optimal column width, i.e. maximum of all cell widths.
+  //- obsolete: Use clist.column(column).get_optimal_width().
+  WRAP_METHOD(
+    gint gtk_clist_optimal_column_width(GtkCList*,gint),
+    gint           optimal_column_width(gint column)const);
+
+  //: Set the pixel width of a column.
+  //- This is a necessary step in
+  //- creating a CList because otherwise the column width is chozen from
+  //- the width of the column title, which will never be right.
+  //-
+  //- obsolete: Use clist.column(column).set_width(width).
+  WRAP_METHOD(
+    void gtk_clist_set_column_width(GtkCList*,gint,gint),
+    void           set_column_width(gint column, gint width));
+
+  //: Returns the width in pixels of the column, returns -1 if the column doens't exist. Column numbers start with 0.
+  //- obsolete: Use clist.column(column).get_width().
+  gint get_column_width(gint column) const;
+
+  //: Set column minimum width. min_width < 0 => no restriction.
+  //- obsolete: Use clist.column(column).set_min_width(min).
+  WRAP_METHOD(
+    void gtk_clist_set_column_min_width(GtkCList*,gint,gint),
+    void           set_column_min_width(gint column, gint min_width));
+
+  //: Set column maximum width. max_width < 0 => no restriction.
+  //- obsolete: Use clist.column(column).set_max_width(max).
+  WRAP_METHOD(
+    void gtk_clist_set_column_max_width(GtkCList*,gint,gint),
+    void           set_column_max_width(gint column, gint max_width));
+
+  //: Represents a button click on a column title.
+  SIGNAL_SPEC("click_column",        both|emit, void click_column(gint));
+
+/********************** Row List operations **************************/
+  //: Prepend a row (see also insert_row).
+  //- note: Method is named prepend in gtk+.
+  //-
+  //- obsolete: Use clist.rows().push_front(text).
+  WRAP_METHOD(
+    gint gtk_clist_prepend    (GtkCList*,gchar**),
+    gint           prepend_row(const SArray &text));
+  WRAP_METHOD(
+    gint gtk_clist_prepend    (GtkCList*,gchar**),
+    gint           prepend(const SArray &text));
+
+  //: Append a row (see also insert_row).
+  //- note: Method is named append in gtk+.
+  //-
+  //- obsolete: Use clist.rows().push_back(text).
+  WRAP_METHOD(
+    gint gtk_clist_append    (GtkCList*,gchar **),
+    gint           append_row(const SArray &text));
+  WRAP_METHOD(
+    gint gtk_clist_append    (GtkCList*,gchar **),
+    gint           append(const SArray &text));
+
+  //: Inserts a row at index row.
+  //- note: Method is named insert in gtk+.
+  //-
+  //- obsolete: Use clist.rows().insert(clist.row(row),text).
+  WRAP_METHOD(
+    gint gtk_clist_insert    (GtkCList*,gint,gchar**),
+    gint           insert_row(gint row, const SArray& text));
+  WRAP_METHOD(
+    gint gtk_clist_insert    (GtkCList*,gint,gchar**),
+    gint           insert(gint row, const SArray& text));
+
+  //: Clear the entire list. 
+  //- Faster than individual removal.
+  //-
+  //- obsolete: Use clist.rows().clear().
+  WRAP_METHOD(
+    void gtk_clist_clear(GtkCList*),
+    void           clear());
+
+  //: Returns the number of rows.
+  //- obsolete: Use clist.rows().size().
+  WRAP_MEMBER(value,rows,rows,gint,gint);
+
+  //: Swap the position of two rows.
+  //- obsolete: Use clist.rows().swap(clist.row(row1),clist.row(row2)).
+  WRAP_METHOD(
+    void gtk_clist_swap_rows(GtkCList*,gint,gint),
+    void           swap_rows(gint row1, gint row2));
+
+  //: Move row from source_row position to dest_row position.
+  //- obsolete: Use clist.rows().move(clist.row(row1),clist.row(row2)).
+  SIGNAL_SPEC("row_move",both, void row_move(gint,gint),gtk_clist_row_move);
+
+  //: Given a data pointer, find the first (and hopefully only!) row that points to that data, or -1 if none.
+  //- obsolete: Use clist.rows().find_data(data).
+  WRAP_METHOD(
+    gint gtk_clist_find_row_from_data(GtkCList*,gpointer),
+    gint           find_row_from_data(gpointer data) const);
+
+  
+/********************** Row operations **************************/
+
+  //: Whether the row is visible.
+  //- obsolete: Use clist.row(row).is_visible().
+  WRAP_METHOD(
+    GtkVisibility gtk_clist_row_is_visible(GtkCList*,gint),
+    GtkVisibility           row_is_visible(gint row)const);
+
+  //: Sets the foreground color of a row, the color must already be allocated.
+  //- obsolete: Use clist.row(row).set_foreground(color).
+  WRAP_METHOD(
+    void gtk_clist_set_foreground(GtkCList*,gint,GdkColor*),
+    void           set_foreground(gint row, const Gdk_Color &color));
+
+  //: Sets the background color of a row, the color must already be allocated.
+  //- obsolete: Use clist.row(row).set_background(color).
+  WRAP_METHOD(
+    void gtk_clist_set_background (GtkCList*,gint,GdkColor*),
+    void           set_background(gint row, const Gdk_Color &color));
+
+  //- obsolete: Use clist.row(row).set_style(style).
+  WRAP_METHOD(
+    void gtk_clist_set_row_style(GtkCList*,gint,GtkStyle*),
+    void           set_row_style(gint row, Gtk::Style &style));
+
+  //- obsolete: Use clist.row(row).get_style().
+  WRAP_METHOD(
+    GtkStyle* gtk_clist_get_row_style(GtkCList*,gint),
+    Gtk::Style* get_row_style(gint row) const);
+
+  //- obsolete: Use clist.row(row).get_selectable().
+  WRAP_METHOD(
+    gboolean gtk_clist_get_selectable(GtkCList*,gint),
+    bool               get_selectable(gint row) const);
+
+  //: Set selectable flag of a single row.
+  //- obsolete: Use clist.row(row).set_selectable(selectable).
+  WRAP_METHOD(
+    void gtk_clist_set_selectable(GtkCList*,gint,gboolean),
+    void           set_selectable(gint row, bool selectable));
+
+  //: Removes row at index row.
+  //- Note: this is gtk_clist_remove() in gtk, but renamed 
+  //- here to remove_row().
+  //-
+  //- obsolete: Use clist.rows().remove(clist.row(row)).
+  WRAP_METHOD(
+    void gtk_clist_remove    (GtkCList*,gint),
+    void           remove_row(gint row));
+
+  //: Sets a arbitrary data pointer for a given row.
+  //- obsolete: Use clist.row(row).get_data().
+  WRAP_METHOD(
+    void gtk_clist_set_row_data (GtkCList*,gint,gpointer),
+    void set_row_data(gint row, gpointer data));
+
+  //: Returns the data set for a row.
+  //- obsolete: Use clist.row(row).set_data(data).
+  WRAP_METHOD(
+    gpointer gtk_clist_get_row_data(GtkCList*,gint),
+    gpointer           get_row_data(gint row) const);
+
+  //: Sets a data pointer for a given row with destroy notification.
+  //- obsolete: Use clist.row(row).set_data(data,destroy).
+  WRAP_METHOD(
+    void gtk_clist_set_row_data_full(GtkCList*,gint,gpointer,GtkDestroyNotify),
+    void           set_row_data_full(gint row, gpointer data, 
+                                     GtkDestroyNotify destroy));
+
+
+/********************** Cell operations *************************/
+
+  //: Scroll the viewing area of the list to the given column and row.
+  //- row_align and col_align are between 0-1 representing the
+  //- location the row should appear on the screnn, 0.0 being top or left,
+  //- 1.0 being bottom or right. If row or column is -1 then then there
+  //- is no change.
+  //-
+  //- obsolete: Use clist.cell(row,column).moveto().
+  WRAP_METHOD(
+    void gtk_clist_moveto(GtkCList*,gint,gint,gfloat,gfloat),
+    void           moveto(gint row, gint column, 
+                          gfloat row_align=0.5, gfloat col_align=0.5));
+
+
+  //: Returns the cell type.
+  //- GtkCellType is one of:
+  //- {\enum GTK_CELL_EMPTY}, {\enum GTK_CELL_TEXT}, {\enum GTK_CELL_PIXMAP},
+  //- {\enum GTK_CELL_PIXTEXT}, or {\enum GTK_CELL_WIDGET}.
+  //-
+  //- obsolete: Use clist.cell(row,column).get_type().
+  WRAP_METHOD(
+    GtkCellType gtk_clist_get_cell_type(GtkCList*,gint,gint),
+    GtkCellType           get_cell_type(gint row, gint column) const);
+
+  //: Sets a given cell's text, replacing it's current contents.
+  //-
+  //- obsolete: Use clist.cell(row,column).set_text(text).
+  WRAP_METHOD(
+    void gtk_clist_set_text(GtkCList*,gint,gint,const gchar*),  
+    void           set_text(gint row, gint column, const string &text));
+
+  //: Get cell's text.
+  //- Returns true on success.
+  //-
+  //- obsolete: Use clist.cell(row,column).get_text().
+  bool         get_text(gint row, gint column, nstring *text) const;
+  bool         get_text(gint row, gint column, string &text) const;
+  nstring get_text(gint row, gint column) const;
+
+  //: Sets a given cell's pixmap, replacing it's current contents.
+  //- obsolete: Use clist.cell(row,column).set_pixmap(pixmap,mask).
+  WRAP_METHOD(
+    void gtk_clist_set_pixmap(GtkCList*,gint,gint,GdkPixmap*,GdkBitmap*),
+    void           set_pixmap(gint row, gint column,
+		              const Gdk_Pixmap &pixmap,const Gdk_Bitmap &mask));
+
+  //: Get cell's pixmap.
+  //- obsolete: Use clist.cell(row,column).get_pixmap().
+  gint get_pixmap(gint row, gint column,
+                  Gdk_Pixmap &pixmap, Gdk_Bitmap &mask) const;
+
+  //: Sets a given cell's pixmap and text, replacing it's current contents.
+  //- obsolete: Full replacement of contents not needed, use cell methods.
+  WRAP_METHOD(
+    void gtk_clist_set_pixtext(GtkCList*,gint,gint,const gchar*,guint8,
+                               GdkPixmap*,GdkBitmap*),
+    void           set_pixtext(gint row, gint column, const string &text, 
+                               guint8 spacing,
+                               const Gdk_Pixmap &pixmap, 
+                               const Gdk_Bitmap &mask));
+
+  //- Any of the return pointer can be NULL if you are not interested.
+  //-
+  //- text: An output not an input. If the cell is empty a zero length
+  //- string ("") will be returned.
+  //-
+  //- obsolete: Use cell methods.
+  bool get_pixtext(gint row, gint column, string& text,
+                   guint8 &spacing,
+                   Gdk_Pixmap &pixmap, Gdk_Bitmap &mask) const;
+
+  //: Set cell style.
+  //- obsolete: Use clist.cell(row,column).set_style(style).
+  WRAP_METHOD(
+    void gtk_clist_set_cell_style(GtkCList*,gint,gint,GtkStyle*),
+    void           set_cell_style(gint row, gint column, Gtk::Style &style));
+
+  //: Get cell style.
+  //- obsolete: Use clist.cell(row,column).get_style().
+  WRAP_METHOD(
+    GtkStyle* gtk_clist_get_cell_style (GtkCList*,gint,gint),
+    Gtk::Style* get_cell_style (gint row, gint column) const);
+
+  //: This sets a horizontal and vertical shift for drawing the contents of a cell.
+  //- The shift can be positive or negative. This is
+  //- particulary useful for indenting items in a column.
+  //-
+  //- obsolete: Use clist.cell(row,column).set_shift(vertical,horizontal).
+  WRAP_METHOD(
+    void gtk_clist_set_shift(GtkCList*,gint,gint,gint,gint),
+    void           set_shift(gint row, gint column, 
+                             gint vertical, gint horizontal));
+
+
+/*********************** Signals (largely internal) ****************/
+
+  SIGNAL_SPEC("resize_column",       both, void resize_column(gint,gint));
+  SIGNAL_SPEC("toggle_focus_row",    both, void toggle_focus_row());
+  SIGNAL_SPEC("toggle_add_mode",     both, void toggle_add_mode());
+  SIGNAL_SPEC("start_selection",     both, void start_selection());
+  SIGNAL_SPEC("end_selection",       both, void end_selection());
+  SIGNAL_SPEC("extend_selection",    both, 
+    void extend_selection(GtkScrollType,gfloat,gboolean));
+  SIGNAL_SPEC("scroll_vertical",     both, 
+    void scroll_vertical(GtkScrollType,gfloat));
+  SIGNAL_SPEC("scroll_horizontal",   both, 
+    void scroll_horizontal(GtkScrollType,gfloat));
+  SIGNAL_SPEC("abort_column_resize", both, void abort_column_resize());
+  SIGNAL_SPEC("set_scroll_adjustments", both|fake, 
+    void set_scroll_adjustments(Gtk::Adjustment*, Gtk::Adjustment*),
+    void gtk_clist_set_scroll_adjustments(GtkCList*,GtkAdjustment*, GtkAdjustment*));
+
+/****** These are user overridable functions, NOT signals **********/
+  SIGNAL_SPEC("insert_row",impl, int insert_row(gint row, gchar**)); 
+              //const Gtk_SArray&));
+  SIGNAL_SPEC("remove_row",impl, void remove_row(gint row));
+  SIGNAL_SPEC("clear",     impl, void clear());
+  SIGNAL_SPEC("sort_list", impl, void sort_list());
+
+
+private:
+  virtual bool check_seliterator_type() const;
+};
+typedef CList ColumnList;
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+#include <gtk--/style.h>
+#include <gtk--/adjustment.h>
+
+namespace Gtk
+{
+
+CList::CList(int columnsx, const gchar* titles[])
+  : Container((GtkContainer*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GTK_OBJECT_UNSET_FLAGS(gtkobj(), GTK_CONSTRUCTED);
+  gtk_clist_construct(gtkobj(),columnsx,const_cast<gchar**>(titles));
+}
+
+CList::CList(const SArray &titles)
+  : Container((GtkContainer*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GTK_OBJECT_UNSET_FLAGS(gtkobj(), GTK_CONSTRUCTED);
+  gtk_clist_construct(gtkobj(),titles.size(),const_cast<gchar**>((const char **)titles));
+}
+
+CList::CList(GtkCList *castitem)
+  : Container(GTK_CONTAINER(castitem))
+{
+  initialize_class();
+}
+
+bool CList::check_seliterator_type() const { return true; }
+
+bool
+CList::get_text(gint row, gint column, nstring *text) const
+{
+  g_return_val_if_fail(text != 0, false);
+
+  gchar *tmp;
+  
+  gint rc = gtk_clist_get_text(const_cast<GtkCList*>(gtkobj()),
+			       row, column, &tmp);
+  *text=tmp; 
+
+  return (rc)?true:false;  
+}
+
+bool
+CList::get_text(gint row, gint column, string &text) const
+{
+  gchar *tmp;
+  
+  gint rc = gtk_clist_get_text(const_cast<GtkCList*>(gtkobj()),
+			       row, column, &tmp);
+  text=tmp; 
+
+  return (rc)?true:false;  
+}
+
+nstring
+CList::get_text(gint row, gint column) const
+{
+  gchar *tmp;
+  
+  gint rc = gtk_clist_get_text(const_cast<GtkCList*>(gtkobj()),
+			       row, column, &tmp);
+  if ( rc )
+    return tmp;
+  else
+    return 0;
+}
+
+gint
+CList::get_pixmap(gint row, gint column,
+		      Gdk_Pixmap &pixmap, Gdk_Bitmap &mask) const
+{ 
+  GdkPixmap *pm;
+  GdkBitmap *bm;
+  gint rc=gtk_clist_get_pixmap(const_cast<GtkCList*>(gtkobj()),
+			       row, column, &pm, &bm);
+  pixmap=Gdk_Pixmap(pm);
+  mask=Gdk_Bitmap(bm);
+  return rc;
+}
+
+
+bool 
+CList::get_pixtext(gint row, gint column, string &text,
+		       guint8 &spacing,
+		       Gdk_Pixmap &pixmap, Gdk_Bitmap &mask) const
+{
+
+  GdkBitmap *bm;
+  GdkPixmap *pm;
+  guint8    sp;
+  gchar     *tmp;
+  
+  gint rc = gtk_clist_get_pixtext ( const_cast < GtkCList * > ( gtkobj () ),
+				  row, column, &tmp, &sp, &pm, &bm );
+  pixmap = Gdk_Pixmap ( pm );
+  mask = Gdk_Bitmap ( bm );
+
+  if ( tmp )
+    text = tmp;
+  else
+    text.erase();
+
+  spacing = sp;
+
+  return (rc)?true:false;
+}
+
+
+gint 
+CList::get_column_width ( gint column ) const
+{
+  if ( column < ( gtkobj () -> columns ) )
+      return gtkobj () -> column [ column ] .  width;
+  return -1;
+}
+
+CList::Cell CList::cell(gint row, gint column)
+  {
+    return Cell(gtkobj(),row,column);
+  }
+
+const CList::Cell CList::cell(gint row, gint column) const
+  {
+    return Cell(const_cast<GtkCList*>(gtkobj()),row,column);
+  }
+
+void CList::Proxy_select_row::emit(int row, int column)
+  {
+    gtk_clist_select_row(obj->gtkobj(),row,column);
+  }
+
+void CList::Proxy_unselect_row::emit(int row, int column)
+  {
+    gtk_clist_unselect_row(obj->gtkobj(),row,column);
+  }
+
+namespace CList_Helpers {
+/**************************************************************
+*** Cell
+**************************************************************/
+Cell::Cell(GtkCList *parent, gint row, gint column)
+  {
+    parent_=parent;
+    row__=0;
+    number__=row;
+    column_=column;
+  }
+
+Cell::Cell(GtkCList *parent, GtkCListRow *row, gint column)
+  {
+    parent_=parent;
+    row__=row;
+    number__=-1;
+    column_=column;
+  }
+
+Cell::Cell()
+  {
+    parent_=0;
+    row__=0;
+    number__=-1;
+    column_=0;
+  }
+
+GtkCell* Cell::get_cell()
+  {  
+    if (column_>=parent_->columns) 
+      return 0;
+    return &(get_row()->cell[column_]);
+  }
+
+GtkCell* Cell::get_cell() const
+  {  
+    if (column_>=parent_->columns) 
+      return 0;
+    return &(get_row()->cell[column_]);
+  }
+
+GtkCListRow* Cell::get_row() const
+  {
+    if (!row__) 
+      return (GtkCListRow*)(g_list_nth(parent_->row_list,number__)->data);
+    return row__;
+  }
+
+GtkCListRow* Cell::get_row()
+  {
+    if (!row__) 
+      row__=(GtkCListRow*)(g_list_nth(parent_->row_list,number__)->data);
+    return row__;
+  }
+
+gint Cell::get_row_num()
+  {
+    if (number__==-1)
+      number__=g_list_index(parent_->row_list,row__);
+    return number__;
+  }
+
+gint Cell::get_row_num() const
+  {
+    if (number__!=-1) return number__;
+    return g_list_index(parent_->row_list,row__);
+  }
+
+GtkCellType Cell::get_type() const
+  {  
+    GtkCell* cell=get_cell();
+    if (!cell) return GTK_CELL_EMPTY;
+    return cell->type;
+  }
+
+Gtk::Style* Cell::get_style() const
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return 0;
+    return wrap(cell->style);
+  }
+
+nstring Cell::get_text() const
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return 0;
+    switch (cell->type)
+      {
+        case GTK_CELL_TEXT:
+          return ((GtkCellText*)cell)->text;
+        case GTK_CELL_PIXTEXT:
+          return ((GtkCellPixText*)cell)->text;
+        default:
+          return 0;
+      }
+  }
+
+guint8 Cell::get_spacing() const
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return 0;
+    switch (cell->type)
+      {
+        case GTK_CELL_PIXTEXT:
+          return ((GtkCellPixText*)cell)->spacing;
+        default:
+          return 0;
+      }
+  }
+
+Gdk_Pixmap Cell::get_pixmap() const
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return 0;
+    switch (cell->type)
+      {
+        case GTK_CELL_PIXMAP:
+          return ((GtkCellPixmap*)cell)->pixmap;
+        case GTK_CELL_PIXTEXT:
+          return ((GtkCellPixText*)cell)->pixmap;
+        default:
+          return 0;
+      }
+  }
+
+Gdk_Bitmap Cell::get_mask() const
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return 0;
+    switch (cell->type)
+      {
+        case GTK_CELL_PIXMAP:
+          return ((GtkCellPixmap*)cell)->mask;
+        case GTK_CELL_PIXTEXT:
+          return ((GtkCellPixText*)cell)->mask;
+        default:
+          return 0;
+      }
+  }
+
+void Cell::redraw()
+  {
+    if (parent_->freeze_count==0
+        && gtk_clist_row_is_visible (parent_, get_row_num()) 
+              != GTK_VISIBILITY_NONE)
+      (((GtkCListClass*)(((GtkObject*)parent_)->klass))->draw_row)
+        (parent_,NULL,get_row_num(),get_row());
+  }
+
+void Cell::moveto(gfloat row_align,gfloat col_align)
+  {
+    gtk_clist_moveto(parent_, get_row_num(), column_, row_align, col_align);
+  }
+
+void Row::moveto(gfloat row_align,gfloat col_align)
+  {
+    gtk_clist_moveto(parent_, get_row_num(), -1, row_align, col_align);
+  }
+
+void Column::moveto(gfloat row_align,gfloat col_align)
+  {
+    gtk_clist_moveto(parent_, -1, column_, row_align, col_align);
+  }
+
+void Cell::set_style(Gtk::Style& style)
+  {
+    gtk_clist_set_cell_style(parent_, get_row_num(), column_, 
+       style.gtkobj());
+  }
+
+void Cell::set_spacing(guint8 spacing)
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return;
+    switch (cell->type)
+      {
+        case GTK_CELL_PIXTEXT:
+          cell->u.pt.spacing=spacing;
+          redraw();
+        default:
+          return;
+      }
+  }
+
+void Cell::clear()
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return;
+    switch (cell->type)
+      {
+        case GTK_CELL_EMPTY:
+          break;
+        case GTK_CELL_TEXT:
+          g_free(cell->u.text);
+          break;
+        case GTK_CELL_PIXMAP:
+          gdk_pixmap_unref (cell->u.pm.pixmap);
+          if (cell->u.pm.mask)
+            gdk_bitmap_unref (cell->u.pm.mask);
+          break;
+        case GTK_CELL_PIXTEXT:
+          g_free (cell->u.pt.text);
+          gdk_pixmap_unref (cell->u.pt.pixmap);
+          if (cell->u.pt.mask)
+            gdk_bitmap_unref (cell->u.pt.mask);
+          break;
+        case GTK_CELL_WIDGET:
+          /* unimplimented */
+          break;
+        default:
+          break;
+      }
+    cell->type=GTK_CELL_EMPTY;
+  }
+
+void Cell::set_text(nstring str)
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return;
+    Gdk_Pixmap pm;
+    Gdk_Bitmap bm;
+    switch (cell->type)
+      {
+        case GTK_CELL_EMPTY:
+        case GTK_CELL_TEXT:
+          gtk_clist_set_text(parent_,get_row_num(),column_,str.c_str());
+          break;
+        case GTK_CELL_PIXTEXT:
+          pm=cell->u.pt.pixmap;
+          bm=cell->u.pt.mask;
+          gtk_clist_set_pixtext(parent_,get_row_num(),column_,str.c_str(),
+            cell->u.pt.spacing, pm, bm);
+          break;
+        case GTK_CELL_PIXMAP:
+          pm=cell->u.pm.pixmap;
+          bm=cell->u.pm.mask;
+          gtk_clist_set_pixtext(parent_,get_row_num(),column_,str.c_str(),
+            5, pm, bm);
+        default:
+          break;
+      }
+  }
+
+void Cell::set_pixmap(const Gdk_Pixmap& pixmap,const Gdk_Bitmap& mask)
+  {
+    GtkCell *cell=get_cell();
+    if (!cell) return;
+    string s;
+    switch (cell->type)
+      {
+        case GTK_CELL_EMPTY:
+        case GTK_CELL_PIXMAP:
+          gtk_clist_set_pixmap(parent_,get_row_num(),column_,
+            pixmap.gdkobj(), mask.gdkobj());
+          break;
+        case GTK_CELL_TEXT:
+          s=cell->u.text;
+          if (s=="")  // junk text should be removed
+            gtk_clist_set_pixmap(parent_,get_row_num(),column_,
+              pixmap.gdkobj(), mask.gdkobj());
+          else
+            gtk_clist_set_pixtext(parent_,get_row_num(),column_,s.c_str(),
+              5, pixmap.gdkobj(), mask.gdkobj());
+          break;
+        case GTK_CELL_PIXTEXT:
+          s=cell->u.pt.text;
+          gtk_clist_set_pixtext(parent_,get_row_num(),column_,s.c_str(),
+            cell->u.pt.spacing, pixmap.gdkobj(), mask.gdkobj());
+          break;
+        default:
+          break;
+      }
+  }
+
+void Cell::set_shift(gint vertical,gint horizontal)
+  {
+    gtk_clist_set_shift(parent_,get_row_num(),column_, vertical, horizontal);
+  }
+
+void Cell::select()
+  {
+    gtk_clist_select_row(parent_,get_row_num(),column_);
+  }
+
+void Cell::unselect()
+  {
+    gtk_clist_unselect_row(parent_,get_row_num(),column_);
+  }
+
+/**************************************************************
+*** Column
+**************************************************************/
+Column::Column(GtkCList* parent,gint number)
+  {
+    parent_=parent;
+    column_=number;
+  }
+
+Column::Column()
+  {
+    parent_=0;
+    column_=0;
+  }
+
+void Column::set_active()
+  {
+    gtk_clist_column_title_active(parent_,column_);
+  }
+
+void Column::set_passive()
+  {
+    gtk_clist_column_title_passive(parent_,column_);
+  }
+
+void Column::set_title(const string& title)
+  {
+    gtk_clist_set_column_title(parent_,column_,title.c_str());
+  }
+
+string Column::get_title()
+  {
+    return string(gtk_clist_get_column_title(parent_,column_));
+  }
+
+void Column::set_widget(Gtk::Widget* widget)
+  {
+    gtk_clist_set_column_widget(parent_,column_,
+                                widget?widget->gtkobj():0);
+  }
+
+void Column::set_widget(Gtk::Widget& widget)
+  {
+    gtk_clist_set_column_widget(parent_,column_,widget.gtkobj());
+  }
+
+Gtk::Widget* Column::get_widget()
+  {
+    return wrap(gtk_clist_get_column_widget(parent_,column_));
+  }
+
+void Column::set_justification(GtkJustification justification)
+  {
+    gtk_clist_set_column_justification(parent_,column_,justification);
+  }
+
+void Column::set_visiblity(bool vis)
+  {
+    gtk_clist_set_column_visibility(parent_,column_,vis);
+  }
+
+void Column::set_resizable(bool resize)
+  {
+    gtk_clist_set_column_resizeable(parent_,column_,resize);
+  }
+
+void Column::set_auto_resize(bool resize)
+  {
+    gtk_clist_set_column_auto_resize(parent_,column_,resize);
+  }
+
+gint Column::get_optimal_width()
+  {
+    return gtk_clist_optimal_column_width(parent_,column_);
+  }
+
+void Column::set_width(gint width)
+  {
+    gtk_clist_set_column_width(parent_,column_,width);
+  }
+
+void Column::set_min_width(gint min)
+  {
+    gtk_clist_set_column_min_width(parent_,column_,min);
+  }
+
+void Column::set_max_width(gint max)
+  {
+    gtk_clist_set_column_max_width(parent_,column_,max);
+  }
+
+/**************************************************************
+*** Row
+**************************************************************/
+
+Row::Row()
+  {
+    parent_ = 0;
+    row__ = 0;
+    number__ = 0; 
+  }
+
+Row::Row(GtkCList* parent,GtkCListRow* row)
+  {
+    parent_=parent;
+    row__=row;
+    number__=-1;
+  }
+
+Row::Row(GtkCList* parent,gint number)
+  {
+    parent_=parent;
+    row__=0;
+    number__=number;
+  }
+
+GtkCListRow* Row::get_row()
+  {
+    if (!row__&&number__==-1)
+      return 0;
+    if (!row__)
+      row__=(GtkCListRow*)(g_list_nth(parent_->row_list,number__)->data);
+    return row__;
+  }
+
+GtkCListRow* Row::get_row() const
+  {
+    if (!row__&&number__==-1)
+      return 0;
+    if (!row__) 
+      return (GtkCListRow*)(g_list_nth(parent_->row_list,number__)->data);
+    return row__;
+  }
+
+gint Row::get_row_num() 
+  {
+    if (number__==-1) 
+      number__=g_list_index(parent_->row_list,row__);
+    return number__;
+  }
+
+gint Row::get_row_num() const
+  {
+    if (number__!=-1) return number__;
+    return g_list_index(parent_->row_list,row__);
+  }
+
+GtkVisibility Row::is_visible()
+  {
+    return gtk_clist_row_is_visible(parent_,get_row_num());
+  }
+
+Gtk::Style* Row::get_style() const
+  {
+    return wrap(gtk_clist_get_row_style(parent_,get_row_num()));
+  }
+
+gpointer Row::get_data() const
+  {
+    return gtk_clist_get_row_data(parent_,get_row_num());
+  }
+
+bool Row::get_selectable() const
+  {
+    return gtk_clist_get_selectable(parent_, get_row_num())?true:false;
+  }
+
+void Row::set_style(Gtk::Style& style)
+  {
+    gtk_clist_set_row_style(parent_,get_row_num(),style.gtkobj());
+  }
+
+void Row::set_data(gpointer data)
+  {
+    gtk_clist_set_row_data(parent_, get_row_num(), data);
+  }
+
+void Row::set_data(gpointer data,GtkDestroyNotify destroy)
+  {
+    gtk_clist_set_row_data_full(parent_, get_row_num(), data, destroy);
+  }
+
+void Row::set_selectable(bool selectable)
+  {
+    gtk_clist_set_selectable(parent_, get_row_num(), selectable);
+  }
+
+void Row::set_foreground(const Gdk_Color& color) 
+  {
+    gtk_clist_set_foreground(parent_, get_row_num(), 
+       const_cast<GdkColor*>(color.gdkobj()));
+  }
+
+void Row::set_background(const Gdk_Color& color) 
+  {
+    gtk_clist_set_background(parent_, get_row_num(), 
+       const_cast<GdkColor*>(color.gdkobj()));
+  }
+
+
+void Row::focus()
+  {
+    parent_->focus_row=get_row_num();
+    if (parent_->freeze_count==0)
+      gtk_widget_draw(GTK_WIDGET(parent_),0);
+  }
+
+void Row::select(gint column)
+  { 
+    gtk_clist_select_row(parent_, get_row_num(), column);
+  }                       
+
+void Row::unselect(gint column)
+  { 
+    gtk_clist_unselect_row(parent_, get_row_num(), column);
+  }                       
+                      
+/**************************************************************
+*** CellIterator
+**************************************************************/
+CellIterator&  CellIterator::operator++()
+  {
+    if (column_<parent_->columns) column_++;
+    return *this;
+  }
+
+CellIterator&  CellIterator::operator--()
+  {
+    if (column_>0) column_--;
+    return *this;
+  }
+
+Cell& CellIterator::operator*() const
+  {
+    return const_cast<CellIterator&>(*this);
+  }
+
+Cell* CellIterator::operator -> () const
+  {
+    return &operator*();
+  };
+
+/**************************************************************
+*** ColumnIterator
+**************************************************************/
+ColumnIterator&  ColumnIterator::operator++()
+  {
+    if (column_<parent_->columns) column_++;
+    return *this;
+  }
+
+ColumnIterator&  ColumnIterator::operator--()
+  {
+    if (column_>-1) column_--;
+    return *this;
+  }
+
+
+Column& ColumnIterator::operator*() const
+  {
+    return const_cast<ColumnIterator&>(*this);
+  }
+
+Column* ColumnIterator::operator -> () const
+  {
+    return &operator*();
+  }
+
+/**************************************************************
+*** RowIterator
+**************************************************************/
+
+/* RowIterator is fun.  We have 3 things to be
+concerned about.  The row number, the row and 
+the GList node to that row.  The row__ and number__
+should be blank because otherwise inserts will break
+the cache and give incorrect results.  */
+
+RowIterator::RowIterator(GtkCList* parent,GList* node)
+  : Row(parent,-1), node_(node)
+  {}
+
+RowIterator::RowIterator(GtkCList* parent,gint number)
+  : Row(parent,number), node_(0)
+  {}
+
+RowIterator::RowIterator()
+  : Row(0,-1), node_(0)
+  {}
+
+RowIterator&  RowIterator::operator++()
+  {
+    if (!parent_) return *this;
+    get_node();  // work over caches
+    number__=-1; row__=0;
+    if (!node_)
+      node_=parent_->row_list;
+    else
+      node_ = g_list_next(node_);
+    return *this;
+  }
+
+RowIterator&  RowIterator::operator--()
+  {
+    if (!parent_) return *this;
+    get_node();  // work over caches
+    number__=-1; row__=0; 
+    if (!node_)
+      node_=parent_->row_list_end;
+    else  
+      node_ = g_list_previous(node_);  
+    return *this;
+  }
+
+// get the node changing from row or number
+GList* RowIterator::get_node() const
+  {
+    RowIterator& r=const_cast<RowIterator&>(*this);
+    if (node_) return node_;
+    if (row__) 
+      r.node_=g_list_find(parent_->row_list,row__);
+    else if (number__!=-1)
+      r.node_=g_list_nth(parent_->row_list,number__);
+    return r.node_;
+  }
+
+// get the row changing from node or number
+GtkCListRow* RowIterator::get_row() const
+  {
+    RowIterator& r=const_cast<RowIterator&>(*this);
+    if (node_&&!row__) 
+      {
+        r.row__=(GtkCListRow*)(node_->data);
+        r.number__=-1;
+      }
+    return r.Row::get_row();
+  }
+
+gint RowIterator::get_row_num() const
+  {
+    RowIterator& r=const_cast<RowIterator&>(*this);
+    if (node_&&number__==-1)
+      {
+        r.row__=(GtkCListRow*)(node_->data);
+        r.number__=g_list_position(parent_->row_list,node_);
+      }
+    return r.Row::get_row_num();
+  }
+
+Row& RowIterator::operator*() const
+  {
+    RowIterator& r=const_cast<RowIterator&>(*this);
+    r.get_row();
+    return r;
+  }
+
+Row* RowIterator::operator -> () const
+  {
+    return &operator*();
+  }
+
+Row& SelectionIterator::operator*() const
+  {
+    SelectionIterator& r=const_cast<SelectionIterator&>(*this);
+    r.row__=0;
+    r.number__=GPOINTER_TO_INT(node_->data);
+    return r;
+  }
+
+Row* SelectionIterator::operator -> () const
+  {
+    return &operator*();
+  }
+
+SelectionIterator&  SelectionIterator::operator++()
+  {
+    if (!node_)
+      node_=parent_->selection;
+    else
+      node_ = g_list_next(node_);
+    return *this;
+  }
+
+SelectionIterator&  SelectionIterator::operator--()
+  {
+    if (!node_)
+      node_=parent_->selection_end;
+    else
+      node_ = g_list_previous(node_);
+    return *this;
+  }
+
+/**************************************************************
+*** ColumnVector
+**************************************************************/
+ColumnVector::size_type ColumnVector::size(void) const
+  { return size_type(parent_->gtkobj()->columns); }
+ColumnVector::size_type ColumnVector::max_size(void) const
+  { return size_type(parent_->gtkobj()->columns); }
+ 
+ColumnVector::value_type ColumnVector::operator[](size_type l) const
+  {
+    return Column(parent_->gtkobj(),l);
+  }
+
+/**************************************************************
+*** SelectionList
+**************************************************************/
+SelectionList::iterator SelectionList::begin_() const 
+  { return iterator(parent_->gtkobj(),parent_->gtkobj()->selection); }
+SelectionList::iterator SelectionList::end_() const
+  { return iterator(parent_->gtkobj(),(GList*)0); }
+
+GList*& SelectionList::glist() const 
+  { return parent_->gtkobj()->selection; }
+
+SelectionList::value_type SelectionList::operator[](size_type l) const
+  {
+    return Row(parent_->gtkobj(),
+       GPOINTER_TO_INT(g_list_nth(parent_->gtkobj()->selection,l)->data));
+  }
+
+void SelectionList::all()
+  {
+    gtk_clist_select_all(parent_->gtkobj());
+  }
+
+void SelectionList::clear()
+  {
+    gtk_clist_unselect_all(parent_->gtkobj());
+  }
+
+void SelectionList::undo()
+  {
+    gtk_clist_undo_selection(parent_->gtkobj());
+  }
+
+SelectionList::size_type SelectionList::size() const
+  {
+    return g_list_length(parent_->gtkobj()->selection);
+  }
+
+/**************************************************************
+*** RowList
+**************************************************************/
+RowList::iterator RowList::begin_() const
+  { return iterator(parent_->gtkobj(),parent_->gtkobj()->row_list); }
+RowList::iterator RowList::end_() const
+  { return iterator(parent_->gtkobj(),(GList*)0); }
+
+GList*& RowList::glist() const
+  { return parent_->gtkobj()->row_list; }
+
+RowList::value_type RowList::operator[](size_type l) const
+  {
+    return Row(parent_->gtkobj(),l);
+  }
+
+RowList::iterator RowList::insert(iterator i,const Gtk::SArray& text)
+  {
+    // on autosort the row may be different.
+    return iterator(parent_->gtkobj(),
+      gtk_clist_insert(parent_->gtkobj(),i.get_row_num(),
+      const_cast<gchar**>((const gchar**)text)));
+  }
+
+RowList::iterator RowList::insert(const_reference i,const Gtk::SArray& text)
+  {
+    // on autosort the row may be different.
+    return iterator(parent_->gtkobj(),
+      gtk_clist_insert(parent_->gtkobj(),i.get_row_num(),
+      const_cast<gchar**>((const gchar**)text)));
+  }
+
+void RowList::push_front(const Gtk::SArray& text)
+  {
+    gtk_clist_prepend(parent_->gtkobj(),
+      const_cast<gchar**>((const gchar**)text));
+  }
+
+void RowList::push_back(const Gtk::SArray& text)
+  {
+    gtk_clist_append(parent_->gtkobj(),
+      const_cast<gchar**>((const gchar**)text));
+  }
+
+
+void RowList::clear()
+  {
+    gtk_clist_clear(parent_->gtkobj());
+  }
+
+RowList::iterator RowList::erase(iterator i)
+  {
+    iterator i2=i;
+    ++i2;
+    gtk_clist_remove(parent_->gtkobj(),i.get_row_num());
+    return i2;
+  }
+
+void RowList::erase(iterator start, iterator stop)
+  {
+    for (start; start!=stop; start++)
+      erase(start);
+  }
+
+void RowList::remove(const_reference r)
+  {
+    gtk_clist_remove(parent_->gtkobj(),r.get_row_num());
+  }
+
+void RowList::swap(iterator i1, iterator i2)
+  {
+    gtk_clist_swap_rows(parent_->gtkobj(),i1.get_row_num(),i2.get_row_num());
+  }
+
+void RowList::move(iterator i1, iterator i2)
+  {
+    gtk_clist_row_move(parent_->gtkobj(),i1.get_row_num(),i2.get_row_num());
+  }
+
+void RowList::swap(const_reference i1, const_reference i2)
+  {
+    gtk_clist_swap_rows(parent_->gtkobj(),i1.get_row_num(),i2.get_row_num());
+  }
+
+void RowList::move(const_reference i1, const_reference i2)
+  {
+    gtk_clist_row_move(parent_->gtkobj(),i1.get_row_num(),i2.get_row_num());
+  }
+
+
+RowList::iterator RowList::find_data(gpointer data)
+  {
+    gint i=gtk_clist_find_row_from_data(parent_->gtkobj(), data);
+    if (i==-1) return end();
+    return RowIterator(parent_->gtkobj(),
+                       g_list_nth(parent_->gtkobj()->row_list,i));
+  }
+
+RowList::size_type RowList::size(void) const
+  {
+    return parent_->gtkobj()->rows;
+  }
+
+Freeze::Freeze(CList & clist)
+  : clist_(&clist)
+  {
+    clist_->freeze();
+  }
+
+Freeze::~Freeze()
+  {
+    clist_->thaw();
+  }
+
+
+
+} /* namespace CList_Helpers */
+
+} /* namespace Gtk */
+
+DOCUMENTATION_START;

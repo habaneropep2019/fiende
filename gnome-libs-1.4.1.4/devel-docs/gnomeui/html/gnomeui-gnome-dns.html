@@ -1,0 +1,601 @@
+<HTML
+><HEAD
+><TITLE
+>gnome-dns</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.74b"><LINK
+REL="HOME"
+TITLE="Gnome User Interface Library Reference Manual"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Gnome User Interface Library"
+HREF="libgnomeui.html"><LINK
+REL="PREVIOUS"
+TITLE="gnome-dialog-util"
+HREF="gnomeui-gnome-dialog-util.html"><LINK
+REL="NEXT"
+TITLE="gnome-geometry"
+HREF="gnomeui-gnome-geometry.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>Gnome User Interface Library Reference Manual</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnomeui-gnome-dialog-util.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnomeui.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnomeui-gnome-geometry.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="GNOMEUI-GNOME-DNS"
+>gnome-dns</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN4019"
+></A
+><H2
+>Name</H2
+>gnome-dns&nbsp;--&nbsp;Non-blocking name resolver interface.</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN4022"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;#include &lt;gnome.h&gt;
+
+
+void        <A
+HREF="gnomeui-gnome-dns.html#GNOME-DNS-INIT"
+>gnome_dns_init</A
+>                  (<GTKDOCLINK
+HREF="GINT"
+>gint</GTKDOCLINK
+> server_count);
+<GTKDOCLINK
+HREF="GUINT32"
+>guint32</GTKDOCLINK
+>     <A
+HREF="gnomeui-gnome-dns.html#GNOME-DNS-LOOKUP"
+>gnome_dns_lookup</A
+>                (const char *hostname,
+                                             void (*callback) (guint32 ip_addr, void *callback_data),
+                                             void *callback_data);
+void        <A
+HREF="gnomeui-gnome-dns.html#GNOME-DNS-ABORT"
+>gnome_dns_abort</A
+>                 (<GTKDOCLINK
+HREF="GUINT32"
+>guint32</GTKDOCLINK
+> tag);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN4031"
+></A
+><H2
+>Description</H2
+><P
+>You can use this module to do name server lookups in a non-blocking
+fashion.  You need to provide a callback function to be invoked when
+the name has been resolved.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN4034"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN4036"
+></A
+><H3
+><A
+NAME="GNOME-DNS-INIT"
+></A
+>gnome_dns_init ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        gnome_dns_init                  (<GTKDOCLINK
+HREF="GINT"
+>gint</GTKDOCLINK
+> server_count);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Initialize the dns functions for use.</P
+><P
+>server_count specifies the number of servers to <GTKDOCLINK
+HREF="FORK"
+>fork</GTKDOCLINK
+>() at
+init, or &lt;= 0 to do dynamic server forking.  If you are
+concerned about virtual mem usage, fork your servers as one of the
+first things in your program.</P
+><P
+>Note that it will still do dynamic forking if you specify &gt; 0. 
+when it runs out of servers.. a good init value may be 1 or 2.</P
+><P
+>Results:
+<A
+HREF="gnomeui-gnome-dns.html#GNOME-DNS-LOOKUP"
+>gnome_dns_lookup</A
+>() will be ready for use.</P
+><P
+>Side effects:
+The library is initialized.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN4049"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>server_count</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> server count to <GTKDOCLINK
+HREF="FORK"
+>fork</GTKDOCLINK
+>() at init.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN4059"
+></A
+><H3
+><A
+NAME="GNOME-DNS-LOOKUP"
+></A
+>gnome_dns_lookup ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+><GTKDOCLINK
+HREF="GUINT32"
+>guint32</GTKDOCLINK
+>     gnome_dns_lookup                (const char *hostname,
+                                             void (*callback) (guint32 ip_addr, void *callback_data),
+                                             void *callback_data);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Looks up an address and returns a tag for use with
+<A
+HREF="gnomeui-gnome-dns.html#GNOME-DNS-ABORT"
+>gnome_dns_abort</A
+>() if desired.  May not return -1 if
+hostname was in cache.</P
+><P
+>Callback function is called when dns_lookup is complete.</P
+><P
+>Side effects:
+A new dns server may be spawned if all the current servers
+are in use.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN4069"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>hostname</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> hostname to lookup</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> function to call when dns lookup is complete.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>callback_data</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> data to pass to the callback function</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+></SPAN
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> A tag identifying this lookup or 0 if lookup was
+in cache.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN4090"
+></A
+><H3
+><A
+NAME="GNOME-DNS-ABORT"
+></A
+>gnome_dns_abort ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        gnome_dns_abort                 (<GTKDOCLINK
+HREF="GUINT32"
+>guint32</GTKDOCLINK
+> tag);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Aborts a previous call to <A
+HREF="gnomeui-gnome-dns.html#GNOME-DNS-LOOKUP"
+>gnome_dns_lookup</A
+>().
+DNS callback function is not called.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN4098"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>tag</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the tag returned from previous call to <A
+HREF="gnomeui-gnome-dns.html#GNOME-DNS-LOOKUP"
+>gnome_dns_lookup</A
+>().</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="gnomeui-gnome-dialog-util.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="book1.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libgnomeui.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="gnomeui-gnome-geometry.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-dialog-util</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>gnome-geometry</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

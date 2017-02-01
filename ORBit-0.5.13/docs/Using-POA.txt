@@ -1,0 +1,124 @@
+Given:
+
+	interface Foo {
+		void bar();
+		long baz(in string blum);
+	};
+you want to write a server for this interface.
+
+After running orbit-idl on this .idl file, you will get a foo.h, and
+foo-{stubs,common,skels}.c
+
+Now, in your server program you write implementation functions called:
+	void do_Foo_bar(PortableServer_Servant servant, CORBA_Environment *ev);
+	CORBA_long do_Foo_baz(PortableServer_Servant, CORBA_char *blum,
+			      CORBA_Environment *ev);
+
+You will notice that the signatures for these functions look almost like the
+signatures for the client-side stubs, but they take a servant as the first
+argument instead of a CORBA_Object. A servant is a language-specific object
+that holds information needed to process requests for a CORBA_Object. There
+is not always a 1:1 mapping between a particular CORBA_Object and a
+particular servant - the CORBA POA allows multiple servants to be used to
+handle different requests on the same CORBA_Object, and it is also possible
+to use one servant to handle requests for multiple CORBA_Object's.
+
+Looking in foo.h, you will notice a POA_Foo__epv type definition. You
+need to create a structure of this type and fill it in with the
+pointers to your implementation functions:
+	POA_Foo__epv my_Foo_epv = {
+		NULL, /* Leave the ORB-private data NULL */
+		&do_Foo_bar,
+		&do_Foo_baz
+	};
+
+
+You also need a PortableServer_ServantBase__epv that contains the
+function table listing your implementations for the basic servant
+functions (this structure is defined in <orb/corba_portableserver_type.h>:
+	PortableServer_ServantBase__epv base_epv = {
+		NULL, /* Leave the ORB-private data NULL */
+		NULL, /* We don't have a servant finalization function that
+		         we want run when this servant is destroyed */
+		NULL, /* We don't have a default_POA function
+			 (not sure what this does :) */
+	};
+
+Now we need to define a POA_Foo__vepv that lists the epv's for all the
+different classes:
+	POA_Foo__vepv foo_vepv = {
+		&base_epv, /* function table for the PortableServer_ServantBase
+			      routines */
+		&my_Foo_epv, /* function table for the POA_Foo routines
+				(for interface X, the server-side POA
+				 stuff is placed in the "POA" namespace,
+				 so the servant stuff for X starts with POA_X_ */
+	};
+Last, but not least, we define the actual servant structure itself:
+	POA_Foo my_Foo_servant = {
+		NULL, /* Leave ORB-private data NULL */
+		&foo_vepv /* Pointer to the vepv (list of function tables) */
+	};
+
+Now in our program, when we want to tell the ORB that we want a
+bona-fide CORBA_Object, able to take requests, we would do something
+like:
+
+/** begin C code **/
+/**** create_Foo_Object
+      Inputs: None
+      Outputs: Return value - stringified IOR of the activated object
+
+      Description: Initializes the servant for use by the ORB,
+		   tells the ORB to send requests to the servant,
+		   and turns the servant into an object reference
+		   that can be passed to other programs for use.
+ */
+char *create_Foo_Object(PortableServer_POA poa, CORBA_Environment *ev)
+{
+	char *retval;
+	CORBA_Object obj;
+	/* An ObjectId is a unique identifier for a specific
+	   CORBA_Object...
+	   The first member should be zero, the second
+	   should be the size of the object identifier string
+	   (including the terminating \0), and the third member
+	   should be the string itself */
+	PortableServer_ObjectId objid = {0, sizeof("myFoo"), "myFoo" };
+
+	/* First, ask the ORB to fill in our servant structure
+	   so it can handle requests */
+	POA_Foo__init(&my_Foo_servant);
+
+	/* Now tell the POA to make requests on this objid
+	   be sent to our servant */
+	PortableServer_POA_activate_object_with_id(poa, &objid,
+						   &my_Foo_servant, ev);
+
+	obj = PortableServer_POA_servant_to_reference(poa, &my_Foo_servant, ev);
+	retval = CORBA_ORB_object_to_string(obj, ev);
+	CORBA_Object_release(obj, ev);
+
+	/* Now tell the POA manager to start taking incoming requests on the
+	   POA that this servant is using */
+	PortableServer_POAManager_activate(PortableServer_POA__get_the_POAManager(poa, ev), ev);
+
+	/* And tell the world how to get to this object */
+	return retval;
+}
+/** end C code **/
+
+Now when you want to deactivate the servant, you would do:
+
+/** begin C code **/
+void destroy_Foo_Object(PortableServer_POA poa, CORBA_Environment *ev)
+{
+	PortableServer_ObjectId objid = {0, sizeof("myFoo"), "myFoo" };
+
+	PortableServer_POA_deactivate_object(poa, &objid, ev);
+
+	POA_Foo__fini(&my_Foo_servant);
+}
+/** end C code **/
+
+-- Elliot

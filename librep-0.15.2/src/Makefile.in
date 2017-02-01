@@ -1,0 +1,172 @@
+# Makefile.in -- input for the src directory's Makefile
+# Copyright (C) 1998 John Harper <john@dcs.warwick.ac.uk>
+# $Id: Makefile.in,v 1.75 2001/08/24 03:05:41 jsh Exp $
+#
+# This file is part of Jade.
+#
+# Jade is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# Jade is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Jade; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+top_builddir=..
+VPATH=@srcdir@:@top_srcdir@
+
+COMMON_SRCS =	continuations.c datums.c debug-buffer.c files.c find.c \
+		fluids.c lisp.c lispcmds.c lispmach.c macros.c main.c \
+		message.c misc.c numbers.c origin.c regexp.c regsub.c \
+		streams.c structures.c symbols.c tuples.c values.c weak-refs.c
+UNIX_SRCS =	unix_dl.c unix_files.c unix_main.c unix_processes.c
+
+INSTALL_HDRS = rep.h rep_lisp.h rep_regexp.h rep_subrs.h
+
+SRCS = $(COMMON_SRCS) $(UNIX_SRCS)
+OBJS = $(SRCS:.c=.lo)
+
+SDBM_SRCS = sdbm.c sdbm_pair.c sdbm_hash.c
+SDBM_OBJS = $(SDBM_SRCS:.c=.o)
+SDBM_LOBJS = $(SDBM_SRCS:.c=.lo)
+
+DL_SRCS = repsdbm.c timers.c gettext.c readline.c tables.c repgdbm.c \
+	  record-profile.c safemach.c sockets.c md5.c
+DL_OBJS = sdbm.la timers.la gettext.la readline.la tables.la gdbm.la \
+	  record-profile.la safe-interpreter.la sockets.la md5.la
+DL_DSTS = rep/io/db/sdbm.la rep/io/timers.la rep/i18n/gettext.la \
+	  rep/io/readline.la rep/data/tables.la rep/io/db/gdbm.la \
+	  rep/lang/record-profile.la rep/vm/safe-interpreter.la \
+	  rep/io/sockets.la rep/util/md5.la
+DL_DIRS = rep rep/io rep/io/db rep/i18n rep/data rep/lang rep/vm rep/util
+
+REP_SRCS = rep.c
+REP_OBJS = $(REP_SRCS:.c=.o)
+
+INTL_OBJS_yes=../intl/*.lo
+INTL_OBJS_no=
+INTL_OBJS=$(INTL_OBJS_@USE_INCLUDED_LIBINTL@)
+
+all : librep.la $(DL_OBJS) check-dl rep rep-config rep-remote rep-xgettext .libexec
+
+librep.la : $(OBJS) $(LIBOBJS) $(ALLOCA)
+	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) \
+	  -version-info $(libversion) -export-symbols librep.sym \
+	  -o $@ $^ -rpath $(libdir) $(LIBS) $(GMP_LIBS)
+
+rep : $(REP_OBJS) $(EXTRA_LIBOBJS) librep.la
+	$(LIBTOOL) --mode=link $(CC) -export-dynamic $(CPPFLAGS) $(CFLAGS) -o $@ \
+	  $(REP_OBJS) librep.la $(EXTRA_LIBOBJS) $(LIBS) $(GMP_LIBS)
+
+srep : $(REP_OBJS) $(EXTRA_LIBOBJS) librep.la
+	$(LIBTOOL) --mode=link $(CC) -static -export-dynamic $(CPPFLAGS) $(CFLAGS) -o $@ \
+	  $(REP_OBJS) librep.la $(EXTRA_LIBOBJS) $(LIBS) $(GMP_LIBS)
+
+rep-remote : rep-remote.c
+
+rep-xgettext : rep-xgettext.jl rep .libexec
+	$(COMPILE_ENV) $(rep_prog) --batch -l rep.vm.compiler \
+	  -f compile-batch $< \
+	&& mv $<c $@ && chmod +x $@
+
+check-dl :
+	@set -e; for f in $(DL_OBJS); do \
+	  if grep "dlname=''" $$f >/dev/null; then \
+	    echo; echo "** Error: $$f has no associated shared library;"; \
+	    deps=`grep '^dependency_libs=' $$f \
+	      | sed -e "s/.*='\(.*\)'.*/\1/" \
+	      | sed -e "s/-l//g"`; \
+	    echo "** You may be missing a shared library from: $$deps"; echo; \
+	    exit 1; \
+	  fi; \
+	done
+
+install : all installdirs
+	$(LIBTOOL) --mode=install $(INSTALL_PROGRAM) librep.la $(DESTDIR)${libdir}
+	$(LIBTOOL) -n --finish $(DESTDIR)${libdir}
+	$(LIBTOOL) --mode=install $(INSTALL_PROGRAM) -m 755 rep $(DESTDIR)${bindir}
+	$(LIBTOOL) --mode=install $(INSTALL_PROGRAM) -m 755 repdoc $(DESTDIR)${bindir}
+	$(INSTALL_SCRIPT) -m 755 rep-config $(DESTDIR)${bindir}
+	$(INSTALL_SCRIPT) -m 755 rep-xgettext $(DESTDIR)${bindir}
+	$(INSTALL_PROGRAM) -m 755 rep-remote $(DESTDIR)${bindir}
+	$(foreach x,$(DL_DSTS),\
+	  $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) \
+	  $(notdir $(x)) $(DESTDIR)$(repexecdir)/$(dir $(x));)
+	printf "\nrep_open_globally=yes\n" \
+	  >>$(DESTDIR)${repexecdir}/rep/i18n/gettext.la
+	for i in $(INSTALL_HDRS); do \
+	  $(INSTALL_DATA) $(srcdir)/$$i $(DESTDIR)$(includedir); \
+	done
+	$(INSTALL_DATA) rep_config.h $(DESTDIR)$(repcommonexecdir)
+	$(SHELL) $(top_srcdir)/install-aliases -c . $(DESTDIR)$(repexecdir)
+
+installdirs : mkinstalldirs
+	$(SHELL) $< $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) \
+	  $(foreach x,$(DL_DIRS),$(DESTDIR)$(repexecdir)/$(x)) \
+	  $(DESTDIR)$(includedir)
+
+uninstall :
+	$(LIBTOOL) rm $(DESTDIR)${libdir}/librep.la
+	$(LIBTOOL) rm $(DESTDIR)${bindir}/rep
+	$(LIBTOOL) rm $(DESTDIR)${bindir}/repdoc
+	rm -f $(DESTDIR)${bindir}/rep-config
+	rm -f $(DESTDIR)${bindir}/rep-xgettext
+	rm -f $(DESTDIR)${bindir}/rep-remote
+	for dl in $(DL_DSTS); do \
+	  $(LIBTOOL) rm $(DESTDIR)${repexecdir}/$$dl; \
+	done
+	for i in $(INSTALL_HDRS); do \
+	  rm $(DESTDIR)$(includedir)/$$i; \
+	done
+
+rep-config : rep-config.sh Makefile
+	$(SHELL) $< "${prefix}" "${libdir}" "${version}" \
+	  "${LDFLAGS} ${LIBS} ${GMP_LIBS}" "${repcommonexecdir}">$@
+	chmod +x $@
+
+repdoc : repdoc.o
+	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ $^ $(GDBM_LIBS)
+
+sdbm.la : $(SDBM_LOBJS) repsdbm.lo
+	$(rep_DL_LD) $(LDFLAGS) -o $@ $^
+
+gdbm.la : repgdbm.lo
+	$(rep_DL_LD) $(LDFLAGS) -o $@ $^ $(GDBM_LIBS)
+
+gettext.la : gettext.lo
+	$(rep_DL_LD) $(LDFLAGS) -o $@ $^ $(INTL_OBJS)
+
+readline.la : readline.lo
+	$(rep_DL_LD) $(LDFLAGS) -o $@ $^ $(READLINE_LIBS)
+
+safe-interpreter.la : safemach.lo
+	$(rep_DL_LD) $(LDFLAGS) -o $@ $^
+
+sockets.la : sockets.lo
+	$(rep_DL_LD) $(LDFLAGS) -o $@ $^
+
+md5.la : md5.lo rep-md5.lo
+	$(rep_DL_LD) $(LDFLAGS) -o $@ $^
+
+.libexec : $(DL_OBJS)
+	$(SHELL) $(srcdir)/fake-libexec
+
+clean :
+	rm -f *~ *.o *.lo *.la build.h
+	rm -f repdoc core rep rep-remote srep
+
+distclean : clean
+	rm -f .*.d Makefile rep_config.h dump.out dumped.s rep-config
+	rm -rf .libs .libexec
+
+realclean : distclean
+
+check :
+
+-include $(SRCS:%.c=.%.d) $(DL_SRCS:%.c=.%.d) $(REP_SRCS:%.c=.%.d)

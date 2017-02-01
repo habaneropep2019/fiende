@@ -1,0 +1,146 @@
+<ENUM>
+<NAME>GnorbaInitFlags</NAME>
+typedef enum {
+  GNORBA_INIT_SERVER_FUNC = 1 << 0,
+  GNORBA_INIT_DISABLE_COOKIES = 1 << 1
+} GnorbaInitFlags;
+</ENUM>
+<FUNCTION>
+<NAME>gnome_CORBA_init</NAME>
+<RETURNS>CORBA_ORB  </RETURNS>
+const char *app_id,const char *app_version,int *argc, char **argv,GnorbaInitFlags gnorba_flags,CORBA_Environment *ev
+</FUNCTION>
+<FUNCTION>
+<NAME>gnome_CORBA_init_with_popt_table</NAME>
+<RETURNS>CORBA_ORB  </RETURNS>
+const char *app_id,const char *app_version,int *argc, char **argv,const struct poptOption *options,int popt_flags,poptContext *return_ctx,GnorbaInitFlags gnorba_flags,CORBA_Environment *ev
+</FUNCTION>
+<FUNCTION>
+<NAME>gnome_CORBA_ORB</NAME>
+<RETURNS>CORBA_ORB  </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>gnorba_CORBA_init</NAME>
+<RETURNS>CORBA_ORB  </RETURNS>
+int *argc, char **argv,GnorbaInitFlags flags,CORBA_Environment *ev
+</FUNCTION>
+<FUNCTION>
+<NAME>gnome_name_service_get</NAME>
+<RETURNS>CORBA_Object  </RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>goad_server_activation_id</NAME>
+<RETURNS>const char  *</RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>goad_server_register</NAME>
+<RETURNS>int</RETURNS>
+CORBA_Object name_server,CORBA_Object server,const char* name,const char* kind,CORBA_Environment* ev
+</FUNCTION>
+<FUNCTION>
+<NAME>goad_server_unregister</NAME>
+<RETURNS>int</RETURNS>
+CORBA_Object name_server,const char* name,const char* kind,CORBA_Environment* ev
+</FUNCTION>
+<STRUCT>
+<NAME>GnomePluginObject</NAME>
+typedef struct {
+	const char   **repo_id;
+	const char   *server_id;
+	const char   *kind;
+	const char   *description;
+	CORBA_Object (*activate)   (PortableServer_POA poa,
+				    const char *goad_id,
+				    const char **params,
+				    gpointer *impl_ptr,
+				    CORBA_Environment *ev);
+	void         (*deactivate) (PortableServer_POA poa,
+				    const char *goad_id,
+				    gpointer impl_ptr,
+				    CORBA_Environment *ev);
+} GnomePluginObject;
+</STRUCT>
+<STRUCT>
+<NAME>GnomePlugin</NAME>
+typedef struct {
+	const GnomePluginObject *plugin_object_list;
+	const char *description;
+} GnomePlugin;
+</STRUCT>
+<ENUM>
+<NAME>GoadServerType</NAME>
+typedef enum {
+	GOAD_SERVER_SHLIB = 1,
+	GOAD_SERVER_EXE = 2,
+	GOAD_SERVER_RELAY = 3,
+	GOAD_SERVER_FACTORY = 4
+} GoadServerType;
+</ENUM>
+<ENUM>
+<NAME>GoadActivationFlags</NAME>
+typedef enum {
+	/* these two are mutually exclusive */
+	GOAD_ACTIVATE_SHLIB = 1 << 0, 	/* prefer shlib activation */
+	GOAD_ACTIVATE_REMOTE = 1 << 1, 	/* prefer remote activation */
+
+	/* these two are mutually exclusive */
+	GOAD_ACTIVATE_EXISTING_ONLY = 1 << 2, /* Only do lookup in name
+					       * service for currently running
+					       * version.
+					       */
+	GOAD_ACTIVATE_NEW_ONLY = 1 << 3,      /* No lookup in name service. */
+	GOAD_ACTIVATE_ASYNC = 1 << 4 /* Just make sure that the object is running */
+} GoadActivationFlags;
+</ENUM>
+<STRUCT>
+<NAME>GoadServer</NAME>
+typedef struct {
+	GoadServerType type;
+        GoadActivationFlags flags; /* only GOAD_ACTIVATE_NEW_ONLY
+				      currently parsed in */
+	char     **repo_id;
+	char     *server_id;
+	char     *description;
+
+        /*
+	 * Executable/shlib path, relayer IOR, whatever.
+	 * This field may disappear at any time. You have been warned ;-)
+	 */
+	char     *location_info;
+} GoadServer;
+</STRUCT>
+<STRUCT>
+<NAME>GoadServerList</NAME>
+typedef struct {
+  GoadServer *list;
+  GHashTable *by_goad_id;
+} GoadServerList;
+</STRUCT>
+<FUNCTION>
+<NAME>goad_server_list_get</NAME>
+<RETURNS>GoadServerList  *</RETURNS>
+void
+</FUNCTION>
+<FUNCTION>
+<NAME>goad_server_list_free</NAME>
+<RETURNS>void  </RETURNS>
+GoadServerList *server_list
+</FUNCTION>
+<FUNCTION>
+<NAME>goad_server_activate</NAME>
+<RETURNS>CORBA_Object  </RETURNS>
+GoadServer *sinfo,GoadActivationFlags flags,const char **params
+</FUNCTION>
+<FUNCTION>
+<NAME>goad_server_activate_with_repo_id</NAME>
+<RETURNS>CORBA_Object  </RETURNS>
+GoadServerList *server_list,const char *repo_id,GoadActivationFlags flags,const char **params
+</FUNCTION>
+<FUNCTION>
+<NAME>goad_server_activate_with_id</NAME>
+<RETURNS>CORBA_Object</RETURNS>
+GoadServerList *server_list,const char *server_id,GoadActivationFlags flags,const char **params
+</FUNCTION>

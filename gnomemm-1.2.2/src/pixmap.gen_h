@@ -1,0 +1,284 @@
+// -*- C++ -*- // this is for the .gen_h, I realize gensig puts one in
+/* $Id: pixmap.gen_h,v 1.23 2001/03/28 12:28:41 murrayc Exp $ */
+
+/* pixmap.h
+ * 
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * Copyright (C) 1999 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <libgnomeui/gnome-pixmap.h>
+#include <gnome--/imlib.h>
+#include <libgnome/gnome-util.h> //For gnome_pixmap_file().
+
+CLASS_START(Gnome);
+class Pixmap : public Gtk::Widget
+{
+  WRAP_CLASS(Pixmap, GnomePixmap,
+             GNOME_PIXMAP, GNOME_IS_PIXMAP,
+             pixmap,
+             Gtk::Widget, GtkWidget, GTK_WIDGET);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  Pixmap (const Gtk::string &filename);
+
+  Pixmap (const Gtk::string &filename,
+		int width,
+		int height);
+
+  Pixmap (char ** xpm_data);
+
+  Pixmap (char ** xpm_data,
+		int width,
+		int height);
+
+  Pixmap (const Gdk_Imlib::Image &im);
+
+  Pixmap (const Gdk_Imlib::Image &im,
+		int width,
+		int height);
+
+  Pixmap (unsigned char * rgb_data,
+		unsigned char * alpha,
+		int rgb_width,
+		int rgb_height);
+
+  Pixmap (unsigned char * rgb_data,
+		unsigned char * alpha,
+		int rgb_width,
+		int rgb_height, 
+		const Gdk_Imlib::Color &shape_color);
+
+  Pixmap (unsigned char * rgb_data,
+		unsigned char * alpha,
+		int rgb_width,
+		int rgb_height, 
+		int width,
+		int height);
+  
+  void load (const Gtk::string &filename, int width = 0, int height = 0);
+
+  WRAP_METHOD(void gnome_pixmap_load_xpm_d (GnomePixmap*, char**),
+	      void load (char **xpm_data));
+
+  WRAP_METHOD(void gnome_pixmap_load_xpm_d_at_size (GnomePixmap*, char**, int , int),
+	      void load (char **xpm_data, int width, int height));
+
+  WRAP_METHOD(void gnome_pixmap_load_rgb_d (GnomePixmap*,
+					    unsigned char*,
+					    unsigned char*,
+					    int, int),
+	      void load    (unsigned char * rgb_data,
+			    unsigned char * alpha,
+			    int rgb_width,
+			    int rgb_height));
+
+  // gnome_pixmap_load_rgb_d_shaped
+  void load (unsigned char *data,
+	     unsigned char *alpha,
+	     int rgb_width,
+	     int rgb_height, 
+	     const Gdk_Imlib::Color &shape_color);
+
+  WRAP_METHOD(void gnome_pixmap_load_rgb_d_at_size (GnomePixmap*,
+						    unsigned char*,
+						    unsigned char*,
+						    int , int , int , int),
+	      void load (unsigned char *data,
+			 unsigned char *alpha,
+			 int rgb_width,
+			 int rgb_height,
+			 int width, int height));
+
+
+  // gnome_pixmap_load_imlib - gnome_pixmap_load_imlib_at_size
+  void load    (const Gdk_Imlib::Image &im,
+		int width = 0,
+		int height = 0);
+
+  //- Lookup actual filepath for the pixmap.
+  //- Returns a filename from the GNOMEDIR tree or from the
+  //- GNOME installation directory for the pixmap directory ($prefix/share/pixmaps),
+  //- or an empty string if the file does not exist.
+  static Gtk::string find_file(const Gtk::string& filename);
+};
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+IMPL_START;
+#include <gnome--/private/pixmap_p.h>
+
+#include <sys/stat.h>
+#include <unistd.h>
+
+/* pixmap.cc
+ *
+ * Copyright (C) 1998 EMC Capital Management Inc.
+ * Developed by Havoc Pennington <hp@pobox.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+namespace Gnome {
+
+Pixmap::Pixmap(const Gtk::string &filename)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(filename);
+}
+
+Pixmap::Pixmap(const Gtk::string &filename, int widthx, int heightx)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(filename, widthx, heightx);
+}
+
+Pixmap::Pixmap(char ** xpm_data)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(xpm_data);
+}
+
+Pixmap::Pixmap(char ** xpm_data, int widthx, int heightx)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(xpm_data, widthx, heightx);
+}
+
+Pixmap::Pixmap(const Gdk_Imlib::Image &im)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(im);
+}
+
+Pixmap::Pixmap(const Gdk_Imlib::Image &im, int widthx, int heightx)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(im, widthx, heightx);
+}
+
+Pixmap::Pixmap(unsigned char * rgb_data, unsigned char * alpha,
+			   int rgb_width, int rgb_height)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(rgb_data, alpha, rgb_width, rgb_height);
+}
+
+Pixmap::Pixmap(unsigned char * rgb_data, unsigned char * alpha,
+			   int rgb_width, int rgb_height, 
+			   const Gdk_Imlib::Color &shape_color)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(rgb_data, alpha, rgb_width, rgb_height, shape_color);
+}
+
+Pixmap::Pixmap(unsigned char * rgb_data, unsigned char * alpha,
+			   int rgb_width, int rgb_height, 
+			   int widthx, int heightx)
+  : Gtk::Widget(GTK_WIDGET(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  load(rgb_data, alpha, rgb_width, rgb_height, widthx, heightx);
+}
+
+void
+Pixmap::load(unsigned char *data,
+		   unsigned char *alpha,
+		   int rgb_width,
+		   int rgb_height, 
+		   const Gdk_Imlib::Color &shape_color)
+{
+  gnome_pixmap_load_rgb_d_shaped(gtkobj(), data, alpha,
+				 rgb_width, rgb_height,
+				 const_cast<GdkImlibColor*>(shape_color.gdkobj()));
+}
+  
+
+void
+Pixmap::load(const Gdk_Imlib::Image &im, int width, int height)
+{
+  if (width && height)
+    gnome_pixmap_load_imlib_at_size(gtkobj(),
+				    const_cast<GdkImlibImage*>(im.gdkobj()),
+				    width, height);
+  else
+    gnome_pixmap_load_imlib(gtkobj(),
+			    const_cast<GdkImlibImage*>(im.gdkobj()));
+}
+
+
+void
+Pixmap::load(const Gtk::string &filename, int width, int height)
+{
+  struct stat dummyBuf;
+
+  if(stat(filename.c_str(), &dummyBuf) == -1) // file isn't there
+    {
+      load(Gdk_Pixmap::defaultPixmap);
+      Gdk_Pixmap::warn_about_xpm_file_problem(filename);
+    }
+  else
+    if (width && height)
+      gnome_pixmap_load_file_at_size(gtkobj(), filename.c_str(),
+				     width, height);
+    else
+      gnome_pixmap_load_file(gtkobj(), filename.c_str());
+}
+
+//static:
+Gtk::string
+Pixmap::find_file(const Gtk::string& filename)
+{ 
+  Gtk::string strResult;
+  
+  gchar* pchFilepath = gnome_pixmap_file(filename.c_str());
+  if(pchFilepath)
+  {
+    strResult = pchFilepath;
+    g_free(pchFilepath);
+  }
+  
+  return strResult;
+}
+
+} /* namespace Gnome */

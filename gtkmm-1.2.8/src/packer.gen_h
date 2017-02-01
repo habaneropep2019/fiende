@@ -1,0 +1,362 @@
+/* $Id: packer.gen_h,v 1.47 2000/08/21 19:24:37 kenelson Exp $ */
+
+/* packer.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gtk/gtkpacker.h>
+
+CLASS_START(Gtk);
+
+// gtk_packer_add lacks a default flag 
+void gtkmm_packer_add(GtkPacker*,GtkWidget*,GtkSideType,GtkAnchorType,guint,guint,guint,guint,guint,guint);
+
+// using ~0 instead of 0xffffffff will be better with non 32-bit guint's
+// and typo-safe
+#define GTKMM_PACKER_DEFAULT (~((guint)0))
+
+namespace Packer_Helpers
+{
+  class Child : protected _GtkPackerChild
+    {
+      public:
+        inline _GtkPackerChild* gtkobj() {return (this);}
+        inline const _GtkPackerChild* gtkobj() const {return (this);}
+      private:
+        Child& operator=(const Child&);
+        Child(const Child&);
+      protected:
+        Child(void* do_not_derive_this);
+
+        inline GtkPacker* parent()
+          {return (GtkPacker*)(gtkobj()->widget->parent);}
+        void redraw();
+
+      public:
+
+        Widget* get_widget() const;
+        GtkSideType get_side() const;
+        GtkAnchorType get_anchor() const;
+        guint get_options() const;
+        guint get_border_width() const;
+        guint get_pad_x() const;
+        guint get_pad_y() const;
+        guint get_ipad_x() const;
+        guint get_ipad_y() const;
+
+        void set_packing(GtkSideType s,
+                         GtkAnchorType a,
+                         guint o,
+                         guint b=GTKMM_PACKER_DEFAULT,
+                         guint x=GTKMM_PACKER_DEFAULT,
+                         guint y=GTKMM_PACKER_DEFAULT,
+                         guint ix=GTKMM_PACKER_DEFAULT,
+                         guint iy=GTKMM_PACKER_DEFAULT);
+
+        // These are our own
+        void set_side(GtkSideType s);
+        void set_anchor(GtkAnchorType a);
+        void set_options(guint o);
+        void set_border_width(guint b);
+        void set_pad(guint x,guint y);
+        void set_ipad(guint x,guint y);
+    };
+
+  class PackerList;
+  class Element
+    {
+      friend class PackerList;
+      private:
+        Widget* child_;
+        GtkSideType side_;
+        GtkAnchorType anchor_;
+        guint options_;
+        guint border_width_;
+        guint pad_x_;
+        guint pad_y_;
+        guint i_pad_x_;
+        guint i_pad_y_;
+
+     public:
+        Element(Widget &child,
+                GtkSideType side,
+                GtkAnchorType anchor = GTK_ANCHOR_CENTER,
+                guint options=(guint)0,
+                guint border_width=GTKMM_PACKER_DEFAULT,
+                guint pad_x=GTKMM_PACKER_DEFAULT,
+                guint pad_y=GTKMM_PACKER_DEFAULT,
+                guint i_pad_x=GTKMM_PACKER_DEFAULT,
+                guint i_pad_y=GTKMM_PACKER_DEFAULT);
+    };
+
+#m4 include(list.m4)
+  GP_LIST(PackerList,Packer,Child)
+  GP_LIST_CONTAINER_REMOVE(get_widget)
+  GP_LIST_FIND(get_widget)
+
+        // Non-standard
+        void reorder(iterator loc,iterator pos);
+  GP_LIST_END()
+
+};
+
+//: Gtk_Packer is easy-to-use container widget.
+class Packer : public Container {
+  WRAP_CLASS(Packer,GtkPacker,GTK_PACKER,GTK_IS_PACKER,packer,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+  typedef Packer_Helpers::PackerList PackerList;
+  typedef PackerList::iterator           iterator;
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  /* this overrides the virtual function */
+  //void add_impl(Gtk_Widget *child) { add(*child, GTK_SIDE_TOP); }
+
+  //: Add a widget with specified location
+  //- {\var options}: {\enum GTK_PACK_EXPAND, GTK_FILL_X, GTK_FILL_Y}
+  //-
+  //- {\var side}: {\enum GTK_SIDE_TOP(default), GTK_SIDE_BOTTOM
+  //-   GTK_SIDE_LEFT, GTK_SIDE_RIGHT}
+  //-
+  //- {\var anchor}: {\enum GTK_ANCHOR_CENTER,
+  //- GTK_ANCHOR_NORTH | GTK_ANCHOR_N, 
+  //- GTK_ANCHOR_NORTH_WEST | GTK_ANCHOR_NW,
+  //- GTK_ANCHOR_NORTH_EAST | GTK_ANCHOR_NE,
+  //- GTK_ANCHOR_SOUTH | GTK_ANCHOR_S,
+  //- GTK_ANCHOR_SOUTH_WEST | GTK_ANCHOR_SW,
+  //- GTK_ANCHOR_SOUTH_EAST | GTK_ANCHOR_SE,
+  //- GTK_ANCHOR_WEST | GTK_ANCHOR_W,
+  //- GTK_ANCHOR_EAST | GTK_ANCHOR_E}
+  //
+  // the default values of GTKMM_PACKER_DEFAULT will be transformed to real
+  // default values inside the method -- hack to overcome c++'s
+  // nice restriction...
+  WRAP_METHOD(   
+    void gtkmm_packer_add(GtkPacker*,GtkWidget*,GtkSideType,GtkAnchorType,
+                          guint,guint,guint,guint,guint,guint),
+    void add                  (Gtk::Widget &child, 
+			       GtkSideType side,
+			       GtkAnchorType anchor = GTK_ANCHOR_CENTER,
+			       guint options=(guint)0,
+			       guint border_width=GTKMM_PACKER_DEFAULT,
+			       guint pad_x=GTKMM_PACKER_DEFAULT,
+			       guint pad_y=GTKMM_PACKER_DEFAULT,
+			       guint i_pad_x=GTKMM_PACKER_DEFAULT,
+			       guint i_pad_y=GTKMM_PACKER_DEFAULT));
+
+  WRAP_MEMBER(value,spacing,spacing,guint,guint);
+  WRAP_MEMBER(value,default_border_width,default_border_width,guint,guint);
+  WRAP_MEMBER(value,default_pad_x,default_pad_x,guint,guint);
+  WRAP_MEMBER(value,default_pad_y,default_pad_y,guint,guint);
+  WRAP_MEMBER(value,default_ipad_x,default_i_pad_x,guint,guint);
+  WRAP_MEMBER(value,default_ipad_y,default_i_pad_y,guint,guint);
+
+  WRAP_METHOD(void gtk_packer_set_spacing(GtkPacker*, guint),
+	      void set_spacing(guint spacing));
+
+  WRAP_METHOD(void gtk_packer_set_default_border_width(GtkPacker*, guint),
+	      void set_default_border_width(guint border));
+
+  WRAP_METHOD(void gtk_packer_set_default_pad(GtkPacker*, guint, guint),
+	      void set_default_pad(guint pad_x, guint pad_y));
+
+  WRAP_METHOD(void gtk_packer_set_default_ipad(GtkPacker*, guint, guint),
+	      void set_default_ipad(guint i_pad_x, guint i_pad_y));
+
+  // Fancy access
+  PackerList& children() 
+    {return reinterpret_cast<PackerList&>(widget_self); }
+  const PackerList& children() const 
+    {return reinterpret_cast<const PackerList&>(widget_self); }
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+void gtkmm_packer_add(GtkPacker* p,GtkWidget* w,GtkSideType side,
+                     GtkAnchorType anchor,
+                     guint options,
+                     guint border_widthx,
+                     guint pad_x,
+                     guint pad_y,
+                     guint i_pad_x,
+                     guint i_pad_y)
+{
+  g_return_if_fail (p != NULL);
+
+  if (border_widthx==GTKMM_PACKER_DEFAULT) border_widthx=p->default_border_width;
+  if (pad_x==GTKMM_PACKER_DEFAULT) pad_x=p->default_pad_x;
+  if (pad_y==GTKMM_PACKER_DEFAULT) pad_y=p->default_pad_y;
+  if (i_pad_x==GTKMM_PACKER_DEFAULT) i_pad_x=p->default_i_pad_x;
+  if (i_pad_y==GTKMM_PACKER_DEFAULT) i_pad_y=p->default_i_pad_y;
+
+  gtk_packer_add(p, w,
+		 side, anchor, GtkPackerOptions(options), border_widthx,
+		 pad_x, pad_y, i_pad_x, i_pad_y);
+}
+
+/**********************************************************************/
+
+void Packer_Helpers::Child::redraw()
+  { 
+    if (GTK_WIDGET_VISIBLE (gtkobj()->widget) && GTK_WIDGET_VISIBLE (parent()))
+            gtk_widget_queue_resize (gtkobj()->widget);
+  }
+
+void Packer_Helpers::Child::set_packing(
+                         GtkSideType s,
+                         GtkAnchorType a,
+                         guint o,
+                         guint b,
+                         guint x,guint y,
+                         guint ix,guint iy)
+{
+  if (b==GTKMM_PACKER_DEFAULT) b=parent()->default_border_width;
+  if (x==GTKMM_PACKER_DEFAULT) x=parent()->default_pad_x;
+  if (y==GTKMM_PACKER_DEFAULT) y=parent()->default_pad_y;
+  if (ix==GTKMM_PACKER_DEFAULT) ix=parent()->default_i_pad_x;
+  if (iy==GTKMM_PACKER_DEFAULT) iy=parent()->default_i_pad_y;
+    
+  gtkobj()->anchor=a;
+  gtkobj()->side=s;
+  gtkobj()->options=GtkPackerOptions(o);
+  gtkobj()->border_width=b;
+  gtkobj()->pad_x = x;
+  gtkobj()->pad_y = y;
+  gtkobj()->i_pad_x = ix;
+  gtkobj()->i_pad_y = iy;
+   
+  redraw();
+}
+
+// These are our own
+void Packer_Helpers::Child::set_anchor(GtkAnchorType a)
+{ gtkobj()->anchor=a; redraw(); }
+void Packer_Helpers::Child::set_side(GtkSideType s)
+{ gtkobj()->side=s; redraw(); }
+void Packer_Helpers::Child::set_options(guint o)
+{ gtkobj()->options=GtkPackerOptions(o); redraw(); }
+void Packer_Helpers::Child::set_border_width(guint b)
+{ gtkobj()->border_width=b; redraw(); }
+void Packer_Helpers::Child::set_pad(guint x,guint y)
+{ gtkobj()->pad_x=x; gtkobj()->pad_y=y;redraw(); }
+void Packer_Helpers::Child::set_ipad(guint x,guint y)
+{ gtkobj()->i_pad_x=x; gtkobj()->i_pad_y=y;redraw(); }
+
+/**********************************************************************/
+
+Packer_Helpers::Element::Element(Widget &child,
+				     GtkSideType side,
+				     GtkAnchorType anchor,
+				     guint options,
+				     guint border_width,
+				     guint pad_x,
+				     guint pad_y,
+				     guint i_pad_x,
+				     guint i_pad_y)
+    : child_(&child),
+      side_(side),anchor_(anchor),options_(options),border_width_(border_width),
+      pad_x_(pad_x),pad_y_(pad_y),i_pad_x_(i_pad_x),i_pad_y_(i_pad_y)
+{}
+
+/**********************************************************************/
+typedef Packer_Helpers::PackerList::iterator packer_iterator;
+
+packer_iterator Packer_Helpers::PackerList::insert(packer_iterator position, const Element& e)
+{
+  iterator i;
+  gtkmm_packer_add(parent_->gtkobj(),
+     (e.child_?e.child_->gtkobj():0), e.side_, e.anchor_, e.options_,
+     e.border_width_, e.pad_x_, e.pad_y_, e.i_pad_x_, e.i_pad_y_);
+
+  i=--end();
+  if (position!=end()) reorder(i,position);
+  return i;
+}
+
+// Non-standard
+void Packer_Helpers::PackerList::reorder(packer_iterator loc,packer_iterator pos)
+{
+  gint position=g_list_position(glist(),pos.node);
+  gtk_packer_reorder_child(parent_->gtkobj(),(*loc)->gtkobj()->widget,position);
+}
+
+Widget* Packer_Helpers::Child::get_widget() const { return wrap(gtkobj()->widget);}
+GtkSideType Packer_Helpers::Child::get_side() const   { return gtkobj()->side; }
+GtkAnchorType Packer_Helpers::Child::get_anchor() const   { return gtkobj()->anchor; }
+guint Packer_Helpers::Child::get_options() const      { return gtkobj()->options; }
+guint Packer_Helpers::Child::get_border_width() const { return gtkobj()->border_width; }
+guint Packer_Helpers::Child::get_pad_x() const        { return gtkobj()->pad_x; }
+guint Packer_Helpers::Child::get_pad_y() const        { return gtkobj()->pad_y; }
+guint Packer_Helpers::Child::get_ipad_x() const       { return gtkobj()->i_pad_x; }
+guint Packer_Helpers::Child::get_ipad_y() const       { return gtkobj()->i_pad_y; }
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Packer)
+//. name: children
+//. type: GPackerList*
+//. get:
+//. set:
+//. desc:
+
+//. name: spacing
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: default_border_width
+//. type: guint:16
+//. get:
+//. set:
+//. desc:
+
+//. name: default_pad_x
+//. type: guint:16
+//. get:
+//. set:
+//. desc:
+
+//. name: default_pad_y
+//. type: guint:16
+//. get:
+//. set:
+//. desc:
+
+//. name: default_i_pad_x
+//. type: guint:16
+//. get:
+//. set:
+//. desc:
+
+//. name: default_i_pad_y
+//. type: guint:16
+//. get:
+//. set:
+//. desc:
+

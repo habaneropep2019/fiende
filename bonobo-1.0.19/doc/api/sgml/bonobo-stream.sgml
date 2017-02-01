@@ -1,0 +1,262 @@
+<refentry id="bonobo-bonobo-stream">
+<refmeta>
+<refentrytitle>BonoboStream</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboStream</refname><refpurpose>Abstract object for file (stream) access.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+#define     <link linkend="BONOBO-IO-DRIVER-FS-CAPS">BONOBO_IO_DRIVER_FS</link>
+#define     <link linkend="BONOBO-IO-DRIVER-EFS-CAPS">BONOBO_IO_DRIVER_EFS</link>
+#define     <link linkend="BONOBO-IO-DRIVER-VFS-CAPS">BONOBO_IO_DRIVER_VFS</link>
+typedef     <link linkend="BonoboStream">BonoboStream</link>;
+typedef     <link linkend="BonoboStreamClass">BonoboStreamClass</link>;
+<link linkend="POA-Bonobo-Stream--epv">POA_Bonobo_Stream__epv</link>* <link linkend="bonobo-stream-get-epv">bonobo_stream_get_epv</link>
+                                            (void);
+<link linkend="Bonobo-Stream">Bonobo_Stream</link> <link linkend="bonobo-stream-corba-object-create">bonobo_stream_corba_object_create</link>
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object);
+<link linkend="BonoboStream">BonoboStream</link>* <link linkend="bonobo-stream-open">bonobo_stream_open</link>            (const char *driver,
+                                             const char *path,
+                                             <link linkend="gint">gint</link> flags,
+                                             <link linkend="gint">gint</link> mode);
+<link linkend="BonoboStream">BonoboStream</link>* <link linkend="bonobo-stream-open-full">bonobo_stream_open_full</link>       (const char *driver,
+                                             const char *path,
+                                             <link linkend="gint">gint</link> flags,
+                                             <link linkend="gint">gint</link> mode,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+   This is an abstract class for the various Stream implementations in
+   Bonobo.  There are at least: file based streams, memory based
+   streams and structured storage streams.   The BonoboStream abstract
+   class can be used to implement new servers that implement the
+   IDL:Bonobo/Stream:1.0 interface. 
+</para>
+
+<para>
+   If you are writing a component, this is one interface that your
+component should not really support. You probably want to implement
+the a <link linkend="BonoboPersist">BonoboPersist</link> interface such as <link linkend="BonoboPersistStream">BonoboPersistStream</link>. This
+allows a component to serialize itself and de-persist itself using
+a stream supplied by a container.
+</para>
+
+<para>
+   If you are implementing a stream you probably want to see some
+of the helpful wrappers first.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BONOBO-IO-DRIVER-FS-CAPS">BONOBO_IO_DRIVER_FS</title>
+<programlisting>#define BONOBO_IO_DRIVER_FS  "fs"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-IO-DRIVER-EFS-CAPS">BONOBO_IO_DRIVER_EFS</title>
+<programlisting>#define BONOBO_IO_DRIVER_EFS "efs"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BONOBO-IO-DRIVER-VFS-CAPS">BONOBO_IO_DRIVER_VFS</title>
+<programlisting>#define BONOBO_IO_DRIVER_VFS "vfs"
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboStream">BonoboStream</title>
+<programlisting>typedef struct {
+        BonoboObject object;
+} BonoboStream;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboStreamClass">BonoboStreamClass</title>
+<programlisting>typedef struct {
+	BonoboObjectClass parent_class;
+
+	/*
+	 * virtual methods
+	 */
+
+	Bonobo_StorageInfo *(*get_info) (BonoboStream *stream,
+					 const Bonobo_StorageInfoFields mask,
+					 CORBA_Environment *ev);
+	void          (*set_info)       (BonoboStream *stream,
+					 const Bonobo_StorageInfo *info,
+					 const Bonobo_StorageInfoFields mask,
+					 CORBA_Environment *ev);
+	void          (*write)          (BonoboStream *stream,
+					 const Bonobo_Stream_iobuf *buffer,
+					 CORBA_Environment *ev);
+	void          (*read)           (BonoboStream *stream, 
+					 CORBA_long count,
+					 Bonobo_Stream_iobuf **buffer,
+					 CORBA_Environment *ev);
+        CORBA_long    (*seek)           (BonoboStream *stream,
+					 CORBA_long offset, 
+					 Bonobo_Stream_SeekType whence,
+					 CORBA_Environment *ev);
+        void          (*truncate)       (BonoboStream *stream,
+					 const CORBA_long new_size, 
+					 CORBA_Environment *ev);
+	void          (*copy_to)        (BonoboStream *stream,
+					 const CORBA_char * dest,
+					 const CORBA_long bytes,
+					 CORBA_long *read,
+					 CORBA_long *written,
+					 CORBA_Environment *ev);
+        void          (*commit)         (BonoboStream *stream,
+					 CORBA_Environment *ev);
+        void          (*revert)         (BonoboStream *stream,
+					 CORBA_Environment *ev);
+} BonoboStreamClass;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-stream-get-epv">bonobo_stream_get_epv ()</title>
+<programlisting><link linkend="POA-Bonobo-Stream--epv">POA_Bonobo_Stream__epv</link>* bonobo_stream_get_epv
+                                            (void);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-stream-corba-object-create">bonobo_stream_corba_object_create ()</title>
+<programlisting><link linkend="Bonobo-Stream">Bonobo_Stream</link> bonobo_stream_corba_object_create
+                                            (<link linkend="BonoboObject">BonoboObject</link> *object);</programlisting>
+<para>
+Creates and activates the CORBA object that is wrapped by the
+<parameter>object</parameter> BonoboObject.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>object</parameter>&nbsp;:</entry>
+<entry> the GtkObject that will wrap the CORBA object
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> An activated object reference to the created object
+or <literal>CORBA_OBJECT_NIL</literal> in case of failure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-stream-open">bonobo_stream_open ()</title>
+<programlisting><link linkend="BonoboStream">BonoboStream</link>* bonobo_stream_open            (const char *driver,
+                                             const char *path,
+                                             <link linkend="gint">gint</link> flags,
+                                             <link linkend="gint">gint</link> mode);</programlisting>
+<para>
+Opens or creates the file named at <parameter>path</parameter> with the stream driver <parameter>driver</parameter>.
+</para>
+<para>
+<parameter>driver</parameter> is one of: "fs" or "vfs" for now.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>driver</parameter>&nbsp;:</entry>
+<entry> driver to use for opening.
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> path where the base file resides
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry> Bonobo Storage OpenMode
+</entry></row>
+<row><entry align="right"><parameter>mode</parameter>&nbsp;:</entry>
+<entry> Unix open(2) mode
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> a created BonoboStream object.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-stream-open-full">bonobo_stream_open_full ()</title>
+<programlisting><link linkend="BonoboStream">BonoboStream</link>* bonobo_stream_open_full       (const char *driver,
+                                             const char *path,
+                                             <link linkend="gint">gint</link> flags,
+                                             <link linkend="gint">gint</link> mode,
+                                             <link linkend="CORBA-Environment">CORBA_Environment</link> *opt_ev);</programlisting>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>driver</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>flags</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>mode</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><parameter>opt_ev</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+   <link linkend="bonobo-stream-client">bonobo-stream-client</link>, BonoboPersistStream, <link linkend="BonoboPersist">BonoboPersist</link>, <link linkend="BonoboStreamFile">BonoboStreamFile</link>, <link linkend="BonoboStreamMem">BonoboStreamMem</link>
+</para>
+</refsect1>
+
+</refentry>

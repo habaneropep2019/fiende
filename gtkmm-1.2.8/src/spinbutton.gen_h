@@ -1,0 +1,317 @@
+/* $Id: spinbutton.gen_h,v 1.52 2001/07/15 13:33:38 murrayc Exp $ */
+
+
+/* spinbutton.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/entry.h>
+#include <gtk/gtkspinbutton.h>
+
+
+CLASS_START(Gtk);
+class Adjustment;
+
+//: Retrieve an integer or floating-point number from the user.
+//- A {\class Gtk::SpinButton} is an ideal way to allow the user to set the value of
+//- some attribute. Rather than having to directly type a number into a {Gtk::Entry::},
+//- {\class Gtk::SpinButton} allows the user to click on one of two arrows to
+//- increment or decrement the displayed value. A value can still be typed in, with the
+//- bonus that it can be checked to ensure it is in a given range.
+//-
+//- The main properties of a {\class Gtk::SpinButton} are through a {Gtk::Adjustment::}.
+//- See the {Gtk::Adjustment::} section for more details about an adjustment's
+//- properties.
+//-
+//- The {Gtk::Adjustment::} of a spin button can be set or retrieved with a call to
+//- {set_adjustment()} or {get_adjustment()}, respectively.
+//-
+//- The number of digits after the decimal point of a spin button can be altered with
+//- {set_digits()}.
+//-
+//- To retrieve values from a spin button, use {get_value_as_float()} if you require
+//- a floating point number, or {get_value_as_int()} if you require an integer.
+//-
+//- To set the value of a {\class Gtk::SpinButton}, use {set_value()}. To change the
+//- update behaviour of a spin button, use {set_update_policy()}.
+//-
+//- When a spin button reaches it's upper or lower limit, it can either stop spinning,
+//- or wrap around and continue spinning from the opposite limit. For example, if five
+//- is the upper limit and the lower limit is zero, upon reaching the value five, the
+//- spin button can change it's value back to zero and continue spinning upwards. This
+//- behaviour is set with {set_wrap()}.
+//-
+//- A border around a spin button's arrows can be created using {set_shadow_type()}.
+//-
+//- A number may be entered that is invalid, given a spin button's range. An erroneous
+//- number can be corrected as soon as the spin button is 'activated' using
+//- {set_snap_to_ticks()}, which will alter the current value to the nearest step
+//- increment. (See {Gtk::Adjustment::} for step increments).
+//-
+//- Because a spin contains a {Gtk::Entry::}, alphabetic characters may be entered.
+//- These can be ignored by using {set_numeric()} with a value of TRUE. Then only
+//- numeric values, '-' and a decimal point will be accepted.
+//-
+//- To manually increment or decrement the spin button, use {spin()}, and to force an
+//- update (refresh), use {update()}.
+class SpinButton : public Entry
+{
+ 
+  WRAP_CLASS(SpinButton,GtkSpinButton,GTK_SPIN_BUTTON,GTK_IS_SPIN_BUTTON,spin_button,Gtk::Entry,GtkEntry,GTK_ENTRY);
+public:
+  
+  //: Creates a new {\class Gtk::SpinButton}.
+  //- {\var adjustment}: The {Gtk::Adjustment::} object that this spin button should use.
+  //-
+  //- {\var climb_rate}: Specifies how much the spin button changes when an arrow is clicked on.
+  //-
+  //- {\var digits}: The number of decimal places to display. Must be less than 6.
+  SpinButton(gfloat climb_rate=0, gint digits=0);
+  SpinButton(Adjustment &adjustment,
+		 gfloat climb_rate=0, gint digits=0);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  WRAP_MEMBER(value,update_policy,update_policy,GtkSpinButtonUpdatePolicy,
+    GtkSpinButtonUpdatePolicy);
+  WRAP_MEMBER(value,digits,digits,guint,guint);
+  WRAP_MEMBER(value,numeric,numeric,bool,guint);
+  WRAP_MEMBER(value,wrap,wrap,bool,guint);
+  WRAP_MEMBER(value,shadow_type,shadow_type,GtkShadowType,GtkShadowType);
+  WRAP_MEMBER(value,snap_to_ticks,snap_to_ticks,bool,guint);
+
+  //: Changes which {Gtk::Adjustment::} is associated with a spin button.
+  //- {\var adjustment}: A {Gtk::Adjustment::}. 
+  WRAP_METHOD(
+    void gtk_spin_button_set_adjustment(GtkSpinButton*,GtkAdjustment*),
+    void set_adjustment(Gtk::Adjustment &adjustment));
+
+  //: Changes which {Gtk::Adjustment::} is associated with a spin button.
+  //- {\var adjustment}: A {Gtk::Adjustment::}. 
+  WRAP_METHOD(
+    void gtk_spin_button_set_adjustment(GtkSpinButton*,GtkAdjustment*),
+    void set_adjustment(Gtk::Adjustment *adjustment));
+
+  //: Retrieves the GtkAdjustment used by a given spin button.
+  //- {\var Returns}: A {Gtk::Adjustment::}. 
+  WRAP_MEMBER(value,adjustment,adjustment,Gtk::Adjustment*,GtkAdjustment*);
+
+  //: Alters the number of decimal places that are displayed in a spin button.
+  //- {\var digits}: The number of decimal places.
+  WRAP_METHOD(void gtk_spin_button_set_digits(GtkSpinButton*, gint),
+	      void set_digits(gint digits));
+
+  //: Retrieves the current value of a {\class Gtk::SpinButton}.
+  //- If the number has no decimal places, it is converted to a float before the function returns.
+  //- {\var Returns}: The value of the spin button as a gfloat.
+  WRAP_METHOD(gfloat gtk_spin_button_get_value_as_float(GtkSpinButton*),
+	      gfloat get_value_as_float () const);
+
+  //: Retrieves the current integer value of a {\class Gtk::SpinButton}.
+  //- {\var Returns}: The value of the spin button as a gint.
+  WRAP_METHOD(gint gtk_spin_button_get_value_as_int(GtkSpinButton*),
+	      gint get_value_as_int() const);
+
+  //: Sets the value of a spin button.
+  //- {\var value}: The new floating point value.
+  WRAP_METHOD(void gtk_spin_button_set_value(GtkSpinButton*, gfloat),
+	      void set_value(gfloat value));
+
+  //: Changes the way a spin button refreshes and updates itself.
+  //- {\var policy}: The new update policy. This is one of:
+  //- {\enum GTK_UPDATE_ALWAYS}, or {\enum GTK_UPDATE_IF_VALID}.
+  // ??? GTK_UPDATE_SNAP_TO_TICKS
+  WRAP_METHOD(void gtk_spin_button_set_update_policy(GtkSpinButton*, GtkSpinButtonUpdatePolicy),
+	      void set_update_policy(GtkSpinButtonUpdatePolicy policy));
+
+  //: Sets a spin button's value to the lower limit when it's upper limit is reached, and vice versa.
+  //- {\var wrap}: Defaults to FALSE, set to TRUE to make the spin button wrap. 
+  WRAP_METHOD(void gtk_spin_button_set_wrap(GtkSpinButton*, bool),
+	      void set_wrap(bool wrap));
+
+  //: Sets how the spin button's {Gtk::Entry::} reacts to alphabetic characters.
+  //- A value of TRUE to numeric means that all non-numeric characters (except '-'
+  //- and a decimal point) are ignored.
+  //-
+  //- {\var numeric}: Whether letters should be ignored.
+  WRAP_METHOD(void gtk_spin_button_set_numeric(GtkSpinButton*, bool),
+	      void set_numeric(bool numeric));
+
+  //: Performs an explicit 'spin' on a spin button.
+  //- {\var direction}: The type of spin to perform.
+  //-
+  //- {\var increment}: The amount to spin.
+  WRAP_METHOD(void gtk_spin_button_spin(GtkSpinButton*, GtkSpinType, gfloat),
+	      void spin(GtkSpinType direction, gfloat step));
+
+  //: Creates a border around the arrows of a {\class Gtk::SpinButton}.
+  //- The type of border is determined by shadow_type.
+  //-
+  //- {\var shadow_type}: The new border type. This is one of:  {\enum GTK_SHADOW_NONE},
+  //- {\enum GTK_SHADOW_IN}, {\enum GTK_SHADOW_OUT}, {\enum GTK_SHADOW_ETCHED_IN},
+  //- or {\enum GTK_SHADOW_ETCHED_OUT}.
+  WRAP_METHOD(void gtk_spin_button_set_shadow_type(GtkSpinButton*, GtkShadowType),
+	      void set_shadow_type(GtkShadowType shadow_type));
+
+  //: Sets whether a number typed into a spin button should be snapped to the nearest step increment.
+  //- {\var snap_to_ticks}: TRUE or FALSE.
+  WRAP_METHOD(void gtk_spin_button_set_snap_to_ticks(GtkSpinButton*, bool),
+	      void set_snap_to_ticks(bool snap_to_ticks));
+
+  //: Refreshes a spin button.
+  //- The behaviour of the update is determined {set_update_policy()}.
+	WRAP_METHOD(void gtk_spin_button_update(GtkSpinButton*),
+	      void update());
+
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/entry_p.h>
+IMPL_START;
+#include <gtk--/adjustment.h>
+namespace Gtk
+{
+
+SpinButton::SpinButton(gfloat climb_rate, gint digits) :
+  Entry((GtkEntry*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gtk_spin_button_configure(gtkobj(),
+			    0,
+			    climb_rate, digits);
+
+}
+
+SpinButton::SpinButton(Adjustment &adjustment,
+			       gfloat climb_rate, gint digits) :
+  Entry((GtkEntry*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gtk_spin_button_configure(gtkobj(),
+			    adjustment.gtkobj(),
+			    climb_rate, digits);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_SpinButton)
+//. name: adjustment
+//. type: GtkAdjustment*
+//. get:
+//. set:
+//. desc:
+
+//. name: panel
+//. type: GdkWindow*
+//. get:
+//. set:
+//. desc:
+
+//. name: shadow_type
+//. type: GtkShadowType
+//. get:
+//. set:
+//. desc:
+
+//. name: timer
+//. type: guint32
+//. get:
+//. set:
+//. desc:
+
+//. name: ev_time
+//. type: guint32
+//. get:
+//. set:
+//. desc:
+
+//. name: climb_rate
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: timer_step
+//. type: gfloat
+//. get:
+//. set:
+//. desc:
+
+//. name: update_policy
+//. type: GtkSpinButtonUpdatePolicy
+//. get:
+//. set:
+//. desc:
+
+//. name: in_child
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: click_child
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: button
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: need_timer
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: timer_calls
+//. type: guint:3
+//. get:
+//. set:
+//. desc:
+
+//. name: digits
+//. type: guint:3
+//. get:
+//. set:
+//. desc:
+
+//. name: numeric
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: wrap
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: snap_to_ticks
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

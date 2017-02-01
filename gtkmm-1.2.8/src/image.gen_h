@@ -1,0 +1,97 @@
+/* $Id: image.gen_h,v 1.38 2000/02/13 02:22:09 kenelson Exp $ */
+
+/* image.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/misc.h>
+#include <gtk/gtkimage.h>
+
+CLASS_START(Gtk);
+//: Image Widget
+//- An image is a client side pixmap.  As it is client side,
+//- it can be altered directly by the program.  However, it
+//- pays a performance hit.
+//- 
+class Image : public Misc {
+  WRAP_CLASS(Image,GtkImage,GTK_IMAGE,GTK_IS_IMAGE,image,Gtk::Misc,GtkMisc,GTK_MISC);
+public:
+
+  //: Create a Image widget from a Gdk_Image and Gdk_Bitmap.
+  Image(const Gdk_Image &val, const Gdk_Bitmap &mask);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Set the image.
+  WRAP_METHOD(void gtk_image_set(GtkImage*,GdkImage*,GdkBitmap*),
+	      void set(const Gdk_Image &val,
+		       const Gdk_Bitmap &mask));
+
+  //: Access the image.
+  // void gtk_image_get(GtkImage*,GdkImage**,GdkBitmap**)
+  void get(Gdk_Image &val,
+	   Gdk_Bitmap &mask) const;
+};
+
+PRIVATE_START;
+#include <gtk--/private/misc_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+Image::Image(const Gdk_Image &val, const Gdk_Bitmap &mask)
+  :    Misc((GtkMisc*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GtkImage *image;
+
+  //if (val==NULL) return;
+  g_return_if_fail (val.connected());
+
+  image = (GtkImage*)gtkobject;
+
+  gtk_image_set (image, gdk_const_cast(val), 
+                        gdk_const_cast(mask));
+
+}
+
+void
+Image::get(Gdk_Image &val, Gdk_Bitmap &mask) const
+{ GdkImage *im;
+  GdkBitmap *bm;
+  gtk_image_get(const_cast<GtkImage*>(gtkobj()), &im, &bm);
+  val.assign(im);
+  mask=bm;
+}
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Image)
+//. name: image
+//. type: Gdk_Image
+//. get: {get()}
+//. set: {set()}
+//. desc: Images graphic representation.
+
+//. name: mask
+//. type: Gdk_Bitmap
+//. get: {get()}
+//. set: {set()}
+//. desc: Bitmap that defines the boundaries of the image. 
+

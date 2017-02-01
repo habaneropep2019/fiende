@@ -1,0 +1,307 @@
+AC_INIT(installer/gnome-font-install.c)
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(gnome-print,0.35)
+AM_ACLOCAL_INCLUDE(macros)
+
+dnl ==========================================
+dnl LIBGNOMEPRINT Versioning
+dnl ==========================================
+dnl libtool versioning
+dnl increment if the interface has additions, changes, removals.
+GNOMEPRINT_CURRENT=16
+
+dnl increment any time the source changes; set to 
+dnl  0 if you increment CURRENT
+GNOMEPRINT_REVISION=11
+
+dnl increment if any interfaces have been added; set to 0
+dnl  if any interfaces have been removed. removal has 
+dnl  precedence over adding, so set to 0 if both happened.
+GNOMEPRINT_AGE=1
+
+AC_SUBST(GNOMEPRINT_CURRENT)
+AC_SUBST(GNOMEPRINT_REVISION)
+AC_SUBST(GNOMEPRINT_AGE)
+dnl ==========================================
+dnl END: LIBGNOMEPRINT Versioning
+dnl ==========================================
+
+dnl ==========================================
+dnl LIBGPA Versioning
+dnl ==========================================
+dnl increment if the interface has additions, changes, removals.
+GPA_CURRENT=0
+
+dnl increment any time the source changes; set to 
+dnl  0 if you increment CURRENT
+GPA_REVISION=0
+
+dnl increment if any interfaces have been added; set to 0
+dnl  if any interfaces have been removed. removal has 
+dnl  precedence over adding, so set to 0 if both happened.
+GPA_AGE=0
+
+AC_SUBST(GPA_CURRENT)
+AC_SUBST(GPA_REVISION)
+AC_SUBST(GPA_AGE)
+dnl ==========================================
+dnl END: LIBGPA Versioning
+dnl ==========================================
+
+
+AM_MAINTAINER_MODE
+
+AC_ISC_POSIX
+AC_PROG_CC
+AC_PROG_CPP
+AM_PROG_LIBTOOL
+AM_PATH_GLIB(1.2.8)
+ALL_LINGUAS="az bg ca da de el es eu et fi fr gl hr hu it ja ko lt lv nl nn no pl pt pt_BR ro ru sk sl sv tr uk wa zh_CN.GB2312 zh_TW"
+
+GNOME_INIT
+
+GNOME_COMPILE_WARNINGS
+GNOME_X_CHECKS
+AM_GNOME_GETTEXT
+AM_PATH_GDK_PIXBUF(0.7.0, , AC_MSG_ERROR([Need gdk-pixbuf-0.7.0 or later!]))
+GNOME_XML_CHECK
+
+dnl =======================
+dnl LibXML checking
+dnl =======================
+AC_MSG_CHECKING(for libxml (gnome-xml) version >= 1.8.8)
+vers=`$GNOME_CONFIG --modversion xml | sed -e "s/xml.//" | awk 'BEGIN { FS = "."; } { printf "%d", ($1 * 1000 + $2) * 1000 + $3;}'`
+if test "$vers" -ge 1008008; then
+	AC_MSG_RESULT(found)
+else
+	AC_MSG_ERROR(You need at least libxml 1.8.8 for this version of gnome-print)
+fi
+dnl =======================
+dnl END: LibXML checking
+dnl =======================
+
+dnl ==========================================
+dnl Checks for zlib library.
+dnl ==========================================
+_cppflags="${CPPFLAGS}"
+_ldflags="${LDFLAGS}"
+
+AC_ARG_WITH(zlib,
+[  --with-zlib[=DIR]       use libz in DIR],[
+  if test "$withval" != "no"; then
+    Z_DIR=$withval
+    CPPFLAGS="${CPPFLAGS} -I$withval/include"
+    LDFLAGS="${LDFLAGS} -L$withval/lib"
+  fi
+])
+
+AC_CHECK_HEADERS(zlib.h,
+    AC_CHECK_LIB(z, gzread,[
+	AC_DEFINE(HAVE_LIBZ)
+        if test "x${Z_DIR}" != "x"; then
+            Z_CFLAGS="-I${Z_DIR}/include"
+            Z_LIBS="-L${Z_DIR}/lib -lz"
+        else
+            Z_LIBS="-lz"
+        fi]))
+AC_SUBST(Z_CFLAGS)
+AC_SUBST(Z_LIBS)
+dnl ==========================================
+dnl END: Checks for zlib library.
+dnl ==========================================
+
+
+dnl ==========================================
+dnl Gtk-doc documentation
+dnl ==========================================
+AC_ARG_WITH(html-dir, [  --with-html-dir=PATH path to installed docs ])
+if test "x$with_html_dir" = "x" ; then
+  HTML_DIR='${datadir}/gtk-doc/html'
+else
+  HTML_DIR=$with_html_dir
+fi
+AC_SUBST(HTML_DIR)
+dnl ==========================================
+dnl END: Gtk-doc documentation
+dnl ==========================================
+
+
+dnl ============================================
+dnl Check for gnome-print-admin optional support
+dnl ============================================
+admin=
+try_admin=false
+have_admin=false
+AC_ARG_WITH(admin,
+	   [--{with,without}-admin    Compile with gnome-print-admin support (UNSTABLE, EXPERIMENTAL)],
+	   if test x$withval = xno; then
+		 try_admin=false;
+	   else
+	      try_admin=true;
+	   fi
+)
+
+AC_MSG_CHECKING(gnome-print-admin support)
+if $try_admin; then
+   AC_MSG_RESULT(yes)
+   have_admin=true
+   AC_MSG_CHECKING(for LIBGPA >= 0.0)
+   AC_MSG_RESULT(found)
+   AC_DEFINE(ENABLE_LIBGPA)
+
+   dnl ==========================================
+   dnl END: gnome-xml checking
+   dnl ==========================================
+
+   dnl =======================
+   dnl LibGlade checking
+   dnl =======================
+   AC_MSG_CHECKING(for Glade libraries >= 0.13)
+   if gnome-config --libs libglade > /dev/null 2>&1; then 
+      vers=`gnome-config --modversion libglade | awk 'BEGIN { FS = "."; } { print $1 * 1000 + $2;}'`
+      if test "$vers" -ge 13; then
+          AC_MSG_RESULT(found)
+      else
+          AC_MSG_ERROR(You need at least libglade 0.13 for this version of gnome-print)
+      fi
+   else
+      AC_MSG_ERROR(Did not find libGlade installed)
+   fi
+   dnl =======================
+   dnl END: LibGlade checking
+   dnl =======================
+
+   PRINT_LIBS="$PRINT_LIBS -lgpa"
+   AC_DEFINE(LIBGPA)
+else
+   AC_MSG_RESULT(nope)
+fi
+
+AM_CONDITIONAL(LIBGPA, $have_admin);
+
+if $have_admin; then
+  LIBGPA_CFLAGS="`xml-config --cflags`"
+  LIBGPA_LIBS="-lgpa `xml-config --libs`"
+
+dnl *** NOTE : *****
+dnl The gtk dependency will be removed once we move to the new glib
+dnl and replace the GtkObjects to GlibObjects
+dnl *** end NOTE ****
+  LIBGPA_CFLAGS="${LIBGPA_CFLAGS} `gtk-config --cflags`"
+  LIBGPA_LIBS="${LIBGPA_LIBS} `gtk-config --libs`"
+
+  LIBGPA_LIBDIR='-L${libdir}'
+
+  LIBGPA_INCLUDEDIR='-I${includedir}'
+  LIBGPA_INCLUDEDIR="$LIBGPA_INCLUDEDIR `xml-config --cflags`"
+
+  AC_SUBST(LIBGPA_CFLAGS)
+  AC_SUBST(LIBGPA_LIBS)
+  AC_SUBST(LIBGPA_INCLUDEDIR)
+  AC_SUBST(LIBGPA_LIBDIR)
+fi
+
+dnl =================================
+dnl END: Check for gnome-print-admin 
+dnl =================================
+
+dnl =================================
+dnl Checking for freetype2
+dnl =================================
+
+FREETYPE_LIBS=
+FREETYPE_CFLAGS=
+AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no)
+if test "x$FREETYPE_CONFIG" = "xno" ; then
+	AC_MSG_ERROR(You need FreeType2 for that version of gnome-print)
+else
+	FREETYPE_CFLAGS=`$FREETYPE_CONFIG --cflags`
+	FREETYPE_LIBS=`$FREETYPE_CONFIG --libs`
+fi
+
+dnl =================================
+dnl END: Checking for freetype2
+dnl =================================
+
+
+LIBGNOMEPRINT_CFLAGS="$FREETYPE_CFLAGS `$GNOME_CONFIG --cflags gnome gnomeui gdk_pixbuf libart xml`"
+LIBGNOMEPRINT_LIBS="`$GNOME_CONFIG --libs gnome gnomeui gdk_pixbuf libart xml` $FREETYPE_LIBS"
+
+AC_SUBST(LIBGNOMEPRINT_CFLAGS)
+AC_SUBST(LIBGNOMEPRINT_LIBS)
+
+
+dnl =================================
+dnl Variables for printConf.sh
+dnl =================================
+
+PRINT_LIBDIR='-L${libdir}'
+PRINT_LIBS="-lgnomeprint $LIBGNOMEPRINT_LIBS"
+PRINT_INCLUDEDIR="-I${includedir}/gnome-1.0 $LIBGNOMEPRINT_CFLAGS"
+
+AC_SUBST(PRINT_LIBDIR)
+AC_SUBST(PRINT_LIBS)
+AC_SUBST(PRINT_INCLUDEDIR)
+
+dnl =================================
+dnl END: Variables for creating printConf.sh
+dnl =================================
+
+dnl echo "FIXME FIXME FIXME -- this is terribly wrong!"
+dnl
+dnl The is completely contrary to the autoconf/libtool way of doing
+dnl things.  If solaris needs that option, then libtool should have
+dnl put it there.  It failed to do that for whoever caused this test
+dnl to end up here, but the cause should be fixed -- not patched
+dnl with duct tape like this.
+dnl
+dnl DISABLED BY Chema. 15-Nov-00
+dnl AC_CANONICAL_HOST
+dnl case $host in
+dnl *-*-solaris*)
+dnl 	PRINT_LIBDIR="${PRINT_LIBDIR} -R${libdir}"
+dnl 	;;
+dnl esac
+
+
+dnl =====================================
+dnl For building tests within gnome-print
+dnl =====================================
+
+PRINT_TEST_CFLAGS="$LIBGNOMEPRINT_CFLAGS"
+PRINT_TEST_LIBS="$LIBGNOMEPRINT_LIBS"
+
+AC_SUBST(PRINT_TEST_CFLAGS)
+AC_SUBST(PRINT_TEST_LIBS)
+
+dnl =====================================
+dnl END: For building tests within gnome-print
+dnl =====================================
+
+
+AC_PATH_PROGS(PERL, perl5 perl)
+AC_SUBST(PERL)
+
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+
+AC_OUTPUT([
+Makefile
+fonts/Makefile
+gnome-print.spec
+profiles/Makefile
+libgpa/Makefile
+data/Makefile
+data/models/Makefile
+data/ppds/Makefile
+libgnomeprint/Makefile
+po/Makefile.in
+intl/Makefile
+afms/Makefile
+afms/adobe/Makefile
+fonts/Makefile
+tests/Makefile
+installer/Makefile],
+[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])
+

@@ -1,0 +1,32 @@
+#if !defined(__LIBGNORBA_COMPILATION) && defined(__ORBIT_IDL__)
+%{
+#pragma include_defs libgnorba/Table.h
+%}
+#pragma inhibit push
+#endif
+
+module GNOME {
+
+	interface Table {
+		const short VALUE_STRING  = 0;
+		const short VALUE_FLOAT   = 2;
+
+		union Value switch(short) {
+			case VALUE_FLOAT:   double v_float;
+			case VALUE_STRING:  string str;
+		};
+
+		exception OutOfRange {};
+
+		Value get (in long col, in long row)
+			raises (OutOfRange);
+
+		long set (in long col, in long row, in Value val)
+			raises (OutOfRange);
+
+	};
+};
+
+#if !defined(__LIBGNORBA_COMPILATION) && defined(__ORBIT_IDL__)
+#pragma inhibit pop
+#endif

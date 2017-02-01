@@ -1,0 +1,236 @@
+/* $Id: preview.gen_h,v 1.42 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* preview.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/widget.h>
+#include <gtk/gtkpreview.h>
+CLASS_START(Gtk);
+//: A widget to display RGB or grayscale data.
+// The {\class Gtk::Preview} widget provides a simple interface used to display images as RGB or grayscale data.
+class Preview : public Widget {
+  WRAP_CLASS(Preview,GtkPreview,GTK_PREVIEW,GTK_IS_PREVIEW,preview,Gtk::Widget,GtkWidget,GTK_WIDGET);
+public:
+
+  explicit Preview(GtkPreviewType type);
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Set the size that the preview widget will request in response to a "size_request"
+  //- signal. The drawing area may actually be allocated a size larger than this
+  //- depending on how it is packed within the enclosing containers. The effect of this
+  //- is determined by whether the preview is set to expand or not (see {set_expand()}).
+  //-
+  //- width: The new width.
+  //-
+  //- height: The new height.
+  WRAP_METHOD(void gtk_preview_size(GtkPreview*, gint, gint),
+	      void size(gint width, gint height));
+
+  void put                     (Gdk_Window &window,
+				Gdk_GC &gc,
+				gint srcx, gint srcy,
+				gint destx, gint desty,
+				gint width, gint height);
+
+  //: Sets the data for a portion of a row.
+  //- data: The new data for the portion. It should contain w bytes of data if the
+  //- preview is of type {\enum GTK_TYPE_GRAYSCALE}, and 3*w bytes of data if the
+  //- preview is of type {\enum GTK_TYPE_COLOR}.
+  //-
+  //- x: The starting value on the row to set.
+  //-
+  //- y: The row to change.
+  //-
+  //- w: The number of pixels in the row to change.
+  WRAP_METHOD(void gtk_preview_draw_row(GtkPreview*, fixmegtkconst guchar*,
+					gint, gint, gint),
+	      void draw_row(const guchar* data,
+			    gint x, gint y, gint w));
+
+  //: Determines the way that the the preview widget behaves when the size it is
+  //: allocated is larger than the requested size.
+  //- If expand is FALSE, then the preview's window and buffer will be no larger
+  //- than the size set with {size()}, and the data set will be centered in the
+  //- allocation if it is larger. If expand is TRUE then the window and buffer
+  //- will expand with the allocation; the application is responsible for
+  //- catching the "size_allocate" signal and providing the data appropriate for
+  //- this size.
+  //-
+  //- expand: Whether the preview's window should expand or not.
+  WRAP_METHOD(void gtk_preview_set_expand(GtkPreview*, bool),
+	      void set_expand(bool expand));
+
+  //: Set the gamma-correction value for all preview widgets. (This function
+  //- will eventually be replaced with a function that sets a per-preview-widget
+  //- gamma value). The resulting intensity is given by: destination_value * pow
+  //- (source_value/255, 1/gamma). The gamma value is applied when the data is
+  //- set with {draw_row()} so changing this value will not affect existing data in preview widgets.
+  //-
+  //- gamma: The new gamma value.
+  WRAP_METHOD(void gtk_preview_set_gamma(double),
+	      static void set_gamma(double gamma));
+
+  //: This function is deprecated and does nothing. {\class Gdk:::RGB} automatically
+  //: picks an optimium color cube for the display.
+  WRAP_METHOD(void gtk_preview_set_color_cube(guint, guint, guint, guint),
+	      static void set_color_cube(guint nred_shades,
+					 guint ngreen_shades,
+					 guint nblue_shades,
+					 guint ngray_shades));
+
+  //: This function is deprecated and does nothing. {\class Gdk::RGB} will
+  //: automatically pick a private colormap if it cannot allocate sufficient colors.
+  WRAP_METHOD(void gtk_preview_set_install_cmap (bool),
+	      static void set_install_cmap (bool install_cmap));
+
+  //: This function is deprecated and does nothing.
+  WRAP_METHOD(void gtk_preview_set_reserved(gint),
+	      static void set_reserved(gint nreserved));
+
+  static Gdk_Visual get_visual ();
+  static Gdk_Colormap get_cmap ();
+  static GtkPreviewInfo * get_info();
+
+  //: This function is deprecated and does nothing. It was once used for changing the colormap and visual on the fly.
+  WRAP_METHOD(void gtk_preview_reset(),
+	      static void reset());
+
+  //: This function is deprecated and does nothing.
+  WRAP_METHOD(void gtk_preview_uninit(),
+	      static void uninit());
+  
+  //: Set the dithering mode for the display.
+  //- dither: The dithering mode. There are three values:
+  //-
+  //- {\enum GDK_RGB_DITHER_NONE}: Never use dithering.
+  //-
+  //- {\enum GDK_RGB_DITHER_NORMAL}: Use dithering in 8 bits per pixel (and below) only.
+  //-
+  //- {\enum GDK_RGB_DITHER_MAX}: Use dithering in 16 bits per pixel and below.
+  WRAP_METHOD(void gtk_preview_set_dither(GtkPreview*, GdkRgbDither),
+	      void set_dither(GdkRgbDither dither));
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/widget_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+Preview::Preview(GtkPreviewType typex)
+  :    Widget((GtkWidget*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  GtkPreview *preview;
+
+  preview = (GtkPreview*)gtkobject;
+  preview->type = typex;
+
+  if (typex == GTK_PREVIEW_COLOR)
+    preview->bpp = 3;
+  else
+    preview->bpp = 1;
+
+  preview->dither = GDK_RGB_DITHER_NORMAL;
+}
+
+
+void
+Preview::put(Gdk_Window &window, Gdk_GC &gc,
+		 gint srcx, gint srcy, gint destx,
+		 gint desty, gint widthx, gint heightx)
+{
+  gtk_preview_put(gtkobj(), window, gc, srcx, srcy, destx,
+		  desty, widthx, heightx);
+}
+
+
+Gdk_Visual 
+Preview::get_visual()
+{
+  return gtk_preview_get_visual();
+}
+
+Gdk_Colormap 
+Preview::get_cmap()
+{
+  return gtk_preview_get_cmap();
+}
+
+GtkPreviewInfo *
+Preview::get_info()
+{
+  return gtk_preview_get_info();
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Preview)
+//. name: buffer
+//. type: guchar*
+//. get:
+//. set:
+//. desc:
+
+//. name: buffer_width
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: buffer_height
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: bpp
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: rowstride
+//. type: guint16
+//. get:
+//. set:
+//. desc:
+
+//. name: dither
+//. type: GdkRgbDither
+//. get:
+//. set:
+//. desc:
+
+//. name: type
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: expand
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

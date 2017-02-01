@@ -1,0 +1,156 @@
+<!-- ##### SECTION Title ##### -->
+BonoboWindow
+
+<!-- ##### SECTION Short_Description ##### -->
+the toplevel application window implementation
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+The BonoboWindow class uses a #BonoboUIEngine, in combination
+with several #BonoboUISync classes to achieve a powerful new
+top-level window widget. It's API mandates the use of XML to
+specify your UI, it also strongly encourages the use of the
+#BonoboUIComponent API to create even the top-level UI. This
+incurs almost no penalty since ORBit's CORBA implementation is
+extremely fast in-processes. This in turn encourages people to
+ensure that even their top-level components are capable of being
+used as controls with minimal effort.
+</para>
+
+<para>
+  <example>
+    <title>Creating a BonoboWindow</title>
+    <programlisting>
+	BonoboUIContainer *ui_container;
+	BonoboUIComponent *ui_component;
+	BonoboWindow      *win;
+
+	win = BONOBO_WINDOW (
+		bonobo_window_new ("Win", "My Test Application"));
+
+	ui_container = bonobo_ui_container_new ();
+	bonobo_ui_container_set_win (ui_container, win);
+	
+	bonobo_ui_engine_config_set_path (
+		bonobo_window_get_ui_engine (win),
+		"/my-application-name/UIConfig/kvps");
+    </programlisting>
+  </example>
+  So, even for a toplevel window we also want to create a
+#BonoboUIComponent to merge our toplevel UI elements in:
+  <example>
+    <title>Setting up the window UI</title>
+    <programlisting>
+	ui_component = bonobo_ui_component_new ("my-app");
+
+	/* Associate the #BonoboUIComponent with the container */	
+	bonobo_ui_component_set_container (
+		ui_component, BONOBO_OBJREF (ui_container);
+
+	bonobo_ui_util_set_ui (
+		ui_component, MY_COMPILE_TIME_PREFIX,
+		"GNOME_MyApp.ui", "my-app");
+    </programlisting>
+  </example>
+  Where GNOME_MyApp.ui is the toplevel UI xml file.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+#BonoboUIEngine, #BonoboUISync, #BonoboUIComponent
+</para>
+
+<!-- ##### FUNCTION bonobo_window_construct ##### -->
+<para>
+
+</para>
+
+@win: 
+@win_name: 
+@title: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_window_new ##### -->
+<para>
+
+</para>
+
+@win_name: 
+@title: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_window_set_contents ##### -->
+<para>
+
+</para>
+
+@win: 
+@contents: 
+
+
+<!-- ##### FUNCTION bonobo_window_get_contents ##### -->
+<para>
+
+</para>
+
+@win: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_window_set_name ##### -->
+<para>
+
+</para>
+
+@win: 
+@win_name: 
+
+
+<!-- ##### FUNCTION bonobo_window_get_name ##### -->
+<para>
+
+</para>
+
+@win: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_window_get_accel_group ##### -->
+<para>
+
+</para>
+
+@win: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bonobo_window_add_popup ##### -->
+<para>
+
+</para>
+
+@win: 
+@popup: 
+@path: 
+
+
+<!-- ##### FUNCTION bonobo_window_remove_popup ##### -->
+<para>
+
+</para>
+
+@win: 
+@path: 
+
+
+<!-- ##### FUNCTION bonobo_window_get_ui_engine ##### -->
+<para>
+
+</para>
+
+@win: 
+@Returns: 
+
+

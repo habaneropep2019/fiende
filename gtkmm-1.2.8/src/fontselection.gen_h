@@ -1,0 +1,367 @@
+/* $Id: fontselection.gen_h,v 1.47 2001/10/05 22:48:25 murrayc Exp $ */
+
+/* fontselection.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/window.h>
+#include <gtk--/notebook.h>
+#include <gtk--/radiobutton.h>
+#include <gtk--/clist.h>
+#include <gtk--/entry.h>
+#include <gtk--/box.h>
+#include <gtk/gtkfontsel.h>
+
+
+CLASS_START(Gtk);
+//: A widget for selecting fonts.
+//- The {\class Gtk::FontSelection} widget lists the available fonts, styles and sizes,
+//- allowing the user to select a font. It is used in the
+//- {\class Gtk::FontSelectionDialog} widget to provide a dialog box for selecting
+//- fonts.
+//-
+//- To set the font which is initially selected, use {set_font_name()}.
+//-
+//- To get the selected font use {get_font()} or {get_font_name()}.
+//-
+//- To change the text which is shown in the preview area, use {set_preview_text()}.
+//-
+//- Filters can be used to limit the fonts shown. There are 2 filters in the
+//- {\class Gtk::FontSelection} - a base filter and a user filter. The base filter can
+//- not be changed by the user, so this can be used when the user must choose from the
+//- restricted set of fonts (e.g. for a terminal-type application you may want to
+//- force the user to select a fixed-width font). The user filter can be changed or
+//- reset by the user, by using the 'Reset Filter' button or changing the options on
+//- the 'Filter' page of the widget.
+class FontSelection : public Notebook {
+  WRAP_CLASS(FontSelection,GtkFontSelection,GTK_FONT_SELECTION,GTK_IS_FONT_SELECTION,font_selection,Gtk::Notebook,GtkNotebook,GTK_NOTEBOOK);
+public:
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  // gchar* gtk_font_selection_get_font_name(GtkFontSelection *);
+  //: Gets the currently-selected font name.
+  string   get_font_name       () const;
+
+  //: Gets the currently-selected font.
+  //- Returns: The currently-selected font, or NULL if no font is selected.
+  WRAP_METHOD(
+    GdkFont* gtk_font_selection_get_font(GtkFontSelection *),
+    Gdk_Font get_font            () const);
+
+  //: Sets the currently-selected font.
+  //- fontname: A fontname.
+  //-
+  //- Returns: TRUE if the font was found.
+  WRAP_METHOD(
+    gboolean gtk_font_selection_set_font_name(GtkFontSelection *,const gchar*),
+    bool set_font_name       (const string &fontname));
+
+  //void  gtk_font_selection_set_filter(GtkFontSelection *,
+  //  GtkFontFilterType, GtkFontType, gchar**, gchar**, gchar**, gchar**, 
+  //  gchar**, gchar**);
+  //: Sets one of the two font filters, to limit the fonts shown.
+  //- filter_type: Which of the two font filters to set, either
+  //- {\enum GTK_FONT_FILTER_BASE} or {\enum GTK_FONT_FILTER_USER}. The user filter
+  //- can be changed by the user, but the base filter is permanent.
+  //-
+  //- font_type: The types of font to be shown. This is a bitwise combination of
+  //- {\enum GTK_FONT_BITMAP}, {\enum GTK_FONT_SCALABLE} and
+  //- {\enum GTK_FONT_SCALABLE_BITMAP}, or {\enum GTK_FONT_ALL} to show all three
+  //- font types.
+  //-
+  //- foundries: A NULL-terminated array of strings containing foundry names which
+  //- will be shown, or NULL to show all foundries.
+  //-
+  //- weights: A NULL-terminated array of strings containing weight names which
+  //- will be shown, or NULL to show all weights.
+  //-
+  //- slants: A NULL-terminated array of strings containing slant names which will
+  //- be shown, or NULL to show all slants.
+  //-
+  //- setwidths: A NULL-terminated array of strings containing setwidth names which
+  //- will be shown, or NULL to show all setwidths.
+  //-
+  //- spacings: A NULL-terminated array of strings containing spacings which will
+  //- be shown, or NULL to show all spacings.
+  //-
+  //- charsets: A NULL-terminated array of strings containing charset names which
+  //- will be shown, or NULL to show all charsets.
+  void     set_filter          (GtkFontFilterType filter_type,
+				GtkFontType	font_type,
+				const SArray	&foundries,
+				const SArray	&weights,
+				const SArray	&slants,
+				const SArray	&setwidths,
+				const SArray	&spacings,
+				const SArray	&charsets);
+
+  //: Gets the text displayed in the preview area.
+  //- Returns: The text displayed in the preview area.
+  WRAP_METHOD(
+    gchar* gtk_font_selection_get_preview_text(GtkFontSelection *),
+    string   get_preview_text    () const);
+
+  //: Sets the text displayed in the preview area.
+  //- text: The text to display in the preview area.
+  WRAP_METHOD(
+    void gtk_font_selection_set_preview_text(GtkFontSelection *,const gchar*),
+    void     set_preview_text    (const string &fontname));
+
+  // Font page
+  WRAP_MEMBER(value,font_box,main_vbox,Gtk::Box*,GtkWidget*);
+  WRAP_MEMBER(value,font_label,font_label,Gtk::Label*,GtkWidget*);
+
+  WRAP_MEMBER(value,font_entry,font_entry,Gtk::Entry*,GtkWidget*);
+  WRAP_MEMBER(value,font_style_entry,font_style_entry,Gtk::Entry*,GtkWidget*);
+  WRAP_MEMBER(value,size_entry,size_entry,Gtk::Entry*,GtkWidget*);
+  WRAP_MEMBER(value,preview_entry,preview_entry,Gtk::Entry*,GtkWidget*);
+
+  WRAP_MEMBER(value,font_list,font_clist,Gtk::CList*,GtkWidget*);
+  WRAP_MEMBER(value,font_style_list,font_style_clist,Gtk::CList*,GtkWidget*);
+  WRAP_MEMBER(value,size_list,size_clist,Gtk::CList*,GtkWidget*);
+
+  WRAP_MEMBER(value,pixels_button,pixels_button,Gtk::RadioButton*,GtkWidget*);
+  WRAP_MEMBER(value,points_button,points_button,Gtk::RadioButton*,GtkWidget*);
+  WRAP_MEMBER(value,filter_button,filter_button,Gtk::Button*,GtkWidget*);
+  WRAP_MEMBER(value,message_label,message_label,Gtk::Label*,GtkWidget*);
+
+  // Font info page
+  WRAP_MEMBER(value,info_box,info_vbox,Gtk::Box*,GtkWidget*);
+  WRAP_MEMBER(value,info_list,info_clist,Gtk::CList*,GtkWidget*);
+  WRAP_MEMBER(value,requested_font_name,requested_font_name,
+                  Gtk::Entry*,GtkWidget*);
+  WRAP_MEMBER(value,actual_font_name,actual_font_name,Gtk::Entry*,GtkWidget*);
+
+  // Filter page
+  WRAP_MEMBER(value,filter_box,filter_vbox,Gtk::Box*,GtkWidget*);
+  WRAP_MEMBER(value,type_bitmaps_button,type_bitmaps_button,
+                  Gtk::CheckButton*,GtkWidget*);
+  WRAP_MEMBER(value,type_scalable_button,type_scalable_button,
+                  Gtk::CheckButton*,GtkWidget*);
+  WRAP_MEMBER(value,type_scaled_bitmaps_button,type_scaled_bitmaps_button,
+                  Gtk::CheckButton*,GtkWidget*);
+
+  enum PropertyType { WEIGHT, SLANT, SET_WIDTH, SPACING, CHARSET, FOUNDRY };
+
+  CList* get_filter_list(PropertyType p);
+
+};
+
+//: A dialog box for selecting fonts.
+//- The {\class Gtk::FontSelectionDialog} widget is a dialog box for selecting a font.
+//-
+//- To set the font which is initially selected, use {set_font_name()}.
+//-
+//- To get the selected font use {get_font()} or {get_font_name()}.
+//-
+//- To change the text which is shown in the preview area, use {set_preview_text()}.
+//-
+//- Filters can be used to limit the fonts shown. There are 2 filters in the
+//- {\class Gtk::FontSelectionDialog} - a base filter and a user filter. The base
+//- filter can not be changed by the user, so this can be used when the user must
+//- choose from the restricted set of fonts (e.g. for a terminal-type application
+//- you may want to force the user to select a fixed-width font). The user filter can
+//- be changed or reset by the user, by using the 'Reset Filter' button or changing the
+//- options on the 'Filter' page of the dialog.
+class FontSelectionDialog : public Window
+{
+  WRAP_CLASS(FontSelectionDialog,GtkFontSelectionDialog,GTK_FONT_SELECTION_DIALOG,GTK_IS_FONT_SELECTION_DIALOG,font_selection_dialog,Gtk::Window,GtkWindow,GTK_WINDOW);
+public:
+
+  FontSelectionDialog(const nstring &title=(char*)0);
+  WRAP_DTOR;
+
+  //: Sets the currently-selected font.
+  //- fontname: A fontname.
+  //-
+  //- Returns: TRUE if the font was found.
+  WRAP_METHOD(
+    gboolean gtk_font_selection_dialog_set_font_name(GtkFontSelectionDialog *,const gchar*), 
+    bool     set_font_name   (const string &fontname));
+
+  // gchar* gtk_font_selection_dialog_get_font_name(GtkFontSelectionDialog *),
+  //: Gets the currently-selected font name.
+  //- Returns: The currently-selected font name, or NULL if no font is selected.
+  nstring   get_font_name   () const;
+
+  //: Gets the currently-selected font.
+  //- Returns: The currently-selected font, or NULL if no font is selected.
+  WRAP_METHOD(
+    GdkFont* gtk_font_selection_dialog_get_font(GtkFontSelectionDialog *),
+    Gdk_Font get_font        () const);
+
+  //: Gets the text displayed in the preview area.
+  //- Returns: The text displayed in the preview area.
+  WRAP_METHOD(
+    gchar* gtk_font_selection_dialog_get_preview_text (GtkFontSelectionDialog *),
+    string   get_preview_text() const);
+
+  //: Sets the text displayed in the preview area.
+  //- text: The text to display in the preview area.
+  WRAP_METHOD(
+    void gtk_font_selection_dialog_set_preview_text(GtkFontSelectionDialog *,const gchar*),
+    void     set_preview_text(const string &fontname));
+
+  // void gtk_font_selection_dialog_set_filter(GtkFontSelectionDialog *fsd,
+  //   GtkFontFilterType, GtkFontType, gchar**, gchar**, gchar**,
+  //   gchar**, gchar**, gchar**);
+  //: Sets one of the two font filters, to limit the fonts shown.
+  //- filter_type: Which of the two font filters to set, either
+  //- {\enum GTK_FONT_FILTER_BASE} or {\enum GTK_FONT_FILTER_USER}. The user
+  //- filter can be changed by the user, but the base filter is permanent.
+  //-
+  //- font_type: The types of font to be shown. This is a bitwise combination
+  //- of {\enum GTK_FONT_BITMAP}, {\enum GTK_FONT_SCALABLE} and
+  //- {\enum GTK_FONT_SCALABLE_BITMAP}, or {\enum GTK_FONT_ALL} to show all
+  //- three font types.
+  //-
+  //- foundries: A NULL-terminated array of strings containing foundry names
+  //- which will be shown, or NULL to show all foundries.
+  //-
+  //- weights: A NULL-terminated array of strings containing weight names which
+  //- will be shown, or NULL to show all weights.
+  //-
+  //- slants: A NULL-terminated array of strings containing slant names which
+  //- will be shown, or NULL to show all slants.
+  //-
+  //- setwidths: A NULL-terminated array of strings containing setwidth names
+  //- which will be shown, or NULL to show all setwidths.
+  //-
+  //- spacings: A NULL-terminated array of strings containing spacings which
+  //- will be shown, or NULL to show all spacings.
+  //- charsets: A NULL-terminated array of strings containing charset names
+  //- which will be shown, or NULL to show all charsets.
+  void     set_filter      (GtkFontFilterType filter_type,
+			    GtkFontType		font_type,
+                            const SArray	&foundries,
+                            const SArray	&weights,
+                            const SArray	&slants,
+                            const SArray	&setwidths,
+                            const SArray	&spacings,
+                            const SArray	&charsets);
+
+  WRAP_MEMBER(value,font_selection,fontsel,Gtk::FontSelection*,GtkWidget*);
+  WRAP_MEMBER(value,ok_button,ok_button,Gtk::Button*,GtkWidget*);
+  WRAP_MEMBER(value,apply_button,apply_button,Gtk::Button*,GtkWidget*);
+  WRAP_MEMBER(value,cancel_button,cancel_button,Gtk::Button*,GtkWidget*);
+
+};
+
+
+PRIVATE_START;
+#include <gtk--/private/notebook_p.h>
+#include <gtk--/private/window_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+#include <gtk--/box.h>
+#include <gtk--/button.h>
+#include <gtk--/entry.h>
+#include <gtk--/clist.h>
+#include <gtk--/radiobutton.h>
+
+
+CList* 
+FontSelection::get_filter_list(PropertyType p)
+{
+  return dynamic_cast<CList*>(
+           wrap(gtkobj()->filter_clists[(int)p])
+         );
+}
+ 
+
+string 
+FontSelection::get_font_name() const
+{
+  gchar *tmp = gtk_font_selection_get_font_name(const_cast<GtkFontSelection*>(gtkobj()));
+  if(tmp != 0) {
+    string tmps(tmp);
+    g_free(tmp);
+    return tmps;
+  }
+  else {
+    return string();
+  }
+}
+
+void
+FontSelection::set_filter(GtkFontFilterType filter_type,
+			      GtkFontType	font_type,
+                              const SArray	&foundries,
+                              const SArray	&weights,
+                              const SArray	&slants,
+                              const SArray	&setwidths,
+                              const SArray	&spacings,
+                              const SArray	&charsets)
+{
+  gtk_font_selection_set_filter(gtkobj(),
+				filter_type, font_type,
+				const_cast<char**>((const char**)foundries),
+				const_cast<char**>((const char**)weights),
+				const_cast<char**>((const char**)slants),
+				const_cast<char**>((const char**)setwidths),
+				const_cast<char**>((const char**)spacings),
+				const_cast<char**>((const char**)charsets));
+}
+
+
+
+/////////////////////////////
+
+FontSelectionDialog::FontSelectionDialog(const nstring& title)
+  : Window((GtkWindow*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  set_title(title);
+}
+
+FontSelectionDialog::FontSelectionDialog(GtkFontSelectionDialog *castitem)
+  : Window((GtkWindow*)(castitem))
+{
+  initialize_class();
+}
+
+nstring 
+FontSelectionDialog::get_font_name() const
+{
+  return get_font_selection()->get_font_name();
+}
+
+
+void
+FontSelectionDialog::set_filter(GtkFontFilterType filter_type,
+				    GtkFontType	font_type,
+                                    const SArray	&foundries,
+                                    const SArray	&weights,
+                                    const SArray	&slants,
+                                    const SArray	&setwidths,
+                                    const SArray	&spacings,
+                                    const SArray	&charsets)
+{
+  get_font_selection()->set_filter(filter_type,font_type,foundries,
+                             weights,slants,setwidths,spacings,charsets);
+}
+
+}
+
+DOCUMENTATION_START;
+

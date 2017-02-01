@@ -1,0 +1,210 @@
+
+1. MIME type handling in the GNOME desktop
+------------------------------------------
+
+MIME types are using to distinguish what sort of operations and
+attributes a file has.  The operations are usually things like: how to
+open files of a given mime-type, how to view them, what icon is used
+to display it and so on.
+
+Besides the MIME types, in GNOME, the metadata system is used to
+provide information in a per-file basis (for example, to override the
+defaults of the mime-type). 
+
+GNOME uses a number of techniques depending on the speed requirements
+to figure out what the MIME type of a file is.  It is possible to get
+the mime-type by only using the filename or if speed is not important,
+by checking the actual file contents (for more information look at the
+gnome-mime.h header file and the accompanying documentation).
+
+There are ways in GNOME to fetch the values bound to a mime-type with
+the routines provided in gnome-mime-info.c.
+
+
+2. Mapping a filename to a MIME type
+------------------------------------      
+
+To make the GNOME desktop aware of a new MIME type it is necessary to
+install a file with the extension .mime in the $gnome/share/mime-info
+directory or from the ~/.gnome/mime-info directory.
+
+The file $gnome/share/mime-info/gnome.mime is special, as it contains
+the defaults for gnome, and is read first.  In addition, the file
+~/.gnome/mime-info/user.mime is read last.  This will guarantee that
+there is a way to set system defaults, and there is a way for the user
+to override them.  There is currently no way to tell anything about the
+order of the other files in those directories, nor is there anyway to
+override system defaults yet.
+
+The format is the following:
+
+mime-type-name
+	ext[,priority]: ext1 ext2 ext3
+	ext[,priority]: ext4
+	regex[,priority]: regex1
+	regex[,priority]: regex2
+
+where "mime-type-name" is a valid MIME type.  For example
+"text/plain". 
+
+Multiple ext and regex entries can be provided for this mime-type.
+Please note that the regex keyword only allows one regular expression
+per line, while the ext keyword lets you list a number of extensions
+in the same line.
+
+The priority indicates the number of components that your extension
+matches (the bigger the number, the better).  Right now, only
+priorities 1 and 2 are supported.
+
+This is required to distinguish the mime type correctly for situations
+like "emacs.tar.gz", where the .gz could match the "compressed" rule,
+while the real match should be for "tar.gz", so a "tar.gz" would have
+a higher priority
+
+For example, for a vCalendar application, this file would be
+installed:
+
+------ calendar.mime  -------
+application/v-calendar:
+	ext: vcf
+-----------------------------
+
+3. Adding keys to a MIME type
+-----------------------------
+
+To add keys to a mime-type, it is necessary to install a file with the
+extension .keys in the $gnome/share/mime-info directory or from the
+~/.gnome/mime-info directory.
+
+Similar to the .mime files, there is a provision for a
+$gnome/share/mime-info/gnome.keys file and a
+~/.gnome/mime-info/user.keys file.  This, as above, allows for both
+defaults and user preferences.
+
+The file has the following format:
+
+mime-type-match:
+	[\[LANG\]]key=value
+
+"mime-type-match" allows you to provide either a full mime-type, or a
+glob expression, for example, you can list "image/gif" for making the
+entries apply to the image/gif mime type or "image/*" if you want the
+keys to apply to all of the images.
+
+The [LANG] part is optional, and it used to provide internationalized
+versions of any strings appearing in the value.
+
+key is the key (a number of keys are standardized) and value is the
+value bound to it.
+
+For example, the GIMP could ship with this file:
+
+------ gimp.keys --------
+image/*:
+	open=gimp %f
+	
+image/x-xcf:
+	icon-filename=/opt/gimp/share/xcf.png
+-------------------------
+
+This will make the GIMP the handler for the open action.  Files of
+type xcf would use the filename pointed in the icon-filename key.
+
+%f gets interpolated with the file name or the list of file names that
+matched this mime-type.
+
+As you can see, a .keys file does not need to provide all of the
+values, it can just provide or override some of the actions.
+
+Note that user defined bindings in .keys file will take precedence
+over system installed files.
+
+
+4. Default keys
+---------------
+
+The following keys are recognized in the GNOME desktop:
+
+    key			action
+------------------------------------------------------------
+
+    open		open the give file with this command.
+
+    icon-filename	points to a filename with the icon
+			that should be used to represent files 
+			of this type
+
+    view                Command to view the file contents.
+
+    ascii-view          A command that should be used to do
+			an ascii-rendering of the file.   Used as 
+			a fall-back by the filemanager if a "view"
+			action does not exist.
+
+    fm-open             file-manager open.  If present, the file
+			manager will use this action instead of the
+			value in open to perform this action (the 
+			filemanager for example will open archive files
+			as if they were directories by using the VFS).
+
+    fm-view		file-manager view.  If present, invoking the
+			view operation on the file manager will use the
+			value defined here instead of the value in
+			"view".
+
+    fm-ascii-view	Fall-back operation for the file manager as
+			well.
+
+Those keys are also queried on the metadata (except in the cases where
+the lookup would be too expensive). 
+
+5. Defining multiple actions
+----------------------------
+
+Sometimes it is important to provide more than one "open" action.  To
+do this, the keys should be specified in the following fashion (The
+same applies to any other key that might need more than one option):
+
+text/plain:
+	open=command %f
+	open.tag1.Do this and that=this-and-that %f
+	open.tag2.Gzip it=gzip %f
+	open.tag3.Mail it=mail %{Recipient} < %f
+
+This will define a default action (which would invoke "command %f"),
+and three extra open commands:
+   
+   "Do this and that"	-> this-and-that %f
+   "Gzip it"		-> gzip %f
+   "Mail it"		-> mail ${Recipient} < %f
+
+Please notice that you have to add a "tag" to every "open" key.
+
+6. Localizing the texts for a tagged key
+----------------------------------------
+
+The reason for using the tags, is that they are required to
+distinguish the correct value for internationalization purposes, here
+is how the above example would be translated to Spanish:
+
+text/plain:
+	open=command %f
+	open.tag1.Do this and that=this-and-that %f
+	[es]open.tag1.Hacer esto y aquello=this and that %f
+	open.tag2.Gzip it=gzip %f
+	[es]open.tag2.Comprimir con gzip=gzip %f
+	open.tag3.Mail it=mail %{Recipient} < %f
+	[es]open.tag3.Enviarlo por correo=mail %{Recipient} < %f
+	open.tag4.Example=example %f
+
+To the application programmer, if the code is running with LANG=es, he
+will get the following keys: "open", "open.tag1.Hacer esto y aquello",
+"open.tag2.Comprimir con gzip", "open.tag3.Enviarlo por correo" and
+"open.tag4.Example" 
+
+If a translation entry were missing, he would get the general
+definition for the default value (in the example above, I did not
+translate the value for open.tag4.
+
+
+Miguel de Icaza (miguel@gnu.org).

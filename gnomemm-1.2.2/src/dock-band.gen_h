@@ -1,0 +1,131 @@
+/* $Id: dock-band.gen_h,v 1.2 2000/08/29 18:42:22 kenelson Exp $ */
+
+
+/* dock-band.gen_h
+ * 
+ * Copyright (C) 2000 The Gtk-- Development Team
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/container.h>
+#include <gnome--/dock-item.h>
+#include <gnome--/dock-layout.h>
+#include <libgnomeui/gnome-dock-band.h>
+
+CLASS_START(Gnome);
+
+class DockBand : public Gtk::Container
+{
+  WRAP_CLASS(DockBand, GnomeDockBand,
+             GNOME_DOCK_BAND, GNOME_IS_DOCK_BAND,
+             dock_band,
+             Gtk::Container, GtkContainer, GTK_CONTAINER);
+public:
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+
+  WRAP_METHOD(void gnome_dock_band_set_orientation (GnomeDockBand*, GtkOrientation),
+	            void set_orientation (GtkOrientation orientation));
+
+  WRAP_METHOD(GtkOrientation gnome_dock_band_get_orientation (GnomeDockBand*),
+	            GtkOrientation get_orientation ());
+
+  WRAP_METHOD(gboolean gnome_dock_band_insert (GnomeDockBand *band,
+                                                 GtkWidget *child,
+                                                 guint offset,
+                                                 gint position),
+              bool insert (Gtk::Widget& child,
+                           guint offset,
+                           gint position));
+                           
+  WRAP_METHOD(gboolean gnome_dock_band_prepend(GnomeDockBand *band,
+                                               GtkWidget *child,
+                                               guint offset),
+              bool prepend (Gtk::Widget& child,
+                           guint offset));
+                           
+  WRAP_METHOD(gboolean gnome_dock_band_append (GnomeDockBand *band,
+                                               GtkWidget *child,
+                                               guint offset),
+              bool append (Gtk::Widget& child,
+                           guint offset));
+    
+  WRAP_METHOD(void gnome_dock_band_set_child_offset (GnomeDockBand *band,
+                                                     GtkWidget *child,
+                                                     guint offset),
+              void set_child_offset (Gtk::Widget& child,
+                                    guint offset));
+                           
+  WRAP_METHOD(guint gnome_dock_band_get_child_offset (GnomeDockBand *band,
+                                                 GtkWidget *child),
+              guint get_child_offset (Gtk::Widget& child));
+
+  //TODO: What's this GList* old_child about? Maybe it should just be a GtkWidget*                                  
+  WRAP_METHOD(void gnome_dock_band_move_child (GnomeDockBand *band,
+                                               GList *old_child,
+                                               guint new_num),
+              void move_child (GList *old_child,
+                               guint new_num));
+   
+  WRAP_METHOD(guint gnome_dock_band_get_num_children (GnomeDockBand *band),
+              guint get_num_children());
+
+  //- We use the band_ prefix, because Gtk::Widget already has a 'drag_begin' signal.
+  WRAP_METHOD(void gnome_dock_band_drag_begin (GnomeDockBand *band,
+                                               GnomeDockItem *item),
+              void band_drag_begin(Gnome::DockItem& item));
+              
+  WRAP_METHOD(gboolean gnome_dock_band_drag_to (GnomeDockBand *band,
+                                                GnomeDockItem *item,
+                                                gint x, gint y),
+              bool band_drag_to(Gnome::DockItem& item,
+                           gint x, gint y));
+
+  WRAP_METHOD(void gnome_dock_band_drag_end (GnomeDockBand *band,
+                                             GnomeDockItem *item),
+              void band_drag_end(Gnome::DockItem& item));
+   
+  WRAP_METHOD(GnomeDockItem *gnome_dock_band_get_item_by_name (GnomeDockBand *band,
+                                                 const char *name,
+                                                 guint *position_return,
+                                                 guint *offset_return),
+              Gnome::DockItem* get_item_by_name (const Gtk::nstring& name,
+                                          guint& position_return,
+                                          guint& offset_return));
+
+  WRAP_METHOD(void gnome_dock_band_layout_add (GnomeDockBand *band,
+                                               GnomeDockLayout *layout,
+                                               GnomeDockPlacement placement,
+                                               guint band_num),
+              void layout_add (Gnome::DockLayout& layout,
+                               GnomeDockPlacement placement,
+                               guint band_num));
+
+
+};
+
+
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+#include <gnome--/private/dock-band_p.h>
+
+
+DOCUMENTATION_START;
+

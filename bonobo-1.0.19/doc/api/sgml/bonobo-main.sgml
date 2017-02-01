@@ -1,0 +1,176 @@
+<refentry id="bonobo-bonobo-main">
+<refmeta>
+<refentrytitle>bonobo-main</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>bonobo-main</refname><refpurpose>Bonobo initialization.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-init">bonobo_init</link>                     (<link linkend="CORBA-ORB-CAPS">CORBA_ORB</link> orb,
+                                             <link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             <link linkend="PortableServer-POAManager">PortableServer_POAManager</link> manager);
+void        <link linkend="bonobo-main">bonobo_main</link>                     (void);
+<link linkend="gboolean">gboolean</link>    <link linkend="bonobo-activate">bonobo_activate</link>                 (void);
+void        <link linkend="bonobo-setup-x-error-handler">bonobo_setup_x_error_handler</link>    (void);
+<link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   <link linkend="bonobo-orb">bonobo_orb</link>                      (void);
+<link linkend="PortableServer-POA">PortableServer_POA</link> <link linkend="bonobo-poa">bonobo_poa</link>               (void);
+<link linkend="PortableServer-POAManager">PortableServer_POAManager</link> <link linkend="bonobo-poa-manager">bonobo_poa_manager</link>
+                                            (void);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+  Initialization functions for Bonobo applications.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="bonobo-init">bonobo_init ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_init                     (<link linkend="CORBA-ORB-CAPS">CORBA_ORB</link> orb,
+                                             <link linkend="PortableServer-POA">PortableServer_POA</link> poa,
+                                             <link linkend="PortableServer-POAManager">PortableServer_POAManager</link> manager);</programlisting>
+<para>
+Initializes the bonobo document model.  It requires at least
+the value for <parameter>orb</parameter>.  If <parameter>poa</parameter> is CORBA_OBJECT_NIL, then the
+RootPOA will be used, in this case <parameter>manager</parameter> should be CORBA_OBJECT_NIL.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>orb</parameter>&nbsp;:</entry>
+<entry> the ORB in which we run
+</entry></row>
+<row><entry align="right"><parameter>poa</parameter>&nbsp;:</entry>
+<entry> optional, a POA.
+</entry></row>
+<row><entry align="right"><parameter>manager</parameter>&nbsp;:</entry>
+<entry> optional, a POA Manager
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>TRUE</literal> on success, or <literal>FALSE</literal> on failure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-main">bonobo_main ()</title>
+<programlisting>void        bonobo_main                     (void);</programlisting>
+<para>
+Activates the Bonobo POA Manager and enters the main event loop.</para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-activate">bonobo_activate ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    bonobo_activate                 (void);</programlisting>
+<para>
+Activates the Bonobo POA manager registered by bonobo_init.
+This should be called at the end of application initialization.
+You do not need to call this function if you use <link linkend="bonobo-main">bonobo_main</link>().</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry><literal>TRUE</literal> on success, or <literal>FALSE</literal> on failure.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-setup-x-error-handler">bonobo_setup_x_error_handler ()</title>
+<programlisting>void        bonobo_setup_x_error_handler    (void);</programlisting>
+<para>
+To do graphical embedding in the X window system, Bonobo
+uses the classic foreign-window-reparenting trick.  The
+GtkPlug/GtkSocket widgets are used for this purpose.  However,
+serious robustness problems arise if the GtkSocket end of the
+connection unexpectedly dies.  The X server sends out DestroyNotify
+events for the descendants of the GtkPlug (i.e., your embedded
+component's windows) in effectively random order.  Furthermore, if
+you happened to be drawing on any of those windows when the
+GtkSocket was destroyed (a common state of affairs), an X error
+will kill your application.
+</para>
+<para>
+To solve this latter problem, Bonobo sets up its own X error
+handler which ignores certain X errors that might have been
+caused by such a scenario.  Other X errors get passed to gdk_x_error
+normally.</para>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-orb">bonobo_orb ()</title>
+<programlisting><link linkend="CORBA-ORB-CAPS">CORBA_ORB</link>   bonobo_orb                      (void);</programlisting>
+<para>
+fetches the bonobo orb</para>
+<para>
+   Returns the CORBA_ORB object that is being used by Bonobo.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The ORB used for this Bonobo application.  The ORB
+is created in <link linkend="bonobo-init">bonobo_init</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-poa">bonobo_poa ()</title>
+<programlisting><link linkend="PortableServer-POA">PortableServer_POA</link> bonobo_poa               (void);</programlisting>
+<para>
+fetches the bonobo poa</para>
+<para>
+   Returns the POA object that is being used by Bonobo.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The POA used for this Bonobo application.  The POA
+is created when <link linkend="bonobo-init">bonobo_init</link>() is called.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-poa-manager">bonobo_poa_manager ()</title>
+<programlisting><link linkend="PortableServer-POAManager">PortableServer_POAManager</link> bonobo_poa_manager
+                                            (void);</programlisting>
+<para>
+fetches the bonobo poa manager.</para>
+<para>
+   Returns the POA Manager object that is being used by Bonobo.
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The POA Manager used for this Bonobo application.  The POA
+Manager is created when <link linkend="bonobo-init">bonobo_init</link>() is called, but it is not
+activated until <link linkend="bonobo-main">bonobo_main</link>() is called.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

@@ -1,0 +1,86 @@
+AC_INIT(src/gtkgs.c)
+
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(ggv, 1.0.2)
+AM_MAINTAINER_MODE
+
+AM_ACLOCAL_INCLUDE(macros)
+AM_PROG_XML_I18N_TOOLS
+
+GNOME_INIT
+
+AC_ISC_POSIX
+AC_PROG_CC
+AC_STDC_HEADERS
+AC_ARG_PROGRAM
+AM_PROG_LIBTOOL
+
+GNOME_X_CHECKS
+
+AC_CHECK_HEADER(paths.h)
+AC_PATH_PROG(GS_PROG, gs)
+AC_PATH_PROG(LPR_PROG, lpr)
+AC_DEFINE_UNQUOTED(GS_PATH, "$GS_PROG")
+AC_DEFINE_UNQUOTED(LPR_PATH, "$LPR_PROG")
+
+
+dnl **************************************************
+dnl * internationalization support
+dnl **************************************************
+ALL_LINGUAS="ca cs da de el es fi fr ga gl hr hu it ja ko lt nl no pl pt pt_BR ro ru sk sl sv tr uk zh_CN.GB2312 zh_TW"
+AM_GNU_GETTEXT
+
+AC_LINK_FILES($nls_cv_header_libgt, $nls_cv_header_intl)
+
+dnl ******************************
+dnl Check for Bonobo
+dnl ******************************
+try_bonobo=true
+bonobo=
+have_bonobo=false
+AC_ARG_WITH(bonobo,
+	[--{with,without}-bonobo   Compile with Bonobo support or without it],
+	if test x$withval = xno; then
+		try_bonobo=false
+	fi
+)
+
+if $try_bonobo; then
+	AC_MSG_CHECKING(for Bonobo >= 0.30)
+	vers=`gnome-config --modversion bonobox | sed -e "s/bonobo-//" | \
+		awk 'BEGIN { FS = "."; } { printf "%d", $1 * 1000 + $2;}'`
+	if test "$vers" -ge 30; then
+		AC_MSG_RESULT(found)
+		have_bonobo=true
+		bonobo=bonobox
+
+	else
+		AC_MSG_RESULT(not found)
+	fi
+fi
+AM_CONDITIONAL(BONOBO, $have_bonobo)
+
+EXTRA_GNOME_LIBS=`gnome-config --libs $bonobo`
+EXTRA_GNOME_CFLAGS=`gnome-config --cflags $bonobo`
+AC_SUBST(EXTRA_GNOME_LIBS)
+AC_SUBST(EXTRA_GNOME_CFLAGS)
+
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+
+AC_OUTPUT([
+Makefile
+ggv.spec
+intl/Makefile
+po/Makefile.in
+macros/Makefile
+help/Makefile
+help/C/Makefile
+help/it/Makefile
+help/ja/Makefile
+pixmaps/Makefile
+src/Makefile
+src/stock/Makefile
+omf-install/Makefile
+],[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

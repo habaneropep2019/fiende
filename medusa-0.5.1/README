@@ -1,0 +1,151 @@
+Medusa is software that allows you to quickly search your system for
+particular types of files, using an index.
+
+CAVEATS
+-------
+
+Medusa is still in its early stages.  It is not yet feature complete,
+and there are known bugs, some of which can take up lots of
+unnecessary resources on your machine.
+
+Please do not use this code on an afs system or over nfs volumes; the
+file permissions are not compatible with medusa.  Running
+medusa on these systems is completely insecure.
+
+HOW TO BUILD MEDUSA
+--------------------
+
+To make and install medusa, do the following from within
+the medusa source directory:
+
+./configure 
+make 
+make install 
+(do the last step as root if you are installing to a
+place where you do not have write permission)
+
+
+RUNNING MEDUSA ON YOUR SYSTEM
+-----------------------------
+
+Medusa comes with a cron job that will be installed on your machine.
+By default a regular indexing process will not be run on your machine.
+You can turn the regular indexing process on by running 
+ "medusa-index-configure --on".
+
+You can turn regular indexing off by running 
+ "medusa-index-configure --off".
+
+Nautilus also allows you to turn indexing off and on.  
+
+You can also create an index and set up the service by hand.  More
+information about the indexer and how to set up medusa by hand appears
+below.
+
+You should have at least 64, and preferably at least 96 megs
+of RAM to run the indexer.  Removable media will also be indexed by
+medusa, so remove CDs, zip drives, and floppies before indexing.
+
+Medusa's indexes will be created in proportion to the amount of data
+on your hard drive.  In general the size of the indexes will be
+between 0.25-5% of the size of all of the data on your computer, so be
+sure you have enough free space to make the indexes before running
+medusa.
+
+After the indexer is finished, it will print a message to stdout,
+telling you that this is the case.
+
+
+To start the indexing process, as root run
+
+medusa-indexd
+
+Let it keep running, and wait for it to
+finish indexing.  
+
+When the indexer is completed you should start the medusa search
+service.
+
+As root, run
+
+medusa-searchd
+
+After both the indexer is completed and the search service
+has begun, you can perform searches.
+
+This can be done by using the "search" feature in Nautilus,
+or by using the command line testing tool, called "msearch"
+
+For documentation about the command line tool, see the file
+docs/how_to_use_msearch.  It is possible that this file is slightly
+out of date.
+
+CONFIGURING MEDUSA ON YOUR SYSTEM
+---------------------------------
+
+Because indexing the contents of your machine each night can
+be expensive, Medusa by default does not run a nightly indexing process.
+You can turn on a nightly indexing process by running the following
+command:
+
+medusa-enable-indexing --on
+
+It can be turned off by running 
+
+medusa-enable-indexing --off.
+
+You can also set a preference to "use fast search" in Nautilus,
+which will turn Medusa on.
+
+Any user on a system by default can turn the Medusa service on.  A
+system administrator may also disable the service for everyone by
+using the medusa.conf file.  This file is installed by default into
+the /etc directory.  Setting blocked=yes will keep Medusa off and
+prevent any user from turning the service on.  The medusa.conf
+man page also has information about the configuration file included with 
+Medusa.
+
+
+REPORTING BUGS
+--------------
+
+Medusa bugs can be reported using the eazel bug report tool, which is
+located at bugzilla.eazel.com.  Report bugs for the "medusa"
+component.
+
+Bug reports that occur during the use of Nautilus should be reported
+using the Nautilus bug report tool if possible, but can also be
+reported using bugzilla.
+
+You can send email regarding medusa to medusa-list@lists.eazel.com, or
+to rebecka@eazel.com.
+
+MEDUSA FREQUENTLY ASKED QUESTIONS
+---------------------------------
+
+1.  How is medusa different than slocate?
+
+Medusa is able to find files by their names quickly.  However, medusa
+is also able to find files by their path, size, content, and owner, or
+in any combination.
+
+2.  Indexing takes a long time!  When will this get better?
+
+Indexing your whole drive does take a long time, and we hope to
+improve this as much as possible.  To some degree, however, 
+this is a byproduct of the slowness of hard drives.
+However, we hope to introduce "incremental" indexing soon, so
+that files will only get reindexed when they are altered after
+the last indexing.
+
+
+
+
+
+
+
+
+
+
+
+

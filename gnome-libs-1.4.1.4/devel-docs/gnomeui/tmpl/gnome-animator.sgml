@@ -1,0 +1,363 @@
+<!-- ##### SECTION Title ##### -->
+GnomeAnimator
+
+<!-- ##### SECTION Short_Description ##### -->
+A widget for adding simple animations to GNOME applications.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+<type>GnomeAnimator</type> is a widget that is able to play simple
+animations in the GTK+ event loop.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GnomeAnimator ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM GnomeAnimatorStatus ##### -->
+<para>
+This enumeration is used to determine if the animator object is running or
+not. Use <function>gnome_animator_get_status()</function> to
+retrieve it.</para>
+
+<itemizedlist>
+  <listitem>
+    <para>
+      %GNOME_ANIMATOR_STATUS_STOPPED: The value used 
+      when the GnomeAnimator object is not running.
+    </para>
+  </listitem>
+
+	<listitem><para>%GNOME_ANIMATOR_STATUS_RUNNING: The value used
+		when the GnomeAnimator object is running.
+	</para></listitem>
+</itemizedlist>
+
+
+<!-- ##### ENUM GnomeAnimatorLoopType ##### -->
+<para>
+This enumeration is used to set the type of animation loop desired in the
+GnomeAnimator object.
+</para>
+
+<itemizedlist>
+	<listitem><para>%GNOME_ANIMATOR_LOOP_NONE: Do not use a loop in
+		the animation. When the animation is played, it will not
+		repeat when it is completed.</para></listitem>
+
+	<listitem><para>%GNOME_ANIMATOR_LOOP_RESTART: After the animation
+		is played, loop back to the beginning of the animation and
+		replay it. If the animation is playing forward, the loop
+		will return to the first frame; if it is being played
+		backward, the loop will return to the last frame in the
+		sequence.</para></listitem>
+
+	<listitem><para>%GNOME_ANIMATOR_LOOP_PING_PONG: When the animation
+		sequence is completed, the playback direction is reversed.
+		</para></listitem>
+</itemizedlist>
+
+<!-- ##### STRUCT GnomeAnimatorFrame ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT GnomeAnimatorPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnome_animator_new_with_size ##### -->
+<para>
+Create a GnomeAnimator object of the specified size.
+</para>
+
+@width: guint specifying the width of the new object
+@height: guint specifying the height of the new object
+@Returns: Returns a GtkWidget* pointing to the newly allocated object.
+
+
+<!-- ##### FUNCTION gnome_animator_set_loop_type ##### -->
+<para>
+Sets the type of loop the animator will use.
+</para>
+
+@animator: GnomeAnimator to apply this property to.
+@loop_type: The type of loop to be used. See GnomeAnimatorLoopType.
+
+
+<!-- ##### FUNCTION gnome_animator_get_loop_type ##### -->
+<para>
+Determine the type of loop being used on the animator object.
+</para>
+
+@animator: GnomeAnimator object to retrieve the value from.
+@Returns: GnomeAnimatorLoopType.
+
+
+<!-- ##### FUNCTION gnome_animator_set_playback_direction ##### -->
+<para>
+Set the direction the animation should be played back. Setting a positive
+value will cause the animator to play forward; a negative value will cause
+it to play backward.
+</para>
+
+@animator: The GnomeAnimator object to apply the property to.
+@playback_direction: A gint value; use a positive value for "forward" and
+	a negative value for "backward".
+
+
+<!-- ##### FUNCTION gnome_animator_get_playback_direction ##### -->
+<para>
+Determines the direction of playback.
+</para>
+
+@animator: The GnomeAnimator object to query the value from.
+@Returns: Returns a gint; a positive value is returned if the animation
+	plays forward, a negative value is returned if it plays backward
+
+
+<!-- ##### FUNCTION gnome_animator_append_frame_from_imlib_at_size ##### -->
+<para>
+Append a frame from a GdkImlibImage to the GnomeAnimator object and render
+it.
+</para>
+
+@animator: GnomeAnimator to which the frame will be appended.
+@image: GdkImlibImage to be appended.
+@x_offset: Horizontal offset of frame within the animator widget.
+@y_offset: Vertical offset of frame within the animator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@width: Width of the frame in pixels.
+@height: Height of the frame in pixels.
+@Returns: TRUE if the append succeeds.
+
+
+<!-- ##### FUNCTION gnome_animator_append_frame_from_imlib ##### -->
+<para>
+Adds frame contained within a GdkImlibImage image at the end of the
+current animation.  The frame display interval is divided by the playback
+speed.
+</para>
+
+@animator: GnomeAnimator object to append to.
+@image: Image to be appended.
+@x_offset: Horizontal offset of frame within the GnomeAnimator widget.
+@y_offset: Vertical offset of frame within the GnomeAnimator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@Returns: %TRUE if append is successful.
+
+
+<!-- ##### FUNCTION gnome_animator_append_frame_from_file_at_size ##### -->
+<para>
+Appends a frame from a file to a GnomeAnimator widget. If the specified
+width and height variables are different from the actual size of the
+image, it is scaled proportionally. The frame display interval is
+@interval divided by the playback speed.
+</para>
+
+@animator: GnomeAnimator widget to append onto.
+@name: Filename of the image to append.
+@x_offset: Horizontal offset of the frame within the GnomeAnimator widget.
+@y_offset: Vertical offset of the frame within the GnomeAnimator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@width: Width of the frame in pixels.
+@height: Height of the frame in pixels.
+@Returns: %TRUE if the append is successful.
+
+
+<!-- ##### FUNCTION gnome_animator_append_frame_from_file ##### -->
+<para>
+Append a frame from a given file to a GnomeAnimator widget. The frame
+display interval is @interval divided by the playback speed.
+</para>
+
+@animator: The GnomeAnimator widget to append onto.
+@name: Filename of the image to append.
+@x_offset: Horizontal offset of the frame within the GnomeAnimator widget.
+@y_offset: Vertical offset of the frame within the GnomeAnimator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@Returns: %TRUE if the append is successful.
+
+
+<!-- ##### FUNCTION gnome_animator_append_frames_from_imlib_at_size ##### -->
+<para>
+Appends multiple frames contained within a GdkImlibImage image to a
+GnomeAnimator widget. Each frame within the image should be next to one
+another in a single, horizontal row.  If @width and/or @height are
+different from the actual size of the frame, the image will be scaled
+proportionally.  The frame display interval is @interval divided by the
+playback speed.
+</para>
+
+@animator: The GnomeAnimator widget to append onto.
+@image: The GdkImlibImage containing the frames to be appended.
+@x_offset: Horizontal offset of a frame within the GnomeAnimator widget.
+@y_offset: Vertical offset of a frame within the GnomeAnimator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@x_unit: The width of a single frame in the image, measured in pixels.
+@width: Width of the frame to be appended, measured in pixels.
+@height: Height of the frame to be appended, measured in pixels.
+@Returns: %TRUE if append is successful.
+
+
+<!-- ##### FUNCTION gnome_animator_append_frames_from_imlib ##### -->
+<para>
+Append multiple frames contained within a GdkImlibImage image to the end
+of a GnomeAnimator widget. Each frame within the image should be next to
+one another in a single, horizontal row.  The frame display interval is
+@interval divided by the playback speed.
+</para>
+
+@animator: The GnomeAnimator widget to append onto.
+@image: The GdkImlibImage containing the frames to be appended.
+@x_offset: Horizontal offset of a frame within the animator widget.
+@y_offset: Vertical offset of a frame within the animator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@x_unit: Width of a single frame in the image, measured in pixels.
+@Returns: %TRUE if the append is successful.
+
+
+<!-- ##### FUNCTION gnome_animator_append_frames_from_file_at_size ##### -->
+<para>
+Load and render an image containing multiple frames, and append those
+frames to the animator widget. Each frame within the image should be
+next to one another in a single, horizontal row. If @width and/or @height
+are different from the actual frame size, the image is scaled
+proportionally.  The frame display interval is @interval divided by the
+playback speed.
+
+</para>
+
+@animator: The animator widget to append onto.
+@name: The filename of the image containing the frames to append.
+@x_offset: Horizontal offset of a frame within a GnomeAnimator widget.
+@y_offset: Vertical offset of a frame within a GnomeAnimator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@x_unit: Width of a single frame in the image, measured in pixels.
+@width: Width of the frame to be appended, measured in pixels.
+@height: Height of the frame to be appended, measured in pixels.
+@Returns: %TRUE if the append is successful.
+
+
+<!-- ##### FUNCTION gnome_animator_append_frames_from_file ##### -->
+<para>
+Load and render an image containing multiple frames, and append those
+frames to the animator widget. Each frame within the image should be
+next to one another in a single, horizontal row. The frame display
+interval is @interval divided by the playback speed.
+</para>
+
+@animator: The animator widget to append onto.
+@name: The filename of the image containing the frames to append.
+@x_offset: Horizontal offset of a frame within a GnomeAnimator widget.
+@y_offset: Vertical offset of a frame within a GnomeAnimator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@x_unit: Width of a single frame in the image, measured in pixels.
+@Returns: %TRUE if the append is successful.
+
+
+<!-- ##### FUNCTION gnome_animator_append_frame_from_gnome_pixmap ##### -->
+<para>
+Appends a frame from a GnomePixmap image to the animator widget.  The
+frame display interval is @interval divided by the playback speed.
+</para>
+
+@animator: The animator to append onto.
+@pixmap: GnomePixmap to be appended to the animator.
+@x_offset: Horizontal offset of frame within the animator widget.
+@y_offset: Vertical offset of frame within the animator widget.
+@interval: Number of milliseconds to delay before showing the next frame.
+@Returns: %TRUE if the append is successful.
+
+
+<!-- ##### FUNCTION gnome_animator_start ##### -->
+<para>
+Begin animating the widget.
+</para>
+
+@animator: The animator widget to start.
+
+
+<!-- ##### FUNCTION gnome_animator_stop ##### -->
+<para>
+Stop an animator that is running.
+</para>
+
+@animator: The animator widget to stop.
+
+
+<!-- ##### FUNCTION gnome_animator_advance ##### -->
+<para>
+Advance the animator widget @num frames.  If @num is positive, use the
+specified @playback_direction; if it is negative, go in the opposite
+direction.  After the call, the animator is in the same state it would be
+if it had actually executed the sppecified number of iterations.
+
+</para>
+
+@animator: The animator widget to be updated.
+@num: Number of frames to advance by.
+@Returns: %TRUE if the animator is now stopped.
+
+
+<!-- ##### FUNCTION gnome_animator_goto_frame ##### -->
+<para>
+Jump to the specified frame.  If @num_frame is greater than the total
+number of frames, no action is taken.
+</para>
+
+@animator: The animator widget to be updated.
+@num_frame: Frame number to be made current.
+<!-- # Unused Parameters # -->
+@frame_number: 
+
+
+<!-- ##### FUNCTION gnome_animator_get_current_frame_number ##### -->
+<para>
+Determine the current frame number of the animator widget.
+</para>
+
+@animator: The animator widget to be queried. 
+@Returns: Current frame number.
+
+
+<!-- ##### FUNCTION gnome_animator_get_status ##### -->
+<para>
+Obtain the current status from the animator widget.
+</para>
+
+@animator: Animator widget to be queried. Possible return values include
+%GNOME_ANIMATOR_STATUS_STOPPED or %GNOME_ANIMATOR_STATUS_RUNNING.
+
+@Returns: &GnomeAnimatorStatus status constant.
+
+
+<!-- ##### FUNCTION gnome_animator_set_playback_speed ##### -->
+<para>
+Sets the playback speed.  The delay between every frame is divided by this
+value before being used.  As a consequence, higher values give higher
+playback speeds.
+</para>
+
+@animator: Animator widget to be updated.
+@speed: Rate multiplier for playback speed.
+
+
+<!-- ##### FUNCTION gnome_animator_get_playback_speed ##### -->
+<para>
+Obtain the current playback speed.
+</para>
+
+@animator: Animator widget to be queried.
+@Returns: @double indicating the playback speed.

@@ -1,0 +1,243 @@
+/* $Id: statusbar.gen_h,v 1.49 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* statusbar.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/box.h>
+#include <gtk/gtkstatusbar.h>
+
+CLASS_START(Gtk);
+
+namespace Statusbar_Helpers
+{
+  class Message: protected GtkStatusbarMsg
+    {
+      private:
+        Message& operator=(const Message&);
+        Message(const Message&);
+      protected:
+        Message(void* do_not_derive_this);
+      public:
+        inline string get_text() {return text;} 
+        inline guint get_context_id() {return context_id;} 
+        inline guint get_message_id() {return message_id;} 
+    };
+
+  struct Element
+    {
+     guint context_id;
+     string message;
+     Element(const char* str) : context_id(1), message(str) {}
+     Element(const string& str) : context_id(1), message(str) {}
+     Element(guint cid,const string& str) : context_id(cid), message(str) {}
+    };
+
+  class MsgList
+    {
+      public:
+        typedef Message*                           value_type;
+        typedef value_type &                       reference;
+        typedef const value_type &                 const_reference;
+
+        typedef G_SList_Iterator<value_type>       iterator;
+        typedef G_List_ConstIterator<iterator>     const_iterator;
+
+        typedef size_t                             difference_type;
+        typedef size_t                             size_type;
+
+      private:
+        friend class Gtk::Statusbar;
+        Gtk::Statusbar *parent_;
+        explicit MsgList(Statusbar* parent): parent_(parent) {}
+
+        GSList*& glist() const;
+
+      public:
+        ~MsgList() {}
+
+        iterator begin();
+        iterator end();
+
+        inline const_iterator begin() const
+          { return const_iterator(begin()); }
+        inline const_iterator end() const
+          { return const_iterator(end()); }
+
+        void push_front(const Element& e);
+        inline void pop_front() { erase(begin()); }
+
+        inline void clear() { erase(begin(),end()); }
+        size_type size(void) const;
+        inline size_type max_size(void) { return size_type(-1); }
+        inline bool empty(void) { return glist() == 0; }
+
+        iterator erase(iterator);
+        void erase(iterator start, iterator stop);
+        void remove(const_reference);
+    };
+
+};
+
+//: Text status indicator
+//- This widget is used to display status information.
+//- Messages are pushed and poped onto a message stack.  
+//- When text is pushed it replaces the old contents. 
+//- The old text is restored when popped. 
+//-
+//- It derives from Gtk_HBox so that additional information can be added 
+//- easily.
+//-
+//- The message list can be accessed through the messages() list.
+class Statusbar : public HBox
+{
+  WRAP_CLASS(Statusbar,GtkStatusbar,GTK_STATUSBAR,GTK_IS_STATUSBAR,statusbar,Gtk::HBox,GtkHBox,GTK_HBOX);
+public:
+  typedef Statusbar_Helpers::MsgList MsgList;
+
+  WRAP_CTOR_CAST;
+  WRAP_CTOR_DEFAULT;
+  WRAP_DTOR;
+  
+  //: Is emitted whenever a new message gets pushed onto a statusbar's stack.
+  SIGNAL_SPEC("text_pushed",both,void text_pushed(guint,const gchar*));
+  //: Is emitted whenever a new message is popped off a statusbar's stack.
+  SIGNAL_SPEC("text_popped",both,void text_popped(guint,const gchar*));
+
+  //: Returns a new context identifier, given a description of the actual context.
+  //- {\var context_description}: Textual description of what context the new message is being used in.
+  //-
+  //- {\var Returns}: An integer id. 
+  WRAP_METHOD(
+    guint gtk_statusbar_get_context_id (GtkStatusbar *,const gchar  *),
+    guint get_context_id (const nstring &context_description) const);
+
+  //: Pushes a new message onto a statusbar's stack.
+  //- {\var context_id}: The message's context id, as returned by {get_context_id()}.
+  //-
+  //- {\var text}: The message to add to the statusbar.
+  //-
+  //- {\var Returns}: The message's new message id for use with {remove()}.
+  WRAP_METHOD(
+    guint gtk_statusbar_push(GtkStatusbar *,guint,const gchar*),
+    guint push         (guint context_id,
+			const nstring &text));
+
+  //: Removes the message at the top of a GtkStatusBar's stack.
+  //- {\var context_id}: A context identifier. 
+  WRAP_METHOD(
+    void gtk_statusbar_pop(GtkStatusbar*, guint),
+    void pop(guint context_id));
+
+  typedef G_SList_Iterator < GtkStatusbarMsg * > iterator;
+  iterator messages_begin() { return iterator(gtkobj()->messages);}
+  iterator messages_end() { return iterator(static_cast<GSList*>(0));}
+
+  //: Forces the removal of a message from a statusbar's stack. The exact context_id and message_id must be specified.
+  //- {\var context_id}: A context identifier.
+  //-
+  //- {\var message_id}: A message identifier, as returned by {push()}.
+  WRAP_METHOD(void gtk_statusbar_remove(GtkStatusbar*, guint, guint),
+	      void remove_message(guint context_id, guint message_id));
+
+  MsgList& messages()
+    {return reinterpret_cast<MsgList&>(widget_self); }
+  const MsgList& messages() const
+    {return reinterpret_cast<const MsgList&>(widget_self); }
+ 
+};
+
+PRIVATE_START;
+#include <gtk--/private/box_p.h>
+IMPL_START;
+namespace Gtk
+{
+
+typedef Statusbar_Helpers::MsgList MsgList;
+typedef MsgList::iterator msg_iterator;
+
+GSList*& MsgList::glist() const
+  { return parent_->gtkobj()->messages; }
+
+msg_iterator MsgList::begin()
+  { return iterator(glist()); }
+msg_iterator MsgList::end()
+  { return iterator((GSList*)0); }
+
+void MsgList::push_front(const Statusbar_Helpers::Element& e)
+  { parent_->push(e.context_id,e.message); }
+
+MsgList::size_type MsgList::size(void) const
+  { return g_slist_length(glist()); }
+
+msg_iterator MsgList::erase(iterator i)
+  {
+    iterator next=i;
+    ++next;
+    remove(*i);
+    return next;
+  }
+
+void MsgList::erase(msg_iterator start, msg_iterator stop)
+  { while (start!=stop) erase(start++); }
+
+void MsgList::remove(const_reference r)
+  { if (r) parent_->remove_message(r->get_context_id(),r->get_message_id()); }
+
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_StatusBar)
+//. name: frame
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: label
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: messages
+//. type: GSList*
+//. get:
+//. set:
+//. desc:
+
+//. name: keys
+//. type: GSList*
+//. get:
+//. set:
+//. desc:
+
+//. name: seq_context_id
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: seq_message_id
+//. type: guint
+//. get:
+//. set:
+//. desc:
+

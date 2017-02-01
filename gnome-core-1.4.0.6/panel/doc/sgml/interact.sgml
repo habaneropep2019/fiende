@@ -1,0 +1,402 @@
+<refentry id="panel-Panel-Interaction">
+<refmeta>
+<refentrytitle>Panel Interaction</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>PANEL Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Panel Interaction</refname><refpurpose>Functions to interact with the panel</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;applet-widget.h&gt;
+
+
+void        <link linkend="applet-widget-add">applet_widget_add</link>               (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);
+void        <link linkend="applet-widget-add-full">applet_widget_add_full</link>          (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="gboolean">gboolean</link> bind_events);
+void        <link linkend="applet-widget-abort-load">applet_widget_abort_load</link>        (<link linkend="AppletWidget">AppletWidget</link> *applet);
+void        <link linkend="applet-widget-remove">applet_widget_remove</link>            (<link linkend="AppletWidget">AppletWidget</link> *applet);
+void        <link linkend="applet-widget-bind-events">applet_widget_bind_events</link>       (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);
+void        <link linkend="applet-widget-set-tooltip">applet_widget_set_tooltip</link>       (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             const char *text);
+void        <link linkend="applet-widget-set-widget-tooltip">applet_widget_set_widget_tooltip</link>
+                                            (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             const char *text);
+enum        <link linkend="GNOME-Panel-OrientType">GNOME_Panel_OrientType</link>;
+typedef     <link linkend="PanelOrientType">PanelOrientType</link>;
+<link linkend="PanelOrientType">PanelOrientType</link> <link linkend="applet-widget-get-panel-orient">applet_widget_get_panel_orient</link>
+                                            (<link linkend="AppletWidget">AppletWidget</link> *applet);
+int         <link linkend="applet-widget-get-panel-pixel-size">applet_widget_get_panel_pixel_size</link>
+                                            (<link linkend="AppletWidget">AppletWidget</link> *applet);
+int         <link linkend="applet-widget-get-free-space">applet_widget_get_free_space</link>    (<link linkend="AppletWidget">AppletWidget</link> *applet);
+void        <link linkend="applet-widget-send-position">applet_widget_send_position</link>     (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="gboolean">gboolean</link> enable);
+void        <link linkend="applet-widget-send-draw">applet_widget_send_draw</link>         (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="gboolean">gboolean</link> enable);
+void        <link linkend="applet-widget-get-rgb-bg">applet_widget_get_rgb_bg</link>        (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="guchar">guchar</link> **rgb,
+                                             int *w,
+                                             int *h,
+                                             int *rowstride);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="applet-widget-add">applet_widget_add ()</title>
+<programlisting>void        applet_widget_add               (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+Add a child (<parameter>widget</parameter>) to the <parameter>applet</parameter>.  This finishes the
+handshaking with the panel started in <parameter>applet_widget_new</parameter>.  You should never
+call this function twice for the same <parameter>applet</parameter> and you should always use
+this function rather then <link linkend="gtk-container-add">gtk_container_add</link>.  If you have already created
+an applet widget with <link linkend="applet-widget-new">applet_widget_new</link>, but need to cancel the loading
+of the applet, use <link linkend="applet-widget-abort-load">applet_widget_abort_load</link>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the child to add
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-add-full">applet_widget_add_full ()</title>
+<programlisting>void        applet_widget_add_full          (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             <link linkend="gboolean">gboolean</link> bind_events);</programlisting>
+<para>
+Add a child (<parameter>widget</parameter>) to the <parameter>applet</parameter>.  This finishes the
+handshaking with the panel started in <parameter>applet_widget_new</parameter>.  You should never
+call this function twice for the same <parameter>applet</parameter> and you should always use
+this function rather then <link linkend="gtk-container-add">gtk_container_add</link>.  If you have already created
+an applet widget with <link linkend="applet-widget-new">applet_widget_new</link>, but need to cancel the loading
+of the applet, use <link linkend="applet-widget-abort-load">applet_widget_abort_load</link>.  This function is only for
+special applets and you should use <link linkend="applet-widget-bind-events">applet_widget_bind_events</link> on some
+internal widget if <parameter>bind_events</parameter> was <literal>FALSE</literal>.  Normally you'll just want to
+use <link linkend="applet-widget-add">applet_widget_add</link>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the child to add
+</entry></row>
+<row><entry align="right"><parameter>bind_events</parameter>&nbsp;:</entry>
+<entry> bind 2nd and 3rd button events over the applet if <literal>TRUE</literal>
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-abort-load">applet_widget_abort_load ()</title>
+<programlisting>void        applet_widget_abort_load        (<link linkend="AppletWidget">AppletWidget</link> *applet);</programlisting>
+<para>
+Abort the applet loading, once applet has been created, this is
+a way to tell the panel to forget about us if we decide we want to quit
+before we add the actual applet to the applet-widget.  This is only useful
+to abort after <link linkend="applet-widget-new">applet_widget_new</link> was called but before <link linkend="applet-widget-add">applet_widget_add</link>
+is called.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> <link linkend="AppletWidget">AppletWidget</link> to work on.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-remove">applet_widget_remove ()</title>
+<programlisting>void        applet_widget_remove            (<link linkend="AppletWidget">AppletWidget</link> *applet);</programlisting>
+<para>
+Remove the plug from the panel, this will destroy the applet.
+You can only call this once for each applet.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> <link linkend="AppletWidget">AppletWidget</link> to work on.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-bind-events">applet_widget_bind_events ()</title>
+<programlisting>void        applet_widget_bind_events       (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget);</programlisting>
+<para>
+Binds the 2nd and 3rd button clicks over this widget. 
+Normally this is done during <link linkend="applet-widget-add">applet_widget_add</link>, but if you need to
+bind events over a widget which you added later, use this function.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the widget over which to bind events
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-set-tooltip">applet_widget_set_tooltip ()</title>
+<programlisting>void        applet_widget_set_tooltip       (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             const char *text);</programlisting>
+<para>
+Set a tooltip on the entire applet that will follow the
+tooltip setting from the panel configuration.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><parameter>text</parameter>&nbsp;:</entry>
+<entry> the tooltip text
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-set-widget-tooltip">applet_widget_set_widget_tooltip ()</title>
+<programlisting>void        applet_widget_set_widget_tooltip
+                                            (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="GtkWidget">GtkWidget</link> *widget,
+                                             const char *text);</programlisting>
+<para>
+Set a tooltip on the <parameter>widget</parameter> that will follow the tooltip
+setting from the panel configuration.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><parameter>widget</parameter>&nbsp;:</entry>
+<entry> the widget to set tooltip on
+</entry></row>
+<row><entry align="right"><parameter>text</parameter>&nbsp;:</entry>
+<entry> the tooltip text
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="GNOME-Panel-OrientType">enum GNOME_Panel_OrientType</title>
+<programlisting>   typedef enum
+   {
+      GNOME_Panel_ORIENT_UP,
+      GNOME_Panel_ORIENT_DOWN,
+      GNOME_Panel_ORIENT_LEFT,
+      GNOME_Panel_ORIENT_RIGHT
+   }
+   GNOME_Panel_OrientType;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="PanelOrientType">PanelOrientType</title>
+<programlisting>typedef GNOME_Panel_OrientType PanelOrientType;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-get-panel-orient">applet_widget_get_panel_orient ()</title>
+<programlisting><link linkend="PanelOrientType">PanelOrientType</link> applet_widget_get_panel_orient
+                                            (<link linkend="AppletWidget">AppletWidget</link> *applet);</programlisting>
+<para>
+Gets the orientation of the panel this widget is on.
+it can be one of ORIENT_UP, ORIENT_DOWN, ORIENT_LEFT and ORIENT_RIGHT.
+This is not the position of the panel, but rather the direction that the
+applet should be "reaching out".  So any arrows should for example point
+in this direction.  It will be ORIENT_UP or ORIENT_DOWN for horizontal
+panels and ORIENT_LEFT or ORIENT_RIGHT for vertical panels</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  PanelOrientType enum of the orientation
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-get-panel-pixel-size">applet_widget_get_panel_pixel_size ()</title>
+<programlisting>int         applet_widget_get_panel_pixel_size
+                                            (<link linkend="AppletWidget">AppletWidget</link> *applet);</programlisting>
+<para>
+Gets the width of the panel in pixels.  This is not the
+actual size, but the recomended one.  The panel may be streched if the
+applets use larger sizes then this.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  Size of panel in pixels
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-get-free-space">applet_widget_get_free_space ()</title>
+<programlisting>int         applet_widget_get_free_space    (<link linkend="AppletWidget">AppletWidget</link> *applet);</programlisting>
+<para>
+Gets the free space left that you can use for your applet.
+This is the number of pixels around your applet to both sides.  If you
+strech by this amount you will not disturb any other applets.  If you
+are on a packed panel 0 will be returned.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>  Free space left for your applet.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-send-position">applet_widget_send_position ()</title>
+<programlisting>void        applet_widget_send_position     (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="gboolean">gboolean</link> enable);</programlisting>
+<para>
+If you need to get a signal everytime this applet changes
+position relative to the screen, you need to run this function with <literal>TRUE</literal>
+for <parameter>enable</parameter> and bind the change_position signal on the applet.  This signal
+can be quite CPU/bandwidth consuming so only applets which need it should
+use it.  By default change_position is not sent.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><parameter>enable</parameter>&nbsp;:</entry>
+<entry> whether to enable or disable change_position signal
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-send-draw">applet_widget_send_draw ()</title>
+<programlisting>void        applet_widget_send_draw         (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="gboolean">gboolean</link> enable);</programlisting>
+<para>
+If you are using rgb background drawing, call this function
+with <literal>TRUE</literal> for <parameter>enable</parameter>, and then bind the do_draw signal.  Inside that
+signal you can get an RGB buffer to draw on with <link linkend="applet-widget-get-rgb-bg">applet_widget_get_rgb_bg</link>.
+The do_draw signal will only be sent when the RGB truly changed.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><parameter>enable</parameter>&nbsp;:</entry>
+<entry> whether to enable or disable do_draw signal
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="applet-widget-get-rgb-bg">applet_widget_get_rgb_bg ()</title>
+<programlisting>void        applet_widget_get_rgb_bg        (<link linkend="AppletWidget">AppletWidget</link> *applet,
+                                             <link linkend="guchar">guchar</link> **rgb,
+                                             int *w,
+                                             int *h,
+                                             int *rowstride);</programlisting>
+<para>
+Gets an rgb buffer that you can draw your applet on.  Useful
+in conjunction with the do_draw signal and the <link linkend="applet-widget-send-draw">applet_widget_send_draw</link>
+method.  The rgb should be freed after use with g_free.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>applet</parameter>&nbsp;:</entry>
+<entry> the <link linkend="AppletWidget">AppletWidget</link> to work with
+</entry></row>
+<row><entry align="right"><parameter>rgb</parameter>&nbsp;:</entry>
+<entry> pointer to a pointer to which the rgb buffer will be returned
+</entry></row>
+<row><entry align="right"><parameter>w</parameter>&nbsp;:</entry>
+<entry> pointer to an integer in which the width will be stored
+</entry></row>
+<row><entry align="right"><parameter>h</parameter>&nbsp;:</entry>
+<entry> pointer to an integer in which the height will be stored
+</entry></row>
+<row><entry align="right"><parameter>rowstride</parameter>&nbsp;:</entry>
+<entry> pointer to an integer in which the rowstride will be stored
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

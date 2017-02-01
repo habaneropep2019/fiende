@@ -1,0 +1,153 @@
+# Makefile.in -- input for rep-gtk Makefile
+# Copyright (C) 1998 John Harper <john@dcs.warwick.ac.uk>
+# $Id: Makefile.in,v 1.26 2000/07/23 22:53:55 john Exp $
+
+SGTK_SRCS = rep-types.c
+SGTK_OBJS = $(SGTK_SRCS:.c=.lo)
+
+SRCS = rep-gtk.c gtk-support.c gtk-compat.c gdk-glue.c gtk-glue.c
+OBJS = $(SRCS:.c=.lo)
+
+LIBGLADE_SRCS = libglade-support.c libglade-glue.c
+LIBGLADE_OBJS = libglade-support.lo libglade-glue.lo
+GNOME_LIBGLADE_OBJS = libglade-gnome-support.lo libglade-glue.lo
+
+GNOMELIB_SRCS = gnomelib-support.c gnomelib-glue.c
+GNOMELIB_OBJS = $(GNOMELIB_SRCS:.c=.lo)
+
+GNOMEUI_SRCS = gnomeui-support.c gnomeui-glue.c
+GNOMEUI_OBJS = $(GNOMEUI_SRCS:.c=.lo)
+
+GNOME_CANVAS_SRCS = gnome-canvas-support.c gnome-canvas-glue.c
+GNOME_CANVAS_OBJS = $(GNOME_CANVAS_SRCS:.c=.lo)
+
+GDK_PIXBUF_SRCS = gdk-pixbuf-glue.c
+GDK_PIXBUF_OBJS = $(GDK_PIXBUF_SRCS:.c=.lo)
+
+GNOME_CANVAS_PIXBUF_SRCS = gnome-canvas-pixbuf-glue.c
+GNOME_CANVAS_PIXBUF_OBJS = $(GNOME_CANVAS_PIXBUF_SRCS:.c=.lo)
+
+OUT = @OUT@
+OUT_DESTS = $(foreach x, $(OUT), gui/$(x))
+
+# include ::alias directives
+INSTALL_GLUE = gdk-pixbuf-glue.c gnome-canvas-pixbuf-glue.c
+
+version=@version@
+host_type=@host@
+SHELL=/bin/sh
+
+repexecdir=@REP_EXECDIR@
+include $(repexecdir)/rules.mk
+
+CC=@CC@
+CPPFLAGS=@CPPFLAGS@
+CFLAGS=@CFLAGS@
+LDFLAGS=@LDFLAGS@
+override CPPFLAGS += -DHAVE_CONFIG_H -I.
+override CFLAGS += @GLIB_CFLAGS@ @GTK_CFLAGS@ @REP_CFLAGS@ @LIBGLADE_CFLAGS@ @GNOME_CFLAGS@ @GDK_PIXBUF_CFLAGS@ @GNOME_CANVAS_PIXBUF_CFLAGS@
+REP_SGTK_LIBS=@GLIB_LIBS@ @LIBS@
+REP_GTK_LIBS=@GTK_LIBS@ @LIBS@
+REP_LIBGLADE_LIBS=@LIBGLADE_LIBS@ @LIBS@
+REP_GNOME_LIBGLADE_LIBS=@GNOME_LIBGLADE_LIBS@ @LIBS@
+REP_GNOMELIB_LIBS=@GNOME_LIBS@ @LIBS@
+REP_GNOMEUI_LIBS=@GNOMEUI_LIBS@ @LIBS@
+REP_GDK_PIXBUF_LIBS=@GDK_PIXBUF_LIBS@ @LIBS@
+REP_GNOME_CANVAS_PIXBUF_LIBS=@GNOME_CANVAS_PIXBUF_LIBS@ @LIBS@
+
+INSTALL=@INSTALL@
+INSTALL_DATA=@INSTALL_DATA@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+
+DESTDIR=
+installdir=$(repexecdir)
+
+top_srcdir=@top_srcdir@
+top_builddir=.
+VPATH=@top_srcdir@:.
+
+.PHONY: clean realclean install
+
+all : build_dirs $(OUT)
+
+gtk/types.la : $(SGTK_OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_SGTK_LIBS)
+
+gtk/gtk.la : $(OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_GTK_LIBS)
+
+gtk/libglade.la : $(LIBGLADE_OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_LIBGLADE_LIBS)
+
+gnome/libglade.la : $(GNOME_LIBGLADE_OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_GNOME_LIBGLADE_LIBS)
+
+gnome/lib.la : $(GNOMELIB_OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_GNOMELIB_LIBS)
+
+gnome/ui.la : $(GNOMEUI_OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_GNOMEUI_LIBS)
+
+gnome/canvas.la : $(GNOME_CANVAS_OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_GNOMEUI_LIBS)
+
+gtk/gdk-pixbuf.la : $(GDK_PIXBUF_OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_GDK_PIXBUF_LIBS)
+
+gnome/canvas-pixbuf.la : $(GNOME_CANVAS_PIXBUF_OBJS)
+	$(rep_DL_LD) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(REP_GNOME_CANVAS_PIXBUF_LIBS)
+
+%-glue.c : %.defs build-gtk.jlc
+	rep build-gtk.jlc -f build-gtk-batch $< $@
+
+build-gtk.jlc : build-gtk.jl
+	rep compiler -f compile-batch $<
+
+libglade-gnome-support.lo : libglade-support.c
+	$(rep_LIBTOOL) --mode=compile $(CC) -c $(CPPFLAGS) $(CFLAGS) \
+	 @GNOME_LIBGLADE_CFLAGS@ -DGLADE_GNOME=1 $< -o $@
+
+install : all installdirs $(INSTALL_GLUE)
+	set -e; for f in $(OUT); do \
+	  $(rep_DL_INSTALL) $$f $(DESTDIR)$(installdir)/gui/`dirname $$f`; \
+	done
+	set -e; for f in $(OUT_DESTS); do \
+	  case $$f in \
+	    gui/gtk/gtk.la|gui/gnome/lib.la) \
+	      printf "\nrep_requires='gui.gtk.types'\n" >>$(DESTDIR)$(installdir)/$$f ;; \
+	    gui/*/libglade.la|gui/gnome/ui.la|gui/gtk/gdk-pixbuf.la) \
+	      printf "\nrep_requires='gui.gtk.gtk'\n" >>$(DESTDIR)$(installdir)/$$f ;; \
+	    gui/gnome/canvas*.la) \
+	      printf "\nrep_requires='gui.gnome.ui'\n" >>$(DESTDIR)$(installdir)/$$f ;; \
+	  esac; \
+	done
+	for f in $(OUT_DESTS); do \
+	  printf "\nrep_open_globally=yes\n" >>$(DESTDIR)$(installdir)/$$f; \
+	done
+	$(rep_INSTALL_ALIASES) -c . $(DESTDIR)$(installdir)
+
+installdirs : $(top_srcdir)/mkinstalldirs
+	$(SHELL) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(installdir)/gui/gtk \
+	  $(DESTDIR)$(installdir)/gui/gnome
+
+uninstall :
+	$(rep_DL_UNINSTALL) $(DESTDIR)$(installdir)/$(OUT)
+
+clean :
+	rm -f *-glue.c *~ core *.jlc *.o *.lo *.la
+	rm -rf gtk gnome
+
+realclean : clean
+	rm -f Makefile config.cache config.log config.status config.h
+	rm -f rep-gtk.spec
+
+cvsclean : realclean
+	rm -f aclocal.m4 configure
+
+build_dirs : gnome gtk
+
+gnome :
+	mkdir gnome
+
+gtk :
+	mkdir gtk

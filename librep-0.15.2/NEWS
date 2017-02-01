@@ -1,0 +1,1002 @@
+News
+****
+
+0.15
+====
+
+   * Parser can now associate lexical location (file name and line
+     number) with parsed objects. Added `call-with-lexical-origins' and
+     `lexical-origin' functions. This adds memory overhead but is only
+     enabled in interpreted mode, or other times it could be useful
+     (e.g.  when compiling)
+
+   * The compiler enables line-numbering, and uses the information when
+     it prints errors. It also prints errors in a more standard format
+     (intended to mimic GCC), and distinguishes warnings from errors
+
+   * Debugger is much improved, and supports emacs-style emission of
+     line number tokens. Use the included `rep-debugger.el' elisp code
+     to source-debug rep programs in Emacs!
+
+   * New command line option `--debug'. When given, rep starts up in
+     the debugger
+
+   * Reformatted backtrace output. Also backtraces only ever include
+     evaluated argument lists now. They also include lexical information
+     when possible
+
+   * Syntax errors include error description and line number
+
+   * Now supports weak reference objects. New functions
+     `make-weak-ref', `weak-ref', `weak-ref-set'. A weak reference is a
+     pointer to another object. When that object is garbage collected,
+     the pointer in the weak reference is set to false.
+
+   * New `error helper' module. When an error is handled, this module
+     is called and tries to print a human-understandable message
+     explaining why the error may have occurred
+
+   * REPL commands may now be specified by their shortest unique set of
+     leading characters, e.g. `,o' instead of `,open'
+
+   * Added an `#undefined' value. Returned by `%define' and the macros
+     using it (`defun', `defmacro', etc...)
+
+   * New function `table-size' in module `rep.data.tables'
+
+   * `thread-suspend' returns true iff the timeout was reached (i.e.
+     return false if `thread-wake' was used to unsuspend the thread)
+
+   * Objects defined using the `object' macro now have an implicit
+     `self' binding - the object representing their self (or their most
+     derived self)
+
+   * Added TIMEOUT parameter to `condition-variable-wait' and
+     `obtain-mutex' functions
+
+   * New `rep.threads.message-port' module, implements a simple message
+     queue for threads
+
+   * `log' function now optionally accepts a second argument, the base
+     of the logarithm
+
+   * Use gmp to generate random numbers when possible (if at least
+     version 3 of gmp is found) [disabled in librep 0.15.1 - gmp seems
+     to be buggy?]
+
+   * The `string-replace' function may now be given a function as its
+     TEMPLATE parameter
+
+   * Bug fixes:
+
+        - Signal an error if writes don't write all characters they were
+          asked to. Also, some functions could write fewer characters
+          than they were supposed to even if no errors occurred
+
+        - Remembered that file sizes may not fit in fixnums
+
+        - Don't preserve trailing slashes in results of
+          canonical-file-name (to make the path canonical)
+
+        - Don't signal an error when end of file is encountered
+          immediately after reading `#\X' syntax
+
+        - `current-thread' and `all-threads' will create a thread
+          object for the implicit thread if there isn't one already
+
+        - In C subrs that take optional integer arguments, signal an
+          error if the given value isn't an integer or undefined
+          (false). Also, accept all types of numbers where it makes
+          sense to do so
+
+        - Signal an error if end of file is read while parsing a block
+          comment
+
+        - Don't ever return a null object from `current-time-string'
+
+        - Catch errors signalled during command line option processing,
+          and pass them to the standard error handler
+
+        - Right hand side of `letrec' bindings may now have more than
+          one form
+
+        - The `object' macro now evaluates its BASE-OBJECT parameter
+          exactly once
+
+        - Finally removed `define-value'
+
+        - Ignore null lines (or lines which only have comments) in the
+          repl
+
+        - In the compiler, don't expand macros which have have been
+          shadowed by local bindings
+
+        - Don't print some compiler errors/warnings twice
+
+        - Fixes for `mips-compaq-nonstopux' architecture (Tom Bates)
+
+        - Fixed `,reload' and `,unload' repl commands not to try to
+          remove non-existent structures
+
+
+0.14
+====
+
+   * New module `rep.util.md5', has two functions for generating MD5
+     message digests (of files or strings)
+
+   * Changes to the `rep.io.sockets' function:
+
+     In the `socket-server' function the HOST and/or PORT arguments may
+     be false, meaning to listen on all addresses and to choose a
+     random unused port.
+
+     New functions `socket-peer-address' and `socket-peer-port', these
+     always returns the details of the far end of the connetion.
+     `socket-address' and `socket-port' have been changed to always
+     return the details of the local connection point.
+
+   * New function in `rep.system' module, `crypt'. A wrapper for the
+     system's `crypt' function (if it has one)
+
+   * New function in `rep.threads' mdoule, `make-suspended-thread'
+
+   * New module `rep.net.rpc', provides a text-stream based RPC
+     mechanism for Lisp programs. Similar in some ways to untyped CORBA.
+     (This is still in the experimental stage - its interface may
+     change in forthcoming releases)
+
+   * New functions in `rep.data' module, `list->vector' and
+     `vector->list'
+
+   * New macro `define-special-form'. A combination of `defvar' and
+     `setq' - it always makes the variable special and it always sets
+     it to the given value
+
+   * New module `rep.test.framework' implementing `assert', `check' and
+     `test' macros. This provides a framework for implementing unit
+     tests in Lisp modules (such that running the interpreter with the
+     `--check' option will run all tests that have been set up to be
+     autoloaded
+
+   * Bug fixes:
+
+        - When reading from strings, don't choke on zero bytes
+
+        - When writing into sockets, be aware that the socket is in
+          non-blocking mode
+
+        - SDBM and GDBM modules now close any open databases before the
+          interpreter exits
+
+        - Fixed the `rep_parse_number' function not to require a
+          terminating null character in the string when parsing bignums
+
+        - Only define `Qrep_lang_interpreter' once
+
+        - Don't assign vm registers to physical registers on 68000
+          architectures - it's been reported to crash
+
+        - When running asynchronous subprocesses, open and initialize
+          the pty slave before forking to avoid a race condition with
+          the child process
+
+        - Flush symbols from the module cache at another point
+
+        - Fixes for Unixware
+
+        - When compiling non-top-level `defvar' forms, add any doc
+          string they have to the database
+
+
+0.13.5
+======
+
+   * Tar file handling no longer requires GNU tar
+
+   * The `defvar' special form can now take only a single argument
+
+   * The reader now treats `#\return' characters as white space
+
+   * Other miscellaneous bug fixes...
+
+
+0.13.4
+======
+
+   * Don't restrict symbols exported from plugin libraries, some need
+     to export symbols to work properly (this bug only seemed to appear
+     on Solaris systems)
+
+   * Added `rep_file_type' and `rep_guardian_type' to the list of
+     symbols exported from librep
+
+   * Fixed the `install-aliases' script (Peter Teichman)
+
+   * New module `rep.threads.condition-variable'
+
+   * Added `string-split' and `string-replace' to the gaol
+
+
+0.13.3
+======
+
+   * Try to only export public symbols from `librep.so' and modules
+
+   * When expanding file names translate `/..' to `/'
+
+   * Set an upper bound on the allowed recursion depth when regexp
+     matching, prevents the stack from overflowing in pathological cases
+
+   * Added optional second arg to `readline' function, a function to
+     call to generate completions. The `rl-completion-generator' method
+     of supplying this function is deprecated
+
+   * Fixed bugs when handling character-case in regexp module (Andrew
+     Rodionoff)
+
+   * Added an `premature-end-of-stream' error. This is signalled
+     instead of `end-of-stream' when reading characters in the middle
+     of a syntax form. The `end-of-stream' error is only signalled when
+     the end of the stream is reached before encountering anything other
+     than whitespace characters
+
+   * Fixed bug of expanding declarations in the `define' macro expansion
+
+
+0.13.2
+======
+
+   * Fix `define' so that it tracks bound variables and ignores
+     shadowed keywords when traversing code
+
+   * Added checks to compilation process for the kind of missing
+     shared-library problems that many people see
+
+   * Fixed the `install-aliases' shell script
+
+   * New configure option: `--enable-full-name-terminator'
+
+
+0.13.1
+======
+
+   * Added functions `remove-if' and `remove-if-not'
+
+   * Various bug-fixes for non-linux or solaris systems (John H.
+     Palmieri, Philippe Defert)
+
+   * `#f', `#t', `#!optional', `#!key' and `#!rest' are now uninterned
+     symbols. Keywords are interned in a separate obarray
+
+   * Fixed bug of caching regexps even when their string has been
+     modified
+
+   * Fixed some bugs in the ftp remote file handler and the
+     `pwd-prompt' function
+
+   * Fixed `define' to ignore `structure' and `define-structure' forms
+
+
+0.13
+====
+
+   * The end-of-list / boolean-false object is no longer the symbol
+     `nil'. Instead there is a special object `()' fulfulling these two
+     roles. For modules importing the `rep' module, the symbol `nil'
+     evaluates to `()'. This allows the `scheme' module to be more
+     compliant with the Scheme standard
+
+   * Parameter list changes:
+
+        - Deprecated `&optional' and `&rest', in favour of `#!optional'
+          and `#!rest'.
+
+        - Added keyword parameters. Use `#!key' to declare them.
+          Keyword syntax is `#:PARAM'. For example:
+
+               ((lambda (#!key a b) (list a b)) #:b 2 #:a 1) => (1 2)
+
+        - `#!optional' and `#!key' parameters may now have default
+          values, syntax is `(VAR DEFAULT)'. For example:
+
+               ((lambda (#!optional (a 1)) a)) => 1
+
+   * The module namespace is now hierarchical. `.' characters in module
+     names denote directory separators, e.g. `foo.bar' translates to
+     the file `foo/bar'
+
+     All module names prefixed with `rep.' are reserved for librep,
+     other top-level names should be picked to be as unique as possible
+
+     The existing modules have been renamed to fit this scheme (see the
+     file `TREE' in the distribution for the hierarchy details).
+     However, old module names will still work for the time being
+
+   * The `rep' module no longer includes the `rep.regexp',
+     `rep.system', `rep.io.files', `rep.io.processes' or
+     `rep.io.file-handlers' modules. These need to be imported
+     explicitly
+
+   * Doc strings are now indexed by module name as well as symbol name.
+     The `define' macro now takes a doc string as its optional third
+     parameter
+
+   * Record constructors may include all lambda-list keywords (e.g.
+     keywords and/or default values)
+
+   * Incompatible virtual machine changes, hence bytecode files will
+     need to be recompiled. Improvements include:
+
+        - Only heap-allocate variables when absolutely necessary
+
+        - Closure analysis to allow inlining of some types of `letrec'
+          expressions
+
+        - Added a `safe' virtual machine, which makes no assumptions
+          regarding validity of bytecode, so is safe for untrusted code
+
+   * Added an `unscheme' module. Another Scheme implementation, but the
+     goal of this one is to integrate cleanly with the librep runtime
+     environment, even if this is at the expense of R4RS compliance
+
+     For example, in `unscheme' code, `#f => ()' and `#t => t'. This
+     allows rep and unscheme functions to call each other without
+     needing to convert any data
+
+   * By default, it is now illegal to modify top-level variables that
+     have not previously been defined
+
+   * New macro `define-structures' to export multiple views of a single
+     underlying environment
+
+   * The librep runtime no longer handles the `--help' option itself,
+     this should be done by scripts
+
+   * Don't search `$LD_LIBRARY_PATH' for plugins, but prepend all
+     directories in colon-separated `$REP_DL_LOAD_PATH' to
+     `dl-load-path'. Similarly, the contents of `$REP_LOAD_PATH' is
+     prepended to `rep-load-path'
+
+   * `(/ X) => (/ 1 X)'
+
+   * Extra string-manipulation functions: `string-replace',
+     `string-split' (in the `rep.regexp' module)
+
+   * `#f' and `#t' are now primitive symbols, not special objects
+
+   * Special case tail-recursive calls to `apply', to ensure they get
+     eliminated
+
+   * The `0x123' and `0123' read syntaxes have been deprecated, use
+     `#x123' and `#o123' instead
+
+   * `#| ... |#' comments now nest correctly
+
+   * New modules: `rep.i18n.gettext', `rep.vm.safe-interpreter',
+     `rep.vm.assembler', `unscheme', `rep.data.objects',
+     `rep.www.quote-url', `rep.www.fetch-url', `rep.util.ispell',
+     `rep.util.base64', `rep.util.autoloader', `rep.io.sockets',
+     `rep.util.time', `rep.net.domain-name'
+
+   * Bug fixes, including:
+
+        - Find size of `long long' type on AIX, IRIX and Solaris (Dan
+          McNichol, Albert Chin-A-Young)
+
+        - Never allow macros to be called as functions
+
+        - Make bitfields unsigned (Albert Chin-A-Young)
+
+        - Fixed bounds-checking when parsing non-base-10 fixnums
+
+        - Thread fixes (and much lower thread-switch latency in many
+          cases)
+
+        - Fixed `DEFUN' macro for C++ (Matt Tucker); also fixed header
+          files to avoid C++ keywords
+
+        - Make error message for bytecode version mismatches more
+          meaningful
+
+        - Fixed: `default-boundp', `continuation-callable-p'
+
+        - Only the evaluate the value of `defvar' forms if the symbol
+          isn't already bound
+
+        - Compile else-less `case' expressions correctly; eliminate
+          tail-recursion in `cond' forms when possible
+
+        - Various fixes in `scheme' module
+
+0.12.4
+======
+
+   * Support building without GNU MP, `--without-gmp' option to
+     configure. Use `long long' for non-fixnum integers (promote to
+     floats when out of range); no exact rationals. There's also an
+     option to disable continuations/threading
+     (`--disable-continuations')
+
+   * Sanitized function inlining:
+
+        - Use `(declare (inline NAMES...))' to tell the compiler that
+          it might be useful to inline the named functions
+
+        - Don't even think about inlining across module/file boundaries
+          (for now anyway)
+
+   * Cleaned up the `gaol' module. Interface is essentially:
+     `gaol-define', `gaol-define-special', `gaol-define-file-handler'.
+     Added `gaol-open' to import complete modules. Still supports old
+     interface
+
+   * Be a lot more efficient when printing quoted strings and symbol
+     names (for some streams there used to be a system-call per
+     character!)  Also, when quoting weird symbol names, be more
+     intelligent
+
+   * Removed code to autoload from modules (which didn't really work
+     anyway)
+
+   * Be more intelligent about deciding when to flush the module cache
+
+   * Build fixes for IRIX (David Kaelbling)
+
+   * Other miscellaneous bug-fixes and performance tweaks
+
+
+0.12.3
+======
+
+   * New function `thread-join', waits for a specified thread to exit,
+     then returns the value of the last form it evaluated
+
+   * Added a rudimentary profiler (`,profile FORM' command in repl)
+
+   * Reorganized `ring' module, sanitized the interface (preserving
+     compatibility with old functions), also added a `ring->list'
+     function
+
+   * `rplaca' and `rplacd' (but not `setcar' and `setcdr') functions
+     now return the cell being modified, not the value being stored
+     into it, for compatibility with CL (Karl Hegbloom)
+
+   * `unwind-protect', `catch', `condition-case': these special forms
+     are now macros
+
+   * When signalling `bad-arg' or `missing-arg' errors, try to include
+     the function as the first element of the error data
+
+   * `load' function now _only_ loads files without suffixes if
+     NO-SUFFIX arg is non-`nil' (prevents picking up un-suffixed files
+     by mistake, e.g. from the current directory)
+
+   * Fixed some bugs when reading rationals
+
+   * Fixed bug of `gettext' module not redefining `_' binding in `rep'
+     module
+
+   * Fixed bug when building `rep-config' script (Mark Hewitt, Dan
+     Winship)
+
+   * Fixed bug of `rep_INTERN_SPECIAL' macro not looking for default
+     values of special variables
+
+   * Fixed interpreted versions of `min' and `max' when operating on
+     non-numeric values
+
+   * If unable to allocate heap space, just print an error and
+     terminate the program (the low-memory handling doesn't currently
+     work properly)
+
+   * Fixed bug when extracting doc strings from `define' forms
+
+   * Fixed bug when compiling structure definitions in non-top-level
+     environments
+
+   * Fixed bug of being unable to `load' empty files
+
+   * When recursively macro-expanding, dereference identifiers in the
+     correct module
+
+
+0.12.2
+======
+
+   * The tar file-handler now caches the unpacked archive (wins big
+     when loading sawfish themes)
+
+   * The `gaol' module can now create multiple gaols, each with it's
+     own namespace
+
+   * More performance tweaks
+
+   * Miscellaneous bug-fixes (more vm stack smashing, `defconst' never
+     evaluates its constant)
+
+
+0.12.1
+======
+
+   * Some virtual machine performance tweaks
+
+   * Fixed nasty stack smashing bug (when using compiler declarations)
+
+   * Some 64-bit cleanups (George Lebl)
+
+   * Fixed non-ANSI C syntax (Sam Falkner)
+
+
+0.12
+====
+
+   * Added a basic module system.
+
+     Modelled after the Scheme48 system, but simpler. At its simplest,
+     include a `define-structure' form in each file representing a
+     module:
+
+          (define-structure NAME INTERFACE CONFIG BODY...)
+
+     The external definitions of this module can then be imported by
+     other modules through their CONFIG statements, e.g. `(open
+     NAMES...)'. Most modules will open `rep' to get the standard
+     language definitions.
+
+     `foo#bar' reads as `(structure-ref foo bar)'
+
+     The `timers', `tables', `sdbm', `gdbm', `readline', `gettext',
+     `ring', `mutex', `memoize', `lisp-doc', `disassembler', `compiler',
+     `date', `cgi-get', `gaol' features are all now modules (this is
+     backwards compatible, since modules may be imported using
+     `require')
+
+     See the "Modules" section of the manual for more details.
+
+   * The repl now contains meta-commands for inspecting and configuring
+     the module system (amongst other things)
+
+   * Added a facility for creating new primitive types: `make-datum',
+     `datum-ref', `datum-set', `has-type-p', `define-datum-printer'
+
+   * Added an SRFI 9 compatible `define-record-type' macro for defining
+     data structures (the `records' module)
+
+   * Added fluid variables--a method of creating dynamically scoped
+     bindings that fit well with lexically scoped definitions
+     (`make-fluid', `fluid', `fluid-set', `with-fluids', `let-fluids')
+
+   * Added a `queues' module providing a basic queue type
+
+   * Added stream functions: `peek-char', `input-stream-p',
+     `output-stream-p'
+
+   * Interpreter now also eliminates tail-calls
+
+   * Changed handling of inexact numbers to be compatible with the
+     Scheme standard:
+
+        - Many operations now produce inexact outputs if any of their
+          inputs are inexact (e.g. `min', `max', `floor', `ceiling',
+          `round', `truncate')
+
+        - `eql' and `equal' no longer ignore exactness when comparing
+          numbers. `=', `/=', `<', `>', `<=' and `>=' _do_ ignore
+          inexactness. E.g.
+
+               (eql 2 2.) => nil
+               (= 2 2.) => t
+
+   * Support most of Scheme's read-syntax for numbers (i.e. `#b', `#o',
+     `#d', `#x' radix prefixes, and `#e', `#i' exactness prefixes).
+
+   * Implemented Scheme's `string->number' and `number->string'
+     functions
+
+   * Included a basic R4RS Scheme implementation (module: `scheme'). Do
+     `,new foo <RET> ,open scheme' to test it in the repl, use `(open
+     scheme)' instead of `(open rep)' to use it within modules.
+
+     The compiler also knows enough about Scheme to be able to compile
+     it.  Also, use the `-s' or `--scheme' options to load a file of
+     Scheme code.
+
+   * The debugger works better (and can be used to walk the stack
+     history somewhat)
+
+   * Last arg of `append' and `nconc' may be a non-proper-list now
+
+   * Implemented the Scheme `do' macro for iteration
+
+   * `define' supports curried functions. E.g. `(define ((plus a) b) (+
+     a b))', then `(plus 1)' evaluates to the function that adds one to
+     its argument.
+
+   * Many performance improvements:
+
+        - Allocates less memory (so garbage collects less often)
+
+        - Much faster at bytecode-to-bytecode function calling
+
+        - Much reduced VM overhead (when compiled with GCC)
+
+   * Compiler improvements:
+
+        - Supports the `(declare CLAUSES...)' form. See the "Compiler
+          Declarations" section of the manual for details on the actual
+          declarations supported.
+
+        - Is cleverer about detecting when to create new bindings when
+          tail recursing, and when the old bindings can just be
+          overwritten
+
+        - Groks the module system, and the language of the module being
+          compiled (so that it can compile both rep and Scheme code)
+
+        - Splices bodies of top-level `progn' and `begin' forms
+          themselves into the top-level (for when macros expand into
+          multiple definitions)
+
+        - Compiling already defined functions (or whole modules of
+          functions) now (mostly) works
+
+        - Coalesce and compile non-defining top-level forms
+
+   * Many bug fixes (see ChangeLog files for details)
+
+
+0.11.3
+======
+
+   * Fixed bug of throwing uninitialized errors when autoloading
+
+   * Fixed bug of interpreting `(let () ...)' as a named let
+
+0.11.2
+======
+
+   * Replaced many special forms by macros--`let', `let*', `function',
+     `if', `and', `or', `prog2', `defmacro', `defun', `defconst',
+     `define-value', `setq-default'
+
+   * `let' now supports Scheme's named-let construct for iteration via
+     tail recursion
+
+   * Parse some standard Common Lisp and Scheme syntax: `#| ... |#'
+     block comments, `#\C' or `#\NAME' characters (where NAME may be
+     one of: `space', `newline', `backspace', `tab', `linefeed',
+     `return', `page', `rubout'), and `#(...)' vectors
+
+   * When comparing symbols, compare their names as strings
+
+   * Implemented Scheme's `dynamic-wind' function
+
+   * Fixed bug of sometimes evaluating function arguments in the
+     environment of the callee not the caller
+
+   * Fixed bug when calculating how long to sleep for when no threads
+     are available
+
+   * Fixed bugs in mutex implementation (Damon Anderson)
+
+   * Work around bugs in Tru64 `RTLD_GLOBAL'; everything should work on
+     Tru64 now (Aron Griffis)
+
+   * Fixed bug of not saving current regexp state across continuations
+
+
+0.11.1
+======
+
+   * The compiler now eliminates single-function tail calls (instead of
+     leaving it to the virtual machine)
+
+   * Updated to use libtool-1.3.4
+
+   * Miscellaneous bug fixes and minor changes
+
+0.11
+====
+
+   * Better support for numerical computing. Now supports bignums,
+     rational numbers (numerator and denominator are bignums), and
+     floating point values as well as the original fixnums. Many new
+     numerical functions supporting these types. Promotes and demotes
+     hopefully as you'd expect (never demotes an inexact number to an
+     exact number).  Tries to follow the Scheme numeric system as much
+     as possible
+
+   * Supports "guardian" objects through the `make-guardian' function
+     (as described in Dybvig's paper). These are a clean mechanism for
+     allowing the programmer to control when arbitrary lisp objects are
+     finally deallocated. Also added a new hook: `after-gc-hook'
+
+   * The default error handler can now be redefined. If the variable
+     `error-handler-function' contains a function then it will be
+     called to handle the error, with arguments `(ERROR DATA)'.
+
+   * New special form `case', switches on a key value and sets of
+     constants
+
+   * New function `call/cc' (also available through the alias
+     `call-with-current-continuation'). Provides scheme-like
+     continuation functions. Special variables are now deep-bound to
+     support this correctly
+
+   * Supports "soft" preemptive threads using continuations and a
+     general "barrier" mechanism (used either for restricting control
+     flow, or for receiving notification when control passes across a
+     barrier)
+
+   * Parameter lists in lambda expressions now support improper lists,
+     as in scheme. E.g. `(lambda (x . y) ...)'
+
+   * Implements the scheme `define' syntax, with support for inner
+     definitions
+
+   * The `tables' plugin implements hash tables, with extensible
+     hashing and comparison methods; supports both strongly and weakly
+     keyed tables
+
+   * Included a GDBM binding; DOC files are now stored in GDBM files
+     (SDBM has limits on datum sizes)
+
+   * `put' and `get' functions now use `equal' to compare property names
+
+   * Virtual machine / compiler improvements:
+
+        - Variable references and mutations are classified by type:
+          lexical bindings use (one-dimensional) lexically addressed
+          instructions, global non-special bindings have their own
+          instructions, everything else uses the original instructions.
+          Similar classification when creating new bindings
+
+        - Eliminate tail-recursive function calls wherever possible in
+          compiled code (when the calling function has no dynamic state)
+
+     Compiled lisp code will need to be rebuilt to run on the modified
+     virtual machine.
+
+   * When expanding macros, bind `macro-environment' to the macro
+     environment it was called with. This allows macros to reliably
+     expand inner macro uses
+
+   * New hook `before-exit-hook'. Called immediately before exiting
+
+   * `rep-xgettext' now has an option `--c'. This makes it output
+     pseudo C code containing the string constants found
+
+   * Fixed misfeature of interpreting filenames `FOO//BAR' as `/BAR'.
+     Contiguous path separators are now merged (i.e. `FOO/BAR')
+
+
+0.10
+====
+
+   * Updated support for dumping (freezing) lisp definitions to handle
+     lisp-1 nature with closures. Also now generates C code instead of
+     assembler for portability; creates a plugin that may be loaded
+     through the REP_DUMP_FILE environment variable
+
+   * Plugin `.la' files may now contain rep-specific settings:
+     `rep_open_globally=yes' and `rep_requires='FEATURES...''
+
+   * New function `define-value'. A combination of `set' and `defvar',
+     but without implying dynamic scope
+
+   * `load' scans AFTER-LOAD-ALIST for plugins as well as lisp libraries
+
+   * `(if t)' now evaluates to `nil' not `t'
+
+   * Fix regexp bug in matching simple non-greedy operators (Matt Krai)
+
+   * Borrowed guile's bouncing parentheses for readline (Ceri Storey)
+
+   * New C functions `rep_load_environment' and `rep_top_level_exit'
+
+   * `defvar' allows symbols to be redefined in protected environments
+     if they haven't also been defined by unprotected environments
+
+   * Detect GCC's with broken `__builtin_return_address' functions
+     (George Lebl)
+
+   * Try to use libc `gettext' implementation, but only if it looks
+     like it's the GNU implementation
+
+
+0.9
+===
+
+   * Support for using GNU readline (give configure the
+     `--with-readline' option)
+
+   * New functions: `letrec', `caar', ..., `cddr', `caaar', ...,
+     `cdddr', `in-hook-p', `make-variable-special'
+
+   * Changed `unless' to have the Common Lisp semantics--return `nil'
+     when the condition evaluates true, not the value of the condition
+
+   * Fixed/added some compiler optimisations
+
+   * Fixed `rep-xgettext' script to remove duplicated strings and to
+     search exhaustively
+
+   * `add-hook' forces the hook variable to be special (in case it
+     wasn't declared using `defvar')
+
+
+0.8.1
+=====
+
+   Fixed some documentation bugs; fixed some build problems
+
+0.8
+===
+
+   * Default scoping is now lexical, only variables declared using
+     `defvar' are dynamically scoped.
+
+   * There is now only a single namespace for symbols (excepting
+     property lists), this means that the `fset', `symbol-function' and
+     `fboundp' functions have been removed
+
+     This allows all elements in procedure-call forms to be evaluated
+     equally (as in scheme), so things like:
+
+          ((if t + -) 1 2)
+
+     now work. Related to this, function names (i.e. symbols and lambda
+     expressions) are no longer dereferenced by any operations taking
+     functions as arguments. Only built-in subroutines and closures are
+     considered functions.
+
+     This means that where before you'd write something like:
+
+          (mapcar '+ '(1 2 3))
+
+     this is now illegal; the `+' function must be evaluated:
+
+          (mapcar + '(1 2 3))
+
+   * `lambda' is now a special form evaluating to a closure (as in
+     scheme); this means that the following are exactly equivalent:
+
+          (lambda (x) x) == (function (lambda (x) x)) == #'(lambda (x) x)
+
+     An alternative method of enclosing a lambda expression is to use
+     the `make-closure' function.
+
+   * `gaol' module providing semi-safe environment for untrusted code
+     to evaluate in
+
+   * Support for i18n through `gettext' module; also support for `%1$s'
+     type format specifiers
+
+   * New functions `string-equal' and `string-lessp'
+
+
+0.7.1
+=====
+
+   * Added `--with-rep-prefix' option to autoconf AM_PATH_REP macro
+
+   * Fixed bug when inserting a new timer before an existing timer
+
+   * Fix the malloc tracking code
+
+   * Fix dlmalloc for FreeBSD
+
+   * Use install when installing, not cp
+
+   * Some fixes for compiling with SUN's C compiler on Solaris
+
+
+0.7
+===
+
+   * Added file handler for read-only access to the contents of tar
+     archives, access files like `foo.tar.gz#tar/bar'
+
+   * `process-id' function now returns pid of lisp interpreter when
+     called with zero arguments
+
+   * Added (untested) support for loading dynamic objects via
+     `shl_load' (HP-UX)
+
+   * Added (untested) support for systems that prefix symbol names in
+     dynamic objects with underscores
+
+   * Fix bug when compiling `last' function
+
+   * Fix bug of not closing files in the `load' function
+
+
+0.6.2
+=====
+
+   * Added `autoload-verbose' variable; set it to `nil' to turn off the
+     messages when autoloading
+
+   * Fix problems when `--prefix' option has a trailing slash
+
+   * Updated libtool files to version 1.3.3
+
+   * Initial (incomplete) support for building under Tru64, from Aron
+     Griffis
+
+
+0.6.1
+=====
+
+   No new features; minor portability tweaks and build changes. Fix bug
+of trying to load directories as Lisp scripts
+
+0.6
+===
+
+   * Add `unsetenv' function
+
+   * `system' now uses `process-environment'
+
+   * Workaround compiler bug with GCC 2.95 on sparc
+
+   * Fix build problem where libsdbm.la can't be located
+
+
+0.5
+===
+
+   * New function `set-input-handler', registers an asynchronous input
+     handler for a local file
+
+   * Don't abort on receipt of unexpected `SIGCHLD' signals
+
+   * Upgrade libtool to version 1.2f
+
+   * The `rep' binary by default always loads a script named `rep', not
+     named by it's `argv[0]' (this breaks under the newer libtool)
+
+
+0.4
+===
+
+   * Sending a rep process a `SIGUSR2' prints all debug buffers
+
+   * Added `--with-value-type', and `--with-malloc-alignment' configure
+     options. Also added code to automatically detect the first of
+     these options.
+
+   * Fixed some 64-bit problems
+
+   * Removed the difference between static and dynamic strings
+
+
+0.3
+===
+
+   * New compiler command line option `--write-docs'
+
+
+0.2
+===
+
+   * The variables `error-mode' and `interrupt-mode' control where
+     errors and user-interrupts (i.e. `SIGINT' signals) are handled.
+     The three possible values are: `top-level', `exit' and `nil'
+     (denotes the current event loop).
+
+   * Fixed bug where all dynamic types were erroneously `symbolp'.
+
+   * `SIGINT', `SIGHUP' and `SIGTERM' signals should now be caught more
+     successfully.
+
+   * Added a new directory to `dl-load-path': `LIBEXECDIR/rep/ARCH' to
+     contain third-party shared libraries.
+
+
+0.1
+===
+
+   First public release.
+

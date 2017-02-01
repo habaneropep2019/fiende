@@ -1,0 +1,595 @@
+/* $Id: style.gen_h,v 1.49 2000/08/21 19:24:37 kenelson Exp $ */
+
+/* style.gen_h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--config.h>
+#include <gtk/gtkstyle.h>
+#include <gdk--.h>
+#include <gtk--/base.h>
+
+CLASS_START(Gtk);
+class RC;
+class RCStyle;
+class Widget;
+class Style;
+
+inline Style *wrap (GtkStyle *o)
+{
+   return (Style *)o;
+}
+
+// This wrapper is very temporary.  There should be a new
+// replacement for this at some point when gtk+ adds a data 
+// field.  For now only setting the colors works.  When
+// gtk+ gets field, all draw_* become virtual and one can define
+// their own style in C++.
+class Style : protected GtkStyle
+{
+public:
+  typedef Style          CppObjectType;
+  typedef GtkStyle           BaseObjectType;
+
+private:
+
+  Style();
+  //Gtk_Style(GtkStyle *castitem);
+  Style(const Style&);
+  Style operator=(const Style&);
+
+  friend class RC;
+  friend class RCStyle;
+  friend class Widget;
+  
+protected:
+  Style(void* do_not_derive_me);
+
+public:
+  ~Style();
+
+  // These are worthless to the users they should use set_style instead.
+  //Gtk_Style* attach(Gdk_Window &window);
+  //void       detach();
+
+  // Many objects share styles so they must be on heap so they
+  // can't fall out of scope while being used.
+  static Style* create();
+  Style* copy() const;
+  Style* ref();
+  void       unref();
+
+/* These can only be called pior to the first use */  
+  void set_background(const Gdk_Drawable& window, GtkStateType state_type);
+  void apply_default_background(const Gdk_Drawable &window,
+				bool set_bg,
+				GtkStateType state_type,
+				const Gdk_Rectangle &area,
+				gint          x, 
+				gint          y, 
+				gint          width, 
+				gint          height);
+
+  void set_bg    ( GtkStateType state_type, const Gdk_Color &new_color );
+  void set_light ( GtkStateType state_type, const Gdk_Color &new_color );
+  void set_dark  ( GtkStateType state_type, const Gdk_Color &new_color );
+  void set_mid   ( GtkStateType state_type, const Gdk_Color &new_color );
+  void set_base  ( GtkStateType state_type, const Gdk_Color &new_color );
+  void set_fg    ( GtkStateType state_type, const Gdk_Color &new_color );
+  void set_text  ( GtkStateType state_type, const Gdk_Color &new_color );
+
+  void set_font(Gdk_Font f);
+
+/* These are only available after being attached to a window */
+  Gdk_Font get_font () const;
+
+  // FIXME: The Gdk_GC need to be real const, not handle const! Damn!
+  inline Gdk_GC get_fg_gc  ( GtkStateType state_type)  
+    { return fg_gc[state_type]; }
+  inline Gdk_GC get_bg_gc  ( GtkStateType state_type)  
+    { return bg_gc[state_type]; }
+  inline Gdk_GC get_light_gc( GtkStateType state_type) 
+    { return light_gc[state_type]; }
+  inline Gdk_GC get_dark_gc( GtkStateType state_type)  
+    { return dark_gc[state_type]; }
+  inline Gdk_GC get_mid_gc ( GtkStateType state_type)  
+    { return mid_gc[state_type]; }
+  inline Gdk_GC get_text_gc( GtkStateType state_type)  
+    { return text_gc[state_type]; }
+  inline Gdk_GC get_base_gc( GtkStateType state_type)  
+    { return base_gc[state_type]; }
+
+  inline Gdk_GC get_black_gc() { return black_gc; }
+  inline Gdk_GC get_white_gc() { return white_gc; }
+
+  inline Gdk_Pixmap get_background(GtkStateType state_type) 
+    {return bg_pixmap[state_type]; }
+
+/* Drawing functions */
+  void draw_hline               (Gdk_Window     &window,
+				 GtkStateType   state_type,
+				 gint           x1,
+				 gint           x2,
+				 gint           y) const;
+
+  void draw_vline               (Gdk_Window     &window,
+				 GtkStateType   state_type,
+				 gint           y1,
+				 gint           y2,
+				 gint           x) const;
+
+  void draw_shadow              (Gdk_Window     &window,
+				 GtkStateType   state_type,
+				 GtkShadowType  shadow_type,
+				 gint           x,
+				 gint           y,
+				 gint           width,
+				 gint           height) const;
+
+  void draw_polygon             (Gdk_Window     &window,
+				 GtkStateType   state_type,
+				 GtkShadowType  shadow_type,
+				 GdkPoint      *points,
+				 gint           npoints,
+				 gint           fill) const;
+
+  void draw_arrow               (Gdk_Window     &window,
+				 GtkStateType   state_type,
+				 GtkShadowType  shadow_type,
+				 GtkArrowType   arrow_type,
+				 gint           fill,
+				 gint           x,
+				 gint           y,
+				 gint           width,
+				 gint           height) const;
+
+  void draw_diamond             (Gdk_Window     &window,
+				 GtkStateType   state_type,
+				 GtkShadowType  shadow_type,
+				 gint           x,
+				 gint           y,
+				 gint           width,
+				 gint           height) const;
+
+  void draw_oval                (Gdk_Window     &window,
+				 GtkStateType   state_type,
+				 GtkShadowType  shadow_type,
+				 gint           x,
+				 gint           y,
+				 gint           width,
+				 gint           height) const;
+
+  void draw_string              (Gdk_Window     &window,
+				 GtkStateType   state_type,
+				 gint           x,
+				 gint           y,
+				 const nstring &string) const;
+
+  inline const GtkStyle* gtkobj() const { return (GtkStyle*)this; }
+  inline GtkStyle* gtkobj()             { return (GtkStyle*)this; }
+
+};
+
+PRIVATE_START;
+IMPL_START;
+namespace Gtk
+{
+
+/* 
+Design notes:
+
+Okay these are my notes on how a GtkStyle works.
+They are not meant to be taken as documentation as I didn't
+write the code.  
+
+styles keeps a copy of itself for each color depth.  Thus
+changing a style after it has been attached wont work!
+
+At allocation time a Gtk Style has 
+  - all GC set to 0 as they will be allocated later
+  - has all color values set to default values.
+  - a ref count of 1 and an attach count of 0 (floating?)
+  - a properly referenced font.
+  - colormap and depth are invalid.
+  - The style list and rcstyle are 0. (??? styles wasn't set explicitly!)
+
+It returns to this state if the style is detatched from
+all widgets.
+
+Attach acts to sink the object removing it from the floating state.
+
+attaching a style for the first time initializes it. 
+Initializing a style
+  - sets the colormap and depth.
+  - sets the mid colors. (thus allowing user to set these would be pointless)
+  - gets black and white from the colormap.
+  - allocates all the colors.
+  - uses gtk_gc_get to share a gc if there is a matching one.
+
+Conclusions, we need to rework the concept of Gdk to allow
+for const objects.  
+
+*/
+
+Style* Style::create()
+{
+  return (Style*)gtk_style_new();
+}
+
+Style::~Style()
+{}
+
+Style*
+Style::ref()
+{
+  gtk_style_ref(gtkobj());
+  return this;
+}
+
+void
+Style::unref()
+{
+  gtk_style_unref(gtkobj());
+}
+
+Style*
+Style::copy() const
+{
+  return (Style*)(gtk_style_copy(const_cast<GtkStyle*>(gtkobj())));
+}
+
+void
+Style::set_font(Gdk_Font f)
+{
+  g_return_if_fail ( f.gdkobj()!=0 );
+  gdk_font_unref(gtkobj()->font);
+  gtkobj()->font=f.gdkobj(); 
+  gdk_font_ref(gtkobj()->font);
+}
+
+Gdk_Font
+Style::get_font () const
+{
+  return Gdk_Font ( gtkobj() -> font );
+}
+
+void
+Style::set_bg ( GtkStateType state_type, const Gdk_Color &new_color )
+{
+  memcpy ( &( gtkobj() -> bg [ state_type ] ), &new_color, sizeof ( GdkColor ) );
+}
+
+void
+Style::set_light ( GtkStateType state_type, const Gdk_Color &new_color )
+{
+  memcpy ( &( gtkobj() -> light [ state_type ] ), &new_color, sizeof ( GdkColor ) );
+}
+
+void
+Style::set_dark ( GtkStateType state_type, const Gdk_Color &new_color )
+{
+  memcpy ( &( gtkobj() -> dark [ state_type ] ), &new_color, sizeof ( GdkColor ) );
+}
+
+void
+Style::set_mid ( GtkStateType state_type, const Gdk_Color &new_color )
+{
+  memcpy ( &( gtkobj() -> mid [ state_type ] ), &new_color, sizeof ( GdkColor ) );
+}
+
+void
+Style::set_base ( GtkStateType state_type, const Gdk_Color &new_color )
+{
+  memcpy ( &( gtkobj() -> base [ state_type ] ), &new_color, sizeof ( GdkColor ) );
+}
+
+void
+Style::set_fg ( GtkStateType state_type, const Gdk_Color &new_color )
+{
+  memcpy ( &( gtkobj() -> fg [ state_type ] ), &new_color, sizeof ( GdkColor ) );
+}
+
+void
+Style::set_text ( GtkStateType state_type, const Gdk_Color &new_color )
+{
+  memcpy ( &( gtkobj() -> text [ state_type ] ), &new_color, sizeof ( GdkColor ) );
+}
+
+void
+Style::set_background(const Gdk_Drawable& window, GtkStateType state_type)
+{
+  gtk_style_set_background(const_cast<GtkStyle*>(gtkobj()), window, state_type);
+}
+
+void
+Style::draw_hline(Gdk_Window     &window,
+			   GtkStateType   state_type,
+			   gint           x1,
+			   gint           x2,
+			   gint           y) const
+{
+  gtk_draw_hline(const_cast<GtkStyle*>(gtkobj()), window, state_type, x1, x2, y);
+}
+
+void
+Style::draw_vline(Gdk_Window     &window,
+			   GtkStateType   state_type,
+			   gint           y1,
+			   gint           y2,
+			   gint           x) const
+{
+  gtk_draw_vline(const_cast<GtkStyle*>(gtkobj()), window, state_type, y1, y2, x);
+}
+
+void
+Style::draw_shadow(Gdk_Window     &window,
+			    GtkStateType   state_type,
+			    GtkShadowType  shadow_type,
+			    gint           x,
+			    gint           y,
+			    gint           width,
+			    gint           height) const
+{
+  gtk_draw_shadow(const_cast<GtkStyle*>(gtkobj()), window,
+		  state_type, shadow_type, x, y, width, height);
+}
+
+void
+Style::draw_polygon(Gdk_Window     &window,
+			     GtkStateType   state_type,
+			     GtkShadowType  shadow_type,
+			     GdkPoint      *points,
+			     gint           npoints,
+			     gint           fill) const
+{
+  gtk_draw_polygon(const_cast<GtkStyle*>(gtkobj()), window,
+		   state_type, shadow_type, points, npoints, fill);
+}
+
+void
+Style::draw_arrow(Gdk_Window     &window,
+			   GtkStateType   state_type,
+			   GtkShadowType  shadow_type,
+			   GtkArrowType   arrow_type,
+			   gint           fill,
+			   gint           x,
+			   gint           y,
+			   gint           width,
+			   gint           height) const
+{
+  gtk_draw_arrow(const_cast<GtkStyle*>(gtkobj()), window, state_type, shadow_type,
+		 arrow_type, fill, x, y, width, height);
+}
+
+void
+Style::draw_diamond(Gdk_Window     &window,
+			     GtkStateType   state_type,
+			     GtkShadowType  shadow_type,
+			     gint           x,
+			     gint           y,
+			     gint           width,
+			     gint           height) const
+{
+  gtk_draw_diamond(const_cast<GtkStyle*>(gtkobj()), window, state_type, shadow_type,
+		   x, y, width, height);
+}
+
+void
+Style::draw_oval(Gdk_Window     &window,
+		     GtkStateType   state_type,
+		     GtkShadowType  shadow_type,
+		     gint x, gint y,
+		     gint width, gint height) const
+{
+  gtk_draw_oval(const_cast<GtkStyle*>(gtkobj()), window,
+		state_type, shadow_type, x, y, width, height);
+}
+
+void
+Style::draw_string(Gdk_Window     &window,
+		       GtkStateType   state_type,
+		       gint x, gint y,
+		       const nstring &str) const
+{
+  gtk_draw_string(const_cast<GtkStyle*>(gtkobj()), window, state_type, x, y, str.gc_str());
+}
+
+void
+Style::apply_default_background(const Gdk_Drawable &window,
+				    bool set_bg,
+				    GtkStateType state_type,
+				    const Gdk_Rectangle &area,
+				    gint x, gint y, 
+				    gint width, gint height) 
+{
+  gtk_style_apply_default_background(gtkobj(), window, set_bg,
+				     state_type, gdk_const_cast(area),
+				     x, y,
+				     width, height);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(gtkstyle)
+
+//. name: fg
+//. type: GdkColor[5]
+//. get:
+//. set:
+//. desc:
+
+//. name: bg
+//. type: GdkColor[5]
+//. get:
+//. set:
+//. desc:
+
+//. name: light
+//. type: GdkColor[5]
+//. get:
+//. set:
+//. desc:
+
+//. name: dark
+//. type: GdkColor[5]
+//. get:
+//. set:
+//. desc:
+
+//. name: mid
+//. type: GdkColor[5]
+//. get:
+//. set:
+//. desc:
+
+//. name: text
+//. type: GdkColor[5]
+//. get:
+//. set:
+//. desc:
+
+//. name: base
+//. type: GdkColor[5]
+//. get:
+//. set:
+//. desc:
+
+//. name: black
+//. type: GdkColor
+//. get:
+//. set:
+//. desc:
+
+//. name: white
+//. type: GdkColor
+//. get:
+//. set:
+//. desc:
+
+//. name: font
+//. type: GdkFont*
+//. get:
+//. set:
+//. desc:
+
+//. name: fg_gc[5]
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: bg_gc[5]
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: light_gc[5]
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: dark_gc[5]
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: mid_gc[5]
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: text_gc[5]
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: base_gc[5]
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: black_gc
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: white_gc
+//. type: GdkGC*
+//. get:
+//. set:
+//. desc:
+
+//. name: bg_pixmap[5]
+//. type: GdkPixmap*
+//. get:
+//. set:
+//. desc:
+
+//. name: ref_count
+//. type: gint
+//. get:
+//. set:
+//. desc: private 
+
+//. name: attach_count
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: depth
+//. type: gint
+//. get:
+//. set:
+//. desc:
+
+//. name: colormap
+//. type: GdkColormap*
+//. get:
+//. set:
+//. desc:
+
+//. name: engine
+//. type: GtkThemeEngine*
+//. get:
+//. set:
+//. desc:
+
+//. name: engine_data
+//. type: gpointer
+//. get:
+//. set:
+//. desc:
+
+//. name: styles
+//. type: GSList*
+//. get:
+//. set:
+//. desc: the Rc style from which this style
+//. was created
+//. 				 
+

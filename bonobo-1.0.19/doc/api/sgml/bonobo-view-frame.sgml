@@ -1,0 +1,328 @@
+<refentry id="bonobo-bonobo-view-frame">
+<refmeta>
+<refentrytitle>BonoboViewFrame</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>BONOBO Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>BonoboViewFrame</refname><refpurpose>the container side frame for a BonoboView</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+
+
+struct      <link linkend="BonoboViewFrame-struct">BonoboViewFrame</link>;
+struct      <link linkend="BonoboViewFrameClass">BonoboViewFrameClass</link>;
+<link linkend="BonoboViewFrame">BonoboViewFrame</link>* <link linkend="bonobo-view-frame-construct">bonobo_view_frame_construct</link>
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame,
+                                             <link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uih);
+<link linkend="BonoboViewFrame">BonoboViewFrame</link>* <link linkend="bonobo-view-frame-new">bonobo_view_frame_new</link>      (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-Unknown">Bonobo_Unknown</link> uih);
+void        <link linkend="bonobo-view-frame-bind-to-view">bonobo_view_frame_bind_to_view</link>  (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame,
+                                             <link linkend="Bonobo-View">Bonobo_View</link> view);
+<link linkend="Bonobo-View">Bonobo_View</link> <link linkend="bonobo-view-frame-get-view">bonobo_view_frame_get_view</link>      (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);
+<link linkend="BonoboClientSite">BonoboClientSite</link>* <link linkend="bonobo-view-frame-get-client-site">bonobo_view_frame_get_client_site</link>
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);
+<link linkend="GtkWidget">GtkWidget</link>*  <link linkend="bonobo-view-frame-get-wrapper">bonobo_view_frame_get_wrapper</link>   (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);
+void        <link linkend="bonobo-view-frame-set-covered">bonobo_view_frame_set_covered</link>   (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame,
+                                             <link linkend="gboolean">gboolean</link> covered);
+<link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> <link linkend="bonobo-view-frame-get-ui-container">bonobo_view_frame_get_ui_container</link>
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);
+void        <link linkend="bonobo-view-frame-view-activate">bonobo_view_frame_view_activate</link> (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);
+void        <link linkend="bonobo-view-frame-view-deactivate">bonobo_view_frame_view_deactivate</link>
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);
+void        <link linkend="bonobo-view-frame-set-zoom-factor">bonobo_view_frame_set_zoom_factor</link>
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame,
+                                             <link linkend="double">double</link> zoom);
+
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+The BonoboViewFrame is the container side control interface
+for its attached remote <link linkend="BonoboView">BonoboView</link>. The view frame can be
+used to set the zoom factor on the embedded view using the
+<function>bonobo_view_freame_set_zoom_factor</function>
+function.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="BonoboViewFrame-struct">struct BonoboViewFrame</title>
+<programlisting>struct BonoboViewFrame;</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="BonoboViewFrameClass">struct BonoboViewFrameClass</title>
+<programlisting>struct BonoboViewFrameClass {
+	BonoboControlFrameClass parent_class;
+
+	POA_Bonobo_ViewFrame__epv epv;
+
+	/* Signals. */
+	void (*user_activate)       (BonoboViewFrame *view_frame);
+	void (*user_context)        (BonoboViewFrame *view_frame);
+};
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-construct">bonobo_view_frame_construct ()</title>
+<programlisting><link linkend="BonoboViewFrame">BonoboViewFrame</link>* bonobo_view_frame_construct
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame,
+                                             <link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> uih);</programlisting>
+<para>
+Initializes <parameter>view_frame</parameter> with the parameters.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> The BonoboViewFrame object to be initialized.
+</entry></row>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> the client site to which the newly-created ViewFrame will belong.
+</entry></row>
+<row><entry align="right"><parameter>uih</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> the initialized BonoboViewFrame object <parameter>view_frame</parameter> that implements the
+Bonobo::ViewFrame CORBA service.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-new">bonobo_view_frame_new ()</title>
+<programlisting><link linkend="BonoboViewFrame">BonoboViewFrame</link>* bonobo_view_frame_new      (<link linkend="BonoboClientSite">BonoboClientSite</link> *client_site,
+                                             <link linkend="Bonobo-Unknown">Bonobo_Unknown</link> uih);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>client_site</parameter>&nbsp;:</entry>
+<entry> the client site to which the newly-created ViewFrame will belong.
+</entry></row>
+<row><entry align="right"><parameter>uih</parameter>&nbsp;:</entry>
+<entry>
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> BonoboViewFrame object that implements the
+Bonobo::ViewFrame CORBA service.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-bind-to-view">bonobo_view_frame_bind_to_view ()</title>
+<programlisting>void        bonobo_view_frame_bind_to_view  (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame,
+                                             <link linkend="Bonobo-View">Bonobo_View</link> view);</programlisting>
+<para>
+Associates <parameter>view</parameter> with this <parameter>view_frame</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> A BonoboViewFrame object.
+</entry></row>
+<row><entry align="right"><parameter>view</parameter>&nbsp;:</entry>
+<entry> The CORBA object for the BonoboView embedded
+in this ViewFrame.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-get-view">bonobo_view_frame_get_view ()</title>
+<programlisting><link linkend="Bonobo-View">Bonobo_View</link> bonobo_view_frame_get_view      (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);</programlisting>
+<para>
+Associates <parameter>view</parameter> with this <parameter>view_frame</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> A BonoboViewFrame object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>
+
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-get-client-site">bonobo_view_frame_get_client_site ()</title>
+<programlisting><link linkend="BonoboClientSite">BonoboClientSite</link>* bonobo_view_frame_get_client_site
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> The view frame
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>the BonoboClientSite associated with this view frame
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-get-wrapper">bonobo_view_frame_get_wrapper ()</title>
+<programlisting><link linkend="GtkWidget">GtkWidget</link>*  bonobo_view_frame_get_wrapper   (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> A BonoboViewFrame object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboWrapper widget associated with this ViewFrame.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-set-covered">bonobo_view_frame_set_covered ()</title>
+<programlisting>void        bonobo_view_frame_set_covered   (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame,
+                                             <link linkend="gboolean">gboolean</link> covered);</programlisting>
+<para>
+This function either covers or uncovers the View embedded in a
+BonoboViewFrame.  If the View is covered, then the embedded widgets
+will receive no Gtk events, such as mouse movements, keypresses,
+and exposures.  When the View is uncovered, all events pass through
+to the BonoboView's widgets normally.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> A BonoboViewFrame object whose embedded View should be
+either covered or uncovered.
+</entry></row>
+<row><entry align="right"><parameter>covered</parameter>&nbsp;:</entry>
+<entry> <literal>TRUE</literal> if the View should be covered.  <literal>FALSE</literal> if it should
+be uncovered.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-get-ui-container">bonobo_view_frame_get_ui_container ()</title>
+<programlisting><link linkend="Bonobo-UIContainer">Bonobo_UIContainer</link> bonobo_view_frame_get_ui_container
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> A BonoboViewFrame object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> The BonoboUIContainer associated with this ViewFrame.  See
+also <link linkend="bonobo-view-frame-set-ui-container">bonobo_view_frame_set_ui_container</link>().
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-view-activate">bonobo_view_frame_view_activate ()</title>
+<programlisting>void        bonobo_view_frame_view_activate (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);</programlisting>
+<para>
+Activates the BonoboView embedded in <parameter>view_frame</parameter> by calling the
+<link linkend="activate">activate</link>() <link linkend="Bonobo-Control">Bonobo_Control</link> interface method on it.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> The BonoboViewFrame object whose view should be
+activated.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-view-deactivate">bonobo_view_frame_view_deactivate ()</title>
+<programlisting>void        bonobo_view_frame_view_deactivate
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame);</programlisting>
+<para>
+Deactivates the BonoboView embedded in <parameter>view_frame</parameter> by calling a the
+<link linkend="activate">activate</link>() CORBA method on it with the parameter <literal>FALSE</literal>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> The BonoboViewFrame object whose view should be
+deactivated.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="bonobo-view-frame-set-zoom-factor">bonobo_view_frame_set_zoom_factor ()</title>
+<programlisting>void        bonobo_view_frame_set_zoom_factor
+                                            (<link linkend="BonoboViewFrame">BonoboViewFrame</link> *view_frame,
+                                             <link linkend="double">double</link> zoom);</programlisting>
+<para>
+Requests the associated view to change its zoom factor the the value in <parameter>zoom</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>view_frame</parameter>&nbsp;:</entry>
+<entry> A BonoboViewFrame object.
+</entry></row>
+<row><entry align="right"><parameter>zoom</parameter>&nbsp;:</entry>
+<entry> a zoom factor.  1.0 means one-to-one mapping.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<link linkend="BonoboControlFrame">BonoboControlFrame</link>, <link linkend="BonoboView">BonoboView</link>
+</para>
+</refsect1>
+
+</refentry>

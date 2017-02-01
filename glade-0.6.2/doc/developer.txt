@@ -1,0 +1,167 @@
+
+This file will contain info for developers of Glade.
+
+A lot of this is out-of-date.
+
+
+Overview
+========
+
+Describe GbWidgets
+
+Describe structs, file formats
+
+Writing source code - use same style as GTK+ (& GNU), i.e. the standard output
+of GNU indent.
+
+
+Compiling Glade for Debugging
+=============================
+
+export CFLAGS=-g
+./configure --enable-debug
+
+Set the CFLAGS environment variable to -g before running configure, so you get
+all the symbols for a debugger to use. (You should also compile GTK like this
+as well.) e.g. 'export CFLAGS=-g' for the bash shell.
+
+Use the --enable-debug flag when configuring Glade. This enables debugging
+output, but doesn't turn it on.
+
+Set the 'GLADE_DEBUG' environment variable, which is a list of options
+separated by colons. Current options:
+
+  warnings - causes an abort() when a WARNING message is issued, so you can
+             use gdb to find out exactly what happened.
+  messages - causes lots of debugging messages to be output.
+
+e.g. to enable the warnings option:
+
+  export GLADE_DEBUG='warnings'
+
+for both options:
+
+  export GLADE_DEBUG='warnings:messages'
+
+This means that you can turn these features on/off without recompiling!!
+
+
+Brief Description of the Glade Source Files
+===========================================
+
+Main files:
+
+  project.c	  - the main project window & all its functions.
+  palette.c	  - the widget palette & its functions - very simple.
+  property.c	  - the property window & all its functions.
+
+  editor.c	  - the bulk of the user interface editing code.
+  gbwidget.c	  - functions for manipulating the GbWidgets.
+
+  glade_keys_dialog.c
+		  - a dialog box which shows the list of GDK keysyms to
+		    select for accelerators (encapsulated as a widget).
+  glade_menu_editor.c
+		  - a dialog box for editing menubars/popup menus
+		    (encapsulated as a widget).
+  tree.c	  - the window showing a hierarchical view of the widgets.
+
+  load.c	  - functions used when loading project files.
+  save.c	  - functions used when saving project files.
+  source.c	  - functions used when writing C source code.
+
+
+Simple additional files:
+
+  keys.c	  - array of Gdk keysyms which can be used for accelerators.
+  utils.c	  - a few utility functions, currently 3 simple dialog boxes.
+
+  gb.h		  - this is included by all gbwidget source files and includes
+		    all the glade header files. (It is used so that we don't
+		    have to change every gbwidget source file each time a new
+		    header file is added.)
+
+
+GbWidgets
+=========
+
+Each file in gbwidgets/ directory corresponds to one GtkWidget, and includes
+functions for creating a new widget, getting & setting the properties
+particular to that widget, adding items to the popup context-sensitive menus,
+and writing the C source code.
+
+I've used a flat structure (i.e. GbWidgets can't have subclasses/superclasses)
+for simplicity. A class structure may have eliminated some duplicated code,
+but would have been more complex to set up. Maybe in future...
+
+When Glade development began, the reflection mechanism in GTK+ (Args) was
+still immature and not complete, so I could not use it.
+But we will be moving towards Args, first to support external widgets, and
+then gradually moving existing widgets over. Though we need to make this
+very flexible so we can still add special code for individual widgets when
+needed.
+
+
+
+GbWidgetData
+============
+
+Each widget has a GbWidgetData struct which contains extra information
+for the widget. For example, it holds flags specifying whether the widget
+should be visible and whether it should grab the focus & the default.
+It also contains a list of accelerators and signals added to the widget.
+
+It may also contain the widget's size and position, though this depends on
+where the widget is used in the interface. For most widgets the position
+is set by the parent container, but for toplevel windows and widgets in
+fixed containers, the position can be set explicitly.
+
+
+Properties
+==========
+
+  The property hashes for looking up value widgets, ( + labels & buttons)
+  Storing values of properties in the data hash of the value widget
+
+
+'Placeholders'
+==============
+
+Placeholders are used to represent spaces in boxes/tables etc. into which a
+widget can be placed by the user.
+
+The macro GB_WIDGET_IS_PLACEHOLDER(widget) can be used to see if the
+widget (a GtkWidget*) is a placeholder.
+
+
+'GbStyles'
+==========
+
+The GbStyle struct stores information about styles used for widgets created
+in Glade. GbStyles can be named so that they can be easily shared between
+widgets. The struct also stores the font specification string and the
+background pixmap filenames, so that the style can be reconstructed later.
+
+Each widget has a pointer to a GbStyle in its GbWidgetData struct. There are
+also two relevant flags in the GbWidgetData -
+  GB_STYLE_IS_UNNAMED - if the widget is supposedly using an unnamed GbStyle.
+			Note: the widget may actually be using a named GbStyle,
+			but we only create new unnamed GbStyles if the widget's
+			style is changed. This is done because all widgets are
+			initially created with an unnamed style so users can
+			edit each widgets style individually, but we don't
+			want to create individual GbStyles for all widgets
+			since most will not be changed.
+  GB_STYLE_PROPAGATE  - if the widget's GbStyle is propagated to its
+			descendants. But it won't override a descendant
+			widget's GbStyle if that has been set explicitly.
+
+Note: A GtkStyle may be shared between GbStyles. ?
+
+This code is unfortunately quite confusing at present. Most of it is in
+apply_style() in gbwidget.c and in the functions to do with the style dialog,
+after show_style_dialog() in property.c.
+
+
+
+Damon, 26 September 1998.

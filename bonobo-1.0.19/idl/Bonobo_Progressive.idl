@@ -1,0 +1,68 @@
+/*
+ * Bonobo::ProgressiveDataSink interface.
+ *
+ * Copyright (C) 1999  Helix Code, Inc.
+ *
+ * Author:
+ *    Nat Friedman (nat@gnome-support.com)
+ */
+
+/*
+ * The purpose of this component is to provide an easy way for a
+ * sequence of data which is not available all at once to be
+ * marshalled across a connection into an object.
+ *
+ */
+
+#ifndef BONOBO_PROGRESSIVE_IDL
+#define BONOBO_PROGRESSIVE_IDL
+
+#include "Bonobo_Unknown.idl"
+
+module Bonobo {
+
+	interface ProgressiveDataSink : Unknown {
+		typedef sequence<octet> iobuf;
+
+		/**
+		 * start:
+		 *
+		 * This method signals that a new transmission of data
+		 * is coming in.  It must be called before addData
+		 * can be used.
+		 */
+		void start ();
+
+		/**
+		 * end:
+		 * 
+		 * An interface's 'end' method is called when the data
+		 * in a transmission has been completely transferred.
+		 */
+		void end ();
+
+		/**
+		 * addData:
+		 * @buffer:
+		 *
+		 * As each chunk of data comes in, this method is
+		 * called with a CORBA sequence buffer, which
+		 * specifies its size.
+		 */
+		void addData (in iobuf buffer);
+
+		/**
+		 * setSize:
+		 * @count:
+		 *
+		 * This method notifies a component of the total size
+		 * of the incoming data.  It can be called at any
+		 * point after #start has been called, even after the
+		 * data has started to flow.
+		 */
+		void setSize (in long count);
+
+	};
+};
+
+#endif /* BONOBO_PROGRESSIVE_IDL */

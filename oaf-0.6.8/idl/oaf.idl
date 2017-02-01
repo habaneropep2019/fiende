@@ -1,0 +1,205 @@
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*- */
+/*
+ *  oaf.idl: IDL definition of the OAF daemon CORBA interfaces.
+ *
+ *  Copyright (C) 1999, 2000 Red Hat, Inc.
+ *  Copyright (C) 1999, 2000 Eazel, Inc.
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License as
+ *  published by the Free Software Foundation; either version 2 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ *  Authors: Elliot Lee <sopwith@redhat.com>,
+ *
+ */
+
+#ifndef __OAF_IDL__
+#define __OAF_IDL__
+
+#if !defined(OAF_COMPILATION) && defined(__ORBIT_IDL__)
+%{
+#pragma include_defs liboaf/oaf.h
+%}
+#pragma inhibit push
+#endif
+
+#include "oaf-factory.idl"
+
+module OAF {
+        exception GeneralError { 
+                string description; 
+        };
+
+        typedef string ImplementationID;
+        typedef string ActivationID;
+        interface ActivationContext;
+
+        typedef long ActivationFlags;
+        const ActivationFlags FLAG_NO_LOCAL = 1<<0; // No shared libraries
+        const ActivationFlags FLAG_PRIVATE = 1<<1; // start a new server and don't register it
+        const ActivationFlags FLAG_EXISTING_ONLY = 1<<2; // don't start the server if not started
+
+        /* ActivationResult */
+        enum ActivationResultType { 
+                RESULT_OBJECT, 
+                RESULT_SHLIB, 
+                RESULT_NONE 
+        };
+
+        union ActivationResultData switch (ActivationResultType) {
+        case RESULT_OBJECT:
+                Object res_object;
+        case RESULT_SHLIB:
+                GNOME::stringlist res_shlib;
+        };
+
+        struct ActivationResult {
+                string aid;
+                ActivationResultData res;
+        };
+
+        /* Property */
+        enum PropertyType { 
+                P_STRING, 
+                P_NUMBER, 
+                P_BOOLEAN, 
+                P_STRINGV 
+        };
+
+        union PropertyValue switch (PropertyType) {
+        case P_STRING:
+                string value_string;
+        case P_NUMBER:
+                double value_number;
+        case P_BOOLEAN:
+                boolean value_boolean;
+        case P_STRINGV:
+                GNOME::stringlist value_stringv;
+        };
+
+        struct Property {
+                string name;
+                PropertyValue v;
+        };
+
+        /* Server */
+        struct ServerInfo {
+                ImplementationID iid;
+                
+                string server_type;
+                string location_info;
+                string username, hostname, domain;
+		
+                sequence<Property> props;
+        };
+
+        typedef sequence<ServerInfo> ServerInfoList;
+
+        typedef long long CacheTime;
+  
+        union ServerInfoListCache switch (boolean) {
+        case TRUE:
+                ServerInfoList server_list;
+        };
+
+        union ServerStateCache switch (boolean) {
+        case TRUE:
+                sequence<ImplementationID> active_servers;
+        };
+
+        enum RegistrationResult { 
+                REG_SUCCESS, 
+                REG_NOT_LISTED, 
+                REG_ALREADY_ACTIVE, 
+                REG_ERROR 
+        };
+
+        interface ActivationCallback {
+                oneway void report_activation_failed (in string reason);
+                oneway void report_activation_succeeded (in ActivationResult result);
+        };
+
+        /* Interfaces */
+        interface ObjectDirectory {
+		enum UnregisterType {
+			UNREGISTER_NORMAL,
+			UNREGISTER_NOTIFY_UNUSED /* For factories to use */
+		};
+                ServerInfoListCache get_servers (in CacheTime only_if_newer);
+                ServerStateCache get_active_servers (in CacheTime only_if_newer);
+                
+                readonly attribute string username, hostname, domain;
+
+                Object activate (in ImplementationID iid, in ActivationContext ac, in ActivationFlags flags)
+                        context ("username", "hostname", "domain", "display");
+
+                /* Ensures consistency for activations of publicly advertised objects */
+                void lock();
+                oneway void unlock();
+
+                RegistrationResult register_new (in ImplementationID iid, in Object obj);
+                void unregister (in ImplementationID iid, in Object obj, in UnregisterType notify);
+        };
+
+        typedef sequence<ObjectDirectory> ObjectDirectoryList;
+
+        interface ActivationContext {
+                exception NotListed {};
+                exception AlreadyListed {};
+                exception IncompleteContext {};
+                exception ParseFailed { 
+                        string description; 
+                };
+
+                readonly attribute ObjectDirectoryList directories;
+                void add_directory (in ObjectDirectory dir) raises (AlreadyListed);
+                void remove_directory (in ObjectDirectory dir) raises (NotListed);
+
+                ActivationResult activate (in string requirements,
+                                           in GNOME::stringlist selection_order,
+                                           in ActivationFlags flags)
+                        raises (ParseFailed, IncompleteContext, GeneralError)
+                        context ("username", "hostname", "domain", "display");
+
+                oneway void activate_async (in string requirements,
+                                            in GNOME::stringlist selection_order,
+                                            in ActivationFlags flags,
+                                            in ActivationCallback callback_object)
+                        context ("username", "hostname", "domain", "display");
+
+
+
+                readonly attribute ServerInfoList servers;
+                ServerInfoList query (in string requirements,
+                                      in GNOME::stringlist selection_order)
+                        raises (ParseFailed, IncompleteContext)
+                        context ("username", "hostname", "domain");
+
+                ActivationResult activate_from_id (in ActivationID aid, in ActivationFlags flags)
+                        raises (ParseFailed, IncompleteContext, GeneralError)
+                        context ("username", "hostname", "domain", "display");
+
+                oneway void activate_from_id_async (in ActivationID aid, 
+                                                    in ActivationFlags flags,
+                                                    in ActivationCallback callback_object)
+                        context ("username", "hostname", "domain", "display");
+
+        };
+};
+
+#if !defined(OAF_COMPILATION && defined(__ORBIT_IDL__)
+#pragma inhibit pop
+#endif
+
+
+#endif

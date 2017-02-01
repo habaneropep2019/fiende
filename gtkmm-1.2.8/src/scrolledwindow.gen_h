@@ -1,0 +1,226 @@
+/* $Id: scrolledwindow.gen_h,v 1.63 2001/07/15 13:33:38 murrayc Exp $ */
+
+/* scrolledwindow.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/bin.h>
+#include <gtk/gtkscrolledwindow.h>
+
+CLASS_START(Gtk);
+class Adjustment;
+class HScrollbar;
+class VScrollbar;
+
+//: Adds scrollbars to its child widget.
+//- {\class Gtk::ScrolledWindow} is a {Gtk::Bin::} subclass: it's a container that accepts
+//- a single child widget. {\class Gtk::ScrolledWindow} adds scrollbars to the child widget. 
+//-
+//- The scrolled window can work in two ways. Some widgets have native scrolling support;
+//- these widgets have {\i slots} for {Gtk::Adjustment::} objects. The scrolled window
+//- installs {Gtk::Adjustment::} objects in the child window's slots using the
+//- set_scroll_adjustments_signal, found in the {Gtk::Widget::} Class. (This is how it works in GTK+, not sure about GTK--).
+//-
+//- The second way to use the scrolled window is useful with widgets that lack the
+//- set_scroll_adjustments_signal. The {Gtk::Viewport::} widget acts as a
+//- proxy, implementing scrollability for child widgets that lack their own scrolling capabilities. 
+//-
+//- If a widget has native scrolling abilities, it can be added to the
+//- {\class Gtk::ScrolledWindow} with {Gtk::Container::add()}. If a widget does not, you must first add
+//- the widget to a {Gtk::Viewport::}, then add the {Gtk::Viewport::} to the scrolled
+//- window. The convenience function {add_with_viewport()} does exactly this, so you can
+//- ignore the presence of the viewport. 
+class ScrolledWindow : public Bin {
+  
+  WRAP_CLASS(ScrolledWindow,GtkScrolledWindow,GTK_SCROLLED_WINDOW,GTK_IS_SCROLLED_WINDOW,scrolled_window,Gtk::Bin,GtkBin,GTK_BIN);
+
+public:
+
+  //- Little restriction over gtk+ here : you have to specify either
+  //-  both adjustements or none at all.
+  ScrolledWindow(Adjustment &hadjustment,
+		     Adjustment &vadjustment);
+  ScrolledWindow();
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: Sets the {Gtk::Adjustment::} for the horizontal scrollbar. 
+  //- {\var hadjustment}: Horizontal scroll adjustment.
+  WRAP_METHOD(
+    void gtk_scrolled_window_set_hadjustment(GtkScrolledWindow *,GtkAdjustment*),
+    void set_hadjustment(Gtk::Adjustment* hadjustment=0));
+
+  //: Sets the {Gtk::Adjustment::} for the vertical scrollbar. 
+  //- {\var vadjustment}: Vertical scroll adjustment.
+  WRAP_METHOD(
+    void gtk_scrolled_window_set_vadjustment(GtkScrolledWindow *,GtkAdjustment*),
+    void set_vadjustment(Gtk::Adjustment* vadjustment=0));
+
+  //: Sets the {Gtk::Adjustment::} for the horizontal scrollbar. 
+  //- {\var hadjustment}: Horizontal scroll adjustment.
+  WRAP_METHOD(
+    void gtk_scrolled_window_set_hadjustment(GtkScrolledWindow *,GtkAdjustment*),
+    void set_hadjustment(Gtk::Adjustment& hadjustment));
+
+  //: Sets the {Gtk::Adjustment::} for the vertical scrollbar. 
+  //- {\var vadjustment}: Vertical scroll adjustment.
+  WRAP_METHOD(
+    void gtk_scrolled_window_set_vadjustment(GtkScrolledWindow *,GtkAdjustment*),
+    void set_vadjustment(Gtk::Adjustment& vadjustment));
+
+  // These adjustments are not members.
+  //: Returns the horizontal scrollbar's adjustment, used to connect the horizontal
+  //: scrollbar to the child widget's horizontal scroll functionality. 
+  //- {\var Returns}: The horizontal {Gtk::Adjustment::}. 
+  WRAP_METHOD(
+    GtkAdjustment* gtk_scrolled_window_get_hadjustment(GtkScrolledWindow *),
+    Gtk::Adjustment* get_hadjustment() const);
+
+  //: Returns the vertical scrollbar's adjustment, used to connect the vertical
+  //: scrollbar to the child widget's vertical scroll functionality. 
+  //- {\var Returns}: The vertical {Gtk::Adjustment::}. 
+  WRAP_METHOD( 
+    GtkAdjustment* gtk_scrolled_window_get_vadjustment(GtkScrolledWindow *),
+    Gtk::Adjustment* get_vadjustment() const);
+
+  WRAP_MEMBER(value,hscrollbar_policy,hscrollbar_policy,GtkPolicyType,guint);
+  WRAP_MEMBER(value,vscrollbar_policy,vscrollbar_policy,GtkPolicyType,guint);
+  //: Sets the scrollbar policy for the horizontal and vertical scrollbars.
+  //- The policy determines when the scrollbar should appear; it is a value from
+  //- the {\type GtkPolicyType} enumeration. If {\enum GTK_POLICY_ALWAYS}, the
+  //- scrollbar is always present. If {\enum GTK_POLICY_NEVER}, the scrollbar is
+  //- never present. If {\enum GTK_POLICY_AUTOMATIC}, the scrollbar is present
+  //- only if needed (that is, if the slider part of the bar would be smaller
+  //- than the trough - the display is larger than the page size). 
+  //-
+  //- {\var hscrollbar_policy}: Policy for horizontal bar.
+  //- {\var vscrollbar_policy}: Policy for vertical bar. 
+  WRAP_METHOD(
+    void gtk_scrolled_window_set_policy(GtkScrolledWindow*, GtkPolicyType, GtkPolicyType),
+    void set_policy(GtkPolicyType hscrollbar_policy,
+                    GtkPolicyType vscrollbar_policy));
+
+  WRAP_MEMBER(value,placement,window_placement,GtkCornerType,guint);  
+  //: Determines the location of the child widget with respect to the scrollbars.
+  //- The default is {\enum GTK_CORNER_TOP_LEFT}, meaning the child is in the top left,
+  //- with the scrollbars underneath and to the right. Other values in
+  //- {\type GtkCornerType} are {\enum GTK_CORNER_TOP_RIGHT},
+  //- {\enum GTK_CORNER_BOTTOM_LEFT}, and {\enum GTK_CORNER_BOTTOM_RIGHT}. 
+  //- {\var window_placement}: Position of the child window. 
+  WRAP_METHOD(
+    void gtk_scrolled_window_set_placement(GtkScrolledWindow*, GtkCornerType),
+    void set_placement (GtkCornerType window_placement));
+
+  //: Used to add children without native scrolling capabilities.
+  //- This is simply a convenience function; it is equivalent to adding the unscrollable
+  //- child to a viewport, then adding the viewport to the scrolled window. If a child
+  //- has native scrolling, use {Gtk::Container::add()} instead of this function. 
+  //-
+  //- The viewport scrolls the child by moving its {Gdk::Window::}, and takes the size
+  //- of the child to be the size of its toplevel {Gdk::Window::}. This will be very
+  //- wrong for most widgets that support native scrolling; for example, if you add a
+  //- {Gtk::CList::} with a viewport, the whole widget will scroll, including the
+  //- column headings. Thus {Gtk::CList::} supports scrolling already, and should not
+  //- be used with the {Gtk::Viewport::} proxy. 
+  //- {\var child}: Widget you want to scroll. 
+  WRAP_METHOD(
+    void gtk_scrolled_window_add_with_viewport(GtkScrolledWindow*,GtkWidget*),
+    void add_with_viewport(Gtk::Widget &child));
+
+  WRAP_MEMBER(value,vscrollbar_visible,hscrollbar_visible,bool,guint);
+  WRAP_MEMBER(value,hscrollbar_visible,vscrollbar_visible,bool,guint);
+  WRAP_MEMBER(value,hscrollbar,hscrollbar,Gtk::HScrollbar*,GtkWidget*);
+  WRAP_MEMBER(value,vscrollbar,vscrollbar,Gtk::VScrollbar*,GtkWidget*);
+
+};
+
+PRIVATE_START;
+#include <gtk--/private/bin_p.h>
+IMPL_START;
+#include <gtk--/scrollbar.h>
+#include <gtk--/viewport.h>
+#include <gtk--/adjustment.h>
+namespace Gtk
+{
+
+ScrolledWindow::ScrolledWindow()
+  :     Bin((GtkBin*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gtk_scrolled_window_set_hadjustment (gtkobj(), 0);
+  gtk_scrolled_window_set_vadjustment (gtkobj(), 0);
+  gtk_object_default_construct (gtkobject);
+}
+
+ScrolledWindow::ScrolledWindow(Adjustment &gtkhadjustment,
+				       Adjustment &gtkvadjustment)
+  :     Bin((GtkBin*)(gtk_object_new(get_type(),0)))
+{
+  initialize_class();
+  gtk_scrolled_window_set_hadjustment(gtkobj(), gtkhadjustment.gtkobj());
+  gtk_scrolled_window_set_vadjustment(gtkobj(), gtkvadjustment.gtkobj());
+  gtk_object_default_construct(gtkobject);
+}
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_ScrolledWindow)
+//. name: hscrollbar
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: vscrollbar
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: hscrollbar_policy
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: vscrollbar_policy
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: hscrollbar_visible
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: vscrollbar_visible
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: window_placement
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+

@@ -1,0 +1,150 @@
+Search uris are used to locate a set of resources by using criterion,
+rather than location.  Search uri's are designed to be flexible,
+in that new clause formats may be added, and also to be readable 
+for humans as well as machines.  
+
+The search uri is composed of several parts, as follows:
+
+1.  the gnome-search: prefix, which may also medusa:
+    or search: for now.
+
+2.  Optionally, the search method.  The search method may be one of
+	index-only
+	index-with-backup
+	unindexed-only
+
+	Where 
+	index-only specifies that only the index will be searched
+	for results.  The search will fail if an index is not available.
+
+	index-if-available specifies that only the index will be searched
+        if it can be accessed.  Otherwise, a slow search (only) will be
+        performed.
+
+  	index-with-backup specifies that the index will be searched
+	initially, and then the file system itself will be searched as
+	a backup.  The search will still succeed if no index is available.
+
+	unindexed-only specifies that the index should not be used at
+	all and a direct search should be performed on the disk's contents.
+
+	If no method is stated, the method is assumed to be index-only.
+	
+3.  the root location(s).  Each root must be a URI enclosed
+    in square brackets ([]).  There may be several, and they are not
+    separated by any characters.  Additionally, a space and the word
+    only can proceed a uri to point out that the directory should
+not be recursively searched.  For example:
+
+
+[file:///]
+[file:///][webdav:///home/rebecka]
+[file:///tmp only][file:///usr/local]
+
+
+(NOTE:  at the present time, only a single location, [file:///] is 
+acceptable to medusa)
+
+3.  the criterion to search for.  The criterion are made up of
+clauses.  Clauses may be joined by and's or or's, represented by & and
+| respectively.  Without any further demarcation, | is bound more
+tightly than &.  Parentheses may be used to change the parsing order
+of the boolean expression.  They are not suggested unless used to force
+the meaning of expression, because their overuse clouds the meaning of
+the expression. 
+clauses are self contained, and may be created and parsed individually.
+The clauses accepted by medusa right now are listed here.
+
+(NOTE: at the present time, only the & relation is accceptable
+to medusa)
+
+a. Searches by file name.
+file_name is <string>
+file_name contains <string>
+file_name does_not_contain <string>
+file_name begins_with <string>
+file_name ends_with <string>
+file_name matches <string>
+file_name regexp_matches <string>
+
+b. Searches by directory name
+directory_name is <string>
+directory_name is_not <string>              ; we should implement this
+directory_name contains <string>
+directory_name does_not_contain <string>    ; we should implement this
+directory_name regexp_matches <string>
+directory_name does_not_regexp_match <string>
+directory_name is_in <string>
+directory_name is_not_in <string>           ; we should implement this
+
+3. file type
+file_type is application
+file_type is_not application
+file_type is music
+file_type is_not music
+file_type is text_file
+file_type is_not text_file
+file_type is file
+file_type is_not file
+file_type is directory
+file_type is_not directory
+
+
+4. mod_time
+
+what is available:
+modified is <date>
+modified is_not <date>
+modified is_before <date>
+modified is_after <date>
+modified is today
+modified is yesterday
+modified is_within_a_week_of <date>
+modified is_within_a_month_of <date>
+
+where <date> is a MM/DD/YYYY string.
+
+mtime is_before <time>
+mtime is_after <time>
+
+where <time> is the number of seconds since 00:00:00, Jan 1, 1970 
+
+
+what was available in the first version:
+mod_time updated in_last_month
+mod_time updated in_last_seven_days
+mod_time updated in_last_day
+mod_time not_updated in_last_month
+mod_time not_updated in_last_seven_days
+mod_time not_updated in_last_day
+
+4. owner
+owner is <name>
+owner has_uid <uid>
+owner is_not <name>
+owner does_not_have_uid <uid>
+
+5. group
+group is <name>
+group has_gid <gid>
+group is_not <name>
+group does_not_have_gid <gid>
+
+6. size
+size larger_than <number>
+size smaller_than <number>
+size is <number>
+Note: <number> is in bytes
+
+7. permissions to read
+permissions_to_read include_uid <uid>
+
+8. contains
+content includes_all_of string
+content includes_any_of string
+content does_not_include_all_of string
+content does_not_include_any_of string
+
+9. keywords
+keywords include <keyword>
+keywords do_not_include <keyword>

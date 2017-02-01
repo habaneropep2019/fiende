@@ -1,0 +1,334 @@
+2002-01-11  Frederic Crozat  <fcrozat@mandrakesoft.com>
+
+	* doc/Makefile.am:
+	Fix install when using DESTDIR
+
+2001-11-15  Frederic Crozat  <fcrozat@mandrakesoft.com>
+
+	* src/efstest.c:
+	* src/efstool.c:
+	* src/ib1_cache.c:
+	* src/wrapper.c:
+	Fix warnings caused by missing includes
+
+2001-08-15  Dietmar Maurer  <dietmar@ximian.com>
+
+	* src/ib1_file.c (ib1_node_open): added patches form Dan Nguyen to
+	make it compile on native AIX compiler.
+
+2001-08-14  Dietmar Maurer  <dietmar@ximian.com>
+
+	* src/lock.c (efs_lock_create): buf is 32 bytes now
+
+	* src/Makefile.am (libefs_la_LDFLAGS): added -lz needed for AIX
+
+	* src/ib1_driver.c (ib1_read_head): convert type/protection from LE
+
+2001-06-05  Dietmar Maurer  <dietmar@ximian.com>
+
+	* src/lock.c: resolved Bugzilla bug: 55595
+	* src/efstest.c: resolved Bugzilla bug: 55595
+
+
+2001-05-25  Dietmar Maurer  <dietmar@ximian.com>
+
+	* src/ib1_file.c (ib1_node_open): set EFS_RDWR on new directories
+	as suggested by Mike Kestner.
+
+Mon Nov  6 15:18:00 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/ib1_inode.c (ib1_inode_create): bug fix. clear the whole inode
+	block when we create a new inode.
+
+Sat Nov  4 13:42:51 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/efstool.c (ls_command): more detailed ls command.
+
+	* src/ib1_driver.c (ib1_create_typefd): the file containing the
+	type codes is no private.
+
+	* src/efs.h:
+ 	(EFS_MIME_DIR):  default mime type for files
+	(EFS_MIME_DATA): default mime type for directories
+
+	* src/mime.c (integer_type_lookup): check default mime types
+
+	* src/ib1_driver.h (IB1_ROOT_INODE): changed root inode number
+	to 2.
+
+Fri Nov  3 12:38:54 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/ib1_file.c (ib1_dir_read): return EFS_ERR_NOENT on eof
+
+Thu Nov  2 10:16:03 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/efs_error.h: removed EFS_ERR_EOS.
+
+	* src/efs.h: implement a new method to check if two nodes are
+	equal: efs_node_equal()
+
+Wed Nov  1 14:42:51 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/mime.c (efs_strtype_get): add default mime types for files
+	and directories.
+
+Thu Oct 26 15:46:01 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/efs.h: added new functions efs_node_open(), efs_node_close()
+	and efs_node_stat(). A node is either a directory or file.
+
+	* src/ib1_file.c (ib1_node_open): mergerd dir_open() and
+	file_open() into this new function.
+
+	* src/file.c: renamed to wrapper.c
+
+	* src/dir.c: removed (code moved to wrapper.c)
+
+Mon Oct 23 13:45:43 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/efs.h: renamed efs_rollback() to efs_revert()
+
+Wed Oct 11 11:27:59 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/ib1_inode.c (ib1_imap_lookup): don´t store imap data in
+	the root inode.
+
+	* src/ib1_driver.h (IB1_ROOT_INODE): changed root inode number to
+	3 so that we can use inode 0 to 2 to store imap data.
+
+Tue Oct 10 09:56:10 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* configure.in (CRYPTLIB): only add -lcrypt if we have one
+
+Tue Oct  3 15:57:34 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/ib1_driver.h: changed the inode format (we can now store
+	64 bytes of data in the inode.
+
+	* src/ib1_driver.c:  store a pointer to the previous
+	inode block when we clone the root inode.
+
+	* src/ib1_inode.c (ib1_inode_map): store a pointer to the previous
+	inode block if we clone the inode.
+
+Sat Sep 30 14:03:03 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* libefs.pc.in: new file for pkg-config 
+
+2000-09-23  root  <dietmar@maurer-it.com>
+
+	* src/ib1_file.c (ib1_dir_open): make sure that there is only one 
+	directory with a EFS_ROOT flag.
+
+2000-09-19  root  <dietmar@maurer-it.com>
+
+	* src/ib1_file.c (ib1_dir_open): you can open the directory itself
+	now (duplicate the directory pointer)
+
+Tue Sep 19 08:34:43 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/efs.h: added a bytes_read argument to efs_file_read, and
+	efs_file_seek now returns the current pos.
+
+Thu Sep 14 09:12:28 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/ib1_alloc.c (ib1_bitmap_init): removed 1GB limit from block
+	allocation code. 
+
+	* src/ib1_driver.h: changed inode format - we can now store up
+	to 56 (IB1_IDATA_LEN) bytes directly in the inode.
+
+	* src/*.[ch]: fixed the copyright statement. 
+
+Mon Sep 11 12:50:20 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/efstest.c (main): add more directory tests
+	
+	* src/ib1_inode.c (ib1_inode_trunc): we must unlock the cache
+	before we return!
+	
+	* src/ib1_driver.c (ib1_commit): fixed a serious bug in commit
+
+	* src/ib1_file.c (ib1_check_entry): test if rec_len is zero
+
+	* src/ib1_file.c (ib1_find_entry): add test for name length
+
+	* src/efs.c (efs_typehash_clear): cleanup typ hash
+
+Sat Sep  9 18:30:14 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/mime.c: experimental code to add mime type support
+
+	* src/efstest.c (main): added more tests
+
+	* src/ib1_cache.c (ib1_cache_map_clone): really copy the data
+	instead of doing dirty cache tricks.
+
+Thu Sep  7 09:40:32 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/efs.c (efs_passwd_set): use md5 crypt.
+
+	* src/efs.h: removed efs_file_set_type() and efs_file_get_type. We
+	can use efs_set_type and efs_get_type to set types on directories
+	and files.
+
+	* COPYING.LIB: new license 
+
+2000-09-06  Dan Winship  <danw@helixcode.com>
+
+       * configure.in: Lack of crypt.h isn't fatal: some OSes put crypt
+       in unistd.h.
+
+       * src/efs.c: Only include crypt.h #ifdef HAVE_CRYPT_H
+
+Mon Aug 28 10:08:43 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/ib1_cache.c: add block crc.
+
+	* src/efs.h (and most other files): final API cleanup. 
+
+Sun Aug 27 13:05:04 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* src/dir.c:
+	* src/file.c: 
+	* src/efs.c: better error handling.
+
+Thu Aug 24 13:02:48 2000  Dietmar Maurer  <dietmar@maurer-it.com>
+
+	* all files: checked in a complete rewrite of libefs. Changed
+	version to 1.0.0.
+
+2000-06-23  Michael Meeks  <michael@helixcode.com>
+
+	* src/efs.c (efs_open): make sure we always have a valid
+	driver.
+
+2000-06-22  Michael Meeks  <michael@helixcode.com>
+
+	* libefs-config.in: Add.
+
+	* configure.in: build efs-config.
+
+	* Makefile.am (bin_SCRIPTS): add bin scripts.
+
+2000-05-03  Michael Meeks  <michael@helixcode.com>
+
+	* src/efs.c (efs_find_driver): s/strcasecmp/g_strcasecmp/
+
+2000-05-02  Michael Meeks  <michael@helixcode.com>
+
+	* src/efstool.c (get_command): add. (main): add get.
+
+2000-02-19  Mathieu Lacage <mathieu@advogato.org>
+
+	* src/dir.c: API documentation.
+
+	* src/file.c: idem.
+
+	* src/efs.c: idem. This Changelog corresponds
+	to a previous commit where I had forgotten the
+	ChangeLog
+
+2000-02-09  Michael Meeks  <michael@helixcode.com>
+
+	* src/fsys.c (fsys_open, fsys_stat): kill C++ comments.
+
+	* src/fsys_file.c: include dirent.h.
+
+	* src/simple.c (simple_open): kill C++ comment. (simple_close): ditto.
+
+	* src/simple_alloc.c (simple_write_bmap): ditto.
+
+Sun Nov 21 16:57:23 1999  Dietmar Maurer  <dm@darkstar>
+
+	* src/simple.c: removed locking support since it does not work
+	over nfs.
+
+Thu Nov 18 14:57:13 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/Makefile.am: generate shared libs
+
+Sun Oct 24 13:15:16 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/efstest.c: implemented more tests
+
+Sat Oct 23 12:40:10 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/simple*: several fixes for big endian systems. libefs no
+	works on solaris (sparc). 
+
+Fri Oct 22 11:57:24 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/efs.c: replaced flock with fcntl which also compiles on
+	solaris (without ucb lib)
+
+Mon Sep 27 11:13:22 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/simple_file.c: finnished big endian support - but it is
+	totally untested, since i don't have a big endian mashine.
+
+Sat Sep 25 14:39:10 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/simple.c: add support for big endian systems (not finished) 
+
+Mon Sep  6 01:22:10 1999 Timur Bakeyev <timur@gnu.org>
+
+	* configure.in: Add checks against presence d_off member in DIR
+	structure and location of the header, where DIR is declared. Also
+	fixed some zlib checks.
+	
+	* src/fsys.h, fsys_file.c: Wrap d_off reference. If there is no such
+	element in DIR, we use 0 to initialize EFSDirEntry.offset.
+
+Tue Jul  6 07:17:58 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/comp_file.c: new file (zlib support)
+
+	* configure.in: added check for zlib.
+
+Mon Jul  5 10:50:25 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/simple.h: add mod_time to SimpleINode.
+	* src/fsys.h: new driver for native filesystem access
+	* src/fsys_file.c: new file 
+	* src/fsys.c: new file
+
+Sun Jul  4 13:25:51 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/efs.h: changed API - all pathnames are relative to the
+	specified directory. various bug fixes.
+
+	* doc/libefs.sgml: new docu.
+
+Fri Jul  2 10:23:17 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* src/simple.h (SIMPLE_NAME_LEN): max name length is now
+	248 (min. 2 entries per block)
+
+	* simple_inode.c: 4 inodes are stored in in block. Changed 
+	IMAP format.
+	
+
+Tue Jun 29 09:21:23 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* simple.c: simple_commit() implemented. 
+	* simple_inode.c: simple_imap_flush() renamed to
+	simple_write_imap(). IMAP is no longer saved as INODE.
+	* simple_alloc.c: simple_bmap_flush() renamed to
+	simple_write_bmap(). BMAP is no longer saved as INODE.
+
+Mon Jun 21 11:19:50 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* .cvsignore: new cvsignore files
+
+Wed Jun  9 10:22:24 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* libefs: imported the new module into the gnome CVS server.
+
+Thu Jun  3 09:26:50 1999  Dietmar Maurer  <dm@vlsivie.tuwien.ac.at>
+
+	* first version which uses automake/autoconf/libtool
+
+
+	
+

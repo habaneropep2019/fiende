@@ -1,0 +1,759 @@
+<refentry id="libole2-MsOleSummary" revision="9 Jun 2000">
+<refmeta>
+<refentrytitle>MsOleSummary</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>LIBOLE2 Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>MsOleSummary</refname><refpurpose>Handle the summary streams.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;libole2/libole2.h&gt;
+
+
+typedef     <link linkend="MsOleSummary">MsOleSummary</link>;
+<link linkend="MsOleSummary">MsOleSummary</link>* <link linkend="ms-ole-summary-open">ms_ole_summary_open</link>           (<link linkend="MsOle">MsOle</link> *f);
+<link linkend="MsOleSummary">MsOleSummary</link>* <link linkend="ms-ole-docsummary-open">ms_ole_docsummary_open</link>        (<link linkend="MsOle">MsOle</link> *f);
+<link linkend="MsOleSummary">MsOleSummary</link>* <link linkend="ms-ole-summary-open-stream">ms_ole_summary_open_stream</link>    (<link linkend="MsOleStream">MsOleStream</link> *stream,
+                                             const <link linkend="MsOlePropertySetID">MsOlePropertySetID</link> psid);
+<link linkend="MsOleSummary">MsOleSummary</link>* <link linkend="ms-ole-summary-create">ms_ole_summary_create</link>         (<link linkend="MsOle">MsOle</link> *f);
+<link linkend="MsOleSummary">MsOleSummary</link>* <link linkend="ms-ole-docsummary-create">ms_ole_docsummary_create</link>      (<link linkend="MsOle">MsOle</link> *f);
+<link linkend="MsOleSummary">MsOleSummary</link>* <link linkend="ms-ole-summary-create-stream">ms_ole_summary_create_stream</link>  (<link linkend="MsOleStream">MsOleStream</link> *s,
+                                             const <link linkend="MsOlePropertySetID">MsOlePropertySetID</link> psid);
+void        <link linkend="ms-ole-summary-close">ms_ole_summary_close</link>            (<link linkend="MsOleSummary">MsOleSummary</link> *si);
+<link linkend="GArray">GArray</link>*     <link linkend="ms-ole-summary-get-properties">ms_ole_summary_get_properties</link>   (<link linkend="MsOleSummary">MsOleSummary</link> *si);
+<link linkend="gchar">gchar</link>*      <link linkend="ms-ole-summary-get-string">ms_ole_summary_get_string</link>       (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);
+<link linkend="gboolean">gboolean</link>    <link linkend="ms-ole-summary-get-boolean">ms_ole_summary_get_boolean</link>      (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);
+<link linkend="guint16">guint16</link>     <link linkend="ms-ole-summary-get-short">ms_ole_summary_get_short</link>        (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);
+<link linkend="guint32">guint32</link>     <link linkend="ms-ole-summary-get-long">ms_ole_summary_get_long</link>         (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);
+<link linkend="GTimeVal">GTimeVal</link>    <link linkend="ms-ole-summary-get-time">ms_ole_summary_get_time</link>         (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);
+<link linkend="MsOleSummaryPreview">MsOleSummaryPreview</link> <link linkend="ms-ole-summary-get-preview">ms_ole_summary_get_preview</link>
+                                            (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);
+void        <link linkend="ms-ole-summary-preview-destroy">ms_ole_summary_preview_destroy</link>  (<link linkend="MsOleSummaryPreview">MsOleSummaryPreview</link> d);
+void        <link linkend="ms-ole-summary-set-string">ms_ole_summary_set_string</link>       (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             const <link linkend="gchar">gchar</link> *str);
+void        <link linkend="ms-ole-summary-set-boolean">ms_ole_summary_set_boolean</link>      (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> bool);
+void        <link linkend="ms-ole-summary-set-short">ms_ole_summary_set_short</link>        (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="guint16">guint16</link> i);
+void        <link linkend="ms-ole-summary-set-long">ms_ole_summary_set_long</link>         (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="guint32">guint32</link> i);
+void        <link linkend="ms-ole-summary-set-time">ms_ole_summary_set_time</link>         (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="GTimeVal">GTimeVal</link> time);
+void        <link linkend="ms-ole-summary-set-preview">ms_ole_summary_set_preview</link>      (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="constMsOleSummaryPreview">constMsOleSummaryPreview</link> *preview);
+typedef     <link linkend="MsOleSummarySection">MsOleSummarySection</link>;
+enum        <link linkend="MsOlePropertySetID">MsOlePropertySetID</link>;
+enum        <link linkend="MsOleSummaryType">MsOleSummaryType</link>;
+#define     <link linkend="MS-OLE-SUMMARY-TYPE">MS_OLE_SUMMARY_TYPE</link>             (x)
+enum        <link linkend="MsOleSummaryPID">MsOleSummaryPID</link>;
+#define     <link linkend="MsOleSummaryAllSecurityFlagsEqNone">MsOleSummaryAllSecurityFlagsEqNone</link>
+#define     <link linkend="MsOleSummarySecurityPassworded">MsOleSummarySecurityPassworded</link>
+#define     <link linkend="MsOleSummarySecurityRORecommended">MsOleSummarySecurityRORecommended</link>
+#define     <link linkend="MsOleSummarySecurityRO">MsOleSummarySecurityRO</link>
+#define     <link linkend="MsOleSummarySecurityLockedForAnnotations">MsOleSummarySecurityLockedForAnnotations</link>
+typedef     <link linkend="MsOleSummaryTime">MsOleSummaryTime</link>;
+typedef     <link linkend="MsOleSummaryPreview">MsOleSummaryPreview</link>;
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="MsOleSummary">MsOleSummary</title>
+<programlisting>typedef struct {
+	guint8			class_id[16];
+	GArray *		sections;
+	GArray *		items;
+	GList *			write_items;
+	gboolean		read_mode;
+	MsOleStream *		s;
+	MsOlePropertySetID	ps_id;
+} MsOleSummary;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-open">ms_ole_summary_open ()</title>
+<programlisting><link linkend="MsOleSummary">MsOleSummary</link>* ms_ole_summary_open           (<link linkend="MsOle">MsOle</link> *f);</programlisting>
+<para>
+Opens the SummaryInformation stream, returns NULL on failure.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>f</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>NULL</literal> if unable to open summary stream or a pointer to the 
+SummaryInformation Stream.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-docsummary-open">ms_ole_docsummary_open ()</title>
+<programlisting><link linkend="MsOleSummary">MsOleSummary</link>* ms_ole_docsummary_open        (<link linkend="MsOle">MsOle</link> *f);</programlisting>
+<para>
+Opens the DocumentSummaryInformation stream, returns NULL on failure.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>f</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>NULL</literal> if unable to open summary stream or a pointer to the 
+DocumentSummaryInformation Stream.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-open-stream">ms_ole_summary_open_stream ()</title>
+<programlisting><link linkend="MsOleSummary">MsOleSummary</link>* ms_ole_summary_open_stream    (<link linkend="MsOleStream">MsOleStream</link> *stream,
+                                             const <link linkend="MsOlePropertySetID">MsOlePropertySetID</link> psid);</programlisting>
+<para>
+Opens <parameter>s</parameter> as a summary stream, returns NULL on failure.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>stream</parameter>&nbsp;:</entry>
+<entry> stream object
+</entry></row>
+<row><entry align="right"><parameter>psid</parameter>&nbsp;:</entry>
+<entry> Property Set ID, indicates which property set to open
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>NULL</literal> if unable to open summary stream or a pointer to the 
+Summary Stream.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-create">ms_ole_summary_create ()</title>
+<programlisting><link linkend="MsOleSummary">MsOleSummary</link>* ms_ole_summary_create         (<link linkend="MsOle">MsOle</link> *f);</programlisting>
+<para>
+Create a SummaryInformation stream, returns NULL on failure.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>f</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>NULL</literal> if unable to create the stream, otherwise a pointer to a
+new SummaryInformation stream.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-docsummary-create">ms_ole_docsummary_create ()</title>
+<programlisting><link linkend="MsOleSummary">MsOleSummary</link>* ms_ole_docsummary_create      (<link linkend="MsOle">MsOle</link> *f);</programlisting>
+<para>
+Create a DocumentSummaryInformation stream, returns NULL on failure.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>f</parameter>&nbsp;:</entry>
+<entry> filesystem object.
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>NULL</literal> if unable to create the stream, otherwise a pointer to a
+new DocumentSummaryInformation stream.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-create-stream">ms_ole_summary_create_stream ()</title>
+<programlisting><link linkend="MsOleSummary">MsOleSummary</link>* ms_ole_summary_create_stream  (<link linkend="MsOleStream">MsOleStream</link> *s,
+                                             const <link linkend="MsOlePropertySetID">MsOlePropertySetID</link> psid);</programlisting>
+<para>
+Creates <parameter>s</parameter> as a summary stream (<parameter>psid</parameter> determines which one), returns NULL on
+failure.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>s</parameter>&nbsp;:</entry>
+<entry> stream object
+</entry></row>
+<row><entry align="right"><parameter>psid</parameter>&nbsp;:</entry>
+<entry> Property Set ID, indicates which property set to open
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> <literal>NULL</literal> if unable to create stream, otherwise a pointer to a new
+summary stream.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-close">ms_ole_summary_close ()</title>
+<programlisting>void        ms_ole_summary_close            (<link linkend="MsOleSummary">MsOleSummary</link> *si);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-get-properties">ms_ole_summary_get_properties ()</title>
+<programlisting><link linkend="GArray">GArray</link>*     ms_ole_summary_get_properties   (<link linkend="MsOleSummary">MsOleSummary</link> *si);</programlisting>
+<para>
+Returns an array of MsOleSummaryPID.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> summary stream
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> an array of property ids in the current summary stream or 
+<literal>NULL</literal> if either the summary stream is non-existent or the summary stream
+contains no properties.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-get-string">ms_ole_summary_get_string ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      ms_ole_summary_get_string       (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);</programlisting>
+<para>
+FIXME
+Note: Ensure that you free returned value after use.</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>available</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-get-boolean">ms_ole_summary_get_boolean ()</title>
+<programlisting><link linkend="gboolean">gboolean</link>    ms_ole_summary_get_boolean      (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>available</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-get-short">ms_ole_summary_get_short ()</title>
+<programlisting><link linkend="guint16">guint16</link>     ms_ole_summary_get_short        (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>available</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-get-long">ms_ole_summary_get_long ()</title>
+<programlisting><link linkend="guint32">guint32</link>     ms_ole_summary_get_long         (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>available</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-get-time">ms_ole_summary_get_time ()</title>
+<programlisting><link linkend="GTimeVal">GTimeVal</link>    ms_ole_summary_get_time         (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>available</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-get-preview">ms_ole_summary_get_preview ()</title>
+<programlisting><link linkend="MsOleSummaryPreview">MsOleSummaryPreview</link> ms_ole_summary_get_preview
+                                            (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> *available);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>available</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-preview-destroy">ms_ole_summary_preview_destroy ()</title>
+<programlisting>void        ms_ole_summary_preview_destroy  (<link linkend="MsOleSummaryPreview">MsOleSummaryPreview</link> d);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>d</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-set-string">ms_ole_summary_set_string ()</title>
+<programlisting>void        ms_ole_summary_set_string       (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             const <link linkend="gchar">gchar</link> *str);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>str</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-set-boolean">ms_ole_summary_set_boolean ()</title>
+<programlisting>void        ms_ole_summary_set_boolean      (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="gboolean">gboolean</link> bool);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>bool</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-set-short">ms_ole_summary_set_short ()</title>
+<programlisting>void        ms_ole_summary_set_short        (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="guint16">guint16</link> i);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>i</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-set-long">ms_ole_summary_set_long ()</title>
+<programlisting>void        ms_ole_summary_set_long         (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="guint32">guint32</link> i);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>i</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-set-time">ms_ole_summary_set_time ()</title>
+<programlisting>void        ms_ole_summary_set_time         (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="GTimeVal">GTimeVal</link> time);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>time</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="ms-ole-summary-set-preview">ms_ole_summary_set_preview ()</title>
+<programlisting>void        ms_ole_summary_set_preview      (<link linkend="MsOleSummary">MsOleSummary</link> *si,
+                                             <link linkend="MsOleSummaryPID">MsOleSummaryPID</link> id,
+                                             <link linkend="constMsOleSummaryPreview">constMsOleSummaryPreview</link> *preview);</programlisting>
+<para>
+FIXME</para>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>si</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>id</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+<row><entry align="right"><parameter>preview</parameter>&nbsp;:</entry>
+<entry> FIXME
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummarySection">MsOleSummarySection</title>
+<programlisting>typedef struct {
+	guint32			offset;
+	guint32			props;
+	guint32			bytes;
+	MsOlePropertySetID	ps_id;
+} MsOleSummarySection;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOlePropertySetID">enum MsOlePropertySetID</title>
+<programlisting>typedef enum {
+	MS_OLE_PS_SUMMARY_INFO,
+	MS_OLE_PS_DOCUMENT_SUMMARY_INFO,
+	MS_OLE_PS_USER_DEFINED_SUMMARY_INFO
+} MsOlePropertySetID;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummaryType">enum MsOleSummaryType</title>
+<programlisting>typedef enum {
+	MS_OLE_SUMMARY_TYPE_STRING  = 0x10,
+	MS_OLE_SUMMARY_TYPE_TIME    = 0x20,
+	MS_OLE_SUMMARY_TYPE_LONG    = 0x30,
+	MS_OLE_SUMMARY_TYPE_SHORT   = 0x40,
+	MS_OLE_SUMMARY_TYPE_BOOLEAN = 0x50,
+	MS_OLE_SUMMARY_TYPE_OTHER   = 0x60
+} MsOleSummaryType;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MS-OLE-SUMMARY-TYPE">MS_OLE_SUMMARY_TYPE()</title>
+<programlisting>#define MS_OLE_SUMMARY_TYPE(x) ((MsOleSummaryType)((x)&gt;&gt;8))
+</programlisting>
+<para>
+
+</para><informaltable pgwide=1 frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>x</parameter>&nbsp;:</entry>
+<entry>
+
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummaryPID">enum MsOleSummaryPID</title>
+<programlisting>typedef enum {
+/* SummaryInformation Stream Properties */
+/* String properties */
+	MS_OLE_SUMMARY_TITLE          = 0x1002,
+	MS_OLE_SUMMARY_SUBJECT        = 0x1003,
+	MS_OLE_SUMMARY_AUTHOR         = 0x1004,
+	MS_OLE_SUMMARY_KEYWORDS       = 0x1005,
+	MS_OLE_SUMMARY_COMMENTS       = 0x1006,
+	MS_OLE_SUMMARY_TEMPLATE       = 0x1007,
+	MS_OLE_SUMMARY_LASTAUTHOR     = 0x1008,
+	MS_OLE_SUMMARY_REVNUMBER      = 0x1009,
+	MS_OLE_SUMMARY_APPNAME        = 0x1012,
+	
+/* Time properties */
+	MS_OLE_SUMMARY_TOTAL_EDITTIME = 0x200A,
+	MS_OLE_SUMMARY_LASTPRINTED    = 0x200B,
+	MS_OLE_SUMMARY_CREATED        = 0x200C,
+	MS_OLE_SUMMARY_LASTSAVED      = 0x200D,
+	
+/* Long integer properties */
+	MS_OLE_SUMMARY_PAGECOUNT      = 0x300E,
+	MS_OLE_SUMMARY_WORDCOUNT      = 0x300F,
+	MS_OLE_SUMMARY_CHARCOUNT      = 0x3010,
+	MS_OLE_SUMMARY_SECURITY       = 0x3013,
+
+/* Short integer properties */
+	MS_OLE_SUMMARY_CODEPAGE       = 0x4001,
+
+/* Security */	
+	MS_OLE_SUMMARY_THUMBNAIL      = 0x6011,
+
+
+/* DocumentSummaryInformation Properties */
+/* String properties */
+	MS_OLE_SUMMARY_CATEGORY	      = 0x1002,
+	MS_OLE_SUMMARY_PRESFORMAT     = 0x1003,
+	MS_OLE_SUMMARY_MANAGER        = 0x100E,
+	MS_OLE_SUMMARY_COMPANY        = 0x100F,
+
+/* Long integer properties */
+	MS_OLE_SUMMARY_BYTECOUNT      = 0x3004,
+	MS_OLE_SUMMARY_LINECOUNT      = 0x3005,
+	MS_OLE_SUMMARY_PARCOUNT       = 0x3006,
+	MS_OLE_SUMMARY_SLIDECOUNT     = 0x3007,
+	MS_OLE_SUMMARY_NOTECOUNT      = 0x3008,
+	MS_OLE_SUMMARY_HIDDENCOUNT    = 0x3009,
+	MS_OLE_SUMMARY_MMCLIPCOUNT    = 0X300A,
+
+/* Boolean properties */
+	MS_OLE_SUMMARY_SCALE          = 0x500B,
+	MS_OLE_SUMMARY_LINKSDIRTY     = 0x5010
+} MsOleSummaryPID;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummaryAllSecurityFlagsEqNone">MsOleSummaryAllSecurityFlagsEqNone</title>
+<programlisting>#define MsOleSummaryAllSecurityFlagsEqNone        0x00
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummarySecurityPassworded">MsOleSummarySecurityPassworded</title>
+<programlisting>#define MsOleSummarySecurityPassworded            0x01
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummarySecurityRORecommended">MsOleSummarySecurityRORecommended</title>
+<programlisting>#define MsOleSummarySecurityRORecommended         0x02
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummarySecurityRO">MsOleSummarySecurityRO</title>
+<programlisting>#define MsOleSummarySecurityRO                    0x04
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummarySecurityLockedForAnnotations">MsOleSummarySecurityLockedForAnnotations</title>
+<programlisting>#define MsOleSummarySecurityLockedForAnnotations  0x08
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummaryTime">MsOleSummaryTime</title>
+<programlisting>typedef struct {
+	GTimeVal time;
+	GDate    date;
+} MsOleSummaryTime;
+</programlisting>
+<para>
+
+</para></refsect2>
+<refsect2>
+<title><anchor id="MsOleSummaryPreview">MsOleSummaryPreview</title>
+<programlisting>typedef struct {
+	guint32 len;
+	guint8 *data;
+} MsOleSummaryPreview;
+</programlisting>
+<para>
+
+</para></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

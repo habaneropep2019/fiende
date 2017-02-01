@@ -1,0 +1,44 @@
+# This program test whether the tape contains a correct equation in the form
+# |||| + ||| = |||||||
+# the program stops at the side where more | are or at the = sign if the
+# equation is correct.
+0 | | r 1	replace + with I and test syntax for ||* + ||* = |*
+0 + + r 99
+0 = = r 99
+0 _ _ r 99
+1 | | r 1
+1 + | r 2
+1 = = r 99
+1 _ _ r 99
+2 | | r 3
+2 + + r 99
+2 = = r 99
+2 _ _ r 99
+3 | | r 3
+3 + + r 99
+3 = = r 4
+3 _ _ r 99
+4 | | r 4
+4 + + r 99
+4 = = r 99
+4 _ _ l 5	end syntax test for ||* + ||* = |*
+5 | | l 5	go left to beginning of tape
+5 + + r 99
+5 = = l 5
+5 _ _ r 6
+6 | _ r 7	delete leftmost |
+6 + + r 99
+6 = = r 99
+6 _ _ r 99
+7 | | r 7	go right, to end of tape
+7 + + r 99
+7 = = r 7
+7 _ _ l 8
+8 | _ l 5	delete rightmost |
+8 + + r 99
+8 = = l 9
+8 _ _ r 99
+9 | | l 99
+9 + + l 99
+9 = = l 99
+9 _ _ r 10	accept only if there are no blanks left to the left of =

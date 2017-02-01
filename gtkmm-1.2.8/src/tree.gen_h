@@ -1,0 +1,221 @@
+/* $Id: tree.gen_h,v 1.62 2001/07/15 13:33:39 murrayc Exp $ */
+
+/* tree.h
+ * 
+ * Copyright (C) 1998-1999 The Gtk-- Development Team 
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the Free
+ * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#include <gtk--/treeitem.h>
+#include <gtk--/container.h>
+#include <gtk/gtktree.h>
+CLASS_START(Gtk);
+
+namespace Tree_Helpers
+{
+#m4 include(list.m4)
+  GP_LIST(ItemList,Tree,TreeItem)
+  GP_LIST_ELEM(TreeItem)
+  GP_LIST_CONTAINER_REMOVE()
+  GP_LIST_ITER(G_List_Cpp_Iterator<GtkTreeItem,TreeItem>)
+  GP_LIST_END()
+
+  GP_LIST(SelectionList,Tree,TreeItem,selection)
+  GP_LIST_READONLY()
+  GP_LIST_ELEM(TreeItem)
+  GP_LIST_ITER(G_List_Cpp_Iterator<GtkTreeItem,TreeItem>)
+  GP_LIST_END()
+
+};
+
+//: A treelist widget.
+//- The {\class Gtk::Tree} widget is a container that shows users a list of items,
+//- in a tree format complete with branches and leafnodes. Branches can be expanded
+//- to show their child items, or collapsed to hide them.
+class Tree : public Container {
+  WRAP_CLASS(Tree,GtkTree,GTK_TREE,GTK_IS_TREE,tree,Gtk::Container,GtkContainer,GTK_CONTAINER);
+public:
+  typedef Tree_Helpers::ItemList ItemList; 
+  typedef Tree_Helpers::SelectionList SelectionList; 
+
+  WRAP_CTOR_DEFAULT;
+  WRAP_CTOR_CAST;
+  WRAP_DTOR;
+
+  //: deprecated - use get_tree().push_back(w);
+  WRAP_METHOD(void gtk_tree_append(GtkTree*,GtkWidget*),
+  void append (Gtk::TreeItem &widget));
+
+  //: deprecated - use get_tree().push_front(w);
+  WRAP_METHOD(void gtk_tree_prepend(GtkTree*,GtkWidget*),
+  void prepend(Gtk::TreeItem &widget));
+
+  //: deprecated - use get_tree().insert(loc,w);
+  WRAP_METHOD(void gtk_tree_insert(GtkTree*,GtkWidget*,gint),
+  void insert (Gtk::TreeItem &widget, gint position));
+
+  //: deprecated - use get_tree().erase(start,end);
+  WRAP_METHOD(void gtk_tree_clear_items(GtkTree*, gint, gint),
+	      void clear_items(gint start, gint end));
+
+  //: select item by number.
+  //- equivelent to get_tree()[itemnum]->select(); 
+  WRAP_METHOD(void gtk_tree_select_item(GtkTree*, gint),
+	      void select_item  (gint item));
+
+  //: equivelent to get_tree()[itemnum]->unselect(); 
+  WRAP_METHOD(void gtk_tree_unselect_item(GtkTree*, gint),
+	      void unselect_item(gint item));
+ 
+  // removes a list of items from the tree.  
+  // (no STL equivelent) The iterator must 
+  // be to Gtk_TreeItem* and be forward iteratable.
+  template <class iterator>
+  void remove_items(iterator start,iterator stop);
+
+  //: deprecated use get_tree().remove(w);
+  WRAP_METHOD(void gtk_tree_remove_item(GtkTree*,GtkWidget*),
+  void remove_item(Gtk::TreeItem &child));
+ 
+#m4 GTKMM_CHECK(g_return_if_fail(p1!=0);) 
+  SIGNAL_SPEC("select_child",both,void select_child(Gtk::Widget&),
+              void gtk_tree_select_child(GtkTree*,GtkWidget*));
+
+#m4 GTKMM_CHECK(g_return_if_fail(p1!=0);) 
+  SIGNAL_SPEC("unselect_child",both,void unselect_child(Gtk::Widget&),
+              void gtk_tree_unselect_child(GtkTree*,GtkWidget*));
+
+  // get the index of a tree item.  (no STL equiv)
+  WRAP_METHOD(gint gtk_tree_child_position(GtkTree*,GtkWidget*),
+  gint child_position(Gtk::TreeItem &child) const);
+
+  WRAP_METHOD(void gtk_tree_set_selection_mode(GtkTree*, GtkSelectionMode),
+	      void set_selection_mode(GtkSelectionMode mode));
+
+  WRAP_METHOD(void gtk_tree_set_view_mode(GtkTree*, GtkTreeViewMode),
+	      void set_view_mode(GtkTreeViewMode mode));
+
+  WRAP_METHOD(void gtk_tree_set_view_lines(GtkTree*, bool),
+	      void set_view_lines(bool flag));
+ 
+  // indicates there has been a change in the selection list. 
+  SIGNAL_SPEC("selection_changed",both,void selection_changed());
+
+  WRAP_MEMBER(value,level,level,guint,guint);
+
+  ItemList& tree()             
+    {return reinterpret_cast<ItemList&>(tree_self); }
+  const ItemList& tree() const 
+    {return reinterpret_cast<const ItemList&>(tree_self); }
+
+  SelectionList& selection()             
+    {return reinterpret_cast<SelectionList&>(tree_self); }
+  const SelectionList& selection() const 
+    {return reinterpret_cast<const SelectionList&>(tree_self); }
+};
+
+template <class iterator>
+void Tree::remove_items(iterator start, iterator stop)
+  {
+    GList* items=gtkmm_build_glist(start,stop);
+    if (items) gtk_tree_remove_items(gtkobj(),items);
+    g_list_free(items);
+  } 
+
+PRIVATE_START;
+#include <gtk--/private/container_p.h>
+IMPL_START;
+#include <gtk--/treeitem.h>
+namespace Gtk
+{
+
+Tree_Helpers::ItemList::iterator 
+Tree_Helpers::ItemList::insert(iterator pos, TreeItem& e)
+  {
+   if (pos==begin()) 
+     parent_->prepend(e);
+   else if (pos==end()) 
+     parent_->append(e);
+   else
+     parent_->insert(e,parent_->child_position(**pos));
+   return --pos;
+  };
+
+}
+
+DOCUMENTATION_START;
+
+//+ PROPERTIES(Gtk_Tree)
+//. name: children
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: root_tree
+//. type: GtkTree*
+//. get:
+//. set:
+//. desc: owner of selection list 
+
+//. name: tree_owner
+//. type: Gtk_Widget*
+//. get:
+//. set:
+//. desc:
+
+//. name: selection
+//. type: GList*
+//. get:
+//. set:
+//. desc:
+
+//. name: level
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: indent_value
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: current_indent
+//. type: guint
+//. get:
+//. set:
+//. desc:
+
+//. name: selection_mode
+//. type: guint:2
+//. get:
+//. set:
+//. desc:
+
+//. name: view_mode
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+
+//. name: view_line
+//. type: guint:1
+//. get:
+//. set:
+//. desc:
+

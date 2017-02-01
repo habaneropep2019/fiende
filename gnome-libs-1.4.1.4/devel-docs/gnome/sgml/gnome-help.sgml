@@ -1,0 +1,230 @@
+<refentry id="gnome-gnome-help">
+<refmeta>
+<refentrytitle>gnome-help</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>GNOME Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>gnome-help</refname><refpurpose>Routines for displaying help</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+
+#include &lt;gnome.h&gt;
+
+
+struct      <link linkend="GnomeHelpMenuEntry">GnomeHelpMenuEntry</link>;
+<link linkend="gchar">gchar</link>*      <link linkend="gnome-help-file-find-file">gnome_help_file_find_file</link>       (<link linkend="gchar">gchar</link> *app,
+                                             <link linkend="gchar">gchar</link> *path);
+<link linkend="gchar">gchar</link>*      <link linkend="gnome-help-file-path">gnome_help_file_path</link>            (<link linkend="gchar">gchar</link> *app,
+                                             <link linkend="gchar">gchar</link> *path);
+void        <link linkend="gnome-help-display">gnome_help_display</link>              (void *ignore,
+                                             <link linkend="GnomeHelpMenuEntry">GnomeHelpMenuEntry</link> *ref);
+void        <link linkend="gnome-help-goto">gnome_help_goto</link>                 (void *ignore,
+                                             <link linkend="gchar">gchar</link> *file);
+void        <link linkend="gnome-help-pbox-display">gnome_help_pbox_display</link>         (void *ignore,
+                                             <link linkend="gint">gint</link> page_num,
+                                             <link linkend="GnomeHelpMenuEntry">GnomeHelpMenuEntry</link> *ref);
+void        <link linkend="gnome-help-pbox-goto">gnome_help_pbox_goto</link>            (void *ignore,
+                                             int ignore2,
+                                             <link linkend="GnomeHelpMenuEntry">GnomeHelpMenuEntry</link> *ref);
+</synopsis>
+</refsynopsisdiv>
+
+
+
+
+
+<refsect1>
+<title>Description</title>
+<para>
+These routines provide simple wrappers for invoking the help system in
+GNOME.  They will take care of invoking the help browser with the help
+file you provide.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Details</title>
+<refsect2>
+<title><anchor id="GnomeHelpMenuEntry">struct GnomeHelpMenuEntry</title>
+<programlisting>typedef struct {
+    gchar *name;
+    gchar *path;
+} GnomeHelpMenuEntry;
+</programlisting>
+<para>
+This structure describes where to get the help from.  The <parameter>name</parameter> field
+is used to specify the name of the application (this is used to pull the
+help files from the help directory where the files were installed).
+The <parameter>path</parameter> parameter is the name relative to the package's help
+directory. </para>
+
+<para>For example, the Gnumeric spreadsheet uses the structure like
+this:</para>
+
+<programlisting>
+static GnomeHelpMenuEntry help_ref = { "gnumeric", "formatting.html" };
+</programlisting>
+
+<para>
+This identifies the application and the filename that is
+displayed</para></refsect2>
+<refsect2>
+<title><anchor id="gnome-help-file-find-file">gnome_help_file_find_file ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      gnome_help_file_find_file       (<link linkend="gchar">gchar</link> *app,
+                                             <link linkend="gchar">gchar</link> *path);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Name of this application
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> File that contains the help document
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a fully resolved file name for path.  Use needs to g_free the path when
+done.  It looks in LANG, then unser C if LANG is not set
+
+I added this because I didnt want to break all apps using 
+<link linkend="gnome-help-file-path">gnome_help_file_path</link>() currently. We need a good solution (if this isnt it)
+to handle case where locale file didnt exist
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-help-file-path">gnome_help_file_path ()</title>
+<programlisting><link linkend="gchar">gchar</link>*      gnome_help_file_path            (<link linkend="gchar">gchar</link> *app,
+                                             <link linkend="gchar">gchar</link> *path);</programlisting>
+<para>
+</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>app</parameter>&nbsp;:</entry>
+<entry> Name of this application
+</entry></row>
+<row><entry align="right"><parameter>path</parameter>&nbsp;:</entry>
+<entry> File that contains the help document
+</entry></row>
+<row><entry align="right"><emphasis>Returns</emphasis> :</entry><entry>a fully resolved file name for path.  Use needs to g_free the path when
+done.  It looks in LANG, then unser C if LANG is not set
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-help-display">gnome_help_display ()</title>
+<programlisting>void        gnome_help_display              (void *ignore,
+                                             <link linkend="GnomeHelpMenuEntry">GnomeHelpMenuEntry</link> *ref);</programlisting>
+<para>
+Cause a help viewer to display help entry defined in <parameter>ref</parameter>.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>ignore</parameter>&nbsp;:</entry>
+<entry> value of this is ignored.  To simplify hooking into clicked
+signals
+</entry></row>
+<row><entry align="right"><parameter>ref</parameter>&nbsp;:</entry>
+<entry> A GnomeHelpMenuEntry.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-help-goto">gnome_help_goto ()</title>
+<programlisting>void        gnome_help_goto                 (void *ignore,
+                                             <link linkend="gchar">gchar</link> *file);</programlisting>
+<para>
+Cause a help viewer to display file.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>ignore</parameter>&nbsp;:</entry>
+<entry> ignored.
+</entry></row>
+<row><entry align="right"><parameter>file</parameter>&nbsp;:</entry>
+<entry> file to display in the help browser.
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-help-pbox-display">gnome_help_pbox_display ()</title>
+<programlisting>void        gnome_help_pbox_display         (void *ignore,
+                                             <link linkend="gint">gint</link> page_num,
+                                             <link linkend="GnomeHelpMenuEntry">GnomeHelpMenuEntry</link> *ref);</programlisting>
+<para>
+Cause a help viewer to display the help entry defined in ref.  This
+function is meant to be connected to the "help" signal of a
+GnomePropertyBox.  If ref is { "my-app", "properties-blah" }, and
+the current page number is 3, then the help viewer will display
+my-app/lang/properties-blah-3.html, which can be symlinked to the
+appropriate file.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>ignore</parameter>&nbsp;:</entry>
+<entry> ignored.
+</entry></row>
+<row><entry align="right"><parameter>page_num</parameter>&nbsp;:</entry>
+<entry> The number of the current notebook page in the
+properties box.
+</entry></row>
+<row><entry align="right"><parameter>ref</parameter>&nbsp;:</entry>
+<entry> A GnomeHelpMenuEntry
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+<refsect2>
+<title><anchor id="gnome-help-pbox-goto">gnome_help_pbox_goto ()</title>
+<programlisting>void        gnome_help_pbox_goto            (void *ignore,
+                                             int ignore2,
+                                             <link linkend="GnomeHelpMenuEntry">GnomeHelpMenuEntry</link> *ref);</programlisting>
+<para>
+Cause a help viewer to display the help entry defined in <parameter>ref</parameter>.  This
+function is meant to be connected to the help button of a
+GnomePropertyBox, when you don't want any munging of the help path
+done.  Most of the time, you can use gnome_help_pbox_display,
+though.</para>
+<para>
+
+</para><informaltable pgwide="1" frame="none" role="params">
+<tgroup cols="2">
+<colspec colwidth="2*">
+<colspec colwidth="8*">
+<tbody>
+<row><entry align="right"><parameter>ignore</parameter>&nbsp;:</entry>
+<entry> ignored.
+</entry></row>
+<row><entry align="right"><parameter>ignore2</parameter>&nbsp;:</entry>
+<entry> also ignored.
+</entry></row>
+<row><entry align="right"><parameter>ref</parameter>&nbsp;:</entry>
+<entry> A GnomeHelpMenuEntry
+</entry></row>
+</tbody></tgroup></informaltable></refsect2>
+
+</refsect1>
+
+
+
+
+</refentry>

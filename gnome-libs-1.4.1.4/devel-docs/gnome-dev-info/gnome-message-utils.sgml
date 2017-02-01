@@ -1,0 +1,898 @@
+  <!-- Chapter Author: Havoc Pennington, hp@pobox.com -->
+
+  <sect1 id="introduction">
+
+    <title>Introduction</title>
+
+    <para>
+      Gnome strives to provide the user with a maximum level of
+      configurability, and the programmer with a maximum level of
+      convenience. Happily, these two goals tend to go hand in hand:
+      fewer decisions for the programmer means more decisions for the
+      user.
+    </para>
+
+    <para>
+      This section describes Gnome's facilities for communicating
+      simple messages or questions to the user, and retrieving a
+      response. The main widgets involved are <type>GnomeDialog</type>
+      and <type>GnomeAppBar</type> (a statusbar, but that name was
+      taken). Gnome also provides convenience functions which give the
+      user greater choice as a side effect. For example, if you call
+      <function>gnome_app_message()</function> instead of creating a
+      dialog directly, the user can request that messages appear in
+      the app bar instead.
+    </para>
+
+    <para>
+      Some functionality is missing, and some of the API is
+      suboptimal. Hopefully this will be fixed eventually. In
+      particular:
+    </para>
+
+    <itemizedlist>
+      <listitem>
+	<para>
+	  <type>GnomeAppBar</type> does not work in interactive mode,
+	  so all questions must be asked via dialog. Full
+	  Emacs-minibuffer-style functionality needs to be added.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  <type>GnomeAppBar</type> should use
+	  <type>GnomePreferencesType</type> for its has_progress
+	  parameter, and not use a progress bar if the user wants
+	  progress dialogs instead.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  Nonstandard function pointer callbacks are a poor substitute
+	  for Gtk signals and unpleasant in non-C bindings.  One
+	  possible solution is to create a <type>GtkObject</type> to
+	  represent the user interaction, complete with
+	  signals. <type>GnomeQuestion</type>, for example, with a
+	  "answered" and "cancelled" signal. More complex, but more
+	  flexible.
+	</para>
+      </listitem>
+
+      <listitem>
+	<para>
+	  It is all sort of clunky feeling. Perhaps convenience
+	  functions are inherently inelegant?
+	</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>
+      Patches and suggestions are always welcome. Please think about
+      how the API could be improved as you read this and use the
+      facilities, then send along your thoughts.
+    </para>
+
+  </sect1>
+
+  <sect1 id="GnomeAppBar">
+
+    <title>Using <type>GnomeAppBar</type> directly</title>
+
+    <sect2> <title>Creating an AppBar</title>
+      <funcsynopsis><funcdef>GtkWidget *<function>gnome_appbar_new</function>
+	</funcdef>
+	<paramdef>
+	  gboolean <parameter>has_progress</parameter>
+	</paramdef>
+	<paramdef>
+	  gboolean <parameter>has_status</parameter>
+	</paramdef>
+	<paramdef>
+	  GnomePreferencesType <parameter>interactivity</parameter>
+	</paramdef>
+      </funcsynopsis>
+      
+      <para>
+	<type>GnomeAppBar</type> is a progress bar on the left, and a
+	statusbar/minibuffer on the right. It can optionally be only a
+	progress bar (dumb, but you can do it), or only a
+	statusbar/minibuffer (if you have no progress to display).
+      </para>
+      
+      <para>
+	The statusbar/minibuffer can be an interactive prompt a
+	la Emacs or just a status display. (Eventually, anyway. For now
+	interactive mode is broken.) This is specified with the
+	<parameter>interactivity</parameter> parameter, which can have
+	three values: <symbol>GNOME_PREFERENCES_NEVER</symbol>,
+	<symbol>GNOME_PREFERENCES_USER</symbol>, or
+	<symbol>GNOME_PREFERENCES_ALWAYS</symbol>. If you specify
+	<symbol>_NEVER</symbol> or <symbol>_ALWAYS</symbol>, then
+	interactivity will be prohibited or forced. Otherwise, a user
+	setting provided by Gnome will determine interactivity.
+      </para> 
+      
+    </sect2>
+    <sect2> <title>Using a <type>GnomeAppBar</type> to display status</title>
+      <para>
+	The appbar displays one message at a time. There are three kinds
+	of messages: transient status messages, messages on the stack,
+	and the default message. 
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      Transient messages are displayed, overriding any other
+	      messages, but the appbar retains no knowledge of them;
+	      so they disappear forever as soon as the appbar is
+	      refreshed. <function>gnome_appbar_set_status()</function>
+	      creates a transient message.
+	    </para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      If no transient message has overwritten it, the top
+	      message on the stack is always displayed.
+	      <function>gnome_appbar_push()</function>,
+	      <function>gnome_appbar_pop()</function>, and
+	      <function>gnome_appbar_clear_stack()</function>
+	      manipulate the stack.
+	    </para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+	      If the stack is empty, the appbar displays the default
+	      message (which can be the empty string). The default
+	      message is set with
+	      <function>gnome_appbar_set_default()</function>.
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+
+      <para>
+	It is possible and even encouraged to use only one of the
+	three kinds of message. You can make the appbar as simple or
+	as complicated as you like; with only
+	<function>gnome_appbar_set_status()</function>, it's basically
+	just a <type>GtkLabel</type>.
+      </para>
+      
+      <funcsynopsis><funcdef>void <function>gnome_appbar_set_status</function>
+	</funcdef>
+	<paramdef>
+	  GnomeAppBar *<parameter>appbar</parameter>
+	</paramdef>
+	<paramdef>
+	  const gchar *<parameter>status</parameter>
+	</paramdef>
+      </funcsynopsis>
+
+      <para>
+	Often you want to pop up a message that isn't very important,
+	and you don't want to worry about removing it
+	later. <function>gnome_appbar_set_status()</function> does this
+	for you. It sets the message in the appbar until the next
+	time the appbar is changed.
+      </para>
+      <para>
+	If you want, you can use the appbar with only this
+	function. For simple applications it can be a nice approach.
+      </para>
+
+      <funcsynopsis><funcdef>void <function>gnome_appbar_set_default</function>
+	</funcdef>
+	<paramdef>
+	  GnomeAppBar *<parameter>appbar</parameter>
+	</paramdef>
+	<paramdef>
+	  const gchar *<parameter>default_status</parameter>
+	</paramdef>
+      </funcsynopsis>
+
+      <para>
+	When there's no special status to display, the appbar is
+	normally empty. However, if you prefer you can set a default
+	message; this is a message that can never be removed from the
+	message stack. To return to an empty appbar, set the default
+	to an empty string.
+      </para>
+
+      <funcsynopsis><funcdef>void <function>gnome_appbar_push</function>
+	</funcdef>
+	<paramdef>
+	  GnomeAppBar *<parameter>appbar</parameter>
+	</paramdef>
+	<paramdef>
+	  const gchar *<parameter>status</parameter>
+	</paramdef>
+      </funcsynopsis>
+
+      <funcsynopsis><funcdef>void <function>gnome_appbar_pop</function>
+	</funcdef>
+	<paramdef>
+	  GnomeAppBar *<parameter>appbar</parameter>
+	</paramdef>
+      </funcsynopsis>
+
+      <funcsynopsis><funcdef>void <function>gnome_appbar_clear_stack</function>
+	</funcdef>
+	<paramdef>
+	  GnomeAppBar *<parameter>appbar</parameter>
+	</paramdef>
+      </funcsynopsis>
+      
+      <para>
+	<type>GnomeAppBar</type> maintains a stack of messages; it
+	always displays the top message on the stack. (There's one
+	exception: <function>gnome_appbar_set_status()</function>
+	overrides the current top message temporarily.)
+      </para>
+
+      <funcsynopsis><funcdef>void <function>gnome_appbar_refresh</function>
+	</funcdef>
+	<paramdef>
+	  GnomeAppBar *<parameter>appbar</parameter>
+	</paramdef>
+      </funcsynopsis>
+      
+      <para>
+	<function>gnome_appbar_refresh()</function> updates the appbar
+	to reflect the current saved state. Basically this means any
+	transient messages (created with
+	<function>gnome_appbar_set_status()</function>) will
+	disappear, to be replaced by the top of the stack or the
+	default message.
+      </para>
+      </sect2>
+    <sect2> <title>Using an AppBar to query the user</title>
+      <para>
+	This doesn't work so well, so it's not documented. Basically
+	you can put up a prompt, and get a signal if the user enters a
+	response or cancels. It's useful to avoid a dialog if you just
+	want to get a string or the like. But someone needs to write
+	the proper widget, perhaps based on <type>GtkEntry</type>.
+      </para>
+
+    </sect2>
+
+  </sect1>
+
+  <sect1 id="gnome-app-util">
+    <title>The abstract message utility functions</title>
+
+    <para>
+      Gnome provides utility functions for relaying simple messages to
+      the user and asking simple questions. The utility functions
+      serve two purposes: first, they keep programmers from writing
+      dozens of identical dialogs; second, they let the user choose
+      whether messages should appear in dialogs or on the appbar. The
+      main set of utility functions assume that your app uses the
+      <type>GnomeApp</type> widget, and that one is visible at the
+      time they're called. These functions have a dialog backend and
+      an appbar backend. The dialog backend is exposed, so you can use
+      it directly if you have no GnomeApp widget available.  The
+      <type>GnomeApp</type> functions do <emphasis>not</emphasis>
+      assume you have an appbar available; you should use them even if
+      your app has no appbar. In some cases it makes a difference (for
+      example, dialog can be positioned relative to the
+      <type>GnomeApp</type>).
+    </para>
+    </sect1>
+  <sect1> <title>Utility functions if a <type>GnomeApp</type> is available</title>
+    <para>
+      When these functions return a <type>GtkWidget*</type>, they are
+      returning the created dialog, if any. If no dialog is created
+      they return NULL. In general this is useless, but in special
+      circumstances you might care. You should
+      <emphasis>never</emphasis> modify the settings on the returned
+      dialog, such as how it's destroyed, where it's positioned, etc.;
+      you could confuse the library internals and/or override user
+      preferences.
+    </para>
+    <funcsynopsis><funcdef>GtkWidget *<function>gnome_app_message</function>
+      </funcdef>
+      <paramdef>
+	GnomeApp *<parameter>app</parameter>
+      </paramdef>
+      <paramdef>
+	const gchar *<parameter>message</parameter>
+      </paramdef>
+    </funcsynopsis>
+    
+    <para>
+      <function>gnome_app_message()</function> shows a simple message
+      of moderate importance. It will come in a dialog with an OK
+      button, or on the appbar; it will require the user to
+      acknowledge it somehow before it goes away.
+    </para>
+    
+    <funcsynopsis><funcdef>GtkWidget *<function>gnome_app_flash</function>
+      </funcdef>
+      <paramdef>
+	GnomeApp *<parameter>app</parameter>
+      </paramdef>
+      <paramdef>
+	const gchar *<parameter>flash</parameter>
+      </paramdef>
+    </funcsynopsis>
+    
+    <para>
+      This is used for trivial messages that aren't very important; an
+      example might be the little Netscape messages telling which URL
+      is currently being fetched. If the user never sees these
+      messages, it's not a problem; in fact,
+      <function>gnome_app_flash()</function> is not guaranteed to show
+      the user the message (for example, if dialogs are turned off and
+      the <type>GnomeApp</type> has no appbar).
+    </para>
+    
+    <funcsynopsis><funcdef>GtkWidget *<function>gnome_app_error</function>
+      </funcdef>
+      <paramdef>
+	GnomeApp *<parameter>app</parameter>
+      </paramdef>
+      <paramdef>
+	const gchar *<parameter>error</parameter>
+      </paramdef>
+    </funcsynopsis>
+    <para>
+      An important error, issued if an operation fails entirely or
+      there's a major problem. This may do something obnoxious like
+      beep, and will probably require user acknowledgement.
+    </para>
+
+    <funcsynopsis><funcdef>GtkWidget *<function>gnome_app_warning</function>
+      </funcdef>
+      <paramdef>
+	GnomeApp *<parameter>app</parameter>
+      </paramdef>
+      <paramdef>
+	const gchar *<parameter>warning</parameter>
+      </paramdef>
+    </funcsynopsis>
+    <para>
+      Just a warning; not as important as an error, but not as trivial
+      as a flash.
+    </para>
+
+    <funcsynopsis><funcdef>GtkWidget *<function>gnome_app_question</function>
+      </funcdef>
+      <paramdef>
+	GnomeApp *<parameter>app</parameter>
+      </paramdef>
+      <paramdef>
+	const gchar *<parameter>question</parameter>
+      </paramdef>
+      <paramdef>
+	GnomeReplyCallback <parameter>callback</parameter>
+      </paramdef>
+      <paramdef>
+	gpointer <parameter>data</parameter>
+      </paramdef>
+    </funcsynopsis>
+
+    <para>
+      Ask the yes or no question <parameter>question</parameter>, and
+      call <parameter>callback</parameter> to indicate a response or
+      if the user cancels (deleting the dialog or with control-G from
+      the eventual minibuffer widget).
+    </para>
+
+    <para>
+      <type>GnomeReplyCallback</type> is a typedef:
+      <programlisting>
+	typedef void (* GnomeReplyCallback)(gint reply, gpointer data);
+      </programlisting>
+      
+      The first argument received in the callback is a number
+      representing the user's reply. It will be either
+      <symbol>GNOME_YES</symbol> or <symbol>GNOME_NO</symbol>.  The
+      callback also receives a <symbol>data</symbol> argument, the
+      same one you passed in to
+      <function>gnome_app_question()</function>.
+
+    </para>
+
+    <para>
+      Keep in mind that the callback is <emphasis>not</emphasis>
+      guaranteed to be called. If the user declines to answer the
+      question --- say, by destroying the dialog via the window
+      manager --- the callback is ignored. This is an area for API
+      improvement; it probably makes sense to call the callback with
+      reply <symbol>GNOME_USER_CANCELLED</symbol> or something like
+      that. However, this feature is <emphasis>not</emphasis>
+      implemented yet, so don't assume your callback is going to
+      happen.
+    </para>
+    
+
+    <funcsynopsis><funcdef>GtkWidget *<function>gnome_app_question_modal</function>
+      </funcdef>
+      <paramdef>
+	GnomeApp *<parameter>app</parameter>
+      </paramdef>
+      <paramdef>
+	const gchar *<parameter>question</parameter>
+      </paramdef>
+      <paramdef>
+	GnomeReplyCallback <parameter>callback</parameter>
+      </paramdef>
+      <paramdef>
+	gpointer <parameter>data</parameter>
+      </paramdef>
+    </funcsynopsis>
+
+    <para>
+      This function is just the same as
+      <function>gnome_app_question()</function>, but it creates a
+      modal dialog or appbar prompt, so the user will be unable to
+      interact with other parts of the application until the dialog is
+      dealt with (either the question is answered, or the user cancels
+      by closing the dialog/control-G from the appbar). It's a
+      weakness waiting to be fixed that the modal question handles
+      cancels poorly. (see also comments in the intro on possibly
+      using a <type>GtkObject</type> here.)
+    </para>
+
+
+    <funcsynopsis><funcdef>GtkWidget *<function>gnome_app_ok_cancel</function>
+      </funcdef>
+      <paramdef>
+	GnomeApp *<parameter>app</parameter>
+      </paramdef>
+      <paramdef>
+	const gchar *<parameter>message</parameter>
+      </paramdef>
+      <paramdef>
+	GnomeReplyCallback <parameter>callback</parameter>
+      </paramdef>
+      <paramdef>
+	gpointer <parameter>data</parameter>
+      </paramdef>
+    </funcsynopsis>
+
+    <funcsynopsis><funcdef>GtkWidget *<function>gnome_app_ok_cancel_modal</function>
+      </funcdef>
+      <paramdef>
+	GnomeApp *<parameter>app</parameter>
+      </paramdef>
+      <paramdef>
+	const gchar *<parameter>message</parameter>
+      </paramdef>
+      <paramdef>
+	GnomeReplyCallback <parameter>callback</parameter>
+      </paramdef>
+      <paramdef>
+	gpointer <parameter>data</parameter>
+      </paramdef>
+    </funcsynopsis>
+
+    
+    <para>
+      These two functions exactly parallel the
+      <function>gnome_app_question()</function> functions, only they
+      ask the user for OK/Cancel instead of Yes/No, and the callback
+      receives <symbol>GNOME_OK</symbol> or
+      <symbol>GNOME_CANCEL</symbol>.
+    </para>
+
+    <para>
+      FIXME rest of the gnome-app-util functions.
+    </para>
+
+    </sect1>
+
+  <sect1 id="gnome-dialog"> <title>Using <type>GnomeDialog</type> directly</title>
+
+    <para>
+      <type>GnomeDialog</type> provides a common look and feel for all
+      Gnome dialogs. It allows the user to control the look and feel
+      to some extent; and it lets the programmer get look and feel
+      issues right with a minimum of effort. <type>GnomeDialog</type>
+      is meant to have reasonable defaults; it is not a blank slate
+      like <type>GtkDialog</type>.
+    </para>
+
+    <para>
+      A <type>GnomeDialog</type> is a window that pops up and is
+      fairly rapidly dismissed; the GIMP Layers Dialog, for example, is
+      not a dialog in this sense. There is no Gnome standard widget for
+      persistent dialogs at this time.
+    </para>
+      
+    <para>
+      <type>GnomeDialog</type> has a large number of functions, but
+      almost all of them are special-purpose and rarely used. In
+      practice you need only a few. 
+    </para>
+
+    <sect2> <title> Creating a dialog </title>
+      <para>
+	Here's a basic usage example, showing a callback and dialog
+	creation:
+	
+	<programlisting>
+            void dialog_clicked_cb(GnomeDialog * dialog, gint button_number, 
+                                    gpointer data)
+            {
+              switch (button_number) {
+                case 0: /* OK button */
+          	  g_print(_("OK was clicked.\n"));
+                  break;
+                case 1: /* "My Button Name" */
+	          g_print(_("My Button Name was clicked.\n"));
+                  break;
+                case 2: /* Cancel Button */
+	          g_print(_("Cancel clicked\n"));
+                  break;
+	        default:
+                  g_assert_not_reached();
+              };
+              gnome_dialog_close(dialog);
+            }
+	</programlisting>
+	<programlisting>
+	    GtkWidget * label;
+            GtkWidget * dialog;
+
+	    label  = gtk_label_new(_("Dialog contents"));
+
+            dialog = gnome_dialog_new(_("My Title"), GNOME_STOCK_BUTTON_OK,
+                                      _("My Button Name"), 
+	                              GNOME_STOCK_BUTTON_CANCEL, 
+                                      NULL); 
+                 
+	    gtk_box_pack_start(GNOME_DIALOG(dialog)->vbox,
+                               label, TRUE, TRUE, GNOME_PAD);
+
+	    gtk_signal_connect(GTK_OBJECT(dialog), "clicked",
+                               GTK_SIGNAL_FUNC(dialog_clicked_cb),
+                               NULL);
+
+            gtk_widget_show(dialog);
+	</programlisting>
+      </para>
+      
+      <para>
+	This example creates a dialog with a label inside it; the dialog
+	has three buttons: a stock OK button, a custom "My Button Name"
+	button, and a stock Cancel button. The list of button arguments is
+	NULL-terminated. The dialog is titled "My Title." Notice the _()
+	macro, which translates the strings into the user's native language.
+      </para>
+    
+      <para>
+	The buttons you create are numbered in order starting from 0;
+	the clicked callback receives this number. In the callback (or
+	wherever it makes sense in your program), you should close the
+	dialog with <function>gnome_dialog_close()</function>, if you
+	want the dialog to go away.
+      </para>
+
+      <para>
+	Buttons appear in the dialog in the same order they are passed
+	to <function>gnome_dialog_new()</function>. That is, the first
+	button argument will be the leftmost button. Gnome
+	conventionally puts OK before Cancel and Yes before No. The
+	last button in the list will be the default button. Normally
+	you want Cancel/No to be the default, since those actions are
+	the least destructive. However, you can change the default
+	with <function>gnome_dialog_set_default()</function>.
+      </para>
+      
+      <para>
+	For a dialog that simply displays a message, like this one,
+	you would normally use <type>GnomeMessageBox</type> or some of
+	Gnome's convenience functions instead of creating your own.
+	Useful <type>GnomeDialog</type> subclasses include
+	<type>GnomeMessageBox</type>, <type>GnomePropertyBox</type>,
+	and <type>GnomeAbout</type>.
+      </para>
+    </sect2>
+      
+    <sect2> <title>Closing the dialog</title>
+      <para>
+	<type>GnomeDialog</type> has a <symbol>close</symbol> signal,
+	which you can send with
+	<function>gnome_dialog_close()</function>. This signal bundles
+	together the various <emphasis>causes</emphasis> and
+	<emphasis>effects</emphasis> of dialog closure.
+      </para>
+      
+      <para>
+	There are many reasons a dialog can close: the most common are
+	clicking a button and deleting it with a window manager
+	decoration. Most applications define their own reasons; for
+	example, if the parent window of the dialog closes, the
+	application may call <function>gnome_dialog_close()</function>.
+      </para>
+      
+      <para>
+	Likewise, there are two common meanings of "close a dialog"
+	from the programmer's perspective. The most popular is
+	<function>gtk_widget_destroy()</function> &mdash; get rid of
+	the dialog completely. However, if a dialog is expensive to
+	create, you may want to create it only once, then call
+	<function>gtk_widget_hide()</function> to close it, and
+	<function>gtk_widget_show()</function> to pop it up again. The
+	<symbol>close</symbol> signal can cause either of these
+	effects.
+      </para>
+
+      <para>
+	The <symbol>close</symbol> signal allows you to invoke a
+	callback regardless of the reason the dialog was closed. It
+	frees you from worrying about <symbol>delete_event</symbol>,
+	and if you later add a new way to close the dialog, there's no
+	need to special case it in your dialog code. You can also
+	change the default effect of closing a dialog (hide or
+	destroy) without changing all your code.
+      </para>
+
+      <para>
+	If you connect a callback to the <symbol>close</symbol>
+	signal, it must return a boolean value. If the callback
+	returns <symbol>FALSE</symbol>, the dialog is closed. If the
+	callback returns <symbol>TRUE</symbol>, the close is halted;
+	the dialog remains on the screen. For example, if the user
+	enters invalid data and clicks OK, you might detect the
+	invalid data in your callback, display an error, and return
+	TRUE.
+      </para>
+      </sect2>
+    <sect2><title>Dialog options</title>
+
+      <para>
+	<type>GnomeDialog</type> has a number of options to customize
+	its default behavior. Also keep in mind the
+	<type>GtkWindow</type> functions, especially
+	<function>gtk_window_set_modal()</function>. Remember not to
+	override any user preferences for dialogs: for example, you
+	should not call <function>gtk_window_position</function>, or
+	force particular coordinates on the dialog.
+      </para>
+      
+      <funcsynopsis><funcdef>GtkWidget *<function>gnome_dialog_close_hides</function>
+	</funcdef>
+	<paramdef>
+	  GnomeDialog *<parameter>dialog</parameter>
+	</paramdef>
+	<paramdef>
+	  gboolean<parameter>just_hide</parameter>
+	</paramdef>
+      </funcsynopsis>
+      
+      <para>
+	The <symbol>close</symbol> signal can either hide or destroy
+	the dialog. By default, <symbol>close</symbol> destroys the
+	dialog. If you pass <symbol>TRUE</symbol> to this function, it
+	hides instead.
+      </para>
+
+      <funcsynopsis><funcdef>GtkWidget *<function>gnome_dialog_set_default</function>
+	</funcdef>
+	<paramdef>
+	  GnomeDialog *<parameter>dialog</parameter>
+	</paramdef>
+	<paramdef>
+	  gint<parameter>button</parameter>
+	</paramdef>
+      </funcsynopsis>
+      
+      <para>
+	Set the default button. If the user presses enter, the default
+	button is clicked. By default, the highest-numbered button is
+	the default (the last button given in
+	<function>gnome_dialog_new()</function>).
+      </para>
+      
+      <funcsynopsis><funcdef>GtkWidget *<function>gnome_dialog_set_sensitive</function>
+	</funcdef>
+	<paramdef>
+	  GnomeDialog *<parameter>dialog</parameter>
+	</paramdef>
+	<paramdef>
+	  gint<parameter>button</parameter>
+	</paramdef>
+	<paramdef>
+	  gboolean<parameter>sensitivity</parameter>
+	</paramdef>
+      </funcsynopsis>
+    
+      <para>
+	Sets the sensitivity of a button, using
+	<function>gtk_widget_set_sensitive()</function>.
+	By default all buttons are sensitive.
+      </para>
+
+
+
+      <funcsynopsis><funcdef>GtkWidget *<function>gnome_dialog_set_parent</function>
+	</funcdef>
+	<paramdef>
+	  GnomeDialog *<parameter>dialog</parameter>
+	</paramdef>
+	<paramdef>
+	  GtkWindow *<parameter>parent</parameter>
+	</paramdef>
+      </funcsynopsis>
+      
+      <para>
+	Dialogs have a "parent" window, often the main application
+	window. For now, the only effect of telling the dialog its
+	parent is to center the dialog over the parent window, if the
+	user has requested that behavior. In the future it may have
+	other effects (possibly setting some window manager hints to
+	keep the dialog on top of its parent?).
+      </para>
+
+      
+      <funcsynopsis><funcdef>GtkWidget *<function>gnome_dialog_set_accelerator</function>
+	</funcdef>
+	<paramdef>
+	  GnomeDialog *<parameter>dialog</parameter>
+	</paramdef>
+	<paramdef>
+	  gint<parameter>button</parameter>
+	</paramdef>
+	<paramdef>
+	  const guchar<parameter>accelerator_key</parameter>
+	</paramdef>
+	<paramdef>
+	  guint8<parameter>accelerator_mods</parameter>
+	</paramdef>
+      </funcsynopsis>
+    
+      <para>
+	It is unclear that this function still works, and it may not
+	fit into the new <type>GtkAccelGroup</type> scheme
+	properly. It still takes only a character argument instead of
+	a keysym.
+      </para>
+      <para>
+	If/when it works, it sets an accelerator which clicks one of
+	the dialog buttons. Eventually there should probably be some
+	indication of this on the button. But things are broken.
+      </para>
+      
+      
+      <funcsynopsis><funcdef>GtkWidget *<function>gnome_dialog_set_close</function>
+	</funcdef>
+	<paramdef>
+	  GnomeDialog *<parameter>dialog</parameter>
+	</paramdef>
+	<paramdef>
+	  gboolean<parameter>click_closes</parameter>
+	</paramdef>
+      </funcsynopsis>
+      
+      <para>
+	This is a poorly-named convenience function to save you
+	typing; it calls <function>gnome_dialog_close()</function> any
+	time the <symbol>clicked</symbol> signal is emitted. In effect
+	it creates this callback:
+
+	<programlisting>
+	  void 
+          dialog_clicked(GtkWidget * dialog, gint button, 
+	                 gpointer data)
+	  {
+            gnome_dialog_close(GNOME_DIALOG(dialog));
+          }
+	</programlisting>
+
+      </para>
+
+      <funcsynopsis><funcdef>GtkWidget *<function>gnome_dialog_editable_enters</function>
+	</funcdef>
+	<paramdef>
+	  GnomeDialog *<parameter>dialog</parameter>
+	</paramdef>
+	<paramdef>
+	  GtkEditable *<parameter>editable</parameter>
+	</paramdef>
+      </funcsynopsis>
+
+      <para>
+	A <type>GtkEditable</type> such as an entry or a text widget 
+	normally interferes with the enter key accelerator (which clicks
+	the dialog's default button). Often users want to type in the
+	entry, then press return to close the dialog; this function
+	enables that behavior.
+      </para>
+      </sect2>
+    <sect2><title>Modal dialogs</title>
+
+      <para>
+	First off: modal dialogs are bad. Don't use them unless it
+	actually makes sense to do so, or you're adding Gnome support
+	to legacy code that requires it. It is really trivial to do
+	proper callbacks instead, and less confusing for the user.
+      </para>
+      
+      <para>
+	With the lecture out of the way, basically all you have to do
+	to create a modal dialog is call
+	<function>gtk_window_set_modal()</function>. If you want to be
+	truly lazy, and write truly unextensible, ugly, gratuitously
+	yucky code, or you have to support legacy program structure,
+	you can use the <function>gnome_dialog_run()</function>:
+	</para>
+      <funcsynopsis><funcdef>gint<function>gnome_dialog_run</function>
+	</funcdef>
+	<paramdef>
+	  GnomeDialog *<parameter>dialog</parameter>
+	</paramdef>
+      </funcsynopsis>
+
+      <para>
+	This function sets the dialog modal and blocks until the user
+	clicks a button; it then returns the dialog to its original
+	modalness. It returns the number of the button that was
+	clicked, or -1 if the user hit the window manager's delete
+	decoration or there was an error. It also shows the dialog if
+	it is not visible.
+      </para>
+
+      <para>
+	You must be sure the dialog gets closed after the function
+	returns. You can do this by calling
+	<function>gnome_dialog_set_close()</function> before entering
+	<function>gnome_dialog_run()</function>, or you can just call
+	<function>gnome_dialog_close()</function> manually after you
+	get a response.
+      </para>
+      
+      <para>
+	It is important to be careful here:
+	<function>gnome_dialog_close()</function>
+	<emphasis>destroys</emphasis> the dialog by default. Thus it's
+	not safe to call twice. And by default, if the user clicks the
+	window manager's delete decoration, it will be called. So you
+	<emphasis>must not</emphasis> close the dialog again in that
+	case. 
+      </para>
+      
+      <para>
+	There are two easy solutions: use
+	<function>gnome_dialog_set_close()</function> to ensure
+	destruction in <emphasis>all</emphasis> cases; or change close
+	behavior to "hide" with
+	<function>gnome_dialog_close_hides()</function>, then destroy
+	the dialog with <function>gtk_widget_destroy()</function>
+	after <function>gnome_dialog_run()</function> returns.
+      </para>
+
+      <para>
+	One caveat: <function>gnome_dialog_run()</function> has to
+	perform some cleanup to remove its internal callbacks and
+	reset the dialog to non-modal if necessary. This means it must
+	guess whether the dialog was destroyed when clicked (or deleted
+	by the window manager). Right now it does
+	<emphasis>not</emphasis> do this reliably (probably it should
+	connect a callback to <symbol>GtkObject::destroy</symbol> to
+	be sure - patches accepted). So it is probably best to have
+	<symbol>close</symbol> hide the dialog, then destroy the
+	dialog yourself with
+	<function>gtk_widget_destroy()</function>.
+      </para>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+sgml-parent-document:("gnome-dev-info.sgml" "book" "sect1" "")
+End:
+-->

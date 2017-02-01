@@ -1,0 +1,183 @@
+
+		    GNOME Documentation Framework
+
+			     October 1998
+
+	       Federico Mena <federico@nuclecu.unam.mx>
+
+
+* Abstract
+
+This document presents a framework for organizing and writing
+documentation for the GNOME project.  GNOME needs a good documentation
+system that makes it easy for people to integrate their own
+documentation into the global framework.
+
+
+* Documentation back-end
+
+DocBook (http://www.ora.com/davenport) is the documentation back-end
+we have chosen for GNOME.  It is an industry standard, it provides
+markup defined by logical content, and it allows for hyperlinks and
+convenient navigation.
+
+
+* Organization
+
+This section explains the organization of the documentation files in
+the file system.
+
+Each package that provides development libraries needs to have a
+directory with documentation for users and developers.  For the sake
+of this discussion, we will use the gnome-libs package as an example,
+and only consider development documentation for it.
+
+The source code to Gnome-libs is organized as follows:
+
+	gnome-libs
+		libgnome
+		libgnomeui
+		libgnorba
+		libvfs
+		gtk-xmhtml
+		zvt
+
+Hopefully, developers have chosen a good organization of the code
+inside those directories.  If we take this assumption to be true, then
+it makes sense to organize documentation in the same way:
+
+	gnome-libs
+		devel-docs
+			libgnome
+			libgnomeui
+			libgnorba
+			libvfs
+			gtk-xhmtl
+			zvt
+
+Inside each of those directories there would be one sgml file for each
+module in the libraries:
+
+	gnome-libs
+		devel-docs
+			libgnome
+				gnome-config.sgml
+				gnome-dentry.sgml
+				gnome-metadata.sgml
+				...
+			libgnomeui
+				gnome-app-helper.sgml
+				gnome-canvas.sgml
+				gnome-mdi.sgml
+				...
+			...
+
+Modules are usually (hopefully!) small enough that they can be
+conveniently described in a single sgml file.  Each of these would be
+a separate chapter.
+
+Some chapters may want to include images or pictures, or other bizarre
+entities.  I am not sure where to put them -- the easiest way is to
+just put them at the same level as the sgml files themselves, but it
+could potentially get messy if there are a lot of images.  Another
+option is to have a "pictures" subdirectory.  I imagine this is
+specific to each book or part, and can be resolved on the fly.
+
+Going upwards one level, the libgnome/libgnomeui/libgnorba/etc. groups
+would form a part in a book for gnome-libs.  As other GNOME modules
+with libraries are added, they would become separate books.
+Eventually they would all be tied together by a very big toplevel
+book-set.  This maps well to DocBook:
+
+	GNOME Book Set:
+		gnome-libs book
+			libgnome part
+				gnome-config chapter
+				gnome-dentry chapter
+				...
+			libgnomeui part
+				gnome-app-helper chapter
+				gnome-canvas chapter
+				...
+			...
+
+		gnome-core book
+			user-docs part
+				panel chapter
+				help-browser chapter
+				control-center chapter
+			devel-docs part
+				libapplet chapter
+				libcapplet chapter
+				
+		gnome-print book
+			font management chapter
+			graphics primitives chapter
+			...
+
+		ORBit book
+			???
+		
+		...
+
+You get the idea.  I need a DocBook wizard to see if this makes the
+most sense in the DocBook philosophy of life.
+
+
+* Meta-documentation
+
+DocBook is a complex beast, and the online documentation for it is not
+very clear.  We need to provide template files that documentation
+writers can simply cut&paste and modify for their specific docs.  We
+also need a short document that explains how to write documentation
+for GNOME.  I propose something similar to the following:
+
+	gnome-libs
+		devel-docs
+			meta-docs
+				writing-gnome-documentation.sgml
+
+				chapter-template.sgml
+				function-description-template.sgml
+				struct-definition-template.sgml
+				enum-definition-template.sgml
+				...
+
+The "writing GNOME documentation" document would explain the GNOME
+documentation framework, and how people can integrate their own docs
+into it.  The other files are little templates of DocBook markup that
+users can cut&paste, so that they do not have to go and consult a
+DocBook manual every time they want to describe something.
+
+
+* Web availability
+
+Ideally, all the documentation tree should be available for browsing
+in HTML on the GNOME web page.  This makes it easy for people to
+quickly look up something while they are writing programs.  Java has
+this (and it is awesome), KDE has this, and it works very well.
+
+Since all the sgml files live on cvs, we could set up a cron job that
+every day at midnight converts the whole documentation tree into HTML
+and assembles it nicely for the GNOME web page.
+
+When users install a GNOME component in their system, this could
+happen as well (either by conversion at installation time, but this
+means users would need to have the DocBook toolset installed; or by
+shipping pre-HTMLized files).  Users could have /usr/doc/GNOME/... be
+populated automatically when they install a GNOME component.
+
+
+* Documentation browser
+
+To be defined later.
+
+
+* Nice hacks
+
+An minor mode for Emacs that lets you press a hot key when the cursor
+is over a GNOME function, it would launch the GNOME documentation
+browser and take you to the description of that function.
+
+A minor mode for Emacs, built on top of psgml-mode, that lets you
+insert and fill the templates described above automatically.
